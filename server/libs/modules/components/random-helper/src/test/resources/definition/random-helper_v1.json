@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generates a random float value.",
     "help": null,
@@ -101,10 +104,15 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Random Float",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generates a random Hex.",
     "help": null,
@@ -186,10 +194,15 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Random Hex",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generates a random integer value.",
     "help": null,
@@ -284,10 +297,15 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Random Integer",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generates a random string value.",
     "help": null,
@@ -399,10 +417,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Random String",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generates a random UUID.",
     "help": null,
@@ -465,14 +488,16 @@
     "perform": { },
     "processErrorResponse": null,
     "properties": null,
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Random UUID",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "randomFloat",
     "description": "Generates a random float value.",
     "element": { },
     "help": null,
-    "name": "randomFloat",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -569,18 +594,18 @@
     } ],
     "title": "Random Float",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "randomHex",
     "description": "Generates a random Hex.",
     "element": { },
     "help": null,
-    "name": "randomHex",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -658,18 +683,18 @@
     } ],
     "title": "Random Hex",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "randomInt",
     "description": "Generates a random integer value.",
     "element": { },
     "help": null,
-    "name": "randomInt",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -760,18 +785,18 @@
     } ],
     "title": "Random Integer",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "randomString",
     "description": "Generates a random string value.",
     "element": { },
     "help": null,
-    "name": "randomString",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -879,18 +904,18 @@
     } ],
     "title": "Random String",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "randomUuid",
     "description": "Generates a random UUID.",
     "element": { },
     "help": null,
-    "name": "randomUuid",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -949,17 +974,17 @@
     "properties": [ ],
     "title": "Random UUID",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

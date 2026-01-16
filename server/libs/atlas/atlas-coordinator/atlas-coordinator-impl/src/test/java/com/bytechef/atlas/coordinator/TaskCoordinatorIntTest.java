@@ -52,11 +52,10 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
-import com.bytechef.message.broker.memory.SyncMessageBroker;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.message.broker.memory.AsyncMessageBroker;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,9 +73,11 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Arik Cohen
@@ -89,7 +90,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @Import({
     JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
 })
-@SuppressFBWarnings("NP")
 public class TaskCoordinatorIntTest {
 
     private static final TaskFileStorage TASK_FILE_STORAGE = new TaskFileStorageImpl(new Base64FileStorageService());
@@ -98,6 +98,9 @@ public class TaskCoordinatorIntTest {
 
     @Autowired
     private ContextService contextService;
+
+    @Autowired
+    private Environment environment;
 
     @Autowired
     private JobService jobService;
@@ -128,7 +131,8 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, evaluator, jobService, -1, SyncMessageBroker::new, List.of(), taskExecutionService,
+            contextService, evaluator, jobService, -1, role -> new AsyncMessageBroker(environment), List.of(),
+            taskExecutionService,
             new TaskExecutor() {
                 private final Executor executor = Executors.newVirtualThreadPerTaskExecutor();
 

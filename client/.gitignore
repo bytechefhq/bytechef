@@ -40,3 +40,8 @@ yarn-error.log*
 # yalc
 yalc.lock
 .yalc
+
+# playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/

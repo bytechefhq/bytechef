@@ -28,6 +28,7 @@ import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import java.util.Collections;
 import java.util.List;
@@ -72,12 +73,15 @@ public class TaskWorkerConfiguration {
 
     @Bean
     TaskWorker taskWorker(
-        Evaluator evaluator, ApplicationEventPublisher eventPublisher, Executor taskExecutor,
-        TaskFileStorage taskFileStorage, TaskHandlerResolver taskHandlerResolver,
+        ApplicationProperties applicationProperties, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
+        Executor taskExecutor, TaskFileStorage taskFileStorage, TaskHandlerResolver taskHandlerResolver,
         List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors) {
 
+        ApplicationProperties.Worker.Task task = applicationProperties.getWorker()
+            .getTask();
+
         return new TaskWorker(
-            evaluator, eventPublisher, (AsyncTaskExecutor) taskExecutor, taskHandlerResolver, taskFileStorage,
-            taskExecutionPostOutputProcessors);
+            task.getDefaultTimeout(), evaluator, eventPublisher, (AsyncTaskExecutor) taskExecutor, taskHandlerResolver,
+            taskFileStorage, taskExecutionPostOutputProcessors);
     }
 }

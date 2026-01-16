@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new channel within a team.",
     "help": null,
@@ -434,10 +437,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Channel",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a message to a channel.",
     "help": null,
@@ -898,10 +906,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Channel Message",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a message in an existing chat.",
     "help": null,
@@ -1253,14 +1266,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Chat Message",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createChannel",
     "description": "Creates a new channel within a team.",
     "element": { },
     "help": null,
-    "name": "createChannel",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1690,18 +1705,18 @@
     } ],
     "title": "Create Channel",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendChannelMessage",
     "description": "Sends a message to a channel.",
     "element": { },
     "help": null,
-    "name": "sendChannelMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2158,18 +2173,18 @@
     } ],
     "title": "Send Channel Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendChatMessage",
     "description": "Sends a message in an existing chat.",
     "element": { },
     "help": null,
-    "name": "sendChatMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2517,17 +2532,17 @@
     } ],
     "title": "Send Chat Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

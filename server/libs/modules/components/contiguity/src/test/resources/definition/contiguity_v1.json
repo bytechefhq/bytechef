@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send SMS.",
     "help": null,
@@ -456,10 +459,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send SMS",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send email.",
     "help": null,
@@ -1005,14 +1013,16 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Email",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendSms",
     "description": "Send SMS.",
     "element": { },
     "help": null,
-    "name": "sendSms",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1459,18 +1469,18 @@
     } ],
     "title": "Send SMS",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendEmail",
     "description": "Send email.",
     "element": { },
     "help": null,
-    "name": "sendEmail",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2007,17 +2017,17 @@
     } ],
     "title": "Send Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

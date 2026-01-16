@@ -20,6 +20,8 @@ tags:
     description: "The Platform Task Dispatcher Definition Internal API"
   - name: "trigger-definition"
     description: "The Platform Trigger Definition Internal API"
+  - name: "trigger-form"
+    description: "The Platform Trigger Form Internal API"
   - name: "workflow"
     description: "The Platform Workflow Internal API"
   - name: "workflow-node-description"
@@ -39,6 +41,27 @@ tags:
   - name: "workflow-test-configuration"
     description: "The Platform Workflow Test Configuration Internal API"
 paths:
+  /trigger-form/{id}:
+    get:
+      description: "Get a trigger form."
+      summary: "Get a trigger form"
+      tags:
+        - "trigger-form"
+      operationId: "getTriggerForm"
+      parameters:
+        - name: "id"
+          description: "The id of a trigger form."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TriggerForm"
   /component-definitions/{componentName}/connection-definition:
     get:
       description: "Get connection definition for a component."
@@ -614,6 +637,53 @@ paths:
         "204":
           description: "Successful operation."
   /workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/{workflowConnectionKey}/connections:
+    delete:
+      description: "Delete a workflow test configuration connection."
+      summary: "Delete a workflow test configuration connection"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "deleteWorkflowTestConfigurationConnection"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowConnectionKey"
+          description: "The key of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "connectionId"
+              properties:
+                connectionId:
+                  type: "integer"
+                  format: "int64"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
     put:
       description: "Save a workflow test configuration connection."
       summary: "Save a workflow test configuration connection"
@@ -1010,10 +1080,6 @@ paths:
               required:
                 - "path"
               properties:
-                fromAiInMetadata:
-                  description: "If fromAi should be included in metadata."
-                  type: "boolean"
-                  default: false
                 path:
                   description: "The workflow node parameter path."
                   type: "string"
@@ -1718,6 +1784,63 @@ paths:
                 $ref: "#/components/schemas/WorkflowNodeTestOutput"
 components:
   schemas:
+    FieldOption:
+      type: "object"
+      properties:
+        label:
+          type: "string"
+        value:
+          type: "string"
+    TriggerForm:
+      type: "object"
+      properties:
+        buttonLabel:
+          type: "string"
+        customFormStyling:
+          type: "string"
+        formDescription:
+          type: "string"
+        formPath:
+          type: "string"
+        formTitle:
+          type: "string"
+        appendAttribution:
+          type: "boolean"
+        ignoreBots:
+          type: "boolean"
+        useWorkflowTimezone:
+          type: "boolean"
+        inputs:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TriggerFormInput"
+    TriggerFormInput:
+      type: "object"
+      properties:
+        defaultValue:
+          type: "string"
+        fieldDescription:
+          type: "string"
+        fieldLabel:
+          type: "string"
+        fieldName:
+          type: "string"
+        fieldOptions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/FieldOption"
+        fieldType:
+          type: "integer"
+        maxSelection:
+          type: "integer"
+        minSelection:
+          type: "integer"
+        multipleChoice:
+          type: "boolean"
+        placeholder:
+          type: "string"
+        required:
+          type: "boolean"
     ActionDefinition:
       description: "An action is a portion of reusable code that accomplish a specific\
         \ task. When building a workflow, each action is represented as a task inside\
@@ -1760,6 +1883,9 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
+        sseStreamResponse:
+          description: "Does action support SSE streaming."
+          type: "boolean"
         title:
           description: "The title"
           type: "string"
@@ -1802,6 +1928,9 @@ components:
           type: "boolean"
         outputSchemaDefined:
           description: "Does action defines output schema."
+          type: "boolean"
+        sseStreamResponse:
+          description: "Does action support SSE streaming."
           type: "boolean"
         title:
           description: "The title"

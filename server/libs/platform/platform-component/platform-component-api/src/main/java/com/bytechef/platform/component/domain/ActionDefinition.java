@@ -17,7 +17,9 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionDefinition.SseStreamResponsePerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamResponsePerformFunction;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -25,7 +27,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -45,6 +47,7 @@ public class ActionDefinition {
     private boolean outputSchemaDefined;
     private List<? extends Property> properties;
     boolean singleConnection;
+    private boolean sseStreamResponse;
     private String title;
     private boolean workflowNodeDescriptionDefined;
 
@@ -55,29 +58,39 @@ public class ActionDefinition {
         com.bytechef.component.definition.ActionDefinition actionDefinition, String componentName,
         int componentVersion) {
 
-        this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), false);
+        this.batch = actionDefinition.getBatch()
+            .orElse(false);
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.description = Validate.notNull(getDescription(actionDefinition), "description");
-        this.help = OptionalUtils.mapOrElse(actionDefinition.getHelp(), Help::new, null);
+        this.help = actionDefinition.getHelp()
+            .map(Help::new)
+            .orElse(null);
         this.name = Validate.notNull(actionDefinition.getName(), "name");
-        this.outputDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputDefinition(), outputDefinition -> true, false);
-        this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputDefinition(),
-            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
-        this.outputResponse = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputDefinition(), ActionDefinition::toOutputResponse, null);
+        this.outputDefined = actionDefinition.getOutputDefinition()
+            .isPresent();
+        this.outputFunctionDefined = actionDefinition.getOutputDefinition()
+            .map(outputDefinition -> outputDefinition.getOutput()
+                .isPresent())
+            .orElse(false);
+        this.outputResponse = actionDefinition.getOutputDefinition()
+            .map(ActionDefinition::toOutputResponse)
+            .orElse(null);
         this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
-        this.singleConnection = OptionalUtils.mapOrElse(
-            actionDefinition.getPerform(),
-            perform -> perform instanceof com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction,
-            false);
+            actionDefinition.getProperties()
+                .orElse(List.of()),
+            Property::toProperty);
+        this.singleConnection = actionDefinition.getPerform()
+            .map(perform -> perform instanceof PerformFunction)
+            .orElse(false);
+        this.sseStreamResponse = actionDefinition.getPerform()
+            .map(perform -> perform instanceof SseStreamResponsePerformFunction ||
+                perform instanceof MultipleConnectionsSseStreamResponsePerformFunction)
+            .orElse(false);
         this.title = Validate.notNull(getTitle(actionDefinition), "title");
-        this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getWorkflowNodeDescription(), workflowNodeDescriptionFunction -> true, false);
+        this.workflowNodeDescriptionDefined = actionDefinition.getWorkflowNodeDescription()
+            .isPresent();
     }
 
     @Override
@@ -92,7 +105,7 @@ public class ActionDefinition {
             Objects.equals(help, that.help) && Objects.equals(name, that.name) &&
             Objects.equals(outputResponse, that.outputResponse) &&
             Objects.equals(outputSchemaDefined, that.outputSchemaDefined) &&
-            Objects.equals(properties, that.properties) &&
+            Objects.equals(properties, that.properties) && sseStreamResponse == that.sseStreamResponse &&
             Objects.equals(title, that.title) && workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined;
     }
 
@@ -100,7 +113,7 @@ public class ActionDefinition {
     public int hashCode() {
         return Objects.hash(
             batch, componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined,
-            outputResponse, outputSchemaDefined, properties, title, workflowNodeDescriptionDefined);
+            outputResponse, outputSchemaDefined, properties, sseStreamResponse, title, workflowNodeDescriptionDefined);
     }
 
     public String getComponentName() {
@@ -156,6 +169,10 @@ public class ActionDefinition {
         return singleConnection;
     }
 
+    public boolean isSseStreamResponse() {
+        return sseStreamResponse;
+    }
+
     public boolean isWorkflowNodeDescriptionDefined() {
         return workflowNodeDescriptionDefined;
     }
@@ -170,24 +187,26 @@ public class ActionDefinition {
             ", description='" + description + '\'' +
             ", properties=" + properties +
             ", batch=" + batch +
-            ", batch=" + batch +
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +
             ", outputResponse=" + outputResponse +
             ", outputResponseDefined=" + outputSchemaDefined +
             ", help=" + help +
+            ", sseStreamResponse=" + sseStreamResponse +
             ", workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
             '}';
     }
 
     private static String getDescription(com.bytechef.component.definition.ActionDefinition actionDefinition) {
-        return OptionalUtils.orElse(
-            actionDefinition.getDescription(),
-            OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
+        return actionDefinition.getDescription()
+            .orElse(
+                actionDefinition.getTitle()
+                    .orElse(actionDefinition.getName()));
     }
 
     private static String getTitle(com.bytechef.component.definition.ActionDefinition actionDefinition) {
-        return OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName());
+        return actionDefinition.getTitle()
+            .orElse(actionDefinition.getName());
     }
 
     private static OutputResponse toOutputResponse(

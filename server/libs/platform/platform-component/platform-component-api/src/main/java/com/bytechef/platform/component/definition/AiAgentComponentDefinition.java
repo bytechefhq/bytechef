@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.definition;
 
-import static com.bytechef.component.definition.ai.agent.ToolFunction.TOOLS;
+import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;

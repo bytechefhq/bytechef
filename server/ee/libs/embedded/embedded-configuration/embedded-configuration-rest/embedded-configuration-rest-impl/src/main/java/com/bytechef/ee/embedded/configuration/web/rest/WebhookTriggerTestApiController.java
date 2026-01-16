@@ -11,7 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.web.rest.model.StartWebhookTriggerTest200ResponseModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,7 +37,7 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
     public ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(
         String workflowId, Long environmentId) {
 
-        String webhookUrl = webhookTriggerTestFacade.enableTrigger(workflowId, environmentId, ModeType.EMBEDDED);
+        String webhookUrl = webhookTriggerTestFacade.enableTrigger(workflowId, environmentId, PlatformType.EMBEDDED);
 
         return ResponseEntity.ok(
             new StartWebhookTriggerTest200ResponseModel()
@@ -46,7 +46,7 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
     @Override
     public ResponseEntity<Void> stopWebhookTriggerTest(String workflowId, Long environmentId) {
-        webhookTriggerTestFacade.disableTrigger(workflowId, environmentId, ModeType.EMBEDDED);
+        webhookTriggerTestFacade.disableTrigger(workflowId, environmentId, PlatformType.EMBEDDED);
 
         return ResponseEntity.noContent()
             .build();

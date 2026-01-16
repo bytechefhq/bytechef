@@ -274,7 +274,7 @@ public interface Authorization {
 
     String getName();
 
-    Optional<OAuth2AuthorizationExtraQueryParametersFunction> getOAuth2AuthorizationExtraQueryParameters();
+    Optional<OAuth2AuthorizationExtraQueryParametersFunction> getOauth2AuthorizationExtraQueryParameters();
 
     /**
      * TODO

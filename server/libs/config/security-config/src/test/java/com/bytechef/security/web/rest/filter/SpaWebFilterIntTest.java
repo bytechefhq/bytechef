@@ -22,15 +22,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
+import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
+import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
 import com.bytechef.security.config.SecurityConfiguration;
-import org.junit.jupiter.api.Disabled;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -42,10 +45,13 @@ import org.springframework.test.web.servlet.MockMvc;
  * @author Ivica Cardic
  */
 @AutoConfigureMockMvc
-@EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 @EnableConfigurationProperties(ApplicationProperties.class)
 @WithMockUser
-@SpringBootTest(classes = SecurityConfiguration.class)
+@SpringBootTest(
+    classes = {
+        SecurityConfiguration.class, ApplicationProperties.class,
+        SpaWebFilterIntTest.SpaWebFilterIntTestConfiguration.class
+    })
 public class SpaWebFilterIntTest {
 
     @MockitoBean
@@ -54,11 +60,14 @@ public class SpaWebFilterIntTest {
     @MockitoBean
     private AuthenticationSuccessHandler authenticationSuccessHandler;
 
-    @Autowired
-    private MockMvc mockMvc;
-
     @MockitoBean
     private RememberMeServices rememberMeServices;
+
+    @MockitoBean(name = "corsConfigurationSource")
+    private org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource;
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     void testFilterForwardsToIndex() throws Exception {
@@ -68,7 +77,6 @@ public class SpaWebFilterIntTest {
     }
 
     @Test
-    @Disabled
     void testFilterDoesNotForwardToIndexForApi() throws Exception {
         mockMvc.perform(get("/api/authenticate"))
             .andExpect(status().isOk())
@@ -77,7 +85,6 @@ public class SpaWebFilterIntTest {
 
     @Test
     @WithMockUser(authorities = AuthorityConstants.ADMIN)
-    @Disabled
     void testFilterDoesNotForwardToIndexForV3ApiDocs() throws Exception {
         mockMvc.perform(get("/v3/api-docs"))
             .andExpect(status().isOk())
@@ -145,5 +152,40 @@ public class SpaWebFilterIntTest {
     void getUnmappedThirdLevelFile() throws Exception {
         mockMvc.perform(get("/foo/another/bar.js"))
             .andExpect(status().isForbidden());
+    }
+
+    @TestConfiguration
+    static class SpaWebFilterIntTestConfiguration {
+
+        @Bean
+        List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors() {
+            return List.of();
+        }
+
+        @Bean
+        List<SecurityConfigurerContributor> securityConfigurerContributors() {
+            return List.of();
+        }
+
+        @Bean
+        List<SpaWebFilterContributor> spaWebFilterContributors() {
+            return List.of();
+        }
+
+        @org.springframework.web.bind.annotation.RestController
+        public static class TestController {
+
+            @org.springframework.web.bind.annotation.GetMapping("/api/authenticate")
+            public void authenticate() {
+            }
+
+            @org.springframework.web.bind.annotation.GetMapping("/v3/api-docs")
+            public void apiDocs() {
+            }
+
+            @org.springframework.web.bind.annotation.GetMapping("/index.html")
+            public void index() {
+            }
+        }
     }
 }

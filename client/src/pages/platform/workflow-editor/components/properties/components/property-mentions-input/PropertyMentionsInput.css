@@ -13,4 +13,12 @@
             @apply pointer-events-none;
         }
     }
+
+    &.is-from-ai {
+        .tiptap {
+            p {
+                @apply inline-flex items-center rounded-full bg-muted px-2 py-0.5 font-mono text-sm leading-none;
+            }
+        }
+    }
 }

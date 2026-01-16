@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.accessor;
 
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Map;
 
 /**
@@ -34,7 +34,7 @@ public interface JobPrincipalAccessor {
 
     Map<String, ?> getMetadataMap(long jobPrincipalId);
 
-    ModeType getType();
+    PlatformType getType();
 
     String getWorkflowId(long jobPrincipalId, String workflowUuid);
 

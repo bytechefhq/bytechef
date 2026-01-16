@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delay action execution.",
     "help": null,
@@ -29,13 +32,15 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Sleep",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

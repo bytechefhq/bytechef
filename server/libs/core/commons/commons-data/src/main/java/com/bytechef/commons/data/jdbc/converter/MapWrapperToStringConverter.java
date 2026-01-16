@@ -17,9 +17,9 @@
 package com.bytechef.commons.data.jdbc.converter;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import org.springframework.core.convert.converter.Converter;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -29,8 +29,9 @@ public class MapWrapperToStringConverter implements Converter<MapWrapper, String
     private final ObjectMapper objectMapper;
 
     public MapWrapperToStringConverter(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper.copy()
-            .setSerializationInclusion(JsonInclude.Include.ALWAYS);
+        this.objectMapper = objectMapper.rebuild()
+            .changeDefaultVisibility(vc -> vc.with(Visibility.ANY))
+            .build();
     }
 
     @Override

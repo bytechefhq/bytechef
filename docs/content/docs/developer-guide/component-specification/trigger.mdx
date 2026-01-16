@@ -11,6 +11,13 @@ The trigger definition is used to specify the properties of a trigger. Below is 
 - `properties(P... properties)` - Lists the properties that the trigger needs to perform its task. Properties will be shown in the Properties tab. For more information, refer to the [Property](/developer-guide/component-specification/property).
 - `title(String title)` - Sets the name of the trigger that will be displayed in the UI. Use Chicago Style.
 - `type(TriggerType type)` - Sets the type of the trigger. Possible types are `DYNAMIC_WEBHOOK`, `HYBRID`, `LISTENER`, `POLLING` and `STATIC_WEBHOOK`.
+- `poll(PollFunction poll)` - Required for `POLLING` triggers. This method is called at specified intervals to check for new data.
+- `webhookEnable(WebhookEnableFunction webhookEnable)` - Required for `DYNAMIC_WEBHOOK` triggers. This method is called when the trigger is enabled to register the webhook with the third-party service.
+- `webhookDisable(WebhookDisableConsumer webhookDisable)` - Required for `DYNAMIC_WEBHOOK` triggers. This method is called when the trigger is disabled to unregister the webhook from the third-party service.
+- `webhookRequest(WebhookRequestFunction webhookRequest)` - Required for `DYNAMIC_WEBHOOK` and `STATIC_WEBHOOK` triggers. This method is called when a webhook request is received to process the incoming data.
+- `listenerEnable(ListenerEnableConsumer listenerEnable)` - Required for `LISTENER` triggers. This method is called when the trigger is enabled to start listening for events.
+- `listenerDisable(ListenerDisableConsumer listenerDisable)` - Required for `LISTENER` triggers. This method is called when the trigger is disabled to stop listening for events.
+- `webhookValidate(WebhookValidateFunction webhookValidate)` - Optional for webhook triggers. Used to validate the incoming webhook request (e.g., checking signatures).
 
 ## Trigger Type
 

@@ -41,7 +41,7 @@ public class ScheduleUtils {
         return Arrays.stream(DayOfWeek.values())
             .map(dayOfWeek -> option(
                 dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()),
-                dayOfWeek.getValue() == 7 ? 0 : dayOfWeek.getValue() + 1))
+                dayOfWeek.getValue() == 7 ? 1 : dayOfWeek.getValue() + 1))
             .collect(Collectors.toList());
     }
 

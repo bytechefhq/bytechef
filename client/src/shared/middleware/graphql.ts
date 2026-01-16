@@ -38,6 +38,54 @@ export type Scalars = {
   Map: { input: any; output: any; }
 };
 
+export type ActionDefinition = {
+  __typename?: 'ActionDefinition';
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  help?: Maybe<Help>;
+  name: Scalars['String']['output'];
+  outputDefined: Scalars['Boolean']['output'];
+  outputFunctionDefined: Scalars['Boolean']['output'];
+  outputSchemaDefined?: Maybe<Scalars['Boolean']['output']>;
+  properties: Array<Property>;
+  title?: Maybe<Scalars['String']['output']>;
+  workflowNodeDescriptionDefined?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type AddColumnInput = {
+  column: ColumnInput;
+  environmentId: Scalars['Int']['input'];
+  tableId: Scalars['ID']['input'];
+};
+
+export type AdminUser = {
+  __typename?: 'AdminUser';
+  activated?: Maybe<Scalars['Boolean']['output']>;
+  authorities?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  email?: Maybe<Scalars['String']['output']>;
+  firstName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  langKey?: Maybe<Scalars['String']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  lastName?: Maybe<Scalars['String']['output']>;
+  login?: Maybe<Scalars['String']['output']>;
+  uuid?: Maybe<Scalars['String']['output']>;
+};
+
+export type AdminUserPage = {
+  __typename?: 'AdminUserPage';
+  content: Array<Maybe<AdminUser>>;
+  number: Scalars['Int']['output'];
+  size: Scalars['Int']['output'];
+  totalElements: Scalars['Int']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type ApiKey = {
   __typename?: 'ApiKey';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -50,20 +98,142 @@ export type ApiKey = {
   secretKey?: Maybe<Scalars['String']['output']>;
 };
 
+export type ArrayProperty = Property & {
+  __typename?: 'ArrayProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  defaultValue?: Maybe<Array<Maybe<Scalars['Map']['output']>>>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  exampleValue?: Maybe<Array<Maybe<Scalars['Map']['output']>>>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  items?: Maybe<Array<Property>>;
+  label?: Maybe<Scalars['String']['output']>;
+  maxItems?: Maybe<Scalars['Long']['output']>;
+  minItems?: Maybe<Scalars['Long']['output']>;
+  multipleValues?: Maybe<Scalars['Boolean']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  options?: Maybe<Array<Option>>;
+  optionsDataSource?: Maybe<OptionsDataSource>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
+export type Authorization = {
+  __typename?: 'Authorization';
+  description?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  properties?: Maybe<Array<Property>>;
+  title?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<AuthorizationType>;
+};
+
+export enum AuthorizationType {
+  ApiKey = 'API_KEY',
+  BasicAuth = 'BASIC_AUTH',
+  BearerToken = 'BEARER_TOKEN',
+  Custom = 'CUSTOM',
+  DigestAuth = 'DIGEST_AUTH',
+  Oauth2AuthorizationCode = 'OAUTH2_AUTHORIZATION_CODE',
+  Oauth2AuthorizationCodePkce = 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+  Oauth2ClientCredentials = 'OAUTH2_CLIENT_CREDENTIALS',
+  Oauth2ImplicitCode = 'OAUTH2_IMPLICIT_CODE',
+  Oauth2ResourceOwnerPassword = 'OAUTH2_RESOURCE_OWNER_PASSWORD'
+}
+
+export type BooleanProperty = Property & {
+  __typename?: 'BooleanProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  defaultValue?: Maybe<Scalars['Boolean']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  exampleValue?: Maybe<Scalars['Boolean']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
 export type Category = {
   __typename?: 'Category';
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
 };
 
+export type ClusterElementDefinition = {
+  __typename?: 'ClusterElementDefinition';
+  componentName?: Maybe<Scalars['String']['output']>;
+  componentVersion?: Maybe<Scalars['Int']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  help?: Maybe<Help>;
+  icon?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  outputDefined: Scalars['Boolean']['output'];
+  outputFunctionDefined: Scalars['Boolean']['output'];
+  outputSchemaDefined?: Maybe<Scalars['Boolean']['output']>;
+  properties: Array<Property>;
+  title?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<ClusterElementType>;
+};
+
+export type ClusterElementType = {
+  __typename?: 'ClusterElementType';
+  key?: Maybe<Scalars['String']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  multipleElements?: Maybe<Scalars['Boolean']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type ColumnInput = {
+  name: Scalars['String']['input'];
+  type: ColumnType;
+};
+
+export enum ColumnType {
+  Boolean = 'BOOLEAN',
+  Date = 'DATE',
+  DateTime = 'DATE_TIME',
+  Integer = 'INTEGER',
+  Number = 'NUMBER',
+  String = 'STRING'
+}
+
+export type ComponentCategory = {
+  __typename?: 'ComponentCategory';
+  label?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+};
+
 export type ComponentDefinition = {
   __typename?: 'ComponentDefinition';
+  actionClusterElementTypes?: Maybe<Scalars['Map']['output']>;
+  actions?: Maybe<Array<ActionDefinition>>;
+  actionsCount?: Maybe<Scalars['Int']['output']>;
+  clusterElement?: Maybe<Scalars['Boolean']['output']>;
+  clusterElementClusterElementTypes?: Maybe<Scalars['Map']['output']>;
+  clusterElementTypes?: Maybe<Array<ClusterElementType>>;
+  clusterElements?: Maybe<Array<ClusterElementDefinition>>;
+  clusterElementsCount?: Maybe<Scalars['Map']['output']>;
+  clusterRoot?: Maybe<Scalars['Boolean']['output']>;
+  componentCategories?: Maybe<Array<ComponentCategory>>;
   connection?: Maybe<ConnectionDefinition>;
-  description: Scalars['String']['output'];
-  icon: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
+  connectionRequired?: Maybe<Scalars['Boolean']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  icon?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
-  title: Scalars['String']['output'];
+  resources?: Maybe<Resources>;
+  tags?: Maybe<Array<Scalars['String']['output']>>;
+  title?: Maybe<Scalars['String']['output']>;
+  triggers?: Maybe<Array<TriggerDefinition>>;
+  triggersCount?: Maybe<Scalars['Int']['output']>;
+  unifiedApiCategory?: Maybe<UnifiedApiCategory>;
   version?: Maybe<Scalars['Int']['output']>;
 };
 
@@ -130,7 +300,44 @@ export type ConnectedUserProjectWorkflow = {
 export type ConnectionDefinition = {
   __typename?: 'ConnectionDefinition';
   authorizationRequired: Scalars['Boolean']['output'];
+  authorizations?: Maybe<Array<Authorization>>;
+  baseUri?: Maybe<Scalars['String']['output']>;
+  componentDescription?: Maybe<Scalars['String']['output']>;
+  componentName: Scalars['String']['output'];
+  componentTitle?: Maybe<Scalars['String']['output']>;
+  properties?: Maybe<Array<Property>>;
   version: Scalars['Int']['output'];
+};
+
+export enum ControlType {
+  ArrayBuilder = 'ARRAY_BUILDER',
+  CodeEditor = 'CODE_EDITOR',
+  Date = 'DATE',
+  DateTime = 'DATE_TIME',
+  Email = 'EMAIL',
+  FileEntry = 'FILE_ENTRY',
+  Integer = 'INTEGER',
+  JsonSchemaBuilder = 'JSON_SCHEMA_BUILDER',
+  MultiSelect = 'MULTI_SELECT',
+  Null = 'NULL',
+  Number = 'NUMBER',
+  ObjectBuilder = 'OBJECT_BUILDER',
+  Password = 'PASSWORD',
+  Phone = 'PHONE',
+  RichText = 'RICH_TEXT',
+  Select = 'SELECT',
+  Text = 'TEXT',
+  TextArea = 'TEXT_AREA',
+  Time = 'TIME',
+  Url = 'URL'
+}
+
+export type CreateDataTableInput = {
+  baseName: Scalars['String']['input'];
+  columns: Array<ColumnInput>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  environmentId: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 export type CreateMcpProjectInput = {
@@ -144,14 +351,123 @@ export type CreateWorkspaceMcpServerInput = {
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
-  type: ModeType;
+  type: PlatformType;
   workspaceId: Scalars['ID']['input'];
+};
+
+export type DataTable = {
+  __typename?: 'DataTable';
+  baseName: Scalars['String']['output'];
+  columns: Array<DataTableColumn>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+};
+
+export type DataTableColumn = {
+  __typename?: 'DataTableColumn';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: ColumnType;
+};
+
+export type DataTableRow = {
+  __typename?: 'DataTableRow';
+  id: Scalars['ID']['output'];
+  values: Scalars['Map']['output'];
+};
+
+export type DataTableRowPage = {
+  __typename?: 'DataTableRowPage';
+  hasMore: Scalars['Boolean']['output'];
+  items: Array<DataTableRow>;
+  nextOffset?: Maybe<Scalars['Int']['output']>;
+};
+
+export type DataTableTagsEntry = {
+  __typename?: 'DataTableTagsEntry';
+  tableId: Scalars['ID']['output'];
+  tags: Array<Tag>;
+};
+
+export type DataTableWebhook = {
+  __typename?: 'DataTableWebhook';
+  environmentId: Scalars['Long']['output'];
+  id: Scalars['ID']['output'];
+  type: DataTableWebhookType;
+  url: Scalars['String']['output'];
+};
+
+export enum DataTableWebhookType {
+  Delete = 'DELETE',
+  Insert = 'INSERT',
+  Update = 'UPDATE'
+}
+
+export type DateProperty = Property & {
+  __typename?: 'DateProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  defaultValue?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  exampleValue?: Maybe<Scalars['String']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
+export type DateTimeProperty = Property & {
+  __typename?: 'DateTimeProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  defaultValue?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  exampleValue?: Maybe<Scalars['String']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
+export type DeleteRowInput = {
+  environmentId: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
+  tableId: Scalars['ID']['input'];
+};
+
+export type DuplicateDataTableInput = {
+  environmentId: Scalars['Int']['input'];
+  newBaseName: Scalars['String']['input'];
+  tableId: Scalars['ID']['input'];
+};
+
+export type DynamicPropertiesProperty = Property & {
+  __typename?: 'DynamicPropertiesProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  header?: Maybe<Scalars['String']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  propertiesDataSource?: Maybe<PropertiesDataSource>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
 };
 
 export type Environment = {
   __typename?: 'Environment';
-  id?: Maybe<Scalars['ID']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
 };
 
 export enum EnvironmentEnum {
@@ -159,6 +475,62 @@ export enum EnvironmentEnum {
   Production = 'PRODUCTION',
   Staging = 'STAGING'
 }
+
+export type FileEntryProperty = Property & {
+  __typename?: 'FileEntryProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  defaultValue?: Maybe<Scalars['Map']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  exampleValue?: Maybe<Scalars['Map']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
+export type Help = {
+  __typename?: 'Help';
+  description?: Maybe<Scalars['String']['output']>;
+  documentationUrl?: Maybe<Scalars['String']['output']>;
+};
+
+export type ImportCsvInput = {
+  csv: Scalars['String']['input'];
+  environmentId: Scalars['Int']['input'];
+  tableId: Scalars['ID']['input'];
+};
+
+export type InsertRowInput = {
+  environmentId: Scalars['Int']['input'];
+  tableId: Scalars['ID']['input'];
+  values: Scalars['Map']['input'];
+};
+
+export type IntegerProperty = Property & {
+  __typename?: 'IntegerProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  defaultValue?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  exampleValue?: Maybe<Scalars['Long']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  maxValue?: Maybe<Scalars['Long']['output']>;
+  minValue?: Maybe<Scalars['Long']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  options?: Maybe<Array<Option>>;
+  optionsDataSource?: Maybe<OptionsDataSource>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
 
 export type Integration = {
   __typename?: 'Integration';
@@ -249,7 +621,7 @@ export type McpServer = {
   name: Scalars['String']['output'];
   secretKey: Scalars['String']['output'];
   tags?: Maybe<Array<Maybe<Tag>>>;
-  type: ModeType;
+  type: PlatformType;
   url: Scalars['String']['output'];
   version?: Maybe<Scalars['Int']['output']>;
 };
@@ -258,7 +630,7 @@ export type McpServerInput = {
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
-  type: ModeType;
+  type: PlatformType;
 };
 
 export enum McpServerOrderBy {
@@ -299,15 +671,12 @@ export type McpToolInputForComponent = {
   parameters?: InputMaybe<Scalars['Map']['input']>;
 };
 
-export enum ModeType {
-  Automation = 'AUTOMATION',
-  Embedded = 'EMBEDDED'
-}
-
 export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
+  addDataTableColumn: Scalars['Boolean']['output'];
   createApiKey: Scalars['String']['output'];
+  createDataTable: Scalars['Boolean']['output'];
   createMcpComponent?: Maybe<McpComponent>;
   createMcpComponentWithTools?: Maybe<McpComponent>;
   createMcpProject?: Maybe<McpProject>;
@@ -317,33 +686,56 @@ export type Mutation = {
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteApiKey: Scalars['Boolean']['output'];
+  deleteDataTableRow: Scalars['Boolean']['output'];
   deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProject?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
+  deleteUser: Scalars['Boolean']['output'];
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  dropDataTable: Scalars['Boolean']['output'];
+  duplicateDataTable: Scalars['Boolean']['output'];
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
+  importDataTableCsv: Scalars['Boolean']['output'];
   importProjectTemplate: Scalars['ID']['output'];
   importWorkflowTemplate: Scalars['ID']['output'];
+  insertDataTableRow: DataTableRow;
+  inviteUser: Scalars['Boolean']['output'];
+  removeDataTableColumn: Scalars['Boolean']['output'];
+  renameDataTable: Scalars['Boolean']['output'];
+  renameDataTableColumn: Scalars['Boolean']['output'];
   updateApiKey: Scalars['Boolean']['output'];
+  updateDataTableRow: DataTableRow;
+  updateDataTableTags: Scalars['Boolean']['output'];
   updateManagementMcpServerUrl: Scalars['String']['output'];
   updateMcpComponentWithTools?: Maybe<McpComponent>;
   updateMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   updateMcpServer?: Maybe<McpServer>;
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
+  updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
+};
+
+
+export type MutationAddDataTableColumnArgs = {
+  input: AddColumnInput;
 };
 
 
 export type MutationCreateApiKeyArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
-  type?: InputMaybe<ModeType>;
+  type?: InputMaybe<PlatformType>;
+};
+
+
+export type MutationCreateDataTableArgs = {
+  input: CreateDataTableInput;
 };
 
 
@@ -394,6 +786,11 @@ export type MutationDeleteApiKeyArgs = {
 };
 
 
+export type MutationDeleteDataTableRowArgs = {
+  input: DeleteRowInput;
+};
+
+
 export type MutationDeleteMcpComponentArgs = {
   id: Scalars['ID']['input'];
 };
@@ -424,6 +821,11 @@ export type MutationDeleteSharedWorkflowArgs = {
 };
 
 
+export type MutationDeleteUserArgs = {
+  login: Scalars['String']['input'];
+};
+
+
 export type MutationDeleteWorkspaceApiKeyArgs = {
   apiKeyId: Scalars['ID']['input'];
 };
@@ -431,6 +833,16 @@ export type MutationDeleteWorkspaceApiKeyArgs = {
 
 export type MutationDeleteWorkspaceMcpServerArgs = {
   mcpServerId: Scalars['ID']['input'];
+};
+
+
+export type MutationDropDataTableArgs = {
+  input: RemoveTableInput;
+};
+
+
+export type MutationDuplicateDataTableArgs = {
+  input: DuplicateDataTableInput;
 };
 
 
@@ -443,6 +855,11 @@ export type MutationExportSharedProjectArgs = {
 export type MutationExportSharedWorkflowArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   workflowId: Scalars['String']['input'];
+};
+
+
+export type MutationImportDataTableCsvArgs = {
+  input: ImportCsvInput;
 };
 
 
@@ -460,9 +877,46 @@ export type MutationImportWorkflowTemplateArgs = {
 };
 
 
+export type MutationInsertDataTableRowArgs = {
+  input: InsertRowInput;
+};
+
+
+export type MutationInviteUserArgs = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  role: Scalars['String']['input'];
+};
+
+
+export type MutationRemoveDataTableColumnArgs = {
+  input: RemoveColumnInput;
+};
+
+
+export type MutationRenameDataTableArgs = {
+  input: RenameDataTableInput;
+};
+
+
+export type MutationRenameDataTableColumnArgs = {
+  input: RenameColumnInput;
+};
+
+
 export type MutationUpdateApiKeyArgs = {
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateDataTableRowArgs = {
+  input: UpdateRowInput;
+};
+
+
+export type MutationUpdateDataTableTagsArgs = {
+  input: UpdateDataTableTagsInput;
 };
 
 
@@ -495,10 +949,91 @@ export type MutationUpdateMcpServerUrlArgs = {
 };
 
 
+export type MutationUpdateUserArgs = {
+  login: Scalars['String']['input'];
+  role: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateWorkspaceApiKeyArgs = {
   apiKeyId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
 };
+
+export type NullProperty = Property & {
+  __typename?: 'NullProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
+export type NumberProperty = Property & {
+  __typename?: 'NumberProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  defaultValue?: Maybe<Scalars['Float']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  exampleValue?: Maybe<Scalars['Float']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  maxValue?: Maybe<Scalars['Float']['output']>;
+  minValue?: Maybe<Scalars['Float']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  options?: Maybe<Array<Option>>;
+  optionsDataSource?: Maybe<OptionsDataSource>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
+export type ObjectProperty = Property & {
+  __typename?: 'ObjectProperty';
+  additionalProperties?: Maybe<Array<Property>>;
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  defaultValue?: Maybe<Scalars['Map']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  exampleValue?: Maybe<Scalars['Map']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  multipleValues?: Maybe<Scalars['Boolean']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  options?: Maybe<Array<Option>>;
+  optionsDataSource?: Maybe<OptionsDataSource>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  properties?: Maybe<Array<Property>>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
+export type Option = {
+  __typename?: 'Option';
+  description?: Maybe<Scalars['String']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  value?: Maybe<Scalars['Map']['output']>;
+};
+
+export type OptionsDataSource = {
+  __typename?: 'OptionsDataSource';
+  optionsLookupDependsOn?: Maybe<Array<Scalars['String']['output']>>;
+};
+
+export enum PlatformType {
+  Automation = 'AUTOMATION',
+  Embedded = 'EMBEDDED'
+}
 
 export type Project = {
   __typename?: 'Project';
@@ -508,18 +1043,48 @@ export type Project = {
   tags?: Maybe<Array<Maybe<Tag>>>;
 };
 
+export type ProjectDeployment = {
+  __typename?: 'ProjectDeployment';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  environment: Environment;
+  id: Scalars['ID']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  project: Project;
+  projectDeploymentWorkflows: Array<ProjectDeploymentWorkflow>;
+  projectId: Scalars['ID']['output'];
+  projectVersion: Scalars['Int']['output'];
+  tags?: Maybe<Array<Maybe<Tag>>>;
+  version: Scalars['Int']['output'];
+};
+
 export type ProjectDeploymentWorkflow = {
   __typename?: 'ProjectDeploymentWorkflow';
+  connections: Array<ProjectDeploymentWorkflowConnection>;
   createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
+  createdDate?: Maybe<Scalars['String']['output']>;
   enabled: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   inputs?: Maybe<Scalars['Map']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  projectDeploymentId: Scalars['Long']['output'];
-  version?: Maybe<Scalars['Int']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  projectDeploymentId: Scalars['ID']['output'];
+  projectWorkflow: ProjectWorkflow;
+  staticWebhookUrl?: Maybe<Scalars['String']['output']>;
+  version: Scalars['Int']['output'];
+  workflowExecutionId?: Maybe<Scalars['String']['output']>;
   workflowId: Scalars['String']['output'];
+};
+
+export type ProjectDeploymentWorkflowConnection = {
+  __typename?: 'ProjectDeploymentWorkflowConnection';
+  connectionId?: Maybe<Scalars['ID']['output']>;
+  key: Scalars['String']['output'];
+  workflowNodeName: Scalars['String']['output'];
 };
 
 export type ProjectInfo = {
@@ -545,16 +1110,83 @@ export type ProjectTemplate = {
   workflows: Array<WorkflowInfo>;
 };
 
+export type ProjectWorkflow = {
+  __typename?: 'ProjectWorkflow';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  projectId: Scalars['ID']['output'];
+  projectVersion: Scalars['Int']['output'];
+  sseStreamResponse: Scalars['Boolean']['output'];
+  uuid?: Maybe<Scalars['String']['output']>;
+  version: Scalars['Int']['output'];
+  workflow: Workflow;
+  workflowId: Scalars['String']['output'];
+};
+
+export type PropertiesDataSource = {
+  __typename?: 'PropertiesDataSource';
+  propertiesLookupDependsOn?: Maybe<Array<Scalars['String']['output']>>;
+};
+
+export type Property = {
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
+export enum PropertyType {
+  Array = 'ARRAY',
+  Boolean = 'BOOLEAN',
+  Date = 'DATE',
+  DateTime = 'DATE_TIME',
+  DynamicProperties = 'DYNAMIC_PROPERTIES',
+  FileEntry = 'FILE_ENTRY',
+  Integer = 'INTEGER',
+  Null = 'NULL',
+  Number = 'NUMBER',
+  Object = 'OBJECT',
+  String = 'STRING',
+  Task = 'TASK',
+  Time = 'TIME'
+}
+
 export type Query = {
   __typename?: 'Query';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
+  actionDefinition: ActionDefinition;
+  actionDefinitions: Array<ActionDefinition>;
   adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
   apiKey?: Maybe<ApiKey>;
   apiKeys?: Maybe<Array<Maybe<ApiKey>>>;
+  authorities: Array<Scalars['String']['output']>;
+  clusterElementDefinition: ClusterElementDefinition;
+  clusterElementDefinitions: Array<ClusterElementDefinition>;
+  componentDefinition: ComponentDefinition;
+  componentDefinitionSearch: Array<ComponentDefinition>;
+  componentDefinitionVersions: Array<ComponentDefinition>;
+  componentDefinitions: Array<ComponentDefinition>;
   connectedUser?: Maybe<ConnectedUser>;
   connectedUserProjects: Array<ConnectedUserProject>;
   connectedUsers?: Maybe<ConnectedUserPage>;
+  connectionComponentDefinition: ComponentDefinition;
+  connectionDefinition: ConnectionDefinition;
+  connectionDefinitions: Array<ConnectionDefinition>;
+  dataTableRows: Array<DataTableRow>;
+  dataTableRowsPage: DataTableRowPage;
+  dataTableTags: Array<Tag>;
+  dataTableTagsByTable: Array<DataTableTagsEntry>;
+  dataTableWebhooks: Array<DataTableWebhook>;
+  dataTables: Array<DataTable>;
   environments?: Maybe<Array<Maybe<Environment>>>;
+  exportDataTableCsv: Scalars['String']['output'];
   integration?: Maybe<Integration>;
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpComponent?: Maybe<McpComponent>;
@@ -576,13 +1208,36 @@ export type Query = {
   preBuiltProjectTemplates: Array<ProjectTemplate>;
   preBuiltWorkflowTemplates: Array<WorkflowTemplate>;
   project?: Maybe<Project>;
+  projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
   projectTemplate?: Maybe<ProjectTemplate>;
   projects?: Maybe<Array<Maybe<Project>>>;
   sharedProject?: Maybe<SharedProject>;
   sharedWorkflow?: Maybe<SharedWorkflow>;
+  taskDispatcherDefinition: TaskDispatcherDefinition;
+  taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
+  taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
+  triggerDefinition: TriggerDefinition;
+  triggerDefinitions: Array<TriggerDefinition>;
+  unifiedApiComponentDefinitions: Array<ComponentDefinition>;
+  user?: Maybe<AdminUser>;
+  users?: Maybe<AdminUserPage>;
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
+  workspaceProjectDeployments: Array<ProjectDeployment>;
+};
+
+
+export type QueryActionDefinitionArgs = {
+  actionName: Scalars['String']['input'];
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryActionDefinitionsArgs = {
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
 };
 
 
@@ -598,7 +1253,45 @@ export type QueryApiKeyArgs = {
 
 export type QueryApiKeysArgs = {
   environmentId: Scalars['ID']['input'];
-  type: ModeType;
+  type: PlatformType;
+};
+
+
+export type QueryClusterElementDefinitionArgs = {
+  clusterElementName: Scalars['String']['input'];
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryClusterElementDefinitionsArgs = {
+  clusterElementType: Scalars['String']['input'];
+  rootComponentName: Scalars['String']['input'];
+  rootComponentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryComponentDefinitionArgs = {
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryComponentDefinitionSearchArgs = {
+  query: Scalars['String']['input'];
+};
+
+
+export type QueryComponentDefinitionVersionsArgs = {
+  componentName: Scalars['String']['input'];
+};
+
+
+export type QueryComponentDefinitionsArgs = {
+  actionDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
+  connectionDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
+  include?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  triggerDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -620,6 +1313,56 @@ export type QueryConnectedUsersArgs = {
   integrationId?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   pageNumber?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryConnectionComponentDefinitionArgs = {
+  componentName: Scalars['String']['input'];
+  connectionVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryConnectionDefinitionArgs = {
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryConnectionDefinitionsArgs = {
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryDataTableRowsArgs = {
+  environmentId: Scalars['Int']['input'];
+  tableId: Scalars['ID']['input'];
+};
+
+
+export type QueryDataTableRowsPageArgs = {
+  environmentId: Scalars['Int']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  tableId: Scalars['ID']['input'];
+};
+
+
+export type QueryDataTableWebhooksArgs = {
+  environmentId: Scalars['Int']['input'];
+  tableId: Scalars['ID']['input'];
+};
+
+
+export type QueryDataTablesArgs = {
+  environmentId: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryExportDataTableCsvArgs = {
+  environmentId: Scalars['Int']['input'];
+  tableId: Scalars['ID']['input'];
 };
 
 
@@ -669,13 +1412,13 @@ export type QueryMcpServerArgs = {
 
 
 export type QueryMcpServerTagsArgs = {
-  type: ModeType;
+  type: PlatformType;
 };
 
 
 export type QueryMcpServersArgs = {
   orderBy?: InputMaybe<McpServerOrderBy>;
-  type: ModeType;
+  type: PlatformType;
 };
 
 
@@ -706,6 +1449,11 @@ export type QueryProjectArgs = {
 };
 
 
+export type QueryProjectDeploymentWorkflowArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type QueryProjectTemplateArgs = {
   id: Scalars['String']['input'];
   sharedProject: Scalars['Boolean']['input'];
@@ -719,6 +1467,46 @@ export type QuerySharedProjectArgs = {
 
 export type QuerySharedWorkflowArgs = {
   workflowUuid: Scalars['String']['input'];
+};
+
+
+export type QueryTaskDispatcherDefinitionArgs = {
+  name: Scalars['String']['input'];
+  version: Scalars['Int']['input'];
+};
+
+
+export type QueryTaskDispatcherDefinitionVersionsArgs = {
+  name: Scalars['String']['input'];
+};
+
+
+export type QueryTriggerDefinitionArgs = {
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+  triggerName: Scalars['String']['input'];
+};
+
+
+export type QueryTriggerDefinitionsArgs = {
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryUnifiedApiComponentDefinitionsArgs = {
+  category: UnifiedApiCategory;
+};
+
+
+export type QueryUserArgs = {
+  login: Scalars['String']['input'];
+};
+
+
+export type QueryUsersArgs = {
+  pageNumber?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -736,6 +1524,43 @@ export type QueryWorkspaceApiKeysArgs = {
 
 export type QueryWorkspaceMcpServersArgs = {
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceProjectDeploymentsArgs = {
+  environmentId: Scalars['ID']['input'];
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  tagId?: InputMaybe<Scalars['ID']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+export type RemoveColumnInput = {
+  columnId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
+  tableId: Scalars['ID']['input'];
+};
+
+export type RemoveTableInput = {
+  environmentId: Scalars['Int']['input'];
+  tableId: Scalars['ID']['input'];
+};
+
+export type RenameColumnInput = {
+  columnId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
+  newName: Scalars['String']['input'];
+  tableId: Scalars['ID']['input'];
+};
+
+export type RenameDataTableInput = {
+  environmentId: Scalars['Int']['input'];
+  newBaseName: Scalars['String']['input'];
+  tableId: Scalars['ID']['input'];
+};
+
+export type Resources = {
+  __typename?: 'Resources';
+  documentationUrl?: Maybe<Scalars['String']['output']>;
 };
 
 export type SharedProject = {
@@ -760,6 +1585,30 @@ export type SharedWorkflowInfo = {
   label: Scalars['String']['output'];
 };
 
+export type StringProperty = Property & {
+  __typename?: 'StringProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  defaultValue?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  exampleValue?: Maybe<Scalars['String']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  languageId?: Maybe<Scalars['String']['output']>;
+  maxLength?: Maybe<Scalars['Int']['output']>;
+  minLength?: Maybe<Scalars['Int']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  options?: Maybe<Array<Option>>;
+  optionsDataSource?: Maybe<OptionsDataSource>;
+  optionsLoadedDynamically?: Maybe<Scalars['Boolean']['output']>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  regex?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
 export type Tag = {
   __typename?: 'Tag';
   id: Scalars['ID']['output'];
@@ -768,7 +1617,87 @@ export type Tag = {
 
 export type TagInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
-  name: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type TaskDispatcherDefinition = {
+  __typename?: 'TaskDispatcherDefinition';
+  description?: Maybe<Scalars['String']['output']>;
+  icon?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  outputDefined: Scalars['Boolean']['output'];
+  outputFunctionDefined?: Maybe<Scalars['Boolean']['output']>;
+  outputSchemaDefined?: Maybe<Scalars['Boolean']['output']>;
+  properties: Array<Property>;
+  resources?: Maybe<Resources>;
+  taskProperties: Array<Property>;
+  title?: Maybe<Scalars['String']['output']>;
+  variablePropertiesDefined?: Maybe<Scalars['Boolean']['output']>;
+  version: Scalars['Int']['output'];
+};
+
+export type TimeProperty = Property & {
+  __typename?: 'TimeProperty';
+  advancedOption?: Maybe<Scalars['Boolean']['output']>;
+  controlType: ControlType;
+  defaultValue?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayCondition?: Maybe<Scalars['String']['output']>;
+  exampleValue?: Maybe<Scalars['String']['output']>;
+  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  hidden?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  placeholder?: Maybe<Scalars['String']['output']>;
+  required?: Maybe<Scalars['Boolean']['output']>;
+  type: PropertyType;
+};
+
+export type TriggerDefinition = {
+  __typename?: 'TriggerDefinition';
+  componentName?: Maybe<Scalars['String']['output']>;
+  componentVersion?: Maybe<Scalars['Int']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  help?: Maybe<Help>;
+  name: Scalars['String']['output'];
+  outputDefined: Scalars['Boolean']['output'];
+  outputFunctionDefined: Scalars['Boolean']['output'];
+  outputSchemaDefined?: Maybe<Scalars['Boolean']['output']>;
+  properties: Array<Property>;
+  title?: Maybe<Scalars['String']['output']>;
+  type: TriggerType;
+  workflowNodeDescriptionDefined?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export enum TriggerType {
+  DynamicWebhook = 'DYNAMIC_WEBHOOK',
+  Hybrid = 'HYBRID',
+  Listener = 'LISTENER',
+  Polling = 'POLLING',
+  StaticWebhook = 'STATIC_WEBHOOK'
+}
+
+export enum UnifiedApiCategory {
+  Accounting = 'ACCOUNTING',
+  Ats = 'ATS',
+  Crm = 'CRM',
+  ECommerce = 'E_COMMERCE',
+  FileStorage = 'FILE_STORAGE',
+  Hris = 'HRIS',
+  MarketingAutomation = 'MARKETING_AUTOMATION',
+  Ticketing = 'TICKETING'
+}
+
+export type UpdateDataTableTagsInput = {
+  tableId: Scalars['ID']['input'];
+  tags?: InputMaybe<Array<TagInput>>;
+};
+
+export type UpdateRowInput = {
+  environmentId: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
+  tableId: Scalars['ID']['input'];
+  values: Scalars['Map']['input'];
 };
 
 export type Workflow = {
@@ -780,6 +1709,7 @@ export type Workflow = {
   label: Scalars['String']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  triggers: Array<WorkflowTrigger>;
   version?: Maybe<Scalars['Int']['output']>;
 };
 
@@ -806,6 +1736,15 @@ export type WorkflowTemplate = {
   workflow: SharedWorkflowInfo;
 };
 
+export type WorkflowTrigger = {
+  __typename?: 'WorkflowTrigger';
+  description?: Maybe<Scalars['String']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  parameters?: Maybe<Scalars['Map']['output']>;
+  type: Scalars['String']['output'];
+};
+
 export type CreateMcpProjectMutationVariables = Exact<{
   input: CreateMcpProjectInput;
 }>;
@@ -827,7 +1766,7 @@ export type CreateMcpServerMutationVariables = Exact<{
 }>;
 
 
-export type CreateMcpServerMutation = { __typename?: 'Mutation', createWorkspaceMcpServer?: { __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean } | null };
+export type CreateMcpServerMutation = { __typename?: 'Mutation', createWorkspaceMcpServer?: { __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean } | null };
 
 export type DeleteMcpProjectMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -903,7 +1842,7 @@ export type McpProjectsByServerIdQueryVariables = Exact<{
 }>;
 
 
-export type McpProjectsByServerIdQuery = { __typename?: 'Query', mcpProjectsByServerId?: Array<{ __typename?: 'McpProject', id: string, projectDeploymentId: string, mcpServerId: string, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectVersion?: number | null, project?: { __typename?: 'Project', id: string, name: string, category?: { __typename?: 'Category', id?: string | null, name?: string | null } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null, mcpProjectWorkflows?: Array<{ __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', id: string, projectDeploymentId: any, inputs?: any | null, workflowId: string } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
+export type McpProjectsByServerIdQuery = { __typename?: 'Query', mcpProjectsByServerId?: Array<{ __typename?: 'McpProject', id: string, projectDeploymentId: string, mcpServerId: string, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectVersion?: number | null, project?: { __typename?: 'Project', id: string, name: string, category?: { __typename?: 'Category', id?: string | null, name?: string | null } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null, mcpProjectWorkflows?: Array<{ __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', id: string, projectDeploymentId: string, inputs?: any | null, workflowId: string } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
 
 export type PreBuiltProjectTemplatesQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
@@ -911,7 +1850,7 @@ export type PreBuiltProjectTemplatesQueryVariables = Exact<{
 }>;
 
 
-export type PreBuiltProjectTemplatesQuery = { __typename?: 'Query', preBuiltProjectTemplates: Array<{ __typename?: 'ProjectTemplate', authorName?: string | null, categories: Array<string>, description?: string | null, id?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinitionTuple', key?: string | null, value: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null } | null> }>, project?: { __typename?: 'ProjectInfo', name: string, description?: string | null } | null, workflows: Array<{ __typename?: 'WorkflowInfo', id: string, label: string }> }> };
+export type PreBuiltProjectTemplatesQuery = { __typename?: 'Query', preBuiltProjectTemplates: Array<{ __typename?: 'ProjectTemplate', authorName?: string | null, categories: Array<string>, description?: string | null, id?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinitionTuple', key?: string | null, value: Array<{ __typename?: 'ComponentDefinition', icon?: string | null, name: string, title?: string | null, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null } | null> }>, project?: { __typename?: 'ProjectInfo', name: string, description?: string | null } | null, workflows: Array<{ __typename?: 'WorkflowInfo', id: string, label: string }> }> };
 
 export type PreBuiltWorkflowTemplatesQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
@@ -919,7 +1858,7 @@ export type PreBuiltWorkflowTemplatesQueryVariables = Exact<{
 }>;
 
 
-export type PreBuiltWorkflowTemplatesQuery = { __typename?: 'Query', preBuiltWorkflowTemplates: Array<{ __typename?: 'WorkflowTemplate', authorName?: string | null, categories: Array<string>, description?: string | null, id?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }>, workflow: { __typename?: 'SharedWorkflowInfo', label: string, description?: string | null } }> };
+export type PreBuiltWorkflowTemplatesQuery = { __typename?: 'Query', preBuiltWorkflowTemplates: Array<{ __typename?: 'WorkflowTemplate', authorName?: string | null, categories: Array<string>, description?: string | null, id?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinition', icon?: string | null, name: string, title?: string | null, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }>, workflow: { __typename?: 'SharedWorkflowInfo', label: string, description?: string | null } }> };
 
 export type ProjectByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -934,7 +1873,7 @@ export type ProjectTemplateQueryVariables = Exact<{
 }>;
 
 
-export type ProjectTemplateQuery = { __typename?: 'Query', projectTemplate?: { __typename?: 'ProjectTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinitionTuple', key?: string | null, value: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null } | null> }>, project?: { __typename?: 'ProjectInfo', name: string } | null, workflows: Array<{ __typename?: 'WorkflowInfo', id: string, label: string }> } | null };
+export type ProjectTemplateQuery = { __typename?: 'Query', projectTemplate?: { __typename?: 'ProjectTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinitionTuple', key?: string | null, value: Array<{ __typename?: 'ComponentDefinition', icon?: string | null, name: string, title?: string | null, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', componentName: string, version: number } | null } | null> }>, project?: { __typename?: 'ProjectInfo', name: string } | null, workflows: Array<{ __typename?: 'WorkflowInfo', id: string, label: string }> } | null };
 
 export type SharedProjectQueryVariables = Exact<{
   projectUuid: Scalars['String']['input'];
@@ -974,13 +1913,30 @@ export type UpdateWorkspaceApiKeyMutationVariables = Exact<{
 
 export type UpdateWorkspaceApiKeyMutation = { __typename?: 'Mutation', updateWorkspaceApiKey: boolean };
 
+export type WorkflowChatProjectDeploymentWorkflowQueryVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type WorkflowChatProjectDeploymentWorkflowQuery = { __typename?: 'Query', projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', projectWorkflow: { __typename?: 'ProjectWorkflow', sseStreamResponse: boolean, workflow: { __typename?: 'Workflow', label: string } } } | null };
+
+export type WorkflowChatWorkspaceProjectDeploymentsQueryVariables = Exact<{
+  workspaceId: Scalars['ID']['input'];
+  environmentId: Scalars['ID']['input'];
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  tagId?: InputMaybe<Scalars['ID']['input']>;
+}>;
+
+
+export type WorkflowChatWorkspaceProjectDeploymentsQuery = { __typename?: 'Query', workspaceProjectDeployments: Array<{ __typename?: 'ProjectDeployment', id: string, enabled: boolean, project: { __typename?: 'Project', id: string, name: string }, projectDeploymentWorkflows: Array<{ __typename?: 'ProjectDeploymentWorkflow', id: string, enabled: boolean, staticWebhookUrl?: string | null, workflowExecutionId?: string | null, projectWorkflow: { __typename?: 'ProjectWorkflow', workflow: { __typename?: 'Workflow', id: string, label: string, triggers: Array<{ __typename?: 'WorkflowTrigger', parameters?: any | null, type: string }> } } }> }> };
+
 export type WorkflowTemplateQueryVariables = Exact<{
   id: Scalars['String']['input'];
   sharedWorkflow: Scalars['Boolean']['input'];
 }>;
 
 
-export type WorkflowTemplateQuery = { __typename?: 'Query', workflowTemplate?: { __typename?: 'WorkflowTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, workflow: { __typename?: 'SharedWorkflowInfo', label: string }, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }> } | null };
+export type WorkflowTemplateQuery = { __typename?: 'Query', workflowTemplate?: { __typename?: 'WorkflowTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, workflow: { __typename?: 'SharedWorkflowInfo', label: string }, components: Array<{ __typename?: 'ComponentDefinition', icon?: string | null, name: string, title?: string | null, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', componentName: string, version: number } | null }> } | null };
 
 export type WorkspaceApiKeysQueryVariables = Exact<{
   workspaceId: Scalars['ID']['input'];
@@ -995,7 +1951,7 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
@@ -1003,7 +1959,7 @@ export type ConnectedUserProjectsQueryVariables = Exact<{
 }>;
 
 
-export type ConnectedUserProjectsQuery = { __typename?: 'Query', connectedUserProjects: Array<{ __typename?: 'ConnectedUserProject', id: string, environmentId: string, lastExecutionDate?: string | null, projectId: string, projectVersion?: number | null, connectedUser: { __typename?: 'ConnectedUser', id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ __typename?: 'ConnectedUserProjectWorkflow', id: string, connectedUserId: string, enabled: boolean, lastExecutionDate?: string | null, projectId: string, workflowUuid: string, workflowVersion: number, workflow: { __typename?: 'Workflow', id: string, label: string } }> }> };
+export type ConnectedUserProjectsQuery = { __typename?: 'Query', connectedUserProjects: Array<{ __typename?: 'ConnectedUserProject', id: string, environmentId: string, lastExecutionDate?: string | null, projectId: string, projectVersion?: number | null, connectedUser: { __typename?: 'ConnectedUser', id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ __typename?: 'ConnectedUserProjectWorkflow', id: string, connectedUserId: string, enabled: boolean, lastExecutionDate?: string | null, projectId: string, workflowUuid: string, workflowVersion: number, workflow: { __typename?: 'Workflow', id: string, label: string, triggers: Array<{ __typename?: 'WorkflowTrigger', name: string, type: string, parameters?: any | null }> } }> }> };
 
 export type IntegrationByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1021,7 +1977,7 @@ export type AdminApiKeysQuery = { __typename?: 'Query', adminApiKeys?: Array<{ _
 
 export type ApiKeysQueryVariables = Exact<{
   environmentId: Scalars['ID']['input'];
-  type: ModeType;
+  type: PlatformType;
 }>;
 
 
@@ -1030,7 +1986,7 @@ export type ApiKeysQuery = { __typename?: 'Query', apiKeys?: Array<{ __typename?
 export type CreateApiKeyMutationVariables = Exact<{
   name: Scalars['String']['input'];
   environmentId: Scalars['ID']['input'];
-  type?: InputMaybe<ModeType>;
+  type?: InputMaybe<PlatformType>;
 }>;
 
 
@@ -1074,7 +2030,7 @@ export type DeleteMcpComponentMutation = { __typename?: 'Mutation', deleteMcpCom
 export type EnvironmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type EnvironmentsQuery = { __typename?: 'Query', environments?: Array<{ __typename?: 'Environment', id?: string | null, name?: string | null } | null> | null };
+export type EnvironmentsQuery = { __typename?: 'Query', environments?: Array<{ __typename?: 'Environment', id: string, name: string } | null> | null };
 
 export type ManagementMcpServerUrlQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1089,18 +2045,18 @@ export type McpComponentsByServerIdQueryVariables = Exact<{
 export type McpComponentsByServerIdQuery = { __typename?: 'Query', mcpComponentsByServerId?: Array<{ __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, connectionId?: string | null, mcpServerId: string, version?: number | null, mcpTools?: Array<{ __typename?: 'McpTool', id: string, mcpComponentId: string, name: string } | null> | null } | null> | null };
 
 export type McpServerTagsQueryVariables = Exact<{
-  type: ModeType;
+  type: PlatformType;
 }>;
 
 
 export type McpServerTagsQuery = { __typename?: 'Query', mcpServerTags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null };
 
 export type McpServersQueryVariables = Exact<{
-  type: ModeType;
+  type: PlatformType;
 }>;
 
 
-export type McpServersQuery = { __typename?: 'Query', mcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean, secretKey: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type McpServersQuery = { __typename?: 'Query', mcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, secretKey: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type McpToolsByComponentIdQueryVariables = Exact<{
   mcpComponentId: Scalars['ID']['input'];
@@ -1136,6 +2092,43 @@ export type UpdateMcpServerUrlMutationVariables = Exact<{
 
 
 export type UpdateMcpServerUrlMutation = { __typename?: 'Mutation', updateMcpServerUrl: string };
+
+export type AuthoritiesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AuthoritiesQuery = { __typename?: 'Query', authorities: Array<string> };
+
+export type DeleteUserMutationVariables = Exact<{
+  login: Scalars['String']['input'];
+}>;
+
+
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: boolean };
+
+export type InviteUserMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  role: Scalars['String']['input'];
+}>;
+
+
+export type InviteUserMutation = { __typename?: 'Mutation', inviteUser: boolean };
+
+export type UpdateUserMutationVariables = Exact<{
+  login: Scalars['String']['input'];
+  role: Scalars['String']['input'];
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'AdminUser', id?: string | null, login?: string | null, email?: string | null, firstName?: string | null, lastName?: string | null, activated?: boolean | null, authorities?: Array<string | null> | null } };
+
+export type UsersQueryVariables = Exact<{
+  pageNumber?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type UsersQuery = { __typename?: 'Query', users?: { __typename?: 'AdminUserPage', number: number, size: number, totalElements: number, totalPages: number, content: Array<{ __typename?: 'AdminUser', id?: string | null, login?: string | null, email?: string | null, firstName?: string | null, lastName?: string | null, activated?: boolean | null, authorities?: Array<string | null> | null } | null> } | null };
 
 
 
@@ -1577,6 +2570,7 @@ export const ProjectTemplateDocument = `
       key
       value {
         connection {
+          componentName
           version
         }
         icon
@@ -1732,6 +2726,85 @@ export const useUpdateWorkspaceApiKeyMutation = <
   }
     )};
 
+export const WorkflowChatProjectDeploymentWorkflowDocument = `
+    query workflowChatProjectDeploymentWorkflow($id: String!) {
+  projectDeploymentWorkflow(id: $id) {
+    projectWorkflow {
+      sseStreamResponse
+      workflow {
+        label
+      }
+    }
+  }
+}
+    `;
+
+export const useWorkflowChatProjectDeploymentWorkflowQuery = <
+      TData = WorkflowChatProjectDeploymentWorkflowQuery,
+      TError = unknown
+    >(
+      variables: WorkflowChatProjectDeploymentWorkflowQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowChatProjectDeploymentWorkflowQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowChatProjectDeploymentWorkflowQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkflowChatProjectDeploymentWorkflowQuery, TError, TData>(
+      {
+    queryKey: ['workflowChatProjectDeploymentWorkflow', variables],
+    queryFn: fetcher<WorkflowChatProjectDeploymentWorkflowQuery, WorkflowChatProjectDeploymentWorkflowQueryVariables>(WorkflowChatProjectDeploymentWorkflowDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkflowChatWorkspaceProjectDeploymentsDocument = `
+    query workflowChatWorkspaceProjectDeployments($workspaceId: ID!, $environmentId: ID!, $projectId: ID, $tagId: ID) {
+  workspaceProjectDeployments(
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    projectId: $projectId
+    tagId: $tagId
+  ) {
+    id
+    enabled
+    project {
+      id
+      name
+    }
+    projectDeploymentWorkflows {
+      id
+      enabled
+      staticWebhookUrl
+      workflowExecutionId
+      projectWorkflow {
+        workflow {
+          id
+          label
+          triggers {
+            parameters
+            type
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+export const useWorkflowChatWorkspaceProjectDeploymentsQuery = <
+      TData = WorkflowChatWorkspaceProjectDeploymentsQuery,
+      TError = unknown
+    >(
+      variables: WorkflowChatWorkspaceProjectDeploymentsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowChatWorkspaceProjectDeploymentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowChatWorkspaceProjectDeploymentsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkflowChatWorkspaceProjectDeploymentsQuery, TError, TData>(
+      {
+    queryKey: ['workflowChatWorkspaceProjectDeployments', variables],
+    queryFn: fetcher<WorkflowChatWorkspaceProjectDeploymentsQuery, WorkflowChatWorkspaceProjectDeploymentsQueryVariables>(WorkflowChatWorkspaceProjectDeploymentsDocument, variables),
+    ...options
+  }
+    )};
+
 export const WorkflowTemplateDocument = `
     query workflowTemplate($id: String!, $sharedWorkflow: Boolean!) {
   workflowTemplate(id: $id, sharedWorkflow: $sharedWorkflow) {
@@ -1743,6 +2816,7 @@ export const WorkflowTemplateDocument = `
     }
     components {
       connection {
+        componentName
         version
       }
       icon
@@ -1864,6 +2938,11 @@ export const ConnectedUserProjectsDocument = `
       workflow {
         id
         label
+        triggers {
+          name
+          type
+          parameters
+        }
       }
     }
     environmentId
@@ -1947,7 +3026,7 @@ export const useAdminApiKeysQuery = <
     )};
 
 export const ApiKeysDocument = `
-    query apiKeys($environmentId: ID!, $type: ModeType!) {
+    query apiKeys($environmentId: ID!, $type: PlatformType!) {
   apiKeys(environmentId: $environmentId, type: $type) {
     id
     name
@@ -1978,7 +3057,7 @@ export const useApiKeysQuery = <
     )};
 
 export const CreateApiKeyDocument = `
-    mutation createApiKey($name: String!, $environmentId: ID!, $type: ModeType) {
+    mutation createApiKey($name: String!, $environmentId: ID!, $type: PlatformType) {
   createApiKey(name: $name, environmentId: $environmentId, type: $type)
 }
     `;
@@ -2195,7 +3274,7 @@ export const useMcpComponentsByServerIdQuery = <
     )};
 
 export const McpServerTagsDocument = `
-    query mcpServerTags($type: ModeType!) {
+    query mcpServerTags($type: PlatformType!) {
   mcpServerTags(type: $type) {
     id
     name
@@ -2220,7 +3299,7 @@ export const useMcpServerTagsQuery = <
     )};
 
 export const McpServersDocument = `
-    query mcpServers($type: ModeType!) {
+    query mcpServers($type: PlatformType!) {
   mcpServers(type: $type, orderBy: NAME_ASC) {
     id
     name
@@ -2369,6 +3448,129 @@ export const useUpdateMcpServerUrlMutation = <
       {
     mutationKey: ['updateMcpServerUrl'],
     mutationFn: (variables?: UpdateMcpServerUrlMutationVariables) => fetcher<UpdateMcpServerUrlMutation, UpdateMcpServerUrlMutationVariables>(UpdateMcpServerUrlDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AuthoritiesDocument = `
+    query authorities {
+  authorities
+}
+    `;
+
+export const useAuthoritiesQuery = <
+      TData = AuthoritiesQuery,
+      TError = unknown
+    >(
+      variables?: AuthoritiesQueryVariables,
+      options?: Omit<UseQueryOptions<AuthoritiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AuthoritiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AuthoritiesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['authorities'] : ['authorities', variables],
+    queryFn: fetcher<AuthoritiesQuery, AuthoritiesQueryVariables>(AuthoritiesDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteUserDocument = `
+    mutation deleteUser($login: String!) {
+  deleteUser(login: $login)
+}
+    `;
+
+export const useDeleteUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteUser'],
+    mutationFn: (variables?: DeleteUserMutationVariables) => fetcher<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const InviteUserDocument = `
+    mutation inviteUser($email: String!, $password: String!, $role: String!) {
+  inviteUser(email: $email, password: $password, role: $role)
+}
+    `;
+
+export const useInviteUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<InviteUserMutation, TError, InviteUserMutationVariables, TContext>) => {
+    
+    return useMutation<InviteUserMutation, TError, InviteUserMutationVariables, TContext>(
+      {
+    mutationKey: ['inviteUser'],
+    mutationFn: (variables?: InviteUserMutationVariables) => fetcher<InviteUserMutation, InviteUserMutationVariables>(InviteUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateUserDocument = `
+    mutation updateUser($login: String!, $role: String!) {
+  updateUser(login: $login, role: $role) {
+    id
+    login
+    email
+    firstName
+    lastName
+    activated
+    authorities
+  }
+}
+    `;
+
+export const useUpdateUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>(
+      {
+    mutationKey: ['updateUser'],
+    mutationFn: (variables?: UpdateUserMutationVariables) => fetcher<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UsersDocument = `
+    query users($pageNumber: Int, $pageSize: Int) {
+  users(pageNumber: $pageNumber, pageSize: $pageSize) {
+    content {
+      id
+      login
+      email
+      firstName
+      lastName
+      activated
+      authorities
+    }
+    number
+    size
+    totalElements
+    totalPages
+  }
+}
+    `;
+
+export const useUsersQuery = <
+      TData = UsersQuery,
+      TError = unknown
+    >(
+      variables?: UsersQueryVariables,
+      options?: Omit<UseQueryOptions<UsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<UsersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<UsersQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['users'] : ['users', variables],
+    queryFn: fetcher<UsersQuery, UsersQueryVariables>(UsersDocument, variables),
     ...options
   }
     )};

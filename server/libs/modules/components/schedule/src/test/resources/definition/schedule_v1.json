@@ -2,8 +2,8 @@
   "actions": [ ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,
@@ -455,7 +455,7 @@
       }, {
         "description": null,
         "label": "Sunday",
-        "value": 0
+        "value": 1
       } ],
       "optionsDataSource": null,
       "placeholder": null,
@@ -979,7 +979,7 @@
       }, {
         "description": null,
         "label": "Sunday",
-        "value": 0
+        "value": 1
       } ],
       "optionsDataSource": null,
       "placeholder": null,

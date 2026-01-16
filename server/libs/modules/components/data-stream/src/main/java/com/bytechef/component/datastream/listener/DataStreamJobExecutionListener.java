@@ -19,8 +19,8 @@ package com.bytechef.component.datastream.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,7 +37,7 @@ public class DataStreamJobExecutionListener implements JobExecutionListener {
     @Override
     public void afterJob(JobExecution jobExecution) {
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
-            log.info("Job id=%s completed".formatted(jobExecution.getJobId()));
+            log.info("Job id=%s completed".formatted(jobExecution.getId()));
         }
     }
 }

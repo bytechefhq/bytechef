@@ -140,6 +140,165 @@ paths:
                   error:
                     type: "string"
                     description: "Error message if the request failed. Empty string if successful."
+  /crawl:
+    post:
+      summary: "Start SmartCrawler"
+      description: "Start a new web crawl request with AI extraction or markdown conversion."
+      operationId: "startCrawl"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "url"
+              properties:
+                url:
+                  type: "string"
+                  description: "The starting URL for the crawl."
+                  title: "URL"
+                prompt:
+                  type: "string"
+                  description: "Instructions for data extraction. Required when extraction_mode is true."
+                  title: "Prompt"
+                extraction_mode:
+                  type: "boolean"
+                  description: "When false, enables markdown conversion mode (2 credits per page). Default is true."
+                  default: true
+                  title: "Extraction Mode"
+                cache_website:
+                  type: "boolean"
+                  description: "Whether to cache the website content."
+                  default: false
+                  title: "Cache Website"
+                depth:
+                  type: "integer"
+                  description: "Maximum crawl depth."
+                  default: 1
+                  title: "Depth"
+                max_pages:
+                  type: "integer"
+                  description: "Maximum number of pages to crawl."
+                  default: 10
+                  title: "Max Pages"
+                same_domain_only:
+                  type: "boolean"
+                  description: "Whether to crawl only the same domain."
+                  default: true
+                  title: "Same Domain Only"
+                batch_size:
+                  type: "integer"
+                  description: "Number of pages to process in each batch."
+                  default: 1
+                  title: "Batch Size"
+                schema:
+                  type: "object"
+                  description: "JSON Schema object for structured output."
+                  title: "Schema"
+                rules:
+                  type: "object"
+                  description: "Crawl rules for filtering URLs."
+                  title: "Rules"
+                  properties:
+                    exclude:
+                      type: "array"
+                      description: "List of URL patterns (regex) to exclude from crawling. Matches full URL."
+                      items:
+                        type: "string"
+                    include_paths:
+                      type: "array"
+                      description: "List of path patterns to include (e.g., ['/products/*', '/blog/**']). Supports wildcards: * matches any characters, ** matches any path segments. If empty or not specified, all paths are included."
+                      items:
+                        type: "string"
+                    exclude_paths:
+                      type: "array"
+                      description: "List of path patterns to exclude (e.g., ['/admin/*', '/api/**']). Supports wildcards: * matches any characters, ** matches any path segments. Takes precedence over include_paths. If empty or not specified, no paths are excluded."
+                      items:
+                        type: "string"
+                    same_domain:
+                      type: "boolean"
+                      description: "Restrict crawling to same domain."
+                      default: true
+                sitemap:
+                  type: "boolean"
+                  description: "Use sitemap.xml for discovery."
+                  default: false
+                  title: "Sitemap"
+                render_heavy_js:
+                  type: "boolean"
+                  description: "Enable heavy JavaScript rendering."
+                  default: false
+                  title: "Render Heavy JS"
+                stealth:
+                  type: "boolean"
+                  description: "Enable stealth mode to bypass bot protection using advanced anti-detection techniques. Adds +4 credits to the request cost."
+                  default: false
+                  title: "Stealth"
+      responses:
+        200:
+          description: "Crawl started successfully."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  task_id:
+                    type: "string"
+                    description: "Unique identifier for the crawl task. Use this task_id to retrieve the crawl result."
+        422:
+          description: "Validation error."
+  /crawl/{task_id}:
+    get:
+      summary: "Get SmartCrawler Status"
+      description: "Get the status and results of a previous smartcrawl request."
+      operationId: "getCrawlStatus"
+      parameters:
+        - name: "task_id"
+          in: "path"
+          required: true
+          description: "The ID of the crawl job task."
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  status:
+                    type: "string"
+                    description: "Overall status of the request."
+                  result:
+                    type: "object"
+                    description: "The crawl job result."
+                    properties:
+                      status:
+                        type: "string"
+                        description: "Status of the crawl job (e.g., 'done', 'processing', 'failed')."
+                      llm_result:
+                        type: "object"
+                        description: "The extracted data from the crawled pages, structured according to the provided schema."
+                      crawled_urls:
+                        type: "array"
+                        description: "List of URLs that were crawled."
+                        items:
+                          type: "string"
+                      pages:
+                        type: "array"
+                        description: "List of crawled pages with their markdown content."
+                        items:
+                          type: "object"
+                          properties:
+                            url:
+                              type: "string"
+                              description: "The URL of the crawled page."
+                            markdown:
+                              type: "string"
+                              description: "The markdown content of the page."
+        422:
+          description: "Validation error."
 components:
   securitySchemes:
     api_key:

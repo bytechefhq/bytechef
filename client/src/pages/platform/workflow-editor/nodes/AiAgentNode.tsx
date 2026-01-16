@@ -141,9 +141,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             >
                 <HoverCardTrigger>
                     <Button
-                        className={twMerge(
-                            'size-18 focus-visible:ring-stroke-brand-focus flex w-full flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none active:bg-surface-neutral-primary'
-                        )}
+                        className="size-18 flex w-full flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
                         onClick={handleNodeClick}
                     >
                         <span className="self-center text-content-neutral-primary [&_svg]:size-9">

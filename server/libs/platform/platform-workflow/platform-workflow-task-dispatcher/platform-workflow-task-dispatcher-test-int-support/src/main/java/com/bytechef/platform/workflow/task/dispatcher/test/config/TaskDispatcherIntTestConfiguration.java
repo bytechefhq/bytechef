@@ -20,18 +20,7 @@ import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.ContextServiceImpl;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.CounterServiceImpl;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.JobServiceImpl;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.config.ApplicationProperties;
@@ -39,14 +28,11 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
 import com.bytechef.tenant.TenantContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -54,17 +40,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
 @ComponentScan("com.bytechef.platform.workflow.task.dispatcher")
-@EnableAutoConfiguration(
-    exclude = {
-        DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
-    })
+@EnableAutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
@@ -79,35 +64,12 @@ public class TaskDispatcherIntTestConfiguration {
     }
 
     @Bean
-    ContextService contextService(CacheManager cacheManager) {
-        return new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
-    }
-
-    @Bean
-    CounterService counterService(CacheManager cacheManager) {
-        return new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
-    }
-
-    @Bean
-    JobService jobService(CacheManager cacheManager, ObjectMapper objectMapper) {
-        return new JobServiceImpl(
-            new InMemoryJobRepository(cacheManager, taskExecutionRepository(cacheManager), objectMapper));
-    }
-
-    @Bean
-    TaskDispatcherJobTestExecutor taskDispatcherWorkflowTestSupport(
-        ContextService contextService, CounterService counterService, JobService jobService,
-        TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskFileStorage taskFileStorage,
+    TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor(
+        Environment environment, ObjectMapper objectMapper, TaskExecutor taskExecutor, TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
         return new TaskDispatcherJobTestExecutor(
-            contextService, counterService, taskExecutor, jobService, taskExecutionService, taskFileStorage,
-            workflowService);
-    }
-
-    @Bean
-    TaskExecutionService taskExecutionService(CacheManager cacheManager) {
-        return new TaskExecutionServiceImpl(taskExecutionRepository(cacheManager));
+            environment, objectMapper, taskExecutor, taskFileStorage, workflowService);
     }
 
     @Bean
@@ -119,24 +81,14 @@ public class TaskDispatcherIntTestConfiguration {
             public void execute(Runnable task) {
                 String tenantId = TenantContext.getCurrentTenantId();
 
-                executor.execute(() -> {
-                    String currentTenantId = TenantContext.getCurrentTenantId();
-
-                    try {
-                        TenantContext.setCurrentTenantId(tenantId);
-
-                        task.run();
-                    } finally {
-                        TenantContext.setCurrentTenantId(currentTenantId);
-                    }
-                });
+                executor.execute(() -> TenantContext.runWithTenantId(tenantId, task::run));
             }
         };
     }
 
     @Bean
-    InMemoryTaskExecutionRepository taskExecutionRepository(CacheManager cacheManager) {
-        return new InMemoryTaskExecutionRepository(cacheManager);
+    InMemoryTaskExecutionRepository taskExecutionRepository() {
+        return new InMemoryTaskExecutionRepository();
     }
 
     @Bean

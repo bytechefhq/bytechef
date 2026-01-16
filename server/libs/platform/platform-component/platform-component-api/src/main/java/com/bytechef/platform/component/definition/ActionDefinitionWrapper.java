@@ -24,16 +24,16 @@ import java.util.Optional;
  */
 public class ActionDefinitionWrapper extends AbstractActionDefinitionWrapper implements ActionDefinition {
 
-    protected final PerformFunction performFunction;
+    protected final BasePerformFunction performFunction;
 
-    public ActionDefinitionWrapper(ActionDefinition actionDefinition, PerformFunction performFunction) {
+    public ActionDefinitionWrapper(ActionDefinition actionDefinition, BasePerformFunction performFunction) {
         super(actionDefinition);
 
         this.performFunction = performFunction;
     }
 
     @Override
-    public Optional<PerformFunction> getPerform() {
+    public Optional<BasePerformFunction> getPerform() {
         return Optional.ofNullable(performFunction);
     }
 

@@ -16,19 +16,18 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @version ee
@@ -59,7 +58,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     @Override
     public CodeWorkflowContainer create(
         String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
-        byte[] bytes, ModeType type) {
+        byte[] bytes, PlatformType type) {
 
         try {
             UUID codeWorkflowContainerId = UUID.randomUUID();
@@ -92,7 +91,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
 
     private ArrayNode toArrayNode(
         String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, List<? extends TaskDefinition> tasks,
-        ModeType type) {
+        PlatformType type) {
 
         ArrayNode arrayNode = objectMapper.createArrayNode();
 
@@ -117,7 +116,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     }
 
     private String getDefinition(
-        String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, ModeType type) {
+        String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, PlatformType type) {
 
         ObjectNode objectNode = objectMapper.createObjectNode();
 
@@ -134,10 +133,6 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
             workflowDefinition.getTasks(),
             tasks -> objectNode.set("tasks", toArrayNode(codeWorkflowContainerUuid, workflowDefinition, tasks, type)));
 
-        try {
-            return objectMapper.writeValueAsString(objectNode);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.writeValueAsString(objectNode);
     }
 }

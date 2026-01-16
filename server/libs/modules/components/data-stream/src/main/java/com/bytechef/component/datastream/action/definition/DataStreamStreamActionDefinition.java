@@ -42,15 +42,16 @@ import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.tenant.TenantContext;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 
 public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWrapper {
@@ -66,7 +67,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
     }
 
     @Override
-    public Optional<PerformFunction> getPerform() {
+    public Optional<BasePerformFunction> getPerform() {
         return Optional.of((MultipleConnectionsPerformFunction) this::perform);
     }
 
@@ -79,7 +80,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
         JobParameters jobParameters = new JobParameters(
-            new HashMap<>() {
+            new HashSet<>() {
                 {
                     ClusterElement clusterElement = clusterElementMap.getClusterElement(DESTINATION);
 
@@ -98,19 +99,19 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
 
                     value.put(INPUT_PARAMETERS, clusterElement.getParameters());
 
-                    put(DESTINATION.name(), new JobParameter<>(value, Map.class));
+                    add(new JobParameter<>(DESTINATION.name(), value, Map.class));
 
                     if (actionContextAware.getJobPrincipalId() != null) {
-                        put(PRINCIPAL_ID, new JobParameter<>(actionContextAware.getJobPrincipalId(), Long.class));
+                        add(new JobParameter<>(PRINCIPAL_ID, actionContextAware.getJobPrincipalId(), Long.class));
                     }
 
                     if (actionContextAware.getJobPrincipalWorkflowId() != null) {
-                        put(
-                            PRINCIPAL_WORKFLOW_ID,
-                            new JobParameter<>(actionContextAware.getJobPrincipalWorkflowId(), Long.class));
+                        add(
+                            new JobParameter<>(
+                                PRINCIPAL_WORKFLOW_ID, actionContextAware.getJobPrincipalWorkflowId(), Long.class));
                     }
 
-                    put(JOB_ID, new JobParameter<>(actionContextAware.getJobId(), Long.class));
+                    add(new JobParameter<>(JOB_ID, actionContextAware.getJobId(), Long.class));
 
                     clusterElement = clusterElementMap.getClusterElement(SOURCE);
 
@@ -128,17 +129,18 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
 
                     value.put(INPUT_PARAMETERS, clusterElement.getParameters());
 
-                    put(SOURCE.name(), new JobParameter<>(value, Map.class));
+                    add(new JobParameter<>(SOURCE.name(), value, Map.class));
 
-                    put(TENANT_ID, new JobParameter<>(TenantContext.getCurrentTenantId(), String.class));
-                    put(
-                        MetadataConstants.EDITOR_ENVIRONMENT,
-                        new JobParameter<>(actionContextAware.isEditorEnvironment(), Boolean.class));
+                    add(new JobParameter<>(TENANT_ID, TenantContext.getCurrentTenantId(), String.class));
+                    add(
+                        new JobParameter<>(
+                            MetadataConstants.EDITOR_ENVIRONMENT, actionContextAware.isEditorEnvironment(),
+                            Boolean.class));
 
-                    if (actionContextAware.getModeType() != null) {
-                        put(
-                            MODE_TYPE,
-                            new JobParameter<>(String.valueOf(actionContextAware.getModeType()), String.class));
+                    if (actionContextAware.getPlatformType() != null) {
+                        add(
+                            new JobParameter<>(
+                                MODE_TYPE, String.valueOf(actionContextAware.getPlatformType()), String.class));
                     }
                 }
             });

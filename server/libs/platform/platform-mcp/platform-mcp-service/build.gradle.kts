@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
+    testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:core:commons:commons-data"))

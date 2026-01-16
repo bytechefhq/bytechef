@@ -1,3 +1,7 @@
+import {
+    appendToLastAssistantMessage as appendHelper,
+    setLastAssistantMessageContent as setContentHelper,
+} from '@/shared/util/assistant-message-utils';
 import {ThreadMessageLike} from '@assistant-ui/react';
 
 /* eslint-disable sort-keys */
@@ -10,6 +14,8 @@ interface WorkflowTestChatStateI {
 
     messages: ThreadMessageLike[];
     setMessage: (message: ThreadMessageLike) => void;
+    appendToLastAssistantMessage: (delta: string) => void;
+    setLastAssistantMessageContent: (content: string) => void;
     resetMessages: () => void;
 
     workflowTestChatPanelOpen: boolean;
@@ -40,6 +46,16 @@ const useWorkflowTestChatStore = create<WorkflowTestChatStateI>()(
                         messages: [...state.messages, message],
                     };
                 }),
+            appendToLastAssistantMessage: (delta: string) =>
+                set((state) => ({
+                    ...state,
+                    messages: appendHelper(state.messages, delta),
+                })),
+            setLastAssistantMessageContent: (content: string) =>
+                set((state) => ({
+                    ...state,
+                    messages: setContentHelper(state.messages, content),
+                })),
             resetMessages: () => set({messages: []}),
 
             workflowTestChatPanelOpen: false,

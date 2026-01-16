@@ -28,10 +28,10 @@ const ConnectionTabConnectionFieldset = ({
             componentName: componentConnection.componentName,
             componentVersion: componentConnection.componentVersion,
         },
-        currentComponentDefinition === undefined
+        currentComponentDefinition?.connection === undefined
     );
 
-    const componentDefinition = currentComponentDefinition ?? componentDefinitionData;
+    const componentDefinition = componentDefinitionData ?? currentComponentDefinition;
 
     if (!componentDefinition?.connection) {
         return <></>;

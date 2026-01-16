@@ -1,0 +1,288 @@
+interface Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+}
+
+type ArrayProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    controlType: ControlType!
+    defaultValue: [Map]
+    exampleValue: [Map]
+    items: [Property!]
+    label: String
+    maxItems: Long
+    minItems: Long
+    multipleValues: Boolean
+    options: [Option!]
+    optionsDataSource: OptionsDataSource
+    placeholder: String
+}
+
+type BooleanProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    controlType: ControlType!
+    defaultValue: Boolean
+    exampleValue: Boolean
+    label: String
+    placeholder: String
+}
+
+type DateProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    controlType: ControlType!
+    defaultValue: String
+    exampleValue: String
+    label: String
+    placeholder: String
+}
+
+type DateTimeProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    controlType: ControlType!
+    defaultValue: String
+    exampleValue: String
+    label: String
+    placeholder: String
+}
+
+type DynamicPropertiesProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    header: String
+    propertiesDataSource: PropertiesDataSource
+}
+
+type FileEntryProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    controlType: ControlType!
+    defaultValue: Map
+    exampleValue: Map
+    label: String
+    placeholder: String
+}
+
+type IntegerProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    controlType: ControlType!
+    defaultValue: Long
+    exampleValue: Long
+    label: String
+    maxValue: Long
+    minValue: Long
+    options: [Option!]
+    optionsDataSource: OptionsDataSource
+    placeholder: String
+}
+
+type NumberProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    controlType: ControlType!
+    defaultValue: Float
+    exampleValue: Float
+    label: String
+    maxValue: Float
+    minValue: Float
+    options: [Option!]
+    optionsDataSource: OptionsDataSource
+    placeholder: String
+}
+
+type NullProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    controlType: ControlType!
+    label: String
+    placeholder: String
+}
+
+type ObjectProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    additionalProperties: [Property!]
+    controlType: ControlType!
+    defaultValue: Map
+    exampleValue: Map
+    label: String
+    multipleValues: Boolean
+    options: [Option!]
+    optionsDataSource: OptionsDataSource
+    placeholder: String
+    properties: [Property!]
+}
+
+type StringProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    controlType: ControlType!
+    defaultValue: String
+    exampleValue: String
+    label: String
+    languageId: String
+    maxLength: Int
+    minLength: Int
+    options: [Option!]
+    optionsDataSource: OptionsDataSource
+    optionsLoadedDynamically: Boolean
+    placeholder: String
+    regex: String
+}
+
+type TimeProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+
+    controlType: ControlType!
+    defaultValue: String
+    exampleValue: String
+    label: String
+    placeholder: String
+}
+
+type Option {
+    description: String
+    label: String
+    value: Map
+}
+
+type OptionsDataSource {
+    optionsLookupDependsOn: [String!]
+}
+
+type PropertiesDataSource {
+    propertiesLookupDependsOn: [String!]
+}
+
+enum PropertyType {
+    ARRAY
+    BOOLEAN
+    DATE
+    DATE_TIME
+    DYNAMIC_PROPERTIES
+    FILE_ENTRY
+    INTEGER
+    NULL
+    NUMBER
+    STRING
+    OBJECT
+    TASK
+    TIME
+}
+
+enum ControlType {
+    ARRAY_BUILDER
+    CODE_EDITOR
+    DATE
+    DATE_TIME
+    EMAIL
+    INTEGER
+    JSON_SCHEMA_BUILDER
+    FILE_ENTRY
+    MULTI_SELECT
+    NUMBER
+    NULL
+    OBJECT_BUILDER
+    PASSWORD
+    PHONE
+    RICH_TEXT
+    SELECT
+    TEXT
+    TEXT_AREA
+    TIME
+    URL
+}

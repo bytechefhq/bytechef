@@ -79,9 +79,9 @@ public class FilesystemFileStorageServiceTest {
         Assertions.assertThat(fileStorageService.readFileToString("data", fileEntry))
             .isEqualTo(TEST_STRING);
         Assertions.assertThat(fileEntry.getExtension())
-            .isNull();
+            .isEqualTo("bin");
         Assertions.assertThat(fileEntry.getMimeType())
-            .isNull();
+            .isEqualTo("application/octet-stream");
         Assertions.assertThat(fileEntry.getUrl())
             .doesNotContain("LICENSE");
 
@@ -91,9 +91,9 @@ public class FilesystemFileStorageServiceTest {
         Assertions.assertThat(fileStorageService.readFileToString("data", fileEntry))
             .isEqualTo(TEST_STRING);
         Assertions.assertThat(fileEntry.getExtension())
-            .isNull();
+            .isEqualTo("bin");
         Assertions.assertThat(fileEntry.getMimeType())
-            .isNull();
+            .isEqualTo("application/octet-stream");
         Assertions.assertThat(fileEntry.getUrl())
             .doesNotContain(".env");
 

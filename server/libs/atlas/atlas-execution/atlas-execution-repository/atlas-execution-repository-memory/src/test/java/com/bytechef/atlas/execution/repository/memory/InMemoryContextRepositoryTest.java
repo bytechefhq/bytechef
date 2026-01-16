@@ -31,24 +31,19 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 /**
  * @author Ivica Cardic
  */
 class InMemoryContextRepositoryTest {
 
-    private static final String CACHE_NAME = InMemoryContextRepository.class.getName() + ".context";
-
     private InMemoryContextRepository repository;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         TenantContext.resetCurrentTenantId();
 
-        ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager(CACHE_NAME);
-
-        repository = new InMemoryContextRepository(cacheManager);
+        repository = new InMemoryContextRepository();
     }
 
     @AfterEach

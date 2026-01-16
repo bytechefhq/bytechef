@@ -16,8 +16,6 @@
 
 package com.bytechef.message.broker.memory;
 
-import com.bytechef.commons.util.ConvertUtils;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.message.Retryable;
 import com.bytechef.message.route.MessageRoute;
 import java.util.List;
@@ -27,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.thread.Threading;
+import org.springframework.boot.thread.Threading;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
@@ -63,11 +61,16 @@ public class AsyncMessageBroker extends AbstractMessageBroker {
 
         List<Receiver> receivers = receiverMap.get(messageRoute);
 
-        Assert.isTrue(receivers != null && !receivers.isEmpty(), "no listeners subscribed for: " + messageRoute);
+        if (receivers == null || receivers.isEmpty()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("No listeners subscribed for: " + messageRoute);
+            }
+
+            return;
+        }
 
         for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
-            executor.execute(() -> receiver.receive(
-                ConvertUtils.convertValue(JsonUtils.read(JsonUtils.write(message)), message.getClass())));
+            executor.execute(() -> receiver.receive(message));
         }
     }
 

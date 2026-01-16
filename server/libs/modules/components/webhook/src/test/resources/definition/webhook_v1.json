@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts the response to the webhook request.",
     "help": null,
@@ -286,13 +289,15 @@
       "required": null,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Response to Webhook Request",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,
@@ -319,10 +324,10 @@
       "outputResponse": {
         "outputSchema": null,
         "placeholder": {
-          "headers": { },
-          "method": "POST",
+          "body": { },
           "parameters": { },
-          "body": { }
+          "method": "POST",
+          "headers": { }
         },
         "sampleOutput": null
       },
@@ -357,10 +362,10 @@
       "outputResponse": {
         "outputSchema": null,
         "placeholder": {
-          "headers": { },
-          "method": "POST",
+          "body": { },
           "parameters": { },
-          "body": { }
+          "method": "POST",
+          "headers": { }
         },
         "sampleOutput": null
       },
@@ -417,10 +422,10 @@
       "outputResponse": {
         "outputSchema": null,
         "placeholder": {
-          "headers": { },
-          "method": "POST",
+          "body": { },
           "parameters": { },
-          "body": { }
+          "method": "POST",
+          "headers": { }
         },
         "sampleOutput": null
       },

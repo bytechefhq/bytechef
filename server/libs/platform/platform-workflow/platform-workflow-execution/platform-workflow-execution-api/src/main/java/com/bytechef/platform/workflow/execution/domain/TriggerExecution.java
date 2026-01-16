@@ -26,7 +26,7 @@ import com.bytechef.message.Prioritizable;
 import com.bytechef.message.Retryable;
 import com.bytechef.platform.configuration.domain.Trigger;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

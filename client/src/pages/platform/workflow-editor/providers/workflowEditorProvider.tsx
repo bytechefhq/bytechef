@@ -4,7 +4,7 @@ import {
     CredentialStatus,
     DeleteClusterElementParameter200Response,
     DeleteClusterElementParameterOperationRequest,
-    DeleteWorkflowNodeParameterOperationRequest,
+    DeleteWorkflowNodeParameterRequest,
     Tag,
     UpdateClusterElementParameterOperationRequest,
     UpdateWorkflowNodeParameterOperationRequest,
@@ -96,7 +96,7 @@ export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
     deleteWorkflowNodeParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response,
         Error,
-        DeleteWorkflowNodeParameterOperationRequest,
+        DeleteWorkflowNodeParameterRequest,
         unknown
     >;
     invalidateWorkflowQueries: () => void;

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends an email.",
     "help": null,
@@ -317,14 +320,16 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Email",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendEmail",
     "description": "Sends an email.",
     "element": { },
     "help": null,
-    "name": "sendEmail",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -637,20 +642,20 @@
     } ],
     "title": "Send Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   }, {
-    "label": "Marketing Automation",
-    "name": "marketing-automation"
+    "name": "marketing-automation",
+    "label": "Marketing Automation"
   } ],
   "connection": {
     "authorizationRequired": null,

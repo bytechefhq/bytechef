@@ -20,7 +20,6 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.AbstractMap;
@@ -34,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.type.TypeReference;
 
 /**
  *

@@ -34,7 +34,7 @@ public abstract class AbstractActionTest {
     protected ActionContext mockedActionContext = mock(ActionContext.class);
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         when(mockedParameters.getString(TOKEN)).thenReturn("TOKEN");
     }
 }

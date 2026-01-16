@@ -4,7 +4,9 @@ import { updateSearchIndexes } from './update-orama-index';
 env.loadEnvConfig(process.cwd());
 
 async function main() {
-  await Promise.all([updateSearchIndexes()]);
+  await Promise.all([
+    // updateSearchIndexes()
+  ]);
 }
 
 await main().catch((e) => {

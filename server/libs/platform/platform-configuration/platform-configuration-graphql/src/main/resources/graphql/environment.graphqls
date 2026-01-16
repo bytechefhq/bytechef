@@ -1,0 +1,10 @@
+enum EnvironmentEnum {
+    DEVELOPMENT
+    STAGING
+    PRODUCTION
+}
+
+type Environment {
+    id: ID!
+    name: String!
+}

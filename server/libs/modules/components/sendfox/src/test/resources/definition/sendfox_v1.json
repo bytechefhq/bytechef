@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact.",
     "help": null,
@@ -1349,10 +1352,15 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new list.",
     "help": null,
@@ -1576,10 +1584,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create List",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Unsubscribes a contact.",
     "help": null,
@@ -2836,14 +2849,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Unsubscribe Contact",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createContact",
     "description": "Creates a new contact.",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4183,18 +4198,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createList",
     "description": "Creates a new list.",
     "element": { },
     "help": null,
-    "name": "createList",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4409,18 +4424,18 @@
     } ],
     "title": "Create List",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "unsubscribeContact",
     "description": "Unsubscribes a contact.",
     "element": { },
     "help": null,
-    "name": "unsubscribeContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5668,17 +5683,17 @@
     } ],
     "title": "Unsubscribe Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Advertising",
-    "name": "advertising"
+    "name": "advertising",
+    "label": "Advertising"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -35,6 +35,8 @@ public interface TaskExecutionService {
 
     TaskExecution getTaskExecution(long id);
 
+    TaskExecution getTaskExecutionForUpdate(long id);
+
     List<TaskExecution> getJobTaskExecutions(long jobId);
 
     List<TaskExecution> getParentTaskExecutions(long parentId);

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new row.",
     "help": null,
@@ -58,6 +61,7 @@
       "required": false,
       "type": "BOOLEAN"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -69,14 +73,18 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Row",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes the specified row.",
     "help": null,
@@ -124,10 +132,15 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete Row",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Fetches a single table row.",
     "help": null,
@@ -204,10 +217,15 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Row",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Lists table rows.",
     "help": null,
@@ -306,10 +324,15 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "List Rows",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates the specified row.",
     "help": null,
@@ -386,6 +409,7 @@
       "required": false,
       "type": "BOOLEAN"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -397,18 +421,19 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Row",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createRow",
     "description": "Creates a new row.",
     "element": { },
     "help": null,
-    "name": "createRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -460,6 +485,7 @@
       "required": false,
       "type": "BOOLEAN"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -471,24 +497,23 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Create Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteRow",
     "description": "Deletes the specified row.",
     "element": { },
     "help": null,
-    "name": "deleteRow",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -532,18 +557,18 @@
     } ],
     "title": "Delete Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getRow",
     "description": "Fetches a single table row.",
     "element": { },
     "help": null,
-    "name": "getRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -616,18 +641,18 @@
     } ],
     "title": "Get Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listRows",
     "description": "Lists table rows.",
     "element": { },
     "help": null,
-    "name": "listRows",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -722,18 +747,18 @@
     } ],
     "title": "List Rows",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateRow",
     "description": "Updates the specified row.",
     "element": { },
     "help": null,
-    "name": "updateRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -804,6 +829,7 @@
       "required": false,
       "type": "BOOLEAN"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -815,23 +841,22 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Update Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -19,7 +19,7 @@ package com.bytechef.automation.mcp.facade;
 import com.bytechef.automation.mcp.domain.WorkspaceMcpServer;
 import com.bytechef.automation.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -59,7 +59,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
     @Override
     public McpServer createWorkspaceMcpServer(
-        String name, ModeType type, Environment environment, Boolean enabled, Long workspaceId) {
+        String name, PlatformType type, Environment environment, Boolean enabled, Long workspaceId) {
 
         McpServer mcpServer = mcpServerService.create(name, type, environment, enabled);
 

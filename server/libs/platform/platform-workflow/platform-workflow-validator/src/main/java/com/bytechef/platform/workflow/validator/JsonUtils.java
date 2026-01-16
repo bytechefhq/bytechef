@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.workflow.validator;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Centralized utility class for JSON operations and type utilities. Consolidates common JSON operations that were
@@ -61,8 +61,7 @@ class JsonUtils {
     /**
      * Parses JSON string with error handling.
      */
-    @Nullable
-    public static JsonNode parseJsonWithErrorHandling(String json, StringBuilder errors) {
+    public static @Nullable JsonNode parseJsonWithErrorHandling(String json, StringBuilder errors) {
         try {
             return com.bytechef.commons.util.JsonUtils.readTree(json);
         } catch (Exception e) {

@@ -18,8 +18,6 @@
 
 package com.bytechef.message.broker.memory;
 
-import com.bytechef.commons.util.ConvertUtils;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.message.route.MessageRoute;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -43,8 +41,7 @@ public class SyncMessageBroker extends AbstractMessageBroker {
         Assert.isTrue(receivers != null && !receivers.isEmpty(), "no listeners subscribed for: " + messageRoute);
 
         for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
-            receiver.receive(
-                ConvertUtils.convertValue(JsonUtils.read(JsonUtils.write(message)), message.getClass()));
+            receiver.receive(message);
         }
     }
 }

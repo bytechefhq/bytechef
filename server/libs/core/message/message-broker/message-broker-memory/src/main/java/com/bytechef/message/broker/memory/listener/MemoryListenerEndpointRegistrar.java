@@ -33,6 +33,7 @@ import org.springframework.util.ReflectionUtils;
 public class MemoryListenerEndpointRegistrar {
 
     private final MemoryMessageBroker memoryMessageBroker;
+    private volatile boolean stopped;
 
     public MemoryListenerEndpointRegistrar(MemoryMessageBroker memoryMessageBroker) {
         this.memoryMessageBroker = memoryMessageBroker;
@@ -42,6 +43,9 @@ public class MemoryListenerEndpointRegistrar {
         memoryMessageBroker.receive(
             messageRoute,
             message -> {
+                if (stopped) {
+                    return;
+                }
                 try {
                     new MethodInvoker(delegate, methodName).invoke(new Object[] {
                         message
@@ -50,6 +54,14 @@ public class MemoryListenerEndpointRegistrar {
                     throw new RuntimeException(e);
                 }
             });
+    }
+
+    public void stop() {
+        this.stopped = true;
+    }
+
+    public void start() {
+        this.stopped = false;
     }
 
     private static class MethodInvoker {

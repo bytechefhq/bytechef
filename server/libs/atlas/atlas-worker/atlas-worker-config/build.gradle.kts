@@ -5,4 +5,5 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-impl"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
 }

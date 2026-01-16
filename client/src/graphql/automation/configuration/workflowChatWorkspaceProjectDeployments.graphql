@@ -1,0 +1,26 @@
+query workflowChatWorkspaceProjectDeployments($workspaceId: ID!, $environmentId: ID!, $projectId: ID, $tagId: ID) {
+    workspaceProjectDeployments(workspaceId: $workspaceId, environmentId: $environmentId, projectId: $projectId, tagId: $tagId) {
+        id
+        enabled
+        project {
+            id
+            name
+        }
+        projectDeploymentWorkflows {
+            id
+            enabled
+            staticWebhookUrl
+            workflowExecutionId
+            projectWorkflow {
+                workflow {
+                    id
+                    label
+                    triggers {
+                        parameters
+                        type
+                    }
+                }
+            }
+        }
+    }
+}

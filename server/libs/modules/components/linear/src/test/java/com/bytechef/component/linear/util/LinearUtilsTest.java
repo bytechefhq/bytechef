@@ -58,7 +58,7 @@ class LinearUtilsTest {
         option("test2", "2"));
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedTriggerContext.http(any()))

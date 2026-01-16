@@ -25,7 +25,7 @@ spring:
     name: ai-copilot
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5433/bytechef_copilot
+    url: jdbc:postgresql://localhost:5432/bytechef_copilot
     username: postgres
     password: postgres
   profiles:
@@ -57,7 +57,7 @@ bytechef:
             temperature: 0.5
       vectorstore:
         pgvector:
-          url: jdbc:postgresql://localhost:5433/bytechef_copilot
+          url: jdbc:postgresql://localhost:5432/bytechef
           username: postgres
           password: postgres
   edition: EE

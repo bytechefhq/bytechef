@@ -30,9 +30,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
+import org.springframework.core.retry.RetryException;
+import org.springframework.core.retry.RetryPolicy;
+import org.springframework.core.retry.RetryTemplate;
+import org.springframework.util.backoff.ExponentialBackOff;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -67,22 +68,17 @@ public class WebhookJobStatusApplicationEventListener implements ApplicationEven
 
                     RetryTemplate retryTemplate = createRetryTemplate(webhook);
 
-                    retryTemplate.execute(context -> {
-                        if (context.getRetryCount() == 0) {
-                            logger.debug(
-                                "Calling webhook {} -> {}",
-                                webhook.url(),
-                                webhookEvent);
-                        } else {
-                            logger.debug(
-                                "[Retry: {}] Calling webhook {} -> {}",
-                                context.getRetryCount(),
-                                webhook.url(),
-                                webhookEvent);
-                        }
+                    try {
+                        retryTemplate.execute(() -> {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Calling data table webhook {} -> {}", webhook.url(), webhookEvent);
+                            }
 
-                        return restTemplate.postForObject(webhook.url(), webhookEvent, String.class);
-                    });
+                            return restTemplate.postForObject(webhook.url(), webhookEvent, String.class);
+                        });
+                    } catch (RetryException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
@@ -91,22 +87,11 @@ public class WebhookJobStatusApplicationEventListener implements ApplicationEven
     private RetryTemplate createRetryTemplate(Job.Webhook webhook) {
         Job.Retry retry = webhook.retry();
 
-        RetryTemplate retryTemplate = new RetryTemplate();
-
-        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
-
-        backOffPolicy.setInitialInterval(getInitialInterval(retry));
-        backOffPolicy.setMaxInterval(getMaxInterval(retry));
-        backOffPolicy.setMultiplier(getMultiplier(retry));
-
-        retryTemplate.setBackOffPolicy(backOffPolicy);
-
-        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
-
-        retryPolicy.setMaxAttempts(getMaxAttempts(retry));
-        retryTemplate.setRetryPolicy(retryPolicy);
-
-        return retryTemplate;
+        return new RetryTemplate(
+            RetryPolicy.builder()
+                .backOff(new ExponentialBackOff(getInitialInterval(retry), getMultiplier(retry)))
+                .maxRetries(getMaxAttempts(retry))
+                .build());
     }
 
     private static int getMaxAttempts(Job.Retry retry) {
@@ -121,12 +106,12 @@ public class WebhookJobStatusApplicationEventListener implements ApplicationEven
             : retry.multiplier();
     }
 
-    private static long getMaxInterval(Job.Retry retry) {
-        return (retry.maxInterval() == null
-            ? Duration.of(2, ChronoUnit.SECONDS)
-            : Duration.of(retry.maxInterval(), ChronoUnit.SECONDS))
-                .toMillis();
-    }
+//    private static long getMaxInterval(Job.Retry retry) {
+//        return (retry.maxInterval() == null
+//            ? Duration.of(2, ChronoUnit.SECONDS)
+//            : Duration.of(retry.maxInterval(), ChronoUnit.SECONDS))
+//                .toMillis();
+//    }
 
     private static long getInitialInterval(Job.Retry retry) {
         return (retry.initialInterval() == null

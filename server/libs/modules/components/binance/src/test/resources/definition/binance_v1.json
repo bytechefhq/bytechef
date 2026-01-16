@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Fetch the price of a crypto pair from Binance.",
     "help": null,
@@ -172,13 +175,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Fetch Pair Price",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Payment Processing",
-    "name": "payment-processing"
+    "name": "payment-processing",
+    "label": "Payment Processing"
   } ],
   "connection": null,
   "customAction": null,

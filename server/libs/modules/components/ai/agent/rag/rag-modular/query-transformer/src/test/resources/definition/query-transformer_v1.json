@@ -3,51 +3,51 @@
   "actions": [ ],
   "clusterElementClusterElementTypes": { },
   "clusterElementTypes": [ {
+    "name": "MODEL",
     "key": "model",
     "label": "Model",
     "multipleElements": false,
-    "name": "MODEL",
     "required": true
   } ],
   "clusterElements": [ {
+    "name": "compressionQueryTransformer",
     "description": "Uses a large language model to compress a conversation history and a follow-up query\ninto a standalone query that captures the essence of the conversation.\nThis transformer is useful when the conversation history is long and the follow-up\nquery is related to the conversation context.\n",
     "element": { },
     "help": null,
-    "name": "compressionQueryTransformer",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": null,
     "title": "Compression Query Transformer",
     "type": {
+      "name": "QUERY_TRANSFORMER",
       "key": "queryTransformer",
       "label": "Query Transformer",
       "multipleElements": true,
-      "name": "QUERY_TRANSFORMER",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "rewriteQueryTransformer",
     "description": "Uses a large language model to rewrite a user query to provide better results when\nquerying a target system, such as a vector store or a web search engine.\nThis transformer is useful when the user query is verbose, ambiguous, or contains\nirrelevant information that may affect the quality of the search results.\n",
     "element": { },
     "help": null,
-    "name": "rewriteQueryTransformer",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": null,
     "title": "Rewrite Query Transformer",
     "type": {
+      "name": "QUERY_TRANSFORMER",
       "key": "queryTransformer",
       "label": "Query Transformer",
       "multipleElements": true,
-      "name": "QUERY_TRANSFORMER",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "translationQueryTransformer",
     "description": "Uses a large language model to translate a query to a target language that is supported\nby the embedding model used to generate the document embeddings. If the query is\nalready in the target language, it is returned unchanged. If the language of the query\nis unknown, it is also returned unchanged.\nThis transformer is useful when the embedding model is trained on a specific language\nand the user query is in a different language.\n",
     "element": { },
     "help": null,
-    "name": "translationQueryTransformer",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -75,17 +75,17 @@
     } ],
     "title": "Translation Query Transformer",
     "type": {
+      "name": "QUERY_TRANSFORMER",
       "key": "queryTransformer",
       "label": "Query Transformer",
       "multipleElements": true,
-      "name": "QUERY_TRANSFORMER",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

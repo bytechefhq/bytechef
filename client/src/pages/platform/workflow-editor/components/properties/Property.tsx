@@ -79,6 +79,7 @@ const Property = ({
         formattedOptions,
         handleCodeEditorChange,
         handleDeleteCustomPropertyClick,
+        handleFromAiClick,
         handleInputChange,
         handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
@@ -91,6 +92,7 @@ const Property = ({
         isDisplayConditionsPending,
         isFetchingCurrentDisplayCondition,
         isFormulaMode,
+        isFromAi,
         isNumericalInput,
         isValidControlType,
         label,
@@ -119,7 +121,6 @@ const Property = ({
         workflow,
     } = useProperty({
         arrayIndex,
-        arrayName,
         control,
         controlPath,
         displayConditionsQuery,
@@ -185,8 +186,10 @@ const Property = ({
                     defaultValue={defaultValue}
                     deletePropertyButton={deletePropertyButton}
                     description={description}
+                    handleFromAiClick={handleFromAiClick}
                     handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                     isFormulaMode={isFormulaMode}
+                    isFromAi={isFromAi}
                     label={label || name}
                     leadingIcon={typeIcon}
                     path={calculatedPath}

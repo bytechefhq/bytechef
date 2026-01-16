@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a repository in a selected workspace.",
     "help": null,
@@ -2570,10 +2573,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Repository",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a project in selected workspace.",
     "help": null,
@@ -2850,10 +2858,15 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Project",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns list of projects from workspace.",
     "help": null,
@@ -3743,10 +3756,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "List Projects",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns list of repositories from workspace.",
     "help": null,
@@ -6108,14 +6126,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "List Repositories",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "listProjects",
     "description": "Returns list of projects from workspace.",
     "element": { },
     "help": null,
-    "name": "listProjects",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7001,18 +7021,18 @@
     } ],
     "title": "List Projects",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listRepositories",
     "description": "Returns list of repositories from workspace.",
     "element": { },
     "help": null,
-    "name": "listRepositories",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9370,17 +9390,17 @@
     } ],
     "title": "List Repositories",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Project Management",
-    "name": "project-management"
+    "name": "project-management",
+    "label": "Project Management"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -63,7 +64,7 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
         @Autowired(
             required = false) List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers,
         RedisConnectionFactory redisConnectionFactory, RedisMessageDeserializer redisMessageDeserializer,
-        StringRedisTemplate stringRedisTemplate, TaskExecutor taskExecutor) {
+        StringRedisTemplate stringRedisTemplate, @Qualifier("applicationTaskExecutor") TaskExecutor taskExecutor) {
 
         this.messageBrokerConfigurers = messageBrokerConfigurers == null
             ? Collections.emptyList() : messageBrokerConfigurers;
@@ -117,6 +118,42 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
                 messageListenerAdapter, new ChannelTopic(messageRoute.getName()));
         } else {
             listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);
+        }
+    }
+
+    @Override
+    public void stopListenerEndpoints() {
+        try {
+            if (redisListenerEndpointRegistrar != null) {
+                redisListenerEndpointRegistrar.stop();
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to stop Redis listener endpoint registrar: {}", e.getMessage());
+        }
+        try {
+            if (redisMessageListenerContainer != null) {
+                redisMessageListenerContainer.stop();
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to stop Redis message listener container: {}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void startListenerEndpoints() {
+        try {
+            if (redisListenerEndpointRegistrar != null) {
+                redisListenerEndpointRegistrar.start();
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to start Redis listener endpoint registrar: {}", e.getMessage());
+        }
+        try {
+            if (redisMessageListenerContainer != null) {
+                redisMessageListenerContainer.start();
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to start Redis message listener container: {}", e.getMessage());
         }
     }
 }

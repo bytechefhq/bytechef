@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -80,7 +80,7 @@ public class IntegrationTagApiControllerIntTest {
     private WebTestClient webTestClient;
 
     @BeforeEach
-    public void setup() {
+    void beforeEach() {
         this.webTestClient = MockMvcWebTestClient
             .bindTo(mockMvc)
             .build();

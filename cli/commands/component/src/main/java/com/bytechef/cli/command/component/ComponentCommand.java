@@ -18,37 +18,33 @@ package com.bytechef.cli.command.component;
 
 import com.bytechef.cli.command.component.init.openapi.ComponentInitOpenApiGenerator;
 import java.io.File;
-import org.springframework.shell.command.annotation.Command;
-import org.springframework.shell.command.annotation.Option;
+import org.springframework.shell.core.command.annotation.Command;
+import org.springframework.shell.core.command.annotation.Option;
 
-@Command(command = "component", description = "Manage, create, and publish a component")
+@org.springframework.stereotype.Component
 public class ComponentCommand {
 
     @Command
     public void component() {
     }
 
-    @Command(command = "init", description = "Generates project for a new component.")
+    @Command(name = "init", description = "Generates project for a new component.")
     public void init(
         @Option(
-            longNames = "base-package-name", label = "NAME", description = "package for generated classes",
+            longName = "base-package-name", description = "package for generated classes",
             defaultValue = "com.bytechef.component") String basePackageName,
         @Option(
-            longNames = "internal-component",
+            longName = "internal-component",
             description = "if a component is the internal one(ships with the platform) or the custom one",
             defaultValue = "false") boolean internalComponent,
+        @Option(longName = "name", shortName = 'n', description = "component name", required = true) String name,
+        @Option(longName = "open-api-path", description = "path to the OpenAPI specification") String openApiPath,
         @Option(
-            longNames = "name", shortNames = 'n', label = "NAME", description = "component name",
-            required = true) String name,
-        @Option(
-            longNames = "open-api-path", label = "PATH",
-            description = "path to the OpenAPI specification") String openApiPath,
-        @Option(
-            longNames = "output-path", shortNames = 'o', label = "PATH",
+            longName = "output-path", shortName = 'o',
             description = "where to write the generated files (current dir by default)",
             required = true) String outputPath,
         @Option(
-            longNames = "version", shortNames = 'v', label = "VERSION", description = "the component version",
+            longName = "version", shortName = 'v', description = "the component version",
             defaultValue = "1") int version)
         throws Exception {
 

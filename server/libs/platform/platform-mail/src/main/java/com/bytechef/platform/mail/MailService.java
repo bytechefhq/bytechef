@@ -50,6 +50,7 @@ public class MailService {
 
     private static final String USER = "user";
     private static final String BASE_URL = "baseUrl";
+    private static final String PASSWORD = "password";
 
     private final JavaMailSender javaMailSender;
     private final Mail mail;
@@ -96,6 +97,13 @@ public class MailService {
     }
 
     @Async
+    public void sendInvitationEmail(User user, String password) {
+        log.debug("Sending invitation email to '{}'", user.getEmail());
+
+        this.sendInvitationEmailSync(user, password, "mail/invitationEmail", "email.invitation.title");
+    }
+
+    @Async
     public void sendPasswordResetMail(User user) {
         log.debug("Sending password reset email to '{}'", user.getEmail());
 
@@ -116,6 +124,27 @@ public class MailService {
         context.setVariable(USER, user);
 
         context.setVariable(BASE_URL, mail.getBaseUrl());
+
+        String content = templateEngine.process(templateName, context);
+        String subject = messageSource.getMessage(titleKey, null, locale);
+
+        this.sendEmailSync(user.getEmail(), subject, content, false, true);
+    }
+
+    private void sendInvitationEmailSync(User user, String password, String templateName, String titleKey) {
+        if (user.getEmail() == null) {
+            log.debug("Email doesn't exist for user '{}'", user.getLogin());
+
+            return;
+        }
+
+        Locale locale = Locale.forLanguageTag(user.getLangKey());
+
+        Context context = new Context(locale);
+
+        context.setVariable(USER, user);
+        context.setVariable(BASE_URL, mail.getBaseUrl());
+        context.setVariable(PASSWORD, password);
 
         String content = templateEngine.process(templateName, context);
         String subject = messageSource.getMessage(titleKey, null, locale);

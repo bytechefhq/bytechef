@@ -4,6 +4,7 @@ query projectTemplate($id: String!, $sharedProject: Boolean!) {
             key
             value {
                 connection {
+                    componentName
                     version
                 }
                 icon

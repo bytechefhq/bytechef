@@ -1,11 +1,13 @@
 dependencies {
-    api("com.fasterxml.jackson.core:jackson-databind")
-    api("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     api("com.jayway.jsonpath:json-path")
+    api("tools.jackson.core:jackson-databind")
+    api("tools.jackson.dataformat:jackson-dataformat-xml")
 
-    implementation("org.apache.commons:commons-lang3")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation(libs.com.googlecode.owasp.java.html.sanitizer)
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
 
     testImplementation(project(":server:libs:config:jackson-config"))

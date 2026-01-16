@@ -26,8 +26,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
@@ -55,12 +55,11 @@ public class HttpClientActionTest {
     protected final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     protected Object executePerformFunction(ModifiableActionDefinition action) throws Exception {
-        Optional<PerformFunction> performFunction = action.getPerform();
+        Optional<? extends BasePerformFunction> basePerformFunction = action.getPerform();
 
-        assertTrue(performFunction.isPresent());
+        assertTrue(basePerformFunction.isPresent());
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) performFunction.get();
+        PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
 
         when(mockedActionContext.http(contextFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> contextFunctionArgumentCaptor.getValue()
@@ -78,6 +77,6 @@ public class HttpClientActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        return singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
+        return performFunction.apply(mockedParameters, null, mockedActionContext);
     }
 }

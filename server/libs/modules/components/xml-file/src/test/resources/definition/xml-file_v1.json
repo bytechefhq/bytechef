@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads data from a XML file.",
     "help": null,
@@ -203,10 +206,15 @@
       "required": null,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Read from File",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the data to a XML file.",
     "help": null,
@@ -526,13 +534,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Write to File",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

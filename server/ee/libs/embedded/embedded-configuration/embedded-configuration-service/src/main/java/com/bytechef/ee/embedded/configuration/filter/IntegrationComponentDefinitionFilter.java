@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.configuration.filter;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +31,7 @@ public class IntegrationComponentDefinitionFilter implements ComponentDefinition
     }
 
     @Override
-    public boolean supports(ModeType type) {
-        return ModeType.EMBEDDED.equals(type);
+    public boolean supports(PlatformType type) {
+        return PlatformType.EMBEDDED.equals(type);
     }
 }

@@ -17,7 +17,7 @@
 package com.bytechef.automation.mcp.facade;
 
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.List;
 
@@ -49,7 +49,7 @@ public interface WorkspaceMcpServerFacade {
      * @return the created MCP server
      */
     McpServer createWorkspaceMcpServer(
-        String name, ModeType type, Environment environment, Boolean enabled, Long workspaceId);
+        String name, PlatformType type, Environment environment, Boolean enabled, Long workspaceId);
 
     /**
      * Deletes an MCP server and removes it from all workspaces.

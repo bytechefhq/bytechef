@@ -20,12 +20,6 @@ import { mapValues } from '../runtime';
  */
 export interface DeleteClusterElementParameterRequest {
     /**
-     * If fromAi should be included in metadata.
-     * @type {boolean}
-     * @memberof DeleteClusterElementParameterRequest
-     */
-    fromAiInMetadata?: boolean;
-    /**
      * The workflow node parameter path.
      * @type {string}
      * @memberof DeleteClusterElementParameterRequest
@@ -51,7 +45,6 @@ export function DeleteClusterElementParameterRequestFromJSONTyped(json: any, ign
     }
     return {
         
-        'fromAiInMetadata': json['fromAiInMetadata'] == null ? undefined : json['fromAiInMetadata'],
         'path': json['path'],
     };
 }
@@ -67,7 +60,6 @@ export function DeleteClusterElementParameterRequestToJSONTyped(value?: DeleteCl
 
     return {
         
-        'fromAiInMetadata': value['fromAiInMetadata'],
         'path': value['path'],
     };
 }

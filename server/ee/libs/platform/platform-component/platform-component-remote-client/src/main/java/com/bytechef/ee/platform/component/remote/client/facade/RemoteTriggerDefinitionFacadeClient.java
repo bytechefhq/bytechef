@@ -9,7 +9,6 @@ package com.bytechef.ee.platform.component.remote.client.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.domain.Option;
@@ -17,14 +16,14 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -118,16 +117,16 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, ModeType type, Long jobPrincipalId,
-        String workflowUuid, Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        Long connectionId, boolean editorEnvironment) {
+        String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
+        Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest, Long connectionId,
+        Long environmentId, PlatformType type, boolean editorEnvironment) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-trigger"),
             new TriggerRequest(
                 componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
-                connectionId),
+                connectionId, jobPrincipalId, workflowUuid, editorEnvironment, type, environmentId),
             TriggerOutput.class);
     }
 
@@ -183,29 +182,6 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-workflow-node-description"),
-            new NodeDescriptionRequest(
-                componentName, componentVersion, triggerName, inputParameters),
-            String.class);
-    }
-
-    @Override
-    public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode, Object body) {
-        throw new UnsupportedOperationException();
-    }
-
-    private record NodeDescriptionRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
-    }
-
     private record OptionsRequest(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> inputParameters, Long connectionId, List<String> lookupDependsOnPaths, String searchText) {
@@ -248,7 +224,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     private record TriggerRequest(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters, Object state,
-        WebhookRequest webhookRequest, Long connectionId) {
+        WebhookRequest webhookRequest, Long connectionId, Long jobPrincipalId, String workflowUuid,
+        boolean editorEnvironment, PlatformType type, Long environmentId) {
     }
 
     private record WebhookValidateRequest(

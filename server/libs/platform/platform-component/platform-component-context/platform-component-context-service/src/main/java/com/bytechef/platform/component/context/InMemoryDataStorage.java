@@ -17,8 +17,6 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.nio.charset.StandardCharsets;
@@ -26,81 +24,59 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
-class InMemoryDataStorage implements DataStorage {
+class InMemoryDataStorage {
 
     private static final String CACHE = InMemoryDataStorage.class.getName() + ".dataStorage";
 
     private final CacheManager cacheManager;
+    @Nullable
     private final String workflowUuid;
 
-    InMemoryDataStorage(String workflowUuid, CacheManager cacheManager) {
+    InMemoryDataStorage(@Nullable String workflowUuid, CacheManager cacheManager) {
         this.cacheManager = cacheManager;
         this.workflowUuid = workflowUuid;
     }
 
-    @Override
-    public void delete(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
-
-        Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
+    public void delete(String componentName, DataStorageScope scope, String scopeId, String key) {
+        Map<String, Object> map = getValueMap(componentName, scope, scopeId);
 
         map.remove(key);
     }
 
-    @NonNull
-    @Override
     @SuppressWarnings("unchecked")
-    public <T> Optional<T> fetch(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
-
-        Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
+    public <T> Optional<T> fetch(String componentName, DataStorageScope scope, String scopeId, String key) {
+        Map<String, Object> map = getValueMap(componentName, scope, scopeId);
 
         return Optional.ofNullable((T) map.get(key));
     }
 
-    @NonNull
-    @Override
     @SuppressWarnings("unchecked")
-    public <T> T get(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
-
-        Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
+    public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key) {
+        Map<String, Object> map = getValueMap(componentName, scope, scopeId);
 
         return (T) map.get(key);
     }
 
-    @NonNull
-    @Override
     @SuppressWarnings("unchecked")
-    public <T> Map<String, T> getAll(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-        @NonNull ModeType type) {
-
-        return (Map<String, T>) getValueMap(componentName, scope, scopeId, type);
+    public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId) {
+        return (Map<String, T>) getValueMap(componentName, scope, scopeId);
     }
 
-    @Override
-    public void put(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-        @NonNull String key, @NonNull ModeType type, @NonNull Object value) {
-
+    public void put(String componentName, DataStorageScope scope, String scopeId, String key, Object value) {
         int size = getSizeInBytes(value);
 
         if (size > 409600) {
             throw new IllegalArgumentException("Value size exceeds 400KB limit per key. Actual: " + size + " bytes)");
         }
 
-        Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
+        Map<String, Object> map = getValueMap(componentName, scope, scopeId);
 
         map.put(key, value);
     }
@@ -118,11 +94,11 @@ class InMemoryDataStorage implements DataStorage {
     }
 
     private Map<String, Object> getValueMap(
-        String componentName, DataStorageScope scope, String scopeId, ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId) {
 
         Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE), CACHE);
 
-        return cache.get(
-            TenantCacheKeyUtils.getKey(workflowUuid, componentName, scope, scopeId, type), HashMap::new);
+        return Objects.requireNonNull(
+            cache.get(TenantCacheKeyUtils.getKey(workflowUuid, componentName, scope, scopeId), HashMap::new));
     }
 }

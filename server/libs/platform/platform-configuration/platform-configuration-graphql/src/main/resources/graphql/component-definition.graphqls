@@ -1,0 +1,47 @@
+extend type Query {
+    componentDefinition(componentName: String!, componentVersion: Int!): ComponentDefinition!
+    connectionComponentDefinition(componentName: String!, connectionVersion: Int!): ComponentDefinition!
+    componentDefinitionVersions(componentName: String!): [ComponentDefinition!]!
+    unifiedApiComponentDefinitions(category: UnifiedApiCategory!): [ComponentDefinition!]!
+}
+
+type ComponentDefinition {
+    actionClusterElementTypes: Map
+    actions: [ActionDefinition!]
+    actionsCount: Int
+    clusterElement: Boolean
+    clusterElementClusterElementTypes: Map
+    clusterElements: [ClusterElementDefinition!]
+    clusterElementsCount: Map
+    clusterElementTypes: [ClusterElementType!]
+    clusterRoot: Boolean
+    componentCategories: [ComponentCategory!]
+    connection: ConnectionDefinition
+    connectionRequired: Boolean
+    description: String
+    icon: String
+    name: String!
+    resources: Resources
+    tags: [String!]
+    title: String
+    triggers: [TriggerDefinition!]
+    triggersCount: Int
+    unifiedApiCategory: UnifiedApiCategory
+    version: Int
+}
+
+type ComponentCategory {
+    name: String!
+    label: String
+}
+
+enum UnifiedApiCategory {
+    ACCOUNTING
+    ATS
+    CRM
+    E_COMMERCE
+    HRIS
+    FILE_STORAGE
+    MARKETING_AUTOMATION
+    TICKETING
+}

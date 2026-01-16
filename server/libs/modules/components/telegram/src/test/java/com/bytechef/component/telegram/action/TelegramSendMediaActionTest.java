@@ -29,8 +29,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
@@ -85,14 +85,14 @@ class TelegramSendMediaActionTest {
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
-        Optional<PerformFunction> performFunction = TelegramSendMediaAction.ACTION_DEFINITION.getPerform();
+        Optional<? extends BasePerformFunction> basePerformFunction = TelegramSendMediaAction.ACTION_DEFINITION
+            .getPerform();
 
-        assertTrue(performFunction.isPresent());
+        assertTrue(basePerformFunction.isPresent());
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) performFunction.get();
+        PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
 
-        Object result = singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
+        Object result = performFunction.apply(mockedParameters, null, mockedActionContext);
 
         assertEquals(mockedObject, result);
         assertEquals(

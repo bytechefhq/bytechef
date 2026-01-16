@@ -9,7 +9,7 @@ import {
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import {DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
+import {CANVAS_BACKGROUND_COLOR, DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
 import {useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -130,7 +130,7 @@ const ClusterElementsWorkflowEditor = () => {
                     zoomOnDoubleClick={false}
                     zoomOnScroll={false}
                 >
-                    <Background color="#ccc" size={2} variant={BackgroundVariant.Dots} />
+                    <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
 
                     <Controls
                         className="m-2 rounded-md border border-stroke-neutral-secondary bg-background"

@@ -14,7 +14,7 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -77,21 +77,6 @@ public class RemoteTriggerDefinitionFacadeController {
             dynamicWebhookRefreshRequest.componentName, dynamicWebhookRefreshRequest.componentVersion,
             dynamicWebhookRefreshRequest.triggerName, dynamicWebhookRefreshRequest.outputParameters,
             dynamicWebhookRefreshRequest.connectionId));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/execute-workflow-node-description",
-        consumes = {
-            "application/json"
-        })
-    public ResponseEntity<String> executeEditorDescription(
-        @Valid @RequestBody NodeDescriptionRequest nodeDescriptionRequest) {
-
-        return ResponseEntity.ok(
-            triggerDefinitionFacade.executeWorkflowNodeDescription(
-                nodeDescriptionRequest.componentName, nodeDescriptionRequest.componentVersion,
-                nodeDescriptionRequest.triggerName, nodeDescriptionRequest.inputParameters));
     }
 
     @RequestMapping(
@@ -171,9 +156,9 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeTrigger(
                 triggerRequest.componentName, triggerRequest.componentVersion, triggerRequest.triggerName,
-                triggerRequest.type, triggerRequest.jobPrincipalId, triggerRequest.workflowUuid,
-                triggerRequest.inputParameters, triggerRequest.state, triggerRequest.webhookRequest,
-                triggerRequest.connectionId, false));
+                triggerRequest.jobPrincipalId, triggerRequest.workflowUuid, triggerRequest.inputParameters,
+                triggerRequest.state, triggerRequest.webhookRequest, triggerRequest.connectionId,
+                triggerRequest.environmentId, triggerRequest.type, false));
     }
 
     @RequestMapping(
@@ -251,11 +236,6 @@ public class RemoteTriggerDefinitionFacadeController {
     }
 
     @SuppressFBWarnings("EI")
-    public record NodeDescriptionRequest(
-        String componentName, String triggerName, int componentVersion, Map<String, ?> inputParameters) {
-    }
-
-    @SuppressFBWarnings("EI")
     public record ListenerDisableRequest(
         String componentName, int componentVersion, String triggerName,
         Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId) {
@@ -289,8 +269,8 @@ public class RemoteTriggerDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
         String componentName, int componentVersion, String triggerName,
-        ModeType type, Long jobPrincipalId, String workflowUuid, Map<String, ?> inputParameters,
-        Object state, WebhookRequest webhookRequest, Long connectionId) {
+        PlatformType type, Long jobPrincipalId, String workflowUuid, Map<String, ?> inputParameters,
+        Object state, WebhookRequest webhookRequest, Long connectionId, Long environmentId) {
     }
 
     @SuppressFBWarnings("EI")

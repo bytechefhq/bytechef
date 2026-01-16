@@ -16,25 +16,14 @@
 
 package com.bytechef.component.ai.llm.anthropic.action;
 
-import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.CHAT_MODEL_PROPERTY;
-import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.ASK_PROPERTIES;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
@@ -56,19 +45,7 @@ public class AnthropicChatAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
-        .properties(
-            CHAT_MODEL_PROPERTY,
-            FORMAT_PROPERTY,
-            PROMPT_PROPERTY,
-            SYSTEM_PROMPT_PROPERTY,
-            ATTACHMENTS_PROPERTY,
-            MESSAGES_PROPERTY,
-            MAX_TOKENS_PROPERTY,
-            RESPONSE_PROPERTY,
-            TEMPERATURE_PROPERTY,
-            TOP_P_PROPERTY,
-            TOP_K_PROPERTY,
-            STOP_PROPERTY)
+        .properties(ASK_PROPERTIES)
         .output(ModelUtils::output)
         .perform(AnthropicChatAction::perform);
 

@@ -1,8 +1,9 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
+import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {
     AppendMessage,
     AssistantRuntimeProvider,
@@ -14,8 +15,6 @@ import {
 } from '@assistant-ui/react';
 import {ReactNode, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
-
-const workflowTestApi = new WorkflowTestApi();
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
     return message;
@@ -29,10 +28,9 @@ export function WorkflowTestChatRuntimeProvider({
     const [isRunning, setIsRunning] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {setWorkflowIsRunning, setWorkflowTestExecution} = useWorkflowEditorStore(
+    const {setWorkflowIsRunning} = useWorkflowEditorStore(
         useShallow((state) => ({
             setWorkflowIsRunning: state.setWorkflowIsRunning,
-            setWorkflowTestExecution: state.setWorkflowTestExecution,
         }))
     );
     const workflow = useWorkflowDataStore((state) => state.workflow!);
@@ -43,6 +41,12 @@ export function WorkflowTestChatRuntimeProvider({
             setMessage: state.setMessage,
         }))
     );
+
+    const {setStreamRequest} = useWorkflowTestStream({
+        onError: () => setIsRunning(false),
+        onResult: () => setIsRunning(false),
+        workflowId: workflow.id!,
+    });
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {
@@ -55,8 +59,11 @@ export function WorkflowTestChatRuntimeProvider({
         setIsRunning(true);
         setWorkflowIsRunning(true);
 
-        const workflowTestExecution = await workflowTestApi
-            .testWorkflow({
+        try {
+            // Prepare an empty assistant message so streaming appears immediately
+            setMessage({content: '', role: 'assistant'} as ThreadMessageLike);
+
+            const request = getTestWorkflowStreamPostRequest({
                 environmentId: currentEnvironmentId,
                 id: workflow.id!,
                 testWorkflowRequest: {
@@ -68,16 +75,15 @@ export function WorkflowTestChatRuntimeProvider({
                         },
                     },
                 },
-            })
-            .catch((error) => error);
+            });
 
-        setMessage({
-            content: workflowTestExecution.job?.outputs?.message ?? '',
-            role: 'assistant',
-        });
-        setIsRunning(false);
-        setWorkflowTestExecution(workflowTestExecution);
-        setWorkflowIsRunning(false);
+            setStreamRequest(request);
+        } catch (error) {
+            console.error('Failed to build test workflow stream request:', error);
+
+            setIsRunning(false);
+            setWorkflowIsRunning(false);
+        }
     };
 
     const runtime = useExternalStoreRuntime({

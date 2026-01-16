@@ -10,7 +10,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
-    implementation(project(":server:libs:platform:platform-coordinator"))
+    implementation(project(":server:libs:platform:platform-job-sync"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:libs:modules:components:map"))
     implementation(project(":server:libs:modules:task-dispatchers:approval"))

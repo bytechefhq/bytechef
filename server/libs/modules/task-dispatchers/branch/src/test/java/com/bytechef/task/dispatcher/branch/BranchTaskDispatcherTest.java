@@ -42,16 +42,15 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.jackson.config.JacksonConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.ApplicationEventPublisher;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Arik Cohen
@@ -70,7 +69,8 @@ public class BranchTaskDispatcherTest {
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(base64FileStorageService);
 
     static {
-        ObjectMapper objectMapper = new JacksonConfiguration(new JsonComponentModule()).objectMapper();
+        ObjectMapper objectMapper = JsonMapper.builder()
+            .build();
 
         JsonUtils.setObjectMapper(objectMapper);
         MapUtils.setObjectMapper(objectMapper);

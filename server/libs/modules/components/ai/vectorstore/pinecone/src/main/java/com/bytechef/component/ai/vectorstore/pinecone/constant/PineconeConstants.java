@@ -17,9 +17,6 @@
 package com.bytechef.component.ai.vectorstore.pinecone.constant;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.ai.vectorstore.pinecone.PineconeVectorStore;
@@ -33,28 +30,20 @@ public class PineconeConstants {
     public static final String HOST = "host";
     public static final String PINECONE = "pinecone";
 
-    private static final Cache<String, org.springframework.ai.vectorstore.VectorStore> VECTOR_STORES =
-        Caffeine.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .maximumSize(1000)
-            .build();
+    private static final Pattern PATTERN = Pattern.compile("https:\\/\\/(.*)-(.*)\\.svc\\.(.*)\\.pinecone\\.io");
 
-    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> VECTOR_STORES.get(
-        connectionParameters.toString(), key -> {
-            Pattern pattern = Pattern.compile("https:\\/\\/(.*)-(.*)\\.svc\\.(.*)\\.pinecone\\.io");
-            Matcher matcher = pattern.matcher(connectionParameters.getRequiredString(HOST));
+    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
+        Matcher matcher = PATTERN.matcher(connectionParameters.getRequiredString(HOST));
 
-            if (matcher.find()) {
-                return PineconeVectorStore.builder(embeddingModel)
-                    .apiKey(connectionParameters.getRequiredString(API_KEY))
-//                    .projectId(matcher.group(2))
-//                    .environment(matcher.group(3))
-                    .indexName(matcher.group(1))
-                    .build();
-            } else {
-                throw new IllegalArgumentException("Invalid Host url");
-            }
-        });
+        if (matcher.find()) {
+            return PineconeVectorStore.builder(embeddingModel)
+                .apiKey(connectionParameters.getRequiredString(API_KEY))
+                .indexName(matcher.group(1))
+                .build();
+        } else {
+            throw new IllegalArgumentException("Invalid Host url");
+        }
+    };
 
     private PineconeConstants() {
     }

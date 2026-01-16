@@ -81,7 +81,7 @@ class GoogleCalendarEventTriggerTest {
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Watch mockedWatch = mock(Watch.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);

@@ -19,6 +19,7 @@
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.configuration.domain.Task;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The strategy interface used for resolving the apprpriate {@link TaskDispatcher} instance for a given {@link Task}.
@@ -35,5 +36,6 @@ public interface TaskDispatcherResolver {
      * @return a {@link TaskDispatcher} instance to execute the given task or <code>null</code> if unable to resolve
      *         one.
      */
+    @Nullable
     TaskDispatcher<? extends Task> resolve(Task task);
 }

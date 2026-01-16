@@ -1,0 +1,27 @@
+extend type Query {
+    triggerDefinition(componentName: String!, componentVersion: Int!, triggerName: String!): TriggerDefinition!
+    triggerDefinitions(componentName: String!, componentVersion: Int!): [TriggerDefinition!]!
+}
+
+type TriggerDefinition {
+    componentName: String
+    componentVersion: Int
+    description: String
+    help: Help
+    name: String!
+    outputDefined: Boolean!
+    outputFunctionDefined: Boolean!
+    outputSchemaDefined: Boolean
+    properties: [Property!]!
+    title: String
+    type: TriggerType!
+    workflowNodeDescriptionDefined: Boolean
+}
+
+enum TriggerType {
+    DYNAMIC_WEBHOOK
+    HYBRID
+    LISTENER
+    POLLING
+    STATIC_WEBHOOK
+}

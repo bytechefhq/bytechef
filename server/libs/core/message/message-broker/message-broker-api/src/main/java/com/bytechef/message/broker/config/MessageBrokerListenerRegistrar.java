@@ -25,4 +25,16 @@ public interface MessageBrokerListenerRegistrar<T> {
 
     void registerListenerEndpoint(
         T listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency, Object delegate, String methodName);
+
+    /**
+     * Stops all listener endpoints that were registered through this registrar implementation. Implementations should
+     * make a best-effort attempt to stop message consumption so that the engine stops processing messages.
+     */
+    void stopListenerEndpoints();
+
+    /**
+     * Starts (or restarts) all listener endpoints that were registered through this registrar implementation.
+     * Implementations should make a best-effort attempt to resume message consumption.
+     */
+    void startListenerEndpoints();
 }

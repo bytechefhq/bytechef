@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns metrics from target.",
     "help": null,
@@ -612,10 +615,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Metrics",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns user subscription information.",
     "help": null,
@@ -1011,10 +1019,15 @@
     "perform": null,
     "processErrorResponse": null,
     "properties": [ ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Subscription Information",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns the content of a page.",
     "help": null,
@@ -1393,14 +1406,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Page Content",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "getMetrics",
     "description": "Returns metrics from target.",
     "element": { },
     "help": null,
-    "name": "getMetrics",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2005,18 +2020,18 @@
     } ],
     "title": "Get Metrics",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getSubscriptionInfo",
     "description": "Returns user subscription information.",
     "element": { },
     "help": null,
-    "name": "getSubscriptionInfo",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2405,18 +2420,18 @@
     "properties": [ ],
     "title": "Get Subscription Information",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getPageContent",
     "description": "Returns the content of a page.",
     "element": { },
     "help": null,
-    "name": "getPageContent",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2788,17 +2803,17 @@
     } ],
     "title": "Get Page Content",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Analytics",
-    "name": "analytics"
+    "name": "analytics",
+    "label": "Analytics"
   } ],
   "connection": {
     "authorizationRequired": null,

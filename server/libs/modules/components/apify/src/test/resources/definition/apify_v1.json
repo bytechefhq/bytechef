@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get Apify Actor last run.",
     "help": null,
@@ -187,10 +190,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Last Run",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Starts an Apify Actor",
     "help": null,
@@ -252,14 +260,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Start Actor",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "getLastRun",
     "description": "Get Apify Actor last run.",
     "element": { },
     "help": null,
-    "name": "getLastRun",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -439,18 +449,18 @@
     } ],
     "title": "Get Last Run",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "startActor",
     "description": "Starts an Apify Actor",
     "element": { },
     "help": null,
-    "name": "startActor",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -508,17 +518,17 @@
     } ],
     "title": "Start Actor",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Marketing Automation",
-    "name": "marketing-automation"
+    "name": "marketing-automation",
+    "label": "Marketing Automation"
   } ],
   "connection": {
     "authorizationRequired": null,

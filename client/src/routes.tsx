@@ -11,9 +11,10 @@ import RegisterSuccess from '@/pages/account/public/RegisterSuccess';
 import VerifyEmail from '@/pages/account/public/VerifyEmail';
 import {Connections} from '@/pages/automation/connections/Connections';
 import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
+import TriggerForm from '@/pages/automation/trigger-form/TriggerForm';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
-import {AUTHORITIES} from '@/shared/constants';
+import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
 import ErrorPage from '@/shared/error/ErrorPage';
 import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
@@ -46,6 +47,7 @@ const ProjectTemplates = lazy(() => import('@/pages/automation/templates/project
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
 const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
+const WorkflowChatContainer = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChatContainer'));
 const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
 const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workflow-templates/WorkflowTemplates'));
 
@@ -76,6 +78,7 @@ const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integra
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
 const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
+const UsersPage = lazy(() => import('@/pages/settings/platform/users/UsersPage'));
 
 const getAccountRoutes = (path: string) => ({
     children: [
@@ -183,6 +186,18 @@ const platformSettingsRoutes = {
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>
                         <LazyLoadWrapper>
+                            <UsersPage />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'users',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
                             <AiProviders />
                         </LazyLoadWrapper>
                     </EEVersion>
@@ -250,6 +265,10 @@ const platformSettingsRoutes = {
     navItems: [
         {
             title: 'Organization',
+        },
+        {
+            href: 'users',
+            title: 'Users',
         },
         {
             href: 'ai-providers',
@@ -340,12 +359,12 @@ export const getRouter = (queryClient: QueryClient) =>
             path: '/verify-email',
         },
         {
-            element: <WorkflowChat />,
-            path: 'chat/:workflowExecutionId',
+            element: <TriggerForm />,
+            path: 'form/:workflowExecutionId',
         },
         {
-            element: <WorkflowChat />,
-            path: 'chat/:environment/:workflowExecutionId',
+            element: <TriggerForm />,
+            path: 'form/:environmentId/:workflowExecutionId',
         },
         {
             children: [
@@ -429,6 +448,15 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
+                                    loader: async () => {
+                                        const currentEnvironmentId = environmentStore.getState().currentEnvironmentId;
+
+                                        if (currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT) {
+                                            return redirect('/automation/deployments');
+                                        }
+
+                                        return null;
+                                    },
                                     path: 'projects',
                                 },
                                 {
@@ -559,6 +587,22 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'connections',
+                                },
+                                {
+                                    children: [
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                                    <LazyLoadWrapper>
+                                                        <WorkflowChat />
+                                                    </LazyLoadWrapper>
+                                                </PrivateRoute>
+                                            ),
+                                            path: ':workflowExecutionId',
+                                        },
+                                    ],
+                                    element: <WorkflowChatContainer />,
+                                    path: 'chat',
                                 },
                                 {
                                     children: [

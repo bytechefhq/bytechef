@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.copilot.service;
 import com.bytechef.ee.ai.copilot.domain.VectorStore;
 import com.bytechef.ee.ai.copilot.repository.VectorStoreRepository;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,8 +19,8 @@ import org.springframework.stereotype.Service;
  * @author Marko Kriskovic
  */
 @Service
+@ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class VectorStoreService {
-
     private final VectorStoreRepository repository;
 
     public VectorStoreService(VectorStoreRepository repository) {

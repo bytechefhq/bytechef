@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the AWS S3 object.",
     "help": null,
@@ -271,10 +274,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Object",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the url of an AWS S3 object.",
     "help": null,
@@ -359,10 +367,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get URL",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the list AWS S3 objects. Every object needs to have read permission in order to be seen.",
     "help": null,
@@ -617,10 +630,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "List Objects",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "You can share an object with a pre-signed URL for up to 12 hours or until your session expires.",
     "help": null,
@@ -727,10 +745,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Pre-signed Object",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Store an object to AWS S3.",
     "help": null,
@@ -916,16 +939,18 @@
       "required": null,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Put Object",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Developer Tools",
-    "name": "developer-tools"
+    "name": "developer-tools",
+    "label": "Developer Tools"
   }, {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new customer.",
     "help": null,
@@ -366,10 +369,15 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Customer",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new customer payment.",
     "help": null,
@@ -481,10 +489,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Customer Payment",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new supplier.",
     "help": null,
@@ -850,10 +863,15 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Supplier",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new supplier payment.",
     "help": null,
@@ -965,13 +983,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Supplier Payment",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Accounting",
-    "name": "accounting"
+    "name": "accounting",
+    "label": "Accounting"
   } ],
   "connection": {
     "authorizationRequired": null,

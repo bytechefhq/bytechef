@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Description",
     "help": null,
@@ -63,13 +66,15 @@
     "perform": { },
     "processErrorResponse": null,
     "properties": [ ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Title",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": {
     "authorizationRequired": null,

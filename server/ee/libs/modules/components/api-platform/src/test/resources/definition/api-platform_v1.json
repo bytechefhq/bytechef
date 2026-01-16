@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts the response to API request.",
     "help": null,
@@ -53,6 +56,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "response",
       "advancedOption": null,
       "description": "The properties of the response.",
       "displayCondition": null,
@@ -64,17 +68,18 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "response",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Response to API Request",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

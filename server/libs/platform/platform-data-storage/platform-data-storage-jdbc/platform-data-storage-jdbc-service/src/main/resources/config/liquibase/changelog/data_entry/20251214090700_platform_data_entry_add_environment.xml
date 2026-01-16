@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20251214090700-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="data_entry" columnName="environment"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="data_entry">
+            <column name="environment" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20251214090700-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <uniqueConstraintExists tableName="data_entry" constraintName="uk_data_entry_key"/>
+                <columnExists tableName="data_entry" columnName="environment"/>
+            </and>
+        </preConditions>
+
+        <dropUniqueConstraint tableName="data_entry" constraintName="uk_data_entry_key"/>
+
+        <addUniqueConstraint
+            constraintName="uk_data_entry_key"
+            tableName="data_entry"
+            columnNames="scope, scope_id, key, environment"/>
+    </changeSet>
+
+</databaseChangeLog>

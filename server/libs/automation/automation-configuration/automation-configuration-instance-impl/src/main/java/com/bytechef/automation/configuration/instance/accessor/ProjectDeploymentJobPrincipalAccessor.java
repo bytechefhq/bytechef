@@ -24,7 +24,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -95,13 +95,13 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
     }
 
     @Override
-    public ModeType getType() {
-        return ModeType.AUTOMATION;
+    public PlatformType getType() {
+        return PlatformType.AUTOMATION;
     }
 
     @Override
     public String getWorkflowId(long jobPrincipalId, String workflowUuid) {
-        return projectWorkflowService.getProjectDeploymentWorkflowId(jobPrincipalId, workflowUuid);
+        return projectWorkflowService.getProjectWorkflowWorkflowId(jobPrincipalId, workflowUuid);
     }
 
     @Override

@@ -72,7 +72,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                 </Tooltip>
 
                 <DropdownMenuContent className="p-0">
-                    <Tabs defaultValue="workflow">
+                    <Tabs aria-label="Settings menu" defaultValue="workflow">
                         <TabsList className="rounded-none">
                             <TabsTrigger
                                 aria-label="Workflow tab"

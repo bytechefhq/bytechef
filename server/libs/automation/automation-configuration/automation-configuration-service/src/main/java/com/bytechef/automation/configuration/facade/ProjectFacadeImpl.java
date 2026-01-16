@@ -384,7 +384,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return projectWorkflowService.getProjectWorkflows(projectIds)
             .stream()
             .map(projectWorkflow -> new ProjectWorkflowDTO(
-                workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
+                workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow, false))
             .toList();
     }
 

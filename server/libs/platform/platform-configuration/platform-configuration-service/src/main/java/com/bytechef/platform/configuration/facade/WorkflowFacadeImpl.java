@@ -68,6 +68,34 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
     }
 
     @Override
+    public boolean hasSseStreamResponse(String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+        List<WorkflowTask> tasks = workflow.getTasks(true);
+
+        for (WorkflowTask task : tasks) {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(task.getType());
+
+            Optional<ComponentDefinition> componentDefinition = componentDefinitionService.fetchComponentDefinition(
+                workflowNodeType.name(), workflowNodeType.version());
+
+            if (componentDefinition.isPresent()) {
+                boolean hasSseStreamResponse = componentDefinition.get()
+                    .getActions()
+                    .stream()
+                    .filter(actionDefinition -> Objects.equals(
+                        actionDefinition.getName(), workflowNodeType.operation()))
+                    .anyMatch(com.bytechef.platform.component.domain.ActionDefinition::isSseStreamResponse);
+
+                if (hasSseStreamResponse) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
     public void update(String id, String definition, Integer version) {
         workflowService.update(id, definition, version);
     }

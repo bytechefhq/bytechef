@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new folder at path you specify.",
     "help": null,
@@ -1083,10 +1086,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Folder",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new list",
     "help": null,
@@ -1894,10 +1902,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create List",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new item in a list.",
     "help": null,
@@ -1962,6 +1975,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "columns",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1973,14 +1987,18 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "columns",
       "required": null,
       "type": "DYNAMIC_PROPERTIES"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create List Item",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Upload file to Microsoft SharePoint folder.",
     "help": null,
@@ -3067,16 +3085,18 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Upload File",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   }, {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

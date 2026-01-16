@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.scheduler.job;
 
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerPollEvent;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;

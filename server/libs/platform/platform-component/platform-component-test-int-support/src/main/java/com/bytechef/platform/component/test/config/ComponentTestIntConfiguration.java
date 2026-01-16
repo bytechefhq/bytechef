@@ -20,18 +20,6 @@ import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.ContextServiceImpl;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.CounterServiceImpl;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.JobServiceImpl;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
@@ -49,23 +37,24 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorageImpl;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -90,12 +79,11 @@ public class ComponentTestIntConfiguration {
 
     @Bean
     ComponentJobTestExecutor componentWorkflowTestSupport(
-        ContextService contextService, JobService jobService, TaskExecutionService taskExecutionService,
-        Map<String, TaskHandler<?>> taskHandlerMap, TaskExecutor taskExecutor,
-        TaskHandlerProvider taskHandlerProvider, WorkflowService workflowService) {
+        Environment environment, ObjectMapper objectMapper, Map<String, TaskHandler<?>> taskHandlerMap,
+        TaskExecutor taskExecutor, TaskHandlerProvider taskHandlerProvider, WorkflowService workflowService) {
 
         return new ComponentJobTestExecutor(
-            contextService, SpelEvaluator.create(), jobService, taskExecutor, taskExecutionService,
+            environment, SpelEvaluator.create(), objectMapper, taskExecutor,
             MapUtils.concat(taskHandlerMap, taskHandlerProvider.getTaskHandlerMap()), workflowService);
     }
 
@@ -107,16 +95,6 @@ public class ComponentTestIntConfiguration {
     @Bean(name = "dataStorageService")
     DataStorage dataStorage() {
         return Mockito.mock(DataStorage.class);
-    }
-
-    @Bean
-    ContextService contextService(CacheManager cacheManager) {
-        return new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
-    }
-
-    @Bean
-    CounterService counterService(CacheManager cacheManager) {
-        return new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
     }
 
     @Bean
@@ -137,22 +115,6 @@ public class ComponentTestIntConfiguration {
     @Bean
     JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry() {
         return new JobPrincipalAccessorRegistry(List.of());
-    }
-
-    @Bean
-    JobService jobService(CacheManager cacheManager, ObjectMapper objectMapper) {
-        return new JobServiceImpl(
-            new InMemoryJobRepository(cacheManager, taskExecutionRepository(cacheManager), objectMapper));
-    }
-
-    @Bean
-    TaskExecutionService taskExecutionService(CacheManager cacheManager) {
-        return new TaskExecutionServiceImpl(taskExecutionRepository(cacheManager));
-    }
-
-    @Bean
-    InMemoryTaskExecutionRepository taskExecutionRepository(CacheManager cacheManager) {
-        return new InMemoryTaskExecutionRepository(cacheManager);
     }
 
     @Bean

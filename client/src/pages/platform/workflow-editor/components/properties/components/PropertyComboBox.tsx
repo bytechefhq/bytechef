@@ -11,7 +11,7 @@ import {
 } from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {CheckIcon, ChevronsUpDownIcon, CircleQuestionMarkIcon} from 'lucide-react';
-import {FocusEventHandler, ReactNode, useEffect, useMemo, useState} from 'react';
+import {FocusEventHandler, ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
@@ -293,6 +293,19 @@ const PropertyComboBox = ({
         dependencyMissing && 'text-destructive'
     );
 
+    const handleValueChange = useCallback(
+        (value: string) => {
+            setOpen(false);
+
+            setValue(value);
+
+            if (onValueChange) {
+                onValueChange(value);
+            }
+        },
+        [onValueChange]
+    );
+
     useEffect(() => {
         if (initialValue !== undefined) {
             setValue(initialValue.toString());
@@ -431,15 +444,7 @@ const PropertyComboBox = ({
                                     <CommandItem
                                         className="cursor-pointer font-normal hover:bg-muted"
                                         key={option.value.toString()}
-                                        onSelect={() => {
-                                            setOpen(false);
-
-                                            setValue(option.value.toString());
-
-                                            if (onValueChange) {
-                                                onValueChange(option.value.toString());
-                                            }
-                                        }}
+                                        onSelect={() => handleValueChange(option.value.toString())}
                                         value={option.value.toString()}
                                     >
                                         {option.icon && (

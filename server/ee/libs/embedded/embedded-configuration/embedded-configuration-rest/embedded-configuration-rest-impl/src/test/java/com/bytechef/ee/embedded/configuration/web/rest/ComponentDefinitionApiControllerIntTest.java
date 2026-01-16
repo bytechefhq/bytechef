@@ -20,7 +20,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurat
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -53,14 +53,14 @@ public class ComponentDefinitionApiControllerIntTest {
     private WebTestClient webTestClient;
 
     @BeforeEach
-    public void setup() {
+    void beforeEach() {
         this.webTestClient = MockMvcWebTestClient.bindTo(mockMvc)
             .build();
     }
 
     @Test
     public void testGetComponentDefinitions() {
-        Mockito.when(componentDefinitionService.getComponentDefinitions(null, null, null, null, ModeType.EMBEDDED))
+        Mockito.when(componentDefinitionService.getComponentDefinitions(null, null, null, null, PlatformType.EMBEDDED))
             .thenReturn(List.of(new ComponentDefinition("component1"), new ComponentDefinition("component2")));
 
         try {

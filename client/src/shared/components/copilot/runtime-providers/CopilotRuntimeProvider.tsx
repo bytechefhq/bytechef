@@ -65,6 +65,7 @@ export function CopilotRuntimeProvider({
         agent.setState({
             ...context,
             currentSelectedNode: currentComponent?.name,
+            workflowExecutionError: context.taskExecutionError,
             workflowId: workflow.id,
         });
 

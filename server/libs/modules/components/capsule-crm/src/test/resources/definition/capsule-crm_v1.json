@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new Person or Organization",
     "help": null,
@@ -527,10 +530,15 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new Task",
     "help": null,
@@ -1046,13 +1054,15 @@
       "required": false,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

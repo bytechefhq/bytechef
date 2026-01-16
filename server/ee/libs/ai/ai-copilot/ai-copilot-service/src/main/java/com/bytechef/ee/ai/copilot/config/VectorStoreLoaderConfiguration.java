@@ -7,26 +7,17 @@
 
 package com.bytechef.ee.ai.copilot.config;
 
-import com.bytechef.component.definition.Property.Type;
 import com.bytechef.ee.ai.copilot.service.VectorStoreService;
-import com.bytechef.platform.component.domain.ActionDefinition;
-import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.domain.TriggerDefinition;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.domain.BaseProperty;
-import com.bytechef.platform.domain.OutputResponse;
 import com.knuddels.jtokkit.api.EncodingType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -35,11 +26,10 @@ import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.context.event.EventListener;
 
 /**
  * @version ee
@@ -51,198 +41,80 @@ import org.springframework.core.io.Resource;
 public class VectorStoreLoaderConfiguration {
 
     private static final String CATEGORY = "category";
-    private static final String COMPONENTS = "components";
+    private static final String COMPONENTS_PATH = "server/libs/modules/components";
     private static final int MAX_TOKENS = 1536;
     private static final String NAME = "name";
-    private static final String COMPONENT_NAME = "componentName";
-    private static final String TYPE = "type";
-    private static final String WORKFLOWS = "workflows";
+    private static final String README = "readme";
+    private static final String README_PATH = "src/main/resources/README.mdx";
+    private static final String ROOT = "user.dir";
 
     private final TokenCountBatchingStrategy strategy;
     private final VectorStore vectorStore;
     private final VectorStoreService vectorStoreService;
-    private final ComponentDefinitionService componentDefinitionService;
 
     @SuppressFBWarnings("EI")
-    public VectorStoreLoaderConfiguration(
-        VectorStore vectorStore, VectorStoreService vectorStoreService,
-        // TODO Add dependency on ComponentDefinitionService, implement local ComponentDefinitionRegistry, that will
-        // read generated component json definitions
-        @Autowired(required = false) ComponentDefinitionService componentDefinitionService) {
-
-        this.vectorStore = vectorStore;
-        this.vectorStoreService = vectorStoreService;
+    public VectorStoreLoaderConfiguration(VectorStore vectorStore, VectorStoreService vectorStoreService) {
         this.strategy = new TokenCountBatchingStrategy(
             EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
-        this.componentDefinitionService = componentDefinitionService;
+        this.vectorStore = vectorStore;
+        this.vectorStoreService = vectorStoreService;
     }
 
-    // TODO Enable vector store initialization on startup
-    // @EventListener(ApplicationStartedEvent.class)
+    @EventListener(ApplicationStartedEvent.class)
     public void onApplicationStartedEvent() {
-        Resource resource = new ClassPathResource(WORKFLOWS);
+        Path projectRoot = Paths.get(System.getProperty(ROOT));
+        Path componentsPath = projectRoot.resolve(COMPONENTS_PATH);
 
-        try {
-            if (resource.exists() && resource.isFile()) {
-                Path resourcePath = Paths.get(resource.getURI());
+        if (Files.exists(componentsPath) && Files.isDirectory(componentsPath)) {
+            initializeVectorStoreTable(componentsPath);
+        }
+    }
 
-                initializeVectorStoreTable(resourcePath);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private static void addToDocuments(String name, List<Document> documents, String cleanedDocument, int hash) {
+        List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
+
+        for (String chunk : chunks) {
+            documents.add(new Document(chunk, Map.of(CATEGORY, README, NAME, name, "hash", hash)));
         }
     }
 
     private static void addToDocuments(
-        List<Map<String, Object>> vectorStores, String name, String json, List<Document> documents) {
+        List<Map<String, Object>> vectorStoreMetadataList, String name, String json, List<Document> documents,
+        VectorStore vectorStore) {
 
-        if (!containsFile(vectorStores, name, WORKFLOWS)) {
-            String cleanedDocument = preprocessDocument(json);
+        String cleanedDocument = preprocessDocument(json);
+        int hash = cleanedDocument.hashCode();
 
+        if (!containsVectorStoreFile(vectorStoreMetadataList, name, README)) {
             if (!cleanedDocument.isEmpty()) {
-                // Split the document into chunks
-                List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
+                addToDocuments(name, documents, cleanedDocument, hash);
+            }
+        } else {
+            Optional<Map<String, Object>> vectorStoreFileMetadata = getVectorStoreFile(
+                vectorStoreMetadataList, name, README);
+            if (vectorStoreFileMetadata.isPresent()) {
+                Map<String, Object> fileMetadata = vectorStoreFileMetadata.get();
 
-                for (String chunk : chunks) {
-                    documents.add(new Document(chunk, Map.of(CATEGORY, WORKFLOWS, NAME, name)));
+                int vectorHash = (int) fileMetadata.get("hash");
+
+                if (vectorHash != hash) {
+                    deleteFromVectorStore(vectorStore, name, README, hash);
+
+                    addToDocuments(name, documents, cleanedDocument, hash);
                 }
             }
         }
     }
 
-    private static void addToDocuments(
-        String name, String componentName, String json, List<Document> documents, String type) {
+    private static boolean containsVectorStoreFile(
+        List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
 
-        String cleanedDocument = preprocessDocument(json);
-
-        if (!cleanedDocument.isEmpty()) {
-            // Split the document into chunks
-            List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
-
-            for (String chunk : chunks) {
-                documents.add(new Document(chunk,
-                    Map.of(CATEGORY, COMPONENTS, NAME, name, TYPE, type, COMPONENT_NAME, componentName)));
-            }
-        }
+        return !vectorStoreList.isEmpty() && vectorStoreList.stream()
+            .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
     }
 
-    private String createJsonExample(ActionDefinition actionDefinition) {
-        StringBuilder json = new StringBuilder();
-
-        json.append("{")
-            .append("\n")
-            .append("\"label\": \"")
-            .append(actionDefinition.getTitle())
-            .append("\",")
-            .append("\n")
-            .append("\"name\": \"")
-            .append(actionDefinition.getName())
-            .append("\",")
-            .append("\n")
-            .append("\"type\": \"")
-            .append(actionDefinition.getComponentName())
-            .append("/v")
-            .append(actionDefinition.getComponentVersion())
-            .append("/")
-            .append(actionDefinition.getName())
-            .append("\",\n");
-
-        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecorators(actionDefinition.getProperties());
-
-        if (!properties.isEmpty()) {
-            json.append("\"parameters\": ")
-                .append(getObjectValue(properties));
-        }
-
-        return json.append("}")
-            .toString();
-    }
-
-    private String createJsonExample(TriggerDefinition triggerDefinition) {
-        StringBuilder json = new StringBuilder();
-
-        json.append("{")
-            .append("\n")
-            .append("\"label\": \"")
-            .append(triggerDefinition.getTitle())
-            .append("\",")
-            .append("\n")
-            .append("\"name\": \"")
-            .append(triggerDefinition.getName())
-            .append("\",")
-            .append("\n")
-            .append("\"type\": \"")
-            .append(triggerDefinition.getComponentName())
-            .append("/v")
-            .append(triggerDefinition.getComponentVersion())
-            .append("/")
-            .append(triggerDefinition.getName())
-            .append("\",\n");
-
-        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecorators(triggerDefinition.getProperties());
-
-        if (!properties.isEmpty()) {
-            json.append("\"parameters\": ")
-                .append(getObjectValue(properties));
-        }
-        return json.append("}")
-            .toString();
-    }
-
-    private String getArrayValue(List<PropertyDecorator> properties) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("[\n");
-
-        for (var property : properties) {
-            parameters.append(getSampleValue(property))
-                .append(",\n");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        return parameters.append("]")
-            .toString();
-    }
-
-    private String getSampleValue(PropertyDecorator property) {
-        return switch (property.getType()) {
-            case ARRAY -> getArrayValue(property.getItems());
-            case BOOLEAN -> "false";
-            case DATE -> "\"1980-01-01\"";
-            case DATE_TIME -> "\"1980-01-01T00:00:00\"";
-            case DYNAMIC_PROPERTIES -> "{}";
-            case INTEGER -> "1";
-            case NUMBER -> "0.0";
-            case OBJECT -> getObjectValue(property.getObjectProperties());
-            case FILE_ENTRY -> getObjectValue(property.getFileEntryProperties());
-            case TIME -> "\"00:00:00\"";
-            default -> "\"\"";
-        };
-    }
-
-    private String getObjectValue(List<PropertyDecorator> properties) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("{")
-            .append("\n");
-
-        for (var property : properties) {
-            parameters.append("\"")
-                .append(property.getName())
-                .append("\": ")
-                .append(getSampleValue(property))
-                .append(",\n");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        return parameters.append("}")
-            .toString();
+    private static void deleteFromVectorStore(VectorStore vectorStore, String name, String category, int hash) {
+        vectorStore.delete(String.format("name == '%s' AND category == '%s' AND hash == '%d'", name, category, hash));
     }
 
     private void initializeVectorStoreTable(Path documentationPath) {
@@ -256,6 +128,14 @@ public class VectorStoreLoaderConfiguration {
         } else {
             storeDocuments(List.of(), documentationPath);
         }
+    }
+
+    private static Optional<Map<String, Object>> getVectorStoreFile(
+        List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
+
+        return vectorStoreList.stream()
+            .filter(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)))
+            .findFirst();
     }
 
     private static String preprocessDocument(String document) {
@@ -311,7 +191,6 @@ public class VectorStoreLoaderConfiguration {
         return document.trim();
     }
 
-    // Function to split a document into chunks based on a maximum token limit
     private static List<String> splitDocument(String[] tokens) {
         List<String> chunks = new ArrayList<>();
         StringBuilder currentChunk = new StringBuilder();
@@ -320,8 +199,8 @@ public class VectorStoreLoaderConfiguration {
         for (String token : tokens) {
             if (tokenCount + 1 > MAX_TOKENS) {
                 chunks.add(StringUtils.trim(currentChunk.toString()));
-
                 currentChunk.setLength(0); // Reset the current chunk
+
                 tokenCount = 0;
             }
 
@@ -338,105 +217,35 @@ public class VectorStoreLoaderConfiguration {
         return chunks;
     }
 
-    private String toString(ComponentDefinition componentDefinition) {
-        StringBuilder definitionText = new StringBuilder();
-
-        definitionText.append("Component Name: ")
-            .append(componentDefinition.getName())
-            .append(",\n")
-            .append("Description: ")
-            .append(componentDefinition.getDescription())
-            .append(",\n");
-
-        return definitionText.toString();
-    }
-
-    private String toString(TriggerDefinition triggerDefinition) {
-        StringBuilder definitionText = new StringBuilder();
-
-        definitionText.append("Trigger Name: ")
-            .append(triggerDefinition.getName())
-            .append(",\n")
-            .append("Description: ")
-            .append(triggerDefinition.getDescription())
-            .append(",\n")
-            .append("Example JSON Structure: \n")
-            .append(createJsonExample(triggerDefinition))
-            .append(";\n");
-
-        OutputResponse outputResponse = triggerDefinition.getOutputResponse();
-
-        if (triggerDefinition.isOutputDefined() && outputResponse != null && outputResponse.outputSchema() != null) {
-            definitionText.append("Output JSON: \n")
-                .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
-                .append(";\n");
-        }
-
-        return definitionText.toString();
-    }
-
-    private String toString(ActionDefinition actionDefinition) {
-        StringBuilder definitionText = new StringBuilder();
-
-        String name = actionDefinition.getName();
-
-        if (!name.equals("customAction")) {
-
-            definitionText.append("Action Name: ")
-                .append(name)
-                .append(",\n")
-                .append("Description: ")
-                .append(actionDefinition.getDescription())
-                .append(",\n")
-                .append("Example JSON Structure: \n")
-                .append(createJsonExample(actionDefinition))
-                .append(";\n");
-
-            OutputResponse outputResponse = actionDefinition.getOutputResponse();
-
-            if (actionDefinition.isOutputDefined() && outputResponse != null) {
-                definitionText.append("Output JSON: \n")
-                    .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
-                    .append(";\n");
-            }
-        }
-
-        return definitionText.toString();
-    }
-
-    private void storeDocuments(
-        TokenCountBatchingStrategy batchingStrategy, List<Map<String, Object>> vectorStores, VectorStore vectorStore) {
+    private static void storeComponentDocuments(
+        Path componentsBasePath, BatchingStrategy batchingStrategy,
+        List<Map<String, Object>> vectorStoreMetadataList, VectorStore vectorStore) throws IOException {
 
         List<Document> documentList = new ArrayList<>();
 
-        for (ComponentDefinition componentDefinition : componentDefinitionService.getComponentDefinitions()) {
-            String json = toString(componentDefinition);
-            String componentName = componentDefinition.getName();
+        if (!Files.exists(componentsBasePath) || !Files.isDirectory(componentsBasePath)) {
+            return;
+        }
 
-            List<TriggerDefinition> triggers = componentDefinition.getTriggers();
+        try (var componentDirs = Files.list(componentsBasePath)) {
+            componentDirs
+                .filter(Files::isDirectory)
+                .forEach(componentDir -> {
+                    try {
+                        Path readmePath = componentDir.resolve(README_PATH);
 
-            if (!triggers.isEmpty()) {
-                for (TriggerDefinition triggerDefinition : triggers) {
-                    if (!containsFile(vectorStores, triggerDefinition.getName(), componentName, COMPONENTS)) {
-                        String triggerJson = json + toString(triggerDefinition);
+                        if (Files.exists(readmePath) && Files.isReadable(readmePath)) {
+                            String componentName = componentDir.getFileName()
+                                .toString();
+                            String document = Files.readString(readmePath);
 
-                        addToDocuments(triggerDefinition.getName(), componentName, triggerJson, documentList,
-                            "trigger");
+                            addToDocuments(vectorStoreMetadataList, componentName, document, documentList, vectorStore);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error reading README.mdx for component: " +
+                            componentDir.getFileName(), e);
                     }
-                }
-            }
-
-            List<ActionDefinition> actions = componentDefinition.getActions();
-
-            if (!actions.isEmpty()) {
-                for (ActionDefinition actionDefinition : actions) {
-                    if (!containsFile(vectorStores, actionDefinition.getName(), componentName, COMPONENTS)) {
-                        String actionJson = json + toString(actionDefinition);
-
-                        addToDocuments(actionDefinition.getName(), componentName, actionJson, documentList, "action");
-                    }
-                }
-            }
+                });
         }
 
         for (List<Document> batch : batchingStrategy.batch(documentList)) {
@@ -444,214 +253,11 @@ public class VectorStoreLoaderConfiguration {
         }
     }
 
-    private static boolean containsFile(
-        List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
-
-        return !vectorStoreList.isEmpty() && vectorStoreList.stream()
-            .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
-    }
-
-    private static boolean containsFile(
-        List<Map<String, Object>> vectorStoreList, String fileName, String componentName, String categoryName) {
-
-        return !vectorStoreList.isEmpty() && vectorStoreList.stream()
-            .anyMatch(map -> fileName.equals(map.get(NAME)) && componentName.equals(map.get(COMPONENT_NAME))
-                && categoryName.equals(map.get(CATEGORY)));
-    }
-
-    private static void storeDocumentsFromPath(
-        Path path, String suffix, BatchingStrategy batchingStrategy,
-        List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) throws IOException {
-
-        List<Document> documentList = new ArrayList<>();
-
-        Files.walkFileTree(path, new SimpleFileVisitor<>() {
-
-            @Override
-            @SuppressFBWarnings("NP")
-            public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
-                if (StringUtils.endsWith(filePath.toString(), suffix)) {
-                    Path fileNamePath = filePath.getFileName();
-
-                    String fileName = fileNamePath.toString();
-
-                    fileName = fileName.replace(suffix, "");
-
-                    String document = Files.readString(filePath);
-
-                    addToDocuments(vectorStoreList, fileName, document, documentList);
-                }
-
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
-        for (List<Document> batch : batchingStrategy.batch(documentList)) {
-            vectorStore.add(batch);
-        }
-    }
-
-    private void storeDocuments(
-        List<Map<String, Object>> vectorStoreList, Path workflowsPath) {
-
+    private void storeDocuments(List<Map<String, Object>> vectorStoreMetadataList, Path componentsBasePath) {
         try {
-            storeDocumentsFromPath(workflowsPath, ".json", strategy, vectorStoreList, vectorStore);
-            storeDocuments(strategy, vectorStoreList, vectorStore);
+            storeComponentDocuments(componentsBasePath, strategy, vectorStoreMetadataList, vectorStore);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static class PropertyDecorator {
-
-        enum Location {
-            COMPONENT,
-            TASK_DISPATCHER
-        }
-
-        private final BaseProperty property;
-        private final Type type;
-        private final Location location;
-
-        public PropertyDecorator(BaseProperty property) {
-            this.property = property;
-
-            switch (property) {
-                case com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty ignored -> {
-                    this.type = Type.ARRAY;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.ArrayProperty ignored -> {
-                    this.type = Type.ARRAY;
-                    this.location = Location.COMPONENT;
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.BooleanProperty ignored -> {
-                    this.type = Type.BOOLEAN;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.BooleanProperty ignored -> {
-                    this.type = Type.BOOLEAN;
-                    this.location = Location.COMPONENT;
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.DateProperty ignored -> {
-                    this.type = Type.DATE;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.DateProperty ignored -> {
-                    this.type = Type.DATE;
-                    this.location = Location.COMPONENT;
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.DateTimeProperty ignored -> {
-                    this.type = Type.DATE_TIME;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.DateTimeProperty ignored -> {
-                    this.type = Type.DATE_TIME;
-                    this.location = Location.COMPONENT;
-                }
-                case com.bytechef.platform.component.domain.DynamicPropertiesProperty ignored -> {
-                    this.type = Type.DYNAMIC_PROPERTIES;
-                    this.location = Location.COMPONENT;
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.IntegerProperty ignored -> {
-                    this.type = Type.INTEGER;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.IntegerProperty ignored -> {
-                    this.type = Type.INTEGER;
-                    this.location = Location.COMPONENT;
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty ignored -> {
-                    this.type = Type.FILE_ENTRY;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.FileEntryProperty ignored -> {
-                    this.type = Type.FILE_ENTRY;
-                    this.location = Location.COMPONENT;
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.NullProperty ignored -> {
-                    this.type = Type.NULL;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.NumberProperty ignored -> {
-                    this.type = Type.NUMBER;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.NumberProperty ignored -> {
-                    this.type = Type.NUMBER;
-                    this.location = Location.COMPONENT;
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty ignored -> {
-                    this.type = Type.OBJECT;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.ObjectProperty ignored -> {
-                    this.type = Type.OBJECT;
-                    this.location = Location.COMPONENT;
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.StringProperty ignored -> {
-                    this.type = Type.STRING;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.StringProperty ignored -> {
-                    this.type = Type.STRING;
-                    this.location = Location.COMPONENT;
-                }
-                case com.bytechef.platform.workflow.task.dispatcher.domain.TimeProperty ignored -> {
-                    this.type = Type.TIME;
-                    this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.TimeProperty ignored -> {
-                    this.type = Type.TIME;
-                    this.location = Location.COMPONENT;
-                }
-                default -> {
-                    this.type = Type.NULL;
-                    this.location = Location.COMPONENT;
-                }
-            }
-        }
-
-        public List<PropertyDecorator> getItems() {
-            return switch (location) {
-                case TASK_DISPATCHER -> toPropertyDecorators(
-                    ((com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty) property).getItems());
-                case COMPONENT ->
-                    toPropertyDecorators(((com.bytechef.platform.component.domain.ArrayProperty) property).getItems());
-            };
-        }
-
-        public List<PropertyDecorator> getFileEntryProperties() {
-            return switch (location) {
-                case TASK_DISPATCHER -> toPropertyDecorators(
-                    ((com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty) property)
-                        .getProperties());
-                case COMPONENT -> toPropertyDecorators(
-                    ((com.bytechef.platform.component.domain.FileEntryProperty) property).getProperties());
-            };
-        }
-
-        public String getName() {
-            return property.getName();
-        }
-
-        public List<PropertyDecorator> getObjectProperties() {
-            return switch (location) {
-                case TASK_DISPATCHER -> toPropertyDecorators(
-                    ((com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty) property).getProperties());
-                case COMPONENT -> toPropertyDecorators(
-                    ((com.bytechef.platform.component.domain.ObjectProperty) property).getProperties());
-            };
-        }
-
-        public Type getType() {
-            return type;
-        }
-
-        public static List<PropertyDecorator> toPropertyDecorators(List<? extends BaseProperty> properties) {
-            return properties.stream()
-                .map(PropertyDecorator::new)
-                .toList();
         }
     }
 }

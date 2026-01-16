@@ -1,6 +1,11 @@
 ---
+<<<<<<< HEAD
 description: "Get started with component development in ByteChef. Learn how to implement this in your ByteChef workflows."
 title: Initial Setup
+=======
+title: "Initial Setup"
+description: "Learn how to create a new component"
+>>>>>>> origin/master
 ---
 
 To create a new component, we will use the `example` component as a template.
@@ -12,6 +17,7 @@ To create a new component, we will use the `example` component as a template.
      ```kotlin
      include("server:libs:modules:components:newcomponent")
      ```
+<<<<<<< HEAD
 3. **Modify Build Files**:
    - Open `bytechef/server/ee/apps/worker-app/build.gradle.kts` and `bytechef/server/apps/server-app/build.gradle.kts`
    - Add the following line to both files to ensure your component is included as a dependency:
@@ -24,3 +30,11 @@ To create a new component, we will use the `example` component as a template.
 5. **Rename Package and Classes**:
    - Inside the newly created package, rename the `example` subpackage to `newcomponent`.
    - Additionally, rename all classes within this package that start with `Example` to start with `NewComponent`.
+=======
+3. **Load Gradle Changes**:
+   - Refresh or reload the Gradle project in IntelliJ IDEA.
+   - This step ensures that IntelliJ recognizes your new component as a Java module, allowing you to work with it seamlessly within the IDE.
+4. **Rename Package and Classes**:
+   - Inside the newly created package, rename the `example` subpackage to `newcomponent`.
+   - Additionally, rename all classes within this package that start with `Example` to start with `NewComponent`.
+>>>>>>> origin/master

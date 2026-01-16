@@ -1,0 +1,53 @@
+extend type Query {
+    preBuiltWorkflowTemplates(query: String, category: String): [WorkflowTemplate!]!
+    sharedWorkflow(workflowUuid: String!): SharedWorkflow
+    workflowTemplate(id: String!, sharedWorkflow: Boolean!): WorkflowTemplate
+}
+
+extend type Mutation {
+    deleteSharedWorkflow(workflowId: String!): Boolean!
+    exportSharedWorkflow(workflowId: String!, description: String): Boolean!
+    importWorkflowTemplate(id: String!, projectId: ID!, sharedWorkflow: Boolean!): ID!
+}
+
+type ProjectWorkflow {
+    id: ID!
+    projectId: ID!
+    workflowId: String!
+    projectVersion: Int!
+    uuid: String
+    sseStreamResponse: Boolean!
+    workflow: Workflow!
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int!
+}
+
+type SharedWorkflow {
+    description: String
+    exported: Boolean!
+    projectVersion: Int
+    publicUrl: String
+}
+
+type SharedWorkflowInfo {
+    description: String
+    label: String!
+}
+
+type WorkflowTemplate {
+    authorEmail: String
+    authorName: String
+    authorRole: String
+    authorSocialLinks: [String]!
+    categories: [String!]!
+    components: [ComponentDefinition!]!
+    id: ID
+    lastModifiedDate: String
+    description: String
+    projectVersion: Int
+    publicUrl: String
+    workflow: SharedWorkflowInfo!
+}

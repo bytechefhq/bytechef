@@ -20,7 +20,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseOutputFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -215,11 +215,12 @@ public interface TriggerDefinition {
         /**
          *
          * @param connectionParameters
-         * @param outputParameters
+         * @param webhookEnableOutputParameters
          * @param context
          * @return
          */
-        WebhookEnableOutput apply(Parameters connectionParameters, Parameters outputParameters, TriggerContext context);
+        WebhookEnableOutput
+            apply(Parameters connectionParameters, Parameters webhookEnableOutputParameters, TriggerContext context);
     }
 
     /**
@@ -372,7 +373,6 @@ public interface TriggerDefinition {
             Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
             TriggerContext context)
             throws Exception;
-
     }
 
     /**
@@ -496,11 +496,11 @@ public interface TriggerDefinition {
          *
          * @param inputParameters
          * @param connectionParameters
-         * @param outputParameters
+         * @param webhookEnableOutputParameters
          * @param workflowExecutionId
          */
         void accept(
-            Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
+            Parameters inputParameters, Parameters connectionParameters, Parameters webhookEnableOutputParameters,
             String workflowExecutionId, TriggerContext context);
 
     }
@@ -539,13 +539,13 @@ public interface TriggerDefinition {
          * @param parameters
          * @param body
          * @param method
-         * @param output
+         * @param webhookEnableOutputParameters
          * @param context
          * @return
          */
         Object apply(
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-            HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
+            HttpParameters parameters, WebhookBody body, WebhookMethod method, Parameters webhookEnableOutputParameters,
             TriggerContext context) throws Exception;
     }
 
@@ -607,7 +607,7 @@ public interface TriggerDefinition {
      * @param webhookExpirationDate
      */
     @SuppressFBWarnings("EI")
-    record WebhookEnableOutput(Map<String, ?> parameters, LocalDateTime webhookExpirationDate) {
+    record WebhookEnableOutput(Map<String, ?> parameters, Instant webhookExpirationDate) {
     }
 
     @SuppressFBWarnings("EI")

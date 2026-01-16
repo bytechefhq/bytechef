@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create an incident synchronously without a corresponding event from a monitoring service.",
     "help": null,
@@ -4015,10 +4018,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Incident",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new note for the specified incident.",
     "help": null,
@@ -4838,10 +4846,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Incident Note",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update selected incident.",
     "help": null,
@@ -8864,14 +8877,16 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Incident",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createIncident",
     "description": "Create an incident synchronously without a corresponding event from a monitoring service.",
     "element": { },
     "help": null,
-    "name": "createIncident",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -12882,18 +12897,18 @@
     } ],
     "title": "Create Incident",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createIncidentNote",
     "description": "Create a new note for the specified incident.",
     "element": { },
     "help": null,
-    "name": "createIncidentNote",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -13709,18 +13724,18 @@
     } ],
     "title": "Create Incident Note",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateIncident",
     "description": "Update selected incident.",
     "element": { },
     "help": null,
-    "name": "updateIncident",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -17739,17 +17754,17 @@
     } ],
     "title": "Update Incident",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Project Management",
-    "name": "project-management"
+    "name": "project-management",
+    "label": "Project Management"
   } ],
   "connection": {
     "authorizationRequired": null,

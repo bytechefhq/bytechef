@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new task.",
     "help": null,
@@ -400,10 +403,15 @@
       "required": false,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Mark a tas as being completed.",
     "help": null,
@@ -443,10 +451,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Mark Task as Completed",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new project.",
     "help": null,
@@ -894,14 +907,16 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Project",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createTask",
     "description": "Creates a new task.",
     "element": { },
     "help": null,
-    "name": "createTask",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1292,18 +1307,18 @@
     } ],
     "title": "Create Task",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "markTaskCompleted",
     "description": "Mark a tas as being completed.",
     "element": { },
     "help": null,
-    "name": "markTaskCompleted",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1336,18 +1351,18 @@
     } ],
     "title": "Mark Task as Completed",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createProject",
     "description": "Creates a new project.",
     "element": { },
     "help": null,
-    "name": "createProject",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1786,17 +1801,17 @@
     } ],
     "title": "Create Project",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

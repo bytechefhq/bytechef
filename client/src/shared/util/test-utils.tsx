@@ -1,3 +1,4 @@
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {cleanup, render} from '@testing-library/react';
 import {ReactElement} from 'react';
 import {afterEach, vi} from 'vitest';
@@ -6,12 +7,26 @@ afterEach(() => {
     cleanup();
 });
 
-const customRender = (ui: ReactElement, options = {}) =>
-    render(ui, {
-        // wrap provider(s) here if needed
-        wrapper: ({children}) => <>{children}</>,
+const createTestQueryClient = () =>
+    new QueryClient({
+        defaultOptions: {
+            mutations: {
+                retry: false,
+            },
+            queries: {
+                retry: false,
+            },
+        },
+    });
+
+const customRender = (ui: ReactElement, options = {}) => {
+    const testQueryClient = createTestQueryClient();
+
+    return render(ui, {
+        wrapper: ({children}) => <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>,
         ...options,
     });
+};
 
 export const windowResizeObserver = () => {
     class MockResizeObserver {

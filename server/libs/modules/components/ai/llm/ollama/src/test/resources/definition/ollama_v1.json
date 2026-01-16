@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Ask anything you want.",
     "help": null,
@@ -1350,14 +1353,16 @@
       "required": null,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Ask",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "model",
     "description": "Ollama model.",
     "element": { },
     "help": null,
-    "name": "model",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2205,17 +2210,17 @@
     } ],
     "title": "Ollama Model",
     "type": {
+      "name": "MODEL",
       "key": "model",
       "label": "Model",
       "multipleElements": false,
-      "name": "MODEL",
       "required": true
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

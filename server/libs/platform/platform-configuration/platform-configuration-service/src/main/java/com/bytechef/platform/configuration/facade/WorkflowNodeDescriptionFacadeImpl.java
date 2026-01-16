@@ -20,9 +20,9 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.evaluator.Evaluator;
-import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
-import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -41,26 +41,27 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
 
     private static final Logger logger = LoggerFactory.getLogger(WorkflowNodeDescriptionFacadeImpl.class);
 
-    private final ActionDefinitionFacade actionDefinitionFacade;
-    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
+    private final ActionDefinitionService actionDefinitionService;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final Evaluator evaluator;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
-    private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeDescriptionFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, ClusterElementDefinitionFacade clusterElementDefinitionFacade,
-        Evaluator evaluator, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
-        TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
+        ActionDefinitionService actionDefinitionService,
+        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        TriggerDefinitionService triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
-        this.actionDefinitionFacade = actionDefinitionFacade;
-        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
+        this.actionDefinitionService = actionDefinitionService;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
-        this.triggerDefinitionFacade = triggerDefinitionFacade;
+        this.triggerDefinitionService = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
@@ -79,7 +80,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
 
         Map<String, ?> inputParameters = getInputParameters(workflowTask, inputs);
 
-        return clusterElementDefinitionFacade.executeWorkflowNodeDescription(
+        return clusterElementDefinitionService.executeWorkflowNodeDescription(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
             inputParameters);
     }
@@ -93,13 +94,13 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
         String description;
 
         if (workflowNodeName.equals("manual")) {
-            description = triggerDefinitionFacade.executeWorkflowNodeDescription("manual", 1, "manual", Map.of());
+            description = triggerDefinitionService.executeWorkflowNodeDescription("manual", 1, "manual", Map.of());
         } else {
             description = WorkflowTrigger.fetch(workflow, workflowNodeName)
                 .map(workflowTrigger -> {
                     WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-                    return triggerDefinitionFacade.executeWorkflowNodeDescription(
+                    return triggerDefinitionService.executeWorkflowNodeDescription(
                         workflowNodeType.name(), workflowNodeType.version(),
                         workflowNodeType.operation(), workflowTrigger.evaluateParameters(inputs, evaluator));
                 })
@@ -114,7 +115,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
                         return taskDispatcherDefinitionService.executeWorkflowNodeDescription(
                             workflowNodeType.name(), workflowNodeType.version(), inputParameters);
                     } else {
-                        return actionDefinitionFacade.executeWorkflowNodeDescription(
+                        return actionDefinitionService.executeWorkflowNodeDescription(
                             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
                             inputParameters);
                     }

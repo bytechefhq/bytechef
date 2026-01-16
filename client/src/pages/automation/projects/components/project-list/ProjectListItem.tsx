@@ -62,7 +62,7 @@ import {
     UploadIcon,
     WorkflowIcon,
 } from 'lucide-react';
-import {useCallback, useRef, useState} from 'react';
+import {MouseEvent, useCallback, useRef, useState} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -109,7 +109,10 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     });
 
     const deleteProjectMutation = useDeleteProjectMutation({
-        onSuccess: () => {
+        onSuccess: (_, projectId) => {
+            queryClient.cancelQueries({queryKey: ProjectKeys.project(projectId)});
+            queryClient.removeQueries({queryKey: ProjectKeys.project(projectId)});
+
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
             queryClient.invalidateQueries({
                 queryKey: ProjectCategoryKeys.projectCategories,
@@ -215,11 +218,16 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     return (
         <>
             <div
+                aria-label={`${project.name}_container`}
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
                 onClick={(event) => handleProjectListItemClick(event)}
             >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
-                    <div className="flex-1">
+                    <div
+                        aria-label={project.id?.toString() ?? project.name}
+                        className="flex-1"
+                        data-testid="project-item"
+                    >
                         <div className="flex items-center gap-2">
                             {project.projectWorkflowIds && project.projectWorkflowIds.length > 0 ? (
                                 <Link
@@ -270,6 +278,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                 <ButtonGroup>
                                     <Button
+                                        aria-label="Create Workflow"
                                         onClick={(event) => {
                                             event.stopPropagation();
 
@@ -392,11 +401,18 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
+                                <Button
+                                    aria-label="More Project Actions"
+                                    data-testid={`${project.id}-moreProjectActionsButton`}
+                                    icon={<EllipsisVerticalIcon />}
+                                    size="icon"
+                                    variant="ghost"
+                                />
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end" className="p-0">
                                 <DropdownMenuItem
+                                    aria-label="Publish Project"
                                     className="dropdown-menu-item"
                                     onClick={() => setShowPublishProjectDialog(true)}
                                 >
@@ -406,6 +422,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                 <DropdownMenuSeparator className="m-0" />
 
                                 <DropdownMenuItem
+                                    aria-label="Edit Project"
                                     className="dropdown-menu-item"
                                     onClick={() => setShowEditDialog(true)}
                                 >
@@ -413,6 +430,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem
+                                    aria-label="Duplicate Project"
                                     className="dropdown-menu-item"
                                     onClick={() => duplicateProjectMutation.mutate(project.id!)}
                                 >
@@ -421,6 +439,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                 {project.projectWorkflowIds && project.projectWorkflowIds?.length > 0 && (
                                     <DropdownMenuItem
+                                        aria-label="View Workflows"
                                         className="dropdown-menu-item"
                                         onClick={() =>
                                             navigate(
@@ -434,6 +453,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                 {ff_1042 && (
                                     <DropdownMenuItem
+                                        aria-label="Share Project"
                                         className="dropdown-menu-item"
                                         onClick={() => setShowProjectShareDialog(true)}
                                     >
@@ -443,6 +463,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                 {ff_2939 && (
                                     <DropdownMenuItem
+                                        aria-label="Share with Community"
                                         className="dropdown-menu-item"
                                         onClick={() => {
                                             if (templatesSubmissionForm) {
@@ -456,6 +477,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                 {ff_2482 && (
                                     <DropdownMenuItem
+                                        aria-label="Export Project"
                                         className="dropdown-menu-item"
                                         onClick={() =>
                                             (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
@@ -470,6 +492,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                 {ff_1039 && (
                                     <EEVersion hidden={true}>
                                         <DropdownMenuItem
+                                            aria-label="Pull Project from Git"
                                             className="dropdown-menu-item"
                                             disabled={!projectGitConfiguration?.enabled}
                                             onClick={handlePullProjectFromGitClick}
@@ -478,6 +501,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         </DropdownMenuItem>
 
                                         <DropdownMenuItem
+                                            aria-label="Git Configuration"
                                             className="dropdown-menu-item"
                                             onClick={() => setShowProjectGitConfigurationDialog(true)}
                                         >
@@ -489,8 +513,13 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                 )}
 
                                 <DropdownMenuItem
+                                    aria-label="Delete Project"
                                     className="dropdown-menu-item-destructive"
-                                    onClick={() => setShowDeleteDialog(true)}
+                                    onClick={(event: MouseEvent) => {
+                                        setShowDeleteDialog(true);
+
+                                        event.stopPropagation();
+                                    }}
                                 >
                                     <Trash2Icon /> Delete
                                 </DropdownMenuItem>
@@ -517,6 +546,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                         </AlertDialogCancel>
 
                         <AlertDialogAction
+                            aria-label="Confirm Project Deletion"
                             className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
                             onClick={() => {
                                 if (project.id) {

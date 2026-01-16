@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add a new employee.",
     "help": null,
@@ -305,10 +308,15 @@
       "required": false,
       "type": "DATE"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Employee",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update an employee, based on employee ID.",
     "help": null,
@@ -479,10 +487,15 @@
       "required": false,
       "type": "DATE"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Employee",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get employee data, based on employee ID.",
     "help": null,
@@ -568,10 +581,15 @@
       "required": true,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Employee",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update an employee file.",
     "help": null,
@@ -699,14 +717,16 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Employee File",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createEmployee",
     "description": "Add a new employee.",
     "element": { },
     "help": null,
-    "name": "createEmployee",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1007,18 +1027,18 @@
     } ],
     "title": "Create Employee",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateEmployee",
     "description": "Update an employee, based on employee ID.",
     "element": { },
     "help": null,
-    "name": "updateEmployee",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1185,18 +1205,18 @@
     } ],
     "title": "Update Employee",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getEmployee",
     "description": "Get employee data, based on employee ID.",
     "element": { },
     "help": null,
-    "name": "getEmployee",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -1278,18 +1298,18 @@
     } ],
     "title": "Get Employee",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateEmployeeFile",
     "description": "Update an employee file.",
     "element": { },
     "help": null,
-    "name": "updateEmployeeFile",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1413,17 +1433,17 @@
     } ],
     "title": "Update Employee File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Human Resources Information System",
-    "name": "hris"
+    "name": "hris",
+    "label": "Human Resources Information System"
   } ],
   "connection": {
     "authorizationRequired": null,

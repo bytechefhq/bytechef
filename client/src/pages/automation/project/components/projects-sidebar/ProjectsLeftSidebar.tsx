@@ -40,7 +40,7 @@ const ProjectsLeftSidebar = ({
     onProjectClick,
     projectId,
 }: ProjectsLeftSidebarProps) => {
-    const [selectedProjectId, setSelectedProjectId] = useState(projectId || 0);
+    const [selectedProjectId, setSelectedProjectId] = useState(!isNaN(projectId) ? projectId : 0);
     const [sortBy, setSortBy] = useState('last-edited');
     const [searchValue, setSearchValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +76,11 @@ const ProjectsLeftSidebar = ({
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const {data: projects, refetch: refetchProjects} = useGetWorkspaceProjectsQuery({
+    const {
+        data: projects,
+        isLoading: projectsLoading,
+        refetch: refetchProjects,
+    } = useGetWorkspaceProjectsQuery({
         id: currentWorkspaceId!,
     });
 
@@ -107,14 +111,18 @@ const ProjectsLeftSidebar = ({
     });
 
     useEffect(() => {
-        setIsLoading(projectWorkflowsLoading || allProjectsWorkflowsLoading);
-    }, [projectWorkflowsLoading, allProjectsWorkflowsLoading]);
+        setIsLoading(projectWorkflowsLoading || allProjectsWorkflowsLoading || projectsLoading);
+    }, [projectWorkflowsLoading, allProjectsWorkflowsLoading, projectsLoading]);
 
     useEffect(() => {
         if (selectedProjectId === 0) {
             refetchProjects();
         }
     }, [selectedProjectId, refetchProjects]);
+
+    useEffect(() => {
+        setSelectedProjectId(!isNaN(projectId) ? projectId : 0);
+    }, [projectId]);
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {

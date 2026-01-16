@@ -27,6 +27,7 @@ import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -41,9 +42,14 @@ public interface ConnectionDefinitionService {
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, Context context);
 
-    AuthorizationCallbackResponse executeAuthorizationCallback(
+    default @Nullable AuthorizationCallbackResponse executeAuthorizationCallback(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
-        Map<String, ?> connectionParameters, Context context, String redirectUri);
+        Map<String, ?> connectionParameters, String redirectUri) {
+
+        return null;
+    }
+
+    Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection);
 
     Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection, Context context);
 
@@ -53,7 +59,7 @@ public interface ConnectionDefinitionService {
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
-        Map<String, ?> connectionParameters, Context context);
+        Map<String, ?> connectionParameters);
 
     List<String> getAuthorizationDetectOn(
         String componentName, int connectionVersion, AuthorizationType authorizationType);
@@ -66,7 +72,7 @@ public interface ConnectionDefinitionService {
 
     ConnectionDefinition getConnectionConnectionDefinition(String componentName, int connectionVersion);
 
-    ConnectionDefinition getConnectionDefinition(String componentName, Integer componentVersion);
+    ConnectionDefinition getConnectionDefinition(String componentName, @Nullable Integer componentVersion);
 
     List<ConnectionDefinition> getConnectionDefinitions();
 

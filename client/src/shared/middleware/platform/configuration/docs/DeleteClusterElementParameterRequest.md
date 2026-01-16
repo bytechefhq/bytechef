@@ -6,7 +6,6 @@
 
 Name | Type
 ------------ | -------------
-`fromAiInMetadata` | boolean
 `path` | string
 
 ## Example
@@ -16,7 +15,6 @@ import type { DeleteClusterElementParameterRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "fromAiInMetadata": null,
   "path": null,
 } satisfies DeleteClusterElementParameterRequest
 

@@ -16,8 +16,10 @@ import io.awspring.cloud.sqs.config.EndpointRegistrar;
 import io.awspring.cloud.sqs.config.SqsEndpoint;
 import io.awspring.cloud.sqs.config.SqsListenerConfigurer;
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
+import io.awspring.cloud.sqs.listener.SqsMessageListenerContainer;
 import io.awspring.cloud.sqs.listener.acknowledgement.handler.AcknowledgementMode;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -41,12 +43,13 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
     private final List<MessageBrokerConfigurer<EndpointRegistrar>> messageBrokerConfigurers;
     private final MessageHandlerMethodFactory messageHandlerMethodFactory;
     private final SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory;
+    private final List<SqsMessageListenerContainer<?>> containers = new ArrayList<>();
 
     @SuppressFBWarnings("EI")
     public AwsMessageBrokerListenerRegistrarConfiguration(
         @Autowired(required = false) List<MessageBrokerConfigurer<EndpointRegistrar>> messageBrokerConfigurers,
         MessageHandlerMethodFactory messageHandlerMethodFactory,
-        SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory) {
+        @Autowired(required = false) SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory) {
 
         this.messageBrokerConfigurers = messageBrokerConfigurers == null ? List.of() : messageBrokerConfigurers;
         this.messageHandlerMethodFactory = messageHandlerMethodFactory;
@@ -82,6 +85,28 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
         endpointRegistrar.registerEndpoint(endpoint);
     }
 
+    @Override
+    public void stopListenerEndpoints() {
+        for (SqsMessageListenerContainer<?> container : containers) {
+            try {
+                container.stop();
+            } catch (Exception e) {
+                logger.warn("Failed to stop AWS SQS listener container: {}", e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void startListenerEndpoints() {
+        for (SqsMessageListenerContainer<?> container : containers) {
+            try {
+                container.start();
+            } catch (Exception e) {
+                logger.warn("Failed to start AWS SQS listener container: {}", e.getMessage());
+            }
+        }
+    }
+
     private SqsEndpoint createListenerEndpoint(String queueName, Object listener, Method listenerMethod) {
         queueName = queueName.replace(".", "-");
 
@@ -95,7 +120,8 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
         endpoint.setMethod(listenerMethod);
         endpoint.setHandlerMethodFactory(messageHandlerMethodFactory);
 
-        sqsMessageListenerContainerFactory.createContainer(endpoint);
+        SqsMessageListenerContainer<?> container = sqsMessageListenerContainerFactory.createContainer(endpoint);
+        containers.add(container);
 
         return endpoint;
     }

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates approval/disapproval links.",
     "help": null,
@@ -15,16 +18,18 @@
     "perform": { },
     "processErrorResponse": null,
     "properties": [ ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Approval Links",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Developer Tools",
-    "name": "developer-tools"
+    "name": "developer-tools",
+    "label": "Developer Tools"
   }, {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   } ],
   "connection": null,
   "customAction": null,

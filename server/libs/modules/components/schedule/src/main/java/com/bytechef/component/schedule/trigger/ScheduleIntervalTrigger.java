@@ -34,7 +34,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.scheduler.TriggerScheduler;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.time.ZoneId;
 import java.util.Map;
 

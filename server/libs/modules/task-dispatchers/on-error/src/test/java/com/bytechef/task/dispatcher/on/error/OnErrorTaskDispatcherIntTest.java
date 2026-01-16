@@ -52,12 +52,6 @@ public class OnErrorTaskDispatcherIntTest {
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
     @Autowired
-    protected ContextService contextService;
-
-    @Autowired
-    protected TaskExecutionService taskExecutionService;
-
-    @Autowired
     private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
 
     @Autowired
@@ -162,7 +156,7 @@ public class OnErrorTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        CounterService counterService, TaskExecutionService taskExecutionService) {
+        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(

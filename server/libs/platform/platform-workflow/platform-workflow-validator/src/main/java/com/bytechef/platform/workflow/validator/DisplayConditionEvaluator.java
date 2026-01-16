@@ -16,11 +16,10 @@
 
 package com.bytechef.platform.workflow.validator;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Handles evaluation of display conditions for property visibility.
@@ -102,10 +101,8 @@ class DisplayConditionEvaluator {
 
         private final boolean shouldShow;
         private final boolean isMalformed;
-        @Nullable
-        private final String malformedMessage;
+        private final @Nullable String malformedMessage;
 
-        @SuppressFBWarnings("NP")
         private DisplayConditionResult(boolean shouldShow, boolean isMalformed, @Nullable String malformedMessage) {
             this.shouldShow = shouldShow;
             this.isMalformed = isMalformed;

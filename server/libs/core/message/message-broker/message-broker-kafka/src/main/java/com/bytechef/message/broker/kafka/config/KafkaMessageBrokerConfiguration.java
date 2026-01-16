@@ -21,28 +21,28 @@ package com.bytechef.message.broker.kafka.config;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerKafka;
 import com.bytechef.message.broker.kafka.KafkaMessageBroker;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.Map;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.converter.MessageConversionException;
+import org.springframework.messaging.converter.JacksonJsonMessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 import org.springframework.messaging.handler.annotation.support.MessageHandlerMethodFactory;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.ser.jackson.JsonValueSerializer;
 
 /**
  * @author Arik Cohen
@@ -60,7 +60,7 @@ public class KafkaMessageBrokerConfiguration {
     }
 
     @Bean
-    MessageBroker kafkaMessageBroker(KafkaTemplate kafkaTemplate) {
+    MessageBroker kafkaMessageBroker(KafkaTemplate<String, Object> kafkaTemplate) {
         KafkaMessageBroker kafkaMessageBroker = new KafkaMessageBroker();
 
         kafkaMessageBroker.setKafkaTemplate(kafkaTemplate);
@@ -69,39 +69,36 @@ public class KafkaMessageBrokerConfiguration {
     }
 
     @Bean
-    KafkaTemplate<String, Object> kafkaTemplate(ObjectMapper objectMapper, KafkaProperties kafkaProperties) {
-        KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(
-            producerFactory(objectMapper, kafkaProperties));
-
-        return kafkaTemplate;
+    KafkaTemplate<String, Object> kafkaTemplate(JsonMapper objectMapper, KafkaProperties kafkaProperties) {
+        return new KafkaTemplate<>(producerFactory(objectMapper, kafkaProperties));
     }
 
     @Bean
-    ProducerFactory<String, Object> producerFactory(ObjectMapper objectMapper, KafkaProperties kafkaProperties) {
+    ProducerFactory<String, Object> producerFactory(JsonMapper objectMapper, KafkaProperties kafkaProperties) {
         return new DefaultKafkaProducerFactory<>(
-            producerConfigs(kafkaProperties), new StringSerializer(), new JsonSerializer<>(objectMapper));
+            producerConfigs(kafkaProperties), new StringSerializer(), new JacksonJsonSerializer<>(objectMapper));
     }
 
     @Bean
     Map<String, Object> producerConfigs(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildProducerProperties(null);
+        Map<String, Object> props = kafkaProperties.buildProducerProperties();
 
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonValueSerializer.class);
 
         return props;
     }
 
     @Bean
     Map<String, Object> consumerConfigs(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
 
         return props;
     }
 
     @Bean
     MessageConverter jacksonMessageConverter(ObjectMapper objectMapper) {
-        MappingJackson2MessageConverter mappingJackson2MessageConverter = new MappingJackson2MessageConverter() {
+        JacksonJsonMessageConverter jacksonJsonMessageConverter = new JacksonJsonMessageConverter() {
 
             @Override
             protected Object convertFromInternal(Message<?> message, Class<?> targetClass, Object conversionHint) {
@@ -117,41 +114,34 @@ public class KafkaMessageBrokerConfiguration {
                     }
                 }
 
-                JavaType javaType = getObjectMapper().constructType(targetClass);
+                JavaType javaType = objectMapper.constructType(targetClass);
                 Object payload = message.getPayload();
                 Class<?> view = getSerializationView(conversionHint);
 
                 // Note: in the view case, calling withType instead of forType for
                 // compatibility with Jackson <2.5
-                try {
-                    if (payload instanceof byte[]) {
-                        if (view != null) {
-                            return getObjectMapper()
-                                .readerWithView(view)
-                                .forType(javaType)
-                                .readValue((byte[]) payload);
-                        } else {
-                            return getObjectMapper().readValue((byte[]) payload, javaType);
-                        }
+
+                if (payload instanceof byte[]) {
+                    if (view != null) {
+                        return objectMapper.readerWithView(view)
+                            .forType(javaType)
+                            .readValue((byte[]) payload);
                     } else {
-                        if (view != null) {
-                            return getObjectMapper()
-                                .readerWithView(view)
-                                .forType(javaType)
-                                .readValue(payload.toString());
-                        } else {
-                            return getObjectMapper().readValue(payload.toString(), javaType);
-                        }
+                        return objectMapper.readValue((byte[]) payload, javaType);
                     }
-                } catch (IOException ex) {
-                    throw new MessageConversionException(message, "Could not read JSON: " + ex.getMessage(), ex);
+                } else {
+                    if (view != null) {
+                        return objectMapper.readerWithView(view)
+                            .forType(javaType)
+                            .readValue(payload.toString());
+                    } else {
+                        return objectMapper.readValue(payload.toString(), javaType);
+                    }
                 }
             }
         };
 
-        mappingJackson2MessageConverter.setObjectMapper(objectMapper);
-
-        return mappingJackson2MessageConverter;
+        return jacksonJsonMessageConverter;
     }
 
     @Bean

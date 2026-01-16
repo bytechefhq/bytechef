@@ -16,11 +16,10 @@
 
 package com.bytechef.message.broker.redis.serializer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.util.Assert;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -37,14 +36,10 @@ public class RedisMessageSerializer {
     public String serialize(Object object) throws SerializationException {
         Assert.notNull(object, "'object' must not be null");
 
-        try {
-            Class<?> messageClass = object.getClass();
+        Class<?> messageClass = object.getClass();
 
-            return objectMapper.writeValueAsString(
-                new RedisMessage(objectMapper.writeValueAsString(object), messageClass.getName()));
-        } catch (JsonProcessingException e) {
-            throw new SerializationException(e.getMessage());
-        }
+        return objectMapper.writeValueAsString(
+            new RedisMessage(objectMapper.writeValueAsString(object), messageClass.getName()));
     }
 
 }

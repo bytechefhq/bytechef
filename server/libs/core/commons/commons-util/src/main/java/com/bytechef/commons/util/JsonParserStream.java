@@ -16,10 +16,6 @@
 
 package com.bytechef.commons.util;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -44,21 +40,21 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.ObjectReadContext;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
 final class JsonParserStream implements Stream<Map<String, ?>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonParserStream.class);
-
     private final JsonParser jsonParser;
     private final Stream<Map<String, ?>> stream;
 
-    public JsonParserStream(InputStream inputStream, ObjectMapper objectMapper) throws IOException {
-        this.jsonParser = new JsonFactory().createParser(inputStream);
+    public JsonParserStream(InputStream inputStream, ObjectMapper objectMapper) {
+        this.jsonParser = new JsonFactory().createParser(ObjectReadContext.empty(), inputStream);
         this.stream = StreamSupport.stream(
             Spliterators.spliteratorUnknownSize(new JsonIterator(jsonParser, objectMapper), Spliterator.ORDERED),
             false);
@@ -263,13 +259,7 @@ final class JsonParserStream implements Stream<Map<String, ?>> {
     @Override
     public void close() {
         if (jsonParser != null) {
-            try {
-                jsonParser.close();
-            } catch (IOException e) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(e.getMessage(), e);
-                }
-            }
+            jsonParser.close();
         }
     }
 }

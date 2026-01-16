@@ -34,7 +34,6 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Arik Cohen
@@ -153,22 +152,40 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
             contextService.push(
                 iterationTaskExecutionId, Context.Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(iterationTaskExecutionId, Context.Classname.TASK_EXECUTION, context));
+                taskFileStorage.storeContextValue(
+                    iterationTaskExecutionId, Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(iterationTaskExecution);
         } else {
+            mapTaskExecution = taskExecutionService.getTaskExecutionForUpdate(taskExecutionParentId);
+
             if (taskExecution.getOutput() != null) {
-                List<Object> outputs = new ArrayList<>(iterateeWorkflowTasks.size());
+                Long mapTaskExecutionId = Objects.requireNonNull(mapTaskExecution.getId());
+
+                List<Object> outputs;
 
                 if (mapTaskExecution.getOutput() != null) {
-                    outputs.addAll((List<?>) taskFileStorage.readTaskExecutionOutput(mapTaskExecution.getOutput()));
+                    outputs = new ArrayList<>(
+                        (List<?>) taskFileStorage.readTaskExecutionOutput(mapTaskExecution.getOutput()));
+                } else {
+                    outputs = new ArrayList<>(iterateeWorkflowTasks.size());
                 }
 
-                outputs.add(iterationIndex, taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+                while (outputs.size() < iterationIndex) {
+                    outputs.add(null);
+                }
+
+                Object value = taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+
+                if (outputs.size() == iterationIndex) {
+                    outputs.add(value);
+                } else {
+                    outputs.set(iterationIndex, value);
+                }
 
                 mapTaskExecution.setOutput(
                     taskFileStorage.storeTaskExecutionOutput(
-                        Validate.notNull(mapTaskExecution.getId(), "id"), outputs));
+                        Objects.requireNonNull(mapTaskExecution.getJobId()), mapTaskExecutionId, outputs));
             }
 
             long iterationsLeft = counterService.decrement(taskExecutionParentId);
@@ -179,6 +196,8 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
                 mapTaskExecution = taskExecutionService.update(mapTaskExecution);
 
                 taskCompletionHandler.handle(mapTaskExecution);
+            } else {
+                taskExecutionService.update(mapTaskExecution);
             }
         }
     }

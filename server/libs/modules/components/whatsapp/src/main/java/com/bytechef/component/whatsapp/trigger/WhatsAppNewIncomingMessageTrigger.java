@@ -95,7 +95,7 @@ public class WhatsAppNewIncomingMessageTrigger {
     protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders httpHeaders,
         HttpParameters httpParameters, WebhookBody body, WebhookMethod webhookMethod,
-        WebhookEnableOutput webhookEnableOutput, TriggerContext context) {
+        Parameters webhookEnableOutput, TriggerContext context) {
 
         if (body == null) {
             return null;

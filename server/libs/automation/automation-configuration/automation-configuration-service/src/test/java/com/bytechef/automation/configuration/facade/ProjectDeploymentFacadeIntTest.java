@@ -17,7 +17,14 @@
 package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -31,7 +38,9 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.repository.TagRepository;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -41,6 +50,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 /**
  * @author Ivica Cardic
@@ -88,6 +100,12 @@ public class ProjectDeploymentFacadeIntTest {
 
     private ProjectDeploymentFacadeHelper projectDeploymentFacadeHelper;
 
+    @Autowired
+    private JobFacade jobFacade;
+
+    @Autowired
+    private PrincipalJobService principalJobService;
+
     @AfterEach
     public void afterEach() {
         projectDeploymentWorkflowRepository.deleteAll();
@@ -102,12 +120,16 @@ public class ProjectDeploymentFacadeIntTest {
     }
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         workspace = workspaceRepository.save(new Workspace("test"));
 
         projectDeploymentFacadeHelper = new ProjectDeploymentFacadeHelper(
             categoryRepository, projectFacade, projectRepository, projectDeploymentFacade, projectWorkflowFacade,
             projectWorkflowRepository);
+
+        // Default stub: no running jobs unless explicitly mocked by a test
+        when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), anyInt()))
+            .thenReturn(Page.empty());
     }
 
     @Disabled
@@ -220,6 +242,41 @@ public class ProjectDeploymentFacadeIntTest {
                 assertThat(workflow.enabled()).isTrue();
                 assertThat(workflow.workflowId()).isEqualTo(workflowId);
             });
+    }
+
+    @Test
+    public void testDisablingWorkflowStopsRunningJobs() {
+        // Given - Create a project with a workflow and enable deployment + workflow
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
+            workspace.getId(), projectDTO);
+
+        long deploymentId = projectDeploymentDTO.id();
+
+        projectDeploymentFacade.enableProjectDeployment(deploymentId, true);
+
+        String workflowId = projectDeploymentDTO.projectDeploymentWorkflows()
+            .getFirst()
+            .workflowId();
+
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(deploymentId, workflowId, true);
+
+        // And mock PrincipalJobService to return STARTED job IDs for this deployment/workflow
+        List<Long> runningJobIds = List.of(101L, 202L);
+
+        when(
+            principalJobService.getJobIds(
+                eq(Job.Status.STARTED), eq(null), eq(null), eq(List.of(deploymentId)), eq(PlatformType.AUTOMATION),
+                eq(List.of(workflowId)), eq(0)))
+                    .thenReturn(new PageImpl<>(runningJobIds, PageRequest.of(0, 20), runningJobIds.size()));
+
+        // When - Disable the workflow
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(deploymentId, workflowId, false);
+
+        // Then - verify each running job was stopped
+        verify(jobFacade).stopJob(101L);
+        verify(jobFacade).stopJob(202L);
     }
 
     @Test

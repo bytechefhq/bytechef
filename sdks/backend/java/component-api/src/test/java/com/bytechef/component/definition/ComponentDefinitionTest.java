@@ -16,48 +16,37 @@
 
 package com.bytechef.component.definition;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
 public class ComponentDefinitionTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper() {
-        {
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-            registerModule(new JavaTimeModule());
-            registerModule(new Jdk8Module());
-        }
-    };
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    public void testActionDefinition() throws JSONException, JsonProcessingException {
+    public void testActionDefinition() throws JSONException {
         ActionDefinition action = ComponentDsl.action("name")
             .title("title")
             .description("description")
-            .perform((inputParameters, connectionParameters, context) -> null);
+            .perform((ActionDefinition.PerformFunction) (inputParameters, connectionParameters, context) -> null);
 
         jsonAssertEquals(
             """
-                {"batch":null,"deprecated":null,"description":"description","help":null,"metadata":null,"name":"name","outputDefinition":null,"properties":null,"title":"title","processErrorResponse":null,"workflowNodeDescription":null,"perform":{}}
+                {"batch":null,"beforeResume":null,"beforeSuspend":null,"beforeTimeoutResume":null,"deprecated":null,"description":"description","help":null,"metadata":null,"name":"name","outputDefinition":null,"properties":null,"title":"title","processErrorResponse":null,"workflowNodeDescription":null,"resumePerform":null,"suspendPerform":null,"perform":{}}
                 """,
             action);
     }
 
     @Test
-    public void testArrayProperty() throws JSONException, JsonProcessingException {
+    public void testArrayProperty() throws JSONException {
         Property property = ComponentDsl.array("name")
             .defaultValue(1, 2)
             .description("description")
@@ -74,7 +63,7 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testBooleanProperty() throws JSONException, JsonProcessingException {
+    public void testBooleanProperty() throws JSONException {
         Property property = ComponentDsl.bool("name")
             .defaultValue(true)
             .description("description")
@@ -90,7 +79,7 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testComponentDefinition() throws JSONException, JsonProcessingException {
+    public void testComponentDefinition() throws JSONException {
         ComponentDefinition componentDefinition = ComponentDsl.component("name")
             .title("title")
             .description("description")
@@ -105,7 +94,7 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testDateProperty() throws JSONException, JsonProcessingException {
+    public void testDateProperty() throws JSONException {
         Property property = ComponentDsl.date("name")
             .defaultValue(LocalDate.MIN)
             .description("description")
@@ -121,7 +110,7 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testDateTimeProperty() throws JSONException, JsonProcessingException {
+    public void testDateTimeProperty() throws JSONException {
         Property property = ComponentDsl.dateTime("name")
             .defaultValue(LocalDateTime.MIN)
             .description("description")
@@ -137,7 +126,7 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testIntegerProperty() throws JSONException, JsonProcessingException {
+    public void testIntegerProperty() throws JSONException {
         Property property = ComponentDsl.integer("name")
             .defaultValue(2)
             .description("description")
@@ -153,7 +142,7 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testNumberProperty() throws JSONException, JsonProcessingException {
+    public void testNumberProperty() throws JSONException {
         Property property = ComponentDsl.number("name")
             .defaultValue(2)
             .description("description")
@@ -170,7 +159,7 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testObjectProperty() throws JSONException, JsonProcessingException {
+    public void testObjectProperty() throws JSONException {
         Property property = ComponentDsl.object("name")
             .defaultValue(Map.of("key", Map.of("key1", "value1")))
             .description("description")
@@ -186,7 +175,7 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testStringProperty() throws JSONException, JsonProcessingException {
+    public void testStringProperty() throws JSONException {
         Property property = ComponentDsl.string("name")
             .defaultValue("defaultValue")
             .description("description")
@@ -202,7 +191,7 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testPropertyOption() throws JSONException, JsonProcessingException {
+    public void testPropertyOption() throws JSONException {
         Option<?> option = ComponentDsl.option("label", 1);
 
         jsonAssertEquals(
@@ -237,7 +226,7 @@ public class ComponentDefinitionTest {
     }
 
     private void jsonAssertEquals(String expectedString, Object jsonObject)
-        throws JSONException, JsonProcessingException {
+        throws JSONException {
 
         String json = objectMapper.writeValueAsString(jsonObject);
 

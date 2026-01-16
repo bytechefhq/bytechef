@@ -34,7 +34,6 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -59,6 +58,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @version ee
@@ -137,14 +137,14 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
             .fetchProjectDeploymentWorkflow(
                 apiCollection.getProjectDeploymentId(),
-                projectWorkflowService.getProjectDeploymentWorkflowId(
+                projectWorkflowService.getProjectWorkflowWorkflowId(
                     apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowUuid()))
             .orElseGet(() -> {
                 ProjectDeploymentWorkflow newProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
                 newProjectDeploymentWorkflow.setProjectDeploymentId(apiCollection.getProjectDeploymentId());
                 newProjectDeploymentWorkflow.setWorkflowId(
-                    projectWorkflowService.getProjectDeploymentWorkflowId(
+                    projectWorkflowService.getProjectWorkflowWorkflowId(
                         apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowUuid()));
 
                 return projectDeploymentWorkflowService.create(newProjectDeploymentWorkflow);
@@ -466,7 +466,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
             .getProjectDeploymentWorkflow(apiCollectionEndpoint.getProjectDeploymentWorkflowId());
 
-        String workflowUuid = projectWorkflowService.getProjectDeploymentWorkflowUuid(
+        String workflowUuid = projectWorkflowService.getProjectWorkflowUuid(
             projectDeploymentWorkflow.getProjectDeploymentId(), projectDeploymentWorkflow.getWorkflowId());
 
         return new ApiCollectionEndpointDTO(

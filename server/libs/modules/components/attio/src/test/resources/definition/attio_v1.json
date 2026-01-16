@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new record.",
     "help": null,
@@ -1187,10 +1190,15 @@
       "required": true,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Record",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new task.",
     "help": null,
@@ -2265,10 +2273,15 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates a record.",
     "help": null,
@@ -3480,14 +3493,16 @@
       "required": true,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Record",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createRecord",
     "description": "Creates a new record.",
     "element": { },
     "help": null,
-    "name": "createRecord",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -4670,18 +4685,18 @@
     } ],
     "title": "Create Record",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createTask",
     "description": "Creates a new task.",
     "element": { },
     "help": null,
-    "name": "createTask",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5752,18 +5767,18 @@
     } ],
     "title": "Create Task",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateRecord",
     "description": "Updates a record.",
     "element": { },
     "help": null,
-    "name": "updateRecord",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -6971,17 +6986,17 @@
     } ],
     "title": "Update Record",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

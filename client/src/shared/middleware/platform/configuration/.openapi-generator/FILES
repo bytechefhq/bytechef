@@ -6,6 +6,7 @@ apis/EnvironmentApi.ts
 apis/Oauth2Api.ts
 apis/TaskDispatcherDefinitionApi.ts
 apis/TriggerDefinitionApi.ts
+apis/TriggerFormApi.ts
 apis/WorkflowNodeDescriptionApi.ts
 apis/WorkflowNodeDynamicPropertiesApi.ts
 apis/WorkflowNodeOptionApi.ts
@@ -41,11 +42,11 @@ docs/DateProperty.md
 docs/DateTimeProperty.md
 docs/DeleteClusterElementParameter200Response.md
 docs/DeleteClusterElementParameterRequest.md
-docs/DeleteWorkflowNodeParameterRequest.md
 docs/DynamicPropertiesProperty.md
 docs/Environment.md
 docs/EnvironmentApi.md
 docs/ExecutionError.md
+docs/FieldOption.md
 docs/FileEntryProperty.md
 docs/GetClusterElementParameterDisplayConditions200Response.md
 docs/GetOAuth2AuthorizationParametersRequest.md
@@ -79,6 +80,9 @@ docs/TimeProperty.md
 docs/TriggerDefinition.md
 docs/TriggerDefinitionApi.md
 docs/TriggerDefinitionBasic.md
+docs/TriggerForm.md
+docs/TriggerFormApi.md
+docs/TriggerFormInput.md
 docs/TriggerType.md
 docs/UnifiedApiCategory.md
 docs/UpdateClusterElementParameterRequest.md
@@ -126,10 +130,10 @@ models/DateProperty.ts
 models/DateTimeProperty.ts
 models/DeleteClusterElementParameter200Response.ts
 models/DeleteClusterElementParameterRequest.ts
-models/DeleteWorkflowNodeParameterRequest.ts
 models/DynamicPropertiesProperty.ts
 models/Environment.ts
 models/ExecutionError.ts
+models/FieldOption.ts
 models/FileEntryProperty.ts
 models/GetClusterElementParameterDisplayConditions200Response.ts
 models/GetOAuth2AuthorizationParametersRequest.ts
@@ -160,6 +164,8 @@ models/TaskProperty.ts
 models/TimeProperty.ts
 models/TriggerDefinition.ts
 models/TriggerDefinitionBasic.ts
+models/TriggerForm.ts
+models/TriggerFormInput.ts
 models/TriggerType.ts
 models/UnifiedApiCategory.ts
 models/UpdateClusterElementParameterRequest.ts

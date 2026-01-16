@@ -18,7 +18,8 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectServic
 import com.bytechef.embedded.workflow.coordinator.AbstractConnectedUserProjectDispatcherPreSendProcessor;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -41,11 +42,13 @@ public class ConnectedUserProjectTaskDispatcherPreSendProcessor
     private final JobService jobService;
     private final PrincipalJobService principalJobService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectTaskDispatcherPreSendProcessor(
         ConnectedUserProjectService connectedUserProjectService, JobService jobService,
-        PrincipalJobService principalJobService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
+        PrincipalJobService principalJobService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
 
         super(projectDeploymentWorkflowService);
 
@@ -53,6 +56,7 @@ public class ConnectedUserProjectTaskDispatcherPreSendProcessor
         this.connectedUserProjectService = connectedUserProjectService;
         this.principalJobService = principalJobService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
     }
 
     @Override
@@ -60,7 +64,7 @@ public class ConnectedUserProjectTaskDispatcherPreSendProcessor
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long projectDeploymentId = principalJobService.getJobPrincipalId(
-            Validate.notNull(job.getId(), "id"), ModeType.AUTOMATION);
+            Validate.notNull(job.getId(), "id"), PlatformType.AUTOMATION);
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_ID, projectDeploymentId);
 
@@ -77,8 +81,13 @@ public class ConnectedUserProjectTaskDispatcherPreSendProcessor
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_WORKFLOW_ID, projectDeploymentWorkflow.getId());
 
-        taskExecution.putMetadata(MetadataConstants.TYPE, ModeType.AUTOMATION);
+        taskExecution.putMetadata(MetadataConstants.TYPE, PlatformType.AUTOMATION);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
+
+        int environmentId = (int) jobPrincipalAccessorRegistry
+            .getJobPrincipalAccessor(PlatformType.AUTOMATION)
+            .getEnvironmentId(projectDeploymentId);
+        taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
         return taskExecution;
     }
@@ -88,7 +97,7 @@ public class ConnectedUserProjectTaskDispatcherPreSendProcessor
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long projectDeploymentId = OptionalUtils.orElse(
-            principalJobService.fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), ModeType.AUTOMATION),
+            principalJobService.fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), PlatformType.AUTOMATION),
             null);
 
         if (projectDeploymentId == null) {

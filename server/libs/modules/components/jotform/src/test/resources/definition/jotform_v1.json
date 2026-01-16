@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get all submissions for a specific form.",
     "help": null,
@@ -401,13 +404,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Form Submissions",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Surveys and Feedback",
-    "name": "surveys-and-feedback"
+    "name": "surveys-and-feedback",
+    "label": "Surveys and Feedback"
   } ],
   "connection": {
     "authorizationRequired": null,

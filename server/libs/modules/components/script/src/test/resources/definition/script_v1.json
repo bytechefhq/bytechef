@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Executes custom JavaScript code.",
     "help": null,
@@ -114,6 +117,7 @@
         "required": null,
         "type": "INTEGER"
       }, {
+        "name": null,
         "advancedOption": null,
         "controlType": "NULL",
         "defaultValue": null,
@@ -124,7 +128,6 @@
         "hidden": null,
         "label": null,
         "metadata": { },
-        "name": null,
         "placeholder": null,
         "required": null,
         "type": "NULL"
@@ -251,10 +254,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "JavaScript",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Executes custom Python code.",
     "help": null,
@@ -368,6 +376,7 @@
         "required": null,
         "type": "INTEGER"
       }, {
+        "name": null,
         "advancedOption": null,
         "controlType": "NULL",
         "defaultValue": null,
@@ -378,7 +387,6 @@
         "hidden": null,
         "label": null,
         "metadata": { },
-        "name": null,
         "placeholder": null,
         "required": null,
         "type": "NULL"
@@ -505,10 +513,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Python",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Executes custom Ruby code.",
     "help": null,
@@ -622,6 +635,7 @@
         "required": null,
         "type": "INTEGER"
       }, {
+        "name": null,
         "advancedOption": null,
         "controlType": "NULL",
         "defaultValue": null,
@@ -632,7 +646,6 @@
         "hidden": null,
         "label": null,
         "metadata": { },
-        "name": null,
         "placeholder": null,
         "required": null,
         "type": "NULL"
@@ -759,16 +772,18 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Ruby",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   }, {
-    "label": "Developer Tools",
-    "name": "developer-tools"
+    "name": "developer-tools",
+    "label": "Developer Tools"
   } ],
   "connection": null,
   "customAction": null,

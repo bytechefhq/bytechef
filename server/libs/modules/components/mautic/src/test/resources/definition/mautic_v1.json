@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new company.",
     "help": null,
@@ -498,10 +501,15 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Company",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact.",
     "help": null,
@@ -1374,10 +1382,15 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get individual company.",
     "help": null,
@@ -1827,10 +1840,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Company",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get individual contact.",
     "help": null,
@@ -2638,14 +2656,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Contact",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createCompany",
     "description": "Creates a new company.",
     "element": { },
     "help": null,
-    "name": "createCompany",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3139,18 +3159,18 @@
     } ],
     "title": "Create Company",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createContact",
     "description": "Creates a new contact.",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4019,18 +4039,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getCompany",
     "description": "Get individual company.",
     "element": { },
     "help": null,
-    "name": "getCompany",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4476,18 +4496,18 @@
     } ],
     "title": "Get Company",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getContact",
     "description": "Get individual contact.",
     "element": { },
     "help": null,
-    "name": "getContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5291,17 +5311,17 @@
     } ],
     "title": "Get Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Marketing Automation",
-    "name": "marketing-automation"
+    "name": "marketing-automation",
+    "label": "Marketing Automation"
   } ],
   "connection": {
     "authorizationRequired": null,

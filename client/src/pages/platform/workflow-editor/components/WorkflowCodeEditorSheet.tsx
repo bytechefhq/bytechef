@@ -16,11 +16,16 @@ import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/compo
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/WorkflowTestConfigurationDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
+import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
-import {Suspense, lazy, useState} from 'react';
+import {Suspense, lazy, useCallback, useEffect, useState} from 'react';
+
+const workflowTestApi = new WorkflowTestApi();
 
 interface WorkflowCodeEditorSheetProps {
     invalidateWorkflowQueries: () => void;
@@ -34,8 +39,6 @@ interface WorkflowCodeEditorSheetProps {
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
-const workflowTestApi = new WorkflowTestApi();
-
 const WorkflowCodeEditorSheet = ({
     invalidateWorkflowQueries,
     onSheetOpenClose,
@@ -47,33 +50,57 @@ const WorkflowCodeEditorSheet = ({
 }: WorkflowCodeEditorSheetProps) => {
     const [dirty, setDirty] = useState<boolean>(false);
     const [definition, setDefinition] = useState<string>(workflow.definition!);
-    const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
-    const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
+    const [jobId, setJobId] = useState<string | null>(null);
     const [showCloseAlertDialog, setShowCloseAlertDialog] = useState(false);
     const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
+    const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
+    const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
+    const {getPersistedJobId, persistJobId} = usePersistJobId(workflow.id, currentEnvironmentId);
+    const {close: closeWorkflowTestStream, setStreamRequest} = useWorkflowTestStream({
+        onError: () => {
+            setWorkflowTestExecution(undefined);
+            setWorkflowIsRunning(false);
+            setJobId(null);
+        },
+        onResult: (execution) => {
+            setWorkflowTestExecution(execution);
+            setWorkflowIsRunning(false);
+            setJobId(null);
+        },
+        onStart: (jobId) => setJobId(jobId),
+        workflowId: workflow.id!,
+    });
     const {updateWorkflowMutation} = useWorkflowEditor();
+
+    const handleStopClick = useCallback(() => {
+        setWorkflowIsRunning(false);
+        setStreamRequest(null);
+        closeWorkflowTestStream();
+
+        if (jobId) {
+            workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => {
+                persistJobId(null);
+                setJobId(null);
+            });
+        }
+    }, [closeWorkflowTestStream, jobId, persistJobId, setStreamRequest]);
 
     const handleRunClick = () => {
         setWorkflowTestExecution(undefined);
         setWorkflowIsRunning(true);
+        setJobId(null);
+        persistJobId(null);
 
         if (workflow?.id) {
-            workflowTestApi
-                .testWorkflow({
-                    environmentId: currentEnvironmentId,
-                    id: workflow?.id,
-                })
-                .then((workflowTestExecution) => {
-                    setWorkflowTestExecution(workflowTestExecution);
-                    setWorkflowIsRunning(false);
-                })
-                .catch(() => {
-                    setWorkflowIsRunning(false);
-                    setWorkflowTestExecution(undefined);
-                });
+            const request = getTestWorkflowStreamPostRequest({
+                environmentId: currentEnvironmentId,
+                id: workflow.id,
+            });
+
+            setStreamRequest(request);
         }
     };
 
@@ -114,6 +141,21 @@ const WorkflowCodeEditorSheet = ({
             }
         }
     };
+
+    useEffect(() => {
+        if (!workflow.id || currentEnvironmentId === undefined) return;
+
+        const jobId = getPersistedJobId();
+
+        if (!jobId) {
+            return;
+        }
+
+        setWorkflowIsRunning(true);
+        setJobId(jobId);
+
+        setStreamRequest(getTestWorkflowAttachRequest({jobId}));
+    }, [workflow.id, currentEnvironmentId, getPersistedJobId, setWorkflowIsRunning, setJobId, setStreamRequest]);
 
     return (
         <Sheet onOpenChange={handleOpenOnChange} open={sheetOpen}>
@@ -178,14 +220,7 @@ const WorkflowCodeEditorSheet = ({
                         )}
 
                         {workflowIsRunning && (
-                            <Button
-                                icon={<SquareIcon />}
-                                onClick={() => {
-                                    console.error('Implement cancel workflow execution');
-                                }}
-                                size="icon"
-                                variant="destructive"
-                            />
+                            <Button icon={<SquareIcon />} onClick={handleStopClick} size="icon" variant="destructive" />
                         )}
 
                         <SheetCloseButton />

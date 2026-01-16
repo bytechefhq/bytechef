@@ -251,6 +251,92 @@ Type: OBJECT
 ```
 
 
+### Create Fork
+Name: createFork
+
+`Create a fork of Github repository.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | Repository that will be forked. | true |
+| name | Name | STRING | A new name for the fork. | false |
+| organization | Organization | STRING | The organization name if forking into an organization. | false |
+| defaultBranchOnly | Default Branch Only | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When forking from an existing repository, fork with only the default branch. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Fork",
+  "name" : "createFork",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "name" : "",
+    "organization" : "",
+    "defaultBranchOnly" : false
+  },
+  "type" : "github/v1/createFork"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique identifier of the fork. |
+| node_id | STRING | The node ID of the fork. |
+| name | STRING | The name of the forked repository. |
+| full_name | STRING | The full name of the forked repository including owner. |
+| owner | OBJECT <details> <summary> Properties </summary> &#123;STRING\(login), STRING\(id), STRING\(node_id), STRING\(url)&#125; </details> | Owner information. |
+| private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the forked repository is private. |
+| html_url | STRING | HTML URL of the forked repository. |
+| url | STRING | API URL of the forked repository. |
+| description | STRING | Description of the repository. |
+| fork | STRING | Whether this repository is a fork. |
+| created_at | STRING | Creation timestamp. |
+| updated_at | STRING | Last update timestamp. |
+| pushed_at | STRING | Last push timestamp. |
+| default_branch | STRING | Default branch name. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "node_id" : "",
+  "name" : "",
+  "full_name" : "",
+  "owner" : {
+    "login" : "",
+    "id" : "",
+    "node_id" : "",
+    "url" : ""
+  },
+  "private" : false,
+  "html_url" : "",
+  "url" : "",
+  "description" : "",
+  "fork" : "",
+  "created_at" : "",
+  "updated_at" : "",
+  "pushed_at" : "",
+  "default_branch" : ""
+}
+```
+
+
 ### Create Issue
 Name: createIssue
 

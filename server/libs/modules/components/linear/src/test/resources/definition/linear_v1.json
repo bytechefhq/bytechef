@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new issue.",
     "help": null,
@@ -393,10 +396,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Issue",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update an issue.",
     "help": null,
@@ -814,10 +822,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Issue",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new project.",
     "help": null,
@@ -1202,10 +1215,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Project",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update a project.",
     "help": null,
@@ -1590,10 +1608,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Project",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new comment.",
     "help": null,
@@ -1984,10 +2007,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Comment",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Perform a raw Graphql query.",
     "help": null,
@@ -2130,14 +2158,16 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Raw Graphql Query",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createIssue",
     "description": "Creates a new issue.",
     "element": { },
     "help": null,
-    "name": "createIssue",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2526,18 +2556,18 @@
     } ],
     "title": "Create Issue",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateIssue",
     "description": "Update an issue.",
     "element": { },
     "help": null,
-    "name": "updateIssue",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2951,18 +2981,18 @@
     } ],
     "title": "Update Issue",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createProject",
     "description": "Creates a new project.",
     "element": { },
     "help": null,
-    "name": "createProject",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3343,18 +3373,18 @@
     } ],
     "title": "Create Project",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateProject",
     "description": "Update a project.",
     "element": { },
     "help": null,
-    "name": "updateProject",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3735,18 +3765,18 @@
     } ],
     "title": "Update Project",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createComment",
     "description": "Creates a new comment.",
     "element": { },
     "help": null,
-    "name": "createComment",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4133,18 +4163,18 @@
     } ],
     "title": "Create Comment",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "rawGraphqlQuery",
     "description": "Perform a raw Graphql query.",
     "element": { },
     "help": null,
-    "name": "rawGraphqlQuery",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4283,17 +4313,17 @@
     } ],
     "title": "Raw Graphql Query",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Project Management",
-    "name": "project-management"
+    "name": "project-management",
+    "label": "Project Management"
   } ],
   "connection": {
     "authorizationRequired": null,

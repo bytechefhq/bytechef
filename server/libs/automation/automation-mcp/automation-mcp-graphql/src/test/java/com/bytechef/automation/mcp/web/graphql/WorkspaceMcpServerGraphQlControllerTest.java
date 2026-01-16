@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.mcp.web.graphql.WorkspaceMcpServerGraphQlController.CreateWorkspaceMcpServerInput;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.Arrays;
 import java.util.List;
@@ -79,7 +79,7 @@ class WorkspaceMcpServerGraphQlControllerTest {
     void testCreateMcpServerForWorkspace() {
         // Given
         String name = "Test Server";
-        ModeType type = ModeType.AUTOMATION;
+        PlatformType type = PlatformType.AUTOMATION;
         long environmentId = Environment.DEVELOPMENT.ordinal();
         Boolean enabled = true;
         Long workspaceId = 1L;
@@ -110,7 +110,7 @@ class WorkspaceMcpServerGraphQlControllerTest {
     void testCreateMcpServerForWorkspaceWithNullEnabled() {
         // Given
         String name = "Test Server";
-        ModeType type = ModeType.AUTOMATION;
+        PlatformType type = PlatformType.AUTOMATION;
         long environmentId = Environment.PRODUCTION.ordinal();
         Boolean enabled = null;
         Long workspaceId = 2L;
@@ -141,7 +141,7 @@ class WorkspaceMcpServerGraphQlControllerTest {
     void testCreateMcpServerForWorkspaceWithEmbeddedType() {
         // Given
         String name = "Embedded Server";
-        ModeType type = ModeType.EMBEDDED;
+        PlatformType type = PlatformType.EMBEDDED;
         long environmentId = Environment.DEVELOPMENT.ordinal();
         Boolean enabled = false;
         Long workspaceId = 3L;
@@ -184,7 +184,7 @@ class WorkspaceMcpServerGraphQlControllerTest {
     void testCreateMcpServerForWorkspaceInputRecord() {
         // Given
         String name = "Test Server";
-        ModeType type = ModeType.AUTOMATION;
+        PlatformType type = PlatformType.AUTOMATION;
         long environmentId = 0L;
         Boolean enabled = true;
         Long workspaceId = 1L;
@@ -202,7 +202,7 @@ class WorkspaceMcpServerGraphQlControllerTest {
     }
 
     private McpServer createMockMcpServer(Long id, String name) {
-        McpServer mcpServer = new McpServer(name, ModeType.AUTOMATION, Environment.DEVELOPMENT);
+        McpServer mcpServer = new McpServer(name, PlatformType.AUTOMATION, Environment.DEVELOPMENT);
 
         mcpServer.setId(id);
 

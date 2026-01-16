@@ -1,0 +1,26 @@
+extend type Query {
+    projectDeploymentWorkflow(id: String!): ProjectDeploymentWorkflow
+}
+
+type ProjectDeploymentWorkflow {
+    id: ID!
+    workflowId: String!
+    projectDeploymentId: ID!
+    enabled: Boolean!
+    staticWebhookUrl: String
+    workflowExecutionId: String
+    projectWorkflow: ProjectWorkflow!
+    connections: [ProjectDeploymentWorkflowConnection!]!
+    inputs: Map
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int!
+}
+
+type ProjectDeploymentWorkflowConnection {
+    key: String!
+    workflowNodeName: String!
+    connectionId: ID
+}

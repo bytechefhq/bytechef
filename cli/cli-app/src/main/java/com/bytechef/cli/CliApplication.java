@@ -19,7 +19,7 @@ package com.bytechef.cli;
 import com.bytechef.cli.command.component.ComponentCommand;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.shell.command.annotation.EnableCommand;
+import org.springframework.shell.core.command.annotation.EnableCommand;
 
 /**
  * @author Ivica Cardic

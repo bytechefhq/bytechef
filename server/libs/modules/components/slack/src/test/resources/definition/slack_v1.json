@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a reaction to a message.",
     "help": null,
@@ -346,10 +349,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Add Reaction",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends approval message to a channel.",
     "help": null,
@@ -1065,10 +1073,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Approval Message",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a message to a public or private channel.",
     "help": null,
@@ -1784,10 +1797,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Channel Message",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a direct message to another user in a workspace. If it hasn't already, a direct message conversation will be created.",
     "help": null,
@@ -2503,14 +2521,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Direct Message",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "addReaction",
     "description": "Adds a reaction to a message.",
     "element": { },
     "help": null,
-    "name": "addReaction",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2852,18 +2872,18 @@
     } ],
     "title": "Add Reaction",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendApprovalMessage",
     "description": "Sends approval message to a channel.",
     "element": { },
     "help": null,
-    "name": "sendApprovalMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3575,18 +3595,18 @@
     } ],
     "title": "Send Approval Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendChannelMessage",
     "description": "Sends a message to a public or private channel.",
     "element": { },
     "help": null,
-    "name": "sendChannelMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4298,18 +4318,18 @@
     } ],
     "title": "Send Channel Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendDirectMessage",
     "description": "Sends a direct message to another user in a workspace. If it hasn't already, a direct message conversation will be created.",
     "element": { },
     "help": null,
-    "name": "sendDirectMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5021,20 +5041,20 @@
     } ],
     "title": "Send Direct Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   }, {
-    "label": "Developer Tools",
-    "name": "developer-tools"
+    "name": "developer-tools",
+    "label": "Developer Tools"
   } ],
   "connection": {
     "authorizationRequired": null,

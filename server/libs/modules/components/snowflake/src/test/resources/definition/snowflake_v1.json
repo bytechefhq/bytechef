@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete row from the table.",
     "help": null,
@@ -1240,10 +1243,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete Row",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Execute SQL statement.",
     "help": null,
@@ -2408,10 +2416,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Execute SQL",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Insert row into the table.",
     "help": null,
@@ -3629,6 +3642,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "values",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -3640,14 +3654,18 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "values",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Insert Row",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update row from the table.",
     "help": null,
@@ -4887,6 +4905,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "values",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -4898,18 +4917,19 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "values",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Row",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "deleteRow",
     "description": "Delete row from the table.",
     "element": { },
     "help": null,
-    "name": "deleteRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6145,18 +6165,18 @@
     } ],
     "title": "Delete Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "executeSql",
     "description": "Execute SQL statement.",
     "element": { },
     "help": null,
-    "name": "executeSql",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7317,18 +7337,18 @@
     } ],
     "title": "Execute SQL",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "insertRow",
     "description": "Insert row into the table.",
     "element": { },
     "help": null,
-    "name": "insertRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8540,6 +8560,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "values",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -8551,24 +8572,23 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "values",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Insert Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateRow",
     "description": "Update row from the table.",
     "element": { },
     "help": null,
-    "name": "updateRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9802,6 +9822,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "values",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -9813,23 +9834,22 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "values",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Update Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Analytics",
-    "name": "analytics"
+    "name": "analytics",
+    "label": "Analytics"
   } ],
   "connection": {
     "authorizationRequired": null,

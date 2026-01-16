@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
@@ -34,13 +33,12 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.facade.OperationDefinitionFacade;
-import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.service.OperationDefinitionService;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.file.storage.TempFileStorage;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
@@ -74,37 +72,31 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
  */
 class HttpClientExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpClientExecutor.class);
-
     private final ApplicationContext applicationContext;
-    private final ConnectionDefinitionService connectionDefinitionService;
     private final TempFileStorage tempFileStorage;
 
     @SuppressFBWarnings("EI")
-    public HttpClientExecutor(
-        ApplicationContext applicationContext, ConnectionDefinitionService connectionDefinitionService,
-        TempFileStorage tempFileStorage) {
-
+    public HttpClientExecutor(ApplicationContext applicationContext, TempFileStorage tempFileStorage) {
         this.applicationContext = applicationContext;
-        this.connectionDefinitionService = connectionDefinitionService;
         this.tempFileStorage = tempFileStorage;
     }
 
     public Response execute(
-        String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Body body,
-        Configuration configuration, RequestMethod requestMethod, String componentName, int componentVersion,
-        String componentOperationName, ComponentConnection componentConnection, Context context)
-        throws Exception {
+        String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
+        @Nullable Body body, Configuration configuration, RequestMethod requestMethod, String componentName,
+        int componentVersion, String componentOperationName, @Nullable ComponentConnection componentConnection,
+        Context context) throws Exception {
 
         HttpResponse<?> httpResponse;
 
@@ -115,19 +107,17 @@ class HttpClientExecutor {
             HttpRequest httpRequest = createHttpRequest(
                 urlString, requestMethod, headers, queryParameters, body, componentName, componentConnection, context);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "uri: {}, requestMethod: {}, headers: {}, queryParameters: {}, responseType: {}",
-                    httpRequest.uri(), requestMethod, headers, queryParameters, configuration.getResponseType());
-            }
+            context.log(log -> log.debug(
+                "uri: {}, requestMethod: {}, headers: {}, queryParameters: {}, responseType: {}",
+                httpRequest.uri(), requestMethod, headers, queryParameters, configuration.getResponseType()));
 
             httpResponse = httpClient.send(httpRequest, createResponseBodyHandler(configuration));
 
-            return handleResponse(httpResponse, configuration);
+            return handleResponse(httpResponse, configuration, context);
         }
     }
 
-    BodyPublisher createBodyPublisher(Body body) {
+    BodyPublisher createBodyPublisher(@Nullable Body body) {
         BodyPublisher bodyPublisher;
 
         if (body == null) {
@@ -156,7 +146,7 @@ class HttpClientExecutor {
     HttpClient createHttpClient(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Configuration configuration,
         String componentName, int componentVersion, String componentOperationName,
-        ComponentConnection componentConnection, Context context) {
+        @Nullable ComponentConnection componentConnection, Context context) {
 
         Methanol.Builder builder = Methanol.newBuilder();
 
@@ -187,7 +177,7 @@ class HttpClientExecutor {
                 getInterceptor(
                     componentName, componentVersion, componentOperationName, componentConnection.version(),
                     componentConnection.authorizationType(), componentConnection.canCredentialsBeRefreshed(),
-                    isAction));
+                    isAction, context));
         }
 
         if (configuration.isFollowRedirect()) {
@@ -218,8 +208,8 @@ class HttpClientExecutor {
 
     HttpRequest createHttpRequest(
         String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters, Body body, String componentName,
-        ComponentConnection componentConnection, Context context) {
+        @Nullable Map<String, List<String>> queryParameters, @Nullable Body body, String componentName,
+        @Nullable ComponentConnection componentConnection, Context context) {
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
             .method(requestMethod.name(), createBodyPublisher(body));
@@ -238,15 +228,18 @@ class HttpClientExecutor {
         return httpRequestBuilder.build();
     }
 
-    Response handleResponse(HttpResponse<?> httpResponse, Configuration configuration) {
+    Response handleResponse(HttpResponse<?> httpResponse, Configuration configuration, Context context) {
         HttpHeaders httpHeaders = httpResponse.headers();
         ResponseType responseType = configuration.getResponseType();
         int statusCode = httpResponse.statusCode();
 
         if (statusCode != 204 && ((responseType == null) || !matches(responseType, httpHeaders))) {
-            logger.warn(
-                "Unexpected response body content-type type: {} can not be converted to {}",
-                httpHeaders.firstValue("content-type"), responseType);
+            String contentType = httpHeaders.firstValue("content-type")
+                .orElse(null);
+
+            context.log(log -> log.warn(
+                "Unexpected response body content-type type: {} can not be converted to {}", contentType,
+                responseType));
 
             return new ResponseImpl(httpHeaders.map(), null, statusCode);
         }
@@ -297,11 +290,13 @@ class HttpClientExecutor {
 
     private void applyAuthorization(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, String componentName,
-        ComponentConnection componentConnection, Context context) {
+        @Nullable ComponentConnection componentConnection, Context context) {
 
         if (componentConnection == null) {
             return;
         }
+
+        ConnectionDefinitionService connectionDefinitionService = getConnectionDefinitionService();
 
         ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
             componentName, componentConnection.version(),
@@ -341,17 +336,22 @@ class HttpClientExecutor {
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 
+    private ConnectionDefinitionService getConnectionDefinitionService() {
+        return applicationContext.getBean(ConnectionDefinitionService.class);
+    }
+
     private String getConnectionUrl(
-        String urlString, String componentName, ComponentConnection componentConnection, Context context) {
+        String urlString, String componentName, @Nullable ComponentConnection componentConnection, Context context) {
 
         if (urlString.contains("://") || (componentConnection == null)) {
             return urlString;
         }
 
-        return OptionalUtils.map(
-            connectionDefinitionService.executeBaseUri(componentName, componentConnection, context),
-            baseUri -> baseUri + urlString);
+        ConnectionDefinitionService connectionDefinitionService = getConnectionDefinitionService();
 
+        return connectionDefinitionService.executeBaseUri(componentName, componentConnection, context)
+            .map(baseUri -> baseUri + urlString)
+            .orElseThrow(() -> new RuntimeException("Failed to get baseUri for component: " + componentName));
     }
 
     private BodyPublisher getFormDataBodyPublisher(Body body) {
@@ -414,18 +414,21 @@ class HttpClientExecutor {
      */
     private Methanol.Interceptor getInterceptor(
         String componentName, int componentVersion, String componentOperationName, int connectionVersion,
-        AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean isAction) {
+        @Nullable AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean isAction,
+        Context context) {
 
         return new Methanol.Interceptor() {
             @Override
             public <T> HttpResponse<T> intercept(HttpRequest httpRequest, Chain<T> chain)
                 throws IOException, InterruptedException {
 
-                logger.trace("Intercepting request to analyze response");
+                context.log(log -> log.trace("Intercepting request to analyze response"));
 
                 HttpResponse<T> httpResponse = chain.forward(httpRequest);
 
-                OperationDefinitionFacade operationDefinitionFacade = getOperationDefinitionFacade(isAction);
+                OperationDefinitionService operationDefinitionService = getOperationDefinitionService(isAction);
+
+                ConnectionDefinitionService connectionDefinitionService = getConnectionDefinitionService();
 
                 if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 400)) {
                     List<String> detectOn = connectionDefinitionService.getAuthorizationDetectOn(
@@ -435,7 +438,7 @@ class HttpClientExecutor {
                         Object body = httpResponse.body();
 
                         if (body != null && RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
-                            throw operationDefinitionFacade.executeProcessErrorResponse(
+                            throw operationDefinitionService.executeProcessErrorResponse(
                                 componentName, componentVersion, componentOperationName, httpResponse.statusCode(),
                                 body);
                         }
@@ -446,13 +449,13 @@ class HttpClientExecutor {
 
                 Object body = httpResponse.body();
 
-                throw operationDefinitionFacade.executeProcessErrorResponse(
+                throw operationDefinitionService.executeProcessErrorResponse(
                     componentName, componentVersion, componentOperationName, httpResponse.statusCode(), body);
             }
 
             @Override
             public <T> CompletableFuture<HttpResponse<T>> interceptAsync(HttpRequest httpRequest, Chain<T> chain) {
-                logger.trace("Intercepting ASYNC request to analyze response");
+                context.log(log -> log.trace("Intercepting ASYNC request to analyze response"));
 
                 return chain.forwardAsync(httpRequest);
             }
@@ -464,16 +467,16 @@ class HttpClientExecutor {
             BodyPublishers.ofString(JsonUtils.write(body.getContent())), MediaType.APPLICATION_JSON);
     }
 
-    private OperationDefinitionFacade getOperationDefinitionFacade(boolean isAction) {
-        OperationDefinitionFacade operationDefinitionFacade;
+    private OperationDefinitionService getOperationDefinitionService(boolean isAction) {
+        OperationDefinitionService operationDefinitionService;
 
         if (isAction) {
-            operationDefinitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
+            operationDefinitionService = applicationContext.getBean(ActionDefinitionService.class);
         } else {
-            operationDefinitionFacade = applicationContext.getBean(TriggerDefinitionFacade.class);
+            operationDefinitionService = applicationContext.getBean(TriggerDefinitionService.class);
         }
 
-        return operationDefinitionFacade;
+        return operationDefinitionService;
     }
 
     private BodyPublisher getStringBodyPublisher(Body body) {
@@ -488,7 +491,7 @@ class HttpClientExecutor {
             BodyPublishers.ofString(XmlUtils.write(body.getContent())), MediaType.APPLICATION_XML);
     }
 
-    private boolean isEmpty(final Object object) {
+    private boolean isEmpty(@Nullable Object object) {
         if (object == null) {
             return true;
         }
@@ -504,8 +507,12 @@ class HttpClientExecutor {
         Optional<String> contentTypeOptional = httpHeaders.firstValue("content-type");
 
         return contentTypeOptional
-            .map(contentType -> StringUtils.equalsIgnoreCase(contentType, responseType.getContentType()) ||
-                StringUtils.containsIgnoreCase(contentType, String.valueOf(responseType.getType())))
+            .map(contentType -> {
+                String mediaType = contentType.split(";")[0].trim();
+
+                return Strings.CI.equals(mediaType, responseType.getContentType()) ||
+                    Strings.CI.equals(mediaType, String.valueOf(responseType.getType()));
+            })
             .orElse(true);
 
     }
@@ -531,10 +538,11 @@ class HttpClientExecutor {
     private static class ResponseImpl implements Response {
 
         private final Map<String, List<String>> headers;
+        @Nullable
         private final Object body;
         private final int statusCode;
 
-        private ResponseImpl(Map<String, List<String>> headers, Object body, int statusCode) {
+        private ResponseImpl(Map<String, List<String>> headers, @Nullable Object body, int statusCode) {
             this.headers = headers;
             this.body = body;
             this.statusCode = statusCode;
@@ -586,6 +594,7 @@ class HttpClientExecutor {
 
     private static class UnauthorizedCertsX509ExtendedTrustManager extends X509ExtendedTrustManager {
 
+        @Nullable
         public X509Certificate[] getAcceptedIssuers() {
             return null;
         }

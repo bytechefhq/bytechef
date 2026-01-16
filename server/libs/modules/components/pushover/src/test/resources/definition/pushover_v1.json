@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a notification.",
     "help": null,
@@ -413,14 +416,16 @@
       "required": false,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Notification",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendNotification",
     "description": "Sends a notification.",
     "element": { },
     "help": null,
-    "name": "sendNotification",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -829,17 +834,17 @@
     } ],
     "title": "Send Notification",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

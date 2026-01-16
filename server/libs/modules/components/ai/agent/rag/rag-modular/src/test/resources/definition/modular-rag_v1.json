@@ -3,57 +3,57 @@
   "actions": [ ],
   "clusterElementClusterElementTypes": { },
   "clusterElementTypes": [ {
+    "name": "DOCUMENT_JOINER",
     "key": "documentJoiner",
     "label": "Document Joiner",
     "multipleElements": false,
-    "name": "DOCUMENT_JOINER",
     "required": false
   }, {
+    "name": "DOCUMENT_RETRIEVER",
     "key": "documentRetriever",
     "label": "Document Retriever",
     "multipleElements": false,
-    "name": "DOCUMENT_RETRIEVER",
     "required": true
   }, {
+    "name": "QUERY_AUGMENTER",
     "key": "queryAugmenter",
     "label": "Query Augmenter",
     "multipleElements": false,
-    "name": "QUERY_AUGMENTER",
     "required": false
   }, {
+    "name": "QUERY_EXPANDER",
     "key": "queryExpander",
     "label": "Query Expander",
     "multipleElements": false,
-    "name": "QUERY_EXPANDER",
     "required": false
   }, {
+    "name": "QUERY_TRANSFORMER",
     "key": "queryTransformer",
     "label": "Query Transformer",
     "multipleElements": true,
-    "name": "QUERY_TRANSFORMER",
     "required": false
   } ],
   "clusterElements": [ {
+    "name": "rag",
     "description": "Moduler RAG.",
     "element": { },
     "help": null,
-    "name": "rag",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": null,
     "title": "Moduler RAG",
     "type": {
+      "name": "RAG",
       "key": "rag",
       "label": "RAG",
       "multipleElements": false,
-      "name": "RAG",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

@@ -20,7 +20,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ComponentHandler.ActionHandlerFunction;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandler;
 import java.util.function.BiFunction;
@@ -30,7 +30,7 @@ import java.util.function.BiFunction;
  */
 public class DefaultComponentHandlerLoader extends AbstractComponentHandlerLoader<ComponentHandler> {
 
-    public static final BiFunction<ComponentHandler, ActionDefinition, SingleConnectionPerformFunction> PERFORM_FUNCTION_FUNCTION =
+    public static final BiFunction<ComponentHandler, ActionDefinition, PerformFunction> PERFORM_FUNCTION_FUNCTION =
         (componentHandler, actionDefinition) -> {
             ActionHandlerFunction actionHandlerFunction = OptionalUtils.get(componentHandler.getActionHandler());
 

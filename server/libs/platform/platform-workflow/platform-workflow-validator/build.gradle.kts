@@ -1,6 +1,6 @@
 dependencies {
     api(project(":server:libs:platform:platform-api"))
-    api("com.fasterxml.jackson.core:jackson-databind")
+    api("tools.jackson.core:jackson-databind")
 
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")

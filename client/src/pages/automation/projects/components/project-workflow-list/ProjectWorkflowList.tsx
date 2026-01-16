@@ -22,7 +22,7 @@ import {ChevronDownIcon, LayoutTemplateIcon, UploadIcon, WorkflowIcon} from 'luc
 import {useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-const ProjectWorkflowList = ({project}: {project: Project}) => {
+const ProjectWorkflowList = ({project, queryEnabled}: {project: Project; queryEnabled?: boolean}) => {
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowImported} = useAnalytics();
@@ -47,7 +47,7 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
 
     const {data: workflows, isLoading: isProjectWorkflowsLoading} = useGetProjectWorkflowsQuery(
         project.id!,
-        !!project.id
+        queryEnabled && !!project.id
     );
 
     const workflowTaskDispatcherDefinitions: {

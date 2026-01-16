@@ -15,7 +15,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,7 +37,7 @@ public class CodeWorkflowPerformActionDefinition extends AbstractActionDefinitio
     }
 
     @Override
-    public Optional<PerformFunction> getPerform() {
+    public Optional<BasePerformFunction> getPerform() {
         return Optional.of((MultipleConnectionsPerformFunction) this::perform);
     }
 
@@ -48,6 +48,6 @@ public class CodeWorkflowPerformActionDefinition extends AbstractActionDefinitio
         return codeWorkflowTaskExecutor.executePerform(
             inputParameters.getRequiredString("codeWorkflowContainerUuid"),
             inputParameters.getRequiredString("workflowName"), inputParameters.getRequiredString("taskName"),
-            inputParameters.getRequired(MetadataConstants.TYPE, ModeType.class));
+            inputParameters.getRequired(MetadataConstants.TYPE, PlatformType.class));
     }
 }

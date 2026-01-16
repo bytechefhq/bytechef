@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a document on Google Docs.",
     "help": null,
@@ -59,10 +62,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Document",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new document based on an existing one and can replace any placeholder variables found in your template document, like [[name]], [[email]], etc.",
     "help": null,
@@ -233,10 +241,15 @@
       "required": false,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Document From Template",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve a specified document from your Google Drive.",
     "help": null,
@@ -276,14 +289,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Document",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createDocument",
     "description": "Create a document on Google Docs.",
     "element": { },
     "help": null,
-    "name": "createDocument",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -338,18 +353,18 @@
     } ],
     "title": "Create Document",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createDocumentFromTemplate",
     "description": "Creates a new document based on an existing one and can replace any placeholder variables found in your template document, like [[name]], [[email]], etc.",
     "element": { },
     "help": null,
-    "name": "createDocumentFromTemplate",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -516,18 +531,18 @@
     } ],
     "title": "Create Document From Template",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getDocument",
     "description": "Retrieve a specified document from your Google Drive.",
     "element": { },
     "help": null,
-    "name": "getDocument",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -563,17 +578,17 @@
     } ],
     "title": "Get Document",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   } ],
   "connection": {
     "authorizationRequired": null,

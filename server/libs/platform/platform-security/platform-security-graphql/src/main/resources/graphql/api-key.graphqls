@@ -1,11 +1,11 @@
 extend type Query {
-    apiKeys(environmentId: ID!, type: ModeType!): [ApiKey]
+    apiKeys(environmentId: ID!, type: PlatformType!): [ApiKey]
     adminApiKeys(environmentId: ID!): [ApiKey]
     apiKey(id: ID!): ApiKey
 }
 
 extend type Mutation {
-    createApiKey(name: String!, environmentId: ID!, type: ModeType): String!
+    createApiKey(name: String!, environmentId: ID!, type: PlatformType): String!
     deleteApiKey(id: ID!): Boolean!
     updateApiKey(id: ID!, name: String!): Boolean!
 }

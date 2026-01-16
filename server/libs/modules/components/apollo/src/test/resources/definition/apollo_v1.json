@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates the details of existing deals within your team's Apollo account.",
     "help": null,
@@ -747,10 +750,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Deal",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new deal for an Apollo account.",
     "help": null,
@@ -1497,10 +1505,15 @@
       "required": false,
       "type": "DATE"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Deal",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Enriches data for a person.",
     "help": null,
@@ -2396,10 +2409,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Enrich Person",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Enriches data for company.",
     "help": null,
@@ -3105,14 +3123,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Enrich Company",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "updateDeal",
     "description": "Updates the details of existing deals within your team's Apollo account.",
     "element": { },
     "help": null,
-    "name": "updateDeal",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3852,18 +3872,18 @@
     } ],
     "title": "Update Deal",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createDeal",
     "description": "Creates new deal for an Apollo account.",
     "element": { },
     "help": null,
-    "name": "createDeal",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4603,18 +4623,18 @@
     } ],
     "title": "Create Deal",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "enrichPerson",
     "description": "Enriches data for a person.",
     "element": { },
     "help": null,
-    "name": "enrichPerson",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5503,18 +5523,18 @@
     } ],
     "title": "Enrich Person",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "enrichCompany",
     "description": "Enriches data for company.",
     "element": { },
     "help": null,
-    "name": "enrichCompany",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6213,17 +6233,17 @@
     } ],
     "title": "Enrich Company",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

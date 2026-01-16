@@ -31,29 +31,25 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.annotation.BeforeStep;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("NP")
 public abstract class AbstractItemStreamDelegate {
 
     protected boolean editorEnvironment;
     protected String componentName;
     protected String clusterElementName;
     protected int componentVersion;
-    @Nullable
-    protected ComponentConnection componentConnection;
-    @Nullable
-    protected Parameters connectionParameters;
+    protected @Nullable ComponentConnection componentConnection;
+    protected @Nullable Parameters connectionParameters;
     protected ClusterElementContext clusterElementContext;
     protected Parameters inputParameters;
     protected String tenantId;
@@ -78,7 +74,7 @@ public abstract class AbstractItemStreamDelegate {
             return;
         }
 
-        Map<String, ?> clusterElementMap = (Map<String, ?>) jobParameter.getValue();
+        Map<String, ?> clusterElementMap = (Map<String, ?>) jobParameter.value();
 
         componentName = MapUtils.getRequiredString(clusterElementMap, COMPONENT_NAME);
         componentVersion = MapUtils.getRequiredInteger(clusterElementMap, COMPONENT_VERSION);
@@ -93,12 +89,12 @@ public abstract class AbstractItemStreamDelegate {
 
         jobParameter = Validate.notNull(jobParameters.getParameter(TENANT_ID), "tenantId is required");
 
-        tenantId = (String) jobParameter.getValue();
+        tenantId = (String) jobParameter.value();
 
         jobParameter = Validate.notNull(
             jobParameters.getParameter(MetadataConstants.EDITOR_ENVIRONMENT), "editorEnvironment is required");
 
-        editorEnvironment = (boolean) jobParameter.getValue();
+        editorEnvironment = (boolean) jobParameter.value();
 
         clusterElementContext = contextFactory.createClusterElementContext(
             componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment);

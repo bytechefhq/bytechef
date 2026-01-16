@@ -65,7 +65,7 @@ import org.mockito.MockedStatic;
 
 class GoogleMailNewEmailTriggerTest {
 
-    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final Parameters mockedWebhookEnableOutput = MockParametersFactory.create(Map.of(HISTORY_ID, 123));
     private final Get mockedGet = mock(Get.class);
     protected MockedStatic<GoogleServices> mockedGoogleServices;
     private final Gmail mockedGmail = mock(Gmail.class);
@@ -154,8 +154,6 @@ class GoogleMailNewEmailTriggerTest {
 
         when(mockedTriggerContext.data(any()))
             .thenReturn(Optional.of(123));
-        when(mockedWebhookEnableOutput.parameters())
-            .thenReturn((Map) Map.of(HISTORY_ID, 123));
         when(mockedGmail.users())
             .thenReturn(mockedUsers);
         when(mockedUsers.history())

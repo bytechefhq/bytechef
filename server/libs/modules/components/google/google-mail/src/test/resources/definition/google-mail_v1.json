@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add labels to an email in your Gmail account.",
     "help": null,
@@ -301,10 +304,15 @@
       "required": true,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Add Labels",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete an email from your Gmail account permanently via Id",
     "help": null,
@@ -336,10 +344,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete Mail",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get an email from your Gmail account via Id",
     "help": null,
@@ -461,10 +474,15 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Mail",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets the specified thread.",
     "help": null,
@@ -586,10 +604,15 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Thread",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Remove labels from an email in your Gmail account.",
     "help": null,
@@ -890,10 +913,15 @@
       "required": true,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Remove Labels",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a reply to an email message.",
     "help": null,
@@ -1476,10 +1504,15 @@
       "required": null,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Reply to Email",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Lists the messages in the user's mailbox.",
     "help": null,
@@ -2026,10 +2059,15 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Search Email",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends the specified message to the recipients in the To, Cc, and Bcc headers.",
     "help": null,
@@ -2655,14 +2693,16 @@
       "required": null,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Email",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "addLabels",
     "description": "Add labels to an email in your Gmail account.",
     "element": { },
     "help": null,
-    "name": "addLabels",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2959,18 +2999,18 @@
     } ],
     "title": "Add Labels",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteMail",
     "description": "Delete an email from your Gmail account permanently via Id",
     "element": { },
     "help": null,
-    "name": "deleteMail",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2998,18 +3038,18 @@
     } ],
     "title": "Delete Mail",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getMail",
     "description": "Get an email from your Gmail account via Id",
     "element": { },
     "help": null,
-    "name": "getMail",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
@@ -3127,18 +3167,18 @@
     } ],
     "title": "Get Mail",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getThread",
     "description": "Gets the specified thread.",
     "element": { },
     "help": null,
-    "name": "getThread",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
@@ -3256,18 +3296,18 @@
     } ],
     "title": "Get Thread",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "removeLabels",
     "description": "Remove labels from an email in your Gmail account.",
     "element": { },
     "help": null,
-    "name": "removeLabels",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3564,18 +3604,18 @@
     } ],
     "title": "Remove Labels",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "replyToEmail",
     "description": "Send a reply to an email message.",
     "element": { },
     "help": null,
-    "name": "replyToEmail",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4154,18 +4194,18 @@
     } ],
     "title": "Reply to Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "searchEmail",
     "description": "Lists the messages in the user's mailbox.",
     "element": { },
     "help": null,
-    "name": "searchEmail",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4708,18 +4748,18 @@
     } ],
     "title": "Search Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendEmail",
     "description": "Sends the specified message to the recipients in the To, Cc, and Bcc headers.",
     "element": { },
     "help": null,
-    "name": "sendEmail",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5341,17 +5381,17 @@
     } ],
     "title": "Send Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

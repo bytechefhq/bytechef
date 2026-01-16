@@ -21,7 +21,8 @@ dependencies {
     implementation(project(":cli:commands:component"))
 
     implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework.shell:spring-shell-starter")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.shell:spring-shell-starter:${rootProject.libs.versions.spring.shell.get()}")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

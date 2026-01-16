@@ -16,47 +16,98 @@
 
 package com.bytechef.component.shopify.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.Context.Http.ResponseType;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.INPUT;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER_ID;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.USER_ERRORS_PROPERTY;
+import static com.bytechef.component.shopify.util.ShopifyUtils.executeGraphQlOperation;
 
-import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.shopify.property.ShopifyOrderProperties;
-import com.bytechef.component.shopify.util.ShopifyUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.shopify.util.ShopifyOptionsUtils;
 import java.util.Map;
 
 /**
- * Provides a list of the component actions.
- *
- * @generated
+ * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 public class ShopifyCloseOrderAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("closeOrder")
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("closeOrder")
         .title("Close Order")
         .description(
-            "Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded.")
-        .metadata(
-            Map.of(
-                "method", "POST",
-                "path", "/orders/{orderId}/close.json"
-
-            ))
-        .properties(integer("orderId").label("Order ID")
-            .description("ID of the order to close.")
-            .required(true)
-            .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.PATH)))
-        .output(outputSchema(object().properties(ShopifyOrderProperties.PROPERTIES)
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+            "Marks an open Order as closed. A closed order is one where merchants fulfill or cancel all LineItem " +
+                "objects and complete all financial transactions.")
+        .properties(
+            string(ORDER_ID)
+                .label("Order ID")
+                .description("ID of the order to close.")
+                .required(true)
+                .options((OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("order")
+                            .description("The closed order.")
+                            .properties(
+                                bool("canMarkAsPaid")
+                                    .description("Whether an order can be manually marked as paid."),
+                                object("cancelReason")
+                                    .description("The reason provided for an order cancellation."),
+                                dateTime("cancelledAt")
+                                    .description("The date and time in ISO 8601 format when an order was canceled."),
+                                string("clientIp")
+                                    .description("The IP address of the customer who placed the order."),
+                                bool("confirmed")
+                                    .description("Whether inventory has been reserved for an order."),
+                                array("discountCodes")
+                                    .description(
+                                        "The discount codes used for the order. Multiple codes can be applied to a " +
+                                            "single order.")
+                                    .items(
+                                        string("discountCode")
+                                            .description("The discount code used for an order."))),
+                        USER_ERRORS_PROPERTY)))
+        .perform(ShopifyCloseOrderAction::perform);
 
     private ShopifyCloseOrderAction() {
+    }
+
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String query = """
+            mutation OrderClose($input: OrderCloseInput!) {
+              orderClose(input: $input) {
+                order {
+                  canMarkAsPaid
+                  cancelReason
+                  cancelledAt
+                  clientIp
+                  confirmed
+                  customer {
+                    displayName
+                    email
+                  }
+                  discountCodes
+                }
+                userErrors {
+                  field
+                  message
+                }
+              }
+            }""";
+
+        Map<String, Object> variables = Map.of(INPUT, Map.of(ID, inputParameters.getRequiredString(ORDER_ID)));
+
+        return executeGraphQlOperation(query, context, variables, "orderClose");
     }
 }

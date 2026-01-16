@@ -1,0 +1,10 @@
+query workflowChatProjectDeploymentWorkflow($id: String!) {
+    projectDeploymentWorkflow(id: $id) {
+        projectWorkflow {
+            sseStreamResponse
+            workflow {
+                label
+            }
+        }
+    }
+}

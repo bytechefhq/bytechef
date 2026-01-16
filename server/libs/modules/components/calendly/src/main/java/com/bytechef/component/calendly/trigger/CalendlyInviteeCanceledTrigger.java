@@ -76,7 +76,7 @@ public class CalendlyInviteeCanceledTrigger {
     protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders httpHeaders,
         HttpParameters httpParameters, WebhookBody webhookBody, WebhookMethod webhookMethod,
-        WebhookEnableOutput webhookEnableOutput, TriggerContext triggerContext) {
+        Parameters webhookEnableOutput, TriggerContext triggerContext) {
 
         return webhookBody.getContent(new TypeReference<>() {});
     }

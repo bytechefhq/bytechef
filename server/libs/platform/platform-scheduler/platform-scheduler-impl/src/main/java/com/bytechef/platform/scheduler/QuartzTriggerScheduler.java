@@ -16,17 +16,17 @@
 
 package com.bytechef.platform.scheduler;
 
-import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.scheduler.job.DelaySchedulerJob;
 import com.bytechef.platform.scheduler.job.DynamicWebhookTriggerRefreshJob;
 import com.bytechef.platform.scheduler.job.PollingTriggerJob;
 import com.bytechef.platform.scheduler.job.ScheduleTriggerJob;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 import org.quartz.CronScheduleBuilder;
@@ -72,7 +72,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleDynamicWebhookTriggerRefresh(
-        LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
+        Instant webhookExpirationDate, String componentName, int componentVersion,
         WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
         JobDetail jobDetail = JobBuilder.newJob(DynamicWebhookTriggerRefreshJob.class)
@@ -83,7 +83,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
         Trigger trigger = TriggerBuilder.newTrigger()
             .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), "ScheduleTrigger"))
-            .startAt(DateUtils.toDate(webhookExpirationDate))
+            .startAt(Date.from(webhookExpirationDate))
             .build();
 
         schedule(jobDetail, trigger);
@@ -130,7 +130,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleOneTimeTask(
-        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
         String taskExecutionId) {
 
         JobDetail jobDetail = JobBuilder.newJob(DelaySchedulerJob.class)
@@ -142,7 +142,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
         Trigger trigger = TriggerBuilder.newTrigger()
             .withIdentity(TriggerKey.triggerKey(taskExecutionId, "DelayTask"))
-            .startAt(DateUtils.toDate(executeAt))
+            .startAt(Date.from(executeAt))
             .build();
 
         schedule(jobDetail, trigger);

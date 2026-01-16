@@ -16,8 +16,6 @@
 
 package com.bytechef.task.dispatcher.parallel;
 
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
@@ -40,12 +38,6 @@ public class ParallelTaskDispatcherIntTest {
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
     @Autowired
-    protected ContextService contextService;
-
-    @Autowired
-    protected TaskExecutionService taskExecutionService;
-
-    @Autowired
     private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
 
     @Autowired
@@ -60,7 +52,7 @@ public class ParallelTaskDispatcherIntTest {
     public void testDispatch() {
         taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString("parallel_v1_1"),
-            (counterService, taskExecutionService) -> List.of(
+            (contextService, counterService, taskExecutionService) -> List.of(
                 (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(
                     counterService, taskCompletionHandler, taskExecutionService)),
             (eventPublisher, contextService, counterService, taskExecutionService) -> List.of(

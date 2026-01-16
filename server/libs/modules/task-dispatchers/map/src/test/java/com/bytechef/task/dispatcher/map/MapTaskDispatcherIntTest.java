@@ -29,6 +29,7 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor.TaskDispatcherJobExecution;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
@@ -54,12 +55,6 @@ public class MapTaskDispatcherIntTest {
     private TestVarTaskHandler<List<Object>, Object> testVarTaskHandler;
 
     @Autowired
-    protected ContextService contextService;
-
-    @Autowired
-    protected TaskExecutionService taskExecutionService;
-
-    @Autowired
     private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
 
     @Autowired
@@ -68,17 +63,20 @@ public class MapTaskDispatcherIntTest {
     @BeforeEach
     void beforeEach() {
         testVarTaskHandler = new TestVarTaskHandler<>(
-            (valueMap, name, value) -> valueMap.computeIfAbsent(name, key -> new ArrayList<>())
+            (valueMap, name, value) -> valueMap.computeIfAbsent(
+                name,
+                key -> java.util.Collections.synchronizedList(new ArrayList<>()))
                 .add(value));
     }
 
     @Test
     public void testDispatch1() {
-        Job job = taskDispatcherJobTestExecutor.execute(
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString("map_v1_1"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
-        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(jobExecution.job()
+            .getOutputs());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(3, 12)
@@ -89,36 +87,43 @@ public class MapTaskDispatcherIntTest {
 
     @Test
     public void testDispatch2() {
-        Job job = taskDispatcherJobTestExecutor.execute(
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString("map_v1_2"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
+        Job job = jobExecution.job();
+
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        Assertions.assertEquals(
-            IntStream.rangeClosed(1, 10)
-                .boxed()
-                .map(item1 -> IntStream.rangeClosed(1, item1)
-                    .mapToObj(item2 -> item1 + "_" + item2 + 1)
-                    .collect(Collectors.toList()))
-                .collect(Collectors.toList()),
-            outputs.get("map"));
+        List<?> actual = (List<?>) outputs.get("map");
+
+        List<?> expected = IntStream.rangeClosed(1, 10)
+            .boxed()
+            .map(item1 -> IntStream.rangeClosed(1, item1)
+                .mapToObj(item2 -> item1 + "_" + item2 + 1)
+                .collect(Collectors.toList()))
+            .collect(Collectors.toList());
+
+        Assertions.assertEquals(expected.size(), actual.size());
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
     public void testDispatch3() {
-        Job job = taskDispatcherJobTestExecutor.execute(
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString("map_v1_3"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
+        Job job = jobExecution.job();
+
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        Assertions.assertEquals(null, outputs.get("map"));
+        Assertions.assertNull(outputs.get("map"));
     }
 
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        CounterService counterService, TaskExecutionService taskExecutionService) {
+        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(

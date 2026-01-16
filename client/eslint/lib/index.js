@@ -1,6 +1,6 @@
 /**
  * @fileoverview Bytechef ESLint plugin
- * @author Bytechef
+ * @author Ivica Cardic
  */
 'use strict';
 
@@ -31,6 +31,7 @@ module.exports.configs = {
             'bytechef/no-duplicate-imports': 'error',
             'bytechef/no-length-jsx-expression': 'error',
             'bytechef/ref-name-suffix': 'error',
+            'bytechef/require-await-test-step': 'error',
             'bytechef/sort-import-destructures': 'error',
             'bytechef/sort-imports': 'error',
             'bytechef/use-state-naming-pattern': 'error',
@@ -48,6 +49,7 @@ module.exports.configs = {
                 'bytechef/no-duplicate-imports': 'error',
                 'bytechef/no-length-jsx-expression': 'error',
                 'bytechef/ref-name-suffix': 'error',
+                'bytechef/require-await-test-step': 'error',
                 'bytechef/sort-import-destructures': 'error',
                 'bytechef/sort-imports': 'error',
                 'bytechef/use-state-naming-pattern': 'error',

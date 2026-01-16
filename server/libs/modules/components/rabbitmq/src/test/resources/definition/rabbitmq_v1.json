@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a new RabbitMQ message.",
     "help": null,
@@ -52,14 +55,16 @@
       "required": true,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Message",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendMessage",
     "description": "Send a new RabbitMQ message.",
     "element": { },
     "help": null,
-    "name": "sendMessage",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -107,10 +112,10 @@
     } ],
     "title": "Send Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null

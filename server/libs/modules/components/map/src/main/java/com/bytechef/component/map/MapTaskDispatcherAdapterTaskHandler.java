@@ -47,8 +47,7 @@ import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
-import org.springframework.cache.CacheManager;
+import java.util.Objects;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -58,15 +57,11 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
 
-    private final CacheManager cacheManager;
     private final CurrentThreadExecutorService currentThreadExecutorService = new CurrentThreadExecutorService();
     private final Evaluator evaluator;
     private final TaskHandlerResolver taskHandlerResolver;
 
-    public MapTaskDispatcherAdapterTaskHandler(
-        CacheManager cacheManager, Evaluator evaluator, TaskHandlerResolver taskHandlerResolver) {
-
-        this.cacheManager = cacheManager;
+    public MapTaskDispatcherAdapterTaskHandler(Evaluator evaluator, TaskHandlerResolver taskHandlerResolver) {
         this.evaluator = evaluator;
         this.taskHandlerResolver = taskHandlerResolver;
     }
@@ -98,23 +93,25 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskExecutionService taskExecutionService =
-            new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository(cacheManager));
+            new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
 
         taskExecution = taskExecutionService.create(taskExecution);
 
-        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
         contextService.push(
-            Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+            Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION,
             taskFileStorage.storeTaskExecutionOutput(
-                Validate.notNull(taskExecution.getId(), "id"), Collections.emptyMap()));
+                Objects.requireNonNull(taskExecution.getJobId()), Objects.requireNonNull(taskExecution.getId()),
+                Collections.emptyMap()));
 
         TaskWorker taskWorker = new TaskWorker(
-            evaluator, getEventPublisher(syncMessageBroker), currentThreadExecutorService::execute, taskHandlerResolver,
+            null, evaluator, getEventPublisher(syncMessageBroker), currentThreadExecutorService::execute,
+            taskHandlerResolver,
             taskFileStorage, List.of());
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(
-            contextService, new CounterServiceImpl(new InMemoryCounterRepository(cacheManager)), evaluator,
+            contextService, new CounterServiceImpl(new InMemoryCounterRepository()), evaluator,
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             curTaskExecution -> taskWorker.onTaskExecutionEvent(new TaskExecutionEvent(curTaskExecution)),
             taskExecutionService, taskFileStorage);

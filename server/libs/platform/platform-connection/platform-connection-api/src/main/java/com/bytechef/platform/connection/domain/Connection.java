@@ -20,7 +20,7 @@ import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -38,7 +39,6 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -219,8 +219,8 @@ public final class Connection {
             .toList();
     }
 
-    public ModeType getType() {
-        return ModeType.values()[type];
+    public PlatformType getType() {
+        return PlatformType.values()[type];
     }
 
     public int getVersion() {
@@ -265,7 +265,7 @@ public final class Connection {
         }
     }
 
-    public void setType(ModeType type) {
+    public void setType(PlatformType type) {
         this.type = type.ordinal();
     }
 
@@ -319,7 +319,7 @@ public final class Connection {
         private String name;
         private Map<String, Object> parameters;
         private List<Long> tagIds;
-        private ModeType type;
+        private PlatformType type;
         private int version;
 
         private Builder() {
@@ -367,7 +367,7 @@ public final class Connection {
             return this;
         }
 
-        public Builder type(ModeType type) {
+        public Builder type(PlatformType type) {
             this.type = type;
 
             return this;

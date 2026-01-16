@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new opportunity.",
     "help": null,
@@ -186,10 +189,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Opportunity",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new organization.",
     "help": null,
@@ -443,10 +451,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Organization",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new person.",
     "help": null,
@@ -833,14 +846,16 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Person",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createOpportunity",
     "description": "Creates a new opportunity.",
     "element": { },
     "help": null,
-    "name": "createOpportunity",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1017,18 +1032,18 @@
     } ],
     "title": "Create Opportunity",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createOrganization",
     "description": "Creates a new organization.",
     "element": { },
     "help": null,
-    "name": "createOrganization",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1273,18 +1288,18 @@
     } ],
     "title": "Create Organization",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createPerson",
     "description": "Creates a new person.",
     "element": { },
     "help": null,
-    "name": "createPerson",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1662,17 +1677,17 @@
     } ],
     "title": "Create Person",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

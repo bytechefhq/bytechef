@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Computes and returns the hash of the input.",
     "help": null,
@@ -119,10 +122,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Hash",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Computes and returns the HMAC of the input.",
     "help": null,
@@ -263,10 +271,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Hmac",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Decrypts PGP encrypted file using private key and passphrase.",
     "help": null,
@@ -641,10 +654,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "PGP Decrypt",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Encrypts the file using PGP public key.",
     "help": null,
@@ -997,10 +1015,15 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "PGP Encrypt",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Decrypts RSA encrypted file using RSA private key.",
     "help": null,
@@ -1353,10 +1376,15 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "RSA Decrypt",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Encrypts the file using the RSA public key.",
     "help": null,
@@ -1709,10 +1737,15 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "RSA Encrypt",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Cryptographically signs a file.",
     "help": null,
@@ -2065,10 +2098,15 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Sign",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Verify the signature using public RSA key.",
     "help": null,
@@ -2365,14 +2403,16 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Verify",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "hash",
     "description": "Computes and returns the hash of the input.",
     "element": { },
     "help": null,
-    "name": "hash",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2487,18 +2527,18 @@
     } ],
     "title": "Hash",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "hmac",
     "description": "Computes and returns the HMAC of the input.",
     "element": { },
     "help": null,
-    "name": "hmac",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2635,18 +2675,18 @@
     } ],
     "title": "Hmac",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "pgpDecrypt",
     "description": "Decrypts PGP encrypted file using private key and passphrase.",
     "element": { },
     "help": null,
-    "name": "pgpDecrypt",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3017,18 +3057,18 @@
     } ],
     "title": "PGP Decrypt",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "pgpEncrypt",
     "description": "Encrypts the file using PGP public key.",
     "element": { },
     "help": null,
-    "name": "pgpEncrypt",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3377,18 +3417,18 @@
     } ],
     "title": "PGP Encrypt",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "rsaDecrypt",
     "description": "Decrypts RSA encrypted file using RSA private key.",
     "element": { },
     "help": null,
-    "name": "rsaDecrypt",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3737,18 +3777,18 @@
     } ],
     "title": "RSA Decrypt",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "rsaEncrypt",
     "description": "Encrypts the file using the RSA public key.",
     "element": { },
     "help": null,
-    "name": "rsaEncrypt",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4097,18 +4137,18 @@
     } ],
     "title": "RSA Encrypt",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sign",
     "description": "Cryptographically signs a file.",
     "element": { },
     "help": null,
-    "name": "sign",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4457,18 +4497,18 @@
     } ],
     "title": "Sign",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "verify",
     "description": "Verify the signature using public RSA key.",
     "element": { },
     "help": null,
-    "name": "verify",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4761,17 +4801,17 @@
     } ],
     "title": "Verify",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

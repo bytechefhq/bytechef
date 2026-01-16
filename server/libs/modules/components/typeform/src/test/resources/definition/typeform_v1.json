@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new form",
     "help": null,
@@ -152,13 +155,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Form",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Surveys and Feedback",
-    "name": "surveys-and-feedback"
+    "name": "surveys-and-feedback",
+    "label": "Surveys and Feedback"
   } ],
   "connection": {
     "authorizationRequired": null,

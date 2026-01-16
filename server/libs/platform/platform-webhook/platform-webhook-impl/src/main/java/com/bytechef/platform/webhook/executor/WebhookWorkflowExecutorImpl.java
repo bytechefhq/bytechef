@@ -26,17 +26,21 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.platform.job.sync.SseStreamBridge;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent.WebhookParameters;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.tenant.TenantContext;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -50,6 +54,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     private final WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor;
     private final TaskFileStorage taskFileStorage;
 
+    @SuppressFBWarnings("EI")
     public WebhookWorkflowExecutorImpl(
         ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         PrincipalJobFacade principalJobFacade, JobSyncExecutor jobSyncExecutor,
@@ -64,14 +69,51 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     }
 
     @Override
-    public void execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    public void executeAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         eventPublisher.publishEvent(
             new TriggerWebhookEvent(new WebhookParameters(workflowExecutionId, webhookRequest)));
     }
 
     @Override
-    @Nullable
-    public Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    public CompletableFuture<Void> executeAsync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge) {
+
+        TriggerOutput triggerOutput = webhookWorkflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
+
+        String workflowId = getWorkflowId(workflowExecutionId);
+        Map<String, ?> inputMap = getInputMap(workflowExecutionId);
+
+        if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?>) {
+            throw new IllegalStateException("Trigger output value must not be a collection");
+        }
+
+        Map<String, Object> inputs = new java.util.HashMap<>(inputMap);
+
+        inputs.put(workflowExecutionId.getTriggerName(), triggerOutput.value());
+
+        long jobId = TenantContext.callWithTenantId(
+            workflowExecutionId.getTenantId(), () -> jobSyncExecutor.startJob(
+                new JobParametersDTO(workflowId, inputs),
+                jobParameters -> principalJobFacade.createSyncJob(
+                    jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType())));
+
+        return CompletableFuture.runAsync(() -> {
+            AutoCloseable handle = jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge);
+
+            sseStreamBridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", String.valueOf(jobId))));
+
+            TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
+                try {
+                    jobSyncExecutor.awaitJob(jobId, false);
+                } finally {
+                    handle.close();
+                }
+            });
+        });
+    }
+
+    @Override
+    public @Nullable Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         Object outputs;
 
         TriggerOutput triggerOutput = webhookWorkflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
@@ -113,7 +155,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         WebhookValidateResponse response = webhookWorkflowSyncExecutor.validate(workflowExecutionId, webhookRequest);
 
         if (response.status() == HttpStatus.OK.getValue()) {
-            execute(workflowExecutionId, webhookRequest);
+            executeAsync(workflowExecutionId, webhookRequest);
         }
 
         return response;
@@ -131,23 +173,23 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         WorkflowExecutionId workflowExecutionId, String workflowId, Map<String, ?> inputMap,
         Object triggerOutputValue) {
 
-        return new JobParametersDTO(
-            workflowId,
-            MapUtils.concat(
-                (Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), triggerOutputValue)));
+        Map<String, Object> concat = MapUtils.concat(
+            (Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), triggerOutputValue));
+
+        return new JobParametersDTO(workflowId, concat);
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        JobPrincipalAccessor jobPrincipalAccessor =
-            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        JobPrincipalAccessor jobPrincipalAccessor =
-            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());

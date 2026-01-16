@@ -22,7 +22,7 @@ import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.webhook.executor.config;
 
+import static com.bytechef.platform.job.sync.executor.JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR;
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -38,7 +39,8 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutorImpl;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowSyncExecutor;
@@ -61,7 +63,6 @@ import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -76,28 +77,29 @@ public class WebhookConfiguration {
 
     @Bean
     WebhookWorkflowExecutor webhookExecutor(
-        CacheManager cacheManager, ContextService contextService, CounterService counterService,
+        ContextService contextService, CounterService counterService,
         Environment environment, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
-        WebhookWorkflowSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        WebhookWorkflowSyncExecutor triggerSyncExecutor, WorkflowService workflowService) {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
+        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage();
 
         return new WebhookWorkflowExecutorImpl(
             eventPublisher, jobPrincipalAccessorRegistry,
             principalJobFacade,
             new JobSyncExecutor(
-                contextService, evaluator, jobService, -1, () -> asyncMessageBroker, getTaskCompletionHandlerFactories(
+                contextService, evaluator, jobService, -1,
+                role -> (role == COORDINATOR) ? asyncMessageBroker : new AsyncMessageBroker(environment),
+                getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
-                getTaskDispatcherAdapterFactories(cacheManager, evaluator), taskDispatcherPreSendProcessors,
+                getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
                     taskFileStorage),
-                taskExecutionService, taskExecutor,
-                taskHandlerRegistry, taskFileStorage, 300, workflowService),
+                taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             triggerSyncExecutor, taskFileStorage);
     }
 
@@ -137,15 +139,13 @@ public class WebhookConfiguration {
                 counterService, taskCompletionHandler, taskExecutionService));
     }
 
-    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(
-        CacheManager cacheManager, Evaluator evaluator) {
-
+    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(Evaluator evaluator) {
         return List.of(
             new TaskDispatcherAdapterFactory() {
 
                 @Override
                 public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver) {
-                    return new MapTaskDispatcherAdapterTaskHandler(cacheManager, evaluator, taskHandlerResolver);
+                    return new MapTaskDispatcherAdapterTaskHandler(evaluator, taskHandlerResolver);
                 }
 
                 @Override

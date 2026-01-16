@@ -26,7 +26,6 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
-import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -35,7 +34,7 @@ import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSha
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -71,9 +70,6 @@ public class ConnectionFacadeIntTest {
     private ConnectionDefinitionService connectionDefinitionService;
 
     @Autowired
-    private ConnectionDefinitionFacade connectionDefinitionFacade;
-
-    @Autowired
     private ConnectionFacade connectionFacade;
 
     @Autowired
@@ -105,7 +101,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        long connectionId = connectionFacade.create(connectionDTO, ModeType.AUTOMATION);
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
         Assertions.assertThat(connectionId)
             .isEqualTo(1055L);
@@ -122,7 +118,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        long connectionId1 = connectionFacade.create(connectionDTO1, ModeType.AUTOMATION);
+        long connectionId1 = connectionFacade.create(connectionDTO1, PlatformType.AUTOMATION);
 
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
             .authorizationType(AuthorizationType.BASIC_AUTH)
@@ -133,7 +129,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        long connectionId2 = connectionFacade.create(connectionDTO2, ModeType.AUTOMATION);
+        long connectionId2 = connectionFacade.create(connectionDTO2, PlatformType.AUTOMATION);
 
         Assertions.assertThat(connectionRepository.count())
             .isEqualTo(2);
@@ -159,7 +155,7 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name");
-        connection.setType(ModeType.AUTOMATION);
+        connection.setType(PlatformType.AUTOMATION);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -168,7 +164,7 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        when(connectionDefinitionFacade.executeBaseUri(eq("componentName"), any()))
+        when(connectionDefinitionService.executeBaseUri(eq("componentName"), any()))
             .thenReturn(Optional.of("baseUri"));
 
         Assertions.assertThat(connectionFacade.getConnection(connection.getId()))
@@ -184,7 +180,7 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name");
-        connection.setType(ModeType.AUTOMATION);
+        connection.setType(PlatformType.AUTOMATION);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -193,7 +189,7 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        when(connectionDefinitionFacade.executeBaseUri(eq("componentName"), any()))
+        when(connectionDefinitionService.executeBaseUri(eq("componentName"), any()))
             .thenThrow(new IllegalStateException("Connection failed"));
 
         ConnectionDTO result = connectionFacade.getConnection(connection.getId());
@@ -212,7 +208,7 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name");
-        connection.setType(ModeType.AUTOMATION);
+        connection.setType(PlatformType.AUTOMATION);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -222,7 +218,7 @@ public class ConnectionFacadeIntTest {
         connection = connectionRepository.save(connection);
 
         List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(
-            null, null, List.of(), null, null, ModeType.AUTOMATION);
+            null, null, List.of(), null, null, PlatformType.AUTOMATION);
 
         Assertions.assertThat(CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
             .isEqualTo(List.of(connection));
@@ -240,11 +236,11 @@ public class ConnectionFacadeIntTest {
 
         connection2.setComponentName("componentName2");
         connection2.setName("name");
-        connection2.setType(ModeType.AUTOMATION);
+        connection2.setType(PlatformType.AUTOMATION);
 
         connectionRepository.save(connection2);
 
-        connectionDTOs = connectionFacade.getConnections(null, null, List.of(), null, null, ModeType.AUTOMATION);
+        connectionDTOs = connectionFacade.getConnections(null, null, List.of(), null, null, PlatformType.AUTOMATION);
 
         Assertions.assertThat(CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
             .isEqualTo(List.of(connection));
@@ -260,11 +256,11 @@ public class ConnectionFacadeIntTest {
         connection.setComponentName("componentName");
         connection.setName("name");
         connection.setTags(List.of(tag1, tag2));
-        connection.setType(ModeType.AUTOMATION);
+        connection.setType(PlatformType.AUTOMATION);
 
         connectionRepository.save(connection);
 
-        Assertions.assertThat(connectionFacade.getConnectionTags(ModeType.AUTOMATION)
+        Assertions.assertThat(connectionFacade.getConnectionTags(PlatformType.AUTOMATION)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -274,7 +270,7 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name2");
-        connection.setType(ModeType.AUTOMATION);
+        connection.setType(PlatformType.AUTOMATION);
 
         tag1 = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag1.getId(), "id")));
 
@@ -282,7 +278,7 @@ public class ConnectionFacadeIntTest {
 
         connectionRepository.save(connection);
 
-        Assertions.assertThat(connectionFacade.getConnectionTags(ModeType.AUTOMATION)
+        Assertions.assertThat(connectionFacade.getConnectionTags(PlatformType.AUTOMATION)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -290,7 +286,7 @@ public class ConnectionFacadeIntTest {
 
         connectionRepository.deleteById(Validate.notNull(connection.getId(), "id"));
 
-        Assertions.assertThat(connectionFacade.getConnectionTags(ModeType.AUTOMATION)
+        Assertions.assertThat(connectionFacade.getConnectionTags(PlatformType.AUTOMATION)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -310,7 +306,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();
 
-        connectionDTO = connectionFacade.getConnection(connectionFacade.create(connectionDTO, ModeType.AUTOMATION));
+        connectionDTO = connectionFacade.getConnection(connectionFacade.create(connectionDTO, PlatformType.AUTOMATION));
 
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(2);
@@ -359,8 +355,8 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public ModeType getType() {
-                    return ModeType.AUTOMATION;
+                public PlatformType getType() {
+                    return PlatformType.AUTOMATION;
                 }
 
                 @Override

@@ -36,9 +36,9 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -275,7 +275,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                ModeType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
+                PlatformType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
                 integrationWorkflow.getUuidAsString(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
@@ -312,7 +312,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                ModeType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
+                PlatformType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
                 integrationWorkflow.getUuidAsString(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
@@ -367,7 +367,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     private Instant getIntegrationInstanceLastExecutionDate(long integrationInstanceId) {
         return OptionalUtils.mapOrElse(
-            principalJobService.fetchLastJobId(integrationInstanceId, ModeType.EMBEDDED), this::getJobEndDate, null);
+            principalJobService.fetchLastJobId(integrationInstanceId, PlatformType.EMBEDDED), this::getJobEndDate,
+            null);
     }
 
     private Instant getJobEndDate(Long jobId) {

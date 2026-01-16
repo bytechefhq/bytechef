@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a meeting.",
     "help": null,
@@ -766,6 +769,7 @@
               "required": null,
               "type": "INTEGER"
             }, {
+              "name": null,
               "advancedOption": null,
               "controlType": "NULL",
               "defaultValue": null,
@@ -776,7 +780,6 @@
               "hidden": null,
               "label": null,
               "metadata": { },
-              "name": null,
               "placeholder": null,
               "required": null,
               "type": "NULL"
@@ -1899,6 +1902,7 @@
             "required": null,
             "type": "INTEGER"
           }, {
+            "name": null,
             "advancedOption": null,
             "controlType": "NULL",
             "defaultValue": null,
@@ -1909,7 +1913,6 @@
             "hidden": null,
             "label": null,
             "metadata": { },
-            "name": null,
             "placeholder": null,
             "required": null,
             "type": "NULL"
@@ -2541,10 +2544,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Meeting",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create and submit a user's registration to a meeting.",
     "help": null,
@@ -3648,14 +3656,16 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Add Meeting Registrant",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createMeeting",
     "description": "Creates a meeting.",
     "element": { },
     "help": null,
-    "name": "createMeeting",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4411,6 +4421,7 @@
               "required": null,
               "type": "INTEGER"
             }, {
+              "name": null,
               "advancedOption": null,
               "controlType": "NULL",
               "defaultValue": null,
@@ -4421,7 +4432,6 @@
               "hidden": null,
               "label": null,
               "metadata": { },
-              "name": null,
               "placeholder": null,
               "required": null,
               "type": "NULL"
@@ -5544,6 +5554,7 @@
             "required": null,
             "type": "INTEGER"
           }, {
+            "name": null,
             "advancedOption": null,
             "controlType": "NULL",
             "defaultValue": null,
@@ -5554,7 +5565,6 @@
             "hidden": null,
             "label": null,
             "metadata": { },
-            "name": null,
             "placeholder": null,
             "required": null,
             "type": "NULL"
@@ -6187,18 +6197,18 @@
     } ],
     "title": "Create Meeting",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "addMeetingRegistrant",
     "description": "Create and submit a user's registration to a meeting.",
     "element": { },
     "help": null,
-    "name": "addMeetingRegistrant",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7293,17 +7303,17 @@
     } ],
     "title": "Add Meeting Registrant",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

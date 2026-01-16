@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.domain;
 
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;

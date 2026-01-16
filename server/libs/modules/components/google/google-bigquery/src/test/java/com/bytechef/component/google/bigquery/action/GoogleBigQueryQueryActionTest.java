@@ -30,8 +30,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -69,12 +69,12 @@ class GoogleBigQueryQueryActionTest {
 
     @Test
     void perform() throws Exception {
-        Optional<PerformFunction> performFunction = GoogleBigQueryQueryAction.ACTION_DEFINITION.getPerform();
+        Optional<? extends BasePerformFunction> basePerformFunction =
+            GoogleBigQueryQueryAction.ACTION_DEFINITION.getPerform();
 
-        assertTrue(performFunction.isPresent());
+        assertTrue(basePerformFunction.isPresent());
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) performFunction.get();
+        PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
 
         when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
@@ -93,7 +93,7 @@ class GoogleBigQueryQueryActionTest {
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
-        Object result = singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
+        Object result = performFunction.apply(mockedParameters, null, mockedActionContext);
 
         assertEquals(mockedObject, result);
 

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Ask anything you want.",
     "help": null,
@@ -763,14 +766,16 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Ask",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "model",
     "description": "NVIDIA model.",
     "element": { },
     "help": null,
-    "name": "model",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1031,17 +1036,17 @@
     } ],
     "title": "NVIDIA Model",
     "type": {
+      "name": "MODEL",
       "key": "model",
       "label": "Model",
       "multipleElements": false,
-      "name": "MODEL",
       "required": true
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

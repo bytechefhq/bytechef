@@ -24,7 +24,6 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.hubspot.util.HubspotUtils;
 import java.util.HashMap;
@@ -47,7 +46,7 @@ abstract class AbstractHubspotTriggerTest {
     protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     protected Parameters mockedParameters;
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    protected Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     protected WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =

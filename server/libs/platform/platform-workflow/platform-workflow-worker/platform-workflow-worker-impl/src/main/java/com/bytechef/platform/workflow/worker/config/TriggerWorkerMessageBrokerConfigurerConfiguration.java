@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.worker.config;
 
+import static com.bytechef.tenant.TenantContext.CURRENT_TENANT_ID;
+
 import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.event.MessageEvent;
@@ -23,6 +25,7 @@ import com.bytechef.message.event.MessageEventPostReceiveProcessor;
 import com.bytechef.platform.workflow.worker.TriggerWorker;
 import com.bytechef.platform.workflow.worker.event.TriggerExecutionEvent;
 import com.bytechef.platform.workflow.worker.message.route.TriggerWorkerMessageRoute;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -64,21 +67,23 @@ public class TriggerWorkerMessageBrokerConfigurerConfiguration {
         List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors, TriggerWorker triggerWorker) {
 
         public void onCancelControlTriggerEvent(MessageEvent<?> messageEvent) {
-            process(messageEvent);
-
-            triggerWorker.onCancelControlTriggerEvent(messageEvent);
+            TenantContext.runWithTenantId(
+                (String) messageEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> triggerWorker.onCancelControlTriggerEvent(process(messageEvent)));
         }
 
         public void onTriggerExecutionEvent(TriggerExecutionEvent triggerExecutionEvent) {
-            process(triggerExecutionEvent);
-
-            triggerWorker.onTriggerExecutionEvent(triggerExecutionEvent);
+            TenantContext.runWithTenantId(
+                (String) triggerExecutionEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> triggerWorker.onTriggerExecutionEvent((TriggerExecutionEvent) process(triggerExecutionEvent)));
         }
 
-        private void process(MessageEvent<?> messageEvent) {
+        private MessageEvent<?> process(MessageEvent<?> messageEvent) {
             for (MessageEventPostReceiveProcessor messageEventPostReceiveProcessor : messageEventPostReceiveProcessors) {
-                messageEventPostReceiveProcessor.process(messageEvent);
+                messageEvent = messageEventPostReceiveProcessor.process(messageEvent);
             }
+
+            return messageEvent;
         }
     }
 }

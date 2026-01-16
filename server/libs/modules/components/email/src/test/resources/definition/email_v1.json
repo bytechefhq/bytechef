@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send an email to any address.",
     "help": null,
@@ -392,10 +395,15 @@
       "required": null,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get emails from inbox.",
     "help": null,
@@ -857,16 +865,18 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Mail",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   }, {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": {
     "authorizationRequired": false,
@@ -959,30 +969,6 @@
       "regex": null,
       "required": true,
       "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "If selected the connection will use TLS when connecting to server.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Use TLS",
-      "metadata": { },
-      "name": "tls",
-      "options": [ {
-        "description": null,
-        "label": "True",
-        "value": true
-      }, {
-        "description": null,
-        "label": "False",
-        "value": false
-      } ],
-      "placeholder": null,
-      "required": null,
-      "type": "BOOLEAN"
     }, {
       "advancedOption": null,
       "controlType": "SELECT",

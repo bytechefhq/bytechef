@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -34,7 +34,7 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
     }
 
     @Override
-    public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, ModeType type) {
+    public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -44,7 +44,7 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
     }
 
     @Override
-    public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, ModeType type) {
+    public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -54,6 +54,6 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParametersDTO jobParameters, long jobPrincipalId, ModeType type) {
+    public record CreateJobRequest(JobParametersDTO jobParameters, long jobPrincipalId, PlatformType type) {
     }
 }

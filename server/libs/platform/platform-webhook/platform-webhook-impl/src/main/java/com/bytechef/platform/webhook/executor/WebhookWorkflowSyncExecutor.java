@@ -31,8 +31,8 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
@@ -101,12 +101,12 @@ public class WebhookWorkflowSyncExecutor {
             triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
-            workflowNodeType.name(), workflowNodeType.version(),
-            workflowNodeType.operation(), workflowExecutionId.getType(),
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid(),
             triggerExecution.getParameters(), triggerExecution.getState(),
             MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
-            CollectionUtils.findFirstOrElse(connectionIdMap.values(), null), false);
+            CollectionUtils.findFirstOrElse(connectionIdMap.values(), null), null, workflowExecutionId.getType(),
+            false);
 
         triggerExecution.setBatch(triggerOutput.batch());
         triggerExecution.setOutput(

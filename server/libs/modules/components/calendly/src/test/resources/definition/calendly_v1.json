@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Cancels specified event.",
     "help": null,
@@ -352,14 +355,16 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Cancel Event",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "cancelEvent",
     "description": "Cancels specified event.",
     "element": { },
     "help": null,
-    "name": "cancelEvent",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -702,17 +707,17 @@
     } ],
     "title": "Cancel Event",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

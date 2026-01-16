@@ -20,7 +20,9 @@ sonarProperties.forEach { key, value ->
 subprojects {
     apply(plugin = "org.sonarqube")
 
-    dependencies {
-        implementation("org.springframework.shell:spring-shell-starter")
-    }
+//    configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
+//        imports {
+//            mavenBom("org.springframework.shell:spring-shell-dependencies:${rootProject.libs.versions.spring.shell.get()}")
+//        }
+//    }
 }

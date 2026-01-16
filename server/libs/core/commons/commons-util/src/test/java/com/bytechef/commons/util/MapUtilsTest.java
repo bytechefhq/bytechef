@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.bytechef.jackson.config.JacksonConfiguration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -28,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.jackson.JsonComponentModule;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Matija Petanjek
@@ -37,7 +36,9 @@ public class MapUtilsTest {
 
     @BeforeAll
     public static void setUp() {
-        MapUtils.setObjectMapper(new JacksonConfiguration(new JsonComponentModule()).objectMapper());
+        MapUtils.setObjectMapper(
+            JsonMapper.builder()
+                .build());
     }
 
     @Test

@@ -81,7 +81,7 @@ public class BoxNewFolderTrigger {
 
     protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
         return body.getContent(new TypeReference<Map<String, ?>>() {})
             .get("source");

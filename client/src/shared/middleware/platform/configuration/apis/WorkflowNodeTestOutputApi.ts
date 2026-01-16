@@ -85,7 +85,7 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         if (requestParameters['createdDate'] != null) {
-            queryParameters['createdDate'] = requestParameters['createdDate'];
+            queryParameters['createdDate'] = (requestParameters['createdDate'] as any).toISOString();
         }
 
         if (requestParameters['environmentId'] != null) {

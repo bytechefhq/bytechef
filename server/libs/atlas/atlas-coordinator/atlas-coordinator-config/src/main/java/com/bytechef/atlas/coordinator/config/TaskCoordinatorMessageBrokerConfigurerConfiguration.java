@@ -16,6 +16,8 @@
 
 package com.bytechef.atlas.coordinator.config;
 
+import static com.bytechef.tenant.TenantContext.CURRENT_TENANT_ID;
+
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
@@ -30,6 +32,7 @@ import com.bytechef.config.ApplicationProperties.Coordinator.Task.Subscriptions;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -89,45 +92,48 @@ public class TaskCoordinatorMessageBrokerConfigurerConfiguration {
         List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors, TaskCoordinator taskCoordinator) {
 
         public void onApplicationEvent(ApplicationEvent applicationEvent) {
-            process(applicationEvent);
-
-            taskCoordinator.onApplicationEvent(applicationEvent);
+            TenantContext.runWithTenantId(
+                (String) applicationEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> taskCoordinator.onApplicationEvent((ApplicationEvent) process(applicationEvent)));
         }
 
         public void onErrorEvent(ErrorEvent errorEvent) {
-            process(errorEvent);
-
-            taskCoordinator.onErrorEvent(errorEvent);
+            TenantContext.runWithTenantId(
+                (String) errorEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> taskCoordinator.onErrorEvent((ErrorEvent) process(errorEvent)));
         }
 
         public void onResumeJobEvent(ResumeJobEvent resumeJobEvent) {
-            process(resumeJobEvent);
-
-            taskCoordinator.onResumeJobEvent(resumeJobEvent);
+            TenantContext.runWithTenantId(
+                (String) resumeJobEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> taskCoordinator.onResumeJobEvent((ResumeJobEvent) process(resumeJobEvent)));
         }
 
         public void onStartJobEvent(StartJobEvent startJobEvent) {
-            process(startJobEvent);
-
-            taskCoordinator.onStartJobEvent(startJobEvent);
+            TenantContext.runWithTenantId(
+                (String) startJobEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> taskCoordinator.onStartJobEvent((StartJobEvent) process(startJobEvent)));
         }
 
         public void onStopJobEvent(StopJobEvent stopJobEvent) {
-            process(stopJobEvent);
-
-            taskCoordinator.onStopJobEvent(stopJobEvent);
+            TenantContext.runWithTenantId(
+                (String) stopJobEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> taskCoordinator.onStopJobEvent((StopJobEvent) process(stopJobEvent)));
         }
 
         public void onTaskExecutionCompleteEvent(TaskExecutionCompleteEvent taskExecutionCompleteEvent) {
-            process(taskExecutionCompleteEvent);
-
-            taskCoordinator.onTaskExecutionCompleteEvent(taskExecutionCompleteEvent);
+            TenantContext.runWithTenantId(
+                (String) taskExecutionCompleteEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> taskCoordinator.onTaskExecutionCompleteEvent(
+                    (TaskExecutionCompleteEvent) process(taskExecutionCompleteEvent)));
         }
 
-        private void process(MessageEvent<?> messageEvent) {
+        private MessageEvent<?> process(MessageEvent<?> messageEvent) {
             for (MessageEventPostReceiveProcessor messageEventPostReceiveProcessor : messageEventPostReceiveProcessors) {
-                messageEventPostReceiveProcessor.process(messageEvent);
+                messageEvent = messageEventPostReceiveProcessor.process(messageEvent);
             }
+
+            return messageEvent;
         }
     }
 }

@@ -26,7 +26,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.VectorStoreChatMemoryComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,9 +38,7 @@ public class VectorStoreChatMemoryComponentHandler implements ComponentHandler {
 
     private final VectorStoreChatMemoryComponentDefinition componentDefinition;
 
-    public VectorStoreChatMemoryComponentHandler(
-        @Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
-
+    public VectorStoreChatMemoryComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
         this.componentDefinition = new VectorStoreChatMemoryComponentDefinitionImpl(
             component(VECTOR_STORE_CHAT_MEMORY)
                 .title("Vector Store Chat Memory")

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Make a phone call using voice AI agent.",
     "help": null,
@@ -241,14 +244,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Make Phone Call",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "makePhoneCall",
     "description": "Make a phone call using voice AI agent.",
     "element": { },
     "help": null,
-    "name": "makePhoneCall",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -485,17 +490,17 @@
     } ],
     "title": "Make Phone Call",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

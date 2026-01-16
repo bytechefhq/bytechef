@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Move Contact to the recycling bin.",
     "help": null,
@@ -40,10 +43,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get contact details.",
     "help": null,
@@ -490,10 +498,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update Contact properties.",
     "help": null,
@@ -1096,10 +1109,15 @@
       "required": false,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a contact with the given properties.",
     "help": null,
@@ -1675,10 +1693,15 @@
       "required": false,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new deal.",
     "help": null,
@@ -2248,10 +2271,15 @@
       "required": false,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Deal",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets ticket details.",
     "help": null,
@@ -2698,14 +2726,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Ticket",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "deleteContact",
     "description": "Move Contact to the recycling bin.",
     "element": { },
     "help": null,
-    "name": "deleteContact",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2738,18 +2768,18 @@
     } ],
     "title": "Delete Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getContact",
     "description": "Get contact details.",
     "element": { },
     "help": null,
-    "name": "getContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3189,18 +3219,18 @@
     } ],
     "title": "Get Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateContact",
     "description": "Update Contact properties.",
     "element": { },
     "help": null,
-    "name": "updateContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3794,18 +3824,18 @@
     } ],
     "title": "Update Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createContact",
     "description": "Create a contact with the given properties.",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4372,18 +4402,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createDeal",
     "description": "Creates a new deal.",
     "element": { },
     "help": null,
-    "name": "createDeal",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4944,18 +4974,18 @@
     } ],
     "title": "Create Deal",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getTicket",
     "description": "Gets ticket details.",
     "element": { },
     "help": null,
-    "name": "getTicket",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5395,17 +5425,17 @@
     } ],
     "title": "Get Ticket",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Marketing Automation",
-    "name": "marketing-automation"
+    "name": "marketing-automation",
+    "label": "Marketing Automation"
   } ],
   "connection": {
     "authorizationRequired": null,

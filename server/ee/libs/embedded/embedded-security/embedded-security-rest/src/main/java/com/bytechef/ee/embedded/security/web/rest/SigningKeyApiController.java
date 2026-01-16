@@ -15,7 +15,7 @@ import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.rest.model.CreateSigningKey200ResponseModel;
 import com.bytechef.ee.embedded.security.web.rest.model.SigningKeyModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -48,12 +48,11 @@ public class SigningKeyApiController implements SigningKeyApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<CreateSigningKey200ResponseModel> createSigningKey(SigningKeyModel signingKeyModel) {
         return ResponseEntity.ok(
             new CreateSigningKey200ResponseModel().privateKey(
                 signingKeyFacade.create(
-                    conversionService.convert(signingKeyModel, SigningKey.class), ModeType.EMBEDDED)));
+                    conversionService.convert(signingKeyModel, SigningKey.class), PlatformType.EMBEDDED)));
     }
 
     @Override
@@ -73,11 +72,10 @@ public class SigningKeyApiController implements SigningKeyApi {
     public ResponseEntity<List<SigningKeyModel>> getSigningKeys(Long environmentId) {
         return ResponseEntity.ok(
             CollectionUtils.map(signingKeyService.getSigningKeys(
-                ModeType.EMBEDDED, environmentId), this::getSigningKeyModel));
+                PlatformType.EMBEDDED, environmentId), this::getSigningKeyModel));
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<Void> updateSigningKey(Long id, SigningKeyModel signingKeyModel) {
         signingKeyService.update(conversionService.convert(signingKeyModel.id(id), SigningKey.class));
 

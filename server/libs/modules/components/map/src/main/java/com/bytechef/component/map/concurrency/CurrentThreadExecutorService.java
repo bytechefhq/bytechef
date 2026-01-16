@@ -23,7 +23,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -79,8 +79,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     }
 
     @Override
-    @NonNull
-    public List<Runnable> shutdownNow() {
+    public @NonNull List<Runnable> shutdownNow() {
         shutdown();
 
         return Collections.emptyList();

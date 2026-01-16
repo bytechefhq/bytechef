@@ -17,11 +17,9 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants;
 import com.bytechef.platform.scheduler.TriggerScheduler;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +88,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleDynamicWebhookTriggerRefresh(
-        LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
+        Instant webhookExpirationDate, String componentName, int componentVersion,
         WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
         String workflowExecutionIdString = workflowExecutionId.toString();
@@ -106,7 +104,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .name(DYNAMIC_WEBHOOK_TRIGGER_REFRESH + workflowExecutionIdString.substring(0, 16))
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
-            .startDate(webhookExpirationDate.toInstant(ZoneOffset.UTC)));
+            .startDate(webhookExpirationDate));
     }
 
     @Override
@@ -130,7 +128,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleOneTimeTask(
-        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
         String taskExecutionId) {
 
         Target sqsTarget = Target.builder()
@@ -145,7 +143,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .name(ONE_TIME_TASK + taskExecutionId.substring(0, 16))
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
-            .startDate(executeAt.toInstant(ZoneOffset.UTC)));
+            .startDate(executeAt));
     }
 
     @Override

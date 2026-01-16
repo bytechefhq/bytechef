@@ -17,18 +17,20 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface TriggerContextAware extends TriggerContext {
 
+    @Nullable
     Long getJobPrincipalId();
 
     String getTriggerName();
 
-    ModeType getType();
+    PlatformType getType();
 
     String getWorkflowUuid();
 }

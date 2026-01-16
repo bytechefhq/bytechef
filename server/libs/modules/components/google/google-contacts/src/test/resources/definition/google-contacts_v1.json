@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact.",
     "help": null,
@@ -849,10 +852,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new group.",
     "help": null,
@@ -977,10 +985,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Group",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Modifies an existing contact.",
     "help": null,
@@ -1851,10 +1864,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Searches the contacts in Google Contacts account.",
     "help": null,
@@ -2791,14 +2809,16 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Search Contacts",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createContact",
     "description": "Creates a new contact.",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3643,18 +3663,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createGroup",
     "description": "Creates a new group.",
     "element": { },
     "help": null,
-    "name": "createGroup",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3775,18 +3795,18 @@
     } ],
     "title": "Create Group",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateContact",
     "description": "Modifies an existing contact.",
     "element": { },
     "help": null,
-    "name": "updateContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4653,18 +4673,18 @@
     } ],
     "title": "Update Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "searchContacts",
     "description": "Searches the contacts in Google Contacts account.",
     "element": { },
     "help": null,
-    "name": "searchContacts",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5597,17 +5617,17 @@
     } ],
     "title": "Search Contacts",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

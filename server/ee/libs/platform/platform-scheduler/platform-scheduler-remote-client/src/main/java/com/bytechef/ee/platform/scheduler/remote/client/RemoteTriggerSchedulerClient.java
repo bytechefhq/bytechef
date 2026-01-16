@@ -9,9 +9,9 @@ package com.bytechef.ee.platform.scheduler.remote.client;
 
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.scheduler.TriggerScheduler;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +65,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
 
     @Override
     public void scheduleDynamicWebhookTriggerRefresh(
-        LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
+        Instant webhookExpirationDate, String componentName, int componentVersion,
         WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
         loadBalancedRestClient.post(
@@ -101,7 +101,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
 
     @Override
     public void scheduleOneTimeTask(
-        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
         String taskExecutionId) {
 
         loadBalancedRestClient.post(
@@ -114,13 +114,13 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
 
     @SuppressFBWarnings("EI")
     private record DynamicWebhookRefreshTaskRequest(
-        WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
+        WorkflowExecutionId workflowExecutionId, Instant webhookExpirationDate, String componentName,
         int componentVersion, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     private record OneTimeTaskRequest(
-        WorkflowExecutionId workflowExecutionId, LocalDateTime executeAt, Map<String, Object> output,
+        WorkflowExecutionId workflowExecutionId, Instant executeAt, Map<String, Object> output,
         String taskExecutionId) {
     }
 

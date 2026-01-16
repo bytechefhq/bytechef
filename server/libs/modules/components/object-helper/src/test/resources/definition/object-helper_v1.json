@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add value to the object by key if it exists. Otherwise, update the value",
     "help": null,
@@ -217,6 +220,7 @@
       "required": true,
       "type": "INTEGER"
     }, {
+      "name": "value",
       "advancedOption": null,
       "controlType": "NULL",
       "defaultValue": null,
@@ -227,7 +231,6 @@
       "hidden": null,
       "label": "Value",
       "metadata": { },
-      "name": "value",
       "placeholder": null,
       "required": true,
       "type": "NULL"
@@ -313,10 +316,15 @@
       "required": true,
       "type": "TIME"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Add Value to the Object by Key",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add values from list to object. The source object can either be empty or populated with properties. The items in the list will be treated as Key-value pairs.",
     "help": null,
@@ -452,6 +460,7 @@
         "required": null,
         "type": "NUMBER"
       }, {
+        "name": null,
         "advancedOption": null,
         "controlType": "NULL",
         "defaultValue": null,
@@ -462,7 +471,6 @@
         "hidden": null,
         "label": null,
         "metadata": { },
-        "name": null,
         "placeholder": null,
         "required": null,
         "type": "NULL"
@@ -753,6 +761,7 @@
           "required": true,
           "type": "INTEGER"
         }, {
+          "name": "value",
           "advancedOption": null,
           "controlType": "NULL",
           "defaultValue": null,
@@ -763,7 +772,6 @@
           "hidden": null,
           "label": "Value",
           "metadata": { },
-          "name": "value",
           "placeholder": null,
           "required": true,
           "type": "NULL"
@@ -864,10 +872,15 @@
       "required": true,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Add Key-Value Pairs",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Checks if the given key exists in the given object.",
     "help": null,
@@ -976,10 +989,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Contains",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a key-value pair in the given object by the specified key. Returns the modified object.",
     "help": null,
@@ -1036,10 +1054,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete Key-Value Pair",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Compares two objects and returns true if they are equal.",
     "help": null,
@@ -1146,10 +1169,15 @@
       "required": true,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Equals",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Merge two objects into one. If there is any property with the same name, the source value will be used.",
     "help": null,
@@ -1204,13 +1232,15 @@
       "required": true,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Merge Two Objects",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

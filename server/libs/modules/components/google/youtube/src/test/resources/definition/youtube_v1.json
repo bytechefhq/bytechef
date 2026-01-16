@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Uploads video to Youtube.",
     "help": null,
@@ -1395,14 +1398,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Upload Video",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "uploadVideo",
     "description": "Uploads video to Youtube.",
     "element": { },
     "help": null,
-    "name": "uploadVideo",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2793,17 +2798,17 @@
     } ],
     "title": "Upload Video",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -20,11 +20,10 @@ import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.XmlUtils;
-import com.bytechef.jackson.config.JacksonConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.springframework.boot.jackson.JsonComponentModule;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
  * This extension is used to setup the ObjectMapper for the tests.
@@ -35,13 +34,14 @@ public class ObjectMapperSetupExtension implements BeforeAllCallback {
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        JacksonConfiguration jacksonConfiguration = new JacksonConfiguration(new JsonComponentModule());
-
-        ObjectMapper objectMapper = jacksonConfiguration.objectMapper();
+        JsonMapper objectMapper = JsonMapper.builder()
+            .build();
 
         ConvertUtils.setObjectMapper(objectMapper);
         JsonUtils.setObjectMapper(objectMapper);
         MapUtils.setObjectMapper(objectMapper);
-        XmlUtils.setXmlMapper(jacksonConfiguration.xmlMapper());
+        XmlUtils.setXmlMapper(
+            XmlMapper.builder()
+                .build());
     }
 }

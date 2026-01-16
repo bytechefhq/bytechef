@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads data from a JSON file.",
     "help": null,
@@ -233,10 +236,15 @@
       "required": null,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Read from File",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the data to a JSON file.",
     "help": null,
@@ -586,14 +594,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Write to File",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "read",
     "description": "Reads data from a JSON file.",
     "element": { },
     "help": null,
-    "name": "read",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -822,18 +832,18 @@
     } ],
     "title": "Read from File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "write",
     "description": "Writes the data to a JSON file.",
     "element": { },
     "help": null,
-    "name": "write",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1179,17 +1189,17 @@
     } ],
     "title": "Write to File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

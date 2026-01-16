@@ -27,12 +27,12 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.dto.PasswordChangeDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
-import com.bytechef.platform.user.exception.InvalidPasswordException;
 import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.user.util.PasswordValidator;
 import com.bytechef.platform.user.web.rest.exception.AccountErrorType;
 import com.bytechef.platform.user.web.rest.exception.AccountResourceException;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
@@ -132,9 +132,7 @@ public class AccountController {
             }
         }
 
-        if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
-            throw new InvalidPasswordException();
-        }
+        PasswordValidator.validate(managedUserVM.getPassword());
 
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
 
@@ -169,10 +167,10 @@ public class AccountController {
                 "No user was found for this activation key", AccountErrorType.USER_NOT_FOUND);
         }
 
-        if (tenantService.isMultiTenantEnabled()) {
-            String tenantId = tenantService.createTenant();
+        User user = userOptional.get();
 
-            User user = userOptional.get();
+        if (tenantService.isMultiTenantEnabled() && !tenantService.tenantIdsByUserEmailExist(user.getEmail())) {
+            String tenantId = tenantService.createTenant();
 
             user.setId(null);
 
@@ -258,9 +256,7 @@ public class AccountController {
      */
     @PostMapping(path = "/account/change-password")
     public void changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
-        if (isPasswordLengthInvalid(passwordChangeDto.getNewPassword())) {
-            throw new InvalidPasswordException();
-        }
+        PasswordValidator.validate(passwordChangeDto.getNewPassword());
 
         userService.changePassword(passwordChangeDto.getCurrentPassword(), passwordChangeDto.getNewPassword());
     }
@@ -350,9 +346,7 @@ public class AccountController {
      */
     @PostMapping(path = "/account/reset-password/finish")
     public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
-        if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
-            throw new InvalidPasswordException();
-        }
+        PasswordValidator.validate(keyAndPassword.getNewPassword());
 
         Optional<User> user;
 
@@ -379,11 +373,5 @@ public class AccountController {
     private static boolean isEqualsIgnoreCase(Optional<User> existingUser, String userLogin) {
         return OptionalUtils.get(existingUser, User::getLogin)
             .equalsIgnoreCase(userLogin);
-    }
-
-    private static boolean isPasswordLengthInvalid(String password) {
-        return StringUtils.isEmpty(password) ||
-            password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
-            password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH;
     }
 }

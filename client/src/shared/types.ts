@@ -67,6 +67,7 @@ export type ComponentType = {
         ui?: {
             condition?: string;
             dynamicPropertyTypes?: {[key: string]: string};
+            fromAi?: Array<string>;
         };
     };
     name?: string;
@@ -325,6 +326,7 @@ export type PropertyAllType = Omit<PropertyTypeAllType, 'controlType'> & {
     controlType?: ControlType;
     custom?: boolean;
     expressionEnabled?: boolean;
+    properties?: Array<PropertyAllType>;
 };
 
 export type UpdateWorkflowMutationType = UseMutationResult<void, Error, UpdateWorkflowRequestI, unknown>;

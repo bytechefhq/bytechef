@@ -16,7 +16,6 @@
 
 package com.bytechef.component.definition;
 
-import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseOutputFunction;
@@ -69,20 +68,20 @@ public final class OutputDefinition implements BaseOutputDefinition {
         return new OutputDefinition(outputSchema, sampleOutput, placeholder);
     }
 
-    public static OutputDefinition of(BaseOutputFunction output) {
+    public static OutputDefinition of(ActionDefinition.BaseOutputFunction output) {
         Objects.requireNonNull(output, "'output' mut not be null");
 
         return new OutputDefinition(output);
     }
 
-    public static OutputDefinition of(OutputFunction output) {
+    public static OutputDefinition of(TriggerDefinition.OutputFunction output) {
         Objects.requireNonNull(output, "'output' mut not be null");
 
         return new OutputDefinition(output);
     }
 
     @Override
-    public Optional<BaseOutputFunction> getOutput() {
+    public Optional<? extends BaseOutputFunction> getOutput() {
         return Optional.ofNullable(output);
     }
 

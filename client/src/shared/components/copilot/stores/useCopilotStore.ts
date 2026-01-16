@@ -6,7 +6,7 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 export enum MODE {
-    CHAT = 'CHAT',
+    ASK = 'ASK',
     BUILD = 'BUILD',
 }
 
@@ -20,6 +20,11 @@ export type ContextType = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters: Record<string, any>;
     mode: MODE;
+    taskExecutionError?: {
+        errorMessage?: string;
+        stackTrace?: string[];
+        title?: string;
+    };
 };
 
 interface CopilotStateI {
@@ -28,6 +33,15 @@ interface CopilotStateI {
 
     context: ContextType;
     setContext: (context: ContextType | undefined) => void;
+    setWorkflowExecutionError: (
+        workflowExecutionError:
+            | {
+                  errorMessage?: string;
+                  stackTrace?: string[];
+                  title?: string;
+              }
+            | undefined
+    ) => void;
 
     copilotPanelOpen: boolean;
     setCopilotPanelOpen: (showCopilot: boolean) => void;
@@ -54,13 +68,26 @@ export const useCopilotStore = create<CopilotStateI>()(
         },
 
         context: {
-            mode: MODE.CHAT,
+            source: Source.WORKFLOW_EDITOR,
+            parameters: {},
+            mode: MODE.ASK,
+            workflowExecutionError: undefined,
         },
         setContext: (context) =>
             set((state) => {
                 return {
                     ...state,
                     context,
+                };
+            }),
+        setWorkflowExecutionError: (error) =>
+            set((state) => {
+                return {
+                    ...state,
+                    context: {
+                        ...state.context,
+                        taskExecutionError: error,
+                    },
                 };
             }),
 

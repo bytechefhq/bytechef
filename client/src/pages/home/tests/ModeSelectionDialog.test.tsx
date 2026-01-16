@@ -1,16 +1,16 @@
 import ModeSelectionDialog from '@/pages/home/components/ModeSelectionDialog';
-import {ModeType} from '@/pages/home/stores/useModeTypeStore';
-import {mockModeTypeStore} from '@/pages/home/tests/mocks/mockModeTypeStore';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
+import {mockPlatformTypeStore} from '@/pages/home/tests/mocks/mockPlatformTypeStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
 
-vi.mock('@/pages/home/stores/useModeTypeStore', async () => {
-    const actual = await import('@/pages/home/stores/useModeTypeStore');
+vi.mock('@/pages/home/stores/usePlatformTypeStore', async () => {
+    const actual = await import('@/pages/home/stores/usePlatformTypeStore');
     return {
         ...actual,
-        useModeTypeStore: vi.fn(),
+        usePlatformTypeStore: vi.fn(),
     };
 });
 
@@ -34,7 +34,7 @@ const mockedUseFeatureFlagsStore = useFeatureFlagsStore as Mock;
 
 beforeEach(() => {
     mockReactRouter();
-    mockModeTypeStore();
+    mockPlatformTypeStore();
     mockedUseFeatureFlagsStore.mockReturnValue(() => true);
 });
 
@@ -76,8 +76,8 @@ it('should not show dialog when isDialogOpen is false', () => {
 });
 
 it('should show current type as checked on dialog open', () => {
-    mockModeTypeStore({
-        currentType: ModeType.EMBEDDED,
+    mockPlatformTypeStore({
+        currentType: PlatformType.EMBEDDED,
     });
 
     renderModeSelectionDialog();
@@ -86,7 +86,7 @@ it('should show current type as checked on dialog open', () => {
 });
 
 it('should not show any type as checked if the current type is undefined', () => {
-    mockModeTypeStore({
+    mockPlatformTypeStore({
         currentType: undefined,
     });
 
@@ -115,7 +115,7 @@ it('should show the cancel button and x icon', () => {
 });
 
 it('should not show the cancel button when currentType is undefined', () => {
-    mockModeTypeStore({
+    mockPlatformTypeStore({
         currentType: undefined,
     });
 
@@ -143,7 +143,7 @@ it('should call the onDialogClose function on click of the "Confirm" button if i
 });
 
 it('should not call the onDialogClose function on click of escape key if the currentType is undefined', async () => {
-    mockModeTypeStore({
+    mockPlatformTypeStore({
         currentType: undefined,
     });
 
@@ -157,8 +157,8 @@ it('should not call the onDialogClose function on click of escape key if the cur
 it('should call setCurrentType with appropriate value when a currentType is changed', async () => {
     const mockSetCurrentType = vi.fn();
 
-    mockModeTypeStore({
-        currentType: ModeType.EMBEDDED,
+    mockPlatformTypeStore({
+        currentType: PlatformType.EMBEDDED,
         setCurrentType: mockSetCurrentType,
     });
 
@@ -168,7 +168,7 @@ it('should call setCurrentType with appropriate value when a currentType is chan
 
     await userEvent.click(screen.getByText('Confirm'));
 
-    expect(mockSetCurrentType).toHaveBeenCalledWith(ModeType.AUTOMATION);
+    expect(mockSetCurrentType).toHaveBeenCalledWith(PlatformType.AUTOMATION);
 });
 
 it('should navigate to embedded page when currentType is changed to embedded', async () => {
@@ -182,8 +182,8 @@ it('should navigate to embedded page when currentType is changed to embedded', a
 });
 
 it('should navigate to automation page when currentType is changed to automation', async () => {
-    mockModeTypeStore({
-        currentType: ModeType.EMBEDDED,
+    mockPlatformTypeStore({
+        currentType: PlatformType.EMBEDDED,
     });
 
     renderModeSelectionDialog();

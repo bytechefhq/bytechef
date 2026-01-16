@@ -8,8 +8,8 @@
 package com.bytechef.runtime.job.platform.scheduler;
 
 import com.bytechef.platform.scheduler.TriggerScheduler;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
-import java.time.LocalDateTime;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
+import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -33,7 +33,7 @@ public class NoOpTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleDynamicWebhookTriggerRefresh(
-        LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
+        Instant webhookExpirationDate, String componentName, int componentVersion,
         WorkflowExecutionId workflowExecutionId, Long connectionId) {
     }
 
@@ -48,7 +48,7 @@ public class NoOpTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleOneTimeTask(
-        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
         String taskExecutionId) {
     }
 }

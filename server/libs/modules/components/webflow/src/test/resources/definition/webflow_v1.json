@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates an order's status to fulfilled.",
     "help": null,
@@ -214,10 +217,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Fulfill Order",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get collection item in a collection.",
     "help": null,
@@ -540,14 +548,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Collection Item",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "fulfillOrder",
     "description": "Updates an order's status to fulfilled.",
     "element": { },
     "help": null,
-    "name": "fulfillOrder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -754,18 +764,18 @@
     } ],
     "title": "Fulfill Order",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getCollectionItem",
     "description": "Get collection item in a collection.",
     "element": { },
     "help": null,
-    "name": "getCollectionItem",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1081,17 +1091,17 @@
     } ],
     "title": "Get Collection Item",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Developer Tools",
-    "name": "developer-tools"
+    "name": "developer-tools",
+    "label": "Developer Tools"
   } ],
   "connection": {
     "authorizationRequired": null,

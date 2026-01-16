@@ -20,12 +20,12 @@ import com.bytechef.ee.ai.copilot.repository.converter.ListDoubleToPGObjectConve
 import com.bytechef.ee.ai.copilot.repository.converter.MapToPGObjectConverter;
 import com.bytechef.ee.ai.copilot.repository.converter.PGObjectToListDoubleConverter;
 import com.bytechef.ee.ai.copilot.repository.converter.PGobjectToMapConverter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic

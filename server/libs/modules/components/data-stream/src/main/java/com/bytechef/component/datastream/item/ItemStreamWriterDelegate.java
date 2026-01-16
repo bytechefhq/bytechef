@@ -22,18 +22,16 @@ import com.bytechef.component.definition.datastream.ItemWriter;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.tenant.TenantContext;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamWriter;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
+import org.springframework.batch.infrastructure.item.ItemStreamWriter;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("NP")
 public class ItemStreamWriterDelegate extends AbstractItemStreamDelegate
     implements ItemStreamWriter<Map<String, Object>> {
 

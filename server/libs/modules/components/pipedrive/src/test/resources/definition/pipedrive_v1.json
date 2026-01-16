@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns all deals.",
     "help": null,
@@ -918,10 +921,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Deals",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a new deal.",
     "help": null,
@@ -1955,10 +1963,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Add Deal",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Searches all deals by title, notes and/or custom fields.",
     "help": null,
@@ -3024,10 +3037,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Search Deals",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Marks a deal as deleted. After 30 days, the deal will be permanently deleted.",
     "help": null,
@@ -3201,10 +3219,15 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete Deal",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns the details of a specific deal.",
     "help": null,
@@ -3964,10 +3987,15 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Details of Deal",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest.",
     "help": null,
@@ -4633,10 +4661,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Leads",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a lead. A lead always has to be linked to a person or an organization or both.",
     "help": null,
@@ -5298,10 +5331,15 @@
       "required": false,
       "type": "DATE"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Add Lead",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a specific lead.",
     "help": null,
@@ -5484,10 +5522,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete Lead",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns details of a specific lead. ",
     "help": null,
@@ -5946,10 +5989,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Lead Details",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Searches all leads by title, notes and/or custom fields.",
     "help": null,
@@ -6625,10 +6673,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Search Leads",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns all organizations.",
     "help": null,
@@ -7164,10 +7217,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get All Organizations",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a new organization.",
     "help": null,
@@ -7615,10 +7673,15 @@
       "required": false,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Add Organization",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Searches all organizations by name, address, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope.",
     "help": null,
@@ -8188,10 +8251,15 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Search Organizations",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Marks an organization as deleted. After 30 days, the organization will be permanently deleted.",
     "help": null,
@@ -8365,10 +8433,15 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete Organization",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns the details of an organization.",
     "help": null,
@@ -8790,10 +8863,15 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Details of Organization",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns all persons.",
     "help": null,
@@ -9931,10 +10009,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Persons",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a new person.",
     "help": null,
@@ -11258,10 +11341,15 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Add Person",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Searches all persons by name, email, phone, notes and/or custom fields.",
     "help": null,
@@ -12461,10 +12549,15 @@
       "required": false,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Search Persons",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Marks a person as deleted. After 30 days, the person will be permanently deleted.",
     "help": null,
@@ -12638,10 +12731,15 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete Person",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns the details of a person. This also returns some additional fields which are not present when asking for all persons.",
     "help": null,
@@ -13665,14 +13763,16 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Details of Person",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "getDeals",
     "description": "Returns all deals.",
     "element": { },
     "help": null,
-    "name": "getDeals",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -14583,18 +14683,18 @@
     } ],
     "title": "Get Deals",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "addDeal",
     "description": "Adds a new deal.",
     "element": { },
     "help": null,
-    "name": "addDeal",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -15619,18 +15719,18 @@
     } ],
     "title": "Add Deal",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "searchDeals",
     "description": "Searches all deals by title, notes and/or custom fields.",
     "element": { },
     "help": null,
-    "name": "searchDeals",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -16689,18 +16789,18 @@
     } ],
     "title": "Search Deals",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteDeal",
     "description": "Marks a deal as deleted. After 30 days, the deal will be permanently deleted.",
     "element": { },
     "help": null,
-    "name": "deleteDeal",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -16867,18 +16967,18 @@
     } ],
     "title": "Delete Deal",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getDealDetails",
     "description": "Returns the details of a specific deal.",
     "element": { },
     "help": null,
-    "name": "getDealDetails",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -17631,18 +17731,18 @@
     } ],
     "title": "Get Details of Deal",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getLeads",
     "description": "Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest.",
     "element": { },
     "help": null,
-    "name": "getLeads",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -18301,18 +18401,18 @@
     } ],
     "title": "Get Leads",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "addLead",
     "description": "Creates a lead. A lead always has to be linked to a person or an organization or both.",
     "element": { },
     "help": null,
-    "name": "addLead",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -18965,18 +19065,18 @@
     } ],
     "title": "Add Lead",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteLead",
     "description": "Deletes a specific lead.",
     "element": { },
     "help": null,
-    "name": "deleteLead",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -19152,18 +19252,18 @@
     } ],
     "title": "Delete Lead",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getLeadDetails",
     "description": "Returns details of a specific lead. ",
     "element": { },
     "help": null,
-    "name": "getLeadDetails",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -19615,18 +19715,18 @@
     } ],
     "title": "Get Lead Details",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "searchLeads",
     "description": "Searches all leads by title, notes and/or custom fields.",
     "element": { },
     "help": null,
-    "name": "searchLeads",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -20295,18 +20395,18 @@
     } ],
     "title": "Search Leads",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getOrganizations",
     "description": "Returns all organizations.",
     "element": { },
     "help": null,
-    "name": "getOrganizations",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -20835,18 +20935,18 @@
     } ],
     "title": "Get All Organizations",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "addOrganization",
     "description": "Adds a new organization.",
     "element": { },
     "help": null,
-    "name": "addOrganization",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -21285,18 +21385,18 @@
     } ],
     "title": "Add Organization",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "searchOrganization",
     "description": "Searches all organizations by name, address, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope.",
     "element": { },
     "help": null,
-    "name": "searchOrganization",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -21859,18 +21959,18 @@
     } ],
     "title": "Search Organizations",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteOrganization",
     "description": "Marks an organization as deleted. After 30 days, the organization will be permanently deleted.",
     "element": { },
     "help": null,
-    "name": "deleteOrganization",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -22037,18 +22137,18 @@
     } ],
     "title": "Delete Organization",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getOrganizationDetails",
     "description": "Returns the details of an organization.",
     "element": { },
     "help": null,
-    "name": "getOrganizationDetails",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -22463,18 +22563,18 @@
     } ],
     "title": "Get Details of Organization",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getPersons",
     "description": "Returns all persons.",
     "element": { },
     "help": null,
-    "name": "getPersons",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -23605,18 +23705,18 @@
     } ],
     "title": "Get Persons",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "addPerson",
     "description": "Adds a new person.",
     "element": { },
     "help": null,
-    "name": "addPerson",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -24931,18 +25031,18 @@
     } ],
     "title": "Add Person",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "searchPersons",
     "description": "Searches all persons by name, email, phone, notes and/or custom fields.",
     "element": { },
     "help": null,
-    "name": "searchPersons",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -26135,18 +26235,18 @@
     } ],
     "title": "Search Persons",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deletePerson",
     "description": "Marks a person as deleted. After 30 days, the person will be permanently deleted.",
     "element": { },
     "help": null,
-    "name": "deletePerson",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -26313,18 +26413,18 @@
     } ],
     "title": "Delete Person",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getPersonDetails",
     "description": "Returns the details of a person. This also returns some additional fields which are not present when asking for all persons.",
     "element": { },
     "help": null,
-    "name": "getPersonDetails",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -27341,17 +27441,17 @@
     } ],
     "title": "Get Details of Person",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

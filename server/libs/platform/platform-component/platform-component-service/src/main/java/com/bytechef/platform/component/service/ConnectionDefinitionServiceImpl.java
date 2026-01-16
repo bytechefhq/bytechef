@@ -49,12 +49,12 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.exception.ConnectionDefinitionErrorType;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
 import java.net.URI;
@@ -72,6 +72,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
@@ -83,9 +84,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     private static final Logger logger = LoggerFactory.getLogger(ConnectionDefinitionServiceImpl.class);
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
+    private final ContextFactory contextFactory;
 
-    public ConnectionDefinitionServiceImpl(@Lazy ComponentDefinitionRegistry componentDefinitionRegistry) {
+    public ConnectionDefinitionServiceImpl(
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
+
         this.componentDefinitionRegistry = componentDefinitionRegistry;
+        this.contextFactory = contextFactory;
     }
 
     @Override
@@ -125,57 +130,17 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
-        Map<String, ?> connectionParameters, Context context, String redirectUri) {
+        Map<String, ?> connectionParameters, String redirectUri) {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Executing with {} authorization type.", authorizationType);
-        }
+        return executeAuthorizationCallback(
+            componentName, connectionVersion, authorizationType, connectionParameters,
+            contextFactory.createContext(componentName, null), redirectUri);
+    }
 
-        Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connectionVersion, authorizationType);
-        String verifier = null;
-
-        if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
-            PkceFunction pkceFunction = OptionalUtils.orElse(
-                authorization.getPkce(), getDefaultPkceFunction());
-
-            // TODO pkce
-            Authorization.Pkce pkce;
-
-            try {
-                pkce = pkceFunction.apply(null, null, "SHA256", context);
-            } catch (Exception e) {
-                throw new ConfigurationException(
-                    e, ConnectionDefinitionErrorType.AUTHORIZATION_CALLBACK_FAILED);
-            }
-
-            verifier = pkce.verifier();
-        }
-
-        AuthorizationCallbackFunction authorizationCallbackFunction = OptionalUtils.orElse(
-            authorization.getAuthorizationCallback(),
-            getDefaultAuthorizationCallbackFunction(
-                OptionalUtils.orElse(
-                    authorization.getClientId(),
-                    (connectionParameters1, context1) -> getDefaultClientId(
-                        connectionParameters1)),
-                OptionalUtils.orElse(
-                    authorization.getClientSecret(),
-                    (connectionParameters1, context1) -> getDefaultClientSecret(
-                        connectionParameters1)),
-                OptionalUtils.orElse(
-                    authorization.getTokenUrl(),
-                    (connectionParameters1, context1) -> getDefaultTokenUrl(
-                        connectionParameters1))));
-
-        try {
-            return authorizationCallbackFunction.apply(
-                ParametersFactory.createParameters(connectionParameters),
-                MapUtils.getString(connectionParameters, CODE), redirectUri, verifier, context);
-        } catch (Exception e) {
-            throw new ConfigurationException(
-                e, ConnectionDefinitionErrorType.AUTHORIZATION_CALLBACK_FAILED);
-        }
+    @Override
+    public Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection) {
+        return executeBaseUri(
+            componentName, componentConnection, contextFactory.createContext(componentName, componentConnection));
     }
 
     @Override
@@ -319,11 +284,18 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             .toList();
     }
 
-    @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
-        Map<String, ?> connectionParameters,
-        Context context) {
+        Map<String, ?> connectionParameters) {
+
+        return getOAuth2AuthorizationParameters(
+            componentName, connectionVersion, authorizationType, connectionParameters,
+            contextFactory.createContext(componentName, null));
+    }
+
+    private AuthorizationCallbackResponse executeAuthorizationCallback(
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters, Context context, String redirectUri) {
 
         if (logger.isTraceEnabled()) {
             logger.trace("Executing with {} authorization type.", authorizationType);
@@ -331,37 +303,48 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
+        String verifier = null;
 
-        AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
-            authorization.getAuthorizationUrl(),
-            (curConnectionParameters, context1) -> getDefaultAuthorizationUrl(
-                curConnectionParameters));
-        ClientIdFunction clientIdFunction = OptionalUtils.orElse(
-            authorization.getClientId(),
-            (curConnectionParameters, context1) -> getDefaultClientId(curConnectionParameters));
-        ScopesFunction scopesFunction = OptionalUtils.orElse(
-            authorization.getScopes(),
-            (curConnectionParameters, context1) -> getDefaultScopes(curConnectionParameters));
-        OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction =
-            OptionalUtils.orElse(
-                authorization.getOAuth2AuthorizationExtraQueryParameters(),
-                (curConnectionParameters, context1) -> Map.of());
+        if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
+            PkceFunction pkceFunction = OptionalUtils.orElse(
+                authorization.getPkce(), getDefaultPkceFunction());
 
-        Parameters parameters = ParametersFactory.createParameters(connectionParameters);
+            // TODO pkce
+            Authorization.Pkce pkce;
 
-        try {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Executing with parameters {}", parameters);
+            try {
+                pkce = pkceFunction.apply(null, null, "SHA256", context);
+            } catch (Exception e) {
+                throw new ConfigurationException(
+                    e, ConnectionDefinitionErrorType.AUTHORIZATION_CALLBACK_FAILED);
             }
 
-            return new OAuth2AuthorizationParameters(
-                authorizationUrlFunction.apply(parameters, context),
-                clientIdFunction.apply(parameters, context),
-                oAuth2AuthorizationExtraQueryParametersFunction.apply(parameters, context),
-                scopesFunction.apply(parameters, context));
+            verifier = pkce.verifier();
+        }
+
+        AuthorizationCallbackFunction authorizationCallbackFunction = OptionalUtils.orElse(
+            authorization.getAuthorizationCallback(),
+            getDefaultAuthorizationCallbackFunction(
+                OptionalUtils.orElse(
+                    authorization.getClientId(),
+                    (connectionParameters1, context1) -> getDefaultClientId(
+                        connectionParameters1)),
+                OptionalUtils.orElse(
+                    authorization.getClientSecret(),
+                    (connectionParameters1, context1) -> getDefaultClientSecret(
+                        connectionParameters1)),
+                OptionalUtils.orElse(
+                    authorization.getTokenUrl(),
+                    (connectionParameters1, context1) -> getDefaultTokenUrl(
+                        connectionParameters1))));
+
+        try {
+            return authorizationCallbackFunction.apply(
+                ParametersFactory.createParameters(connectionParameters),
+                MapUtils.getString(connectionParameters, CODE), redirectUri, verifier, context);
         } catch (Exception e) {
             throw new ConfigurationException(
-                e, ConnectionDefinitionErrorType.INVALID_OAUTH2_AUTHORIZATION_PARAMETERS);
+                e, ConnectionDefinitionErrorType.AUTHORIZATION_CALLBACK_FAILED);
         }
     }
 
@@ -613,6 +596,51 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     private static String getDefaultTokenUrl(Parameters connectionParameters) {
         return MapUtils.getString(connectionParameters, Authorization.TOKEN_URL);
+    }
+
+    private OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters,
+        Context context) {
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("Executing with {} authorization type.", authorizationType);
+        }
+
+        Authorization authorization = componentDefinitionRegistry.getAuthorization(
+            componentName, connectionVersion, authorizationType);
+
+        AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
+            authorization.getAuthorizationUrl(),
+            (curConnectionParameters, context1) -> getDefaultAuthorizationUrl(
+                curConnectionParameters));
+        ClientIdFunction clientIdFunction = OptionalUtils.orElse(
+            authorization.getClientId(),
+            (curConnectionParameters, context1) -> getDefaultClientId(curConnectionParameters));
+        ScopesFunction scopesFunction = OptionalUtils.orElse(
+            authorization.getScopes(),
+            (curConnectionParameters, context1) -> getDefaultScopes(curConnectionParameters));
+        OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction =
+            OptionalUtils.orElse(
+                authorization.getOauth2AuthorizationExtraQueryParameters(),
+                (curConnectionParameters, context1) -> Map.of());
+
+        Parameters parameters = ParametersFactory.createParameters(connectionParameters);
+
+        try {
+            if (logger.isTraceEnabled()) {
+                logger.trace("Executing with parameters {}", parameters);
+            }
+
+            return new OAuth2AuthorizationParameters(
+                authorizationUrlFunction.apply(parameters, context),
+                clientIdFunction.apply(parameters, context),
+                oAuth2AuthorizationExtraQueryParametersFunction.apply(parameters, context),
+                scopesFunction.apply(parameters, context));
+        } catch (Exception e) {
+            throw new ConfigurationException(
+                e, ConnectionDefinitionErrorType.INVALID_OAUTH2_AUTHORIZATION_PARAMETERS);
+        }
     }
 
     private static ConnectionDefinition toConnectionDefinition(

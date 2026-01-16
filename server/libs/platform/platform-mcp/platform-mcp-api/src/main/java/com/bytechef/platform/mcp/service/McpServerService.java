@@ -17,7 +17,7 @@
 package com.bytechef.platform.mcp.service;
 
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.List;
 
@@ -57,7 +57,7 @@ public interface McpServerService {
      * @param enabled     whether the server is enabled (can be null for default value)
      * @return the created MCP server
      */
-    McpServer create(String name, ModeType type, Environment environment, Boolean enabled);
+    McpServer create(String name, PlatformType type, Environment environment, Boolean enabled);
 
     /**
      * Deletes an MCP server by ID.
@@ -88,7 +88,7 @@ public interface McpServerService {
      * @param type the type to filter by
      * @return a list of MCP servers with the given type
      */
-    List<McpServer> getMcpServers(ModeType type);
+    List<McpServer> getMcpServers(PlatformType type);
 
     /**
      * Gets MCP servers filtered by type with ordering.
@@ -97,7 +97,7 @@ public interface McpServerService {
      * @param orderBy the ordering criteria (can be null for default ordering)
      * @return a list of MCP servers with the given type, ordered as specified
      */
-    List<McpServer> getMcpServers(ModeType type, McpServerOrderBy orderBy);
+    List<McpServer> getMcpServers(PlatformType type, McpServerOrderBy orderBy);
 
     /**
      * Updates an existing MCP server.

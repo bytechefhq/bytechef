@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.security.service;
 
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.tenant.domain.TenantKey;
@@ -78,7 +78,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ApiKey> getApiKeys(long environmentId, ModeType type) {
+    public List<ApiKey> getApiKeys(long environmentId, PlatformType type) {
         if (type == null) {
             return apiKeyRepository.findAllByEnvironmentAndTypeIsNull((int) environmentId);
         } else {

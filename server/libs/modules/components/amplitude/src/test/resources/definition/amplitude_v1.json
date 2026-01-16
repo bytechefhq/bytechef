@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates attribution event using Attribution API.",
     "help": null,
@@ -267,10 +270,15 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Attribution Event",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates or updates user without sending an event.",
     "help": null,
@@ -668,14 +676,16 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create or Update User",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createAttributionEvent",
     "description": "Creates attribution event using Attribution API.",
     "element": { },
     "help": null,
-    "name": "createAttributionEvent",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -938,18 +948,18 @@
     } ],
     "title": "Create Attribution Event",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createOrUpdateUser",
     "description": "Creates or updates user without sending an event.",
     "element": { },
     "help": null,
-    "name": "createOrUpdateUser",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1343,17 +1353,17 @@
     } ],
     "title": "Create or Update User",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Analytics",
-    "name": "analytics"
+    "name": "analytics",
+    "label": "Analytics"
   } ],
   "connection": {
     "authorizationRequired": null,

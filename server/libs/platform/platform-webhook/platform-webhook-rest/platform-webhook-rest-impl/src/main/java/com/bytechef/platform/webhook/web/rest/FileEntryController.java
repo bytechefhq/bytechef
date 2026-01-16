@@ -47,7 +47,10 @@ public class FileEntryController {
         FileEntry fileEntry = FileEntry.parse(id);
 
         return ResponseEntity.ok()
-            .contentType(MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())))
+            .contentType(
+                fileEntry.getMimeType() == null
+                    ? MediaType.APPLICATION_OCTET_STREAM
+                    : MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())))
             .body(new InputStreamResource(tempFileStorage.getInputStream(fileEntry)));
     }
 }

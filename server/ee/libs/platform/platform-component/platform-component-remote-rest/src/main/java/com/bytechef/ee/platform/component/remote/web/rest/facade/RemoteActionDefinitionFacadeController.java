@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.component.remote.web.rest.facade;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -55,20 +55,6 @@ public class RemoteActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-node-description",
-        consumes = {
-            "application/json"
-        })
-    public ResponseEntity<String> executeEditorDescription(
-        @Valid @RequestBody NodeDescriptionRequest nodeDescriptionRequest) {
-
-        return ResponseEntity.ok(actionDefinitionFacade.executeWorkflowNodeDescription(
-            nodeDescriptionRequest.componentName, nodeDescriptionRequest.componentVersion,
-            nodeDescriptionRequest.actionName, nodeDescriptionRequest.inputParameters));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
         value = "/execute-options",
         consumes = {
             "application/json"
@@ -92,9 +78,9 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executePerform(
                 performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
-                performRequest.type, performRequest.jobPrincipalId, performRequest.jobPrincipalWorkflowId,
-                performRequest.jobId, performRequest.workflowId, performRequest.inputParameters,
-                performRequest.connectionIds, performRequest.extensions, false));
+                performRequest.jobPrincipalId, performRequest.jobPrincipalWorkflowId, performRequest.jobId,
+                performRequest.workflowId, performRequest.inputParameters, performRequest.connectionIds,
+                performRequest.extensions, performRequest.environmentId, performRequest.type, false));
     }
 
     @RequestMapping(
@@ -110,11 +96,6 @@ public class RemoteActionDefinitionFacadeController {
             actionDefinitionFacade.executeOutput(
                 outputRequest.componentName, outputRequest.componentVersion, outputRequest.actionName,
                 outputRequest.inputParameters, outputRequest.connectionIds));
-    }
-
-    @SuppressFBWarnings("EI")
-    public record NodeDescriptionRequest(
-        String componentName, int componentVersion, String actionName, Map<String, Object> inputParameters) {
     }
 
     @SuppressFBWarnings("EI")
@@ -137,8 +118,8 @@ public class RemoteActionDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record PerformRequest(
-        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
+        String componentName, int componentVersion, String actionName, PlatformType type, Long jobPrincipalId,
         Long jobPrincipalWorkflowId, long jobId, String workflowId, Map<String, ?> inputParameters,
-        Map<String, Long> connectionIds, Map<String, Long> extensions) {
+        Map<String, Long> connectionIds, Map<String, Long> extensions, Long environmentId) {
     }
 }

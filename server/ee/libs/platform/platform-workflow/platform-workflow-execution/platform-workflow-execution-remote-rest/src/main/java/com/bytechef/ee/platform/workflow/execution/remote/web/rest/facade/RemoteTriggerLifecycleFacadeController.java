@@ -8,7 +8,7 @@
 package com.bytechef.ee.platform.workflow.execution.remote.web.rest.facade;
 
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;

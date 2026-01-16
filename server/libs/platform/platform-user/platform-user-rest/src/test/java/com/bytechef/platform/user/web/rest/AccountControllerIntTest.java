@@ -43,7 +43,6 @@ import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -57,22 +56,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the {@link AccountController} REST controller.
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @AutoConfigureMockMvc
+@SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @UserIntTestConfigurationSharedMocks
 class AccountControllerIntTest {
 
@@ -167,7 +167,7 @@ class AccountControllerIntTest {
         ManagedUserVM validUser = new ManagedUserVM();
 
         validUser.setLogin("test-register-valid");
-        validUser.setPassword("password");
+        validUser.setPassword("Password1");
         validUser.setFirstName("Alice");
         validUser.setLastName("Test");
         validUser.setEmail("test-register-valid@example.com");
@@ -193,7 +193,7 @@ class AccountControllerIntTest {
         ManagedUserVM invalidUser = new ManagedUserVM();
 
         invalidUser.setLogin("funky-log(n"); // <-- invalid
-        invalidUser.setPassword("password");
+        invalidUser.setPassword("Password1");
         invalidUser.setFirstName("Funky");
         invalidUser.setLastName("One");
         invalidUser.setEmail("funky@example.com");
@@ -263,7 +263,7 @@ class AccountControllerIntTest {
         ManagedUserVM firstUser = new ManagedUserVM();
 
         firstUser.setLogin("alice");
-        firstUser.setPassword("password");
+        firstUser.setPassword("Password1");
         firstUser.setFirstName("Alice");
         firstUser.setLastName("Something");
         firstUser.setEmail("alice@example.com");
@@ -328,7 +328,7 @@ class AccountControllerIntTest {
         ManagedUserVM firstUser = new ManagedUserVM();
 
         firstUser.setLogin("test-register-duplicate-email");
-        firstUser.setPassword("password");
+        firstUser.setPassword("Password1");
         firstUser.setFirstName("Alice");
         firstUser.setLastName("Test");
         firstUser.setEmail("test-register-duplicate-email@example.com");
@@ -426,7 +426,7 @@ class AccountControllerIntTest {
         User existingUser = new User();
 
         existingUser.setLogin("test-register-valid");
-        existingUser.setPassword("password");
+        existingUser.setPassword("Password1");
         existingUser.setFirstName("Alice");
         existingUser.setLastName("Test");
         existingUser.setEmail("test-register-valid@example.com");
@@ -441,7 +441,7 @@ class AccountControllerIntTest {
         ManagedUserVM validUser = new ManagedUserVM();
 
         validUser.setLogin("badguy");
-        validUser.setPassword("password");
+        validUser.setPassword("Password1");
         validUser.setFirstName("Bad");
         validUser.setLastName("Guy");
         validUser.setEmail("badguy@example.com");
@@ -668,14 +668,14 @@ class AccountControllerIntTest {
                 post("/api/account/change-password")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
-                        objectMapper.writeValueAsBytes(new PasswordChangeDTO("1" + currentPassword, "new password")))
+                        objectMapper.writeValueAsBytes(new PasswordChangeDTO("1" + currentPassword, "NewPassword1")))
                     .with(csrf()))
             .andExpect(status().isBadRequest());
 
         User updatedUser = userRepository.findByLogin("change-password-wrong-existing-password")
             .orElse(null);
 
-        assertThat(passwordEncoder.matches("new password", updatedUser.getPassword())).isFalse();
+        assertThat(passwordEncoder.matches("NewPassword1", updatedUser.getPassword())).isFalse();
         assertThat(passwordEncoder.matches(currentPassword, updatedUser.getPassword())).isTrue();
     }
 
@@ -697,14 +697,14 @@ class AccountControllerIntTest {
             .perform(
                 post("/api/account/change-password")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(new PasswordChangeDTO(currentPassword, "new password")))
+                    .content(objectMapper.writeValueAsBytes(new PasswordChangeDTO(currentPassword, "NewPassword1")))
                     .with(csrf()))
             .andExpect(status().isOk());
 
         User updatedUser = userRepository.findByLogin("change-password")
             .orElse(null);
 
-        assertThat(passwordEncoder.matches("new password", updatedUser.getPassword())).isTrue();
+        assertThat(passwordEncoder.matches("NewPassword1", updatedUser.getPassword())).isTrue();
     }
 
     @Test
@@ -928,7 +928,7 @@ class AccountControllerIntTest {
         KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
 
         keyAndPassword.setKey(user.getResetKey());
-        keyAndPassword.setNewPassword("new password");
+        keyAndPassword.setNewPassword("NewPassword1");
 
         restAccountMockMvc
             .perform(
@@ -982,7 +982,7 @@ class AccountControllerIntTest {
         KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
 
         keyAndPassword.setKey("wrong reset key");
-        keyAndPassword.setNewPassword("new password");
+        keyAndPassword.setNewPassword("NewPassword1");
 
         restAccountMockMvc
             .perform(

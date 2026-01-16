@@ -50,7 +50,6 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.springframework.graphql:spring-graphql")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:rest:rest-api"))
@@ -59,6 +58,6 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
 
     testImplementation("org.springframework:spring-webflux")
-    testImplementation("org.springframework.boot:spring-boot-starter-web")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(project(":server:libs:test:test-int-support"))
 }

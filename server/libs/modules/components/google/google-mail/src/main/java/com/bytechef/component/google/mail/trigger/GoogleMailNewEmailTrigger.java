@@ -123,14 +123,12 @@ public class GoogleMailNewEmailTrigger {
 
     protected static List<Object> webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, Parameters outputParameters,
         TriggerContext context) {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         Optional<Object> historyIdOptional = context.data(data -> data.fetch(WORKFLOW, HISTORY_ID));
-
-        Map<String, ?> outputParameters = output.parameters();
 
         Integer triggerHistoryId = (Integer) outputParameters.get(HISTORY_ID);
 

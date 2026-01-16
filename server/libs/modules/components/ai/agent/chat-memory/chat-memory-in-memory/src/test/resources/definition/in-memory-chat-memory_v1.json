@@ -1,26 +1,26 @@
 {
   "actions": null,
   "clusterElements": [ {
+    "name": "chatMemory",
     "description": "Memory is retrieved added into the prompt's system text.",
     "element": { },
     "help": null,
-    "name": "chatMemory",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": null,
     "title": "In Memory Chat Memory",
     "type": {
+      "name": "CHAT_MEMORY",
       "key": "chatMemory",
       "label": "Memory",
       "multipleElements": false,
-      "name": "CHAT_MEMORY",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

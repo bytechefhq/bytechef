@@ -52,6 +52,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -75,8 +76,9 @@ public class TaskWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskWorker.class);
 
-    private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
+    public static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
+    private final @Nullable Long defaultTimeout;
     private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
     private final AsyncTaskExecutor taskExecutor;
@@ -87,10 +89,11 @@ public class TaskWorker {
 
     @SuppressFBWarnings("EI")
     public TaskWorker(
-        Evaluator evaluator, ApplicationEventPublisher eventPublisher, AsyncTaskExecutor taskExecutor,
-        TaskHandlerResolver taskHandlerResolver, TaskFileStorage taskFileStorage,
-        List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors) {
+        @Nullable Long defaultTimeout, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
+        AsyncTaskExecutor taskExecutor, TaskHandlerResolver taskHandlerResolver,
+        TaskFileStorage taskFileStorage, List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors) {
 
+        this.defaultTimeout = defaultTimeout;
         this.evaluator = evaluator;
         this.eventPublisher = eventPublisher;
         this.taskExecutor = taskExecutor;
@@ -142,6 +145,8 @@ public class TaskWorker {
         try {
             future.get(calculateTimeout(taskExecution), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            future.cancel(true);
+
             handleException(taskExecution, e);
         } catch (CancellationException e) {
             logger.debug("Cancelled task: {}", taskExecution.getId());
@@ -204,8 +209,12 @@ public class TaskWorker {
                     output = taskExecutionPostOutputProcessor.process(taskExecution, output);
                 }
 
-                taskExecution.setOutput(
-                    taskFileStorage.storeTaskExecutionOutput(Validate.notNull(taskExecution.getId(), "id"), output));
+                if (output != null) {
+                    taskExecution.setOutput(
+                        taskFileStorage.storeTaskExecutionOutput(
+                            Objects.requireNonNull(taskExecution.getJobId()),
+                            Objects.requireNonNull(taskExecution.getId()), output));
+                }
             }
 
             taskExecution.setEndDate(Instant.now());
@@ -286,11 +295,15 @@ public class TaskWorker {
         eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
     }
 
-    private long calculateTimeout(TaskExecution taskExecution) {
+    long calculateTimeout(TaskExecution taskExecution) {
         if (taskExecution.getTimeout() != null) {
             Duration duration = Duration.parse("PT" + taskExecution.getTimeout());
 
             return duration.toMillis();
+        }
+
+        if (defaultTimeout != null) {
+            return defaultTimeout;
         }
 
         return DEFAULT_TIME_OUT;

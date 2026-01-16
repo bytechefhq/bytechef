@@ -24,14 +24,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Marko Kriskovic
@@ -56,7 +56,9 @@ class WorkflowValidatorTest {
 
     @BeforeAll
     public static void beforeAll() {
-        JsonUtils.setObjectMapper(new ObjectMapper());
+        JsonUtils.setObjectMapper(
+            JsonMapper.builder()
+                .build());
     }
 
     @Test

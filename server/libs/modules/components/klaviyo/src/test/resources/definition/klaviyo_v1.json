@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get all lists in an account.",
     "help": null,
@@ -1732,10 +1735,15 @@
       "required": true,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Lists",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Subscribe one or more profiles to email marketing, SMS marketing, or both.",
     "help": null,
@@ -1842,10 +1850,15 @@
       "required": true,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Subscribe Profiles",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update the profile with the given profile ID.",
     "help": null,
@@ -6621,14 +6634,16 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Profile",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "getLists",
     "description": "Get all lists in an account.",
     "element": { },
     "help": null,
-    "name": "getLists",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8356,18 +8371,18 @@
     } ],
     "title": "Get Lists",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "subscribeProfiles",
     "description": "Subscribe one or more profiles to email marketing, SMS marketing, or both.",
     "element": { },
     "help": null,
-    "name": "subscribeProfiles",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -8470,18 +8485,18 @@
     } ],
     "title": "Subscribe Profiles",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateProfile",
     "description": "Update the profile with the given profile ID.",
     "element": { },
     "help": null,
-    "name": "updateProfile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -13253,17 +13268,17 @@
     } ],
     "title": "Update Profile",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Marketing Automation",
-    "name": "marketing-automation"
+    "name": "marketing-automation",
+    "label": "Marketing Automation"
   } ],
   "connection": {
     "authorizationRequired": null,

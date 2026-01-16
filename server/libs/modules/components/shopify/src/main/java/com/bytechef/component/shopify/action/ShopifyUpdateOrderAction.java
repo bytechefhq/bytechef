@@ -16,66 +16,108 @@
 
 package com.bytechef.component.shopify.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.BodyContentType;
-import static com.bytechef.component.definition.Context.Http.ResponseType;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.EMAIL;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.INPUT;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.NOTE;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER_ID;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.TAGS;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.USER_ERRORS_PROPERTY;
+import static com.bytechef.component.shopify.util.ShopifyUtils.executeGraphQlOperation;
 
-import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.shopify.property.ShopifyOrderProperties;
-import com.bytechef.component.shopify.util.ShopifyUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.shopify.util.ShopifyOptionsUtils;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Provides a list of the component actions.
- *
- * @generated
+ * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 public class ShopifyUpdateOrderAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("updateOrder")
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateOrder")
         .title("Update Order")
         .description("Update an existing order.")
-        .metadata(
-            Map.of(
-                "method", "PUT",
-                "path", "/orders/{orderId}.json", "bodyContentType", BodyContentType.JSON, "mimeType",
-                "application/json"
-
-            ))
-        .properties(integer("orderId").label("Order ID")
-            .description("ID of the order to update.")
-            .required(true)
-            .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.PATH)),
-            object("order").properties(string("note").label("Note")
+        .properties(
+            string(ORDER_ID)
+                .label("Order ID")
+                .description("ID of the order to update.")
+                .required(true)
+                .options((OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions),
+            string(NOTE)
+                .label("Note")
                 .description("An optional note that a shop owner can attach to the order.")
                 .required(false),
-                string("email").label("Email")
-                    .description("The customer's email address.")
-                    .required(false),
-                string("phone").label("Phone")
-                    .description("The customer's phone number for receiving SMS notifications.")
-                    .required(false),
-                string("tags").label("Tags")
-                    .description("Tags attached to the order, formatted as a string of comma-separated values.")
-                    .required(false))
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY))
-                .label("Order")
+            string(EMAIL)
+                .label("Email")
+                .description("The customer's email address.")
+                .required(false),
+            array(TAGS)
+                .label("Tags")
+                .description("Tags attached to the order.")
+                .items(
+                    string("tag")
+                        .label("Tag")
+                        .description("Tag of the order.")
+                        .required(false))
                 .required(false))
-        .output(outputSchema(object().properties(ShopifyOrderProperties.PROPERTIES)
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("order")
+                            .description("The updated order.")
+                            .properties(
+                                string("id")
+                                    .description("ID of the updated order."),
+                                string("note")
+                                    .description("Note attached to order."),
+                                string("email")
+                                    .description("Customer email."),
+                                array("tags")
+                                    .description("Tags attached to the order.")
+                                    .items(
+                                        string()
+                                            .description("Tag of the order."))),
+                        USER_ERRORS_PROPERTY)))
+        .perform(ShopifyUpdateOrderAction::perform);
 
     private ShopifyUpdateOrderAction() {
+    }
+
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String query = """
+            mutation OrderUpdate($input: OrderInput!) {
+              orderUpdate(input: $input) {
+                order {
+                  id
+                  note
+                  email
+                  tags
+                }
+                userErrors {
+                  field
+                  message
+                }
+              }
+            }""";
+
+        Map<String, Object> variables = Map.of(
+            INPUT, Map.of(
+                ID, inputParameters.getRequiredString(ORDER_ID),
+                NOTE, inputParameters.getString(NOTE, ""),
+                EMAIL, inputParameters.getString(EMAIL, ""),
+                TAGS, inputParameters.getList(TAGS, List.of())));
+
+        return executeGraphQlOperation(query, context, variables, "orderUpdate");
     }
 }

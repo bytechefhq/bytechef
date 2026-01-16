@@ -24,19 +24,6 @@ type McpProjectWorkflow {
     version: Int
 }
 
-type ProjectDeploymentWorkflow {
-    id: ID!
-    workflowId: String!
-    projectDeploymentId: Long!
-    enabled: Boolean!
-    inputs: Map
-    createdBy: String
-    createdDate: Long
-    lastModifiedBy: String
-    lastModifiedDate: Long
-    version: Int
-}
-
 input McpProjectWorkflowInput {
     mcpProjectId: Long!
     projectDeploymentWorkflowId: Long!

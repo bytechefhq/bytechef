@@ -18,7 +18,7 @@
 
 package com.bytechef.evaluator;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 
@@ -26,7 +26,6 @@ import org.springframework.core.env.Profiles;
  * @author Arik Cohen
  * @since Mar, 06 2020
  */
-@SuppressFBWarnings("NP")
 class EmptyEnvironment implements Environment {
 
     @Override
@@ -35,12 +34,12 @@ class EmptyEnvironment implements Environment {
     }
 
     @Override
-    public String getProperty(String key) {
+    public @Nullable String getProperty(String key) {
         return null;
     }
 
     @Override
-    public String getProperty(String key, String aDefaultValue) {
+    public @Nullable String getProperty(String key, String aDefaultValue) {
         return null;
     }
 
@@ -50,27 +49,27 @@ class EmptyEnvironment implements Environment {
     }
 
     @Override
-    public <T> T getProperty(String key, Class<T> aTargetType, T aDefaultValue) {
+    public <T> @Nullable T getProperty(String key, Class<T> aTargetType, T aDefaultValue) {
         return null;
     }
 
     @Override
-    public String getRequiredProperty(String key) throws IllegalStateException {
+    public @Nullable String getRequiredProperty(String key) throws IllegalStateException {
         return null;
     }
 
     @Override
-    public <T> T getRequiredProperty(String key, Class<T> aTargetType) throws IllegalStateException {
+    public <T> @Nullable T getRequiredProperty(String key, Class<T> aTargetType) throws IllegalStateException {
         return null;
     }
 
     @Override
-    public String resolvePlaceholders(String text) {
+    public @Nullable String resolvePlaceholders(String text) {
         return null;
     }
 
     @Override
-    public String resolveRequiredPlaceholders(String text) throws IllegalArgumentException {
+    public @Nullable String resolveRequiredPlaceholders(String text) throws IllegalArgumentException {
         return null;
     }
 

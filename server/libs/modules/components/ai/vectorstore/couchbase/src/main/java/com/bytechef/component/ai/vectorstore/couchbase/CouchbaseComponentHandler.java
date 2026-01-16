@@ -29,7 +29,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,9 +39,7 @@ public class CouchbaseComponentHandler implements ComponentHandler {
 
     private final VectorStoreComponentDefinition componentDefinition;
 
-    public CouchbaseComponentHandler(
-        @Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
-
+    public CouchbaseComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
         this.componentDefinition = new CouchbaseComponentDefinitionImpl(
             component(COUCHBASE)
                 .title("Couchbase")

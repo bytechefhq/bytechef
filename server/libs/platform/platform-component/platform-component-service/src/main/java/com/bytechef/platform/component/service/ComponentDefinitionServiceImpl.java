@@ -19,16 +19,20 @@ package com.bytechef.platform.component.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -74,13 +78,13 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include,
-        ModeType modeType) {
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
+        @Nullable List<String> include, PlatformType platformType) {
 
         ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
-            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(modeType))
+            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + modeType));
+            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + platformType));
 
         List<ComponentDefinition> components = getComponentDefinitions()
             .stream()
@@ -96,6 +100,24 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         }
 
         return components;
+    }
+
+    @Override
+    public List<ComponentDefinition> getComponentDefinitions(String query, PlatformType platformType) {
+        String lowerCaseQuery = query.toLowerCase();
+
+        ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
+            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + platformType));
+
+        return getComponentDefinitions()
+            .stream()
+            .filter(componentDefinitionFilter::filter)
+            .filter(componentDefinition -> hasMatchingComponent(componentDefinition, lowerCaseQuery) ||
+                hasMatchingAction(componentDefinition.getActions(), lowerCaseQuery) ||
+                hasMatchingTrigger(componentDefinition.getTriggers(), lowerCaseQuery))
+            .toList();
     }
 
     @Override
@@ -138,7 +160,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     private static Predicate<ComponentDefinition> filter(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
+        @Nullable Boolean actionDefinitions, @Nullable Boolean connectionDefinitions,
+        @Nullable Boolean triggerDefinitions, @Nullable List<String> include) {
 
         return componentDefinition -> {
             if (include == null || include.contains(componentDefinition.getName())) {
@@ -158,5 +181,28 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             return include == null && actionDefinitions == null && connectionDefinitions == null &&
                 triggerDefinitions == null;
         };
+    }
+
+    private static boolean hasMatchingAction(List<ActionDefinition> actions, String lowerCaseQuery) {
+        return actions.stream()
+            .anyMatch(action -> Strings.CS.contains(StringUtils.lowerCase(action.getName()), lowerCaseQuery) ||
+                (action.getTitle() != null &&
+                    Strings.CS.contains(StringUtils.lowerCase(action.getTitle()), lowerCaseQuery)));
+    }
+
+    private static boolean hasMatchingComponent(ComponentDefinition componentDefinition, String lowerCaseQuery) {
+        return Strings.CS.contains(
+            StringUtils.lowerCase(componentDefinition.getName()), lowerCaseQuery) ||
+            (componentDefinition.getTitle() != null &&
+                Strings.CS.contains(
+                    StringUtils.lowerCase(componentDefinition.getTitle()), lowerCaseQuery));
+    }
+
+    private static boolean hasMatchingTrigger(List<TriggerDefinition> triggers, String lowerCaseQuery) {
+        return triggers.stream()
+            .anyMatch(trigger -> Strings.CS.contains(
+                StringUtils.lowerCase(trigger.getName()), lowerCaseQuery) ||
+                (trigger.getTitle() != null &&
+                    Strings.CS.contains(StringUtils.lowerCase(trigger.getTitle()), lowerCaseQuery)));
     }
 }

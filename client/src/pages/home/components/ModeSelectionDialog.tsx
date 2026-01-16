@@ -18,7 +18,7 @@ import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-import {ModeType, useModeTypeStore} from '../stores/useModeTypeStore';
+import {PlatformType, usePlatformTypeStore} from '../stores/usePlatformTypeStore';
 
 interface ModeSelectionDialogProps {
     isDialogOpen: boolean;
@@ -26,9 +26,9 @@ interface ModeSelectionDialogProps {
 }
 
 const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDialogProps) => {
-    const [selectedType, setSelectedType] = useState<ModeType | undefined>(undefined);
+    const [selectedType, setSelectedType] = useState<PlatformType | undefined>(undefined);
 
-    const {currentType, setCurrentType} = useModeTypeStore(
+    const {currentType, setCurrentType} = usePlatformTypeStore(
         useShallow((state) => ({
             currentType: state.currentType,
             setCurrentType: state.setCurrentType,
@@ -39,10 +39,10 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
 
     const radioValue = useMemo(() => (selectedType ?? currentType ?? '').toString(), [currentType, selectedType]);
 
-    const isEmbeddedChecked = useMemo(() => radioValue === ModeType.EMBEDDED.toString(), [radioValue]);
-    const isAutomationChecked = useMemo(() => radioValue === ModeType.AUTOMATION.toString(), [radioValue]);
+    const isEmbeddedChecked = useMemo(() => radioValue === PlatformType.EMBEDDED.toString(), [radioValue]);
+    const isAutomationChecked = useMemo(() => radioValue === PlatformType.AUTOMATION.toString(), [radioValue]);
 
-    const handleChangeModeType = useCallback(() => {
+    const handleChangePlatformType = useCallback(() => {
         if (selectedType === currentType) {
             handleDialogClose();
 
@@ -52,9 +52,9 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
         if (selectedType !== undefined && selectedType !== currentType) {
             setCurrentType(selectedType);
 
-            if (selectedType === ModeType.AUTOMATION) {
+            if (selectedType === PlatformType.AUTOMATION) {
                 navigate('/automation');
-            } else if (selectedType === ModeType.EMBEDDED) {
+            } else if (selectedType === PlatformType.EMBEDDED) {
                 navigate('/embedded');
             }
 
@@ -118,7 +118,7 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
                                 className={twMerge('radio-card-indicator', isEmbeddedChecked && 'is-checked')}
                                 data-testid="embedded"
                                 id="embedded"
-                                value={ModeType.EMBEDDED.toString()}
+                                value={PlatformType.EMBEDDED.toString()}
                             />
                         </div>
                     </Label>
@@ -151,7 +151,7 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
                                 className={twMerge('radio-card-indicator', isAutomationChecked && 'is-checked')}
                                 data-testid="automation"
                                 id="automation"
-                                value={ModeType.AUTOMATION.toString()}
+                                value={PlatformType.AUTOMATION.toString()}
                             />
                         </div>
                     </Label>
@@ -173,7 +173,7 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
                         className="bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
                         disabled={selectedType === undefined}
                         label="Confirm"
-                        onClick={handleChangeModeType}
+                        onClick={handleChangePlatformType}
                         type="button"
                     />
                 </DialogFooter>

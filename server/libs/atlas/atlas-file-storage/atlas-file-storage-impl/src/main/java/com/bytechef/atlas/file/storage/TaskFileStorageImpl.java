@@ -21,9 +21,9 @@ import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
@@ -64,9 +64,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     }
 
     @Override
-    public FileEntry storeContextValue(
-        long stackId, Context.Classname classname, Map<String, ?> value) {
-
+    public FileEntry storeContextValue(long stackId, Context.Classname classname, Map<String, ?> value) {
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + ".json", CompressionUtils.compress(JsonUtils.write(value)));
     }
@@ -87,7 +85,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     }
 
     @Override
-    public FileEntry storeTaskExecutionOutput(long taskExecutionId, Object output) {
+    public FileEntry storeTaskExecutionOutput(long jobId, long taskExecutionId, Object output) {
         return fileStorageService.storeFileContent(
             TASK_EXECUTION_FILES_DIR, taskExecutionId + ".json", CompressionUtils.compress(JsonUtils.write(output)));
     }

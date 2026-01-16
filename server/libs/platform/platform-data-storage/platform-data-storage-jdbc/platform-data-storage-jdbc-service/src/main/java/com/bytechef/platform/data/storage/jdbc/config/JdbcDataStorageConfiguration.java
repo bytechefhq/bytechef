@@ -17,7 +17,7 @@
 package com.bytechef.platform.data.storage.jdbc.config;
 
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderJdbc;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -50,37 +49,34 @@ public class JdbcDataStorageConfiguration {
 
     private record DataStorageImpl(JdbcDataStorageService jdbcDataStorageService) implements DataStorage {
 
-        @NonNull
         @Override
         public <T> Optional<T> fetch(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type) {
+            String componentName, DataStorageScope scope, String scopeId,
+            String key, long environmentId, PlatformType type) {
 
-            return jdbcDataStorageService.fetch(componentName, scope, scopeId, key, type);
+            return jdbcDataStorageService.fetch(componentName, scope, scopeId, key, environmentId, type);
         }
 
-        @NonNull
         @Override
         public <T> T get(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type) {
+            String componentName, DataStorageScope scope, String scopeId,
+            String key, long environmentId, PlatformType type) {
 
-            return jdbcDataStorageService.get(componentName, scope, scopeId, key, type);
+            return jdbcDataStorageService.get(componentName, scope, scopeId, key, environmentId, type);
         }
 
-        @NonNull
         @Override
         public <T> Map<String, T> getAll(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull ModeType type) {
+            String componentName, DataStorageScope scope, String scopeId, long environmentId,
+            PlatformType type) {
 
-            return jdbcDataStorageService.getAll(componentName, scope, scopeId, type);
+            return jdbcDataStorageService.getAll(componentName, scope, scopeId, environmentId, type);
         }
 
         @Override
         public void put(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type, @NonNull Object value) {
+            String componentName, DataStorageScope scope, String scopeId,
+            String key, Object value, long environmentId, PlatformType type) {
 
             int size = getSizeInBytes(value);
 
@@ -89,15 +85,15 @@ public class JdbcDataStorageConfiguration {
                     "Value size exceeds 400KB limit per key. Actual: " + size + " bytes)");
             }
 
-            jdbcDataStorageService.put(componentName, scope, scopeId, key, type, value);
+            jdbcDataStorageService.put(componentName, scope, scopeId, key, environmentId, type, value);
         }
 
         @Override
         public void delete(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type) {
+            String componentName, DataStorageScope scope, String scopeId,
+            String key, long environmentId, PlatformType type) {
 
-            jdbcDataStorageService.delete(componentName, scope, scopeId, key, type);
+            jdbcDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
         }
 
         private int getSizeInBytes(Object value) {

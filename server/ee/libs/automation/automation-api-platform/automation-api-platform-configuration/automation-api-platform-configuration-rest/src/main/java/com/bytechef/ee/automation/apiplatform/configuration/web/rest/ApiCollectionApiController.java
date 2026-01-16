@@ -56,7 +56,6 @@ public class ApiCollectionApiController implements ApiCollectionApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ApiCollectionModel> createApiCollection(ApiCollectionModel apiCollectionModel) {
         validate(apiCollectionModel);
 
@@ -106,7 +105,6 @@ public class ApiCollectionApiController implements ApiCollectionApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ApiCollectionModel> updateApiCollection(Long id, ApiCollectionModel apiCollectionModel) {
         validate(apiCollectionModel);
 

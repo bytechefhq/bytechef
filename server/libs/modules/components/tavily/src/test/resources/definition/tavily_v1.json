@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Execute a search query.",
     "help": null,
@@ -747,10 +750,15 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Search",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extract web page content from one or more specified URLs.",
     "help": null,
@@ -1399,14 +1407,16 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Extract",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "search",
     "description": "Execute a search query.",
     "element": { },
     "help": null,
-    "name": "search",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2144,18 +2154,18 @@
     } ],
     "title": "Search",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "extract",
     "description": "Extract web page content from one or more specified URLs.",
     "element": { },
     "help": null,
-    "name": "extract",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2795,17 +2805,17 @@
     } ],
     "title": "Extract",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add user to your organization.",
     "help": null,
@@ -473,10 +476,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Add User",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets information about the current organization.",
     "help": null,
@@ -1277,10 +1285,15 @@
     "perform": { },
     "processErrorResponse": null,
     "properties": null,
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Organization",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Lists users found in Zoho account.",
     "help": null,
@@ -2175,14 +2188,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "List Users",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "addUser",
     "description": "Add user to your organization.",
     "element": { },
     "help": null,
-    "name": "addUser",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2651,18 +2666,18 @@
     } ],
     "title": "Add User",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getOrganization",
     "description": "Gets information about the current organization.",
     "element": { },
     "help": null,
-    "name": "getOrganization",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3459,18 +3474,18 @@
     "properties": [ ],
     "title": "Get Organization",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listUsers",
     "description": "Lists users found in Zoho account.",
     "element": { },
     "help": null,
-    "name": "listUsers",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4361,17 +4376,17 @@
     } ],
     "title": "List Users",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

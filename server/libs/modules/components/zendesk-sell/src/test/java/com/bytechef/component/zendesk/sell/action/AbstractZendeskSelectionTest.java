@@ -41,7 +41,7 @@ public abstract class AbstractZendeskSelectionTest {
     protected Map<String, Object> responseMap = Map.of("key", "value");
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))

@@ -22,12 +22,11 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,7 +40,6 @@ public class ContextFactoryImpl implements ContextFactory {
 
     private final ApplicationContext applicationContext;
     private final CacheManager cacheManager;
-    private final ConnectionDefinitionService connectionDefinitionService;
     private final DataStorage dataStorage;
     private final EditorTempFileStorage editorTempFileStorage;
     private final ApplicationEventPublisher eventPublisher;
@@ -51,12 +49,10 @@ public class ContextFactoryImpl implements ContextFactory {
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
-        ConnectionDefinitionService connectionDefinitionService, DataStorage dataStorage,
-        ApplicationEventPublisher eventPublisher, TempFileStorage tempFileStorage) {
+        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, TempFileStorage tempFileStorage) {
 
         this.applicationContext = applicationContext;
         this.cacheManager = cacheManager;
-        this.connectionDefinitionService = connectionDefinitionService;
         this.dataStorage = dataStorage;
         this.editorTempFileStorage = new EditorTempFileStorage();
         this.eventPublisher = eventPublisher;
@@ -68,14 +64,14 @@ public class ContextFactoryImpl implements ContextFactory {
     public ActionContext createActionContext(
         String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
         @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
-        @Nullable ComponentConnection componentConnection, @Nullable ModeType type, boolean editorEnvironment) {
+        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, @Nullable PlatformType type,
+        boolean editorEnvironment) {
 
         return new ActionContextImpl(
-            actionName, componentName, componentVersion, componentConnection, this,
-            getDataStorage(workflowId, editorEnvironment), editorEnvironment, eventPublisher,
-            getHttpClientExecutor(editorEnvironment), jobId, jobPrincipalId, jobPrincipalWorkflowId, type, publicUrl,
-            getTempFileStorage(editorEnvironment),
-            workflowId);
+            componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
+            componentConnection, publicUrl, cacheManager, this, dataStorage, eventPublisher,
+            getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment), environmentId, type,
+            editorEnvironment);
     }
 
     @Override
@@ -98,21 +94,13 @@ public class ContextFactoryImpl implements ContextFactory {
     @Override
     public TriggerContext createTriggerContext(
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
-        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable ModeType type,
-        boolean editorEnvironment) {
+        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
+        @Nullable PlatformType type, boolean editorEnvironment) {
 
         return new TriggerContextImpl(
-            componentName, componentVersion, componentConnection, getDataStorage(workflowUuid, editorEnvironment),
-            editorEnvironment, getTempFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment),
-            jobPrincipalId, triggerName, type, workflowUuid);
-    }
-
-    private DataStorage getDataStorage(String workflowUuid, boolean editorEnvironment) {
-        if (editorEnvironment) {
-            return new InMemoryDataStorage(workflowUuid, cacheManager);
-        }
-
-        return dataStorage;
+            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
+            cacheManager, dataStorage, getTempFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment),
+            environmentId, type, editorEnvironment);
     }
 
     private TempFileStorage getTempFileStorage(boolean editorEnvironment) {
@@ -124,7 +112,6 @@ public class ContextFactoryImpl implements ContextFactory {
     }
 
     private HttpClientExecutor getHttpClientExecutor(boolean editorEnvironment) {
-        return new HttpClientExecutor(
-            applicationContext, connectionDefinitionService, getTempFileStorage(editorEnvironment));
+        return new HttpClientExecutor(applicationContext, getTempFileStorage(editorEnvironment));
     }
 }

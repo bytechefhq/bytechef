@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "The Headless endpoint to use.",
     "help": null,
@@ -65,6 +68,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "properties",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -76,14 +80,18 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "properties",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Headless Request",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "The Headless endpoint to use.",
     "help": null,
@@ -314,6 +322,7 @@
       "required": true,
       "type": "INTEGER"
     }, {
+      "name": "parameters",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -325,17 +334,18 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "parameters",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "JSON WS Services",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": true,

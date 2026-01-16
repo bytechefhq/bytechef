@@ -21,8 +21,8 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.constant.ModeType;
-import javax.annotation.Nullable;
+import com.bytechef.platform.constant.PlatformType;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -32,7 +32,8 @@ public interface ContextFactory {
     ActionContext createActionContext(
         String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
         @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
-        @Nullable ComponentConnection componentConnection, @Nullable ModeType type, boolean editorEnvironment);
+        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, @Nullable PlatformType type,
+        boolean editorEnvironment);
 
     Context createContext(String componentName, @Nullable ComponentConnection componentConnection);
 
@@ -42,6 +43,6 @@ public interface ContextFactory {
 
     TriggerContext createTriggerContext(
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
-        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable ModeType type,
-        boolean editorEnvironment);
+        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
+        @Nullable PlatformType type, boolean editorEnvironment);
 }

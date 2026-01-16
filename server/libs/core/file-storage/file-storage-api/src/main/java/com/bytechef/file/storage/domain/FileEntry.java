@@ -22,6 +22,7 @@ import com.bytechef.commons.util.MimeTypeUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -32,6 +33,7 @@ public class FileEntry {
     private static final String SPLITTER = "_;_";
     private static final char UNIX_NAME_SEPARATOR = '/';
     private static final char WINDOWS_NAME_SEPARATOR = '\\';
+    private static final String DEFAULT_EXTENSION = "bin";
 
     private String extension;
     private String mimeType;
@@ -49,20 +51,16 @@ public class FileEntry {
         Assert.notNull(filename, "'filename' must not be null");
         Assert.notNull(url, "'url' must not be null");
 
-        this.name = filename.substring(indexOfLastSeparator(filename) + 1);
+        String name = filename.substring(indexOfLastSeparator(filename) + 1);
+        String extension = getExtension(name);
 
-        int lastDotIndex = name.lastIndexOf(".");
-
-        if (lastDotIndex > 0) {
-            this.extension = name.substring(lastDotIndex + 1);
-
-            this.mimeType = MimeTypeUtils.getMimeType(extension);
-        }
-
+        this.name = name;
+        this.extension = extension;
+        this.mimeType = MimeTypeUtils.getMimeType(extension);
         this.url = url;
     }
 
-    public FileEntry(String name, String extension, String mimeType, String url) {
+    public FileEntry(String name, @Nullable String extension, @Nullable String mimeType, String url) {
         Assert.notNull(name, "'name' must not be null");
         Assert.notNull(url, "'url' must not be null");
 
@@ -112,11 +110,11 @@ public class FileEntry {
         return Objects.hash(name, url);
     }
 
-    public String getExtension() {
+    public @Nullable String getExtension() {
         return extension;
     }
 
-    public String getMimeType() {
+    public @Nullable String getMimeType() {
         return mimeType;
     }
 
@@ -138,17 +136,28 @@ public class FileEntry {
     @Override
     public String toString() {
         return "FileEntry{" +
-            "extension='" + extension + '\'' +
+            "name='" + name + '\'' +
+            ", extension='" + extension + '\'' +
             ", mimeType='" + mimeType + '\'' +
-            ", name='" + name + '\'' +
             ", url='" + url + '\'' +
             '}';
     }
 
-    private int indexOfLastSeparator(final String fileName) {
+    private static int indexOfLastSeparator(final String fileName) {
         int lastUnixPos = fileName.lastIndexOf(UNIX_NAME_SEPARATOR);
         int lastWindowsPos = fileName.lastIndexOf(WINDOWS_NAME_SEPARATOR);
 
         return Math.max(lastUnixPos, lastWindowsPos);
     }
+
+    private static String getExtension(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf(".");
+
+        if (lastDotIndex > 0) {
+            return fileName.substring(lastDotIndex + 1);
+        }
+
+        return DEFAULT_EXTENSION;
+    }
+
 }

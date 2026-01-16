@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Copy a selected file to a different location within Microsoft OneDrive.",
     "help": null,
@@ -82,10 +85,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Copy File",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new empty folder in Microsoft OneDrive.",
     "help": null,
@@ -887,10 +895,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create New Folder",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new text file in Microsoft OneDrive.",
     "help": null,
@@ -1838,10 +1851,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create New Text File",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete a selected file from Microsoft One Drive.",
     "help": null,
@@ -1876,10 +1894,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete File",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Download a file from your Microsoft OneDrive.",
     "help": null,
@@ -2131,10 +2154,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Download File",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve a specified file from your Microsoft OneDrive.",
     "help": null,
@@ -3004,10 +3032,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get File",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "List files in a OneDrive folder.",
     "help": null,
@@ -3919,10 +3952,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "List Files",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "List folders in a OneDrive folder.",
     "help": null,
@@ -4744,10 +4782,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "List Folders",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Upload a file to your Microsoft OneDrive.",
     "help": null,
@@ -5721,14 +5764,16 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Upload File",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "copyFile",
     "description": "Copy a selected file to a different location within Microsoft OneDrive.",
     "element": { },
     "help": null,
-    "name": "copyFile",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -5806,18 +5851,18 @@
     } ],
     "title": "Copy File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createNewFolder",
     "description": "Creates a new empty folder in Microsoft OneDrive.",
     "element": { },
     "help": null,
-    "name": "createNewFolder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6615,18 +6660,18 @@
     } ],
     "title": "Create New Folder",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createNewTextFile",
     "description": "Creates a new text file in Microsoft OneDrive.",
     "element": { },
     "help": null,
-    "name": "createNewTextFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7570,18 +7615,18 @@
     } ],
     "title": "Create New Text File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteFile",
     "description": "Delete a selected file from Microsoft One Drive.",
     "element": { },
     "help": null,
-    "name": "deleteFile",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -7612,18 +7657,18 @@
     } ],
     "title": "Delete File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "downloadFile",
     "description": "Download a file from your Microsoft OneDrive.",
     "element": { },
     "help": null,
-    "name": "downloadFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7871,18 +7916,18 @@
     } ],
     "title": "Download File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getFile",
     "description": "Retrieve a specified file from your Microsoft OneDrive.",
     "element": { },
     "help": null,
-    "name": "getFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8748,18 +8793,18 @@
     } ],
     "title": "Get File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listFiles",
     "description": "List files in a OneDrive folder.",
     "element": { },
     "help": null,
-    "name": "listFiles",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9667,18 +9712,18 @@
     } ],
     "title": "List Files",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listFolders",
     "description": "List folders in a OneDrive folder.",
     "element": { },
     "help": null,
-    "name": "listFolders",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -10496,18 +10541,18 @@
     } ],
     "title": "List Folders",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "uploadFile",
     "description": "Upload a file to your Microsoft OneDrive.",
     "element": { },
     "help": null,
-    "name": "uploadFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -11477,17 +11522,17 @@
     } ],
     "title": "Upload File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -16,13 +16,12 @@
 
 package com.bytechef.commons.util;
 
-import com.bytechef.jackson.config.JacksonConfiguration;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.jackson.JsonComponentModule;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -31,7 +30,9 @@ public class JsonUtilsTest {
 
     @BeforeAll
     public static void setUp() {
-        JsonUtils.setObjectMapper(new JacksonConfiguration(new JsonComponentModule()).objectMapper());
+        JsonUtils.setObjectMapper(
+            JsonMapper.builder()
+                .build());
     }
 
     @Test
@@ -257,6 +258,20 @@ public class JsonUtilsTest {
 
         Assertions.assertThat(JsonUtils.write(List.of(Map.of("key", "value"))))
             .isEqualTo("[{\"key\":\"value\"}]");
+    }
+
+    @Test
+    public void testWriteWithDefaultPrettyPrinter() {
+        Map<String, ?> map = Map.of("key", "value", "array", List.of(1, 2));
+
+        String json = JsonUtils.writeWithDefaultPrettyPrinter(map);
+
+        Assertions.assertThat(json)
+            .contains("\n    \"key\" : \"value\"")
+            .contains("\n    \"array\" : [")
+            .contains("\n        1,")
+            .contains("\n        2")
+            .contains("\n    ]");
     }
 
     private record Row(String key) {

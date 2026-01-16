@@ -23,7 +23,6 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
-import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
@@ -32,7 +31,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.tag.domain.Tag;
@@ -60,7 +59,6 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(ConnectionFacadeImpl.class);
 
-    private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
@@ -70,12 +68,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
-        ConnectionDefinitionFacade connectionDefinitionFacade, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        OAuth2Service oAuth2Service, TagService tagService,
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, OAuth2Service oAuth2Service, TagService tagService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
-        this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
@@ -85,7 +81,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    public long create(ConnectionDTO connectionDTO, ModeType type) {
+    public long create(ConnectionDTO connectionDTO, PlatformType type) {
         Connection connection = connectionDTO.toConnection();
 
         if (connection.getAuthorizationType() != null && connection.containsParameter(Authorization.CODE)) {
@@ -99,7 +95,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
                 AuthorizationCallbackResponse authorizationCallbackResponse =
-                    connectionDefinitionFacade.executeAuthorizationCallback(
+                    connectionDefinitionService.executeAuthorizationCallback(
                         connection.getComponentName(), connection.getConnectionVersion(),
                         connection.getAuthorizationType(),
                         oAuth2Service.checkPredefinedParameters(
@@ -163,7 +159,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ConnectionDTO> getConnections(List<Long> connectionIds, ModeType type) {
+    public List<ConnectionDTO> getConnections(List<Long> connectionIds, PlatformType type) {
         return connectionService.getConnections(connectionIds)
             .stream()
             .map(connection -> toConnectionDTO(
@@ -175,7 +171,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @Transactional(readOnly = true)
     public List<ConnectionDTO> getConnections(
         String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Long environmentId,
-        ModeType type) {
+        PlatformType type) {
 
         List<Connection> connections = CollectionUtils.filter(
             connectionService.getConnections(
@@ -187,7 +183,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getConnectionTags(ModeType type) {
+    public List<Tag> getConnectionTags(PlatformType type) {
         List<Connection> connections = connectionService.getConnections(type);
 
         return tagService.getTags(
@@ -222,7 +218,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return curTagIds.contains(tag.getId());
     }
 
-    private boolean isConnectionUsed(long connectionId, ModeType type) {
+    private boolean isConnectionUsed(long connectionId, PlatformType type) {
         boolean connectionUsed;
 
         JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
@@ -316,12 +312,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         String uri = null;
 
         try {
-            uri = connectionDefinitionFacade
-                .executeBaseUri(
-                    componentName,
-                    new ComponentConnection(
-                        componentName, connectionVersion, connection.getId(), parameters,
-                        connection.getAuthorizationType()))
+            ComponentConnection componentConnection = new ComponentConnection(
+                componentName, connectionVersion, connection.getId(), parameters,
+                connection.getAuthorizationType());
+
+            uri = connectionDefinitionService
+                .executeBaseUri(componentName, componentConnection)
                 .orElse(null);
         } catch (IllegalStateException e) {
             if (logger.isDebugEnabled()) {

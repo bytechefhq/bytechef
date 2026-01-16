@@ -1,4 +1,4 @@
-import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -14,7 +14,7 @@ interface SettingsProps {
 }
 
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
-    const currentType = useModeTypeStore((state) => state.currentType);
+    const currentType = usePlatformTypeStore((state) => state.currentType);
 
     const isFeatureFlagEnabled = useFeatureFlagsStore();
 
@@ -35,9 +35,9 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
 
         if (navItem.href === 'api-keys') {
             return (
-                (currentType === ModeType.AUTOMATION &&
+                (currentType === PlatformType.AUTOMATION &&
                     (isFeatureFlagEnabled('ff-1025') || isFeatureFlagEnabled('ff-1039'))) ||
-                (currentType === ModeType.EMBEDDED && isFeatureFlagEnabled('ff-520'))
+                (currentType === PlatformType.EMBEDDED && isFeatureFlagEnabled('ff-520'))
             );
         }
 
@@ -47,6 +47,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
 
         if (navItem.href === 'mcp-server') {
             return isFeatureFlagEnabled('ff-2197');
+        }
+
+        if (navItem.href === 'users') {
+            return isFeatureFlagEnabled('ff-3900');
         }
 
         return true;

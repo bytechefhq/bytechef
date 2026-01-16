@@ -29,12 +29,8 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.file.storage.TempFileStorage;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
@@ -57,11 +53,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.net.ssl.SSLSession;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.ApplicationContext;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic
@@ -73,18 +73,17 @@ public class HttpClientExecutorTest {
         .build();
     private final Base64.Encoder encoder = Base64.getEncoder();
     private final HttpClientExecutor httpClientExecutor =
-        new HttpClientExecutor(
-            Mockito.mock(ApplicationContext.class), Mockito.mock(ConnectionDefinitionService.class),
-            Mockito.mock(TempFileStorage.class));
+        new HttpClientExecutor(Mockito.mock(ApplicationContext.class), Mockito.mock(TempFileStorage.class));
 
     static {
-        JacksonConfiguration jacksonConfiguration = new JacksonConfiguration(new JsonComponentModule());
-
-        ObjectMapper objectMapper = jacksonConfiguration.objectMapper();
+        ObjectMapper objectMapper = JsonMapper.builder()
+            .build();
 
         ConvertUtils.setObjectMapper(objectMapper);
         JsonUtils.setObjectMapper(objectMapper);
-        XmlUtils.setXmlMapper(jacksonConfiguration.xmlMapper());
+        XmlUtils.setXmlMapper(
+            XmlMapper.builder()
+                .build());
     }
 
     @Test
@@ -426,7 +425,7 @@ public class HttpClientExecutorTest {
     public void testHandleResponse() {
         assertNull(
             httpClientExecutor
-                .handleResponse(new TestHttpResponse(null), configuration)
+                .handleResponse(new TestHttpResponse(null), configuration, context)
                 .getBody());
 
         //
@@ -437,16 +436,21 @@ public class HttpClientExecutorTest {
             .when(context.file(file -> file.storeContent(Mockito.anyString(), (InputStream) Mockito.any())))
             .thenReturn(fileEntry);
 
+        Http.Configuration configuration1 = Http.responseType(Http.ResponseType.BINARY)
+            .build();
+
         assertEquals(
             fileEntry,
             httpClientExecutor
                 .handleResponse(
                     new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
-                    Http.responseType(Http.ResponseType.BINARY)
-                        .build())
+                    configuration1, context)
                 .getBody());
 
         //
+
+        Http.Configuration configuration3 = Http.responseType(Http.ResponseType.JSON)
+            .build();
 
         assertEquals(
             Map.of("key1", "value1"),
@@ -458,22 +462,24 @@ public class HttpClientExecutorTest {
                                 "key1": "value1"
                             }
                             """),
-                    Http.responseType(Http.ResponseType.JSON)
-                        .build())
+                    configuration3,
+                    context)
                 .getBody());
 
         //
 
-        assertEquals(
-            "text",
-            httpClientExecutor
-                .handleResponse(
-                    new TestHttpResponse("text"),
-                    Http.responseType(Http.ResponseType.TEXT)
-                        .build())
-                .getBody());
+        Http.Configuration configuration2 = Http.responseType(Http.ResponseType.TEXT)
+            .build();
+
+        Http.Response response =
+            httpClientExecutor.handleResponse(new TestHttpResponse("text"), configuration2, context);
+
+        assertEquals("text", response.getBody());
 
         //
+
+        Http.Configuration configuration4 = Http.responseType(Http.ResponseType.XML)
+            .build();
 
         assertEquals(
             Map.of("object", Map.of("key1", "value1")),
@@ -488,8 +494,8 @@ public class HttpClientExecutorTest {
                             </root>
 
                             """),
-                    Http.responseType(Http.ResponseType.XML)
-                        .build())
+                    configuration4,
+                    context)
                 .getBody());
 
         //
@@ -499,7 +505,8 @@ public class HttpClientExecutorTest {
 
         assertEquals(
             new TestResponseImpl(Map.of(), "text", 200),
-            httpClientExecutor.handleResponse(new TestHttpResponse("text"), configurationBuilder.build()));
+            httpClientExecutor.handleResponse(
+                new TestHttpResponse("text"), configurationBuilder.build(), context));
     }
 
     @Test
@@ -512,8 +519,8 @@ public class HttpClientExecutorTest {
             Http.Configuration.newConfiguration()
                 .responseType(Http.ResponseType.JSON);
 
-        Http.Response response =
-            httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
+        Http.Response response = httpClientExecutor.handleResponse(
+            testHttpResponse, configurationBuilder.build(), context);
 
         assertNull(response.getBody());
 
@@ -521,7 +528,7 @@ public class HttpClientExecutorTest {
             "{\"key1\":\"value1\", \"key2\":\"value2\"}",
             HttpHeaders.of(Map.of("content-type", List.of("application/json")), (s, s2) -> true), 404);
 
-        response = httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
+        response = httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build(), context);
 
         assertNotNull(response.getBody());
 
@@ -531,7 +538,7 @@ public class HttpClientExecutorTest {
             "<root><key1>\"value1\"</key1><key2>\"value2\"</key2></root>",
             HttpHeaders.of(Map.of("content-type", List.of("application/xml")), (s, s2) -> true), 200);
 
-        response = httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
+        response = httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build(), context);
 
         assertNull(response.getBody());
 
@@ -539,13 +546,61 @@ public class HttpClientExecutorTest {
             "<root><key1>value1</key1><key2>value2</key2></root>",
             HttpHeaders.of(Map.of("content-type", List.of("application/xml")), (s, s2) -> true), 200);
 
-        response = httpClientExecutor.handleResponse(
-            testHttpResponse, configurationBuilder.responseType(Http.ResponseType.XML)
-                .build());
+        Http.Configuration configuration1 = configurationBuilder.responseType(Http.ResponseType.XML)
+            .build();
+
+        response = httpClientExecutor.handleResponse(testHttpResponse, configuration1, context);
 
         assertNotNull(response.getBody());
 
         assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
+    }
+
+    @Test
+    public void testHandleResponseWithCharsetInContentType() {
+        TestHttpResponse testHttpResponse = new TestHttpResponse(
+            "{\"key1\":\"value1\", \"key2\":\"value2\"}",
+            HttpHeaders.of(Map.of("content-type", List.of("application/json; charset=utf-8")), (s, s2) -> true),
+            200);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder =
+            Http.Configuration.newConfiguration()
+                .responseType(Http.ResponseType.JSON);
+
+        Http.Response response =
+            httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build(), context);
+
+        assertNotNull(response.getBody());
+
+        assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
+
+        testHttpResponse = new TestHttpResponse(
+            "<root><key1>value1</key1><key2>value2</key2></root>",
+            HttpHeaders.of(Map.of("content-type", List.of("application/xml; charset=utf-8")), (s, s2) -> true),
+            200);
+
+        Http.Configuration configuration1 = configurationBuilder.responseType(Http.ResponseType.XML)
+            .build();
+
+        response = httpClientExecutor.handleResponse(testHttpResponse, configuration1, context);
+
+        assertNotNull(response.getBody());
+
+        assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
+
+        testHttpResponse = new TestHttpResponse(
+            "{\"message\":\"success\"}",
+            HttpHeaders.of(Map.of("content-type", List.of("application/json; charset=ISO-8859-1")), (s, s2) -> true),
+            200);
+
+        Http.Configuration configuration2 = configurationBuilder.responseType(Http.ResponseType.JSON)
+            .build();
+
+        response = httpClientExecutor.handleResponse(testHttpResponse, configuration2, context);
+
+        assertNotNull(response.getBody());
+
+        assertEquals(Map.of("message", "success"), response.getBody());
     }
 
     private static class TestResponseImpl implements Http.Response {
@@ -608,7 +663,7 @@ public class HttpClientExecutorTest {
 
         private final Object body;
         private final int statusCode;
-        private final HttpHeaders httpHeaders;
+        private final @Nullable HttpHeaders httpHeaders;
 
         private TestHttpResponse(Object body) {
             this(body, 200);

@@ -103,6 +103,9 @@ management:
     sampling:
       probability: 1.0
   otlp:
+    metrics:
+      export:
+        enabled: ${bytechef.observability.enabled}
     tracing:
       endpoint: ${bytechef.tracing.otlp.endpoint}
 
@@ -141,7 +144,10 @@ spring:
     vectorstore:
       type: none
       pgvector:
+        index-type: hnsw
+        distance-type: cosine_distance
         dimensions: 1536
+        max-document-batch-size: 10000
         initialize-schema: true
   application:
     name: server-app
@@ -277,7 +283,7 @@ bytechef:
       openai:
         chat:
           options:
-            model: gpt-4.1
+            model: gpt-5.1
             temperature: 0.5
         embedding:
           options:

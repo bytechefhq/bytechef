@@ -39,10 +39,11 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar;
+import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
+import org.springframework.boot.amqp.autoconfigure.RabbitProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -63,12 +64,14 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
     private final Exchange controlExchange;
     private final RabbitAdmin rabbitAdmin;
     private final RabbitProperties rabbitProperties;
+    private final RabbitListenerEndpointRegistry rabbitListenerEndpointRegistry;
 
     @SuppressFBWarnings("EI")
     public AmqpMessageBrokerListenerRegistrarConfiguration(
         ConnectionFactory connectionFactory, MessageConverter jacksonAmqpMessageConverter, @Autowired(
             required = false) List<MessageBrokerConfigurer<RabbitListenerEndpointRegistrar>> messageBrokerConfigurers,
-        RabbitAdmin rabbitAdmin, RabbitProperties rabbitProperties) {
+        RabbitAdmin rabbitAdmin, RabbitProperties rabbitProperties,
+        @Autowired(required = false) RabbitListenerEndpointRegistry rabbitListenerEndpointRegistry) {
 
         this.connectionFactory = connectionFactory;
         this.controlExchange = createControlExchange();
@@ -77,6 +80,7 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
         this.messageExchange = createMessageExchange();
         this.rabbitAdmin = rabbitAdmin;
         this.rabbitProperties = rabbitProperties;
+        this.rabbitListenerEndpointRegistry = rabbitListenerEndpointRegistry;
     }
 
     @Override
@@ -168,5 +172,27 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
             .getPrefetch());
 
         return simpleRabbitListenerContainerFactory;
+    }
+
+    @Override
+    public void stopListenerEndpoints() {
+        try {
+            if (rabbitListenerEndpointRegistry != null) {
+                rabbitListenerEndpointRegistry.stop();
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to stop Rabbit listener containers: {}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void startListenerEndpoints() {
+        try {
+            if (rabbitListenerEndpointRegistry != null) {
+                rabbitListenerEndpointRegistry.start();
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to start Rabbit listener containers: {}", e.getMessage());
+        }
     }
 }

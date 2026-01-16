@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new company",
     "help": null,
@@ -322,10 +325,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Company",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact",
     "help": null,
@@ -719,10 +727,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new ticket",
     "help": null,
@@ -1150,14 +1163,16 @@
       "required": false,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Ticket",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createCompany",
     "description": "Creates a new company",
     "element": { },
     "help": null,
-    "name": "createCompany",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1470,18 +1485,18 @@
     } ],
     "title": "Create Company",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createContact",
     "description": "Creates a new contact",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1866,18 +1881,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createTicket",
     "description": "Creates a new ticket",
     "element": { },
     "help": null,
-    "name": "createTicket",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2296,17 +2311,17 @@
     } ],
     "title": "Create Ticket",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Customer Support",
-    "name": "customer-support"
+    "name": "customer-support",
+    "label": "Customer Support"
   } ],
   "connection": {
     "authorizationRequired": null,

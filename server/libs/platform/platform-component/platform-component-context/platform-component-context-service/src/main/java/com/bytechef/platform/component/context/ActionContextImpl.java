@@ -22,17 +22,19 @@ import com.bytechef.component.definition.ActionContext.Approval.Links;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -41,24 +43,25 @@ import org.springframework.context.ApplicationEventPublisher;
 class ActionContextImpl extends ContextImpl implements ActionContext, ActionContextAware {
 
     private final String actionName;
-    private Approval approval;
+    private @Nullable Approval approval;
     private final ContextFactory contextFactory;
     private final Data data;
     private final Event event;
-    private final Long jobPrincipalId;
-    private final Long jobPrincipalWorkflowId;
-    private final Long jobId;
-    private final ModeType modeType;
-    private final String workflowId;
+    private final @Nullable Long jobPrincipalId;
+    private final @Nullable Long jobPrincipalWorkflowId;
+    private final @Nullable Long jobId;
+    private final @Nullable PlatformType type;
+    private final @Nullable String workflowId;
+    private final @Nullable Long environmentId;
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String actionName, String componentName, int componentVersion,
-        @Nullable ComponentConnection componentConnection, ContextFactory contextFactory, DataStorage dataStorage,
-        boolean editorEnvironment, ApplicationEventPublisher eventPublisher, HttpClientExecutor httpClientExecutor,
-        @Nullable Long jobId, @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId,
-        @Nullable ModeType modeType, @Nullable String publicUrl, TempFileStorage tempFileStorage,
-        @Nullable String workflowId) {
+        String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
+        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
+        @Nullable ComponentConnection componentConnection, @Nullable String publicUrl, CacheManager cacheManager,
+        ContextFactory contextFactory, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
+        HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage, @Nullable Long environmentId,
+        @Nullable PlatformType type, boolean editorEnvironment) {
 
         super(
             componentName, componentVersion, actionName, componentConnection, editorEnvironment, httpClientExecutor,
@@ -67,19 +70,20 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.actionName = actionName;
         this.contextFactory = contextFactory;
 
-        if (jobId != null) {
+        if (jobId != null && publicUrl != null) {
             this.approval = new ApprovalImpl(jobId, publicUrl);
         }
 
         this.data = new DataImpl(
-            componentName, componentVersion, actionName, modeType, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-            dataStorage);
+            dataStorage, componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+            workflowId, cacheManager, environmentId, type, editorEnvironment);
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.jobPrincipalId = jobPrincipalId;
         this.jobPrincipalWorkflowId = jobPrincipalWorkflowId;
         this.jobId = jobId;
-        this.modeType = modeType;
+        this.type = type;
         this.workflowId = workflowId;
+        this.environmentId = environmentId;
     }
 
     @Override
@@ -120,28 +124,39 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
+    @Nullable
     public Long getJobPrincipalId() {
         return jobPrincipalId;
     }
 
     @Override
+    @Nullable
     public Long getJobPrincipalWorkflowId() {
         return jobPrincipalWorkflowId;
     }
 
     @Override
+    @Nullable
     public Long getJobId() {
         return jobId;
     }
 
     @Override
-    public ModeType getModeType() {
-        return modeType;
+    @Nullable
+    public PlatformType getPlatformType() {
+        return type;
     }
 
     @Override
+    @Nullable
     public String getWorkflowId() {
         return workflowId;
+    }
+
+    @Override
+    @Nullable
+    public Long getEnvironmentId() {
+        return environmentId;
     }
 
     private record ApprovalImpl(long jobId, String publicUrl) implements Approval {
@@ -156,35 +171,94 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         }
     }
 
-    private record DataImpl(
-        String componentName, Integer componentVersion, String actionName, ModeType type, Long principalId,
-        Long principalWorkflowId, Long jobId, DataStorage dataStorage) implements Data {
+    private static final class DataImpl implements Data {
+
+        private final String actionName;
+        private final String componentName;
+        private final Integer componentVersion;
+        private final DataStorage dataStorage;
+        private final boolean editorEnvironment;
+        private final @Nullable Long environmentId;
+        private final InMemoryDataStorage inMemoryDataStorage;
+        private final @Nullable Long jobPrincipalId;
+        private final @Nullable Long jobPrincipalWorkflowId;
+        private final @Nullable Long jobId;
+        private final @Nullable PlatformType type;
+
+        private DataImpl(
+            DataStorage dataStorage, String componentName, Integer componentVersion, String actionName,
+            @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId,
+            @Nullable String workflowId, CacheManager cacheManager, @Nullable Long environmentId,
+            @Nullable PlatformType type, boolean editorEnvironment) {
+
+            this.actionName = actionName;
+            this.componentName = componentName;
+            this.componentVersion = componentVersion;
+            this.dataStorage = dataStorage;
+            this.editorEnvironment = editorEnvironment;
+            this.environmentId = environmentId;
+            this.inMemoryDataStorage = new InMemoryDataStorage(workflowId, cacheManager);
+            this.jobId = jobId;
+            this.jobPrincipalId = jobPrincipalId;
+            this.jobPrincipalWorkflowId = jobPrincipalWorkflowId;
+            this.type = type;
+        }
 
         @Override
         public <T> Optional<T> fetch(Scope scope, String key) {
-            return dataStorage.fetch(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
+            if (editorEnvironment) {
+                return inMemoryDataStorage.fetch(componentName, getDataStorageScope(scope), getScopeId(scope), key);
+            }
+
+            return dataStorage.fetch(
+                componentName, getDataStorageScope(scope), getScopeId(scope), key,
+                Objects.requireNonNull(environmentId), Objects.requireNonNull(type));
         }
 
         @Override
         public <T> T get(Scope scope, String key) {
-            return dataStorage.get(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
+            if (editorEnvironment) {
+                return inMemoryDataStorage.get(componentName, getDataStorageScope(scope), getScopeId(scope), key);
+            }
+
+            return dataStorage.get(
+                componentName, getDataStorageScope(scope), getScopeId(scope), key,
+                Objects.requireNonNull(environmentId), Objects.requireNonNull(type));
         }
 
         @Override
         public <T> Map<String, T> getAll(Scope scope) {
-            return dataStorage.getAll(componentName, getDataStorageScope(scope), getScopeId(scope), type);
+            if (editorEnvironment) {
+                return inMemoryDataStorage.getAll(componentName, getDataStorageScope(scope), getScopeId(scope));
+            }
+
+            return dataStorage.getAll(
+                componentName, getDataStorageScope(scope), getScopeId(scope), Objects.requireNonNull(environmentId),
+                Objects.requireNonNull(type));
         }
 
         @Override
         public Void put(Scope scope, String key, Object value) {
-            dataStorage.put(componentName, getDataStorageScope(scope), getScopeId(scope), key, type, value);
+            if (editorEnvironment) {
+                inMemoryDataStorage.put(componentName, getDataStorageScope(scope), getScopeId(scope), key, value);
+            } else {
+                dataStorage.put(
+                    componentName, getDataStorageScope(scope), getScopeId(scope), key, value,
+                    Objects.requireNonNull(environmentId), Objects.requireNonNull(type));
+            }
 
             return null;
         }
 
         @Override
         public Void remove(Scope scope, String key) {
-            dataStorage.delete(componentName, getDataStorageScope(scope), getScopeId(scope), key, type);
+            if (editorEnvironment) {
+                inMemoryDataStorage.delete(componentName, getDataStorageScope(scope), getScopeId(scope), key);
+            } else {
+                dataStorage.delete(
+                    componentName, getDataStorageScope(scope), getScopeId(scope), key,
+                    Objects.requireNonNull(environmentId), Objects.requireNonNull(type));
+            }
 
             return null;
         }
@@ -202,11 +276,92 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             return Validate.notNull(
                 switch (scope) {
                     case CURRENT_EXECUTION -> String.valueOf(jobId);
-                    case WORKFLOW -> String.valueOf(principalWorkflowId);
-                    case PRINCIPAL -> String.valueOf(principalId);
+                    case WORKFLOW -> String.valueOf(jobPrincipalWorkflowId);
+                    case PRINCIPAL -> String.valueOf(jobPrincipalId);
                     case ACCOUNT -> "";
                 }, "scope");
         }
+
+        public DataStorage dataStorage() {
+            return dataStorage;
+        }
+
+        public String componentName() {
+            return componentName;
+        }
+
+        public Integer componentVersion() {
+            return componentVersion;
+        }
+
+        public String actionName() {
+            return actionName;
+        }
+
+        public @Nullable Long jobPrincipalId() {
+            return jobPrincipalId;
+        }
+
+        public @Nullable Long jobPrincipalWorkflowId() {
+            return jobPrincipalWorkflowId;
+        }
+
+        public @Nullable Long jobId() {
+            return jobId;
+        }
+
+        public @Nullable Long environmentId() {
+            return environmentId;
+        }
+
+        public @Nullable PlatformType type() {
+            return type;
+        }
+
+        public boolean editorEnvironment() {
+            return editorEnvironment;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this)
+                return true;
+            if (obj == null || obj.getClass() != this.getClass())
+                return false;
+            var that = (DataImpl) obj;
+            return Objects.equals(this.dataStorage, that.dataStorage) &&
+                Objects.equals(this.componentName, that.componentName) &&
+                Objects.equals(this.componentVersion, that.componentVersion) &&
+                Objects.equals(this.actionName, that.actionName) &&
+                Objects.equals(this.jobPrincipalId, that.jobPrincipalId) &&
+                Objects.equals(this.jobPrincipalWorkflowId, that.jobPrincipalWorkflowId) &&
+                Objects.equals(this.jobId, that.jobId) &&
+                Objects.equals(this.environmentId, that.environmentId) &&
+                Objects.equals(this.type, that.type) &&
+                this.editorEnvironment == that.editorEnvironment;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(dataStorage, componentName, componentVersion, actionName, jobPrincipalId,
+                jobPrincipalWorkflowId, jobId, environmentId, type, editorEnvironment);
+        }
+
+        @Override
+        public String toString() {
+            return "DataImpl[" +
+                "dataStorage=" + dataStorage + ", " +
+                "componentName=" + componentName + ", " +
+                "componentVersion=" + componentVersion + ", " +
+                "actionName=" + actionName + ", " +
+                "jobPrincipalId=" + jobPrincipalId + ", " +
+                "jobPrincipalWorkflowId=" + jobPrincipalWorkflowId + ", " +
+                "jobId=" + jobId + ", " +
+                "environmentId=" + environmentId + ", " +
+                "type=" + type + ", " +
+                "editorEnvironment=" + editorEnvironment + ']';
+        }
+
     }
 
     private record EventImpl(ApplicationEventPublisher eventPublisher, long taskExecutionId) implements Event {

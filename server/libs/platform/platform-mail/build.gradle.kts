@@ -5,7 +5,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-context-support")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-mail")
     implementation("org.thymeleaf:thymeleaf-spring6")
     implementation(project(":server:libs:config:logback-config"))
 
@@ -14,4 +14,6 @@ dependencies {
 
     testImplementation(libs.loki.logback.appender)
     testImplementation(project(":server:libs:config:messages-config"))
+    testImplementation("org.springframework.boot:spring-boot-starter-mail-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf-test")
 }

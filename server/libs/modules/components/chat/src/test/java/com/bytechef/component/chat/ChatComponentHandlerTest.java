@@ -23,7 +23,6 @@ public class ChatComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/chat_v1.json",
-            new ChatComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/chat_v1.json", new ChatComponentHandler().getDefinition());
     }
 }

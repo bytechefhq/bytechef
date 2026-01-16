@@ -148,4 +148,29 @@ class GithubUtilsTest {
         assertEquals("name", actualOwnerName);
         assertEquals("/user", stringArgumentCaptor.getValue());
     }
+
+    @Test
+    void testGetItemsWithNullResponse() {
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(null);
+        when(mockedResponse.getHeader("link"))
+            .thenReturn(null);
+
+        List<Map<String, ?>> result = GithubUtils.getItems(mockedContext, "/test/url", false);
+
+        assertEquals(List.of(), result);
+    }
+
+    @Test
+    void testGetRepositoryOptionsWithNullResponse() {
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(null);
+        when(mockedResponse.getHeader("link"))
+            .thenReturn(null);
+
+        List<Option<String>> result = GithubUtils.getRepositoryOptions(
+            mockedParameters, null, Map.of(), "", mockedContext);
+
+        assertEquals(List.of(), result);
+    }
 }

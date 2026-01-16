@@ -16,12 +16,12 @@
 
 package com.bytechef.component.shopify.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
+import static com.bytechef.component.shopify.util.ShopifyTriggerUtils.subscribeWebhook;
+import static com.bytechef.component.shopify.util.ShopifyTriggerUtils.unsubscribeWebhook;
 
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -30,12 +30,11 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.shopify.property.ShopifyOrderProperties;
-import com.bytechef.component.shopify.util.ShopifyUtils;
 import java.util.Map;
 
 /**
  * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 public class ShopifyNewPaidOrderTrigger {
 
@@ -43,7 +42,7 @@ public class ShopifyNewPaidOrderTrigger {
         .title("New Paid Order")
         .description("Triggers when paid order is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .output(outputSchema(object().properties(ShopifyOrderProperties.PROPERTIES)))
+        .output()
         .webhookEnable(ShopifyNewPaidOrderTrigger::webhookEnable)
         .webhookDisable(ShopifyNewPaidOrderTrigger::webhookDisable)
         .webhookRequest(ShopifyNewPaidOrderTrigger::webhookRequest);
@@ -55,20 +54,19 @@ public class ShopifyNewPaidOrderTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new WebhookEnableOutput(
-            Map.of(ID, ShopifyUtils.subscribeWebhook(webhookUrl, "orders/paid", context)), null);
+        return new WebhookEnableOutput(Map.of(ID, subscribeWebhook(webhookUrl, "ORDERS_PAID", context)), null);
     }
 
     protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        ShopifyUtils.unsubscribeWebhook(outputParameters, context);
+        unsubscribeWebhook(outputParameters, context);
     }
 
     protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
         return body.getContent();
     }

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets a list of comments left on the file.",
     "help": null,
@@ -526,10 +529,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Comments",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Posts a new comment on the file.",
     "help": null,
@@ -827,14 +835,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Post Comment",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "getComments",
     "description": "Gets a list of comments left on the file.",
     "element": { },
     "help": null,
-    "name": "getComments",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1353,18 +1363,18 @@
     } ],
     "title": "Get Comments",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "postComment",
     "description": "Posts a new comment on the file.",
     "element": { },
     "help": null,
-    "name": "postComment",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1653,17 +1663,17 @@
     } ],
     "title": "Post Comment",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-20T06:27:32.946393+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-05T14:11:26.033736+01:00[Europe/Ljubljana]", comments = "Generator version: 7.18.0")
 public class WorkflowModel implements com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware {
 
   private @Nullable String createdBy;
@@ -123,6 +123,8 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
   private @Nullable Integer version;
 
   private @Nullable Long projectWorkflowId;
+
+  private @Nullable Boolean sseStreamResponse;
 
   private @Nullable String workflowUuid;
 
@@ -594,6 +596,26 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     this.projectWorkflowId = projectWorkflowId;
   }
 
+  public WorkflowModel sseStreamResponse(@Nullable Boolean sseStreamResponse) {
+    this.sseStreamResponse = sseStreamResponse;
+    return this;
+  }
+
+  /**
+   * Indicates if the workflow has SSE stream response
+   * @return sseStreamResponse
+   */
+  
+  @Schema(name = "sseStreamResponse", accessMode = Schema.AccessMode.READ_ONLY, description = "Indicates if the workflow has SSE stream response", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sseStreamResponse")
+  public @Nullable Boolean getSseStreamResponse() {
+    return sseStreamResponse;
+  }
+
+  public void setSseStreamResponse(@Nullable Boolean sseStreamResponse) {
+    this.sseStreamResponse = sseStreamResponse;
+  }
+
   public WorkflowModel workflowUuid(@Nullable String workflowUuid) {
     this.workflowUuid = workflowUuid;
     return this;
@@ -644,12 +666,13 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
         Objects.equals(this.triggers, workflow.triggers) &&
         Objects.equals(this.version, workflow.version) &&
         Objects.equals(this.projectWorkflowId, workflow.projectWorkflowId) &&
+        Objects.equals(this.sseStreamResponse, workflow.sseStreamResponse) &&
         Objects.equals(this.workflowUuid, workflow.workflowUuid);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, connectionsCount, definition, description, format, id, inputs, inputsCount, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, maxRetries, workflowTaskComponentNames, workflowTriggerComponentNames, tasks, triggers, version, projectWorkflowId, workflowUuid);
+    return Objects.hash(createdBy, createdDate, connectionsCount, definition, description, format, id, inputs, inputsCount, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, maxRetries, workflowTaskComponentNames, workflowTriggerComponentNames, tasks, triggers, version, projectWorkflowId, sseStreamResponse, workflowUuid);
   }
 
   @Override
@@ -677,6 +700,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     sb.append("    triggers: ").append(toIndentedString(triggers)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    projectWorkflowId: ").append(toIndentedString(projectWorkflowId)).append("\n");
+    sb.append("    sseStreamResponse: ").append(toIndentedString(sseStreamResponse)).append("\n");
     sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
     sb.append("}");
     return sb.toString();

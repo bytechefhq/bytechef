@@ -18,7 +18,6 @@ package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
-import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +69,14 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @Override
     @Transactional(readOnly = true)
     public TaskExecution getTaskExecution(long id) {
-        return OptionalUtils.get(taskExecutionRepository.findById(id));
+        return taskExecutionRepository.findById(id)
+            .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));
+    }
+
+    @Override
+    public TaskExecution getTaskExecutionForUpdate(long id) {
+        return taskExecutionRepository.findByIdForUpdate(id)
+            .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));
     }
 
     @Override
@@ -88,24 +94,30 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     public TaskExecution update(TaskExecution taskExecution) {
         Validate.notNull(taskExecution, "'taskExecution' must not be null");
 
-        TaskExecution currentTaskExecution = OptionalUtils.get(
-            taskExecutionRepository.findByIdForUpdate(Validate.notNull(taskExecution.getId(), "id")));
+        long id = Validate.notNull(taskExecution.getId(), "id");
 
-        TaskExecution.Status currentStatus = currentTaskExecution.getStatus();
-        TaskExecution.Status status = taskExecution.getStatus();
+        TaskExecution currentTaskExecution = taskExecutionRepository.findByIdForUpdate(id)
+            .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));
 
-        if (currentStatus.isTerminated() && status == TaskExecution.Status.STARTED) {
-            currentTaskExecution.setStartDate(taskExecution.getStartDate());
+        try {
+            TaskExecution.Status currentStatus = currentTaskExecution.getStatus();
+            TaskExecution.Status status = taskExecution.getStatus();
 
-            taskExecution = currentTaskExecution;
-        } else if (status.isTerminated() && currentTaskExecution.getStatus() == TaskExecution.Status.STARTED) {
-            taskExecution.setStartDate(currentTaskExecution.getStartDate());
+            if (currentStatus.isTerminated() && status == TaskExecution.Status.STARTED) {
+                currentTaskExecution.setStartDate(taskExecution.getStartDate());
+
+                taskExecution = currentTaskExecution;
+            } else if (status.isTerminated() && currentTaskExecution.getStatus() == TaskExecution.Status.STARTED) {
+                taskExecution.setStartDate(currentTaskExecution.getStartDate());
+            }
+
+            // Do not override initial workflow task definition
+
+            taskExecution.setWorkflowTask(currentTaskExecution.getWorkflowTask());
+
+            return taskExecutionRepository.save(taskExecution);
+        } finally {
+            taskExecutionRepository.unlockForUpdate(id);
         }
-
-        // Do not override initial workflow task definition
-
-        taskExecution.setWorkflowTask(currentTaskExecution.getWorkflowTask());
-
-        return taskExecutionRepository.save(taskExecution);
     }
 }

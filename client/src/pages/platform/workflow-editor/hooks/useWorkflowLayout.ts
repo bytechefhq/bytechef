@@ -162,7 +162,14 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     };
 
     const handleCopilotClick = () => {
-        setContext({mode: MODE.CHAT, parameters: {}, source: Source.WORKFLOW_EDITOR});
+        const currentContext = useCopilotStore.getState().context;
+
+        setContext({
+            ...currentContext,
+            mode: MODE.ASK,
+            parameters: {},
+            source: Source.WORKFLOW_EDITOR,
+        });
 
         if (!copilotPanelOpen) {
             setCopilotPanelOpen(!copilotPanelOpen);

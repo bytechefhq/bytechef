@@ -88,7 +88,7 @@ import {
     ComponentDefinitionBasic,
     type DeleteClusterElementParameter200Response,
     type DeleteClusterElementParameterOperationRequest,
-    type DeleteWorkflowNodeParameterOperationRequest,
+    type DeleteWorkflowNodeParameterRequest,
     Tag,
     type UpdateClusterElementParameterOperationRequest,
     type UpdateWorkflowNodeParameterOperationRequest,
@@ -194,7 +194,7 @@ describe('PropertyMentionsInput', () => {
                     deleteWorkflowNodeParameterMutation: dummyMutation as unknown as UseMutationResult<
                         DeleteClusterElementParameter200Response,
                         Error,
-                        DeleteWorkflowNodeParameterOperationRequest,
+                        DeleteWorkflowNodeParameterRequest,
                         unknown
                     >,
                     invalidateWorkflowQueries: () => {},
@@ -309,7 +309,7 @@ describe('PropertyMentionsInput', () => {
                     deleteWorkflowNodeParameterMutation: dummyMutation as unknown as UseMutationResult<
                         DeleteClusterElementParameter200Response,
                         Error,
-                        DeleteWorkflowNodeParameterOperationRequest,
+                        DeleteWorkflowNodeParameterRequest,
                         unknown
                     >,
                     invalidateWorkflowQueries: () => {},

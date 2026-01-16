@@ -41,7 +41,9 @@ interface PropertyMentionsInputProps {
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
+    handleFromAiClick?: (fromAi: boolean) => void;
     handleInputTypeSwitchButtonClick?: () => void;
+    isFromAi?: boolean;
     isFormulaMode?: boolean;
     label?: string;
     leadingIcon?: ReactNode;
@@ -62,8 +64,10 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             defaultValue,
             deletePropertyButton,
             description,
+            handleFromAiClick,
             handleInputTypeSwitchButtonClick,
             isFormulaMode,
+            isFromAi,
             label,
             leadingIcon,
             path,
@@ -134,13 +138,20 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                 localEditorRef.current = instance;
 
                 if (typeof ref === 'function') {
-                    ref(instance as Editor | null);
+                    ref(instance);
                 } else if (ref && 'current' in ref) {
                     ref.current = instance;
                 }
             },
             [ref]
         );
+
+        // Ensure localEditorRef stays in sync with parent ref
+        useEffect(() => {
+            if (ref && typeof ref !== 'function' && 'current' in ref && ref.current && !localEditorRef.current) {
+                localEditorRef.current = ref.current;
+            }
+        }, [ref]);
 
         useEffect(() => {
             if (!focusedInput || !localEditorRef.current) {
@@ -239,6 +250,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         className={twMerge(
                             'property-mentions-editor flex h-full min-h-[34px] w-full rounded-md bg-white',
                             leadingIcon && 'border-0 pl-10 pr-0.5',
+                            isFromAi && 'is-from-ai',
                             className
                         )}
                     >
@@ -248,7 +260,9 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             controlType={controlType}
                             dataPills={dataPills}
                             elementId={elementId}
+                            handleFromAiClick={handleFromAiClick}
                             isFormulaMode={isFormulaMode}
+                            isFromAi={isFromAi}
                             labelId={labelId}
                             onChange={(value) => handleEditorValueChange(value)}
                             onFocus={onFocus}

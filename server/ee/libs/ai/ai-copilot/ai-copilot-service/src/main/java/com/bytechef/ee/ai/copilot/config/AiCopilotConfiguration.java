@@ -9,14 +9,14 @@ package com.bytechef.ee.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
-import com.bytechef.ai.mcp.tool.automation.ProjectTools;
-import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
+import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
+import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Copilot.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.Copilot.OpenAi;
-import com.bytechef.config.ApplicationProperties.Ai.Copilot.Vectorstore;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.model.SafeAnthropicChatModel;
@@ -29,7 +29,6 @@ import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
-import javax.sql.DataSource;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.anthropic.api.AnthropicApi;
@@ -38,8 +37,6 @@ import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.MetadataMode;
-import org.springframework.ai.embedding.BatchingStrategy;
-import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
@@ -47,18 +44,12 @@ import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.retry.RetryUtils;
-import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
-import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
-import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.client.RestClient;
 
 /**
@@ -78,7 +69,6 @@ public class AiCopilotConfiguration {
     private final String openAiChatModel;
     private final Double openAiChatTemperature;
     private final String openAiEmbeddingModel;
-    private final Vectorstore.PgVector pgVector;
     private final Resource systemPromptResource;
 
     @SuppressFBWarnings("EI")
@@ -119,10 +109,6 @@ public class AiCopilotConfiguration {
             .getOptions();
 
         this.openAiEmbeddingModel = openAiEmbeddingOptions.getModel();
-
-        Vectorstore vectorstore = copilot.getVectorstore();
-
-        this.pgVector = vectorstore.getPgVector();
 
         this.systemPromptResource = systemPromptResource;
     }
@@ -215,49 +201,11 @@ public class AiCopilotConfiguration {
                 .build());
     }
 
-    DataSource pgVectorDataSource() {
-        return DataSourceBuilder.create()
-            .type(org.postgresql.ds.PGSimpleDataSource.class)
-            .url(pgVector.getUrl())
-            .username(pgVector.getUsername())
-            .password(pgVector.getPassword())
-            .build();
-    }
-
-    JdbcTemplate pgVectorJdbcTemplate() {
-        return new JdbcTemplate(pgVectorDataSource());
-    }
-
-    @Bean
-    public PgVectorStore vectorStore(
-        EmbeddingModel embeddingModel, PgVectorStoreProperties properties,
-        ObjectProvider<ObservationRegistry> observationRegistry,
-        ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
-        BatchingStrategy batchingStrategy) {
-
-        var initializeSchema = properties.isInitializeSchema();
-
-        return PgVectorStore.builder(pgVectorJdbcTemplate(), embeddingModel)
-            .schemaName(properties.getSchemaName())
-            .idType(properties.getIdType())
-            .vectorTableName(properties.getTableName())
-            .vectorTableValidationsEnabled(properties.isSchemaValidation())
-            .dimensions(properties.getDimensions())
-            .distanceType(properties.getDistanceType())
-            .removeExistingVectorStoreTable(properties.isRemoveExistingVectorStoreTable())
-            .indexType(properties.getIndexType())
-            .initializeSchema(initializeSchema)
-            .observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
-            .customObservationConvention(customObservationConvention.getIfAvailable(() -> null))
-            .batchingStrategy(batchingStrategy)
-            .maxDocumentBatchSize(properties.getMaxDocumentBatchSize())
-            .build();
-    }
-
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, WorkflowService workflowService)
+        ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectTools,
+        ProjectWorkflowToolsImpl projectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
+        WorkflowService workflowService)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR.name();
@@ -268,7 +216,7 @@ public class AiCopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(systemPromptResource))
             .state(new State())
-            .tools(List.of(taskTools, projectWorkflowTools, projectTools))
+            .tools(List.of(projectTools, projectWorkflowTools, componentTools, taskTools))
             .workflowService(workflowService)
             .build();
     }

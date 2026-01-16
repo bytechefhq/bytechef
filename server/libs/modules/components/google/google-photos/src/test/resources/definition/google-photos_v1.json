@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates an album in a user's Google Photos library.",
     "help": null,
@@ -801,10 +804,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Album",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns the app created album based on the specified albumId.",
     "help": null,
@@ -1608,10 +1616,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Album",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Upload media to an album in a user's Google Photos library.",
     "help": null,
@@ -3310,14 +3323,16 @@
       "required": true,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Upload Media",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createAlbum",
     "description": "Creates an album in a user's Google Photos library.",
     "element": { },
     "help": null,
-    "name": "createAlbum",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4114,18 +4129,18 @@
     } ],
     "title": "Create Album",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getAlbum",
     "description": "Returns the app created album based on the specified albumId.",
     "element": { },
     "help": null,
-    "name": "getAlbum",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4925,18 +4940,18 @@
     } ],
     "title": "Get Album",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "uploadMedia",
     "description": "Upload media to an album in a user's Google Photos library.",
     "element": { },
     "help": null,
-    "name": "uploadMedia",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6631,17 +6646,17 @@
     } ],
     "title": "Upload Media",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   } ],
   "connection": {
     "authorizationRequired": null,

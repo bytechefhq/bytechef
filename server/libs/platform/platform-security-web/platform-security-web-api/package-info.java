@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-@NonNullApi
-@NonNullFields
+@NullMarked
 package com.bytechef.automation.configuration;
 
 import org.springframework.lang.NonNullApi;

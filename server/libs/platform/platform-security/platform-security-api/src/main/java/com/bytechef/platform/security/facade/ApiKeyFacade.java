@@ -16,17 +16,17 @@
 
 package com.bytechef.platform.security.facade;
 
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import java.util.List;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface ApiKeyFacade {
 
-    ApiKey create(ApiKey apiKey, @Nullable ModeType type);
+    ApiKey create(ApiKey apiKey, @Nullable PlatformType type);
 
     void delete(long id);
 
@@ -34,7 +34,7 @@ public interface ApiKeyFacade {
 
     ApiKey getApiKey(long id);
 
-    List<ApiKey> getApiKeys(long environmentId, ModeType type);
+    List<ApiKey> getApiKeys(long environmentId, PlatformType type);
 
     ApiKey update(ApiKey apiKey);
 }

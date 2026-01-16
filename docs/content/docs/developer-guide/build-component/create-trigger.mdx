@@ -9,14 +9,117 @@ In `server/libs/modules/components/newcomponent/src/main/java/com/bytechef/compo
 `NewComponentDummyTrigger` class defines the trigger. The `TRIGGER_DEFINITION` constant contains all the details about
 the trigger, including its name, title, description, properties and others.
 
-``` java
-public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = action("dummy")
-        .title("Dummy Trigger")
-        .description("Trigger description.")
-        .properties()
-        .output(
-            outputSchema(
-                string()));
+### Polling Trigger Example
+
+Polling triggers regularly check a data source for changes. You must implement the `poll` method.
+
+```java
+public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("dummyTrigger")
+    .title("Dummy Trigger")
+    .description("Polls a dummy API for new data.")
+    .type(TriggerType.POLLING)
+    .output(outputSchema(string()))
+    .poll(NewComponentDummyTrigger::poll);
+
+protected static PollOutput poll(
+    Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
+    TriggerContext triggerContext) {
+
+    // Implementation logic to fetch data and determine what is new
+    // ...
+
+    return new PollOutput(newRecords, closureParameters, false);
+}
+```
+
+### Dynamic Webhook Trigger Example
+
+Dynamic webhooks require registering a URL with a third-party service. You must implement `webhookEnable`, `webhookDisable`, and `webhookRequest`.
+
+```java
+public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("dummyTrigger")
+    .title("Dummy Trigger")
+    .description("Triggers on a dynamic URL.")
+    .type(TriggerType.DYNAMIC_WEBHOOK)
+    .output(outputSchema(string()))
+    .webhookEnable(NewComponentDummyTrigger::webhookEnable)
+    .webhookDisable(NewComponentDummyTrigger::webhookDisable)
+    .webhookRequest(NewComponentDummyTrigger::webhookRequest);
+
+protected static WebhookEnableOutput webhookEnable(
+    Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
+    String workflowExecutionId, TriggerContext triggerContext) {
+
+    // Logic to register webhookUrl with the third-party API
+    return new WebhookEnableOutput(Map.of(), null);
+}
+
+protected static void webhookDisable(
+    Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
+    String workflowExecutionId, TriggerContext triggerContext) {
+
+    // Logic to unregister the webhook using the ID stored during enable
+}
+
+protected static Object webhookRequest(
+    Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
+    HttpParameters parameters, WebhookBody body, WebhookMethod method,
+    Parameters output, TriggerContext triggerContext) {
+
+    // Logic to process the incoming webhook request body
+    return body.getContent();
+}
+```
+
+### Static Webhook Trigger Example
+
+Static webhooks use a fixed URL and only require the `webhookRequest` method to be implemented.
+
+```java
+public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("dummyTrigger")
+    .title("Dummy Trigger")
+    .description("Triggers on a fixed URL.")
+    .type(TriggerType.STATIC_WEBHOOK)
+    .output(outputSchema(string()))
+    .webhookRequest(NewComponentDummyTrigger::webhookRequest);
+
+protected static Map<String, Object> webhookRequest(
+    Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
+    HttpParameters parameters, WebhookBody body, WebhookMethod method,
+    Parameters output, TriggerContext context) {
+
+    return body.getContent(new TypeReference<>() {});
+}
+```
+
+### Listener Trigger Example
+
+Listener triggers stay active and wait for events (e.g., from a message queue). You must implement `listenerEnable` and `listenerDisable`.
+
+```java
+public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("dummyTrigger")
+    .title("Dummy Trigger")
+    .description("Triggers on a message queue.")
+    .type(TriggerType.LISTENER)
+    .output(outputSchema(string()))
+    .listenerEnable(NewComponentDummyTrigger::listenerEnable)
+    .listenerDisable(NewComponentDummyTrigger::listenerDisable);
+
+protected static void listenerEnable(
+    Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
+    ListenerEmitter listenerEmitter, TriggerContext context) {
+
+    // Logic to start listening (e.g., connect to message broker and set up callback)
+    // When a message arrives:
+    // listenerEmitter.emit(data);
+}
+
+protected static void listenerDisable(
+    Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
+    TriggerContext context) {
+
+    // Logic to stop listening and close connections
+}
 ```
 
 For more information about any method in the `TRIGGER_DEFINITION`, refer to the [trigger documentation](/developer-guide/component-specification/trigger).

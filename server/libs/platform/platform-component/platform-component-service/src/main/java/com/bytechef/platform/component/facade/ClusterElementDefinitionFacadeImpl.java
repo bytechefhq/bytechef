@@ -16,21 +16,16 @@
 
 package com.bytechef.platform.component.facade;
 
-import com.bytechef.component.definition.ClusterElementContext;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
-import com.bytechef.platform.component.exception.ClusterElementDefinitionErrorType;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -41,18 +36,13 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ConnectionService connectionService;
-    private final ContextFactory contextFactory;
-    private final TokenRefreshHelper tokenRefreshHelper;
 
     @SuppressFBWarnings("EI")
     public ClusterElementDefinitionFacadeImpl(
-        ClusterElementDefinitionService clusterElementDefinitionService, ConnectionService connectionService,
-        ContextFactory contextFactory, TokenRefreshHelper tokenRefreshHelper) {
+        ClusterElementDefinitionService clusterElementDefinitionService, ConnectionService connectionService) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.connectionService = connectionService;
-        this.contextFactory = contextFactory;
-        this.tokenRefreshHelper = tokenRefreshHelper;
     }
 
     @Override
@@ -62,17 +52,9 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
-        ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
-            componentName, componentVersion, clusterElementName, componentConnection, true);
-
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, clusterElementContext,
-            ClusterElementDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES,
-            (componentConnection1, clusterElementContext1) -> clusterElementDefinitionService.executeDynamicProperties(
-                componentName, componentVersion, clusterElementName, propertyName, inputParameters,
-                lookupDependsOnPaths, componentConnection1, clusterElementContext1),
-            componentConnection1 -> contextFactory.createClusterElementContext(
-                componentName, componentVersion, clusterElementName, componentConnection1, true));
+        return clusterElementDefinitionService.executeDynamicProperties(
+            componentName, componentVersion, clusterElementName, propertyName, inputParameters,
+            lookupDependsOnPaths, componentConnection);
     }
 
     @Override
@@ -82,65 +64,17 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
-        ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
-            componentName, componentVersion, clusterElementName, componentConnection, true);
-
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, clusterElementContext,
-            ClusterElementDefinitionErrorType.EXECUTE_OPTIONS,
-            (componentConnection1, clusterElementContext1) -> clusterElementDefinitionService.executeOptions(
-                componentName, componentVersion, clusterElementName, propertyName, inputParameters,
-                lookupDependsOnPaths, searchText, componentConnection1, clusterElementContext1),
-            componentConnection1 -> contextFactory.createClusterElementContext(
-                componentName, componentVersion, clusterElementName, componentConnection1, true));
-    }
-
-    @Override
-    public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String clusterElementName, int statusCode, Object body) {
-
-        return clusterElementDefinitionService.executeProcessErrorResponse(
-            componentName, componentVersion, clusterElementName, statusCode, body,
-            contextFactory.createClusterElementContext(
-                componentName, componentVersion, clusterElementName, null, false));
+        return clusterElementDefinitionService.executeOptions(
+            componentName, componentVersion, clusterElementName, propertyName, inputParameters,
+            lookupDependsOnPaths, searchText, componentConnection);
     }
 
     @Override
     public Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable Long connectionId) {
+        String componentName, String clusterElementName, Map<String, ?> inputParameters, @Nullable Long connectionId) {
 
-        return executeTool(
-            componentName, componentVersion, clusterElementName, inputParameters,
-            getComponentConnection(connectionId), false);
-    }
-
-    @Override
-    public Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
-
-        ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
-            componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment);
-
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, clusterElementContext,
-            ClusterElementDefinitionErrorType.EXECUTE_PERFORM,
-            (componentConnection1, clusterElementContext1) -> clusterElementDefinitionService.executeTool(
-                componentName, componentVersion, clusterElementName, inputParameters, componentConnection1,
-                clusterElementContext1),
-            componentConnection1 -> contextFactory.createClusterElementContext(
-                componentName, componentVersion, clusterElementName, componentConnection1, editorEnvironment));
-    }
-
-    @Override
-    public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters) {
-
-        return clusterElementDefinitionService.executeWorkflowNodeDescription(
-            componentName, componentVersion, clusterElementName, inputParameters,
-            contextFactory.createClusterElementContext(
-                componentName, componentVersion, clusterElementName, null, true));
+        return clusterElementDefinitionService.executeTool(
+            componentName, clusterElementName, inputParameters, getComponentConnection(connectionId), false);
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

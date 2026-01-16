@@ -16,9 +16,12 @@
 
 package com.bytechef.message.event.listener;
 
+import static com.bytechef.tenant.TenantContext.CURRENT_TENANT_ID;
+
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.event.MessageEventPreSendProcessor;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.slf4j.Logger;
@@ -56,6 +59,8 @@ public class MessageEventListener {
         for (MessageEventPreSendProcessor messageEventPreSendProcessor : messageEventPreSendProcessors) {
             messageEvent = messageEventPreSendProcessor.process(messageEvent);
         }
+
+        messageEvent.putMetadata(CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
 
         messageBroker.send(messageEvent.getRoute(), messageEvent);
     }

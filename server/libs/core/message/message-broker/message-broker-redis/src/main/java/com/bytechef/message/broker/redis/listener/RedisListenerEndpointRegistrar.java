@@ -106,6 +106,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
     }
 
     public void start() {
+        this.stopped = false;
         taskExecutor.execute(this::periodicallyCheckQueueForMessage);
     }
 

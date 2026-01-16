@@ -316,3 +316,54 @@ Access the application at http://localhost:8080
 - [Official Documentation](https://docs.bytechef.io)
 - [GitHub Repository](https://github.com/bytechefhq/bytechef)
 - [Contributing Guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md)
+
+## Coding Conventions
+
+- Do not use short or cryptic variable names on both the server and client sides; prefer clear, descriptive names that communicate intent.
+- Blank line before control statements (Java)
+  - Insert exactly one empty line before control statements to visually separate logic.
+  - Applies to: `if`, `else if`, `else`, `for`, enhanced `for`, `while`, `do { ... } while (...)`, `switch`, `try`/`catch`/`finally`.
+  - Exceptions (do not add a blank line):
+    - At the very start of a file, class, or method/block (immediately after an opening `{`).
+    - When continuing the previous block on the same line (e.g., `} else {`, `} catch (...) {`, `} finally {`).
+    - Immediately after another required blank line (avoid double blank lines).
+    - Very short top-of-method guard clauses may omit the blank line for brevity when placed directly after the method signature.
+    - If the automatic formatter (Spotless/Google Java Format) enforces a different layout, the formatter wins.
+  - Example:
+    ```java
+    void process(User user) {
+        if (user == null) {
+            return;
+        }
+
+        for (Order order : user.getOrders()) {
+            // ...
+        }
+
+        try {
+            doWork();
+        } catch (IOException e) {
+            handle(e);
+        }
+    }
+    ```
+- Method chaining
+  - Do not chain method calls except where this is natural and idiomatic
+  - Allowed exceptions (non-exhaustive):
+    - Builder patterns (including Lombok `@Builder`)
+    - Java Stream API (`stream()`, `map()`, `filter()`, `collect()`)
+    - `Optional`
+    - Query DSLs and criteria builders:
+      - Spring Data JPA `Specification` (`where(...).and(...).or(...)`)
+      - JPA Criteria API (fluent `CriteriaBuilder`/`Predicate` construction)
+      - QueryDSL (`JPAQueryFactory.select(...).from(...).where(...).orderBy(...)`)
+      - jOOQ (`dsl.select(...).from(...).where(...).orderBy(...)`)
+    - Reactive operators: Project Reactor `Mono`/`Flux` (e.g., `map`, `flatMap`, `filter`, `onErrorResume`)
+    - HTTP client builder/request DSLs: Spring `WebClient`, OkHttp
+    - Testing/assertion DSLs: AssertJ, Mockito BDD APIs
+    - Logging fluent APIs: SLF4J 2.x `logger.atXxx()` fluent logger
+    - JSON builders and similar fluent APIs: Jackson `ObjectNode`/`ArrayNode`, JSON‑P `JsonObjectBuilder`
+  - Formatting rules:
+    - Break each chained step onto its own line when there are 3+ operations or line length would exceed limits
+    - Keep declarative chains (queries, reactive pipelines) as one logical block; prefer one operation per line
+    - Avoid chaining when side effects are involved or intermediate values deserve names for clarity/debugging

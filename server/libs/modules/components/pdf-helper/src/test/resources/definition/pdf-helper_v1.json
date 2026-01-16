@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts pdf to image.",
     "help": null,
@@ -395,10 +398,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Convert to Image",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts text from a PDF file.",
     "help": null,
@@ -565,10 +573,15 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Extract Text",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts image to PDF.",
     "help": null,
@@ -921,10 +934,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Image to PDF",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts text to PDF.",
     "help": null,
@@ -1195,14 +1213,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Text to PDF",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "convertToImage",
     "description": "Converts pdf to image.",
     "element": { },
     "help": null,
-    "name": "convertToImage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1593,18 +1613,18 @@
     } ],
     "title": "Convert to Image",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "extractText",
     "description": "Extracts text from a PDF file.",
     "element": { },
     "help": null,
-    "name": "extractText",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1767,18 +1787,18 @@
     } ],
     "title": "Extract Text",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "imageToPdf",
     "description": "Converts image to PDF.",
     "element": { },
     "help": null,
-    "name": "imageToPdf",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2127,18 +2147,18 @@
     } ],
     "title": "Image to PDF",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "textToPdf",
     "description": "Converts text to PDF.",
     "element": { },
     "help": null,
-    "name": "textToPdf",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2405,17 +2425,17 @@
     } ],
     "title": "Text to PDF",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

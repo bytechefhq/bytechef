@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
+import com.bytechef.component.ai.llm.anthropic.action.AnthropicStreamChatAction;
 import com.bytechef.component.ai.llm.anthropic.cluster.AntropicChatModel;
 import com.bytechef.component.ai.llm.anthropic.connection.AnthropicConnection;
 import com.bytechef.component.definition.ComponentCategory;
@@ -41,7 +42,9 @@ public class AnthropicComponentHandler implements ComponentHandler {
         .icon("path:assets/anthropic.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(AnthropicConnection.CONNECTION_DEFINITION)
-        .actions(AnthropicChatAction.ACTION_DEFINITION)
+        .actions(
+            AnthropicChatAction.ACTION_DEFINITION,
+            AnthropicStreamChatAction.ACTION_DEFINITION)
         .clusterElements(AntropicChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override

@@ -16,10 +16,6 @@
 
 package com.bytechef.commons.util;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
@@ -29,6 +25,9 @@ import java.util.List;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.type.TypeFactory;
 
 /**
  * @author Ivica Cardic
@@ -53,17 +52,6 @@ public class ConvertUtils {
 
     public static <T> T convertValue(Object fromValue, Class<T> toValueType) {
         return objectMapper.convertValue(fromValue, toValueType);
-    }
-
-    public static <T> T convertValue(Object fromValue, Class<T> toValueType, boolean includeNulls) {
-        ObjectMapper currentObjectMapper = objectMapper;
-
-        if (includeNulls) {
-            currentObjectMapper = currentObjectMapper.copy()
-                .setSerializationInclusion(JsonInclude.Include.ALWAYS);
-        }
-
-        return currentObjectMapper.convertValue(fromValue, toValueType);
     }
 
     public static <T> T convertValue(Object fromValue, Type type) {

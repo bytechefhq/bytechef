@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Ask anything you want.",
     "help": null,
@@ -727,10 +730,15 @@
       "required": null,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Ask",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts text and structured content from documents.",
     "help": null,
@@ -1667,10 +1675,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Document OCR",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts text and structured content from documents.",
     "help": null,
@@ -2333,14 +2346,16 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Upload File",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "embedding",
     "description": "Mistral embedding.",
     "element": { },
     "help": null,
-    "name": "embedding",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2376,18 +2391,18 @@
     } ],
     "title": "Mistral Embedding",
     "type": {
+      "name": "EMBEDDING",
       "key": "embedding",
       "label": "Embedding",
       "multipleElements": false,
-      "name": "EMBEDDING",
       "required": true
     },
     "workflowNodeDescription": null
   }, {
+    "name": "model",
     "description": "MistralAI model.",
     "element": { },
     "help": null,
-    "name": "model",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2612,17 +2627,17 @@
     } ],
     "title": "MistralAI Model",
     "type": {
+      "name": "MODEL",
       "key": "model",
       "label": "Model",
       "multipleElements": false,
-      "name": "MODEL",
       "required": true
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -11,7 +11,10 @@ dependencies {
 
     testImplementation("org.apache.commons:commons-lang3")
     testImplementation("org.springframework:spring-context-support")
-    testImplementation("org.springframework.boot:spring-boot-starter-web")
+    testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":server:libs:config:jdbc-config"))
     testImplementation(project(":server:libs:config:app-config"))

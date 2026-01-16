@@ -27,7 +27,7 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -41,14 +41,21 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Marko Kriskovic
  */
 @Component
+@ConditionalOnProperty(name = "bytechef.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
 public class ComponentTools {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentTools.class);
@@ -74,6 +81,7 @@ public class ComponentTools {
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final ConnectionService connectionService;
+    private final VectorStore vectorStore;
 
     private static final String DEFAULT_TRIGGER_DEFINITION = """
         {
@@ -96,11 +104,12 @@ public class ComponentTools {
     @SuppressFBWarnings("EI")
     public ComponentTools(ComponentDefinitionService componentDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
-        ConnectionService connectionService) {
+        ConnectionService connectionService, @Autowired(required = false) VectorStore vectorStore) {
         this.componentDefinitionService = componentDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.connectionService = connectionService;
+        this.vectorStore = vectorStore;
     }
 
     // Helper methods
@@ -117,6 +126,30 @@ public class ComponentTools {
                 logger.debug("Retrieved component {}", componentName);
             }
 
+            String extraInstructions = null;
+
+            if (vectorStore != null) {
+                Filter.Expression filterExpression = new Filter.Expression(
+                    Filter.ExpressionType.AND,
+                    new Filter.Expression(
+                        Filter.ExpressionType.EQ, new Filter.Key("category"), new Filter.Value("readme")),
+                    new Filter.Expression(
+                        Filter.ExpressionType.EQ, new Filter.Key("name"), new Filter.Value(componentName)));
+
+                List<Document> documents = vectorStore.similaritySearch(
+                    SearchRequest.builder()
+                        .query(componentName)
+                        .filterExpression(filterExpression)
+                        .topK(1)
+                        .build());
+
+                if (!documents.isEmpty()) {
+                    Document document = documents.getFirst();
+
+                    extraInstructions = document.getText();
+                }
+            }
+
             return new ComponentInfo(
                 componentDefinition.getName(),
                 componentDefinition.getDescription(),
@@ -131,7 +164,8 @@ public class ComponentTools {
                 componentDefinition.getActions()
                     .stream()
                     .map(ActionDefinition::getName)
-                    .toList());
+                    .toList(),
+                extraInstructions);
         } catch (Exception e) {
             logger.error("Failed to get component {}", componentName, e);
 
@@ -512,7 +546,7 @@ public class ComponentTools {
                         try {
                             var output = triggerDefinitionFacade.executeTrigger(
                                 componentDefinition.getName(), componentDefinition.getVersion(), trigger.getName(),
-                                null, null, null, null, null, null, null, true);
+                                null, null, null, null, null, null, null, null, true);
                             if (output != null) {
                                 outputResponse = SchemaUtils.toOutput(
                                     output, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
@@ -538,20 +572,22 @@ public class ComponentTools {
                             outputResponse = actionDefinition.getOutputResponse();
                         } else if (actionDefinition.isOutputFunctionDefined()) {
                             try {
-
                                 outputResponse = actionDefinitionFacade.executeOutput(
                                     componentDefinition.getName(), componentDefinition.getVersion(),
                                     actionDefinition.getName(), Map.of(), Map.of());
                             } catch (Exception e) {
                                 try {
                                     List<Connection> connections =
-                                        connectionService.getConnections(componentName, version, ModeType.AUTOMATION);
-                                    Map<String, Long> connectionIds = Map.of(operationName, connections.get(0)
-                                        .getId());
+                                        connectionService.getConnections(componentName, version,
+                                            PlatformType.AUTOMATION);
+
+                                    Connection connection = connections.getFirst();
+
+                                    Map<String, Long> connectionIds = Map.of(operationName, connection.getId());
 
                                     var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
                                         componentDefinition.getVersion(), actionDefinition.getName(), null, null, null,
-                                        null, null, null, connectionIds, null, true);
+                                        null, null, connectionIds, null, null, null, true);
                                     if (output != null) {
                                         outputResponse = SchemaUtils.toOutput(
                                             output, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
@@ -683,8 +719,8 @@ public class ComponentTools {
         @JsonProperty("description") @JsonPropertyDescription("The description of the component") String description,
         @JsonProperty("categories") @JsonPropertyDescription("The categories that the component belongs to") List<String> category,
         @JsonProperty("triggers") @JsonPropertyDescription("Triggers that are defined in the component") List<String> triggers,
-        @JsonProperty("actions") @JsonPropertyDescription("Actions that are defined in the component") List<String> actions) {
-
+        @JsonProperty("actions") @JsonPropertyDescription("Actions that are defined in the component") List<String> actions,
+        @JsonProperty("extra instructions") @JsonPropertyDescription("Optional extra instructions on using this component") String readme) {
     }
 
     /**

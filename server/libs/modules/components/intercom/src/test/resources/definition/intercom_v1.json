@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create new contact",
     "help": null,
@@ -441,10 +444,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get a single Contact",
     "help": null,
@@ -792,10 +800,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a new message",
     "help": null,
@@ -1247,14 +1260,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Message",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createContact",
     "description": "Create new contact",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1691,18 +1706,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getContact",
     "description": "Get a single Contact",
     "element": { },
     "help": null,
-    "name": "getContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2046,18 +2061,18 @@
     } ],
     "title": "Get Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendMessage",
     "description": "Send a new message",
     "element": { },
     "help": null,
-    "name": "sendMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2505,17 +2520,17 @@
     } ],
     "title": "Send Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Customer Support",
-    "name": "customer-support"
+    "name": "customer-support",
+    "label": "Customer Support"
   } ],
   "connection": {
     "authorizationRequired": null,

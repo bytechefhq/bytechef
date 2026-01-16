@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a contact.",
     "help": null,
@@ -818,10 +821,15 @@
       "required": false,
       "type": "OBJECT"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create an invoice for your customer.",
     "help": null,
@@ -1228,10 +1236,15 @@
       "required": false,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Invoice",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a sales order for your customer.",
     "help": null,
@@ -1655,14 +1668,16 @@
       "required": false,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Sales Order",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createContact",
     "description": "Create a contact.",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2476,18 +2491,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createInvoice",
     "description": "Create an invoice for your customer.",
     "element": { },
     "help": null,
-    "name": "createInvoice",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2890,18 +2905,18 @@
     } ],
     "title": "Create Invoice",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createSalesOrder",
     "description": "Create a sales order for your customer.",
     "element": { },
     "help": null,
-    "name": "createSalesOrder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3321,17 +3336,17 @@
     } ],
     "title": "Create Sales Order",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Accounting",
-    "name": "accounting"
+    "name": "accounting",
+    "label": "Accounting"
   } ],
   "connection": {
     "authorizationRequired": null,

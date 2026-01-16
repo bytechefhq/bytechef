@@ -72,6 +72,24 @@ export const getFilteredOutput = (
     return output;
 };
 
+export const getErrorItem = (
+    workflowTestExecution?: WorkflowTestExecution
+): TaskExecution | TriggerExecution | undefined => {
+    if (!workflowTestExecution) return undefined;
+
+    if (workflowTestExecution.triggerExecution && workflowTestExecution.triggerExecution.error) {
+        return workflowTestExecution.triggerExecution;
+    }
+
+    const failedTask = workflowTestExecution.job?.taskExecutions?.find((task) => task.error && 'workflowTask' in task);
+
+    if (failedTask) {
+        return failedTask;
+    }
+
+    return undefined;
+};
+
 export const getInitialSelectedItem = (
     workflowTestExecution?: WorkflowTestExecution
 ): TaskExecution | TriggerExecution | undefined => {

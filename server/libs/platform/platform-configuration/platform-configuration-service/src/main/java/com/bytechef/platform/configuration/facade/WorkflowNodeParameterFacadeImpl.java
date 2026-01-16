@@ -106,8 +106,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     @Override
     public ParameterResultDTO deleteClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName, String parameterPath, boolean fromAiInMetadata,
-        long environmentId) {
+        String clusterElementWorkflowNodeName, String parameterPath, long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -139,16 +138,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
             true, environmentId);
 
-        if (fromAiInMetadata) {
-            List<String> fromAiPaths = getFromAiPaths(metadataMap);
-
-            fromAiPaths.remove(parameterPath);
-        }
+        updateFromAiMetadataPaths(false, getFromAiPaths(metadataMap), parameterPath);
 
         setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
         workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -192,7 +187,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
         workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -295,18 +290,14 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
             true, environmentId);
 
-        if (fromAiInMetadata) {
-            List<String> fromAiPaths = getFromAiPaths(metadataMap);
-
-            fromAiPaths.add(parameterPath);
-        }
+        updateFromAiMetadataPaths(fromAiInMetadata, getFromAiPaths(metadataMap), parameterPath);
 
         if (includeInMetadata) {
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
         }
 
         workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -352,7 +343,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
 
         workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -446,6 +437,14 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
     }
 
+    private void updateFromAiMetadataPaths(boolean fromAiInMetadata, List<String> fromAiPaths, String parameterPath) {
+        if (fromAiInMetadata) {
+            fromAiPaths.add(parameterPath);
+        } else {
+            fromAiPaths.remove(parameterPath);
+        }
+    }
+
     private void checkDependOn(
         String name, List<? extends BaseProperty> properties, Map<String, ?> parameterMap,
         Map<String, ?> dynamicPropertyTypesMap) {
@@ -510,9 +509,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                         (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty,
                         removeParameters, environmentId);
 
+                    List<? extends BaseProperty> itemsToCheck = filterArrayItems(
+                        arrayProperty.getItems(), parameterPath, dynamicPropertyTypesMap);
+
                     checkDisplayConditionsAndParameters(
                         parameterPath, workflowNodeName, workflow, operationType, parameterMap,
-                        inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty.getItems(),
+                        inputMap, displayConditionMap, dynamicPropertyTypesMap, itemsToCheck,
                         removeParameters, environmentId);
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty -> {
@@ -521,10 +523,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                         (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty,
                         removeParameters, environmentId);
 
+                    List<? extends BaseProperty> itemsToCheck = filterArrayItems(
+                        arrayProperty.getItems(), parameterPath, dynamicPropertyTypesMap);
+
                     checkDisplayConditionsAndParameters(
-                        parameterPath, workflowNodeName, workflow, operationType, parameterMap,
-                        inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty.getItems(),
-                        removeParameters, environmentId);
+                        parameterPath, workflowNodeName, workflow, operationType, parameterMap, inputMap,
+                        displayConditionMap, dynamicPropertyTypesMap, itemsToCheck, removeParameters, environmentId);
                 }
                 case ObjectProperty objectProperty -> {
                     checkDisplayConditionsAndParameters(
@@ -620,6 +624,77 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 checkDynamicPropertyType(property.getName(), dynamicPropertyTypesMap);
             }
         }
+    }
+
+    /**
+     * Filters array items based on dynamic property types stored in metadata. For array paths like "conditions[0][0]",
+     * only returns the object variant that matches the stored type in dynamicPropertyTypesMap. <br/>
+     * In the condition component, array items are object variants with names like "boolean", "number", "string". We
+     * match the object name against the stored type. <br/>
+     * The type can be stored either: 1. Directly as "conditions[0][0]" -> "STRING" 2. Or inferred from child properties
+     * like "conditions[0][0].value1" -> "STRING"
+     *
+     * @param items                   the list of properties to be filtered, may be null or empty
+     * @param parameterPath           the parameter path that may contain array indices and property accessors
+     * @param dynamicPropertyTypesMap a map containing parameter paths as keys and their corresponding type names as
+     *                                values
+     * @return the filtered list of properties matching the stored type, or the original list if no filtering applies
+     */
+    private List<? extends BaseProperty> filterArrayItems(
+        List<? extends BaseProperty> items, String parameterPath, Map<String, ?> dynamicPropertyTypesMap) {
+
+        if (items == null || items.isEmpty() || !parameterPath.contains("[")) {
+            return items;
+        }
+
+        // Extract parent path (e.g., "conditions[0][0]" from "conditions[0][0].value2")
+        int lastDotIndex = parameterPath.lastIndexOf('.');
+
+        String parentPath = lastDotIndex > 0 ? parameterPath.substring(0, lastDotIndex) : parameterPath;
+
+        String storedType = (String) dynamicPropertyTypesMap.get(parentPath);
+
+        // If not found directly, try to infer from child properties
+        if (storedType == null) {
+            String prefix = parentPath + ".";
+
+            for (Map.Entry<String, ?> entry : dynamicPropertyTypesMap.entrySet()) {
+                String key = entry.getKey();
+
+                if (key.startsWith(prefix) && entry.getValue() instanceof String) {
+                    storedType = (String) entry.getValue();
+
+                    break;
+                }
+            }
+        }
+
+        if (storedType == null) {
+            return items;
+        }
+
+        List<BaseProperty> filteredProperties = new ArrayList<>();
+
+        for (BaseProperty item : items) {
+            if (item instanceof ObjectProperty objectProperty) {
+                String name = objectProperty.getName();
+
+                if (name != null && name.equalsIgnoreCase(storedType)) {
+                    filteredProperties.add(item);
+                }
+            } else if (item instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty) {
+
+                String name = objectProperty.getName();
+
+                if (name != null && name.equalsIgnoreCase(storedType)) {
+                    filteredProperties.add(item);
+                }
+            } else {
+                filteredProperties.add(item);
+            }
+        }
+
+        return filteredProperties.isEmpty() ? items : filteredProperties;
     }
 
     private static Map<String, ?> getClusterElementMap(

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts the JSON string to object/array.",
     "help": null,
@@ -37,10 +40,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Convert from JSON String",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the object/array to a JSON string.",
     "help": null,
@@ -126,14 +134,16 @@
       "required": true,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Convert to JSON String",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "parse",
     "description": "Converts the JSON string to object/array.",
     "element": { },
     "help": null,
-    "name": "parse",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -166,18 +176,18 @@
     } ],
     "title": "Convert from JSON String",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "stringify",
     "description": "Writes the object/array to a JSON string.",
     "element": { },
     "help": null,
-    "name": "stringify",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -259,17 +269,17 @@
     } ],
     "title": "Convert to JSON String",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts HTML data from a given URL.",
     "help": null,
@@ -133,10 +136,15 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Scrape URL",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get a JSON with the page's data. For most popular websites only.",
     "help": null,
@@ -269,10 +277,15 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Scrape URL Autoparse",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts specific data from a given URL.",
     "help": null,
@@ -442,14 +455,16 @@
       "required": true,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Scrape URL With CSS Selectors",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "scrapeUrl",
     "description": "Extracts HTML data from a given URL.",
     "element": { },
     "help": null,
-    "name": "scrapeUrl",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -578,18 +593,18 @@
     } ],
     "title": "Scrape URL",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "scrapeUrlAutoparse",
     "description": "Get a JSON with the page's data. For most popular websites only.",
     "element": { },
     "help": null,
-    "name": "scrapeUrlAutoparse",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -718,18 +733,18 @@
     } ],
     "title": "Scrape URL Autoparse",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "scrapeUrlWithCssSelectors",
     "description": "Extracts specific data from a given URL.",
     "element": { },
     "help": null,
-    "name": "scrapeUrlWithCssSelectors",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -895,17 +910,17 @@
     } ],
     "title": "Scrape URL With CSS Selectors",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Analytics",
-    "name": "analytics"
+    "name": "analytics",
+    "label": "Analytics"
   } ],
   "connection": {
     "authorizationRequired": null,

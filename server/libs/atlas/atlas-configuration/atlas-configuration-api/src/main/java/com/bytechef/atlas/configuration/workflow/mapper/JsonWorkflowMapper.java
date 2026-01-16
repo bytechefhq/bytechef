@@ -17,7 +17,7 @@
 package com.bytechef.atlas.configuration.workflow.mapper;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic

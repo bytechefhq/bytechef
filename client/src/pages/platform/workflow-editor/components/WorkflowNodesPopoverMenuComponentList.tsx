@@ -64,6 +64,8 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
         const ff_797 = useFeatureFlagsStore()('ff-797');
         const ff_1652 = useFeatureFlagsStore()('ff-1652');
+        const ff_3827 = useFeatureFlagsStore()('ff-3827');
+        const ff_3839 = useFeatureFlagsStore()('ff-3839');
 
         useEffect(
             () =>
@@ -91,26 +93,33 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 );
 
                 setFilteredTriggerComponentDefinitions(
-                    componentDefinitions.filter(
-                        ({name, title, triggersCount}) =>
-                            triggersCount &&
-                            (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                title?.toLowerCase().includes(filter.toLowerCase()))
-                    )
+                    componentDefinitions
+                        .filter(({name, title, triggersCount}) => {
+                            const nameIncludes = name?.toLowerCase().includes(filter.toLowerCase());
+                            const titleIncludes = title?.toLowerCase().includes(filter.toLowerCase());
+
+                            return triggersCount && (nameIncludes || titleIncludes);
+                        })
+                        .filter(({name}) => (!ff_3827 && name !== 'form') || ff_3827)
                 );
 
                 if (clusterElementType) {
                     setFilteredClusterElementComponentDefinitions(
-                        componentDefinitions.filter(
-                            ({clusterElementsCount, name, title}) =>
-                                clusterElementsCount?.[convertNameToSnakeCase(clusterElementType as string)] &&
-                                (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                    title?.toLowerCase().includes(filter.toLowerCase()))
-                        )
+                        componentDefinitions
+                            .filter(({clusterElementsCount, name, title}) => {
+                                const nameIncludes = name?.toLowerCase().includes(filter.toLowerCase());
+                                const titleIncludes = title?.toLowerCase().includes(filter.toLowerCase());
+
+                                return (
+                                    clusterElementsCount?.[convertNameToSnakeCase(clusterElementType as string)] &&
+                                    (nameIncludes || titleIncludes)
+                                );
+                            })
+                            .filter(({name}) => (!ff_3839 && name !== 'aiAgent') || ff_3839)
                     );
                 }
             }
-        }, [componentDefinitions, filter, ff_797, ff_1652, clusterElementType]);
+        }, [clusterElementType, componentDefinitions, filter, ff_797, ff_1652, ff_3827, ff_3839]);
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>

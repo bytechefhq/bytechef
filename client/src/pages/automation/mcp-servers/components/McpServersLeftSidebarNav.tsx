@@ -1,6 +1,6 @@
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {ModeType, useMcpServerTagsQuery} from '@/shared/middleware/graphql';
+import {PlatformType, useMcpServerTagsQuery} from '@/shared/middleware/graphql';
 import {TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -15,7 +15,7 @@ const McpServersLeftSidebarNav = () => {
         type: tagId ? Type.Tag : Type.Project,
     };
 
-    const {data, isLoading: tagsIsLoading} = useMcpServerTagsQuery({type: ModeType.Automation});
+    const {data, isLoading: tagsIsLoading} = useMcpServerTagsQuery({type: PlatformType.Automation});
 
     if (!data || !data?.mcpServerTags) {
         return <></>;

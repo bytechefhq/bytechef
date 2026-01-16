@@ -35,19 +35,25 @@ import static java.util.Base64.getUrlDecoder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.Gmail.Users.Messages.Attachments;
 import com.google.api.services.gmail.model.Label;
 import com.google.api.services.gmail.model.ListLabelsResponse;
 import com.google.api.services.gmail.model.Message;
@@ -60,6 +66,7 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -172,6 +179,78 @@ class GoogleMailUtilsTest {
                 List.of(), "https://mail.google.com/mail/u/0/#all/id");
 
         assertEquals(expectedSimpleMessage, result);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testGetSimpleMessageWithAttachments() throws Exception {
+        Message message = new Message()
+            .setId("id")
+            .setThreadId("threadId")
+            .setHistoryId(new BigInteger("123"))
+            .setPayload(
+                new MessagePart()
+                    .setMimeType("multipart/mixed")
+                    .setHeaders(List.of(
+                        new MessagePartHeader()
+                            .setName("Subject")
+                            .setValue("email subject"),
+                        new MessagePartHeader()
+                            .setName("Content-Type")
+                            .setValue("multipart/mixed")))
+                    .setParts(List.of(
+                        new MessagePart()
+                            .setMimeType("text/plain")
+                            .setBody(new MessagePartBody().setData("ZW1haWwgYm9keQ==")),
+                        new MessagePart()
+                            .setMimeType("application/pdf")
+                            .setFilename(null)
+                            .setBody(new MessagePartBody().setAttachmentId("attachmentId1")),
+                        new MessagePart()
+                            .setMimeType("application/octet-stream")
+                            .setFilename("noextension")
+                            .setBody(new MessagePartBody().setAttachmentId("attachmentId2")))));
+
+        Attachments mockedAttachments = mock(Attachments.class);
+        Attachments.Get mockedAttachmentsGet = mock(Attachments.Get.class);
+
+        when(mockedGmail.users()).thenReturn(mockedUsers);
+        when(mockedUsers.messages()).thenReturn(mockedMessages);
+        when(mockedMessages.attachments()).thenReturn(mockedAttachments);
+        when(mockedAttachments.get(anyString(), anyString(), anyString())).thenReturn(mockedAttachmentsGet);
+        when(mockedAttachmentsGet.execute()).thenReturn(new MessagePartBody().setData("YXRhY2htZW50IGNvbnRlbnQ="));
+
+        Context.File mockedFile = mock(Context.File.class);
+
+        when(mockedActionContext.file(any())).thenAnswer(invocation -> {
+            Context.ContextFunction<Context.File, ?> function = invocation.getArgument(0);
+
+            return function.apply(mockedFile);
+        });
+
+        FileEntry mockedFileEntry1 = mock(FileEntry.class);
+        FileEntry mockedFileEntry2 = mock(FileEntry.class);
+
+        when(mockedFile.storeContent(anyString(), any(InputStream.class))).thenReturn(
+            mockedFileEntry1, mockedFileEntry2);
+
+        GoogleMailUtils.SimpleMessage result = GoogleMailUtils.getSimpleMessage(
+            message, mockedActionContext, mockedGmail);
+
+        assertNotNull(result);
+
+        List<FileEntry> attachments = result.attachments();
+
+        assertEquals(2, attachments.size());
+
+        ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(mockedFile, times(2)).storeContent(fileNameCaptor.capture(), any(InputStream.class));
+
+        List<String> capturedFileNames = fileNameCaptor.getAllValues();
+
+        assertEquals("attachment", capturedFileNames.get(0));
+        assertEquals("noextension", capturedFileNames.get(1));
     }
 
     @Test

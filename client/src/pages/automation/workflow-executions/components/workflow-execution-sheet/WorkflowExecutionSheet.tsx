@@ -1,9 +1,10 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import {Sheet, SheetContent} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent} from '@/components/ui/sheet';
 import {Spinner} from '@/components/ui/spinner';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
+import {WorkflowIcon} from 'lucide-react';
 import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -34,39 +35,64 @@ const WorkflowExecutionSheet = () => {
 
     return (
         <Sheet onOpenChange={handleOpenChange} open={workflowExecutionSheetOpen}>
-            <SheetContent className="flex h-full w-[90%] gap-0 p-0 sm:max-w-[90%]">
+            <SheetContent className="absolute bottom-4 right-4 top-3 flex h-auto w-[90%] flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-[90%]">
                 {workflowExecutionLoading ? (
                     <div className="flex size-full items-center justify-center">
                         <Spinner className="size-6" />
                     </div>
                 ) : (
-                    <ResizablePanelGroup direction="horizontal">
-                        <ResizablePanel
-                            className="flex h-full w-1/2 flex-col border-r border-stroke-neutral-secondary bg-surface-neutral-primary"
-                            defaultSize={50}
-                        >
-                            {workflowExecution?.job && (
-                                <WorkflowExecutionSheetContent
-                                    job={workflowExecution.job}
-                                    triggerExecution={workflowExecution?.triggerExecution}
-                                />
-                            )}
-                        </ResizablePanel>
+                    <>
+                        <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md bg-surface-neutral-primary p-3">
+                            <div className="flex items-center gap-x-2">
+                                <WorkflowIcon />
 
-                        <ResizableHandle />
+                                <span className="flex gap-x-1 text-base text-content-neutral-secondary">
+                                    {`${workflowExecution?.project?.name} /`}
 
-                        <ResizablePanel className="w-1/2" defaultSize={50}>
-                            {workflowExecution && (
-                                <WorkflowReadOnlyProvider
-                                    value={{
-                                        useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                                    }}
+                                    <strong className="text-content-neutral-primary">
+                                        {workflowExecution?.workflow?.label}
+                                    </strong>
+                                </span>
+                            </div>
+
+                            <SheetCloseButton />
+                        </header>
+
+                        <div className="flex min-h-0 flex-1 p-3">
+                            <ResizablePanelGroup className="h-full" direction="horizontal">
+                                <ResizablePanel
+                                    className="flex min-h-0 w-1/2 flex-col overflow-hidden rounded-md bg-surface-neutral-primary"
+                                    defaultSize={50}
                                 >
-                                    <WorkflowExecutionSheetWorkflowPanel workflowExecution={workflowExecution} />
-                                </WorkflowReadOnlyProvider>
-                            )}
-                        </ResizablePanel>
-                    </ResizablePanelGroup>
+                                    {workflowExecution?.job && (
+                                        <WorkflowExecutionSheetContent
+                                            job={workflowExecution.job}
+                                            triggerExecution={workflowExecution?.triggerExecution}
+                                        />
+                                    )}
+                                </ResizablePanel>
+
+                                <ResizableHandle className="mx-2.5" withHandle />
+
+                                <ResizablePanel
+                                    className="flex min-h-0 w-1/2 flex-col overflow-hidden"
+                                    defaultSize={50}
+                                >
+                                    {workflowExecution && (
+                                        <WorkflowReadOnlyProvider
+                                            value={{
+                                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
+                                            }}
+                                        >
+                                            <WorkflowExecutionSheetWorkflowPanel
+                                                workflowExecution={workflowExecution}
+                                            />
+                                        </WorkflowReadOnlyProvider>
+                                    )}
+                                </ResizablePanel>
+                            </ResizablePanelGroup>
+                        </div>
+                    </>
                 )}
             </SheetContent>
         </Sheet>

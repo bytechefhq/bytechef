@@ -1,0 +1,47 @@
+# Test-only GraphQL base operations and minimal type stubs for GraphQL slice tests in this module.
+
+# Base operation types so that 'extend type Query/Mutation' from main resources can merge.
+#type Query {
+#    _placeholder: Boolean
+#}
+
+type Mutation {
+    _placeholder: Boolean
+}
+
+# Minimal type stubs referenced by this module's SDL
+
+type ApiKey {
+    id: ID
+    name: String
+}
+
+type Category {
+    id: ID
+    name: String
+}
+
+type ComponentDefinition {
+    name: String
+}
+
+type Environment {
+    id: ID
+    name: String
+}
+
+type Map {
+    key: String
+}
+
+type Tag {
+    id: ID
+    name: String
+    color: String
+}
+
+type Workflow {
+    id: ID!
+    description: String
+    label: String!
+}

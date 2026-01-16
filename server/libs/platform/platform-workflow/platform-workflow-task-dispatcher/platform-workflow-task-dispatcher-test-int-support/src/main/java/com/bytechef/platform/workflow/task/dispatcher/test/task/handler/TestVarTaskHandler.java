@@ -18,15 +18,15 @@ package com.bytechef.platform.workflow.task.dispatcher.test.task.handler;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Ivica Cardic
  */
 public class TestVarTaskHandler<T, V> implements TaskHandler<Object> {
 
-    private final Map<String, T> valueMap = new HashMap<>();
+    private final Map<String, T> valueMap = new ConcurrentHashMap<>();
     private final Consumer<Map<String, T>, String, V> valuesMapBiConsumer;
 
     public TestVarTaskHandler(Consumer<Map<String, T>, String, V> valuesMapBiConsumer) {

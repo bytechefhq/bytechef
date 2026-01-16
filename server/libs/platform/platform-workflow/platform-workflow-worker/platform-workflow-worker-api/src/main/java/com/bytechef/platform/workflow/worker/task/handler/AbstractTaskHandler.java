@@ -23,7 +23,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -58,12 +58,13 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
 
             return actionDefinitionFacade.executePerform(
                 componentName, componentVersion, actionName,
-                MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, ModeType.class),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.JOB_PRINCIPAL_ID),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.JOB_PRINCIPAL_WORKFLOW_ID),
                 Validate.notNull(taskExecution.getJobId(), "jobId"),
                 MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
                 taskExecution.getParameters(), connectIdMap, workflowTask.getExtensions(),
+                MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.ENVIRONMENT_ID),
+                MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, PlatformType.class),
                 MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);

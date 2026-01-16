@@ -44,7 +44,7 @@ import org.mockito.ArgumentCaptor;
  */
 class BambooHrUpdatedEmployeeTriggerTest {
 
-    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final Parameters mockedWebhookEnableOutputParameters = mock(Parameters.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
@@ -123,7 +123,7 @@ class BambooHrUpdatedEmployeeTriggerTest {
 
         Object result = BambooHrUpdatedEmployeeTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutputParameters, mockedTriggerContext);
 
         assertEquals(employees, result);
     }

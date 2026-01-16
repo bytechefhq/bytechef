@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -113,35 +114,32 @@ public final class CollectionUtils {
             .findFirst();
     }
 
-    public static <T> T findFirstOrElse(Collection<T> list, T elseObject) {
+    public static <T> T findFirstOrElse(Collection<T> list, @Nullable T elseObject) {
         Validate.notNull(list, "'list' must not be null");
 
-        return OptionalUtils.orElse(
-            list.stream()
-                .findFirst(),
-            elseObject);
+        return list.stream()
+            .findFirst()
+            .orElse(elseObject);
     }
 
     public static <T> T findFirstFilterOrElse(Collection<T> list, Predicate<? super T> filter, T elseObject) {
         Validate.notNull(list, "'list' must not be null");
         Validate.notNull(filter, "'filter' must not be null");
 
-        return OptionalUtils.orElse(
-            list.stream()
-                .filter(filter)
-                .findFirst(),
-            elseObject);
+        return list.stream()
+            .filter(filter)
+            .findFirst()
+            .orElse(elseObject);
     }
 
     public static <T, R> R findFirstMapOrElse(Collection<T> list, Function<? super T, R> mapper, R elseObject) {
         Validate.notNull(list, "'list' must not be null");
         Validate.notNull(mapper, "'mapper' must not be null");
 
-        return OptionalUtils.orElse(
-            list.stream()
-                .map(mapper)
-                .findFirst(),
-            elseObject);
+        return list.stream()
+            .map(mapper)
+            .findFirst()
+            .orElse(elseObject);
     }
 
     public static <T, R> List<R> flatMap(
@@ -156,19 +154,19 @@ public final class CollectionUtils {
     }
 
     public static <T> T getFirst(Collection<T> collection) {
-        return OptionalUtils.get(
-            collection.stream()
-                .findFirst());
+        return collection.stream()
+            .findFirst()
+            .orElseThrow();
     }
 
     public static <T> T getFirst(Collection<T> collection, Predicate<? super T> filter) {
         Validate.notNull(collection, "'collection' must not be null");
         Validate.notNull(filter, "'filter' must not be null");
 
-        return OptionalUtils.get(
-            collection.stream()
-                .filter(filter)
-                .findFirst());
+        return collection.stream()
+            .filter(filter)
+            .findFirst()
+            .orElseThrow();
     }
 
     public static <T> T getFirst(Collection<T> collection, Predicate<? super T> filter, String exceptionMessage) {
@@ -189,21 +187,21 @@ public final class CollectionUtils {
         Validate.notNull(filter, "'filter' must not be null");
         Validate.notNull(mapper, "'mapper' must not be null");
 
-        return OptionalUtils.get(
-            collection.stream()
-                .filter(filter)
-                .map(mapper)
-                .findFirst());
+        return collection.stream()
+            .filter(filter)
+            .map(mapper)
+            .findFirst()
+            .orElseThrow();
     }
 
     public static <T, U> U getFirstMap(Collection<T> collection, Function<? super T, ? extends U> mapper) {
         Validate.notNull(collection, "'collection' must not be null");
         Validate.notNull(mapper, "'mapper' must not be null");
 
-        return OptionalUtils.get(
-            collection.stream()
-                .map(mapper)
-                .findFirst());
+        return collection.stream()
+            .map(mapper)
+            .findFirst()
+            .orElseThrow();
     }
 
     public static boolean isEmpty(Collection<?> collection) {

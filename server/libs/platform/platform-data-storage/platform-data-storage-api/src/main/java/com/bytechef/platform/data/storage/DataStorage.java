@@ -16,11 +16,10 @@
 
 package com.bytechef.platform.data.storage;
 
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -28,22 +27,21 @@ import org.springframework.lang.NonNull;
 public interface DataStorage {
 
     void delete(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type);
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type);
 
     <T> Optional<T> fetch(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type);
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type);
 
     <T> T get(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type);
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type);
 
     <T> Map<String, T> getAll(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-        @NonNull ModeType type);
+        String componentName, DataStorageScope scope, String scopeId, long environmentId, PlatformType type);
 
     void put(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type, @NonNull Object value);
+        String componentName, DataStorageScope scope, String scopeId, String key, Object value, long environmentId,
+        PlatformType type);
 }

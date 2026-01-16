@@ -49,7 +49,7 @@ class DataMapperMapObjectsToObjectActionTest {
     private Parameters inputParameters;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         connectionParameters = mock(Parameters.class);
         context = mock(ActionContext.class);
         inputParameters = mock(Parameters.class);

@@ -14,7 +14,7 @@ import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -10,7 +10,6 @@ package com.bytechef.ai.copilot.config;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
@@ -19,7 +18,6 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Ivica Cardic
  */
 @Configuration
-@EnableRetry
 public class WebClientConfiguration {
 
     @LoadBalanced

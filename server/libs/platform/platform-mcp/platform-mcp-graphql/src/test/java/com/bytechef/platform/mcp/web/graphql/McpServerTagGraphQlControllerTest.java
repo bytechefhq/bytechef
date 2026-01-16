@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.tag.domain.Tag;
@@ -54,7 +54,7 @@ public class McpServerTagGraphQlControllerTest {
     @Test
     void testGetMcpServerTagsWithValidType() {
         // Given
-        ModeType type = ModeType.AUTOMATION;
+        PlatformType type = PlatformType.AUTOMATION;
 
         List<McpServer> mockServers = List.of(
             createMockMcpServerWithTags(1L, "Server 1", type, List.of(1L, 2L)),
@@ -86,7 +86,7 @@ public class McpServerTagGraphQlControllerTest {
     @Test
     void testGetMcpServerTagsWithNullType() {
         // Given
-        ModeType type = null;
+        PlatformType type = null;
 
         // When
         List<Tag> result = mcpServerTagGraphQlController.mcpServerTags(type);
@@ -100,7 +100,7 @@ public class McpServerTagGraphQlControllerTest {
     @Test
     void testGetMcpServerTagsWithNoServers() {
         // Given
-        ModeType type = ModeType.AUTOMATION;
+        PlatformType type = PlatformType.AUTOMATION;
         List<McpServer> emptyServerList = List.of();
 
         when(mcpServerService.getMcpServers(type)).thenReturn(emptyServerList);
@@ -118,7 +118,7 @@ public class McpServerTagGraphQlControllerTest {
     @Test
     void testGetMcpServerTagsWithServersButNoTags() {
         // Given
-        ModeType type = ModeType.AUTOMATION;
+        PlatformType type = PlatformType.AUTOMATION;
         List<McpServer> mockServers = List.of(
             createMockMcpServerWithTags(1L, "Server 1", type, List.of()),
             createMockMcpServerWithTags(2L, "Server 2", type, List.of()));
@@ -136,12 +136,12 @@ public class McpServerTagGraphQlControllerTest {
     }
 
     @Test
-    void testGetMcpServerTagsWithDifferentModeTypes() {
+    void testGetMcpServerTagsWithDifferentPlatformTypes() {
         // Given
-        ModeType requestedType = ModeType.AUTOMATION;
+        PlatformType requestedType = PlatformType.AUTOMATION;
         List<McpServer> mockServers = List.of(
-            createMockMcpServerWithTags(1L, "Server 1", ModeType.AUTOMATION, List.of(1L)),
-            createMockMcpServerWithTags(2L, "Server 2", ModeType.EMBEDDED, List.of(2L)) // Different type
+            createMockMcpServerWithTags(1L, "Server 1", PlatformType.AUTOMATION, List.of(1L)),
+            createMockMcpServerWithTags(2L, "Server 2", PlatformType.EMBEDDED, List.of(2L)) // Different type
         );
         List<Tag> mockTags = List.of(
             createMockTag(1L, "automation-tag"));
@@ -161,7 +161,7 @@ public class McpServerTagGraphQlControllerTest {
         verify(tagService).getTags(any());
     }
 
-    private McpServer createMockMcpServerWithTags(Long id, String name, ModeType type, List<Long> tagIds) {
+    private McpServer createMockMcpServerWithTags(Long id, String name, PlatformType type, List<Long> tagIds) {
         McpServer server = new McpServer(name, type, Environment.DEVELOPMENT, true);
         server.setId(id);
         server.setVersion(1);

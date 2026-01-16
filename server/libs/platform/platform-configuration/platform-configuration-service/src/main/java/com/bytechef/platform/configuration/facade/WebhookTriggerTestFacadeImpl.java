@@ -31,9 +31,9 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
@@ -86,12 +86,12 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     }
 
     @Override
-    public void disableTrigger(String workflowId, long environmentId, ModeType type) {
+    public void disableTrigger(String workflowId, long environmentId, PlatformType type) {
         executeTrigger(workflowId, false, type, environmentId);
     }
 
     @Override
-    public String enableTrigger(String workflowId, long environmentId, ModeType type) {
+    public String enableTrigger(String workflowId, long environmentId, PlatformType type) {
         try {
             executeTrigger(workflowId, false, type, environmentId);
         } catch (Exception e) {
@@ -138,7 +138,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
             workflowNodeType.operation(), triggerParameters, webhookRequest, connectionId);
     }
 
-    private String executeTrigger(String workflowId, boolean enable, ModeType type, long environmentId) {
+    private String executeTrigger(String workflowId, boolean enable, PlatformType type, long environmentId) {
         String workflowUuid = getWorkflowUuid(workflowId, type);
 
         WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId);
@@ -248,7 +248,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         }
     }
 
-    private String getLatestWorkflowId(String workflowUuid, ModeType type) {
+    private String getLatestWorkflowId(String workflowUuid, PlatformType type) {
         JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
 
         return jobPrincipalAccessor.getLastWorkflowId(workflowUuid);
@@ -259,7 +259,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
             .replace("{id}", workflowExecutionId.toString());
     }
 
-    private String getWorkflowUuid(String workflowId, ModeType type) {
+    private String getWorkflowUuid(String workflowId, PlatformType type) {
         JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
 
         return jobPrincipalAccessor.getWorkflowUuid(workflowId);

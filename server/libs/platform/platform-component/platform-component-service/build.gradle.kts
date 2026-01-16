@@ -1,11 +1,11 @@
 dependencies {
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-jdbc")
     implementation("org.springframework.boot:spring-boot")
+    implementation("org.springframework.boot:spring-boot-jackson")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:config:app-config"))
@@ -19,7 +19,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
-    testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
     testImplementation(libs.org.wiremock.wiremock)
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     testImplementation(project(":server:libs:core:commons:commons-data"))

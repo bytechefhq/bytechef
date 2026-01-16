@@ -190,8 +190,74 @@ public class ExampleComponentHandler implements ComponentHandler {
 
 ## Code Style and Best Practices
 
+### Variable Naming
+- Do not use short or cryptic variable names on both the server and client sides; prefer clear, descriptive names that communicate intent.
+- This applies everywhere, including arrow function parameters and loop variables.
+- Examples:
+  ```typescript
+  // Bad
+  const current = users.find((u) => u?.login === login);
+
+  // Good
+  const current = users.find((user) => user?.login === login);
+  ```
+  ```java
+  // Bad
+  for (Order o : orders) { ... }
+
+  // Good
+  for (Order order : orders) { ... }
+  ```
+
+### Blank Line Before Control Statements (Java)
+- Insert exactly one empty line before control statements to improve visual separation of logic:
+  - Applies to: `if`, `else if`, `else`, `for`, enhanced `for`, `while`, `do { ... } while (...)`, `switch`, `try`/`catch`/`finally`.
+- Exceptions (do not add a blank line):
+  - At the very start of a file, class, or method/block (immediately after an opening `{`).
+  - When the control keyword directly continues the previous block on the same line (e.g., `} else {`, `} catch (...) {`, `} finally {`).
+  - Immediately after another required blank line (avoid double blank lines).
+  - Very short top-of-method guard clauses may omit the blank line for brevity when they appear immediately after the method signature.
+  - If the automatic formatter (Spotless/Google Java Format) enforces a different layout, the formatter’s output wins.
+- Example:
+  ```java
+  void process(User user) {
+      if (user == null) {
+          return;
+      }
+
+      for (Order order : user.getOrders()) {
+          // ...
+      }
+
+      try {
+          doWork();
+      } catch (IOException e) {
+          handle(e);
+      }
+  }
+  ```
+
 ### Method Chaining
-- Avoid method chaining except when the builder pattern is applicable
+- Do not chain method calls except where this is natural and idiomatic
+- Allowed exceptions (non-exhaustive):
+  - Builder patterns (including Lombok `@Builder`)
+  - Java Stream API (`stream()`, `map()`, `filter()`, `collect()`)
+  - `Optional`
+  - Query DSLs and criteria builders:
+    - Spring Data JPA `Specification` (`where(...).and(...).or(...)`)
+    - JPA Criteria API (fluent `CriteriaBuilder`/`Predicate` construction)
+    - QueryDSL (`JPAQueryFactory.select(...).from(...).where(...).orderBy(...)`)
+    - jOOQ (`dsl.select(...).from(...).where(...).orderBy(...)`)
+  - Reactive operators: Project Reactor `Mono`/`Flux` (e.g., `map`, `flatMap`, `filter`, `onErrorResume`)
+  - HTTP client builder/request DSLs: Spring `WebClient`, OkHttp
+  - Testing/assertion DSLs: AssertJ, Mockito BDD APIs
+  - Logging fluent APIs: SLF4J 2.x `logger.atXxx()` fluent logger
+  - JSON builders and similar fluent APIs: Jackson `ObjectNode`/`ArrayNode`, JSON‑P `JsonObjectBuilder`
+
+- Formatting rules:
+  - Break each chained step onto its own line for readability when there are 3+ operations or lines exceed the limit
+  - Keep declarative chains (queries, reactive pipelines) as one logical block; prefer one operation per line
+  - Avoid chaining when side effects are involved or intermediate values deserve names for clarity/debugging
 
 ### Spring Boot Best Practices
 

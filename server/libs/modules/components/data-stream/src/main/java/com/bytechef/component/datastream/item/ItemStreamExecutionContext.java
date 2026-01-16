@@ -19,18 +19,19 @@ package com.bytechef.component.datastream.item;
 import com.bytechef.component.definition.datastream.ExecutionContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public class ItemStreamExecutionContext implements ExecutionContext {
 
-    private final org.springframework.batch.item.ExecutionContext executionContext;
+    private final org.springframework.batch.infrastructure.item.ExecutionContext executionContext;
 
     @SuppressFBWarnings("EI")
-    public ItemStreamExecutionContext(org.springframework.batch.item.ExecutionContext executionContext) {
+    public ItemStreamExecutionContext(org.springframework.batch.infrastructure.item.ExecutionContext executionContext) {
         this.executionContext = executionContext;
     }
 
@@ -105,21 +106,19 @@ public class ItemStreamExecutionContext implements ExecutionContext {
     }
 
     @Override
-    @Nullable
-    public Object get(String key) {
-        return executionContext.get(key);
+    public Optional<Object> get(String key) {
+        return Optional.ofNullable(executionContext.get(key));
+    }
+
+    @Override
+    public <V> Optional<V> get(String key, Class<V> type) {
+        return Optional.ofNullable(executionContext.get(key, type));
     }
 
     @Override
     @Nullable
-    public <V> V get(String key, Class<V> type) {
-        return executionContext.get(key, type);
-    }
-
-    @Override
-    @Nullable
-    public <V> V get(String key, Class<V> type, @Nullable V defaultValue) {
-        return executionContext.get(key, type, defaultValue);
+    public <V> Optional<V> get(String key, Class<V> type, @Nullable V defaultValue) {
+        return Optional.ofNullable(executionContext.get(key, type, defaultValue));
     }
 
     @Override
@@ -149,8 +148,8 @@ public class ItemStreamExecutionContext implements ExecutionContext {
 
     @Override
     @Nullable
-    public Object remove(String key) {
-        return executionContext.remove(key);
+    public Optional<Object> remove(String key) {
+        return Optional.ofNullable(executionContext.remove(key));
     }
 
     @Override

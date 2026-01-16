@@ -14,21 +14,9 @@
 
 
 import * as runtime from '../runtime';
-import type {
-  TestWorkflowRequest,
-  WorkflowTestExecution,
-} from '../models/index';
-import {
-    TestWorkflowRequestFromJSON,
-    TestWorkflowRequestToJSON,
-    WorkflowTestExecutionFromJSON,
-    WorkflowTestExecutionToJSON,
-} from '../models/index';
 
-export interface TestWorkflowOperationRequest {
-    id: string;
-    environmentId: number;
-    testWorkflowRequest?: TestWorkflowRequest;
+export interface StopWorkflowTestRequest {
+    jobId: string;
 }
 
 /**
@@ -37,56 +25,41 @@ export interface TestWorkflowOperationRequest {
 export class WorkflowTestApi extends runtime.BaseAPI {
 
     /**
-     * Execute a workflow synchronously for testing purposes.
-     * Execute a workflow synchronously for testing purpose
+     * Abort an in-progress workflow test run identified by jobId. Sends an \'error\' event with \'Aborted\' and closes the SSE stream.
+     * Stop workflow test run
      */
-    async testWorkflowRaw(requestParameters: TestWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestExecution>> {
-        if (requestParameters['id'] == null) {
+    async stopWorkflowTestRaw(requestParameters: StopWorkflowTestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['jobId'] == null) {
             throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling testWorkflow().'
-            );
-        }
-
-        if (requestParameters['environmentId'] == null) {
-            throw new runtime.RequiredError(
-                'environmentId',
-                'Required parameter "environmentId" was null or undefined when calling testWorkflow().'
+                'jobId',
+                'Required parameter "jobId" was null or undefined when calling stopWorkflowTest().'
             );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters['environmentId'] != null) {
-            queryParameters['environmentId'] = requestParameters['environmentId'];
-        }
-
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
 
-
-        let urlPath = `/workflows/{id}/tests`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        let urlPath = `/workflow-tests/{jobId}/stop`;
+        urlPath = urlPath.replace(`{${"jobId"}}`, encodeURIComponent(String(requestParameters['jobId'])));
 
         const response = await this.request({
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: TestWorkflowRequestToJSON(requestParameters['testWorkflowRequest']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestExecutionFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
-     * Execute a workflow synchronously for testing purposes.
-     * Execute a workflow synchronously for testing purpose
+     * Abort an in-progress workflow test run identified by jobId. Sends an \'error\' event with \'Aborted\' and closes the SSE stream.
+     * Stop workflow test run
      */
-    async testWorkflow(requestParameters: TestWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestExecution> {
-        const response = await this.testWorkflowRaw(requestParameters, initOverrides);
-        return await response.value();
+    async stopWorkflowTest(requestParameters: StopWorkflowTestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.stopWorkflowTestRaw(requestParameters, initOverrides);
     }
 
 }

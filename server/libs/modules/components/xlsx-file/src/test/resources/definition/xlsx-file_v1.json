@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads data from a XLS/XLSX file.",
     "help": null,
@@ -251,10 +254,15 @@
       "required": null,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Read from File",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the data to a XLS/XLSX file.",
     "help": null,
@@ -590,6 +598,7 @@
           "required": null,
           "type": "INTEGER"
         }, {
+          "name": null,
           "advancedOption": null,
           "controlType": "NULL",
           "defaultValue": null,
@@ -600,7 +609,6 @@
           "hidden": null,
           "label": null,
           "metadata": { },
-          "name": null,
           "placeholder": null,
           "required": null,
           "type": "NULL"
@@ -719,13 +727,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Write to File",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

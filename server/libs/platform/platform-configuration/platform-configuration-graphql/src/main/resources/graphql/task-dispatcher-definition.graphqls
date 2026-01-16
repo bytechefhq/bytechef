@@ -1,0 +1,20 @@
+extend type Query {
+    taskDispatcherDefinition(name: String!, version: Int!): TaskDispatcherDefinition!
+    taskDispatcherDefinitions: [TaskDispatcherDefinition!]!
+    taskDispatcherDefinitionVersions(name: String!): [TaskDispatcherDefinition!]!
+}
+
+type TaskDispatcherDefinition {
+    description: String
+    icon: String
+    name: String!
+    outputDefined: Boolean!
+    outputFunctionDefined: Boolean
+    outputSchemaDefined: Boolean
+    properties: [Property!]!
+    resources: Resources
+    taskProperties: [Property!]!
+    title: String
+    variablePropertiesDefined: Boolean
+    version: Int!
+}

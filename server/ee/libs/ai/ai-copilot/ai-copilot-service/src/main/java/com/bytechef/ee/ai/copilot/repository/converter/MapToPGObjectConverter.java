@@ -7,8 +7,6 @@
 
 package com.bytechef.ee.ai.copilot.repository.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -16,6 +14,7 @@ import java.util.Map;
 import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -25,6 +24,7 @@ import org.springframework.data.convert.WritingConverter;
 @WritingConverter
 @SuppressFBWarnings("EI_EXPOSE_REP2")
 public class MapToPGObjectConverter implements Converter<Map<String, Object>, PGobject> {
+
     private final ObjectMapper objectMapper;
 
     public MapToPGObjectConverter(ObjectMapper objectMapper) {
@@ -41,7 +41,7 @@ public class MapToPGObjectConverter implements Converter<Map<String, Object>, PG
             jsonObject.setValue(objectMapper.writeValueAsString(defensiveCopy));
 
             return (PGobject) jsonObject.clone();
-        } catch (SQLException | JsonProcessingException e) {
+        } catch (SQLException e) {
             throw new RuntimeException("Failed to convert Map to PGobject", e);
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Could not clone PGobject", e);

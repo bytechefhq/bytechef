@@ -1,6 +1,6 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
-import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -21,6 +21,7 @@ import {
     LayoutTemplateIcon,
     Link2Icon,
     LucideIcon,
+    MessageCircleMoreIcon,
     ServerIcon,
     Settings2Icon,
     SquareIcon,
@@ -73,6 +74,7 @@ const automationNavigation: NavigationType[] = [
         name: 'Workflow Executions',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
+    {href: '/automation/chat', icon: MessageCircleMoreIcon, name: 'Workflow Chat'},
 ];
 
 const embeddedNavigation: NavigationType[] = [
@@ -135,7 +137,7 @@ function App() {
     );
     const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {currentType, setCurrentType} = useModeTypeStore(
+    const {currentType, setCurrentType} = usePlatformTypeStore(
         useShallow((state) => ({
             currentType: state.currentType,
             setCurrentType: state.setCurrentType,
@@ -152,6 +154,8 @@ function App() {
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
+    const ff_2311 = useFeatureFlagsStore()('ff-2311');
+    const ff_2894 = useFeatureFlagsStore()('ff-2894');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (
@@ -168,6 +172,10 @@ function App() {
 
         if (navItem.href === '/automation/mcp-servers') {
             return ff_2445;
+        }
+
+        if (navItem.href === '/automation/chat') {
+            return ff_2311 || ff_2894;
         }
 
         return true;
@@ -224,9 +232,9 @@ function App() {
         let type;
 
         if (location.pathname.includes('/automation/')) {
-            type = ModeType.AUTOMATION;
+            type = PlatformType.AUTOMATION;
         } else if (location.pathname.includes('/embedded/')) {
-            type = ModeType.EMBEDDED;
+            type = PlatformType.EMBEDDED;
         }
 
         if (type !== undefined && type !== currentType) {

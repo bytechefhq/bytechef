@@ -25,5 +25,3 @@ type McpTool {
     lastModifiedDate: Long
     version: Int
 }
-
-scalar Map

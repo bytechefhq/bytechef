@@ -1,7 +1,6 @@
 dependencies {
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.boot:spring-boot-cache")
     implementation("org.springframework.boot:spring-boot-test")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource"))
@@ -17,6 +16,6 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
-    implementation(project(":server:libs:platform:platform-coordinator"))
+    implementation(project(":server:libs:platform:platform-job-sync"))
     implementation(project(":server:libs:test:test-int-support"))
 }

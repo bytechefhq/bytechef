@@ -35,7 +35,6 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
@@ -50,11 +49,11 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -199,7 +198,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             new JobParametersDTO(
                 workflowId, projectDeploymentWorkflow.getInputs(),
                 Map.of("projectVersion", projectDeployment.getProjectVersion())),
-            id, ModeType.AUTOMATION);
+            id, PlatformType.AUTOMATION);
     }
 
     @Override
@@ -213,12 +212,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflows(id);
 
-        List<Long> jobIds = principalJobService.getJobIds(id, ModeType.AUTOMATION);
+        List<Long> jobIds = principalJobService.getJobIds(id, PlatformType.AUTOMATION);
 
         for (long jobId : jobIds) {
             triggerExecutionService.deleteJobTriggerExecution(jobId);
 
-            principalJobService.deletePrincipalJobs(jobId, ModeType.AUTOMATION);
+            principalJobService.deletePrincipalJobs(jobId, PlatformType.AUTOMATION);
 
             jobFacade.deleteJob(jobId);
         }
@@ -578,7 +577,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                ModeType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
+                PlatformType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectWorkflow.getUuidAsString(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
@@ -635,6 +634,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 enableWorkflowTriggers(projectDeploymentWorkflow);
             } else {
                 disableWorkflowTriggers(projectDeploymentWorkflow);
+                // Also stop any currently running jobs for this workflow under this project deployment
+                stopRunningJobs(projectDeploymentWorkflow);
             }
         }
 
@@ -657,7 +658,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             }
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                ModeType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
+                PlatformType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectWorkflow.getUuidAsString(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
@@ -665,6 +666,34 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
                 getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger),
                 getWebhookUrl(workflowExecutionId));
+        }
+    }
+
+    private void stopRunningJobs(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+        List<Long> principalIds = List.of(projectDeploymentWorkflow.getProjectDeploymentId());
+        List<String> workflowIds = List.of(projectDeploymentWorkflow.getWorkflowId());
+
+        int pageNumber = 0;
+
+        while (true) {
+            org.springframework.data.domain.Page<Long> page = principalJobService.getJobIds(
+                Job.Status.STARTED, null, null, principalIds, PlatformType.AUTOMATION, workflowIds, pageNumber);
+
+            List<Long> jobIds = page.getContent();
+
+            if (jobIds.isEmpty()) {
+                break;
+            }
+
+            for (Long jobId : jobIds) {
+                jobFacade.stopJob(jobId);
+            }
+
+            if (page.hasNext()) {
+                pageNumber++;
+            } else {
+                break;
+            }
         }
     }
 
@@ -697,7 +726,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return oldProjectDeploymentWorkflows.stream()
             .filter(curProjectDeploymentWorkflow -> {
                 String projectDeploymentWorkflowUuid =
-                    projectWorkflowService.getProjectDeploymentWorkflowUuid(
+                    projectWorkflowService.getProjectWorkflowUuid(
                         projectDeployment.getId(), curProjectDeploymentWorkflow.getWorkflowId());
 
                 return Objects.equals(
@@ -713,8 +742,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     private Instant getProjectDeploymentLastExecutionDate(long projectDeploymentId) {
-        return OptionalUtils.mapOrElse(
-            principalJobService.fetchLastJobId(projectDeploymentId, ModeType.AUTOMATION), this::getJobEndDate, null);
+        return principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION)
+            .map(this::getJobEndDate)
+            .orElse(null);
     }
 
     private List<Project> getProjects(List<ProjectDeployment> projectDeployments) {
@@ -736,7 +766,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
             TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
                 triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
-                triggerWorkflowNodeType.operation());
+                Objects.requireNonNull(triggerWorkflowNodeType.operation()));
 
             if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK &&
                 !Objects.equals(triggerDefinition.getName(), "manual")) {
@@ -745,7 +775,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
                 return getWebhookUrl(
                     WorkflowExecutionId.of(
-                        ModeType.AUTOMATION, projectDeploymentId, projectWorkflow.getUuidAsString(),
+                        PlatformType.AUTOMATION, projectDeploymentId, projectWorkflow.getUuidAsString(),
                         workflowTrigger.getName()));
             }
         }
@@ -766,7 +796,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     private Instant getWorkflowLastExecutionDate(List<String> workflowIds) {
-        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowIds), Job::getEndDate, null);
+        return jobService.fetchLastWorkflowJob(workflowIds)
+            .map(Job::getEndDate)
+            .orElse(null);
     }
 
     private String getWorkflowUuid(

@@ -2,7 +2,11 @@
 description: "ByteChef expressions guide. Learn to dynamically transform workflow data. Learn how to implement this in your ByteChef workflows."
 title: Expressions
 ---
+<<<<<<< HEAD
 
+=======
+# Expression Cheat Sheet
+>>>>>>> origin/master
 
 ### Expressions and types
 

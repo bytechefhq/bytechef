@@ -72,7 +72,7 @@ class CalendlyInviteeCreatedTriggerTest extends AbstractCalendlyTriggerTest {
 
         Object result = CalendlyInviteeCreatedTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutputParameters, mockedTriggerContext);
 
         assertEquals(mockedObject, result);
     }

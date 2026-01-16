@@ -1,4 +1,4 @@
-query apiKeys($environmentId: ID!, $type:ModeType!) {
+query apiKeys($environmentId: ID!, $type:PlatformType!) {
     apiKeys(environmentId: $environmentId, type: $type) {
         id,
         name,

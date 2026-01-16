@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new post for the authenticated user,",
     "help": null,
@@ -420,10 +423,15 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Post",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a specific post.",
     "help": null,
@@ -592,10 +600,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Delete Post",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Like a specific post by its ID.",
     "help": null,
@@ -764,10 +777,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Like Post",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reposts a specific post by its ID.",
     "help": null,
@@ -980,10 +998,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Repost Post",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a direct message to a specified user.",
     "help": null,
@@ -1339,14 +1362,16 @@
       "required": false,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send Direct Message",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createPost",
     "description": "Creates a new post for the authenticated user,",
     "element": { },
     "help": null,
-    "name": "createPost",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1762,18 +1787,18 @@
     } ],
     "title": "Create Post",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deletePost",
     "description": "Deletes a specific post.",
     "element": { },
     "help": null,
-    "name": "deletePost",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1938,18 +1963,18 @@
     } ],
     "title": "Delete Post",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "likePost",
     "description": "Like a specific post by its ID.",
     "element": { },
     "help": null,
-    "name": "likePost",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2114,18 +2139,18 @@
     } ],
     "title": "Like Post",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "repostPost",
     "description": "Reposts a specific post by its ID.",
     "element": { },
     "help": null,
-    "name": "repostPost",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2334,18 +2359,18 @@
     } ],
     "title": "Repost Post",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendDirectMessage",
     "description": "Sends a direct message to a specified user.",
     "element": { },
     "help": null,
-    "name": "sendDirectMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2697,17 +2722,17 @@
     } ],
     "title": "Send Direct Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Social Media",
-    "name": "social-media"
+    "name": "social-media",
+    "label": "Social Media"
   } ],
   "connection": {
     "authorizationRequired": null,

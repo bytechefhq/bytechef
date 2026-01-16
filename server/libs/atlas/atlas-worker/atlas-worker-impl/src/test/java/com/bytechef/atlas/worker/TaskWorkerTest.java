@@ -63,10 +63,37 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class TaskWorkerTest {
 
     private static final Evaluator EVALUATOR = SpelEvaluator.create();
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
     private static final ExecutorService NEW_FIXED_THREAD_POOL = Executors.newFixedThreadPool(2);
     private static final ExecutorService NEW_SINGLE_THREAD_EXECUTOR = Executors.newSingleThreadExecutor();
 
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
+
+    @Test
+    public void testCalculateTimeout() {
+        TaskWorker worker = new TaskWorker(
+            5000L, EVALUATOR, event -> {}, NEW_SINGLE_THREAD_EXECUTOR::execute, t -> null, taskFileStorage, List.of());
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
+            .build();
+
+        Assertions.assertEquals(5000L, worker.calculateTimeout(taskExecution));
+
+        taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type", "timeout", "10S")))
+            .build();
+
+        Assertions.assertEquals(10000L, worker.calculateTimeout(taskExecution));
+
+        worker = new TaskWorker(
+            null, EVALUATOR, event -> {}, NEW_SINGLE_THREAD_EXECUTOR::execute, t -> null, taskFileStorage, List.of());
+
+        taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
+            .build();
+        Assertions.assertEquals(24 * 60 * 60 * 1000L, worker.calculateTimeout(taskExecution));
+    }
 
     @Test
     public void test1() {
@@ -83,7 +110,8 @@ public class TaskWorkerTest {
 
         TaskWorker worker =
             new TaskWorker(
-                EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+                null, EVALUATOR,
+                event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
                 NEW_SINGLE_THREAD_EXECUTOR::execute, task -> taskExecution -> "done", taskFileStorage, List.of());
 
         TaskExecution taskExecution = TaskExecution.builder()
@@ -109,7 +137,8 @@ public class TaskWorkerTest {
             t -> {});
 
         TaskWorker worker = new TaskWorker(
-            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            null, EVALUATOR,
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> taskExecution -> {
                 throw new IllegalArgumentException("bad input");
@@ -145,7 +174,8 @@ public class TaskWorkerTest {
             t -> {});
 
         TaskWorker worker = new TaskWorker(
-            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            null, EVALUATOR,
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> {
                 String type = task.getType();
@@ -192,7 +222,8 @@ public class TaskWorkerTest {
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, t -> {});
 
         TaskWorker worker = new TaskWorker(
-            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            null, EVALUATOR,
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> {
                 String type = task.getType();
@@ -253,7 +284,8 @@ public class TaskWorkerTest {
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, t -> {});
 
         TaskWorker worker = new TaskWorker(
-            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            null, EVALUATOR,
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> {
                 String type = task.getType();
@@ -308,7 +340,8 @@ public class TaskWorkerTest {
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
-            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            null, EVALUATOR,
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> taskExecution -> {
                 try {
@@ -331,7 +364,7 @@ public class TaskWorkerTest {
         executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution)));
 
         // give it a second to start executing
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(1, MapUtils.size(worker.getTaskExecutions()));
 
@@ -341,20 +374,20 @@ public class TaskWorkerTest {
                 Validate.notNull(taskExecution.getJobId(), "jobId"), Validate.notNull(taskExecution.getId(), "id"))));
 
         // give it a second to cancel
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
     }
 
     @Test
     public void test7() throws InterruptedException {
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
-            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            null, EVALUATOR,
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> taskExecution -> {
                 try {
@@ -374,7 +407,7 @@ public class TaskWorkerTest {
         taskExecution1.setJobId(2222L);
 
         // execute the task
-        executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution1)));
+        EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution1)));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
@@ -384,10 +417,10 @@ public class TaskWorkerTest {
         taskExecution2.setJobId(4444L);
 
         // execute the task
-        executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
+        EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
 
         // give it a second to start executing
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(2, MapUtils.size(worker.getTaskExecutions()));
 
@@ -397,20 +430,20 @@ public class TaskWorkerTest {
                 Validate.notNull(taskExecution1.getJobId(), "jobId"), Validate.notNull(taskExecution1.getId(), "id"))));
 
         // give it a second to cancel
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(1, MapUtils.size(worker.getTaskExecutions()));
     }
 
     @Test
     public void test8() throws InterruptedException {
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
-            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            null, EVALUATOR,
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             NEW_FIXED_THREAD_POOL::execute,
             task -> taskExecution -> {
                 try {
@@ -430,7 +463,7 @@ public class TaskWorkerTest {
         taskExecution1.setJobId(2222L);
 
         // execute the task
-        executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution1)));
+        EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution1)));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
@@ -441,10 +474,10 @@ public class TaskWorkerTest {
         taskExecution2.setParentId(taskExecution1.getId());
 
         // execute the task
-        executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
+        EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
 
         // give it a second to start executing
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(2, MapUtils.size(worker.getTaskExecutions()));
 
@@ -454,7 +487,7 @@ public class TaskWorkerTest {
                 Validate.notNull(taskExecution1.getJobId(), "jobId"), Validate.notNull(taskExecution1.getId(), "id"))));
 
         // give it a second to cancel
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
     }

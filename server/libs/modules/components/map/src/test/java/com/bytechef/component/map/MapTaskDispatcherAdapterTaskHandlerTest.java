@@ -51,7 +51,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 /**
  * @author Arik Cohen
@@ -70,7 +69,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
 
         MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-            new ConcurrentMapCacheManager(), EVALUATOR, resolver);
+            EVALUATOR, resolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -102,7 +101,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 throw new IllegalStateException("i'm rogue");
             };
             MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-                new ConcurrentMapCacheManager(), EVALUATOR, taskHandlerResolver);
+                EVALUATOR, taskHandlerResolver);
 
             TaskExecution taskExecution = TaskExecution.builder()
                 .workflowTask(
@@ -157,11 +156,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         };
 
         TaskWorker worker = new TaskWorker(
-            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            null, EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             EXECUTOR_SERVICE::execute, taskHandlerResolver, taskFileStorage, List.of());
 
         mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(
-            new ConcurrentMapCacheManager(), EVALUATOR, taskHandlerResolver);
+            EVALUATOR, taskHandlerResolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(

@@ -17,9 +17,7 @@
 /**
  * @version ee
  */
-@NonNullApi
-@NonNullFields
+@NullMarked
 package com.bytechef.ee.ai.copilot;
 
-import org.springframework.lang.NonNullApi;
-import org.springframework.lang.NonNullFields;
+import org.jspecify.annotations.NullMarked;

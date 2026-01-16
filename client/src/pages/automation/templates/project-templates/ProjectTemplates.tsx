@@ -42,7 +42,7 @@ const ProjectTemplates = () => {
                                 authorName={template!.authorName}
                                 categories={template!.categories}
                                 description={template!.project!.description}
-                                icons={icons}
+                                icons={icons as string[]}
                                 key={template.id}
                                 templateId={template!.id!}
                                 title={template!.project!.name}

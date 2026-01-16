@@ -70,7 +70,7 @@ class WoocommerceNewCouponTriggerTest extends AbstractWoocommerceTriggerTest {
 
         Object result = WoocommerceNewCouponTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutputParameters, mockedTriggerContext);
 
         assertEquals(mockWebhookContent, result);
     }

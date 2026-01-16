@@ -24,7 +24,7 @@ import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -83,7 +83,7 @@ public class ConnectionServiceIntTest {
         Environment environment = Environment.PRODUCTION;
         String name = "name";
         Map<String, Object> parameters = Map.of("key1", "value1");
-        ModeType type = ModeType.AUTOMATION;
+        PlatformType type = PlatformType.AUTOMATION;
 
         Connection connection = connectionService.create(
             authorizationType, componentName, connectionVersion, environment.ordinal(), name, parameters, type);
@@ -105,7 +105,7 @@ public class ConnectionServiceIntTest {
         Environment environment = Environment.PRODUCTION;
         String name = "name";
         Map<String, Object> parameters = Map.of("key1", "value1");
-        ModeType type = ModeType.AUTOMATION;
+        PlatformType type = PlatformType.AUTOMATION;
 
         Connection connection = connectionService.create(
             null, componentName, connectionVersion, environment.ordinal(), name, parameters, type);
@@ -142,14 +142,14 @@ public class ConnectionServiceIntTest {
         connection = connectionRepository.save(connection);
 
         assertThat(connectionService.getConnection(Validate.notNull(connection.getId(), "id"))).isEqualTo(connection);
-        assertThat(connectionService.getConnections(null, null, tag.getId(), null, ModeType.AUTOMATION)).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, tag.getId(), null, PlatformType.AUTOMATION)).hasSize(1);
     }
 
     @Test
     public void getGetConnections() {
         connectionRepository.save(getConnection());
 
-        assertThat(connectionService.getConnections(null, null, null, null, ModeType.AUTOMATION)).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, null, null, PlatformType.AUTOMATION)).hasSize(1);
     }
 
     private static Connection getConnection() {
@@ -158,7 +158,7 @@ public class ConnectionServiceIntTest {
             .componentName("componentName")
             .name("name")
             .parameters(Map.of("key1", "value1"))
-            .type(ModeType.AUTOMATION)
+            .type(PlatformType.AUTOMATION)
             .build();
     }
 }

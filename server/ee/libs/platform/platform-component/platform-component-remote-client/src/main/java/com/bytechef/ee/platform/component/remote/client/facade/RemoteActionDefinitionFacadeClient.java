@@ -7,22 +7,19 @@
 
 package com.bytechef.ee.platform.component.remote.client.facade;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
-import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -80,51 +77,40 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Map<String, ?> executePerform(
-        String componentName, int componentVersion, String actionName, ModeType type,
-        Long jobPrincipalId, Long jobPrincipalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
-        Map<String, Long> connectionIds, Map<String, ?> extensions, boolean editorEnvironment) {
+        String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
+        Long jobId, String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
+        Map<String, ?> extensions, Long environmentId, PlatformType type, boolean editorEnvironment) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-perform"),
             new PerformRequest(
                 componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                inputParameters, connectionIds),
+                workflowId, inputParameters, connectionIds, castExtensions(extensions), environmentId),
             new ParameterizedTypeReference<>() {});
     }
 
-    @Override
-    public Object executePerformForPolyglot(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, ActionContext actionContext) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode,
-        Object body) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-workflow-node-description"),
-            new NodeDescriptionRequest(
-                componentVersion, componentName, actionName, inputParameters),
-            String.class);
-    }
-
-    private record NodeDescriptionRequest(
-        int componentVersion, String componentName, String actionName, Map<String, ?> inputParameters) {
+    @SuppressWarnings("unchecked")
+    private Map<String, Long> castExtensions(Map<String, ?> extensions) {
+        if (extensions == null) {
+            return null;
+        }
+        try {
+            return (Map<String, Long>) (Map<?, ?>) extensions;
+        } catch (ClassCastException e) {
+            // Fallback: convert values via toString/parseLong when possible
+            return extensions.entrySet()
+                .stream()
+                .collect(
+                    java.util.stream.Collectors.toMap(Map.Entry::getKey, e2 -> {
+                        Object v = e2.getValue();
+                        if (v == null)
+                            return null;
+                        if (v instanceof Number n)
+                            return n.longValue();
+                        return Long.parseLong(v.toString());
+                    }));
+        }
     }
 
     private record OptionsRequest(
@@ -138,8 +124,9 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     private record PerformRequest(
-        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
-        Long jobPrincipalWorkflowId, long jobId, Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
+        String componentName, int componentVersion, String actionName, PlatformType type, Long jobPrincipalId,
+        Long jobPrincipalWorkflowId, long jobId, String workflowId, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, Long> extensions, Long environmentId) {
     }
 
     private record PropertiesRequest(

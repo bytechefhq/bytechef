@@ -1,7 +1,8 @@
 ---
-description: "Shopify component for ByteChef. E-commerce platform. Learn how to implement this in your ByteChef workflows."
-title: Shopify
+title: "Shopify"
+description: "Shopify is an e-commerce platform that allows businesses to create online stores and sell products."
 ---
+
 
 Categories: E-commerce
 
@@ -18,15 +19,15 @@ Type: shopify/v1
 Version: 1
 
 
-### API Key
+### OAuth2 Authorization Code
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| shopName | Shop name | STRING |  | true |
-| key | Key | STRING |  | true |
-| value | Access Token | STRING |  | true |
+| shopName | Shop Name | STRING | Shopify shop name e.g. name.myshopify.com. | true |
+| clientId | Client Id | STRING | Client ID can be found in Dev Dashboard. | true |
+| clientSecret | Client Secret | STRING | Client secret can be found in Dev Dashboard. | true |
 
 
 
@@ -38,135 +39,34 @@ Version: 1
 ## Actions
 
 
-### Create Order
-Name: createOrder
-
-`Adds an order into a Shopify store.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| order | Order | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)&#125;]\(line_items), STRING\(total_tax), STRING\(currency)&#125; </details> |  | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Create Order",
-  "name" : "createOrder",
-  "parameters" : {
-    "order" : {
-      "line_items" : [ {
-        "fulfillment_status" : "",
-        "grams" : "",
-        "price" : 0.0,
-        "product_id" : 1,
-        "variant_id" : 1,
-        "quantity" : 1,
-        "title" : ""
-      } ],
-      "total_tax" : "",
-      "currency" : ""
-    }
-  },
-  "type" : "shopify/v1/createOrder"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| currency | STRING |  |
-| note | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| tags | STRING |  |
-| line_items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)&#125;] </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : 1,
-  "currency" : "",
-  "note" : "",
-  "email" : "",
-  "name" : "",
-  "phone" : "",
-  "tags" : "",
-  "line_items" : [ {
-    "fulfillment_status" : "",
-    "grams" : "",
-    "price" : 0.0,
-    "product_id" : 1,
-    "variant_id" : 1,
-    "quantity" : 1,
-    "title" : ""
-  } ]
-}
-```
-
-
-### Delete Order
-Name: deleteOrder
-
-`Deletes an order. Orders that interact with an online gateway can't be deleted.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| orderId | Order ID | INTEGER | ID of the order to delete. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Delete Order",
-  "name" : "deleteOrder",
-  "parameters" : {
-    "orderId" : 1
-  },
-  "type" : "shopify/v1/deleteOrder"
-}
-```
-
-#### Output
-
-This action does not produce any output.
-
-
-
-
-### Cancel an order
+### Cancel Order
 Name: cancelOrder
 
-`Cancels an order. Orders that are paid and have fulfillments can't be canceled.`
+`Cancels an order, with options for refunding, restocking inventory, and customer notification.Order cancellation is irreversible.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| orderId | Order ID | INTEGER | ID of the order to cancel. | true |
+| orderId | Order ID | STRING | ID of the order to cancel. | true |
+| reason | Reason | STRING <details> <summary> Options </summary> <span>CUSTOMER</span>, <span>DECLINED</span>, <span>FRAUD</span>, <span>INVENTORY</span>, <span>OTHER</span>, <span>STAFF</span> </details> | The reason for canceling the order. | true |
+| restock | Restock | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to restock the inventory committed to the order. | true |
+| staffNote | Staff Note | STRING | A staff-facing note about the order cancellation. This is not visible to the customer. | false |
+| originalPaymentMethodsRefund | Original Payment Methods Refund | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to refund to the original payment method. | false |
+| notifyCustomer | Notify Customer | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to send a notification to the customer about the order cancellation. | false |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Cancel an order",
+  "label" : "Cancel Order",
   "name" : "cancelOrder",
   "parameters" : {
-    "orderId" : 1
+    "orderId" : "",
+    "reason" : "",
+    "restock" : false,
+    "staffNote" : "",
+    "originalPaymentMethodsRefund" : false,
+    "notifyCustomer" : false
   },
   "type" : "shopify/v1/cancelOrder"
 }
@@ -183,14 +83,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| currency | STRING |  |
-| note | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| tags | STRING |  |
-| line_items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)&#125;] </details> |  |
+| job | OBJECT <details> <summary> Properties </summary> &#123;BOOLEAN\(done), STRING\(id), STRING\(query)&#125; </details> | The job that asynchronously cancels the order. |
+| userErrors | ARRAY <details> <summary> Items </summary> [&#123;STRING\(field), STRING\(message)&#125;] </details> | The list of errors that occurred from executing the mutation. |
 
 
 
@@ -198,97 +92,14 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "id" : 1,
-  "currency" : "",
-  "note" : "",
-  "email" : "",
-  "name" : "",
-  "phone" : "",
-  "tags" : "",
-  "line_items" : [ {
-    "fulfillment_status" : "",
-    "grams" : "",
-    "price" : 0.0,
-    "product_id" : 1,
-    "variant_id" : 1,
-    "quantity" : 1,
-    "title" : ""
-  } ]
-}
-```
-
-
-### Update Order
-Name: updateOrder
-
-`Update an existing order.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| orderId | Order ID | INTEGER | ID of the order to update. | true |
-| order | Order | OBJECT <details> <summary> Properties </summary> &#123;STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)&#125; </details> |  | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Update Order",
-  "name" : "updateOrder",
-  "parameters" : {
-    "orderId" : 1,
-    "order" : {
-      "note" : "",
-      "email" : "",
-      "phone" : "",
-      "tags" : ""
-    }
+  "job" : {
+    "done" : false,
+    "id" : "",
+    "query" : ""
   },
-  "type" : "shopify/v1/updateOrder"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| currency | STRING |  |
-| note | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| tags | STRING |  |
-| line_items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)&#125;] </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : 1,
-  "currency" : "",
-  "note" : "",
-  "email" : "",
-  "name" : "",
-  "phone" : "",
-  "tags" : "",
-  "line_items" : [ {
-    "fulfillment_status" : "",
-    "grams" : "",
-    "price" : 0.0,
-    "product_id" : 1,
-    "variant_id" : 1,
-    "quantity" : 1,
-    "title" : ""
+  "userErrors" : [ {
+    "field" : "",
+    "message" : ""
   } ]
 }
 ```
@@ -297,13 +108,13 @@ Type: OBJECT
 ### Close Order
 Name: closeOrder
 
-`Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded.`
+`Marks an open Order as closed. A closed order is one where merchants fulfill or cancel all LineItem objects and complete all financial transactions.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| orderId | Order ID | INTEGER | ID of the order to close. | true |
+| orderId | Order ID | STRING | ID of the order to close. | true |
 
 #### Example JSON Structure
 ```json
@@ -311,7 +122,7 @@ Name: closeOrder
   "label" : "Close Order",
   "name" : "closeOrder",
   "parameters" : {
-    "orderId" : 1
+    "orderId" : ""
   },
   "type" : "shopify/v1/closeOrder"
 }
@@ -328,14 +139,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| currency | STRING |  |
-| note | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| tags | STRING |  |
-| line_items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)&#125;] </details> |  |
+| order | OBJECT <details> <summary> Properties </summary> &#123;BOOLEAN\(canMarkAsPaid), &#123;&#125;\(cancelReason), DATE_TIME\(cancelledAt), STRING\(clientIp), BOOLEAN\(confirmed), [STRING\($discountCode)]\(discountCodes)&#125; </details> | The closed order. |
+| userErrors | ARRAY <details> <summary> Items </summary> [&#123;STRING\(field), STRING\(message)&#125;] </details> | The list of errors that occurred from executing the mutation. |
 
 
 
@@ -343,21 +148,268 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "id" : 1,
-  "currency" : "",
-  "note" : "",
-  "email" : "",
+  "order" : {
+    "canMarkAsPaid" : false,
+    "cancelReason" : { },
+    "cancelledAt" : "2021-01-01T00:00:00",
+    "clientIp" : "",
+    "confirmed" : false,
+    "discountCodes" : [ "" ]
+  },
+  "userErrors" : [ {
+    "field" : "",
+    "message" : ""
+  } ]
+}
+```
+
+
+### Create Order
+Name: createOrder
+
+`Creates an order with attributes such as customer information, line items, and shipping and billing addresses.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| products | Products | ARRAY <details> <summary> Items </summary> [&#123;STRING\(productId), INTEGER\(quantity)&#125;\($product)] </details> | List of products you want to order. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Order",
+  "name" : "createOrder",
+  "parameters" : {
+    "products" : [ {
+      "productId" : "",
+      "quantity" : 1
+    } ]
+  },
+  "type" : "shopify/v1/createOrder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| order | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), &#123;[&#123;STRING\(id), STRING\(title), INTEGER\(quantity), &#123;STRING\(id)&#125;\(variant)&#125;]\(nodes)&#125;\(lineItems)&#125; </details> | The created order. |
+| userErrors | ARRAY <details> <summary> Items </summary> [&#123;STRING\(field), STRING\(message)&#125;] </details> | The list of errors that occurred from executing the mutation. |
+
+
+
+
+#### Output Example
+```json
+{
+  "order" : {
+    "id" : "",
+    "lineItems" : {
+      "nodes" : [ {
+        "id" : "",
+        "title" : "",
+        "quantity" : 1,
+        "variant" : {
+          "id" : ""
+        }
+      } ]
+    }
+  },
+  "userErrors" : [ {
+    "field" : "",
+    "message" : ""
+  } ]
+}
+```
+
+
+### Delete Order
+Name: deleteOrder
+
+`Deletes an order. Orders that interact with an online gateway can't be deleted.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| orderId | Order ID | STRING | ID of the order to delete. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Order",
+  "name" : "deleteOrder",
+  "parameters" : {
+    "orderId" : ""
+  },
+  "type" : "shopify/v1/deleteOrder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| deletedId | STRING | ID of the deleted order. |
+| userErrors | ARRAY <details> <summary> Items </summary> [&#123;STRING\(field), STRING\(message)&#125;] </details> | The list of errors that occurred from executing the mutation. |
+
+
+
+
+#### Output Example
+```json
+{
+  "deletedId" : "",
+  "userErrors" : [ {
+    "field" : "",
+    "message" : ""
+  } ]
+}
+```
+
+
+### Get Order
+Name: getOrder
+
+`Get order by id.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| orderId | Order ID | STRING | ID of the order you want to fetch. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Order",
+  "name" : "getOrder",
+  "parameters" : {
+    "orderId" : ""
+  },
+  "type" : "shopify/v1/getOrder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Order ID |
+| name | STRING | Order name |
+| totalPriceSet | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(amount)&#125;\(presentmentMoney)&#125; </details> | The total price of the order, before returns, in shop and presentment currencies. |
+| displayFulfillmentStatus | STRING | Fulfillment status of the order. |
+| customer | OBJECT <details> <summary> Properties </summary> &#123;STRING\(email), STRING\(phone)&#125; </details> | Customer information. |
+| lineItems | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(id), STRING\(name)&#125;]\(nodes)&#125; </details> | A list of the order's line items. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
   "name" : "",
-  "phone" : "",
-  "tags" : "",
-  "line_items" : [ {
-    "fulfillment_status" : "",
-    "grams" : "",
-    "price" : 0.0,
-    "product_id" : 1,
-    "variant_id" : 1,
-    "quantity" : 1,
-    "title" : ""
+  "totalPriceSet" : {
+    "presentmentMoney" : {
+      "amount" : ""
+    }
+  },
+  "displayFulfillmentStatus" : "",
+  "customer" : {
+    "email" : "",
+    "phone" : ""
+  },
+  "lineItems" : {
+    "nodes" : [ {
+      "id" : "",
+      "name" : ""
+    } ]
+  }
+}
+```
+
+
+### Update Order
+Name: updateOrder
+
+`Update an existing order.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| orderId | Order ID | STRING | ID of the order to update. | true |
+| note | Note | STRING | An optional note that a shop owner can attach to the order. | false |
+| email | Email | STRING | The customer's email address. | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING\($tag)] </details> | Tags attached to the order. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Order",
+  "name" : "updateOrder",
+  "parameters" : {
+    "orderId" : "",
+    "note" : "",
+    "email" : "",
+    "tags" : [ "" ]
+  },
+  "type" : "shopify/v1/updateOrder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| order | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(note), STRING\(email), [STRING]\(tags)&#125; </details> | The updated order. |
+| userErrors | ARRAY <details> <summary> Items </summary> [&#123;STRING\(field), STRING\(message)&#125;] </details> | The list of errors that occurred from executing the mutation. |
+
+
+
+
+#### Output Example
+```json
+{
+  "order" : {
+    "id" : "",
+    "note" : "",
+    "email" : "",
+    "tags" : [ "" ]
+  },
+  "userErrors" : [ {
+    "field" : "",
+    "message" : ""
   } ]
 }
 ```
@@ -377,26 +429,7 @@ Type: DYNAMIC_WEBHOOK
 
 #### Output
 
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| currency | STRING |  |
-| note | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| tags | STRING |  |
-| line_items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)&#125;] </details> |  |
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -418,26 +451,7 @@ Type: DYNAMIC_WEBHOOK
 
 #### Output
 
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| currency | STRING |  |
-| note | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| tags | STRING |  |
-| line_items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)&#125;] </details> |  |
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -459,26 +473,7 @@ Type: DYNAMIC_WEBHOOK
 
 #### Output
 
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| currency | STRING |  |
-| note | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| tags | STRING |  |
-| line_items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)&#125;] </details> |  |
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -492,18 +487,76 @@ Type: OBJECT
 
 
 
-## What to do if your action is not listed here?
-
-If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
-
-To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
-
 <hr />
 
 # Additional Instructions
 
 ## Connection Setup
 
+### Create Shopify App (Credentials and Shop Name)
+
+1. Navigate to https://dev.shopify.com/dashboard/.
+2. Click on **Create app**.
+3. Enter App name and click on **Create**.
+4. Enter app and redirect url. Depending on which version of ByteChef you are using enter link or link for **Redirect URL**. And link or link for **App URL**.
+5. Enter required scopes:
+    read_customers,read_draft_orders,read_orders,write_orders,write_products
+and click on **Release**
+6. Click on **Release**.
+7. Click on **Settings**.
+8. Here you can see your credentials.
+9. Click on your account icon.
+10. Click on shop you want to connect to.
+11. Click on **Settings**.
+12. Here you can see your **Shop name**.
+13. Done 🚀.
+
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/11b2d3f5-3d31-40af-be00-c5845ab71165?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+    <iframe src="https://www.guidejar.com/embed/14813747-a521-4abe-a5d4-077b94f25c78?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
+
+### Install Shopify App
+
+1. Navigate to https://dev.shopify.com/dashboard/.
+2. Click your app.
+3. Click on **Install app**.
+4. Choose Shopify store you want to install your app in.
+5. Click on **Install**.
+6. Click on **Settings**.
+7. Click on **Apps and sales channels**.
+8. Here you can see your app is installed.
+9. Done. 🚀
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/980d4914-8f34-429d-8064-9daf53070d9d?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
+
+### Enable Read All Orders Permission
+
+1. Navigate to https://partners.shopify.com/organizations.
+2. Choose your organization.
+3. Click on your app.
+4. Click on **API access requests**.
+5. Click on **Choose distribution**.
+6. Click on **Custom Distribution**.
+7. Click on **Select**.
+8. Click on **Select custom distribution**.
+9. Enter your **Shop name** here. In this example it is `bytechef-test-store.myshopify.com`.
+10. Click on **Generate link**.
+11. Click on **Generate link**.
+12. Click on **API access requests**.
+13. Click on **Request access** under **Read all orders scope**.
+14. Enter reason here.
+15. Click on **Request access**.
+16. Navigate to https://dev.shopify.com/dashboard/.
+17. Click on your app.
+18. Click on **Versions**.
+19. Click **Create a version**.
+20. Add `read_all_orders` to scopes.
+21. Click on **Release**.
+22. Click on **Release**.
+23. Done 🚀.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/ef35fc0e-cfd2-4233-899a-c1745f181246?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
 </div>

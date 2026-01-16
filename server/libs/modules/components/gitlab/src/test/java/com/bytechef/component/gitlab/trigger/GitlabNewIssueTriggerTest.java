@@ -34,7 +34,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,7 +44,7 @@ import org.mockito.ArgumentCaptor;
  */
 class GitlabNewIssueTriggerTest {
 
-    protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    protected Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
@@ -75,7 +75,7 @@ class GitlabNewIssueTriggerTest {
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
         Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        Instant webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, Object> expectedParameters = Map.of(ID, 123);
 

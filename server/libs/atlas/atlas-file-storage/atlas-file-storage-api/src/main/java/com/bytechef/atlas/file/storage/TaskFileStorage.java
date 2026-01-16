@@ -38,5 +38,5 @@ public interface TaskFileStorage {
 
     FileEntry storeJobOutputs(long jobId, Map<String, ?> outputs);
 
-    FileEntry storeTaskExecutionOutput(long taskExecutionId, Object output);
+    FileEntry storeTaskExecutionOutput(long jobId, long taskExecutionId, Object output);
 }

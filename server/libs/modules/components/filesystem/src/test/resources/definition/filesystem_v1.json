@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.",
     "help": null,
@@ -63,10 +66,15 @@
     "perform": { },
     "processErrorResponse": null,
     "properties": null,
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Temp Directory",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a directory.",
     "help": null,
@@ -151,10 +159,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.",
     "help": null,
@@ -239,10 +252,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Parent Folder",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Lists the content of a directory for the given path.",
     "help": null,
@@ -515,10 +533,15 @@
       "required": null,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "List",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads all data from a specified file path and outputs it in file entry format.",
     "help": null,
@@ -767,10 +790,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Read File",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Permanently removes the content of a directory.",
     "help": null,
@@ -859,10 +887,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Remove",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
     "help": null,
@@ -1089,14 +1122,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Write to File",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createTempDir",
     "description": "Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.",
     "element": { },
     "help": null,
-    "name": "createTempDir",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1155,18 +1190,18 @@
     "properties": [ ],
     "title": "Create Temp Directory",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "mkdir",
     "description": "Creates a directory.",
     "element": { },
     "help": null,
-    "name": "mkdir",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1247,18 +1282,18 @@
     } ],
     "title": "Create",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getFilePath",
     "description": "Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.",
     "element": { },
     "help": null,
-    "name": "getFilePath",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1339,18 +1374,18 @@
     } ],
     "title": "Get Parent Folder",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "ls",
     "description": "Lists the content of a directory for the given path.",
     "element": { },
     "help": null,
-    "name": "ls",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1619,18 +1654,18 @@
     } ],
     "title": "List",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "readFile",
     "description": "Reads all data from a specified file path and outputs it in file entry format.",
     "element": { },
     "help": null,
-    "name": "readFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1875,18 +1910,18 @@
     } ],
     "title": "Read File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "rm",
     "description": "Permanently removes the content of a directory.",
     "element": { },
     "help": null,
-    "name": "rm",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1971,18 +2006,18 @@
     } ],
     "title": "Remove",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "writeFile",
     "description": null,
     "element": { },
     "help": null,
-    "name": "writeFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2205,17 +2240,17 @@
     } ],
     "title": "Write to File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

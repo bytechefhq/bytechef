@@ -18,7 +18,7 @@ package com.bytechef.platform.workflow.execution.dto;
 
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;

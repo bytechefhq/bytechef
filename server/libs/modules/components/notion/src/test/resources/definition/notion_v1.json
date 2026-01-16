@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new item in Notion database.",
     "help": null,
@@ -40,6 +43,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -51,7 +55,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     }, {
@@ -77,10 +80,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Database Item",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new page that is a child of an existing page.",
     "help": null,
@@ -1676,10 +1684,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Page",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve database information by database ID.",
     "help": null,
@@ -2829,10 +2842,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Database",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve page properties using page ID. Response does not contain page content.",
     "help": null,
@@ -4406,10 +4424,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Page",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update specific fields in a Notion database item.",
     "help": null,
@@ -4471,6 +4494,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -4482,18 +4506,19 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Database Item",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createDatabaseItem",
     "description": "Creates a new item in Notion database.",
     "element": { },
     "help": null,
-    "name": "createDatabaseItem",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -4527,6 +4552,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -4538,7 +4564,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     }, {
@@ -4566,18 +4591,18 @@
     } ],
     "title": "Create Database Item",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createPage",
     "description": "Creates a new page that is a child of an existing page.",
     "element": { },
     "help": null,
-    "name": "createPage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6169,18 +6194,18 @@
     } ],
     "title": "Create Page",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getDatabase",
     "description": "Retrieve database information by database ID.",
     "element": { },
     "help": null,
-    "name": "getDatabase",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7326,18 +7351,18 @@
     } ],
     "title": "Get Database",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getPage",
     "description": "Retrieve page properties using page ID. Response does not contain page content.",
     "element": { },
     "help": null,
-    "name": "getPage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8907,18 +8932,18 @@
     } ],
     "title": "Get Page",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateDatabaseItem",
     "description": "Update specific fields in a Notion database item.",
     "element": { },
     "help": null,
-    "name": "updateDatabaseItem",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -8974,6 +8999,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -8985,23 +9011,22 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Update Database Item",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

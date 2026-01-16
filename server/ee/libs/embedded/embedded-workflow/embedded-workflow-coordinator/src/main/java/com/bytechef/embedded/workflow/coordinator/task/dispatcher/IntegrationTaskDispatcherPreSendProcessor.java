@@ -25,7 +25,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -52,13 +53,15 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationService integrationService;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
 
     @SuppressFBWarnings("EI")
     public IntegrationTaskDispatcherPreSendProcessor(
         JobService jobService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         PrincipalJobService principalJobService, IntegrationInstanceService integrationInstanceService,
-        IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService) {
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
 
         super(integrationInstanceConfigurationWorkflowService);
 
@@ -67,6 +70,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationService = integrationService;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
     }
 
     @Override
@@ -74,7 +78,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long integrationInstanceId = principalJobService.getJobPrincipalId(
-            Validate.notNull(job.getId(), "id"), ModeType.EMBEDDED);
+            Validate.notNull(job.getId(), "id"), PlatformType.EMBEDDED);
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_ID, integrationInstanceId);
 
@@ -121,8 +125,13 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_WORKFLOW_ID, integrationInstanceWorkflow.getId());
 
-        taskExecution.putMetadata(MetadataConstants.TYPE, ModeType.EMBEDDED);
+        taskExecution.putMetadata(MetadataConstants.TYPE, PlatformType.EMBEDDED);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
+
+        int environmentId = (int) jobPrincipalAccessorRegistry
+            .getJobPrincipalAccessor(PlatformType.EMBEDDED)
+            .getEnvironmentId(integrationInstanceId);
+        taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
         return taskExecution;
     }
@@ -132,7 +141,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long integrationInstanceId = OptionalUtils.orElse(
-            principalJobService.fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), ModeType.EMBEDDED), null);
+            principalJobService.fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), PlatformType.EMBEDDED), null);
 
         return integrationInstanceId != null;
     }

@@ -1,7 +1,7 @@
 import {
     DeleteClusterElementParameter200Response,
     DeleteClusterElementParameterOperationRequest,
-    DeleteWorkflowNodeParameterOperationRequest,
+    DeleteWorkflowNodeParameterRequest,
     UpdateClusterElementParameterOperationRequest,
     UpdateWorkflowNodeParameterOperationRequest,
     WorkflowNodeParameterApi,
@@ -11,14 +11,14 @@ import {useMutation} from '@tanstack/react-query';
 interface DeleteWorkflowNodeParameterProps {
     onSuccess?: (
         result: DeleteClusterElementParameter200Response,
-        variables: DeleteWorkflowNodeParameterOperationRequest
+        variables: DeleteWorkflowNodeParameterRequest
     ) => void;
-    onError?: (error: Error, variables: DeleteWorkflowNodeParameterOperationRequest) => void;
+    onError?: (error: Error, variables: DeleteWorkflowNodeParameterRequest) => void;
 }
 
 export const useDeleteWorkflowNodeParameterMutation = (mutationProps?: DeleteWorkflowNodeParameterProps) =>
     useMutation({
-        mutationFn: (request: DeleteWorkflowNodeParameterOperationRequest) => {
+        mutationFn: (request: DeleteWorkflowNodeParameterRequest) => {
             return new WorkflowNodeParameterApi().deleteWorkflowNodeParameter(request);
         },
         onError: mutationProps?.onError,

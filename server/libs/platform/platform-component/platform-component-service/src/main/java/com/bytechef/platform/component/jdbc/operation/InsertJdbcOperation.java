@@ -26,7 +26,6 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.util.SqlUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic

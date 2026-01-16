@@ -1,0 +1,27 @@
+extend type Query {
+    clusterElementDefinition(componentName: String!, componentVersion: Int!, clusterElementName: String!): ClusterElementDefinition!
+    clusterElementDefinitions(rootComponentName: String!, rootComponentVersion: Int!, clusterElementType: String!): [ClusterElementDefinition!]!
+}
+
+type ClusterElementDefinition {
+    componentName: String
+    componentVersion: Int
+    description: String
+    help: Help
+    icon: String
+    name: String!
+    outputDefined: Boolean!
+    outputFunctionDefined: Boolean!
+    outputSchemaDefined: Boolean
+    properties: [Property!]!
+    title: String
+    type: ClusterElementType
+}
+
+type ClusterElementType {
+    key: String
+    label: String
+    multipleElements: Boolean
+    name: String
+    required: Boolean
+}

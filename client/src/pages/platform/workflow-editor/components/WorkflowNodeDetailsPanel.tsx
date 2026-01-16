@@ -571,8 +571,7 @@ const WorkflowNodeDetailsPanel = ({
             currentComponentDefinition?.connection &&
             currentComponentDefinition?.name &&
             currentComponentDefinition?.version &&
-            currentNode?.workflowNodeName &&
-            !currentNode?.clusterElementType
+            currentNode?.workflowNodeName
         ) {
             return [
                 {
@@ -592,7 +591,6 @@ const WorkflowNodeDetailsPanel = ({
         currentComponentDefinition?.connectionRequired,
         currentComponentDefinition?.name,
         currentComponentDefinition?.version,
-        currentNode?.clusterElementType,
         currentNode?.clusterRoot,
         currentNode?.connections,
         currentNode?.isNestedClusterRoot,
@@ -605,11 +603,7 @@ const WorkflowNodeDetailsPanel = ({
         () =>
             TABS.filter(({name}) => {
                 if (name === 'connection') {
-                    return (
-                        (currentWorkflowNodeConnections.length > 0 ||
-                            currentComponentDefinition?.connection !== undefined) &&
-                        !currentNode?.clusterElementType
-                    );
+                    return currentWorkflowNodeConnections.length > 0;
                 }
 
                 if (name === 'output') {
@@ -625,7 +619,6 @@ const WorkflowNodeDetailsPanel = ({
                 return true;
             }),
         [
-            currentComponentDefinition,
             currentNode,
             currentOperationProperties,
             currentTaskDispatcherDefinition,
@@ -1014,11 +1007,7 @@ const WorkflowNodeDetailsPanel = ({
 
     // Tab switching logic
     useEffect(() => {
-        if (
-            activeTab === 'connection' &&
-            ((currentWorkflowNodeConnections.length === 0 && currentComponentDefinition?.connection === undefined) ||
-                currentNode?.clusterElementType)
-        ) {
+        if (activeTab === 'connection' && currentWorkflowNodeConnections.length === 0) {
             setActiveTab('description');
 
             return;
@@ -1418,8 +1407,7 @@ const WorkflowNodeDetailsPanel = ({
                                     (currentWorkflowNodeConnections.length > 0 ||
                                         currentComponentDefinition?.connection !== undefined) &&
                                     currentNode &&
-                                    currentComponentDefinition &&
-                                    !currentNode?.clusterElementType && (
+                                    currentComponentDefinition && (
                                         <ConnectionTab
                                             componentConnections={currentWorkflowNodeConnections}
                                             currentComponentDefinition={currentComponentDefinition}

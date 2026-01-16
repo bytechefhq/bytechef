@@ -21,34 +21,27 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
 public class InMemoryJobRepository implements JobRepository {
 
-    private static final String CACHE = InMemoryJobRepository.class.getName() + ".job";
-
-    private final CacheManager cacheManager;
+    private final ConcurrentHashMap<String, Job> cache = new ConcurrentHashMap<>();
     private final InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository;
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
     public InMemoryJobRepository(
-        CacheManager cacheManager, InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository,
-        ObjectMapper objectMapper) {
+        InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository, ObjectMapper objectMapper) {
 
-        this.cacheManager = cacheManager;
         this.inMemoryTaskExecutionRepository = inMemoryTaskExecutionRepository;
         this.objectMapper = objectMapper;
     }
@@ -70,9 +63,7 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public void deleteById(Long id) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
-
-        cache.evict(TenantCacheKeyUtils.getKey(id));
+        cache.remove(TenantCacheKeyUtils.getKey(id));
     }
 
     @Override
@@ -92,9 +83,7 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Optional<Job> findById(Long id) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
-
-        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(id), Job.class));
+        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(id)));
     }
 
     @Override
@@ -117,9 +106,7 @@ public class InMemoryJobRepository implements JobRepository {
         TaskExecution taskExecution = inMemoryTaskExecutionRepository.findById(taskExecutionId)
             .orElseThrow(() -> new IllegalArgumentException("TaskExecution not found: " + taskExecutionId));
 
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
-
-        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(taskExecution.getJobId()), Job.class));
+        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(taskExecution.getJobId())));
     }
 
     @Override
@@ -128,17 +115,11 @@ public class InMemoryJobRepository implements JobRepository {
             job.setId(Math.abs(Math.max(RandomUtils.nextLong(), Long.MIN_VALUE + 1)));
         }
 
-        try {
-            // Emulate identical behaviour when storing in db by serialization and deserialization
+        // Emulate identical behaviour when storing in db by serialization and deserialization
 
-            Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
-
-            cache.put(
-                TenantCacheKeyUtils.getKey(job.getId()),
-                objectMapper.readValue(objectMapper.writeValueAsString(job), Job.class));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        cache.put(
+            TenantCacheKeyUtils.getKey(job.getId()),
+            objectMapper.readValue(objectMapper.writeValueAsString(job), Job.class));
 
         return job;
     }

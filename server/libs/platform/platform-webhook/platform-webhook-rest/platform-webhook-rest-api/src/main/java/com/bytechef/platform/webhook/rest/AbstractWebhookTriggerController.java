@@ -24,10 +24,10 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.XmlUtils;
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.definition.WebhookResponse;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -40,8 +40,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,6 +54,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -62,7 +62,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MimeType;
 import org.springframework.util.MultiValueMap;
@@ -71,6 +70,7 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.util.ForwardedHeaderUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
@@ -140,7 +140,7 @@ public abstract class AbstractWebhookTriggerController {
         } else if (webhookTriggerFlags.workflowSyncValidation()) {
             responseEntity = validateAndExecuteAsync(workflowExecutionId, webhookRequest);
         } else {
-            webhookWorkflowExecutor.execute(workflowExecutionId, webhookRequest);
+            webhookWorkflowExecutor.executeAsync(workflowExecutionId, webhookRequest);
 
             responseEntity = ResponseEntity.ok()
                 .build();
@@ -228,7 +228,7 @@ public abstract class AbstractWebhookTriggerController {
             }
 
             body = new WebhookBodyImpl(
-                multipartFormDataMap, ContentType.FORM_DATA, httpServletRequest.getContentType(), null);
+                parseMap(multipartFormDataMap), ContentType.FORM_DATA, httpServletRequest.getContentType(), null);
             parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
         } else if (contentType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
             Map<String, String[]> parameterMap = new HashMap<>(httpServletRequest.getParameterMap());
@@ -242,8 +242,7 @@ public abstract class AbstractWebhookTriggerController {
             }
 
             body = new WebhookBodyImpl(
-                parseFormUrlencodedParams(parameterMap), ContentType.FORM_URL_ENCODED,
-                httpServletRequest.getContentType(), null);
+                parseMap(parameterMap), ContentType.FORM_URL_ENCODED, httpServletRequest.getContentType(), null);
             parameters = new HashMap<>(queryParams);
         } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
             try (InputStream inputStream = httpServletRequest.getInputStream()) {
@@ -346,15 +345,15 @@ public abstract class AbstractWebhookTriggerController {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, ?> parseFormUrlencodedParams(Map<String, String[]> parameterMap) {
+    private Map<String, ?> parseMap(Map<String, ?> map) {
         Map<String, Object> multiMap = new HashMap<>();
 
-        for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
             String key = entry.getKey();
-            String[] values = entry.getValue();
+            Object value = entry.getValue();
 
-            // Split the key on [
-            String[] keys = key.split("\\[");
+            // Split the key on [ or .
+            String[] keys = key.split("\\[|\\.");
 
             Map<String, Object> currentMap = multiMap;
 
@@ -369,15 +368,25 @@ public abstract class AbstractWebhookTriggerController {
                 if (i == keys.length - 1) {
                     // If we're at the last key, add the value
 
-                    List<Object> convertedValues = Arrays.stream(values)
-                        .map(string -> (string == null || string.isBlank()) ? null : ConvertUtils.convertString(string))
-                        .toList();
+                    List<Object> values;
+
+                    if (value instanceof Object[] objects) {
+                        values = Arrays.stream(objects)
+                            .map(this::convertValue)
+                            .toList();
+                    } else if (value instanceof List<?> list) {
+                        values = list.stream()
+                            .map(this::convertValue)
+                            .toList();
+                    } else {
+                        values = List.of(convertValue(value));
+                    }
 
                     currentMap.put(
                         currentKey,
-                        convertedValues.isEmpty()
+                        values.isEmpty()
                             ? null
-                            : convertedValues.size() == 1 ? convertedValues.getFirst() : convertedValues);
+                            : values.size() == 1 ? values.getFirst() : values);
                 } else {
                     // Otherwise, add a new map if one doesn't already exist
                     currentMap.putIfAbsent(currentKey, new HashMap<String, Object>());
@@ -388,6 +397,18 @@ public abstract class AbstractWebhookTriggerController {
         }
 
         return multiMap;
+    }
+
+    private Object convertValue(Object value) {
+        if (value instanceof String string) {
+            if (string.isBlank()) {
+                return string;
+            }
+
+            return ConvertUtils.convertString(string);
+        }
+
+        return value;
     }
 
     private ResponseEntity<Object> processWebhookResponse(
@@ -412,7 +433,10 @@ public abstract class AbstractWebhookTriggerController {
                 @SuppressWarnings("unchecked")
                 FileEntry fileEntry = new FileEntry((Map<String, ?>) webhookResponse.getBody());
 
-                bodyBuilder.contentType(MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())));
+                bodyBuilder.contentType(
+                    fileEntry.getMimeType() == null
+                        ? MediaType.APPLICATION_OCTET_STREAM
+                        : MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())));
 
                 responseEntity = bodyBuilder.body(new InputStreamResource(tempFileStorage.getInputStream(fileEntry)));
 

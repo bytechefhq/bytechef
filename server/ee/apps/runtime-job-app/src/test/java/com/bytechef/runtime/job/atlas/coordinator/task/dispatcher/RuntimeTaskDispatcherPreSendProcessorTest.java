@@ -15,7 +15,6 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.runtime.job.platform.connection.ConnectionContext;
 import java.util.HashMap;
@@ -25,7 +24,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.jackson.JsonComponentModule;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -40,16 +39,16 @@ class RuntimeTaskDispatcherPreSendProcessorTest {
     private RuntimeTaskDispatcherPreSendProcessor processor;
 
     @BeforeAll
-    static void setUpUtils() {
-        JacksonConfiguration jacksonConfiguration = new JacksonConfiguration(new JsonComponentModule());
+    static void beforeAll() {
+        JsonMapper jsonMapper = JsonMapper.builder()
+            .build();
 
-        JsonUtils.setObjectMapper(jacksonConfiguration.objectMapper());
-        MapUtils.setObjectMapper(jacksonConfiguration.objectMapper());
+        JsonUtils.setObjectMapper(jsonMapper);
+        MapUtils.setObjectMapper(jsonMapper);
     }
 
     @BeforeEach
-    void setUp() {
-        // Setup mock application arguments with connection parameters
+    void beforeEach() {
         applicationArguments = mock(ApplicationArguments.class);
 
         List<String> connectionValues = List.of(

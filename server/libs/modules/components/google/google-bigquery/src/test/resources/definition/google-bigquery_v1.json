@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Runs a BigQuery SQL query synchronously and returns query results if the query completes within a specified timeout.",
     "help": null,
@@ -2566,14 +2569,16 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Query",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "query",
     "description": "Runs a BigQuery SQL query synchronously and returns query results if the query completes within a specified timeout.",
     "element": { },
     "help": null,
-    "name": "query",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5135,17 +5140,17 @@
     } ],
     "title": "Query",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -71,9 +71,9 @@ public class TaskCoordinator {
     @SuppressFBWarnings("EI")
     public TaskCoordinator(
         List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners,
-        ApplicationEventPublisher eventPublisher,
-        JobExecutor jobExecutor, JobService jobService, TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+        ApplicationEventPublisher eventPublisher, JobExecutor jobExecutor, JobService jobService,
+        TaskCompletionHandler taskCompletionHandler, TaskDispatcher<? super Task> taskDispatcher,
+        TaskExecutionService taskExecutionService) {
 
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;

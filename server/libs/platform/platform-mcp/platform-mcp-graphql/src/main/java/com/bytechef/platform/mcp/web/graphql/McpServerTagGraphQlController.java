@@ -18,7 +18,7 @@ package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.tag.domain.Tag;
@@ -48,7 +48,7 @@ public class McpServerTagGraphQlController {
     }
 
     @QueryMapping
-    public List<Tag> mcpServerTags(@Argument(name = "type") ModeType type) {
+    public List<Tag> mcpServerTags(@Argument(name = "type") PlatformType type) {
         if (type == null) {
             return List.of();
         }

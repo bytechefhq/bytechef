@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Fetch top stories from Hacker News.",
     "help": null,
@@ -528,14 +531,16 @@
       "required": true,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Fetch Top Stories",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "fetchTopStories",
     "description": "Fetch top stories from Hacker News.",
     "element": { },
     "help": null,
-    "name": "fetchTopStories",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1059,17 +1064,17 @@
     } ],
     "title": "Fetch Top Stories",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Social Media",
-    "name": "social-media"
+    "name": "social-media",
+    "label": "Social Media"
   } ],
   "connection": null,
   "customAction": null,

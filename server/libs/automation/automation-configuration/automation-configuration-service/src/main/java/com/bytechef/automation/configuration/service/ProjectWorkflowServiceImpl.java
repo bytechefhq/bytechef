@@ -131,7 +131,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public String getProjectDeploymentWorkflowId(long projectDeploymentId, String workflowUuid) {
+    public String getProjectWorkflowWorkflowId(long projectDeploymentId, String workflowUuid) {
         return projectWorkflowRepository
             .findByProjectDeploymentIdAndUuid(projectDeploymentId, UUID.fromString(workflowUuid))
             .map(ProjectWorkflow::getWorkflowId)
@@ -139,7 +139,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public String getProjectDeploymentWorkflowUuid(long projectDeploymentId, String workflowId) {
+    public String getProjectWorkflowUuid(long projectDeploymentId, String workflowId) {
         return projectWorkflowRepository
             .findByProjectDeploymentIdAndWorkflowId(projectDeploymentId, workflowId)
             .map(ProjectWorkflow::getUuidAsString)

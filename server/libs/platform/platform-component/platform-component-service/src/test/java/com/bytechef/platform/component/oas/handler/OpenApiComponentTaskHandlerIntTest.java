@@ -43,7 +43,7 @@ import com.bytechef.platform.component.context.FileEntryImpl;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -754,7 +754,7 @@ public class OpenApiComponentTaskHandlerIntTest {
             .metadata(
                 Map.of(
                     MetadataConstants.CONNECTION_IDS, Map.of("petstore", Validate.notNull(connection.getId(), "id")),
-                    MetadataConstants.TYPE, ModeType.AUTOMATION))
+                    MetadataConstants.TYPE, PlatformType.AUTOMATION))
             .workflowTask(
                 new WorkflowTask(
                     Map.of(

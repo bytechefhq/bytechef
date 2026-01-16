@@ -18,10 +18,10 @@ package com.bytechef.platform.connection.service;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -32,18 +32,18 @@ public interface ConnectionService {
 
     Connection create(
         @Nullable AuthorizationType authorizationType, String componentName, int connectionVersion,
-        int environmentId, String name, Map<String, Object> parameters, ModeType type);
+        int environmentId, String name, Map<String, Object> parameters, PlatformType type);
 
     void delete(long id);
 
     Connection getConnection(long id);
 
-    List<Connection> getConnections(ModeType type);
+    List<Connection> getConnections(PlatformType type);
 
-    List<Connection> getConnections(String componentName, int version, ModeType type);
+    List<Connection> getConnections(String componentName, int version, PlatformType type);
 
     List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, Long environmentId, ModeType type);
+        String componentName, Integer connectionVersion, Long tagId, Long environmentId, PlatformType type);
 
     List<Connection> getConnections(List<Long> connectionIds);
 

@@ -18,14 +18,14 @@ package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Marko Kriskovic
@@ -212,7 +212,7 @@ public class WorkflowValidator {
         JsonNode tasksJsonNode = workflowNode.get("tasks");
 
         if (tasksJsonNode != null && tasksJsonNode.isArray()) {
-            Iterator<JsonNode> elements = tasksJsonNode.elements();
+            Iterator<JsonNode> elements = tasksJsonNode.iterator();
 
             elements.forEachRemaining(taskJsonNode -> {
                 Stream<JsonNode> stream = taskJsonNodes.stream();
@@ -249,7 +249,7 @@ public class WorkflowValidator {
         JsonNode triggersJsonNode = workflowNode.get("triggers");
 
         if (triggersJsonNode != null && triggersJsonNode.isArray()) {
-            Iterator<JsonNode> triggersJsonNodeIterator = triggersJsonNode.elements();
+            Iterator<JsonNode> triggersJsonNodeIterator = triggersJsonNode.iterator();
 
             triggersJsonNodeIterator.forEachRemaining(triggerJsonNode -> {
                 if (taskJsonNodes.isEmpty()) {

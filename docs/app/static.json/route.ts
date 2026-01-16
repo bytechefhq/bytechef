@@ -6,27 +6,30 @@ export const revalidate = false;
 
 export async function GET(): Promise<Response> {
   const pages = source.getPages();
-  const results = pages
-    .filter((page) => page.slugs[0] !== 'openapi')
-    .map((page) => {
-      const { structuredData } = page.data;
-      const items = getBreadcrumbItems(page.url, source.pageTree, {
-        includePage: false,
-        includeRoot: true,
-      });
+  const promises = pages.map(async (page) => {
+    if (page.data.type === 'openapi') return;
 
-      return {
-        id: page.url,
-        structured: structuredData,
-        tag: page.slugs[0],
-        url: page.url,
-        title: page.data.title,
-        description: page.data.description,
-        breadcrumbs: items.flatMap<string>((item, i) =>
-          i > 0 && typeof item.name === 'string' ? item.name : [],
-        ),
-      } satisfies OramaDocument;
+    const items = getBreadcrumbItems(page.url, source.pageTree, {
+      includePage: false,
+      includeRoot: true,
     });
 
-  return Response.json(results);
+    return {
+      id: page.url,
+      structured: (await page.data.load()).structuredData,
+      tag: page.slugs[0],
+      url: page.url,
+      title: page.data.title,
+      description: page.data.description,
+      breadcrumbs: items.flatMap<string>((item, i) =>
+        i > 0 && typeof item.name === 'string' ? item.name : [],
+      ),
+    } as OramaDocument;
+  });
+
+  return Response.json(
+    (await Promise.all(promises)).filter(
+      (v) => v !== undefined,
+    ) as OramaDocument[],
+  );
 }

@@ -77,9 +77,9 @@ public class FileEntryTest {
         FileEntry original = new FileEntry("LICENSE", "base64:///tmp/LICENSE");
 
         Assertions.assertThat(original.getExtension())
-            .isNull();
+            .isEqualTo("bin");
         Assertions.assertThat(original.getMimeType())
-            .isNull();
+            .isEqualTo("application/octet-stream");
 
         String id = original.toId();
 
@@ -92,9 +92,9 @@ public class FileEntryTest {
         Assertions.assertThat(parsed)
             .isEqualTo(original);
         Assertions.assertThat(parsed.getExtension())
-            .isNull();
+            .isEqualTo("bin");
         Assertions.assertThat(parsed.getMimeType())
-            .isNull();
+            .isEqualTo("application/octet-stream");
         Assertions.assertThat(parsed.getName())
             .isEqualTo("LICENSE");
         Assertions.assertThat(parsed.getUrl())
@@ -106,7 +106,7 @@ public class FileEntryTest {
         FileEntry original = new FileEntry(".env", "base64:///tmp/.env");
 
         Assertions.assertThat(original.getExtension())
-            .isNull();
+            .isEqualTo("bin");
 
         String id = original.toId();
 
@@ -115,7 +115,7 @@ public class FileEntryTest {
         Assertions.assertThat(parsed)
             .isEqualTo(original);
         Assertions.assertThat(parsed.getExtension())
-            .isNull();
+            .isEqualTo("bin");
         Assertions.assertThat(parsed.getMimeType())
             .isEqualTo(original.getMimeType());
         Assertions.assertThat(parsed.getName())

@@ -47,10 +47,9 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashSet;
@@ -61,6 +60,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @version ee
@@ -148,7 +148,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
 
-        List<Connection> connections = connectionService.getConnections(ModeType.EMBEDDED);
+        List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED);
         Map<String, ?> workflowMap = JsonUtils.readMap(definition);
 
         checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
@@ -196,7 +196,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         String workflowId = projectWorkflowService
-            .getProjectDeploymentWorkflowId(
+            .getProjectWorkflowWorkflowId(
                 projectDeploymentService.getProjectDeploymentId(connectedUserProject.getProjectId(), environment),
                 workflowUuid);
 
@@ -456,7 +456,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     private Instant getProjectDeploymentLastExecutionDate(long projectDeploymentId) {
         return OptionalUtils.mapOrElse(
-            principalJobService.fetchLastJobId(projectDeploymentId, ModeType.AUTOMATION), this::getJobEndDate, null);
+            principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION), this::getJobEndDate,
+            null);
     }
 
     private Instant getWorkflowLastExecutionDate(String workflowId) {

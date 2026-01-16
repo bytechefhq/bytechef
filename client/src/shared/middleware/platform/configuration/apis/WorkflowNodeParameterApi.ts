@@ -17,7 +17,6 @@ import * as runtime from '../runtime';
 import type {
   DeleteClusterElementParameter200Response,
   DeleteClusterElementParameterRequest,
-  DeleteWorkflowNodeParameterRequest,
   GetClusterElementParameterDisplayConditions200Response,
   UpdateClusterElementParameterRequest,
   UpdateWorkflowNodeParameterRequest,
@@ -27,8 +26,6 @@ import {
     DeleteClusterElementParameter200ResponseToJSON,
     DeleteClusterElementParameterRequestFromJSON,
     DeleteClusterElementParameterRequestToJSON,
-    DeleteWorkflowNodeParameterRequestFromJSON,
-    DeleteWorkflowNodeParameterRequestToJSON,
     GetClusterElementParameterDisplayConditions200ResponseFromJSON,
     GetClusterElementParameterDisplayConditions200ResponseToJSON,
     UpdateClusterElementParameterRequestFromJSON,
@@ -46,11 +43,11 @@ export interface DeleteClusterElementParameterOperationRequest {
     deleteClusterElementParameterRequest: DeleteClusterElementParameterRequest;
 }
 
-export interface DeleteWorkflowNodeParameterOperationRequest {
+export interface DeleteWorkflowNodeParameterRequest {
     id: string;
     workflowNodeName: string;
     environmentId: number;
-    deleteWorkflowNodeParameterRequest: DeleteWorkflowNodeParameterRequest;
+    deleteClusterElementParameterRequest: DeleteClusterElementParameterRequest;
 }
 
 export interface GetClusterElementParameterDisplayConditionsRequest {
@@ -176,7 +173,7 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
      * Deletes a workflow node parameter.
      * Deletes a workflow node parameter
      */
-    async deleteWorkflowNodeParameterRaw(requestParameters: DeleteWorkflowNodeParameterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteClusterElementParameter200Response>> {
+    async deleteWorkflowNodeParameterRaw(requestParameters: DeleteWorkflowNodeParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteClusterElementParameter200Response>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -198,10 +195,10 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['deleteWorkflowNodeParameterRequest'] == null) {
+        if (requestParameters['deleteClusterElementParameterRequest'] == null) {
             throw new runtime.RequiredError(
-                'deleteWorkflowNodeParameterRequest',
-                'Required parameter "deleteWorkflowNodeParameterRequest" was null or undefined when calling deleteWorkflowNodeParameter().'
+                'deleteClusterElementParameterRequest',
+                'Required parameter "deleteClusterElementParameterRequest" was null or undefined when calling deleteWorkflowNodeParameter().'
             );
         }
 
@@ -225,7 +222,7 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-            body: DeleteWorkflowNodeParameterRequestToJSON(requestParameters['deleteWorkflowNodeParameterRequest']),
+            body: DeleteClusterElementParameterRequestToJSON(requestParameters['deleteClusterElementParameterRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => DeleteClusterElementParameter200ResponseFromJSON(jsonValue));
@@ -235,7 +232,7 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
      * Deletes a workflow node parameter.
      * Deletes a workflow node parameter
      */
-    async deleteWorkflowNodeParameter(requestParameters: DeleteWorkflowNodeParameterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DeleteClusterElementParameter200Response> {
+    async deleteWorkflowNodeParameter(requestParameters: DeleteWorkflowNodeParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DeleteClusterElementParameter200Response> {
         const response = await this.deleteWorkflowNodeParameterRaw(requestParameters, initOverrides);
         return await response.value();
     }

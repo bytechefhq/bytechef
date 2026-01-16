@@ -4,12 +4,92 @@ All URIs are relative to */api/platform/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
+| [**deleteWorkflowTestConfigurationConnection**](WorkflowTestConfigurationApi.md#deleteworkflowtestconfigurationconnection) | **DELETE** /workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/{workflowConnectionKey}/connections | Delete a workflow test configuration connection |
 | [**getWorkflowTestConfiguration**](WorkflowTestConfigurationApi.md#getworkflowtestconfiguration) | **GET** /workflow-test-configurations/{workflowId} | Get a workflow test configuration |
 | [**getWorkflowTestConfigurationConnections**](WorkflowTestConfigurationApi.md#getworkflowtestconfigurationconnections) | **GET** /workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/connections | Get a workflow test configuration connections |
 | [**saveWorkflowTestConfiguration**](WorkflowTestConfigurationApi.md#saveworkflowtestconfiguration) | **PUT** /workflow-test-configurations/{workflowId} | Create new or update an existing workflow test configuration |
 | [**saveWorkflowTestConfigurationConnection**](WorkflowTestConfigurationApi.md#saveworkflowtestconfigurationconnectionoperation) | **PUT** /workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/{workflowConnectionKey}/connections | Save a workflow test configuration connection |
 | [**saveWorkflowTestConfigurationInputs**](WorkflowTestConfigurationApi.md#saveworkflowtestconfigurationinputsoperation) | **PUT** /workflow-test-configurations/{workflowId}/inputs | Save a workflow test configuration inputs |
 
+
+
+## deleteWorkflowTestConfigurationConnection
+
+> deleteWorkflowTestConfigurationConnection(workflowId, workflowNodeName, workflowConnectionKey, environmentId, saveWorkflowTestConfigurationConnectionRequest)
+
+Delete a workflow test configuration connection
+
+Delete a workflow test configuration connection.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  WorkflowTestConfigurationApi,
+} from '';
+import type { DeleteWorkflowTestConfigurationConnectionRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new WorkflowTestConfigurationApi();
+
+  const body = {
+    // string | The id of a testing workflow.
+    workflowId: workflowId_example,
+    // string | The action/trigger name defined in the workflow.
+    workflowNodeName: workflowNodeName_example,
+    // string | The key of a connection.
+    workflowConnectionKey: workflowConnectionKey_example,
+    // number | The id of an environment.
+    environmentId: 789,
+    // SaveWorkflowTestConfigurationConnectionRequest
+    saveWorkflowTestConfigurationConnectionRequest: ...,
+  } satisfies DeleteWorkflowTestConfigurationConnectionRequest;
+
+  try {
+    const data = await api.deleteWorkflowTestConfigurationConnection(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **workflowId** | `string` | The id of a testing workflow. | [Defaults to `undefined`] |
+| **workflowNodeName** | `string` | The action/trigger name defined in the workflow. | [Defaults to `undefined`] |
+| **workflowConnectionKey** | `string` | The key of a connection. | [Defaults to `undefined`] |
+| **environmentId** | `number` | The id of an environment. | [Defaults to `undefined`] |
+| **saveWorkflowTestConfigurationConnectionRequest** | [SaveWorkflowTestConfigurationConnectionRequest](SaveWorkflowTestConfigurationConnectionRequest.md) |  | |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## getWorkflowTestConfiguration

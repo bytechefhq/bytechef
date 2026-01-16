@@ -1,0 +1,26 @@
+extend type Query {
+    workspaceProjectDeployments(
+        workspaceId: ID!
+        environmentId: ID!
+        projectId: ID
+        tagId: ID
+    ): [ProjectDeployment!]!
+}
+
+type ProjectDeployment {
+    id: ID!
+    name: String!
+    description: String
+    enabled: Boolean!
+    environment: Environment!
+    projectId: ID!
+    projectVersion: Int!
+    project: Project!
+    projectDeploymentWorkflows: [ProjectDeploymentWorkflow!]!
+    tags: [Tag]
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int!
+}

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Compress image with specified quality.",
     "help": null,
@@ -375,10 +378,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Compress Image",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Crops an image to the specified dimensions.",
     "help": null,
@@ -807,10 +815,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Crop Image",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get metadata of the image.",
     "help": null,
@@ -951,10 +964,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Image Metadata",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts image to Base64 string.",
     "help": null,
@@ -1121,10 +1139,15 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Image to Base64",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Resizes an image to the specified width and height.",
     "help": null,
@@ -1515,10 +1538,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Resize Image",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Rotates an image by a specified degree.",
     "help": null,
@@ -1902,14 +1930,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Rotate Image",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "compressImage",
     "description": "Compress image with specified quality.",
     "element": { },
     "help": null,
-    "name": "compressImage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2280,18 +2310,18 @@
     } ],
     "title": "Compress Image",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "cropImage",
     "description": "Crops an image to the specified dimensions.",
     "element": { },
     "help": null,
-    "name": "cropImage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2716,18 +2746,18 @@
     } ],
     "title": "Crop Image",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getImageMetadata",
     "description": "Get metadata of the image.",
     "element": { },
     "help": null,
-    "name": "getImageMetadata",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -2864,18 +2894,18 @@
     } ],
     "title": "Get Image Metadata",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "imageToBase64",
     "description": "Converts image to Base64 string.",
     "element": { },
     "help": null,
-    "name": "imageToBase64",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3038,18 +3068,18 @@
     } ],
     "title": "Image to Base64",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "resizeImage",
     "description": "Resizes an image to the specified width and height.",
     "element": { },
     "help": null,
-    "name": "resizeImage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3436,18 +3466,18 @@
     } ],
     "title": "Resize Image",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "rotateImage",
     "description": "Rotates an image by a specified degree.",
     "element": { },
     "help": null,
-    "name": "rotateImage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3827,17 +3857,17 @@
     } ],
     "title": "Rotate Image",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

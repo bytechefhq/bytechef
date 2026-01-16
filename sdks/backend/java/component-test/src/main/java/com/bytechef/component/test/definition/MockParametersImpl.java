@@ -19,7 +19,6 @@ package com.bytechef.component.test.definition;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -32,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.apache.commons.lang3.Validate;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
@@ -158,7 +159,7 @@ public final class MockParametersImpl implements Parameters {
 
     @Override
     public FileEntry getFileEntry(String key) {
-        return MapUtils.get(map, key, FileEntry.class);
+        return (FileEntry) map.get(key);
     }
 
     @Override
@@ -427,7 +428,11 @@ public final class MockParametersImpl implements Parameters {
 
     @Override
     public FileEntry getRequiredFileEntry(String key) {
-        return MapUtils.getRequired(map, key, FileEntry.class);
+        FileEntry value = getFileEntry(key);
+
+        Validate.notNull(value, "Unknown value for : " + key);
+
+        return value;
     }
 
     @Override

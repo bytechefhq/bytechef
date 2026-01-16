@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates feed from website by using website URL.",
     "help": null,
@@ -750,14 +753,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Feed",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createFeed",
     "description": "Creates feed from website by using website URL.",
     "element": { },
     "help": null,
-    "name": "createFeed",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1498,17 +1503,17 @@
     } ],
     "title": "Create Feed",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Social Media",
-    "name": "social-media"
+    "name": "social-media",
+    "label": "Social Media"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -53,7 +53,7 @@ import org.mockito.MockedStatic;
 class MondayNewItemInBoardTriggerTest {
 
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final WebhookEnableOutput mockedDynamicWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final Parameters mockedDynamicWebhookEnableOutput = mock(Parameters.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);

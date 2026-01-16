@@ -17,8 +17,9 @@
 package com.bytechef.component.definition.datastream;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Object representing a context for an {@link ItemStream}. It is a thin wrapper for a map that allows optionally for
@@ -157,8 +158,7 @@ public interface ExecutionContext {
      * @param key The key to get a value for
      * @return The value represented by the given key or {@code null} if the key is not present
      */
-    @Nullable
-    Object get(String key);
+    Optional<Object> get(String key);
 
     /**
      * Typesafe getter for the value represented by the provided key, with cast to given class.
@@ -168,8 +168,7 @@ public interface ExecutionContext {
      * @param <V>  Type of returned value
      * @return The value of given type represented by the given key or {@code null} if the key is not present
      */
-    @Nullable
-    <V> V get(String key, Class<V> type);
+    <V> Optional<V> get(String key, Class<V> type);
 
     /**
      * Typesafe getter for the value represented by the provided key, with cast to given class.
@@ -180,8 +179,7 @@ public interface ExecutionContext {
      * @param <V>          Type of returned value
      * @return The value of given type represented by the given key or the default value if the key is not present
      */
-    @Nullable
-    <V> V get(String key, Class<V> type, @Nullable V defaultValue);
+    <V> Optional<V> get(String key, Class<V> type, @Nullable V defaultValue);
 
     /**
      * Indicates whether or not the context is empty.
@@ -229,8 +227,7 @@ public interface ExecutionContext {
      *
      * @see java.util.Map#remove(Object)
      */
-    @Nullable
-    Object remove(String key);
+    Optional<Object> remove(String key);
 
     /**
      * Indicates whether or not a value is represented in this context.

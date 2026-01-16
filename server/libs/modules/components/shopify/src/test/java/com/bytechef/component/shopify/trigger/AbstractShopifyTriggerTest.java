@@ -16,27 +16,29 @@
 
 package com.bytechef.component.shopify.trigger;
 
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.shopify.util.ShopifyUtils;
+import com.bytechef.component.shopify.util.ShopifyTriggerUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Monika Domiter
  */
-public abstract class AbstractShopifyTriggerTest {
+abstract class AbstractShopifyTriggerTest {
 
-    protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    protected ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);
@@ -44,16 +46,18 @@ public abstract class AbstractShopifyTriggerTest {
     protected Object mockedObject = mock(Object.class);
     protected Parameters mockedParameters = mock(Parameters.class);
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    protected MockedStatic<ShopifyUtils> shopifyUtilsMockedStatic;
+    protected MockedStatic<ShopifyTriggerUtils> shopifyTriggerUtilsMockedStatic;
+    protected ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     protected String workflowExecutionId = "testWorkflowExecutionId";
 
     @BeforeEach
-    public void beforeEach() {
-        shopifyUtilsMockedStatic = mockStatic(ShopifyUtils.class);
+    void beforeEach() {
+        shopifyTriggerUtilsMockedStatic = mockStatic(ShopifyTriggerUtils.class);
     }
 
     @AfterEach
-    public void afterEach() {
-        shopifyUtilsMockedStatic.close();
+    void afterEach() {
+        shopifyTriggerUtilsMockedStatic.close();
     }
+
 }

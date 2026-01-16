@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a new SMS message",
     "help": null,
@@ -1417,10 +1420,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send SMS",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a new WhatsApp message.",
     "help": null,
@@ -2928,14 +2936,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Send WhatsApp Message",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendSMS",
     "description": "Send a new SMS message",
     "element": { },
     "help": null,
-    "name": "sendSMS",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4348,18 +4358,18 @@
     } ],
     "title": "Send SMS",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendWhatsAppMessage",
     "description": "Send a new WhatsApp message.",
     "element": { },
     "help": null,
-    "name": "sendWhatsAppMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5863,17 +5873,17 @@
     } ],
     "title": "Send WhatsApp Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads data from the file as string.",
     "help": null,
@@ -167,10 +170,15 @@
       "required": true,
       "type": "FILE_ENTRY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Read from File as String",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the data to the file.",
     "help": null,
@@ -441,10 +449,15 @@
       "required": null,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Write to File",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Download a file from the URL.",
     "help": null,
@@ -715,14 +728,16 @@
       "required": null,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Download File",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "read",
     "description": "Reads data from the file as string.",
     "element": { },
     "help": null,
-    "name": "read",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -885,18 +900,18 @@
     } ],
     "title": "Read from File as String",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "write",
     "description": "Writes the data to the file.",
     "element": { },
     "help": null,
-    "name": "write",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1163,20 +1178,20 @@
     } ],
     "title": "Write to File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   }, {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

@@ -19,7 +19,6 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -31,7 +30,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
@@ -40,8 +40,9 @@ public final class ParametersImpl implements Parameters {
 
     private final Map<String, Object> map;
 
+    @SuppressWarnings("unchecked")
     public ParametersImpl(Map<String, ?> map) {
-        this.map = Collections.unmodifiableMap(map);
+        this.map = map == null ? Collections.emptyMap() : (Map<String, Object>) Collections.unmodifiableMap(map);
     }
 
     @Override
@@ -196,8 +197,7 @@ public final class ParametersImpl implements Parameters {
         return MapUtils.getFromPath(map, path, new TypeReference<>() {
 
             @Override
-            @NonNull
-            public Type getType() {
+            public @NonNull Type getType() {
                 return elementTypeReference.getType();
             }
         });
@@ -209,8 +209,7 @@ public final class ParametersImpl implements Parameters {
         return MapUtils.getFromPath(map, path, new TypeReference<>() {
 
             @Override
-            @NonNull
-            public Type getType() {
+            public @NonNull Type getType() {
                 return elementTypeReference.getType();
             }
         }, defaultValue);
@@ -246,8 +245,7 @@ public final class ParametersImpl implements Parameters {
         return MapUtils.getList(map, key, new TypeReference<>() {
 
             @Override
-            @NonNull
-            public Type getType() {
+            public @NonNull Type getType() {
                 return elementTypeReference.getType();
             }
         });
@@ -264,8 +262,7 @@ public final class ParametersImpl implements Parameters {
         return MapUtils.getList(map, key, new TypeReference<>() {
 
             @Override
-            @NonNull
-            public Type getType() {
+            public @NonNull Type getType() {
                 return elementTypeReference.getType();
             }
         }, defaultValue);
@@ -342,8 +339,7 @@ public final class ParametersImpl implements Parameters {
         return MapUtils.getMap(map, key, new TypeReference<>() {
 
             @Override
-            @NonNull
-            public Type getType() {
+            public @NonNull Type getType() {
                 return valueTypeReference.getType();
             }
         });
@@ -362,8 +358,7 @@ public final class ParametersImpl implements Parameters {
         return MapUtils.getMap(map, key, new TypeReference<>() {
 
             @Override
-            @NonNull
-            public Type getType() {
+            public @NonNull Type getType() {
                 return valueTypeReference.getType();
             }
         }, defaultValue);
@@ -446,8 +441,7 @@ public final class ParametersImpl implements Parameters {
         return MapUtils.getFromPath(map, path, new TypeReference<>() {
 
             @Override
-            @NonNull
-            public Type getType() {
+            public @NonNull Type getType() {
                 return elementTypeReference.getType();
             }
         });
@@ -474,8 +468,7 @@ public final class ParametersImpl implements Parameters {
         return MapUtils.getRequiredList(map, key, new TypeReference<>() {
 
             @Override
-            @NonNull
-            public Type getType() {
+            public @NonNull Type getType() {
                 return elementTypeReference.getType();
             }
         });
@@ -517,8 +510,7 @@ public final class ParametersImpl implements Parameters {
         return MapUtils.getRequiredMap(map, key, new TypeReference<>() {
 
             @Override
-            @NonNull
-            public Type getType() {
+            public @NonNull Type getType() {
                 return valueTypeReference.getType();
             }
         });
@@ -541,7 +533,7 @@ public final class ParametersImpl implements Parameters {
 
     @Override
     public Map<String, ?> toMap() {
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
     @Override
