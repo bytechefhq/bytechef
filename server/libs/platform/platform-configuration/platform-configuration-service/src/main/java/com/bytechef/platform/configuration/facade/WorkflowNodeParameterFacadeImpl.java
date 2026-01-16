@@ -594,10 +594,17 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 }
             }
         } else {
-            boolean result = evaluate(displayCondition, MapUtils.concat(inputMap, (Map<String, Object>) parameterMap));
+            if (displayCondition.contains("[index]")) {
+                evaluateArray(
+                    property.getName(), displayCondition, displayConditionMap, inputMap, Map.of(),
+                    parameterMap);
+            } else {
+                boolean result = evaluate(
+                    displayCondition, MapUtils.concat(inputMap, (Map<String, Object>) parameterMap));
 
-            if (result) {
-                displayConditionMap.put(displayCondition, property.getName());
+                if (result) {
+                    displayConditionMap.put(displayCondition, property.getName());
+                }
             }
         }
 
