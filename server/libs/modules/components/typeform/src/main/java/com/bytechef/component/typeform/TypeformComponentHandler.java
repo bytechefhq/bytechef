@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.typeform.action.TypeformCreateFormAction;
+import com.bytechef.component.typeform.action.TypeformCreateEmptyFormAction;
 import com.bytechef.component.typeform.connection.TypeformConnection;
 import com.bytechef.component.typeform.trigger.TypeformNewSubmissionTrigger;
 import com.google.auto.service.AutoService;
@@ -40,7 +40,7 @@ public class TypeformComponentHandler implements ComponentHandler {
         .icon("path:assets/typeform.svg")
         .categories(ComponentCategory.SURVEYS_AND_FEEDBACK)
         .connection(TypeformConnection.CONNECTION_DEFINITION)
-        .actions(TypeformCreateFormAction.ACTION_DEFINITION)
+        .actions(TypeformCreateEmptyFormAction.ACTION_DEFINITION)
         .triggers(TypeformNewSubmissionTrigger.TRIGGER_DEFINITION);
 
     @Override
