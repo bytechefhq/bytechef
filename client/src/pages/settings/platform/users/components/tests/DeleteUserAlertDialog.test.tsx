@@ -6,9 +6,9 @@ import DeleteUserAlertDialog, {DeleteUserAlertDialogRefI} from '../DeleteUserAle
 
 const hoisted = vi.hoisted(() => {
     return {
-        handleClose: vi.fn(),
-        handleDelete: vi.fn(),
-        handleOpen: vi.fn(),
+        handleDeleteUserAlertDialogClose: vi.fn(),
+        handleDeleteUserAlertDialogDelete: vi.fn(),
+        handleDeleteUserAlertDialogOpen: vi.fn(),
         mockUseDeleteUserAlertDialog: vi.fn(),
     };
 });
@@ -19,9 +19,9 @@ vi.mock('../hooks/useDeleteUserAlertDialog', () => ({
 
 const defaultMockReturn = {
     deleteLogin: 'admin',
-    handleClose: hoisted.handleClose,
-    handleDelete: hoisted.handleDelete,
-    handleOpen: hoisted.handleOpen,
+    handleDeleteUserAlertDialogClose: hoisted.handleDeleteUserAlertDialogClose,
+    handleDeleteUserAlertDialogDelete: hoisted.handleDeleteUserAlertDialogDelete,
+    handleDeleteUserAlertDialogOpen: hoisted.handleDeleteUserAlertDialogOpen,
     open: true,
 };
 
@@ -64,22 +64,22 @@ describe('DeleteUserAlertDialog', () => {
         expect(screen.getByRole('button', {name: 'Delete'})).toBeInTheDocument();
     });
 
-    it('should call handleDelete when clicking Delete button', async () => {
+    it('should call handleDeleteUserAlertDialogDelete when clicking Delete button', async () => {
         renderDeleteUserAlertDialog();
 
         const deleteButton = screen.getByRole('button', {name: 'Delete'});
         await userEvent.click(deleteButton);
 
-        expect(hoisted.handleDelete).toHaveBeenCalledTimes(1);
+        expect(hoisted.handleDeleteUserAlertDialogDelete).toHaveBeenCalledTimes(1);
     });
 
-    it('should call handleClose when clicking Cancel button', async () => {
+    it('should call handleDeleteUserAlertDialogClose when clicking Cancel button', async () => {
         renderDeleteUserAlertDialog();
 
         const cancelButton = screen.getByRole('button', {name: 'Cancel'});
         await userEvent.click(cancelButton);
 
-        expect(hoisted.handleClose).toHaveBeenCalledTimes(1);
+        expect(hoisted.handleDeleteUserAlertDialogClose).toHaveBeenCalledTimes(1);
     });
 
     it('should expose open method via ref', () => {
@@ -89,12 +89,12 @@ describe('DeleteUserAlertDialog', () => {
         expect(typeof ref.current?.open).toBe('function');
     });
 
-    it('should call handleOpen when open method is called via ref', () => {
+    it('should call handleDeleteUserAlertDialogOpen when open method is called via ref', () => {
         const {ref} = renderDeleteUserAlertDialog();
 
         ref.current?.open('testuser');
 
-        expect(hoisted.handleOpen).toHaveBeenCalledWith('testuser');
+        expect(hoisted.handleDeleteUserAlertDialogOpen).toHaveBeenCalledWith('testuser');
     });
 });
 
@@ -102,9 +102,9 @@ describe('DeleteUserAlertDialog closed state', () => {
     beforeEach(() => {
         hoisted.mockUseDeleteUserAlertDialog.mockReturnValue({
             deleteLogin: null,
-            handleClose: hoisted.handleClose,
-            handleDelete: hoisted.handleDelete,
-            handleOpen: hoisted.handleOpen,
+            handleDeleteUserAlertDialogClose: hoisted.handleDeleteUserAlertDialogClose,
+            handleDeleteUserAlertDialogDelete: hoisted.handleDeleteUserAlertDialogDelete,
+            handleDeleteUserAlertDialogOpen: hoisted.handleDeleteUserAlertDialogOpen,
             open: false,
         });
     });

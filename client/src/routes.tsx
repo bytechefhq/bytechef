@@ -78,7 +78,7 @@ const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integra
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
 const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
-const Users = lazy(() => import('@/pages/settings/platform/users/Users'));
+const UsersPage = lazy(() => import('@/pages/settings/platform/users/UsersPage'));
 
 const getAccountRoutes = (path: string) => ({
     children: [
@@ -186,7 +186,7 @@ const platformSettingsRoutes = {
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>
                         <LazyLoadWrapper>
-                            <Users />
+                            <UsersPage />
                         </LazyLoadWrapper>
                     </EEVersion>
                 </PrivateRoute>

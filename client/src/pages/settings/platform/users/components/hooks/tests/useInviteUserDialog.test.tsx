@@ -65,7 +65,7 @@ describe('useInviteUserDialog', () => {
             const {result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.handleOpen();
+                result.current.handleInviteUserDialogOpen();
             });
 
             expect(result.current.open).toBe(true);
@@ -78,11 +78,11 @@ describe('useInviteUserDialog', () => {
             const {result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.handleOpen();
+                result.current.handleInviteUserDialogOpen();
             });
 
             act(() => {
-                result.current.handleClose();
+                result.current.handleInviteUserDialogClose();
             });
 
             expect(result.current.open).toBe(false);
@@ -116,7 +116,7 @@ describe('useInviteUserDialog', () => {
             const initialPassword = result.current.invitePassword;
 
             act(() => {
-                result.current.handleRegeneratePassword();
+                result.current.handleInviteUserDialogRegeneratePassword();
             });
 
             expect(result.current.invitePassword).toBe(initialPassword);
@@ -128,7 +128,7 @@ describe('useInviteUserDialog', () => {
             const {result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.handleOpen();
+                result.current.handleInviteUserDialogOpen();
             });
 
             expect(result.current.inviteDisabled).toBe(true);
@@ -138,7 +138,7 @@ describe('useInviteUserDialog', () => {
             const {result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.handleOpen();
+                result.current.handleInviteUserDialogOpen();
                 result.current.setInviteEmail('test@test.com');
             });
 
@@ -151,12 +151,12 @@ describe('useInviteUserDialog', () => {
             const {result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.handleOpen();
+                result.current.handleInviteUserDialogOpen();
                 result.current.setInviteEmail('newuser@test.com');
             });
 
             act(() => {
-                result.current.handleInvite();
+                result.current.handleInviteUserDialogInvite();
             });
 
             expect(hoisted.inviteUserMutate).toHaveBeenCalledWith({
@@ -170,12 +170,12 @@ describe('useInviteUserDialog', () => {
             const {result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.handleOpen();
+                result.current.handleInviteUserDialogOpen();
                 result.current.setInviteEmail('newuser@test.com');
             });
 
             act(() => {
-                result.current.handleInvite();
+                result.current.handleInviteUserDialogInvite();
             });
 
             expect(result.current.open).toBe(false);

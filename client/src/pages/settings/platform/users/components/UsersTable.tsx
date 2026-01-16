@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import UsersTableSkeleton from '@/pages/settings/platform/users/components/UsersTableSkeleton';
 import {EditIcon, Trash2Icon} from 'lucide-react';
@@ -86,17 +86,19 @@ const UsersTable = forwardRef<UsersTableRefI, UsersTableProps>(function UsersTab
                                 </TableCell>
 
                                 <TableCell className="flex justify-end whitespace-nowrap">
-                                    <Button onClick={() => onOpenEdit(user?.login ?? '')} size="icon" variant="ghost">
-                                        <EditIcon className="size-4" />
-                                    </Button>
+                                    <Button
+                                        icon={<EditIcon className="size-4" />}
+                                        onClick={() => onOpenEdit(user?.login ?? '')}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
 
                                     <Button
+                                        icon={<Trash2Icon className="size-4 text-destructive" />}
                                         onClick={() => onOpenDelete(user?.login ?? null)}
                                         size="icon"
                                         variant="ghost"
-                                    >
-                                        <Trash2Icon className="size-4 text-destructive" />
-                                    </Button>
+                                    />
                                 </TableCell>
                             </TableRow>
                         ))}

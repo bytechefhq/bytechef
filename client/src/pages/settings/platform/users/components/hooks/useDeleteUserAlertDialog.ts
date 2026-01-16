@@ -2,7 +2,15 @@ import {useDeleteUserMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
-export default function useDeleteUserAlertDialog() {
+interface UseDeleteUserAlertDialogI {
+    deleteLogin: string | null;
+    handleDeleteUserAlertDialogClose: () => void;
+    handleDeleteUserAlertDialogDelete: () => void;
+    handleDeleteUserAlertDialogOpen: (login: string | null) => void;
+    open: boolean;
+}
+
+export default function useDeleteUserAlertDialog(): UseDeleteUserAlertDialogI {
     const [deleteLogin, setDeleteLogin] = useState<string | null>(null);
 
     const queryClient = useQueryClient();
@@ -30,9 +38,9 @@ export default function useDeleteUserAlertDialog() {
 
     return {
         deleteLogin,
-        handleClose,
-        handleDelete,
-        handleOpen,
+        handleDeleteUserAlertDialogClose: handleClose,
+        handleDeleteUserAlertDialogDelete: handleDelete,
+        handleDeleteUserAlertDialogOpen: handleOpen,
         open: !!deleteLogin,
     };
 }

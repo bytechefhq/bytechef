@@ -1,28 +1,25 @@
 export function generatePassword(length = 12) {
-    // Must be at least 8 characters, include at least 1 number and 1 uppercase
-    const minLen = Math.max(8, length);
-    const U = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const L = 'abcdefghijklmnopqrstuvwxyz';
-    const D = '0123456789';
-    const ALL = U + L + D;
+    const minLength = Math.max(8, length);
+    const uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
+    const digits = '0123456789';
+    const allCharacters = uppercaseLetters + lowercaseLetters + digits;
 
-    // Generate extra bytes for splice positions to avoid reusing character-generation bytes
-    const bytes = new Uint32Array(minLen + 2);
+    const bytes = new Uint32Array(minLength + 2);
+
     crypto.getRandomValues(bytes);
 
-    // Ensure required characters
-    const required = [U[bytes[0] % U.length], D[bytes[1] % D.length]];
-    const chars: string[] = [];
+    const requiredCharacters = [uppercaseLetters[bytes[0] % uppercaseLetters.length], digits[bytes[1] % digits.length]];
+    const characters: string[] = [];
 
-    for (let i = 2; i < minLen; i++) {
-        chars.push(ALL[bytes[i] % ALL.length]);
+    for (let i = 2; i < minLength; i++) {
+        characters.push(allCharacters[bytes[i] % allCharacters.length]);
     }
 
-    // Insert required at random positions using dedicated bytes
-    chars.splice(bytes[minLen] % (chars.length + 1), 0, required[0]);
-    chars.splice(bytes[minLen + 1] % (chars.length + 1), 0, required[1]);
+    characters.splice(bytes[minLength] % (characters.length + 1), 0, requiredCharacters[0]);
+    characters.splice(bytes[minLength + 1] % (characters.length + 1), 0, requiredCharacters[1]);
 
-    return chars.join('');
+    return characters.join('');
 }
 
 export function isValidPassword(password: string) {

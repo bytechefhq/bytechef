@@ -8,13 +8,20 @@ export interface DeleteUserAlertDialogRefI {
 }
 
 const DeleteUserAlertDialog = forwardRef<DeleteUserAlertDialogRefI>(function DeleteUserAlertDialog(_, ref) {
-    const {handleClose, handleDelete, handleOpen, open} = useDeleteUserAlertDialog();
+    const {handleDeleteUserAlertDialogClose, handleDeleteUserAlertDialogDelete, handleDeleteUserAlertDialogOpen, open} =
+        useDeleteUserAlertDialog();
 
     useImperativeHandle(ref, () => ({
-        open: handleOpen,
+        open: handleDeleteUserAlertDialogOpen,
     }));
 
-    return <DeleteAlertDialog onCancel={handleClose} onDelete={handleDelete} open={open} />;
+    return (
+        <DeleteAlertDialog
+            onCancel={handleDeleteUserAlertDialogClose}
+            onDelete={handleDeleteUserAlertDialogDelete}
+            open={open}
+        />
+    );
 });
 
 export default DeleteUserAlertDialog;
