@@ -43,7 +43,7 @@ describe('useDeleteUserAlertDialog', () => {
             const {result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleDeleteUserAlertDialogOpen('admin');
             });
 
             expect(result.current.open).toBe(true);
@@ -54,7 +54,7 @@ describe('useDeleteUserAlertDialog', () => {
             const {result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleOpen(null);
+                result.current.handleDeleteUserAlertDialogOpen(null);
             });
 
             expect(result.current.open).toBe(false);
@@ -67,11 +67,11 @@ describe('useDeleteUserAlertDialog', () => {
             const {result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleDeleteUserAlertDialogOpen('admin');
             });
 
             act(() => {
-                result.current.handleClose();
+                result.current.handleDeleteUserAlertDialogClose();
             });
 
             expect(result.current.open).toBe(false);
@@ -84,11 +84,11 @@ describe('useDeleteUserAlertDialog', () => {
             const {result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleDeleteUserAlertDialogOpen('admin');
             });
 
             act(() => {
-                result.current.handleDelete();
+                result.current.handleDeleteUserAlertDialogDelete();
             });
 
             expect(hoisted.deleteUserMutate).toHaveBeenCalledWith({login: 'admin'});
@@ -98,7 +98,7 @@ describe('useDeleteUserAlertDialog', () => {
             const {result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleDelete();
+                result.current.handleDeleteUserAlertDialogDelete();
             });
 
             expect(hoisted.deleteUserMutate).not.toHaveBeenCalled();
@@ -108,11 +108,11 @@ describe('useDeleteUserAlertDialog', () => {
             const {result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleDeleteUserAlertDialogOpen('admin');
             });
 
             act(() => {
-                result.current.handleDelete();
+                result.current.handleDeleteUserAlertDialogDelete();
             });
 
             expect(result.current.open).toBe(false);

@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     Dialog,
     DialogClose,
@@ -21,10 +21,10 @@ export interface InviteUserDialogRefI {
 const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDialog(_, ref) {
     const {
         authorities,
-        handleClose,
-        handleInvite,
-        handleOpen,
-        handleRegeneratePassword,
+        handleInviteUserDialogClose,
+        handleInviteUserDialogInvite,
+        handleInviteUserDialogOpen,
+        handleInviteUserDialogRegeneratePassword,
         inviteDisabled,
         inviteEmail,
         invitePassword,
@@ -35,11 +35,11 @@ const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDia
     } = useInviteUserDialog();
 
     useImperativeHandle(ref, () => ({
-        open: handleOpen,
+        open: handleInviteUserDialogOpen,
     }));
 
     return (
-        <Dialog onOpenChange={(o) => !o && handleClose()} open={open}>
+        <Dialog onOpenChange={(isOpen) => !isOpen && handleInviteUserDialogClose()} open={open}>
             <DialogContent>
                 <div className="flex flex-col gap-4">
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0">
@@ -58,7 +58,7 @@ const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDia
                             <label className="text-sm font-medium">Email</label>
 
                             <Input
-                                onChange={(e) => setInviteEmail(e.target.value)}
+                                onChange={(event) => setInviteEmail(event.target.value)}
                                 placeholder="user@example.com"
                                 type="email"
                                 value={inviteEmail}
@@ -71,7 +71,7 @@ const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDia
                             <Input readOnly type="text" value={invitePassword} />
 
                             <div>
-                                <Button onClick={handleRegeneratePassword} size="sm" variant="secondary">
+                                <Button onClick={handleInviteUserDialogRegeneratePassword} size="sm" variant="outline">
                                     Regenerate
                                 </Button>
                             </div>
@@ -85,15 +85,15 @@ const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDia
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Role</label>
 
-                            <Select onValueChange={(v) => setInviteRole(v)} value={inviteRole ?? undefined}>
+                            <Select onValueChange={(value) => setInviteRole(value)} value={inviteRole ?? undefined}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select role" />
                                 </SelectTrigger>
 
                                 <SelectContent>
-                                    {authorities.map((role) => (
-                                        <SelectItem key={role} value={role}>
-                                            {role}
+                                    {authorities.map((authority) => (
+                                        <SelectItem key={authority} value={authority}>
+                                            {authority}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -103,12 +103,12 @@ const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDia
 
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button onClick={handleClose} type="button" variant="outline">
+                            <Button onClick={handleInviteUserDialogClose} variant="outline">
                                 Cancel
                             </Button>
                         </DialogClose>
 
-                        <Button disabled={inviteDisabled} onClick={handleInvite}>
+                        <Button disabled={inviteDisabled} onClick={handleInviteUserDialogInvite}>
                             Invite
                         </Button>
                     </DialogFooter>

@@ -11,7 +11,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useRef, useState} from 'react';
 
-export default function Users() {
+export default function UsersPage() {
     const [pageNumber, setPageNumber] = useState(0);
 
     const deleteUserAlertDialogRef = useRef<DeleteUserAlertDialogRefI>(null);

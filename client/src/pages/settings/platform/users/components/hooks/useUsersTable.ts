@@ -6,7 +6,25 @@ interface UseUsersTableProps {
     pageSize?: number;
 }
 
-export default function useUsersTable({pageNumber = 0, pageSize = 20}: UseUsersTableProps = {}) {
+interface UseUsersTableI {
+    error: unknown;
+    isLoading: boolean;
+    pageNumber: number;
+    pageSize: number;
+    totalElements: number;
+    totalPages: number;
+    users: Array<{
+        activated?: boolean | null;
+        authorities?: (string | null)[] | null;
+        email?: string | null;
+        firstName?: string | null;
+        id?: string | null;
+        lastName?: string | null;
+        login?: string | null;
+    } | null>;
+}
+
+export default function useUsersTable({pageNumber = 0, pageSize = 20}: UseUsersTableProps = {}): UseUsersTableI {
     const {data, error, isLoading} = useUsersQuery({pageNumber, pageSize});
 
     const usersPage = data?.users;

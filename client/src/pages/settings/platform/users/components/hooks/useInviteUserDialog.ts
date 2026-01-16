@@ -1,9 +1,24 @@
 import {generatePassword, isValidPassword} from '@/pages/settings/platform/users/util/password-utils';
 import {useAuthoritiesQuery, useInviteUserMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useMemo, useState} from 'react';
+import {Dispatch, SetStateAction, useMemo, useState} from 'react';
 
-export default function useInviteUserDialog() {
+interface UseInviteUserDialogI {
+    authorities: string[];
+    handleInviteUserDialogClose: () => void;
+    handleInviteUserDialogInvite: () => void;
+    handleInviteUserDialogOpen: () => void;
+    handleInviteUserDialogRegeneratePassword: () => void;
+    inviteDisabled: boolean;
+    inviteEmail: string;
+    invitePassword: string;
+    inviteRole: string | null;
+    open: boolean;
+    setInviteEmail: Dispatch<SetStateAction<string>>;
+    setInviteRole: Dispatch<SetStateAction<string | null>>;
+}
+
+export default function useInviteUserDialog(): UseInviteUserDialogI {
     const [inviteOpen, setInviteOpen] = useState(false);
     const [inviteEmail, setInviteEmail] = useState('');
     const [invitePassword, setInvitePassword] = useState(generatePassword());
@@ -15,10 +30,12 @@ export default function useInviteUserDialog() {
 
     const inviteUserMutation = useInviteUserMutation({
         onSuccess: () => {
+            const newPassword = generatePassword();
+
             queryClient.invalidateQueries({queryKey: ['users']});
             setInviteOpen(false);
             setInviteEmail('');
-            setInvitePassword(generatePassword());
+            setInvitePassword(newPassword);
             setInviteRole(null);
         },
     });
@@ -44,15 +61,17 @@ export default function useInviteUserDialog() {
     };
 
     const handleRegeneratePassword = () => {
-        setInvitePassword(generatePassword());
+        const newPassword = generatePassword();
+
+        setInvitePassword(newPassword);
     };
 
     return {
         authorities,
-        handleClose,
-        handleInvite,
-        handleOpen,
-        handleRegeneratePassword,
+        handleInviteUserDialogClose: handleClose,
+        handleInviteUserDialogInvite: handleInvite,
+        handleInviteUserDialogOpen: handleOpen,
+        handleInviteUserDialogRegeneratePassword: handleRegeneratePassword,
         inviteDisabled,
         inviteEmail,
         invitePassword,

@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     Dialog,
     DialogClose,
@@ -18,15 +18,24 @@ export interface EditUserDialogRefI {
 }
 
 const EditUserDialog = forwardRef<EditUserDialogRefI>(function EditUserDialog(_, ref) {
-    const {authorities, editRole, editUser, handleClose, handleOpen, handleUpdate, open, setEditRole, updateDisabled} =
-        useEditUserDialog();
+    const {
+        authorities,
+        editRole,
+        editUser,
+        handleEditUserDialogClose,
+        handleEditUserDialogOpen,
+        handleEditUserDialogUpdate,
+        open,
+        setEditRole,
+        updateDisabled,
+    } = useEditUserDialog();
 
     useImperativeHandle(ref, () => ({
-        open: handleOpen,
+        open: handleEditUserDialogOpen,
     }));
 
     return (
-        <Dialog onOpenChange={(o) => !o && handleClose()} open={open}>
+        <Dialog onOpenChange={(isOpen) => !isOpen && handleEditUserDialogClose()} open={open}>
             <DialogContent>
                 <div className="flex flex-col gap-4">
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0">
@@ -41,21 +50,21 @@ const EditUserDialog = forwardRef<EditUserDialogRefI>(function EditUserDialog(_,
                         <div className="space-y-2">
                             <label className="text-sm font-medium">User</label>
 
-                            <div className="text-sm text-muted-foreground">{editUser?.email ?? editUser?.login}</div>
+                            <p className="text-sm text-muted-foreground">{editUser?.email ?? editUser?.login}</p>
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Role</label>
 
-                            <Select onValueChange={(v) => setEditRole(v)} value={editRole ?? undefined}>
+                            <Select onValueChange={(value) => setEditRole(value)} value={editRole ?? undefined}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select role" />
                                 </SelectTrigger>
 
                                 <SelectContent>
-                                    {authorities.map((role) => (
-                                        <SelectItem key={role} value={role}>
-                                            {role}
+                                    {authorities.map((authority) => (
+                                        <SelectItem key={authority} value={authority}>
+                                            {authority}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -65,12 +74,12 @@ const EditUserDialog = forwardRef<EditUserDialogRefI>(function EditUserDialog(_,
 
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button onClick={handleClose} type="button" variant="outline">
+                            <Button onClick={handleEditUserDialogClose} variant="outline">
                                 Cancel
                             </Button>
                         </DialogClose>
 
-                        <Button disabled={updateDisabled} onClick={handleUpdate}>
+                        <Button disabled={updateDisabled} onClick={handleEditUserDialogUpdate}>
                             Save
                         </Button>
                     </DialogFooter>

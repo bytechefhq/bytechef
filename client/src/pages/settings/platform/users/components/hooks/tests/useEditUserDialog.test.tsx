@@ -89,7 +89,7 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleEditUserDialogOpen('admin');
             });
 
             expect(result.current.open).toBe(true);
@@ -101,7 +101,7 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('user');
+                result.current.handleEditUserDialogOpen('user');
             });
 
             expect(result.current.open).toBe(true);
@@ -113,7 +113,7 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('unknown');
+                result.current.handleEditUserDialogOpen('unknown');
             });
 
             expect(result.current.open).toBe(true);
@@ -125,7 +125,7 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleEditUserDialogOpen('admin');
             });
 
             expect(result.current.updateDisabled).toBe(false);
@@ -137,11 +137,11 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleEditUserDialogOpen('admin');
             });
 
             act(() => {
-                result.current.handleClose();
+                result.current.handleEditUserDialogClose();
             });
 
             expect(result.current.open).toBe(false);
@@ -153,7 +153,7 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleEditUserDialogOpen('admin');
             });
 
             act(() => {
@@ -167,7 +167,7 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleEditUserDialogOpen('admin');
             });
 
             act(() => {
@@ -183,12 +183,12 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleEditUserDialogOpen('admin');
                 result.current.setEditRole('ROLE_USER');
             });
 
             act(() => {
-                result.current.handleUpdate();
+                result.current.handleEditUserDialogUpdate();
             });
 
             expect(hoisted.updateUserMutate).toHaveBeenCalledWith({
@@ -201,7 +201,7 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleUpdate();
+                result.current.handleEditUserDialogUpdate();
             });
 
             expect(hoisted.updateUserMutate).not.toHaveBeenCalled();
@@ -211,12 +211,12 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleEditUserDialogOpen('admin');
                 result.current.setEditRole(null);
             });
 
             act(() => {
-                result.current.handleUpdate();
+                result.current.handleEditUserDialogUpdate();
             });
 
             expect(hoisted.updateUserMutate).not.toHaveBeenCalled();
@@ -226,11 +226,11 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleEditUserDialogOpen('admin');
             });
 
             act(() => {
-                result.current.handleUpdate();
+                result.current.handleEditUserDialogUpdate();
             });
 
             expect(result.current.open).toBe(false);

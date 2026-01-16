@@ -2,7 +2,7 @@ import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from
 import {ForwardedRef, forwardRef} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import Users from '../Users';
+import UsersPage from '../UsersPage';
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -88,12 +88,12 @@ afterEach(() => {
     vi.clearAllMocks();
 });
 
-describe('Users', () => {
+describe('UsersPage', () => {
     describe('loading state', () => {
         it('should render skeleton rows when isLoading is true', () => {
             hoisted.mockUseUsersTable.mockReturnValue({...defaultMockReturn, isLoading: true, users: []});
 
-            render(<Users />);
+            render(<UsersPage />);
 
             const skeletons = document.querySelectorAll('.animate-pulse');
 
@@ -103,7 +103,7 @@ describe('Users', () => {
         it('should not render user data when loading', () => {
             hoisted.mockUseUsersTable.mockReturnValue({...defaultMockReturn, isLoading: true, users: []});
 
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.queryByText('admin@test.com')).not.toBeInTheDocument();
         });
@@ -116,7 +116,7 @@ describe('Users', () => {
                 error: new Error('Failed to fetch users'),
             });
 
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByText('Error: Failed to fetch users')).toBeInTheDocument();
         });
@@ -124,25 +124,25 @@ describe('Users', () => {
 
     describe('users table', () => {
         it('should render page title', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByText('Users')).toBeInTheDocument();
         });
 
         it('should render page description', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByText('Manage organization users: invite or delete users.')).toBeInTheDocument();
         });
 
         it('should render Invite User button', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByRole('button', {name: 'Invite User'})).toBeInTheDocument();
         });
 
         it('should render table headers', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByText('Email')).toBeInTheDocument();
             expect(screen.getByText('Name')).toBeInTheDocument();
@@ -151,28 +151,28 @@ describe('Users', () => {
         });
 
         it('should render user emails', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByText('admin@test.com')).toBeInTheDocument();
             expect(screen.getByText('user@test.com')).toBeInTheDocument();
         });
 
         it('should render user names', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByText('Admin User')).toBeInTheDocument();
             expect(screen.getByText('Regular User')).toBeInTheDocument();
         });
 
         it('should render user roles', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByText('ROLE_ADMIN')).toBeInTheDocument();
             expect(screen.getByText('ROLE_USER')).toBeInTheDocument();
         });
 
         it('should render user status', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByText('Active')).toBeInTheDocument();
             expect(screen.getByText('Pending')).toBeInTheDocument();
@@ -181,7 +181,7 @@ describe('Users', () => {
         it('should render empty state when no users', () => {
             hoisted.mockUseUsersTable.mockReturnValue({...defaultMockReturn, users: []});
 
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByText('No users found.')).toBeInTheDocument();
         });
@@ -189,13 +189,13 @@ describe('Users', () => {
 
     describe('invite dialog', () => {
         it('should render InviteUserDialog component', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByTestId('invite-dialog')).toBeInTheDocument();
         });
 
         it('should call invite dialog open method when clicking Invite User button', async () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             const inviteButton = screen.getByRole('button', {name: 'Invite User'});
             await userEvent.click(inviteButton);
@@ -206,13 +206,13 @@ describe('Users', () => {
 
     describe('delete dialog', () => {
         it('should render DeleteUserAlertDialog component', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByTestId('delete-dialog')).toBeInTheDocument();
         });
 
         it('should call delete dialog open method when clicking delete button', async () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             const deleteButtons = screen.getAllByRole('button', {name: ''});
             const deleteButton = deleteButtons.find((btn) => btn.querySelector('.lucide-trash-2'));
@@ -229,13 +229,13 @@ describe('Users', () => {
 
     describe('edit dialog', () => {
         it('should render EditUserDialog component', () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             expect(screen.getByTestId('edit-dialog')).toBeInTheDocument();
         });
 
         it('should call edit dialog open method when clicking edit button', async () => {
-            render(<Users />);
+            render(<UsersPage />);
 
             const editButtons = screen.getAllByRole('button', {name: ''});
             const editButton = editButtons.find((btn) => btn.querySelector('.lucide-edit'));
