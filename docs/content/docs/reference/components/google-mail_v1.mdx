@@ -494,32 +494,25 @@ Name: newEmailPolling
 
 Type: POLLING
 
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns only email message ID and labels; does not return the email headers, body, or payload.">MINIMAL</span>, <span title="Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">FULL</span>, <span title="Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">RAW</span>, <span title="Returns only email message ID, labels, and email headers.">metadata</span> </details> | The format to return the message in. | false |
+
 
 #### Output
 
-
-
-Type: ARRAY
-
-
-Items Type: OBJECT
-
-
-#### Properties
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the message. |
-| threadId | STRING | The ID of the thread the message belongs to. |
-
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
 {
   "label" : "New Email Polling",
   "name" : "newEmailPolling",
+  "parameters" : {
+    "format" : ""
+  },
   "type" : "googleMail/v1/newEmailPolling"
 }
 ```
