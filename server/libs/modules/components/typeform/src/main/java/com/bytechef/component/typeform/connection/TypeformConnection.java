@@ -16,15 +16,13 @@
 
 package com.bytechef.component.typeform.connection;
 
-import static com.bytechef.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.List;
 
 /**
  * @author Monika Kušter
@@ -33,20 +31,13 @@ public class TypeformConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.typeform.com")
-        .authorizations(authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-            .title("OAuth2 Authorization Code")
-            .properties(
-                string(CLIENT_ID)
-                    .label("Client Id")
-                    .required(true),
-                string(CLIENT_SECRET)
-                    .label("Client Secret")
-                    .required(true))
-            .authorizationUrl((connectionParameters, context) -> "https://api.typeform.com/oauth/authorize")
-            .tokenUrl((connectionParameters, context) -> "https://api.typeform.com/oauth/token")
-            .refreshUrl((connectionParameters, context) -> "https://api.typeform.com/oauth/token")
-            .scopes((connectionParameters, context) -> List.of(
-                "forms:write", "forms:read", "workspaces:read", "webhooks:write", "offline")));
+        .authorizations(
+            authorization(AuthorizationType.BEARER_TOKEN)
+                .title("Bearer Token")
+                .properties(
+                    string(TOKEN)
+                        .label("Personal Access Token")
+                        .required(true)));
 
     private TypeformConnection() {
     }
