@@ -192,6 +192,22 @@ public class ExampleComponentHandler implements ComponentHandler {
 
 ### Variable Naming
 - Do not use short or cryptic variable names on both the server and client sides; prefer clear, descriptive names that communicate intent.
+- This applies everywhere, including arrow function parameters and loop variables.
+- Examples:
+  ```typescript
+  // Bad
+  const current = users.find((u) => u?.login === login);
+
+  // Good
+  const current = users.find((user) => user?.login === login);
+  ```
+  ```java
+  // Bad
+  for (Order o : orders) { ... }
+
+  // Good
+  for (Order order : orders) { ... }
+  ```
 
 ### Blank Line Before Control Statements (Java)
 - Insert exactly one empty line before control statements to improve visual separation of logic:
