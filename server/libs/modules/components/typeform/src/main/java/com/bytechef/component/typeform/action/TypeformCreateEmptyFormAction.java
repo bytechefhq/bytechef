@@ -64,7 +64,7 @@ public class TypeformCreateEmptyFormAction {
             string(WORKSPACE)
                 .label("Workspace URL")
                 .description("URL of the workspace to use for the typeform.")
-                .options((OptionsFunction<String>) TypeformUtils::getWorkspaceOptions)
+                .options((OptionsFunction<String>) TypeformUtils::getWorkspaceUrlOptions)
                 .required(true))
         .output(
             outputSchema(

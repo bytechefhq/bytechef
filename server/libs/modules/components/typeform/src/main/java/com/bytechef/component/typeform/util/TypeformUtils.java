@@ -17,14 +17,14 @@
 package com.bytechef.component.typeform.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.typeform.constant.TypeformConstants.HREF;
 import static com.bytechef.component.typeform.constant.TypeformConstants.ID;
 import static com.bytechef.component.typeform.constant.TypeformConstants.TITLE;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +38,9 @@ public class TypeformUtils {
     private TypeformUtils() {
     }
 
-    public static List<Option<String>> getFormOptions(
+    public static List<Option<String>> getFormIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, TriggerContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context
             .http(http -> http.get("/forms"))
@@ -48,12 +48,24 @@ public class TypeformUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body, TITLE);
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("items") instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(TITLE), (String) map.get(ID)));
+                }
+            }
+        }
+
+        return options;
     }
 
-    public static List<Option<String>> getWorkspaceOptions(
+    public static List<Option<String>> getWorkspaceUrlOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         Map<String, Object> body = context
             .http(http -> http.get("/workspaces"))
@@ -61,16 +73,10 @@ public class TypeformUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body, "name");
-    }
-
-    private static List<Option<String>> getOptions(Map<String, Object> body, String label) {
-        List<Option<String>> options = new ArrayList<>();
-
         if (body.get("items") instanceof List<?> list) {
             for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(label), (String) map.get(ID)));
+                if (item instanceof Map<?, ?> map && map.get("self") instanceof Map<?, ?> selfMap) {
+                    options.add(option((String) map.get("name"), (String) selfMap.get(HREF)));
                 }
             }
         }
