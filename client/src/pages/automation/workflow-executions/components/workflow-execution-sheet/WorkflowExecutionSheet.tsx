@@ -1,10 +1,11 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import {Sheet, SheetCloseButton, SheetContent} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Spinner} from '@/components/ui/spinner';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {WorkflowIcon} from 'lucide-react';
+import {VisuallyHidden} from 'radix-ui';
 import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -35,6 +36,10 @@ const WorkflowExecutionSheet = () => {
 
     return (
         <Sheet onOpenChange={handleOpenChange} open={workflowExecutionSheetOpen}>
+            <VisuallyHidden.Root>
+                <SheetTitle>{`${workflowExecution?.project?.name}/${workflowExecution?.workflow?.label}`}</SheetTitle>
+            </VisuallyHidden.Root>
+
             <SheetContent className="absolute bottom-4 right-4 top-3 flex h-auto w-[90%] flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-[90%]">
                 {workflowExecutionLoading ? (
                     <div className="flex size-full items-center justify-center">
