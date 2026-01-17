@@ -15,9 +15,9 @@ This directory contains reusable utilities and fixtures for Playwright E2E tests
 ### Projects and Workflows
 
 - **`utils/projects.ts`**: Project and workflow creation utilities
-  - `createProject(page, projectName?)`: Creates a new project and returns `{id, name}`
-    - `createWorkflow(page, projectId, workflowName?)`: Creates a workflow in a project and returns `{projectId, workflowId, workflowName}`
-    - `createProjectWithWorkflow(page, projectName?, workflowName?)`: Creates both project and workflow in one call
+    - `createProject(page, projectName?)`: Creates a new project and returns `{id, name}`
+        - `createWorkflow(page, projectId, workflowName?)`: Creates a workflow in a project and returns `{projectId, workflowId, workflowName}`
+        - `createProjectWithWorkflow(page, projectName?, workflowName?)`: Creates both project and workflow in one call
 
 ## Fixtures
 
