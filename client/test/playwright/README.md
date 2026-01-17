@@ -9,13 +9,13 @@ This directory contains reusable utilities and fixtures for Playwright E2E tests
 - **`utils/login.ts`**: Login/logout utilities
     - `login(page, email, password, rememberMe?)`: Logs in a user
     - `logout(page)`: Logs out the current user
-    - `ensureAuthenticated(page)`: Ensures user is logged in (from `utils/projects.ts`)
+- **`utils/auth.ts`**: Authentication utilities
+    - `ensureAuthenticated(page)`: Ensures user is logged in (checks if already authenticated)
 
 ### Projects and Workflows
 
 - **`utils/projects.ts`**: Project and workflow creation utilities
-    - `ensureAuthenticated(page)`: Ensures user is logged in before proceeding
-    - `createProject(page, projectName?)`: Creates a new project and returns `{id, name}`
+  - `createProject(page, projectName?)`: Creates a new project and returns `{id, name}`
     - `createWorkflow(page, projectId, workflowName?)`: Creates a workflow in a project and returns `{projectId, workflowId, workflowName}`
     - `createProjectWithWorkflow(page, projectName?, workflowName?)`: Creates both project and workflow in one call
 
@@ -153,7 +153,8 @@ For tests that test creation flows themselves, use utilities directly:
 
 ```typescript
 import {expect, test} from '@playwright/test';
-import {ensureAuthenticated, createProject, createWorkflow} from '../utils/projects';
+import {ensureAuthenticated} from '../utils/auth';
+import {createProject, createWorkflow} from '../utils/projects';
 
 test('should create a project', async ({page}) => {
     await ensureAuthenticated(page);

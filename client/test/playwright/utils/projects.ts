@@ -1,0 +1,72 @@
+import {Page, expect} from '@playwright/test';
+
+import {ProjectsPage} from '../pages/projectsPage';
+import getRandomString from './getRandomString';
+
+export interface TestProjectI {
+    id: string;
+    name: string;
+}
+
+export interface TestWorkflowI {
+    projectId: string;
+    workflowId: string;
+    workflowName: string;
+}
+
+export async function createProject(page: Page, projectName?: string): Promise<TestProjectI> {
+    const name = projectName || `project_${getRandomString()}`;
+
+    const projectsPage = new ProjectsPage(page);
+
+    await page.goto('/automation/projects');
+
+    await projectsPage.waitForPageLoad();
+
+    const projectId = await projectsPage.createProject(name);
+
+    return {id: projectId, name};
+}
+
+export async function createWorkflow(page: Page, projectId: string, workflowName?: string): Promise<TestWorkflowI> {
+    const name = workflowName || `workflow_${getRandomString()}`;
+    const projectsPage = new ProjectsPage(page);
+
+    await page.goto('/automation/projects');
+
+    await projectsPage.waitForPageLoad();
+
+    const projectItem = page.getByLabel(projectId);
+
+    await expect(projectItem).toBeVisible({timeout: 10000});
+
+    const createWorkflowButton = projectItem.getByRole('button', {name: 'Create Workflow'});
+
+    await createWorkflowButton.click();
+
+    await expect(projectsPage.createWorkflowDialogHeading).toBeVisible({timeout: 10000});
+
+    await projectsPage.workflowFormLabelInput.fill(name);
+    await projectsPage.saveButton.click();
+
+    await expect(page).toHaveURL(new RegExp(`${projectId}`), {timeout: 10000});
+
+    const url = page.url();
+
+    const workflowIdMatch = url.match(/project-workflows\/(\d+)/);
+
+    const workflowId = workflowIdMatch ? workflowIdMatch[1] : 'unknown';
+
+    return {projectId, workflowId, workflowName: name};
+}
+
+export async function createProjectWithWorkflow(
+    page: Page,
+    projectName?: string,
+    workflowName?: string
+): Promise<{project: TestProjectI; workflow: TestWorkflowI}> {
+    const project = await createProject(page, projectName);
+    const workflow = await createWorkflow(page, project.id, workflowName);
+
+    return {project, workflow};
+}

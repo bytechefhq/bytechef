@@ -1,10 +1,10 @@
 import {type Locator, expect, test} from '@playwright/test';
 
 import {ProjectsPage} from '../../pages/projectsPage';
+import {ensureAuthenticated} from '../../utils/auth';
 import {clickAndExpectToBeVisible} from '../../utils/clickAndExpectToBeVisible';
 import {ROUTES} from '../../utils/constants';
 import getRandomString from '../../utils/getRandomString';
-import {ensureAuthenticated} from '../../utils/projects';
 
 test.describe('Projects', () => {
     const randomString = getRandomString();
