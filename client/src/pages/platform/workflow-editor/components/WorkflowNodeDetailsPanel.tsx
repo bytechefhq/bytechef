@@ -1271,6 +1271,7 @@ const WorkflowNodeDetailsPanel = ({
 
     return (
         <div
+            aria-label={`${currentNode?.workflowNodeName} component configuration panel`}
             className={twMerge(
                 'absolute bottom-6 right-[69px] top-2 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
                 className
