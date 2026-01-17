@@ -2,9 +2,9 @@ import {type Locator, expect, test} from '@playwright/test';
 
 import {ProjectsPage} from '../../pages/projectsPage';
 import {clickAndExpectToBeVisible} from '../../utils/clickAndExpectToBeVisible';
-import {ROUTES, TEST_USER} from '../../utils/constants';
+import {ROUTES} from '../../utils/constants';
 import getRandomString from '../../utils/getRandomString';
-import {login} from '../../utils/login';
+import {ensureAuthenticated} from '../../utils/projects';
 
 test.describe('Projects', () => {
     const randomString = getRandomString();
@@ -15,7 +15,7 @@ test.describe('Projects', () => {
     let projectsPage: ProjectsPage;
 
     test.beforeEach(async ({page}) => {
-        await login(page, TEST_USER.email, TEST_USER.password);
+        await ensureAuthenticated(page);
 
         projectsPage = new ProjectsPage(page);
 
