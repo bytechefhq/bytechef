@@ -40,7 +40,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -107,11 +106,8 @@ public class DateHelperUtils {
 
     public static List<Option<String>> getComparisonOptions() {
         return Arrays.stream(DateHelperComparisonEnum.values())
-            .map(dateHelperComparisonEnum -> {
-                String name = dateHelperComparisonEnum.getName();
-
-                return (Option<String>) option(name, name);
-            })
+            .map(dateHelperComparisonEnum -> (Option<String>) option(
+                dateHelperComparisonEnum.getLabel(), dateHelperComparisonEnum.name()))
             .toList();
     }
 

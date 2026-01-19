@@ -24,37 +24,27 @@ import java.util.function.BiPredicate;
  */
 public enum DateHelperComparisonEnum {
 
-    IS_AFTER(LocalDateTime::isAfter, DateHelperConstants.IS_AFTER),
+    IS_AFTER(LocalDateTime::isAfter, "Is After"),
     IS_AFTER_OR_EQUAL(
-        (a, b) -> a.isAfter(b) || a.isEqual(b), DateHelperConstants.IS_AFTER_OR_EQUAL),
-    IS_BEFORE(LocalDateTime::isBefore, DateHelperConstants.IS_BEFORE),
+        (a, b) -> a.isAfter(b) || a.isEqual(b), "Is After or Equal"),
+    IS_BEFORE(LocalDateTime::isBefore, "Is Before"),
     IS_BEFORE_OR_EQUAL(
-        (a, b) -> a.isBefore(b) || a.isEqual(b), DateHelperConstants.IS_BEFORE_OR_EQUAL),
-    IS_EQUAL(LocalDateTime::isEqual, DateHelperConstants.IS_EQUAL);
+        (a, b) -> a.isBefore(b) || a.isEqual(b), "Is Before or Equal"),
+    IS_EQUAL(LocalDateTime::isEqual, "Is Equal");
 
     private final BiPredicate<LocalDateTime, LocalDateTime> predicate;
-    private final String name;
+    private final String label;
 
-    DateHelperComparisonEnum(BiPredicate<LocalDateTime, LocalDateTime> predicate, String name) {
+    DateHelperComparisonEnum(BiPredicate<LocalDateTime, LocalDateTime> predicate, String label) {
         this.predicate = predicate;
-        this.name = name;
-    }
-
-    public static DateHelperComparisonEnum fromName(String name) {
-        for (DateHelperComparisonEnum value : values()) {
-            if (value.name.equals(name)) {
-                return value;
-            }
-        }
-
-        throw new IllegalArgumentException("Unknown comparison type: " + name);
+        this.label = label;
     }
 
     public boolean compare(LocalDateTime dateA, LocalDateTime dateB) {
         return predicate.test(dateA, dateB);
     }
 
-    public String getName() {
-        return name;
+    public String getLabel() {
+        return label;
     }
 }

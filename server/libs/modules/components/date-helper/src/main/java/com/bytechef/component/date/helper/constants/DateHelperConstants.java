@@ -46,11 +46,6 @@ public class DateHelperConstants {
     public static final String INCLUSIVE_SECONDS = "inclusiveSeconds";
     public static final String INPUT_DATE = "inputDate";
     public static final String IN_LAST = "inLast";
-    public static final String IS_AFTER = "Is After";
-    public static final String IS_AFTER_OR_EQUAL = "Is After or Equal";
-    public static final String IS_BEFORE = "Is Before";
-    public static final String IS_BEFORE_OR_EQUAL = "Is Before or Equal";
-    public static final String IS_EQUAL = "Is Equal";
     public static final String MINUTE = "minute";
     public static final String MONTH = "month";
     public static final String MONTH_NAME = "monthName";
