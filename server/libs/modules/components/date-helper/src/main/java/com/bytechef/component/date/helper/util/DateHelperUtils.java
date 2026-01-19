@@ -59,16 +59,10 @@ public class DateHelperUtils {
             case HOUR -> localDateTime.truncatedTo(ChronoUnit.HOURS);
             case DAY -> localDateTime.truncatedTo(ChronoUnit.DAYS);
             case MONTH -> localDateTime.withDayOfMonth(1)
-                .withHour(0)
-                .withMinute(0)
-                .withSecond(0)
-                .withNano(0);
+                .truncatedTo(ChronoUnit.DAYS);
             case YEAR -> localDateTime.withMonth(1)
                 .withDayOfMonth(1)
-                .withHour(0)
-                .withMinute(0)
-                .withSecond(0)
-                .withNano(0);
+                .truncatedTo(ChronoUnit.DAYS);
             default -> throw new IllegalArgumentException("Unknown resolution type: " + resolution);
         };
     }
