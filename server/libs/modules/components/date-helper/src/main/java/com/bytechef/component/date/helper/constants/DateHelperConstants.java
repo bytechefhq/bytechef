@@ -99,8 +99,7 @@ public class DateHelperConstants {
 
     public static final ModifiableStringProperty RESOLUTION_PROPERTY = string(RESOLUTION)
         .label("Resolution")
-        .description(
-            "The resolution at which the dates will be compared.")
+        .description("The resolution at which the dates will be compared.")
         .options(
             option("Year", YEAR),
             option("Month", MONTH),

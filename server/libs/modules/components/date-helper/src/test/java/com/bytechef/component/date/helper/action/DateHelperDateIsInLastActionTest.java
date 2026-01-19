@@ -45,11 +45,7 @@ class DateHelperDateIsInLastActionTest {
 
     private boolean run(LocalDateTime date, int inLast, String inLastUnit, String timeZone) {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                DATE, date,
-                IN_LAST, inLast,
-                UNIT, inLastUnit,
-                TIME_ZONE, timeZone));
+            Map.of(DATE, date, IN_LAST, inLast, UNIT, inLastUnit, TIME_ZONE, timeZone));
 
         return DateHelperDateIsInLastAction.perform(mockedParameters, null, null);
     }

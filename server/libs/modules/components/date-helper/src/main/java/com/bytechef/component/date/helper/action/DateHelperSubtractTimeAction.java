@@ -79,9 +79,7 @@ public class DateHelperSubtractTimeAction {
     private DateHelperSubtractTimeAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         LocalDateTime inputDate = inputParameters.getRequiredLocalDateTime(INPUT_DATE);
 
         inputDate = inputDate

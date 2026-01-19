@@ -80,12 +80,10 @@ public class DateHelperIsBetweenDatesAction {
         boolean inclusive = inputParameters.getBoolean(INCLUSIVE);
 
         DateHelperComparisonEnum startDateComparisonEnum = inclusive
-            ? DateHelperComparisonEnum.fromName(IS_AFTER_OR_EQUAL)
-            : DateHelperComparisonEnum.fromName(IS_AFTER);
+            ? DateHelperComparisonEnum.fromName(IS_AFTER_OR_EQUAL) : DateHelperComparisonEnum.fromName(IS_AFTER);
 
         DateHelperComparisonEnum endDateComparisonEnum = inclusive
-            ? DateHelperComparisonEnum.fromName(IS_BEFORE_OR_EQUAL)
-            : DateHelperComparisonEnum.fromName(IS_BEFORE);
+            ? DateHelperComparisonEnum.fromName(IS_BEFORE_OR_EQUAL) : DateHelperComparisonEnum.fromName(IS_BEFORE);
 
         return startDateComparisonEnum.compare(date, startDate) && endDateComparisonEnum.compare(date, endDate);
     }

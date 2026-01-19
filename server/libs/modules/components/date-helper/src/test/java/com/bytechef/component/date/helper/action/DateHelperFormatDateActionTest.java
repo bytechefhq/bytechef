@@ -19,9 +19,7 @@ package com.bytechef.component.date.helper.action;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDateTime;
@@ -35,12 +33,11 @@ class DateHelperFormatDateActionTest {
 
     @Test
     void testPerform() {
-        ActionContext mocekdActionContext = mock(ActionContext.class);
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(DATE, LocalDateTime.of(2025, 11, 27, 9, 45),
                 DATE_FORMAT, "MMMM dd yyyy"));
 
-        Object result = DateHelperFormatDateAction.perform(mockedParameters, mockedParameters, mocekdActionContext);
+        Object result = DateHelperFormatDateAction.perform(mockedParameters, null, null);
 
         assertEquals("November 27 2025", result);
     }

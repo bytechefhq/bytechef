@@ -82,6 +82,7 @@ public class DateHelperGetTimeBetweenAction {
 
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         LocalDateTime dateA = inputParameters.getRequiredLocalDateTime(DATE_A);
         LocalDateTime dateB = inputParameters.getRequiredLocalDateTime(DATE_B);
 
@@ -89,6 +90,7 @@ public class DateHelperGetTimeBetweenAction {
         Duration duration = Duration.between(dateA, dateB);
 
         Map<String, Object> result = new LinkedHashMap<>();
+
         result.put(YEAR, period.getYears());
         result.put(MONTH, period.getMonths());
         result.put(DAY, period.getDays());

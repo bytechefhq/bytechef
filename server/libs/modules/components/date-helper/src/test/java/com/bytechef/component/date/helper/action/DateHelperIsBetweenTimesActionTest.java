@@ -37,16 +37,12 @@ import org.junit.jupiter.api.Test;
 class DateHelperIsBetweenTimesActionTest {
 
     private boolean run(
-        LocalDateTime datetime, LocalTime startTime, LocalTime endTime,
-        boolean inclusiveSeconds, boolean inclusive) {
+        LocalDateTime datetime, LocalTime startTime, LocalTime endTime, boolean inclusiveSeconds, boolean inclusive) {
 
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(
-                DATE, datetime,
-                TIME_A, startTime,
-                TIME_B, endTime,
-                INCLUSIVE_SECONDS, inclusiveSeconds,
-                INCLUSIVE, inclusive));
+                DATE, datetime, TIME_A, startTime, TIME_B, endTime, INCLUSIVE_SECONDS, inclusiveSeconds, INCLUSIVE,
+                inclusive));
 
         return DateHelperIsBetweenTimesAction.perform(mockedParameters, null, null);
     }
@@ -54,7 +50,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformTimeInMiddleOfRange() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 14, 30, 0);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -64,7 +59,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformTimeBeforeRange() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 8, 30, 0);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -74,7 +68,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformTimeAfterRange() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 19, 30, 0);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -84,7 +77,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformTimeEqualsStartInclusive() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 9, 0, 0);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -94,7 +86,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformTimeEqualsStartExclusive() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 9, 0, 0);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -104,7 +95,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformTimeEqualsEndInclusive() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 18, 0, 0);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -114,7 +104,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformTimeEqualsEndExclusive() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 18, 0, 0);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -124,7 +113,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformWithSecondsIncluded() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 14, 30, 45);
-
         LocalTime startTime = LocalTime.of(14, 30, 0);
         LocalTime endTime = LocalTime.of(14, 30, 0);
 
@@ -134,7 +122,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformWithSecondsIgnored() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 14, 30, 45);
-
         LocalTime startTime = LocalTime.of(14, 30, 0);
         LocalTime endTime = LocalTime.of(14, 31, 0);
 
@@ -144,7 +131,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformWithSecondsIgnoredSameMinute() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 14, 30, 59);
-
         LocalTime startTime = LocalTime.of(14, 30, 0);
         LocalTime endTime = LocalTime.of(14, 30, 0);
 
@@ -154,7 +140,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformRangeCrossingMidnight() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 2, 30, 0);
-
         LocalTime startTime = LocalTime.of(22, 0, 0);
         LocalTime endTime = LocalTime.of(6, 0, 0);
 
@@ -164,7 +149,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformRangeCrossingMidnightBeforeStart() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 21, 30, 0);
-
         LocalTime startTime = LocalTime.of(22, 0, 0);
         LocalTime endTime = LocalTime.of(6, 0, 0);
 
@@ -174,7 +158,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformRangeCrossingMidnightAfterEnd() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 7, 30, 0);
-
         LocalTime startTime = LocalTime.of(22, 0, 0);
         LocalTime endTime = LocalTime.of(6, 0, 0);
 
@@ -184,7 +167,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformDifferentTimezoneUTC() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 14, 30, 0);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -194,7 +176,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformDifferentTimezoneEurope() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 14, 30, 0);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -203,10 +184,8 @@ class DateHelperIsBetweenTimesActionTest {
 
     @Test
     void testPerformIgnoresDatePart() {
-        // Different dates but same time - should match
         LocalDateTime datetime1 = LocalDateTime.of(2020, 1, 1, 14, 30, 0);
         LocalDateTime datetime2 = LocalDateTime.of(2025, 12, 31, 14, 30, 0);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -217,7 +196,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformOneSecondBeforeEndInclusive() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 17, 59, 59);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -227,7 +205,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformOneSecondAfterStart() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 9, 0, 1);
-
         LocalTime startTime = LocalTime.of(9, 0, 0);
         LocalTime endTime = LocalTime.of(18, 0, 0);
 
@@ -237,7 +214,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformMidnightTime() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 0, 0, 0);
-
         LocalTime startTime = LocalTime.of(0, 0, 0);
         LocalTime endTime = LocalTime.of(23, 59, 59);
 
@@ -247,7 +223,6 @@ class DateHelperIsBetweenTimesActionTest {
     @Test
     void testPerformVeryShortTimeRange() {
         LocalDateTime datetime = LocalDateTime.of(2023, 5, 15, 12, 0, 30);
-
         LocalTime startTime = LocalTime.of(12, 0, 0);
         LocalTime endTime = LocalTime.of(12, 1, 0);
 

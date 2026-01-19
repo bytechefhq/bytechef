@@ -25,6 +25,7 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.M
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.YEAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -43,26 +44,26 @@ import org.mockito.MockedStatic;
  */
 class DateHelperAddTimeActionTest {
 
-    private final ArgumentCaptor<LocalDateTime> inputDateArgumentCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<LocalDateTime> localDateTimeArgumentCaptor = forClass(LocalDateTime.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(INPUT_DATE, LocalDateTime.of(2000, 1, 1, 1, 1, 1), YEAR, 1, MONTH, 1, DAY, 1, HOUR, 1, MINUTE, 1,
+        Map.of(
+            INPUT_DATE, LocalDateTime.of(2000, 1, 1, 1, 1, 1), YEAR, 1, MONTH, 1, DAY, 1, HOUR, 1, MINUTE, 1,
             SECOND, 1, DATE_FORMAT, "dd/MM/yy"));
 
     @Test
     void testPerform() {
         try (MockedStatic<DateHelperUtils> dateHelperUtilsMockedStatic = mockStatic(DateHelperUtils.class)) {
             dateHelperUtilsMockedStatic
-                .when(() -> DateHelperUtils.getFormattedDate(stringArgumentCaptor.capture(),
-                    inputDateArgumentCaptor.capture()))
+                .when(() -> DateHelperUtils.getFormattedDate(
+                    stringArgumentCaptor.capture(), localDateTimeArgumentCaptor.capture()))
                 .thenReturn("date");
 
-            Object result =
-                DateHelperAddTimeAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
+            Object result = DateHelperAddTimeAction.perform(mockedParameters, null, mock(ActionContext.class));
 
             assertEquals("date", result);
             assertEquals("dd/MM/yy", stringArgumentCaptor.getValue());
-            assertEquals(LocalDateTime.of(2001, 2, 2, 2, 2, 2), inputDateArgumentCaptor.getValue());
+            assertEquals(LocalDateTime.of(2001, 2, 2, 2, 2, 2), localDateTimeArgumentCaptor.getValue());
         }
     }
 }

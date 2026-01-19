@@ -25,6 +25,7 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.M
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.YEAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -43,8 +44,8 @@ import org.mockito.MockedStatic;
  */
 class DateHelperSubtractTimeActionTest {
 
-    private final ArgumentCaptor<LocalDateTime> inputDateArgumentCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<LocalDateTime> localDateTimeArgumentCaptor = forClass(LocalDateTime.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(INPUT_DATE, LocalDateTime.of(2000, 1, 1, 1, 1, 1), YEAR, 1, MONTH, 1, DAY, 1, HOUR, 1, MINUTE, 1,
             SECOND, 1, DATE_FORMAT, "dd/MM/yy"));
@@ -54,7 +55,7 @@ class DateHelperSubtractTimeActionTest {
         try (MockedStatic<DateHelperUtils> dateHelperUtilsMockedStatic = mockStatic(DateHelperUtils.class)) {
             dateHelperUtilsMockedStatic
                 .when(() -> DateHelperUtils.getFormattedDate(stringArgumentCaptor.capture(),
-                    inputDateArgumentCaptor.capture()))
+                    localDateTimeArgumentCaptor.capture()))
                 .thenReturn("date");
 
             Object result =
@@ -62,7 +63,7 @@ class DateHelperSubtractTimeActionTest {
 
             assertEquals("date", result);
             assertEquals("dd/MM/yy", stringArgumentCaptor.getValue());
-            assertEquals(LocalDateTime.of(1998, 11, 30, 0, 0, 0), inputDateArgumentCaptor.getValue());
+            assertEquals(LocalDateTime.of(1998, 11, 30, 0, 0, 0), localDateTimeArgumentCaptor.getValue());
         }
     }
 }
