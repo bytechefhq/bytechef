@@ -22,17 +22,12 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NAME;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
-import java.util.ArrayList;
+import com.google.api.services.gmail.model.Label;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Nikolina Špehar
@@ -45,36 +40,32 @@ public class GoogleMailListLabelsAction {
         .output(
             outputSchema(
                 array()
-                    .description("List of labels. Each label is represented as an object with 'name' and 'id'.")
+                    .description("List of all labels in the user's mailbox.")
                     .items(
                         object()
                             .description("Label object containing 'name' and 'id'.")
                             .properties(
                                 string("name")
-                                    .description("Name of the label."),
+                                    .description("The display name of the label."),
                                 string("id")
-                                    .description("Id of the label.")))))
+                                    .description("ID of the label."),
+                                string("messageListVisibility")
+                                    .description(
+                                        "The visibility of messages with this label in the message list in the Gmail " +
+                                            "web interface."),
+                                string("labelListVisibility")
+                                    .description(
+                                        "The visibility of the label in the label list in the Gmail web interface."),
+                                string("type")
+                                    .description("The owner type for the label.")))))
         .perform(GoogleMailListLabelsAction::perform);
 
     private GoogleMailListLabelsAction() {
     }
 
-    public static List<Map<String, String>> perform(
+    public static List<Label> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        List<Option<String>> labelOptions = GoogleMailUtils.getLabelOptions(
-            inputParameters, connectionParameters, Map.of(), "", (ActionContext) context);
-
-        List<Map<String, String>> labels = new ArrayList<>();
-
-        labelOptions.forEach(labelOption -> {
-            Map<String, String> label = Map.of(
-                NAME, labelOption.getLabel(),
-                ID, labelOption.getValue());
-
-            labels.add(label);
-        });
-
-        return labels;
+        return GoogleMailUtils.getLabels(connectionParameters);
     }
 }

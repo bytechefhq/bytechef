@@ -296,7 +296,18 @@ public class GoogleMailUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Label> labels = null;
+        List<Label> labels = getLabels(connectionParameters);
+
+        for (Label label : labels) {
+            options.add(option(label.getName(), label.getId()));
+        }
+
+        return options;
+    }
+
+    public static List<Label> getLabels(Parameters connectionParameters) {
+        List<Label> labels;
+
         try {
             labels = GoogleServices.getMail(connectionParameters)
                 .users()
@@ -308,11 +319,7 @@ public class GoogleMailUtils {
             throw translateGoogleIOException(e);
         }
 
-        for (Label label : labels) {
-            options.add(option(label.getName(), label.getId()));
-        }
-
-        return options;
+        return labels;
     }
 
     public static Message getMessage(Parameters inputParameters, Gmail service) {
