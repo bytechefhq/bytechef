@@ -23,6 +23,7 @@ import java.util.function.BiPredicate;
  * @author Nikolina Spehar
  */
 public enum DateHelperComparisonEnum {
+
     IS_AFTER(LocalDateTime::isAfter, DateHelperConstants.IS_AFTER),
     IS_AFTER_OR_EQUAL(
         (a, b) -> a.isAfter(b) || a.isEqual(b), DateHelperConstants.IS_AFTER_OR_EQUAL),

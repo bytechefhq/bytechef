@@ -50,8 +50,7 @@ class DateHelperDateDifferenceActionTest {
             Map.of(START_DATE, LocalDateTime.of(2020, 1, 1, 0, 0, 0), END_DATE, LocalDateTime.of(2023, 1, 10, 0, 0, 0),
                 UNIT, YEAR));
 
-        Long result =
-            DateHelperDateDifferenceAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Long result = DateHelperDateDifferenceAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(3, result);
     }
@@ -59,11 +58,11 @@ class DateHelperDateDifferenceActionTest {
     @Test
     void testPerformMonths() {
         mockedParameters = MockParametersFactory.create(
-            Map.of(START_DATE, LocalDateTime.of(2023, 1, 1, 0, 0, 0), END_DATE, LocalDateTime.of(2023, 4, 10, 0, 0, 0),
+            Map.of(
+                START_DATE, LocalDateTime.of(2023, 1, 1, 0, 0, 0), END_DATE, LocalDateTime.of(2023, 4, 10, 0, 0, 0),
                 UNIT, MONTH));
 
-        Long result =
-            DateHelperDateDifferenceAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Long result = DateHelperDateDifferenceAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(3, result);
     }
@@ -71,11 +70,11 @@ class DateHelperDateDifferenceActionTest {
     @Test
     void testPerformDays() {
         mockedParameters = MockParametersFactory.create(
-            Map.of(START_DATE, LocalDateTime.of(2023, 1, 1, 0, 0, 0), END_DATE, LocalDateTime.of(2023, 1, 10, 0, 0, 0),
+            Map.of(
+                START_DATE, LocalDateTime.of(2023, 1, 1, 0, 0, 0), END_DATE, LocalDateTime.of(2023, 1, 10, 0, 0, 0),
                 UNIT, DAY));
 
-        Long result =
-            DateHelperDateDifferenceAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Long result = DateHelperDateDifferenceAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(9, result);
     }
@@ -83,11 +82,11 @@ class DateHelperDateDifferenceActionTest {
     @Test
     void testPerformHours() {
         mockedParameters = MockParametersFactory.create(
-            Map.of(START_DATE, LocalDateTime.of(2023, 1, 1, 0, 0, 0), END_DATE, LocalDateTime.of(2023, 1, 1, 12, 0, 0),
+            Map.of(
+                START_DATE, LocalDateTime.of(2023, 1, 1, 0, 0, 0), END_DATE, LocalDateTime.of(2023, 1, 1, 12, 0, 0),
                 UNIT, HOUR));
 
-        Long result =
-            DateHelperDateDifferenceAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Long result = DateHelperDateDifferenceAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(12, result);
     }
@@ -98,8 +97,7 @@ class DateHelperDateDifferenceActionTest {
             Map.of(START_DATE, LocalDateTime.of(2023, 1, 1, 0, 0, 0), END_DATE, LocalDateTime.of(2023, 1, 1, 1, 30, 0),
                 UNIT, MINUTE));
 
-        Long result =
-            DateHelperDateDifferenceAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Long result = DateHelperDateDifferenceAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(90, result);
     }
@@ -110,8 +108,7 @@ class DateHelperDateDifferenceActionTest {
             Map.of(START_DATE, LocalDateTime.of(2023, 1, 1, 0, 0, 0), END_DATE, LocalDateTime.of(2023, 1, 1, 0, 0, 45),
                 UNIT, SECOND));
 
-        Long result =
-            DateHelperDateDifferenceAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Long result = DateHelperDateDifferenceAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(45, result);
     }

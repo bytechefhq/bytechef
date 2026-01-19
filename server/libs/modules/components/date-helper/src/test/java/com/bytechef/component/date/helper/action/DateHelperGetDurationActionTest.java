@@ -43,72 +43,84 @@ class DateHelperGetDurationActionTest {
     @Test
     void testGetDurationTwoHours() {
         String result = run(7200, SECOND);
+
         assertEquals("2 hours", result);
     }
 
     @Test
     void testGetDurationOneHour() {
         String result = run(3600, SECOND);
+
         assertEquals("1 hour", result);
     }
 
     @Test
     void testGetDurationMinutesFromSeconds() {
         String result = run(180, SECOND);
+
         assertEquals("3 minutes", result);
     }
 
     @Test
     void testGetDurationOneMinute() {
         String result = run(60, SECOND);
+
         assertEquals("1 minute", result);
     }
 
     @Test
     void testGetDurationLessThanMinute() {
         String result = run(30, SECOND);
+
         assertEquals("30 seconds", result);
     }
 
     @Test
     void testGetDurationHoursFromMinutes() {
         String result = run(150, MINUTE);
+
         assertEquals("2 hours, 30 minutes", result);
     }
 
     @Test
     void testGetDurationOneDayFromHours() {
         String result = run(24, HOUR);
+
         assertEquals("1 day", result);
     }
 
     @Test
     void testGetDurationMultipleDaysFromHours() {
         String result = run(49, HOUR);
+
         assertEquals("2 days, 1 hour", result);
     }
 
     @Test
     void testGetDurationWeeksFromDays() {
         String result = run(14, DAY);
+
         assertEquals("14 days", result);
     }
 
     @Test
     void testGetDurationMonthsFromDaysApprox() {
         String result = run(60, DAY);
+
         assertEquals("2 months", result);
     }
 
     @Test
     void testGetDurationYearsFromDaysApprox() {
         String result = run(365, DAY);
+
         assertEquals("1 year", result);
     }
 
     @Test
     void testGetDurationZero() {
         String result = run(0, SECOND);
+
         assertEquals("0 seconds", result);
     }
 }

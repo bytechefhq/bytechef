@@ -47,11 +47,7 @@ class DateHelperCompareDatesActionTest {
 
     private boolean run(String resolution, String comparison, LocalDateTime dateA, LocalDateTime dateB) {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                RESOLUTION, resolution,
-                COMPARISON, comparison,
-                DATE_A, dateA,
-                DATE_B, dateB));
+            Map.of(RESOLUTION, resolution, COMPARISON, comparison, DATE_A, dateA, DATE_B, dateB));
 
         return DateHelperCompareDatesAction.perform(mockedParameters, null, null);
     }
@@ -106,72 +102,70 @@ class DateHelperCompareDatesActionTest {
 
     @Test
     void testIsBefore() {
-        assertTrue(run(SECOND, IS_BEFORE,
-            LocalDateTime.of(2024, 1, 1, 0, 0, 0),
-            LocalDateTime.of(2024, 1, 1, 0, 0, 1)));
+        assertTrue(
+            run(SECOND, IS_BEFORE, LocalDateTime.of(2024, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 1, 1, 0, 0, 1)));
     }
 
     @Test
     void testIsAfter() {
-        assertTrue(run(SECOND, IS_AFTER,
-            LocalDateTime.of(2024, 1, 1, 0, 0, 2),
-            LocalDateTime.of(2024, 1, 1, 0, 0, 1)));
+        assertTrue(
+            run(SECOND, IS_AFTER, LocalDateTime.of(2024, 1, 1, 0, 0, 2), LocalDateTime.of(2024, 1, 1, 0, 0, 1)));
     }
 
     @Test
     void testIsEqual() {
-        assertTrue(run(SECOND, IS_EQUAL,
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5),
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
+        assertTrue(
+            run(SECOND, IS_EQUAL, LocalDateTime.of(2024, 1, 1, 0, 0, 5), LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
     }
 
     @Test
     void testIsBeforeOrEqualEqualCase() {
-        assertTrue(run(SECOND, IS_BEFORE_OR_EQUAL,
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5),
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
+        assertTrue(
+            run(
+                SECOND, IS_BEFORE_OR_EQUAL,
+                LocalDateTime.of(2024, 1, 1, 0, 0, 5), LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
     }
 
     @Test
     void testIsBeforeOrEqualBeforeCase() {
-        assertTrue(run(SECOND, IS_BEFORE_OR_EQUAL,
-            LocalDateTime.of(2024, 1, 1, 0, 0, 4),
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
+        assertTrue(
+            run(
+                SECOND, IS_BEFORE_OR_EQUAL,
+                LocalDateTime.of(2024, 1, 1, 0, 0, 4), LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
     }
 
     @Test
     void testIsAfterOrEqualAfterCase() {
-        assertTrue(run(SECOND, IS_AFTER_OR_EQUAL,
-            LocalDateTime.of(2024, 1, 1, 0, 0, 6),
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
+        assertTrue(
+            run(
+                SECOND, IS_AFTER_OR_EQUAL,
+                LocalDateTime.of(2024, 1, 1, 0, 0, 6), LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
     }
 
     @Test
     void testIsAfterOrEqualEqualCase() {
-        assertTrue(run(SECOND, IS_AFTER_OR_EQUAL,
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5),
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
+        assertTrue(
+            run(
+                SECOND, IS_AFTER_OR_EQUAL,
+                LocalDateTime.of(2024, 1, 1, 0, 0, 5), LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
     }
 
     @Test
     void testIsBeforeNegative() {
-        assertFalse(run(SECOND, IS_BEFORE,
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5),
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
+        assertFalse(
+            run(SECOND, IS_BEFORE, LocalDateTime.of(2024, 1, 1, 0, 0, 5), LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
     }
 
     @Test
     void testIsAfterNegative() {
-        assertFalse(run(SECOND, IS_AFTER,
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5),
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
+        assertFalse(
+            run(SECOND, IS_AFTER, LocalDateTime.of(2024, 1, 1, 0, 0, 5), LocalDateTime.of(2024, 1, 1, 0, 0, 5)));
     }
 
     @Test
     void testIsEqualNegative() {
-        assertFalse(run(SECOND, IS_EQUAL,
-            LocalDateTime.of(2024, 1, 1, 0, 0, 5),
-            LocalDateTime.of(2024, 1, 1, 0, 0, 6)));
+        assertFalse(
+            run(SECOND, IS_EQUAL, LocalDateTime.of(2024, 1, 1, 0, 0, 5), LocalDateTime.of(2024, 1, 1, 0, 0, 6)));
     }
 
     @Test

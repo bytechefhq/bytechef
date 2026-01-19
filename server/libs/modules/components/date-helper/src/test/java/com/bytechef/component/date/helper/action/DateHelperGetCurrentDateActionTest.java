@@ -55,12 +55,12 @@ class DateHelperGetCurrentDateActionTest {
             localDateTimeMockedStatic.when(LocalDateTime::now)
                 .thenReturn(localDateTime);
 
-            Object result =
-                DateHelperGetCurrentDateAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            Object result = DateHelperGetCurrentDateAction.perform(mockedParameters, null, mockedActionContext);
 
             ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("America/New_York"));
 
             long epochSecond = zonedDateTime.toEpochSecond();
+
             assertEquals(epochSecond, result);
         }
     }
@@ -78,8 +78,7 @@ class DateHelperGetCurrentDateActionTest {
             localDateTimeMockedStatic.when(() -> LocalDateTime.now(ZoneId.of("America/New_York")))
                 .thenReturn(localDateTime);
 
-            Object result =
-                DateHelperGetCurrentDateAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            Object result = DateHelperGetCurrentDateAction.perform(mockedParameters, null, mockedActionContext);
 
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(format);
             String expected = dateTimeFormatter.format(localDateTime);

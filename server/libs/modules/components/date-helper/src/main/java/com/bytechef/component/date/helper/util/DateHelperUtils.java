@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Monika Kušter
@@ -51,18 +52,18 @@ public class DateHelperUtils {
     private DateHelperUtils() {
     }
 
-    public static LocalDateTime applyResolution(String resolution, LocalDateTime date) {
+    public static LocalDateTime applyResolution(String resolution, LocalDateTime localDateTime) {
         return switch (resolution) {
-            case SECOND -> date.truncatedTo(ChronoUnit.SECONDS);
-            case MINUTE -> date.truncatedTo(ChronoUnit.MINUTES);
-            case HOUR -> date.truncatedTo(ChronoUnit.HOURS);
-            case DAY -> date.truncatedTo(ChronoUnit.DAYS);
-            case MONTH -> date.withDayOfMonth(1)
+            case SECOND -> localDateTime.truncatedTo(ChronoUnit.SECONDS);
+            case MINUTE -> localDateTime.truncatedTo(ChronoUnit.MINUTES);
+            case HOUR -> localDateTime.truncatedTo(ChronoUnit.HOURS);
+            case DAY -> localDateTime.truncatedTo(ChronoUnit.DAYS);
+            case MONTH -> localDateTime.withDayOfMonth(1)
                 .withHour(0)
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
-            case YEAR -> date.withMonth(1)
+            case YEAR -> localDateTime.withMonth(1)
                 .withDayOfMonth(1)
                 .withHour(0)
                 .withMinute(0)
@@ -70,54 +71,12 @@ public class DateHelperUtils {
                 .withNano(0);
             default -> throw new IllegalArgumentException("Unknown resolution type: " + resolution);
         };
-
     }
 
-    public static List<Option<String>> getComparisonOptions() {
-        return Arrays.stream(DateHelperComparisonEnum.values())
-            .map(dateHelperComparisonEnum -> option(
-                dateHelperComparisonEnum.getName(), dateHelperComparisonEnum.getName()))
-            .collect(Collectors.toList());
-    }
-
-    public static List<Option<Long>> getDayOfWeekOptions() {
-        return Arrays.stream(DayOfWeek.values())
-            .map(dayOfWeek -> option(dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()),
-                dayOfWeek.getValue()))
-            .collect(Collectors.toList());
-    }
-
-    public static Object getFormattedDate(String dateFormat, LocalDateTime inputDate) {
-        if (dateFormat.equals(UNIX_TIMESTAMP)) {
-            ZonedDateTime zonedDateTime = inputDate.atZone(ZoneId.systemDefault());
-
-            return zonedDateTime.toEpochSecond();
-        } else {
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
-
-            return dateTimeFormatter.format(inputDate);
-        }
-    }
-
-    public static List<Option<String>> getZoneOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
-
-        return ZoneId.getAvailableZoneIds()
-            .stream()
-            .map(s -> option(s, s))
-            .collect(Collectors.toList());
-    }
-
-    public static LocalDateTime normalizeToTimeOnly(LocalDateTime date) {
-        return date.withYear(2025)
-            .withMonth(1)
-            .withDayOfMonth(1);
-    }
-
-    public static String formatDuration(long totalSeconds) {
-        if (totalSeconds == 0)
+    public static @NonNull String formatDuration(long totalSeconds) {
+        if (totalSeconds == 0) {
             return "0 seconds";
+        }
 
         totalSeconds = Math.abs(totalSeconds);
 
@@ -150,6 +109,51 @@ public class DateHelperUtils {
             case YEAR -> ChronoUnit.YEARS;
             default -> throw new IllegalArgumentException("Unsupported unit: " + unit);
         };
+    }
+
+    public static List<Option<String>> getComparisonOptions() {
+        return Arrays.stream(DateHelperComparisonEnum.values())
+            .map(dateHelperComparisonEnum -> {
+                String name = dateHelperComparisonEnum.getName();
+
+                return (Option<String>) option(name, name);
+            })
+            .toList();
+    }
+
+    public static List<Option<Long>> getDayOfWeekOptions() {
+        return Arrays.stream(DayOfWeek.values())
+            .map(dayOfWeek -> (Option<Long>) option(
+                dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()), dayOfWeek.getValue()))
+            .toList();
+    }
+
+    public static Object getFormattedDate(String dateFormat, LocalDateTime inputDate) {
+        if (dateFormat.equals(UNIX_TIMESTAMP)) {
+            ZonedDateTime zonedDateTime = inputDate.atZone(ZoneId.systemDefault());
+
+            return zonedDateTime.toEpochSecond();
+        } else {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
+
+            return dateTimeFormatter.format(inputDate);
+        }
+    }
+
+    public static List<Option<String>> getZoneOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
+
+        return ZoneId.getAvailableZoneIds()
+            .stream()
+            .map(s -> (Option<String>) option(s, s))
+            .toList();
+    }
+
+    public static LocalDateTime normalizeToTimeOnly(LocalDateTime localDateTime) {
+        return localDateTime.withYear(2025)
+            .withMonth(1)
+            .withDayOfMonth(1);
     }
 
     private static final List<Unit> UNITS = List.of(

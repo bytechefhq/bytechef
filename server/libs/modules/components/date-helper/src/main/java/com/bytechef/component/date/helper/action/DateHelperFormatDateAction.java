@@ -51,7 +51,6 @@ public class DateHelperFormatDateAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return getFormattedDate(
-            inputParameters.getRequiredString(DATE_FORMAT),
-            inputParameters.getRequiredLocalDateTime(DATE));
+            inputParameters.getRequiredString(DATE_FORMAT), inputParameters.getRequiredLocalDateTime(DATE));
     }
 }

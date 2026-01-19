@@ -39,7 +39,7 @@ class DateHelperIsWeekendActionTest {
 
     @Test
     void testPerform() {
-        boolean result = DateHelperIsWeekendAction.perform(mockedParameters, mockedParameters, mockedContext);
+        boolean result = DateHelperIsWeekendAction.perform(mockedParameters, null, mockedContext);
 
         assertFalse(result);
     }

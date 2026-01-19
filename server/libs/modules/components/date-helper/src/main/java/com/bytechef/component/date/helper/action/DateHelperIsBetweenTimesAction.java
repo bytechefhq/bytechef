@@ -73,8 +73,9 @@ public class DateHelperIsBetweenTimesAction {
     public static boolean perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         LocalDateTime localDateTime = inputParameters.getRequiredLocalDateTime(DATE);
 
-        LocalDateTime startLocalDateTime =
-            getLocalDateTime(inputParameters.getRequiredLocalTime(TIME_A), localDateTime);
+        LocalDateTime startLocalDateTime = getLocalDateTime(
+            inputParameters.getRequiredLocalTime(TIME_A), localDateTime);
+
         LocalDateTime endLocalDateTime = getLocalDateTime(inputParameters.getRequiredLocalTime(TIME_B), localDateTime);
 
         boolean inclusive = inputParameters.getBoolean(INCLUSIVE);
@@ -100,12 +101,10 @@ public class DateHelperIsBetweenTimesAction {
 
         boolean crossesMidnight = end.isBefore(start);
 
-        DateHelperComparisonEnum afterStart = inclusive
-            ? DateHelperComparisonEnum.IS_AFTER_OR_EQUAL
-            : DateHelperComparisonEnum.IS_AFTER;
-        DateHelperComparisonEnum beforeEnd = inclusive
-            ? DateHelperComparisonEnum.IS_BEFORE_OR_EQUAL
-            : DateHelperComparisonEnum.IS_BEFORE;
+        DateHelperComparisonEnum afterStart =
+            inclusive ? DateHelperComparisonEnum.IS_AFTER_OR_EQUAL : DateHelperComparisonEnum.IS_AFTER;
+        DateHelperComparisonEnum beforeEnd =
+            inclusive ? DateHelperComparisonEnum.IS_BEFORE_OR_EQUAL : DateHelperComparisonEnum.IS_BEFORE;
 
         if (crossesMidnight) {
             return afterStart.compare(date, start) || beforeEnd.compare(date, end);

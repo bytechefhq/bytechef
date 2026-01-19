@@ -47,7 +47,7 @@ class DateHelperIsBusinessHoursActionTest {
 
     @Test
     void testPerform() {
-        boolean result = DateHelperIsBusinessHoursAction.perform(mockedParameters, mockedParameters, mockedContext);
+        boolean result = DateHelperIsBusinessHoursAction.perform(mockedParameters, null, mockedContext);
 
         assertTrue(result);
     }

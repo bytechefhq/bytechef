@@ -32,10 +32,7 @@ import org.junit.jupiter.api.Test;
 class DateHelperGetDaysBetweenActionTest {
 
     private int run(LocalDateTime dateA, LocalDateTime dateB) {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                DATE_A, dateA,
-                DATE_B, dateB));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(DATE_A, dateA, DATE_B, dateB));
 
         return DateHelperGetDaysBetweenAction.perform(mockedParameters, null, null);
     }

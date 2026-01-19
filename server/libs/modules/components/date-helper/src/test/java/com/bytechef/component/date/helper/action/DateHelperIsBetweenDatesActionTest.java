@@ -42,15 +42,10 @@ import org.junit.jupiter.api.Test;
 class DateHelperIsBetweenDatesActionTest {
 
     private boolean run(
-        LocalDateTime date, LocalDateTime startDate, LocalDateTime endDate,
-        boolean inclusive, String resolution) {
+        LocalDateTime date, LocalDateTime startDate, LocalDateTime endDate, boolean inclusive, String resolution) {
+
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                DATE, date,
-                DATE_A, startDate,
-                DATE_B, endDate,
-                INCLUSIVE, inclusive,
-                RESOLUTION, resolution));
+            Map.of(DATE, date, DATE_A, startDate, DATE_B, endDate, INCLUSIVE, inclusive, RESOLUTION, resolution));
 
         return DateHelperIsBetweenDatesAction.perform(mockedParameters, null, null);
     }
@@ -239,7 +234,6 @@ class DateHelperIsBetweenDatesActionTest {
 
     @Test
     void testPerformResolutionDayDifferentTimes() {
-        // Same day but different times - should be true with day resolution
         LocalDateTime startDate = LocalDateTime.of(2024, 1, 15, 8, 0, 0);
         LocalDateTime date = LocalDateTime.of(2024, 1, 15, 23, 0, 0);
         LocalDateTime endDate = LocalDateTime.of(2024, 1, 15, 10, 0, 0);

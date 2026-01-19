@@ -55,9 +55,7 @@ public class DateHelperGetCurrentDateAction {
     private DateHelperGetCurrentDateAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String dateFormat = inputParameters.getRequiredString(DATE_FORMAT);
         String timeZone = inputParameters.getRequiredString(TIME_ZONE);
 

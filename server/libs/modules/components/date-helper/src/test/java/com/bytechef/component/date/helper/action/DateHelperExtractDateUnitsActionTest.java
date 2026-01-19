@@ -58,8 +58,7 @@ class DateHelperExtractDateUnitsActionTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0), UNIT, YEAR));
 
-        Object result =
-            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = DateHelperExtractDateUnitsAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(2023, result);
     }
@@ -69,8 +68,7 @@ class DateHelperExtractDateUnitsActionTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0), UNIT, MONTH));
 
-        Object result =
-            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = DateHelperExtractDateUnitsAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(1, result);
     }
@@ -80,8 +78,7 @@ class DateHelperExtractDateUnitsActionTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0), UNIT, DAY));
 
-        Object result =
-            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = DateHelperExtractDateUnitsAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(1, result);
     }
@@ -91,8 +88,7 @@ class DateHelperExtractDateUnitsActionTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0), UNIT, HOUR));
 
-        Object result =
-            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = DateHelperExtractDateUnitsAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(0, result);
     }
@@ -102,8 +98,7 @@ class DateHelperExtractDateUnitsActionTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 2), UNIT, MINUTE));
 
-        Object result =
-            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = DateHelperExtractDateUnitsAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(2, result);
     }
@@ -113,8 +108,7 @@ class DateHelperExtractDateUnitsActionTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0, 3), UNIT, SECOND));
 
-        Object result =
-            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = DateHelperExtractDateUnitsAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(3, result);
     }
@@ -124,8 +118,7 @@ class DateHelperExtractDateUnitsActionTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0), UNIT, DAY_OF_WEEK));
 
-        Object result =
-            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = DateHelperExtractDateUnitsAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(DayOfWeek.SUNDAY.getDisplayName(TextStyle.FULL, Locale.getDefault()), result);
     }
@@ -135,8 +128,7 @@ class DateHelperExtractDateUnitsActionTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0), UNIT, MONTH_NAME));
 
-        Object result =
-            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = DateHelperExtractDateUnitsAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(Month.JANUARY.getDisplayName(TextStyle.FULL, Locale.getDefault()), result);
     }
@@ -146,8 +138,7 @@ class DateHelperExtractDateUnitsActionTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0), UNIT, DATE));
 
-        Object result =
-            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = DateHelperExtractDateUnitsAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(LocalDate.of(2023, 1, 1), result);
     }
@@ -157,8 +148,7 @@ class DateHelperExtractDateUnitsActionTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(INPUT_DATE, LocalDateTime.of(2023, 1, 1, 0, 0), UNIT, TIME));
 
-        Object result =
-            DateHelperExtractDateUnitsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = DateHelperExtractDateUnitsAction.perform(mockedParameters, null, mockedActionContext);
 
         assertEquals(LocalTime.of(0, 0, 0), result);
     }
@@ -171,7 +161,7 @@ class DateHelperExtractDateUnitsActionTest {
         IllegalArgumentException exception =
             assertThrows(IllegalArgumentException.class,
                 () -> DateHelperExtractDateUnitsAction.perform(mockedParameters,
-                    mockedParameters, mock(ActionContext.class)));
+                    null, mock(ActionContext.class)));
 
         assertEquals("Unsupported unit UNSUPPORTED", exception.getMessage());
     }
