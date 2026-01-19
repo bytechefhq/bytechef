@@ -18,9 +18,7 @@ package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.MARKDOWN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -35,8 +33,7 @@ class TextHelperMarkdownToHTMLActionTest {
 
     @Test
     void testPerform() {
-        String result = TextHelperMarkdownToHTMLAction.perform(
-            mockedParameters, mockedParameters, mock(Context.class));
+        String result = TextHelperMarkdownToHTMLAction.perform(mockedParameters, null, null);
 
         String expected = "<h1><a href=\"#hello-world\" id=\"hello-world\">Hello World</a></h1>\n";
 

@@ -19,9 +19,7 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.REGULAR_EXPRESSION;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -32,18 +30,14 @@ import org.junit.jupiter.api.Test;
  */
 class TextHelperExtractRegExActionTest {
 
-    static final Context mockedContext = mock(Context.class);
-
     @Test
     void testPerformSingleMatch() {
         String input = "My email is test@example.com";
         String regex = "[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}";
 
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
 
-        String result = TextHelperExtractRegExAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        String result = TextHelperExtractRegExAction.perform(mockedParameters, null, null);
 
         assertEquals("test@example.com", result);
     }
@@ -53,11 +47,9 @@ class TextHelperExtractRegExActionTest {
         String input = "Contact: test@example.com or admin@site.org";
         String regex = "[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}";
 
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
 
-        String result = TextHelperExtractRegExAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        String result = TextHelperExtractRegExAction.perform(mockedParameters, null, null);
 
         assertEquals("test@example.com", result);
     }

@@ -19,9 +19,7 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.OPERATION;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.text.helper.constant.OperationType;
@@ -33,15 +31,12 @@ import org.junit.jupiter.api.Test;
  */
 class TextHelperUrlEncodeDecodeActionTest {
 
-    private final Context mockedContext = mock(Context.class);
-
     @Test
     void testPerformEncode() {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "Hello+World%21", OPERATION, OperationType.DECODE.name()));
 
-        Object result =
-            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = TextHelperUrlEncodeDecodeAction.perform(mockedParameters, null, null);
 
         assertEquals("Hello World!", result);
     }
@@ -51,8 +46,7 @@ class TextHelperUrlEncodeDecodeActionTest {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "Hello World!", OPERATION, OperationType.ENCODE.name()));
 
-        Object result =
-            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = TextHelperUrlEncodeDecodeAction.perform(mockedParameters, null, null);
 
         assertEquals("Hello+World%21", result);
     }
@@ -62,8 +56,7 @@ class TextHelperUrlEncodeDecodeActionTest {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "", OPERATION, OperationType.DECODE.name()));
 
-        Object result =
-            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = TextHelperUrlEncodeDecodeAction.perform(mockedParameters, null, null);
 
         assertEquals("", result);
     }

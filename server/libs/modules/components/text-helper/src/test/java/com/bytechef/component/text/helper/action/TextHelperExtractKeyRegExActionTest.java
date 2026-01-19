@@ -19,12 +19,9 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.KEY_VALUE_OBJECT;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.REGULAR_EXPRESSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,22 +31,15 @@ import org.junit.jupiter.api.Test;
  */
 class TextHelperExtractKeyRegExActionTest {
 
-    static final Context mockedContext = mock(Context.class);
-
     @Test
     void testPerform() {
-        Map<String, Object> keyValueMap = new LinkedHashMap<>();
-        keyValueMap.put("noDigits", "val1");
-        keyValueMap.put("key99", "val2");
-        keyValueMap.put("another100", "val3");
-
+        Map<String, Object> keyValueMap = Map.of("noDigits", "val1", "key99", "val2", "another100", "val3");
         String regex = "\\d+";
 
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(KEY_VALUE_OBJECT, keyValueMap, REGULAR_EXPRESSION, regex));
+        Parameters mockedParameters =
+            MockParametersFactory.create(Map.of(KEY_VALUE_OBJECT, keyValueMap, REGULAR_EXPRESSION, regex));
 
-        List<String> result = TextHelperExtractKeyRegExAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        List<String> result = TextHelperExtractKeyRegExAction.perform(mockedParameters, null, null);
 
         assertEquals(List.of("another100", "key99"), result);
     }

@@ -47,9 +47,7 @@ public class TextHelperHTMLToMarkdownAction {
     private TextHelperHTMLToMarkdownAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return FlexmarkHtmlConverter.builder()
             .build()
             .convert(inputParameters.getRequiredString(HTML));

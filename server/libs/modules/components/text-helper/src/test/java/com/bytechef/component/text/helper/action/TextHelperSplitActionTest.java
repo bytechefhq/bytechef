@@ -19,9 +19,7 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.DELIMITER;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -36,7 +34,7 @@ class TextHelperSplitActionTest {
     void testPerformTextWithDelimiter() {
         Parameters parameters = MockParametersFactory.create(Map.of(TEXT, "apple,banana,orange", DELIMITER, ","));
 
-        String[] result = TextHelperSplitAction.perform(parameters, parameters, mock(Context.class));
+        String[] result = TextHelperSplitAction.perform(parameters, null, null);
 
         String[] expected = {
             "apple", "banana", "orange"
@@ -49,7 +47,7 @@ class TextHelperSplitActionTest {
     void testPerformTextWithoutDelimiter() {
         Parameters parameters = MockParametersFactory.create(Map.of(TEXT, "apple banana orange", DELIMITER, ","));
 
-        String[] result = TextHelperSplitAction.perform(parameters, parameters, mock(Context.class));
+        String[] result = TextHelperSplitAction.perform(parameters, parameters, null);
 
         String[] expecteed = {
             "apple banana orange"
@@ -62,7 +60,7 @@ class TextHelperSplitActionTest {
     void testPerformEmptyText() {
         Parameters parameters = MockParametersFactory.create(Map.of(TEXT, "", DELIMITER, ","));
 
-        String[] result = TextHelperSplitAction.perform(parameters, parameters, mock(Context.class));
+        String[] result = TextHelperSplitAction.perform(parameters, parameters, null);
 
         String[] expected = {
             ""

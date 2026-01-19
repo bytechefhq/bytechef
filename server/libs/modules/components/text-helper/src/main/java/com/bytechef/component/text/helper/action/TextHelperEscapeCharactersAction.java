@@ -58,9 +58,7 @@ public class TextHelperEscapeCharactersAction {
     private TextHelperEscapeCharactersAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String text = inputParameters.getRequiredString(TEXT);
 
         List<String> escapeCharacters = inputParameters.getRequiredList(ESCAPE_CHARACTERS, String.class);

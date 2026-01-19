@@ -19,9 +19,7 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.ESCAPE_CHARACTERS;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -33,15 +31,12 @@ import org.junit.jupiter.api.Test;
  */
 class TextHelperEscapeCharactersActionTest {
 
-    static final Context mockedContext = mock(Context.class);
-
     @Test
     void testPerformSingleCharacterEscape() {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "abc", ESCAPE_CHARACTERS, List.of("a")));
 
-        String result = TextHelperEscapeCharactersAction.perform(
-            mockedParameters, null, mockedContext);
+        String result = TextHelperEscapeCharactersAction.perform(mockedParameters, null, null);
 
         assertEquals("\\abc", result);
     }
@@ -51,8 +46,7 @@ class TextHelperEscapeCharactersActionTest {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "Hello (World)?", ESCAPE_CHARACTERS, List.of("(", ")", "?")));
 
-        String result = TextHelperEscapeCharactersAction.perform(
-            mockedParameters, null, mockedContext);
+        String result = TextHelperEscapeCharactersAction.perform(mockedParameters, null, null);
 
         assertEquals("Hello \\(World\\)\\?", result);
     }
@@ -62,8 +56,7 @@ class TextHelperEscapeCharactersActionTest {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "dog", ESCAPE_CHARACTERS, List.of("x")));
 
-        String result = TextHelperEscapeCharactersAction.perform(
-            mockedParameters, null, mockedContext);
+        String result = TextHelperEscapeCharactersAction.perform(mockedParameters, null, null);
 
         assertEquals("dog", result);
     }
@@ -73,8 +66,7 @@ class TextHelperEscapeCharactersActionTest {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "C:\\Temp", ESCAPE_CHARACTERS, List.of("\\")));
 
-        String result = TextHelperEscapeCharactersAction.perform(
-            mockedParameters, null, mockedContext);
+        String result = TextHelperEscapeCharactersAction.perform(mockedParameters, null, null);
 
         assertEquals("C:\\\\Temp", result);
     }
@@ -84,8 +76,7 @@ class TextHelperEscapeCharactersActionTest {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "Happy \nNew Year!", ESCAPE_CHARACTERS, List.of("\n")));
 
-        String result = TextHelperEscapeCharactersAction.perform(
-            mockedParameters, null, mockedContext);
+        String result = TextHelperEscapeCharactersAction.perform(mockedParameters, null, null);
 
         assertEquals("Happy \\\nNew Year!", result);
     }

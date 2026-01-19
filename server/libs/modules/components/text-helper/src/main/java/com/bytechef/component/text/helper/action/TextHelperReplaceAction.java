@@ -59,9 +59,7 @@ public class TextHelperReplaceAction {
     private TextHelperReplaceAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String text = inputParameters.getRequiredString(TEXT);
         String searchValue = inputParameters.getRequiredString(SEARCH_VALUE);
         String replaceValue = inputParameters.getRequiredString(REPLACE_VALUE);

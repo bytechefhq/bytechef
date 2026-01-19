@@ -21,9 +21,7 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.PA
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -39,11 +37,10 @@ class TextHelperGetTextBetweenActionTest {
     void testExtractBetweenNormalCase() {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(
-                TEXT, "Hello world! This is a sample text. Hello again!",
-                PATTERN_START, "Hello",
-                PATTERN_END, "again"));
+                TEXT, "Hello world! This is a sample text. Hello again!", PATTERN_START, "Hello", PATTERN_END,
+                "again"));
 
-        String result = TextHelperGetTextBetweenAction.perform(mockedParameters, mockedParameters, mock(Context.class));
+        String result = TextHelperGetTextBetweenAction.perform(mockedParameters, mockedParameters, null);
 
         assertEquals(" world! This is a sample text. Hello ", result);
     }
@@ -51,12 +48,9 @@ class TextHelperGetTextBetweenActionTest {
     @Test
     void testExtractBetweenMultipleMatches() {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                TEXT, "A [first] B [second] C [third]",
-                PATTERN_START, "[",
-                PATTERN_END, "]"));
+            Map.of(TEXT, "A [first] B [second] C [third]", PATTERN_START, "[", PATTERN_END, "]"));
 
-        String result = TextHelperGetTextBetweenAction.perform(mockedParameters, mockedParameters, mock(Context.class));
+        String result = TextHelperGetTextBetweenAction.perform(mockedParameters, mockedParameters, null);
 
         assertEquals("first", result);
     }
@@ -64,38 +58,27 @@ class TextHelperGetTextBetweenActionTest {
     @Test
     void testExtractBetweenStartPatternNotFound() {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                TEXT, "No patterns here!",
-                PATTERN_START, "Hello",
-                PATTERN_END, "world"));
+            Map.of(TEXT, "No patterns here!", PATTERN_START, "Hello", PATTERN_END, "world"));
 
         assertThrows(ProviderException.class,
-            () -> TextHelperGetTextBetweenAction.perform(
-                mockedParameters, mockedParameters, mock(Context.class)));
+            () -> TextHelperGetTextBetweenAction.perform(mockedParameters, mockedParameters, null));
     }
 
     @Test
     void testExtractBetweenEndPatternNotFound() {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                TEXT, "Hello world!",
-                PATTERN_START, "Hello",
-                PATTERN_END, "Universe"));
+            Map.of(TEXT, "Hello world!", PATTERN_START, "Hello", PATTERN_END, "Universe"));
 
         assertThrows(ProviderException.class,
-            () -> TextHelperGetTextBetweenAction.perform(
-                mockedParameters, mockedParameters, mock(Context.class)));
+            () -> TextHelperGetTextBetweenAction.perform(mockedParameters, mockedParameters, null));
     }
 
     @Test
     void testExtractBetweenEmptyResult() {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                TEXT, "StartEnd",
-                PATTERN_START, "Start",
-                PATTERN_END, "End"));
+            Map.of(TEXT, "StartEnd", PATTERN_START, "Start", PATTERN_END, "End"));
 
-        String result = TextHelperGetTextBetweenAction.perform(mockedParameters, mockedParameters, mock(Context.class));
+        String result = TextHelperGetTextBetweenAction.perform(mockedParameters, mockedParameters, null);
 
         assertEquals("", result);
     }

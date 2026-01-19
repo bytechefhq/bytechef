@@ -18,9 +18,7 @@ package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -35,7 +33,7 @@ class TextHelperUpperCaseActionTest {
     void testPerfom() {
         Parameters parameters = MockParametersFactory.create(Map.of(TEXT, "Hello, World!"));
 
-        String result = TextHelperUpperCaseAction.perform(parameters, parameters, mock(Context.class));
+        String result = TextHelperUpperCaseAction.perform(parameters, null, null);
 
         assertEquals("HELLO, WORLD!", result);
     }

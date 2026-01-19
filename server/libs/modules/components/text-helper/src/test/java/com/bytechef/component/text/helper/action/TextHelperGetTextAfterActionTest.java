@@ -21,9 +21,7 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.PA
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -43,7 +41,7 @@ class TextHelperGetTextAfterActionTest {
                 PATTERN, "Hello",
                 MATCH_NUMBER, 2));
 
-        String result = TextHelperGetTextAfterAction.perform(mockedParameters, mockedParameters, mock(Context.class));
+        String result = TextHelperGetTextAfterAction.perform(mockedParameters, mockedParameters, null);
 
         assertEquals(" again!", result);
     }
@@ -56,7 +54,7 @@ class TextHelperGetTextAfterActionTest {
                 PATTERN, "Hello",
                 MATCH_NUMBER, 1));
 
-        String result = TextHelperGetTextAfterAction.perform(mockedParameters, mockedParameters, mock(Context.class));
+        String result = TextHelperGetTextAfterAction.perform(mockedParameters, mockedParameters, null);
 
         assertEquals(" world! Hello again!", result);
     }
@@ -71,7 +69,7 @@ class TextHelperGetTextAfterActionTest {
 
         assertThrows(ProviderException.class,
             () -> TextHelperGetTextAfterAction.perform(
-                mockedParameters, mockedParameters, mock(Context.class)));
+                mockedParameters, mockedParameters, null));
     }
 
     @Test
@@ -84,6 +82,6 @@ class TextHelperGetTextAfterActionTest {
 
         assertThrows(ProviderException.class,
             () -> TextHelperGetTextAfterAction.perform(
-                mockedParameters, mockedParameters, mock(Context.class)));
+                mockedParameters, mockedParameters, null));
     }
 }

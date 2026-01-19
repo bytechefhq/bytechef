@@ -47,13 +47,8 @@ public class TextHelperIsEmailAction {
     }
 
     public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String email = inputParameters.getRequiredString(TEXT);
-
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-
-        Pattern emailPattern = Pattern.compile(emailRegex);
-
-        return emailPattern.matcher(email)
+        return Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+            .matcher(inputParameters.getRequiredString(TEXT))
             .matches();
     }
 }

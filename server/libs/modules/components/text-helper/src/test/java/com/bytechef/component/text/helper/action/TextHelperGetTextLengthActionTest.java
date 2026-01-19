@@ -18,9 +18,7 @@ package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -35,7 +33,7 @@ class TextHelperGetTextLengthActionTest {
     void testPerform() {
         Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "123456789"));
 
-        int result = TextHelperGetTextLengthAction.perform(mockedParameters, mockedParameters, mock(Context.class));
+        int result = TextHelperGetTextLengthAction.perform(mockedParameters, null, null);
 
         assertEquals(9, result);
     }

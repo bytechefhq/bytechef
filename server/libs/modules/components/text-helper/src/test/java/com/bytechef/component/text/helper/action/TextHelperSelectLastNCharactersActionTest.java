@@ -19,9 +19,7 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.NUMBER_OF_CHARACTERS;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -38,7 +36,7 @@ class TextHelperSelectLastNCharactersActionTest {
             Map.of(TEXT, "Hello, World!", NUMBER_OF_CHARACTERS, 5));
 
         String result =
-            TextHelperSelectLastNCharactersAction.perform(parameters, parameters, mock(Context.class));
+            TextHelperSelectLastNCharactersAction.perform(parameters, null, null);
 
         assertEquals("orld!", result);
     }

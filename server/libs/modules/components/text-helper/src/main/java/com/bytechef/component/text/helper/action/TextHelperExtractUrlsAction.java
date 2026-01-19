@@ -43,8 +43,10 @@ public class TextHelperExtractUrlsAction {
                 .description("The text from which to extract URLs.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
-        .output(outputSchema(array().description("Extracted URLs.")
-            .items(string())))
+        .output(
+            outputSchema(
+                array().description("Extracted URLs.")
+                    .items(string())))
         .perform(TextHelperExtractUrlsAction::perform);
 
     private TextHelperExtractUrlsAction() {

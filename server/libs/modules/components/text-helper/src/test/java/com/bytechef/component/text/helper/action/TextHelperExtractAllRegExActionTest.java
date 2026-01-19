@@ -20,9 +20,7 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.RE
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -34,21 +32,16 @@ import org.junit.jupiter.api.Test;
  */
 class TextHelperExtractAllRegExActionTest {
 
-    static final Context mockedContext = mock(Context.class);
-
     @Test
     void testPerformSingleMatch() {
         String input = "My email is test@example.com";
         String regex = "[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}";
 
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
 
-        List<String> result = TextHelperExtractAllRegExAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        List<String> result = TextHelperExtractAllRegExAction.perform(mockedParameters, null, null);
 
-        assertEquals(1, result.size());
-        assertEquals("test@example.com", result.getFirst());
+        assertEquals(List.of("test@example.com"), result);
     }
 
     @Test
@@ -56,15 +49,12 @@ class TextHelperExtractAllRegExActionTest {
         String input = "Contact: test@example.com or admin@site.org";
         String regex = "[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}";
 
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
 
-        List<String> result = TextHelperExtractAllRegExAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        List<String> result = TextHelperExtractAllRegExAction.perform(mockedParameters, null, null);
 
         assertEquals(2, result.size());
-        assertEquals("test@example.com", result.get(0));
-        assertEquals("admin@site.org", result.get(1));
+        assertEquals(List.of("test@example.com", "admin@site.org"), result);
     }
 
     @Test
@@ -72,11 +62,9 @@ class TextHelperExtractAllRegExActionTest {
         String input = "No emails here!";
         String regex = "[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}";
 
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
 
-        List<String> result = TextHelperExtractAllRegExAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        List<String> result = TextHelperExtractAllRegExAction.perform(mockedParameters, null, null);
 
         assertTrue(result.isEmpty());
     }
@@ -86,16 +74,12 @@ class TextHelperExtractAllRegExActionTest {
         String input = "Symbols: $var1 #tag @user";
         String regex = "[$#@]\\w+";
 
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
 
-        List<String> result = TextHelperExtractAllRegExAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        List<String> result = TextHelperExtractAllRegExAction.perform(mockedParameters, null, null);
 
         assertEquals(3, result.size());
-        assertEquals("$var1", result.get(0));
-        assertEquals("#tag", result.get(1));
-        assertEquals("@user", result.get(2));
+        assertEquals(List.of("$var1", "#tag", "@user"), result);
     }
 
     @Test
@@ -103,14 +87,11 @@ class TextHelperExtractAllRegExActionTest {
         String input = "He said \"Hello\" and she said \"Hi\"";
         String regex = "\"([^\"]*)\"";
 
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
 
-        List<String> result = TextHelperExtractAllRegExAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        List<String> result = TextHelperExtractAllRegExAction.perform(mockedParameters, null, null);
 
         assertEquals(2, result.size());
-        assertEquals("\"Hello\"", result.get(0));
-        assertEquals("\"Hi\"", result.get(1));
+        assertEquals(List.of("\"Hello\"", "\"Hi\""), result);
     }
 }

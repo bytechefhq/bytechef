@@ -18,9 +18,7 @@ package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.net.MalformedURLException;
@@ -34,12 +32,10 @@ class TextHelperGetDomainFromURLActionTest {
 
     @Test
     void testPerform() throws MalformedURLException {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, "https://subdomain.site.org/index.html"));
-        Context mockedContext = mock(Context.class);
+        Parameters mockedParameters =
+            MockParametersFactory.create(Map.of(TEXT, "https://subdomain.site.org/index.html"));
 
-        String result = TextHelperGetDomainFromURLAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        String result = TextHelperGetDomainFromURLAction.perform(mockedParameters, null, null);
 
         assertEquals("subdomain.site.org", result);
     }

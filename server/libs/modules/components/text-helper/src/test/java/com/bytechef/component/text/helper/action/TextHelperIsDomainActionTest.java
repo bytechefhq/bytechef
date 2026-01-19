@@ -32,22 +32,18 @@ class TextHelperIsDomainActionTest {
 
     @Test
     void testPerformValidDomain() {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, "example.com"));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "example.com"));
 
-        boolean result = TextHelperIsDomainAction.perform(
-            mockedParameters, null, null);
+        boolean result = TextHelperIsDomainAction.perform(mockedParameters, null, null);
 
         assertTrue(result);
     }
 
     @Test
     void testPerformInvalidDomain() {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, "-invalid.com"));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "-invalid.com"));
 
-        boolean result = TextHelperIsDomainAction.perform(
-            mockedParameters, null, null);
+        boolean result = TextHelperIsDomainAction.perform(mockedParameters, null, null);
 
         assertFalse(result);
     }

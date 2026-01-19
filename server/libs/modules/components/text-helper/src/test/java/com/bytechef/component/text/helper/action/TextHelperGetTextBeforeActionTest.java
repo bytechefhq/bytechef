@@ -21,9 +21,7 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.PA
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -43,7 +41,7 @@ class TextHelperGetTextBeforeActionTest {
                 PATTERN, "Hello",
                 MATCH_NUMBER, 2));
 
-        String result = TextHelperGetTextBeforeAction.perform(mockedParameters, mockedParameters, mock(Context.class));
+        String result = TextHelperGetTextBeforeAction.perform(mockedParameters, mockedParameters, null);
 
         assertEquals("Hello world! This is a sample text. ", result);
     }
@@ -51,12 +49,9 @@ class TextHelperGetTextBeforeActionTest {
     @Test
     void testExtractBeforeMatchFirstOccurrence() {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                TEXT, "Hello world! Hello again!",
-                PATTERN, "Hello",
-                MATCH_NUMBER, 1));
+            Map.of(TEXT, "Hello world! Hello again!", PATTERN, "Hello", MATCH_NUMBER, 1));
 
-        String result = TextHelperGetTextBeforeAction.perform(mockedParameters, mockedParameters, mock(Context.class));
+        String result = TextHelperGetTextBeforeAction.perform(mockedParameters, mockedParameters, null);
 
         assertEquals("", result);
     }
@@ -64,26 +59,18 @@ class TextHelperGetTextBeforeActionTest {
     @Test
     void testExtractBeforeMatchNotFound() {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                TEXT, "Hello world!",
-                PATTERN, "Hi",
-                MATCH_NUMBER, 1));
+            Map.of(TEXT, "Hello world!", PATTERN, "Hi", MATCH_NUMBER, 1));
 
         assertThrows(ProviderException.class,
-            () -> TextHelperGetTextBeforeAction.perform(
-                mockedParameters, mockedParameters, mock(Context.class)));
+            () -> TextHelperGetTextBeforeAction.perform(mockedParameters, mockedParameters, null));
     }
 
     @Test
     void testExtractBeforeMatchMatchNumberTooHigh() {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                TEXT, "Hello world!",
-                PATTERN, "Hello",
-                MATCH_NUMBER, 2));
+            Map.of(TEXT, "Hello world!", PATTERN, "Hello", MATCH_NUMBER, 2));
 
         assertThrows(ProviderException.class,
-            () -> TextHelperGetTextBeforeAction.perform(
-                mockedParameters, mockedParameters, mock(Context.class)));
+            () -> TextHelperGetTextBeforeAction.perform(mockedParameters, mockedParameters, null));
     }
 }
