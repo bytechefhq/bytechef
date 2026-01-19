@@ -33,6 +33,12 @@ import java.util.Map;
  */
 public class ZoominfoUtils {
 
+    public static void checkIfNull(Map<String, Object> body, String key, Object value) {
+        if (value != null) {
+            body.put(key, value);
+        }
+    }
+
     public static List<Option<String>> getCompanyFieldOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         Context context) {
