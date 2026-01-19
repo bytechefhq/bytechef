@@ -19,7 +19,7 @@ package com.bytechef.component.heygen.trigger;
 import static com.bytechef.component.heygen.constant.HeyGenConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.heygen.util.HeyGenUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -32,19 +32,18 @@ import org.junit.jupiter.api.Test;
 class HeyGenVideoGenerationCompletedTriggerTest extends AbstractHeyGenTriggerTest {
 
     @Test
-    void webhookEnable() {
+    void testWebhookEnable() {
         String webhhookUrl = "testWebhookUrl";
 
         heyGenUtilsMockedStatic.when(
-            () -> HeyGenUtils.addWebhook(
+            () -> HeyGenUtils.registerWebhook(
                 stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn("123");
 
-        TriggerDefinition.WebhookEnableOutput webhookEnableOutput = HeyGenVideoGenerationCompletedTrigger.webhookEnable(
+        WebhookEnableOutput webhookEnableOutput = HeyGenVideoGenerationCompletedTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        TriggerDefinition.WebhookEnableOutput expectedWebhookEnableOutput =
-            new TriggerDefinition.WebhookEnableOutput(Map.of(ID, "123"), null);
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
         assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
         assertEquals(List.of("avatar_video.success", webhhookUrl), stringArgumentCaptor.getAllValues());
@@ -52,7 +51,7 @@ class HeyGenVideoGenerationCompletedTriggerTest extends AbstractHeyGenTriggerTes
     }
 
     @Test
-    void webhookDisable() {
+    void testWebhookDisable() {
         mockedParameters = MockParametersFactory.create(Map.of(ID, "123"));
 
         HeyGenVideoGenerationCompletedTrigger.webhookDisable(
@@ -62,11 +61,10 @@ class HeyGenVideoGenerationCompletedTriggerTest extends AbstractHeyGenTriggerTes
     }
 
     @Test
-    void webhookRequest() {
+    void testWebhookRequest() {
         Map<String, Object> content = Map.of("id", 123);
 
-        heyGenUtilsMockedStatic.when(
-            () -> HeyGenUtils.getContent(webhookBodyArgumentCaptor.capture()))
+        heyGenUtilsMockedStatic.when(() -> HeyGenUtils.getWebhookEventData(webhookBodyArgumentCaptor.capture()))
             .thenReturn(content);
 
         Object result = HeyGenVideoGenerationCompletedTrigger.webhookRequest(

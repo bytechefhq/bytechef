@@ -21,9 +21,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.heygen.constant.HeyGenConstants.ID;
-import static com.bytechef.component.heygen.util.HeyGenUtils.addWebhook;
 import static com.bytechef.component.heygen.util.HeyGenUtils.deleteWebhook;
-import static com.bytechef.component.heygen.util.HeyGenUtils.getContent;
+import static com.bytechef.component.heygen.util.HeyGenUtils.getWebhookEventData;
+import static com.bytechef.component.heygen.util.HeyGenUtils.registerWebhook;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -66,7 +66,7 @@ public class HeyGenVideoGenerationCompletedTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new WebhookEnableOutput(Map.of(ID, addWebhook("avatar_video.success", context, webhookUrl)), null);
+        return new WebhookEnableOutput(Map.of(ID, registerWebhook("avatar_video.success", context, webhookUrl)), null);
     }
 
     protected static void webhookDisable(
@@ -80,6 +80,6 @@ public class HeyGenVideoGenerationCompletedTrigger {
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
-        return getContent(body);
+        return getWebhookEventData(body);
     }
 }

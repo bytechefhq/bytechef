@@ -32,7 +32,6 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -60,23 +59,17 @@ class HeyGenGenerateVideoFromTemplateActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-
-        Map<String, Object> responseBody = Map.of(
-            "data", mockedObject);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseBody);
+            .thenReturn(Map.of("data", mockedObject));
 
         Object result =
-            HeyGenGenerateVideoFromTemplateAction.perform(mockedParameters, mockedParameters, mockedContext);
+            HeyGenGenerateVideoFromTemplateAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
 
         Body body = bodyArgumentCaptor.getValue();
-        Map<String, Object> expected = new LinkedHashMap<>();
-        expected.put(FOLDER_ID, "2");
-        expected.put(CAPTION, false);
-        expected.put(ENABLE_SHARING, false);
+        Map<String, Object> expectedBody = Map.of(FOLDER_ID, "2", CAPTION, false, ENABLE_SHARING, false);
 
-        assertEquals(expected, body.getContent());
+        assertEquals(expectedBody, body.getContent());
     }
 }

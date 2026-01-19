@@ -73,14 +73,12 @@ public class HeyGenUploadAssetAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        FileEntry file = inputParameters.getFileEntry(FILE_ENTRY);
+        FileEntry file = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
         Map<String, ?> body = context
             .http(http -> http.post("https://upload.heygen.com/v1/asset"))
             .header("Content-type", file.getMimeType())
-            .body(
-                Body.of(file))
+            .body(Body.of(file))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
