@@ -20,10 +20,6 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.D
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_A;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_B;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.INCLUSIVE;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_AFTER;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_AFTER_OR_EQUAL;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_BEFORE;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_BEFORE_OR_EQUAL;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.RESOLUTION;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.RESOLUTION_PROPERTY;
 import static com.bytechef.component.date.helper.util.DateHelperUtils.applyResolution;
@@ -79,11 +75,11 @@ public class DateHelperIsBetweenDatesAction {
 
         boolean inclusive = inputParameters.getBoolean(INCLUSIVE);
 
-        DateHelperComparisonEnum startDateComparisonEnum = inclusive
-            ? DateHelperComparisonEnum.fromName(IS_AFTER_OR_EQUAL) : DateHelperComparisonEnum.fromName(IS_AFTER);
+        DateHelperComparisonEnum startDateComparisonEnum =
+            inclusive ? DateHelperComparisonEnum.IS_AFTER_OR_EQUAL : DateHelperComparisonEnum.IS_AFTER;
 
-        DateHelperComparisonEnum endDateComparisonEnum = inclusive
-            ? DateHelperComparisonEnum.fromName(IS_BEFORE_OR_EQUAL) : DateHelperComparisonEnum.fromName(IS_BEFORE);
+        DateHelperComparisonEnum endDateComparisonEnum =
+            inclusive ? DateHelperComparisonEnum.IS_BEFORE_OR_EQUAL : DateHelperComparisonEnum.IS_BEFORE;
 
         return startDateComparisonEnum.compare(date, startDate) && endDateComparisonEnum.compare(date, endDate);
     }

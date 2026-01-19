@@ -70,7 +70,7 @@ public class DateHelperCompareDatesAction {
         LocalDateTime dateA = applyResolution(resolution, inputParameters.getRequiredLocalDateTime(DATE_A));
         LocalDateTime dateB = applyResolution(resolution, inputParameters.getRequiredLocalDateTime(DATE_B));
 
-        return DateHelperComparisonEnum.fromName(inputParameters.getRequiredString(COMPARISON))
+        return DateHelperComparisonEnum.valueOf(inputParameters.getRequiredString(COMPARISON))
             .compare(dateA, dateB);
     }
 }

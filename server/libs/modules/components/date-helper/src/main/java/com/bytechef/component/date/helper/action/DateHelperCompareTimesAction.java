@@ -65,7 +65,7 @@ public class DateHelperCompareTimesAction {
         LocalDateTime normalizedDateA = normalizeToTimeOnly(inputParameters.getRequiredLocalDateTime(DATE_A));
         LocalDateTime normalizedDateB = normalizeToTimeOnly(inputParameters.getRequiredLocalDateTime(DATE_B));
 
-        return DateHelperComparisonEnum.fromName(inputParameters.getRequiredString(COMPARISON))
+        return DateHelperComparisonEnum.valueOf(inputParameters.getRequiredString(COMPARISON))
             .compare(normalizedDateA, normalizedDateB);
     }
 }
