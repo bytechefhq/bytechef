@@ -34,7 +34,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Marija Horvat
  */
-public class AbstractHeyGenTriggerTest {
+class AbstractHeyGenTriggerTest {
 
     protected Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);

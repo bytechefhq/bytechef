@@ -38,8 +38,9 @@ public class HeyGenComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("heyGen")
         .title("HeyGen")
-        .description("HeyGen is an AI Video Generator that lets you create explainer videos, marketing and sales " +
-            "promos, product demos, training and onboarding content.")
+        .description(
+            "HeyGen is an AI Video Generator that lets you create explainer videos, marketing and sales promos, " +
+                "product demos, training and onboarding content.")
         .icon("path:assets/heygen.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(HeyGenConnection.CONNECTION_DEFINITION)

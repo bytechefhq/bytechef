@@ -76,7 +76,6 @@ public class HeyGenGenerateVideoFromTemplateAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         Map<String, ?> body = context
             .http(http -> http.post(
                 "https://api.heygen.com/v2/template/" + inputParameters.getRequiredString(TEMPLATE_ID) + "/generate"))

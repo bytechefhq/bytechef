@@ -45,12 +45,14 @@ public class HeyGenTranslateVideoAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("translateVideoAction")
         .title("Translate Video")
         .description(
-            "Translates a video into one or more of 175+ supported languages with natural-sounding voice and accurate lip-sync.")
+            "Translates a video into one or more of 175+ supported languages with natural-sounding voice and " +
+                "accurate lip-sync.")
         .properties(
             string(VIDEO_URL)
                 .label("Video URL")
                 .description(
-                    "URL of the video file to be translated. Supports direct video file URLs, Google Drive URLs, and YouTube URLs.")
+                    "URL of the video file to be translated. Supports direct video file URLs, Google Drive URLs, " +
+                        "and YouTube URLs.")
                 .required(true),
             string(OUTPUT_LANGUAGE)
                 .label("Output Language")
@@ -64,7 +66,8 @@ public class HeyGenTranslateVideoAction {
             bool(TRANSLATE_AUDIO_ONLY)
                 .label("Translate Audio Only")
                 .description(
-                    "Translate only the audio; ideal for videos where the speaker is not visible, such as narrations, voiceovers, etc.")
+                    "Translate only the audio; ideal for videos where the speaker is not visible, such as " +
+                        "narrations, voiceovers, etc.")
                 .defaultValue(false)
                 .required(false))
         .output(
@@ -79,7 +82,6 @@ public class HeyGenTranslateVideoAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         Map<String, ?> body = context
             .http(http -> http.post("https://api.heygen.com/v2/video_translate"))
             .body(

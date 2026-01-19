@@ -19,7 +19,7 @@ package com.bytechef.component.heygen.trigger;
 import static com.bytechef.component.heygen.constant.HeyGenConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.heygen.util.HeyGenUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -36,15 +36,14 @@ class HeyGenVideoGenerationFailedTriggerTest extends AbstractHeyGenTriggerTest {
         String webhhookUrl = "testWebhookUrl";
 
         heyGenUtilsMockedStatic.when(
-            () -> HeyGenUtils.addWebhook(
+            () -> HeyGenUtils.registerWebhook(
                 stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn("123");
 
-        TriggerDefinition.WebhookEnableOutput webhookEnableOutput = HeyGenVideoGenerationFailedTrigger.webhookEnable(
+        WebhookEnableOutput webhookEnableOutput = HeyGenVideoGenerationFailedTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        TriggerDefinition.WebhookEnableOutput expectedWebhookEnableOutput =
-            new TriggerDefinition.WebhookEnableOutput(Map.of(ID, "123"), null);
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
         assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
         assertEquals(List.of("avatar_video.fail", webhhookUrl), stringArgumentCaptor.getAllValues());
@@ -66,7 +65,7 @@ class HeyGenVideoGenerationFailedTriggerTest extends AbstractHeyGenTriggerTest {
         Map<String, Object> content = Map.of("id", 123);
 
         heyGenUtilsMockedStatic.when(
-            () -> HeyGenUtils.getContent(webhookBodyArgumentCaptor.capture()))
+            () -> HeyGenUtils.getWebhookEventData(webhookBodyArgumentCaptor.capture()))
             .thenReturn(content);
 
         Object result = HeyGenVideoGenerationFailedTrigger.webhookRequest(

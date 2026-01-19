@@ -32,10 +32,9 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -47,25 +46,17 @@ import org.mockito.ArgumentCaptor;
 class HeyGenUtilsTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Response mockedResponse = mock(Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final TriggerDefinition.WebhookBody mockedWebhookBody = mock(TriggerDefinition.WebhookBody.class);
+    private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
     void testGetFolderIdOptions() {
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("folders", List.of(Map.of(ID, "1", NAME, "test")));
-        data.put("token", null);
-
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("data", data);
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
@@ -75,10 +66,10 @@ class HeyGenUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseBody);
+            .thenReturn(Map.of("data", Map.of("folders", List.of(Map.of(ID, "1", NAME, "test")))));
 
         List<Option<String>> result = HeyGenUtils.getFolderIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            mockedParameters, null, Map.of(), "", mockedContext);
 
         assertEquals(List.of(option("test", "1")), result);
 
@@ -88,9 +79,6 @@ class HeyGenUtilsTest {
 
     @Test
     void testGetLanguageOptions() {
-
-        Map<String, Object> responseBody = Map.of("data", Map.of("languages", List.of("English")));
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -98,21 +86,16 @@ class HeyGenUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseBody);
+            .thenReturn(Map.of("data", Map.of("languages", List.of("English"))));
 
         List<Option<String>> result = HeyGenUtils.getLanguageOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            mockedParameters, null, Map.of(), "", mockedContext);
 
         assertEquals(List.of(option("English", "English")), result);
     }
 
     @Test
     void testGetTemplateIdOptions() {
-
-        Map<String, Object> responseBody =
-            Map.of("data",
-                Map.of("templates", List.of(Map.of(TEMPLATE_ID, "1", NAME, "test"))));
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -120,17 +103,27 @@ class HeyGenUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseBody);
+            .thenReturn(
+                Map.of("data", Map.of("templates", List.of(Map.of(TEMPLATE_ID, "1", NAME, "test")))));
 
         List<Option<String>> result = HeyGenUtils.getTemplateIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            mockedParameters, null, Map.of(), "", mockedContext);
 
         assertEquals(List.of(option("test", "1")), result);
     }
 
     @Test
-    void testAddWebhook() {
-        Map<String, Object> responseBody = Map.of("data", Map.of("endpoint_id", "1"));
+    void testGetWebhookEventData() {
+        when(mockedWebhookBody.getContent(any(TypeReference.class)))
+            .thenReturn(Map.of("event_data", mockedObject));
+
+        Object result = HeyGenUtils.getWebhookEventData(mockedWebhookBody);
+
+        assertEquals(mockedObject, result);
+    }
+
+    @Test
+    void testRegisterWebhook() {
         String webhookUrl = "testWebhookUrl";
         String eventType = "testEventType";
 
@@ -143,25 +136,13 @@ class HeyGenUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseBody);
+            .thenReturn(Map.of("data", Map.of("endpoint_id", "1")));
 
-        String result = HeyGenUtils.addWebhook(eventType, mockedTriggerContext, webhookUrl);
+        String result = HeyGenUtils.registerWebhook(eventType, mockedTriggerContext, webhookUrl);
 
         assertEquals("1", result);
 
         Body body = bodyArgumentCaptor.getValue();
         assertEquals(Map.of("url", webhookUrl, "events", List.of(eventType)), body.getContent());
-    }
-
-    @Test
-    void testGetContent() {
-        Map<String, Object> content = Map.of("event_data", mockedObject);
-
-        when(mockedWebhookBody.getContent(any(TypeReference.class)))
-            .thenReturn(content);
-
-        Object result = HeyGenUtils.getContent(mockedWebhookBody);
-
-        assertEquals(mockedObject, result);
     }
 }

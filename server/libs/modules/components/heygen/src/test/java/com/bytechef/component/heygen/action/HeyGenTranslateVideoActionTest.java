@@ -32,7 +32,6 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -60,22 +59,16 @@ class HeyGenTranslateVideoActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-
-        Map<String, Object> responseBody = Map.of(
-            "data", mockedObject);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseBody);
+            .thenReturn(Map.of("data", mockedObject));
 
-        Object result = HeyGenTranslateVideoAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = HeyGenTranslateVideoAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
 
         Body body = bodyArgumentCaptor.getValue();
-        Map<String, Object> expected = new LinkedHashMap<>();
-        expected.put(VIDEO_URL, "1");
-        expected.put(OUTPUT_LANGUAGE, "English");
-        expected.put(TITLE, "Test");
-        expected.put(TRANSLATE_AUDIO_ONLY, false);
+        Map<String, Object> expected = Map.of(
+            VIDEO_URL, "1", OUTPUT_LANGUAGE, "English", TITLE, "Test", TRANSLATE_AUDIO_ONLY, false);
 
         assertEquals(expected, body.getContent());
     }

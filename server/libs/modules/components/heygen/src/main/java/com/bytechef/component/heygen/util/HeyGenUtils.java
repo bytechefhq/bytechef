@@ -28,7 +28,7 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
@@ -40,12 +40,18 @@ import java.util.Map;
  */
 public class HeyGenUtils {
 
-    public static List<Option<String>> getFolderIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+    public static void deleteWebhook(TriggerContext context, String webhookId) {
+        context.http(http -> http.delete("https://api.heygen.com/v1/webhook/endpoint.delete"))
+            .queryParameter("endpoint_id", webhookId)
+            .execute();
+    }
 
-        String nextPageToken = null;
+    public static List<Option<String>> getFolderIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
         List<Option<String>> options = new ArrayList<>();
+        String nextPageToken = null;
 
         do {
             Map<String, Map<?, ?>> body = context
@@ -60,10 +66,7 @@ public class HeyGenUtils {
             if (data.get("folders") instanceof List<?> list) {
                 for (Object o : list) {
                     if (o instanceof Map<?, ?> map) {
-                        String id = (String) map.get(ID);
-                        String name = (String) map.get(NAME);
-
-                        options.add(option(name, id));
+                        options.add(option((String) map.get(NAME), (String) map.get(ID)));
                     }
                 }
             }
@@ -76,16 +79,16 @@ public class HeyGenUtils {
     }
 
     public static List<Option<String>> getLanguageOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         Map<String, Map<?, ?>> body = context
             .http(http -> http.get("https://api.heygen.com/v2/video_translate/target_languages"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
 
         Map<?, ?> data = body.get("data");
 
@@ -99,8 +102,10 @@ public class HeyGenUtils {
     }
 
     public static List<Option<String>> getTemplateIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         Map<String, Map<?, ?>> body = context
             .http(http -> http.get("https://api.heygen.com/v2/templates"))
@@ -108,17 +113,12 @@ public class HeyGenUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
         Map<?, ?> data = body.get("data");
 
         if (data.get("templates") instanceof List<?> list) {
             for (Object o : list) {
                 if (o instanceof Map<?, ?> map) {
-                    String id = (String) map.get(TEMPLATE_ID);
-                    String name = (String) map.get(NAME);
-
-                    options.add(option(name, id));
+                    options.add(option((String) map.get(NAME), (String) map.get(TEMPLATE_ID)));
                 }
             }
         }
@@ -126,8 +126,13 @@ public class HeyGenUtils {
         return options;
     }
 
-    public static String addWebhook(String eventType, TriggerContext context, String webhookUrl) {
+    public static Object getWebhookEventData(WebhookBody body) {
+        Map<String, Object> content = body.getContent(new TypeReference<>() {});
 
+        return content.get("event_data");
+    }
+
+    public static String registerWebhook(String eventType, TriggerContext context, String webhookUrl) {
         Map<String, Object> body = context.http(http -> http.post("https://api.heygen.com/v1/webhook/endpoint.add"))
             .body(
                 Body.of(
@@ -142,18 +147,6 @@ public class HeyGenUtils {
         }
 
         throw new ProviderException("Failed to subscribe to webhook");
-    }
-
-    public static void deleteWebhook(TriggerContext context, String webhookId) {
-        context.http(http -> http.delete("https://api.heygen.com/v1/webhook/endpoint.delete"))
-            .queryParameter("endpoint_id", webhookId)
-            .execute();
-    }
-
-    public static Object getContent(TriggerDefinition.WebhookBody body) {
-        Map<String, Object> content = body.getContent(new TypeReference<>() {});
-
-        return content.get("event_data");
     }
 
     private HeyGenUtils() {

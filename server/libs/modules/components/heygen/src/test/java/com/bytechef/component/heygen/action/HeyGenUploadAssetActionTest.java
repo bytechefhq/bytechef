@@ -49,7 +49,7 @@ class HeyGenUploadAssetActionTest {
 
     @Test
     void testPerform() {
-        when(mockedParameters.getFileEntry(FILE_ENTRY))
+        when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
             .thenReturn(mockedFileEntry);
         when(mockedFileEntry.getMimeType())
             .thenReturn("image/jpeg");
@@ -64,19 +64,14 @@ class HeyGenUploadAssetActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-
-        Map<String, Object> responseBody = Map.of(
-            "data", Map.of("id", "1",
-                "name", "test",
-                "file_type", "image", "folder_id", "2"));
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseBody);
+            .thenReturn(Map.of("data", Map.of("id", "1", "name", "test", "file_type", "image", "folder_id", "2")));
 
-        Object result = HeyGenUploadAssetAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = HeyGenUploadAssetAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(List.of("Content-type", "image/jpeg"), stringArgumentCaptor.getAllValues());
 
-        assertEquals(responseBody.get("data"), result);
+        assertEquals(Map.of("id", "1", "name", "test", "file_type", "image", "folder_id", "2"), result);
 
         Body body = bodyArgumentCaptor.getValue();
 
