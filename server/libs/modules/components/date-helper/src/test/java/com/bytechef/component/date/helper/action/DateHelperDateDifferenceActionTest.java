@@ -124,6 +124,6 @@ class DateHelperDateDifferenceActionTest {
             assertThrows(IllegalArgumentException.class, () -> DateHelperDateDifferenceAction.perform(mockedParameters,
                 mockedParameters, mockedActionContext));
 
-        assertEquals("Unsupported unit UNSUPPORTED", exception.getMessage());
+        assertEquals("Unsupported unit: UNSUPPORTED", exception.getMessage());
     }
 }
