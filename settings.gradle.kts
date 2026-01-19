@@ -408,6 +408,7 @@ include("server:libs:modules:components:zoho:zoho-commons")
 include("server:libs:modules:components:zoho:zoho-crm")
 include("server:libs:modules:components:zoho:zoho-invoice")
 include("server:libs:modules:components:zoom")
+include("server:libs:modules:components:zoominfo")
 
 include("server:libs:modules:task-dispatchers:approval")
 include("server:libs:modules:task-dispatchers:branch")

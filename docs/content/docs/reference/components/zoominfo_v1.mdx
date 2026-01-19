@@ -1,0 +1,312 @@
+---
+title: "ZoomInfo"
+description: "ZoomInfo is a platform that provides companies with accurate contact data and sales insights to help them find and engage potential customers."
+---
+
+
+Categories: Marketing Automation
+
+
+Type: zoominfo/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Enrich Company
+Name: enrichCompany
+
+`Enrich company details.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| companyId | Company ID | INTEGER | Unique ZoomInfo identifier for a company. | true |
+| companyName | Company Name | STRING | Company name. | false |
+| companyWebsite | Company Website | STRING | Company website URL in http://www.example.com format. | false |
+| companyPhone | Company Phone | STRING | Phone number of the company headquarters. | false |
+| companyStreet | Company Street | STRING | Street address for the company's primary address. | false |
+| companyCity | Company City | STRING | City for the company's primary address. | false |
+| companyState | Company State | STRING | State for the company's primary address. | false |
+| companyZipcode | Company Zip Code | STRING | Zip code or postal code for the company's primary address. | false |
+| companyCountry | Company Country | STRING | Country for the company's primary address. | false |
+| outputFields | Output Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | Fields you want to get from employee. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Enrich Company",
+  "name" : "enrichCompany",
+  "parameters" : {
+    "companyId" : 1,
+    "companyName" : "",
+    "companyWebsite" : "",
+    "companyPhone" : "",
+    "companyStreet" : "",
+    "companyCity" : "",
+    "companyState" : "",
+    "companyZipcode" : "",
+    "companyCountry" : "",
+    "outputFields" : [ "" ]
+  },
+  "type" : "zoominfo/v1/enrichCompany"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Enrich Contact
+Name: enrichContact
+
+`Enrich contact details.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| personId | Person ID | INTEGER | Unique ZoomInfo identifier for the contact. | true |
+| fullName | Full Name | STRING | Contact full name. | false |
+| firstName | First Name | STRING | Contact first name. | false |
+| lastName | Last Name | STRING | Contact last name. | false |
+| emailAddress | Email | STRING | Business or Personal email address for the contact in example@example.com format. | false |
+| phone | Phone | STRING | Contact direct or mobile phone number. | false |
+| jobTitle | Job Title | STRING | Contact title at current place of employment. | false |
+| externalURL | External URL | STRING | Social media URLs for the contact (e.g., Facebook, Twitter, LinkedIn). | false |
+| companyId | Company ID | INTEGER | Unique ZoomInfo identifier for the company. | false |
+| companyName | Company Name | STRING | Name of the company for for which the contact works, or has worked. | false |
+| outputFields | Output Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | Fields you want to get from employee. See documentation for available fields. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Enrich Contact",
+  "name" : "enrichContact",
+  "parameters" : {
+    "personId" : 1,
+    "fullName" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "emailAddress" : "",
+    "phone" : "",
+    "jobTitle" : "",
+    "externalURL" : "",
+    "companyId" : 1,
+    "companyName" : "",
+    "outputFields" : [ "" ]
+  },
+  "type" : "zoominfo/v1/enrichContact"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Search Company
+Name: searchCompany
+
+`Search company by specific criteria.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| companyName | Company Name | STRING | Company name. | false |
+| companyDescription | Company Description | STRING | Text description unique to the company you want to use as search criteria. | false |
+| companyType | Company Type | STRING | Company type (private, public, and so on). | false |
+| businessModel | Business Model | STRING | Search using Business Model (B2C, B2B, B2G) for a company. Default is All. | false |
+| country | Country | STRING | Country for the company's primary address. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Company",
+  "name" : "searchCompany",
+  "parameters" : {
+    "companyName" : "",
+    "companyDescription" : "",
+    "companyType" : "",
+    "businessModel" : "",
+    "country" : ""
+  },
+  "type" : "zoominfo/v1/searchCompany"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique identifier for the resource. |
+| type | STRING | The type of the resource |
+| attributes | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(city), STRING\(state), STRING\(country), STRING\(revenue), STRING\(employeeCount), STRING\(website), STRING\(logo), &#123;BOOLEAN\(underManagement), STRING\(purchaseDate)&#125;\(managementStatus)&#125; </details> | Response attributes for company search. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "type" : "",
+  "attributes" : {
+    "name" : "",
+    "city" : "",
+    "state" : "",
+    "country" : "",
+    "revenue" : "",
+    "employeeCount" : "",
+    "website" : "",
+    "logo" : "",
+    "managementStatus" : {
+      "underManagement" : false,
+      "purchaseDate" : ""
+    }
+  }
+} ]
+```
+
+
+### Search Contact
+Name: searchContact
+
+`Search contact by specific criteria.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| emailAddress | Email | STRING | Work email address for the contact in example@example.com format. | false |
+| fullName | Full Name | STRING | Contact full name. | false |
+| firstName | First Name | STRING | Contact first name. | false |
+| lastName | Last Name | STRING | Contact last name. | false |
+| jobTitle | Job Title | STRING | Contact title at current place of employment. | false |
+| department | Department | STRING | Contact department at current place of employment. | false |
+| companyName | Company Name | STRING | Company name. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Contact",
+  "name" : "searchContact",
+  "parameters" : {
+    "emailAddress" : "",
+    "fullName" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "jobTitle" : "",
+    "department" : "",
+    "companyName" : ""
+  },
+  "type" : "zoominfo/v1/searchContact"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique identifier for the resource. |
+| type | STRING | The type of the resource. |
+| attributes | OBJECT <details> <summary> Properties </summary> &#123;STRING\(firstName), STRING\(middleName), STRING\(lastName), STRING\(validDate), STRING\(lastUpdatedDate), STRING\(jobTitle), INTEGER\(contactAccuracyScore), STRING\(managementLevel), STRING\(school), BOOLEAN\(hasEmail), BOOLEAN\(hasSupplementalEmail), BOOLEAN\(hasDirectPhone), BOOLEAN\(hasMobilePhone), BOOLEAN\(hasCompanyIndustry), BOOLEAN\(hasCompanyPhone), BOOLEAN\(hasCompanyStreet), BOOLEAN\(hasCompanyState), BOOLEAN\(hasCompanyZipCode), BOOLEAN\(hasCompanyCountry), BOOLEAN\(hasCompanyRevenue), BOOLEAN\(hasCompanyEmployeeCount), BOOLEAN\(directPhoneDoNotCall), BOOLEAN\(mobilePhoneDoNotCall), &#123;BOOLEAN\(underManagement), STRING\(purchaseDate)&#125;\(managementStatus), &#123;INTEGER\(id), STRING\(name)&#125;\(company)&#125; </details> | Response attributes for contact search. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "type" : "",
+  "attributes" : {
+    "firstName" : "",
+    "middleName" : "",
+    "lastName" : "",
+    "validDate" : "",
+    "lastUpdatedDate" : "",
+    "jobTitle" : "",
+    "contactAccuracyScore" : 1,
+    "managementLevel" : "",
+    "school" : "",
+    "hasEmail" : false,
+    "hasSupplementalEmail" : false,
+    "hasDirectPhone" : false,
+    "hasMobilePhone" : false,
+    "hasCompanyIndustry" : false,
+    "hasCompanyPhone" : false,
+    "hasCompanyStreet" : false,
+    "hasCompanyState" : false,
+    "hasCompanyZipCode" : false,
+    "hasCompanyCountry" : false,
+    "hasCompanyRevenue" : false,
+    "hasCompanyEmployeeCount" : false,
+    "directPhoneDoNotCall" : false,
+    "mobilePhoneDoNotCall" : false,
+    "managementStatus" : {
+      "underManagement" : false,
+      "purchaseDate" : ""
+    },
+    "company" : {
+      "id" : 1,
+      "name" : ""
+    }
+  }
+} ]
+```
+
+
+
+
