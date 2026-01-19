@@ -107,6 +107,7 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     @Bean
     @Primary
     @ConditionalOnProperty(prefix = "bytechef.datasource", name = "url")
+    @ConditionalOnProperty(prefix = "bytechef.tenant", name = "mode", havingValue = "single", matchIfMissing = true)
     DataSource dataSource(DataSourceProperties properties) {
         return DataSourceBuilder.create(properties.getClassLoader())
             .type(HikariDataSource.class)
