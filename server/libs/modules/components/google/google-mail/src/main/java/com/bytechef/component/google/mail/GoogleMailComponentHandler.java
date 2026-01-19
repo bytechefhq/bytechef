@@ -27,6 +27,7 @@ import com.bytechef.component.google.mail.action.GoogleMailAddLabelsAction;
 import com.bytechef.component.google.mail.action.GoogleMailDeleteMailAction;
 import com.bytechef.component.google.mail.action.GoogleMailGetMailAction;
 import com.bytechef.component.google.mail.action.GoogleMailGetThreadAction;
+import com.bytechef.component.google.mail.action.GoogleMailListLabelsAction;
 import com.bytechef.component.google.mail.action.GoogleMailRemoveLabelsAction;
 import com.bytechef.component.google.mail.action.GoogleMailReplyToEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSearchEmailAction;
@@ -55,6 +56,7 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             GoogleMailDeleteMailAction.ACTION_DEFINITION,
             GoogleMailGetMailAction.ACTION_DEFINITION,
             GoogleMailGetThreadAction.ACTION_DEFINITION,
+            GoogleMailListLabelsAction.ACTION_DEFINITION,
             GoogleMailRemoveLabelsAction.ACTION_DEFINITION,
             GoogleMailReplyToEmailAction.ACTION_DEFINITION,
             GoogleMailSearchEmailAction.ACTION_DEFINITION,
@@ -67,6 +69,7 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             tool(GoogleMailDeleteMailAction.ACTION_DEFINITION),
             tool(GoogleMailGetMailAction.ACTION_DEFINITION),
             tool(GoogleMailGetThreadAction.ACTION_DEFINITION),
+            tool(GoogleMailListLabelsAction.ACTION_DEFINITION),
             tool(GoogleMailRemoveLabelsAction.ACTION_DEFINITION),
             tool(GoogleMailReplyToEmailAction.ACTION_DEFINITION),
             tool(GoogleMailSearchEmailAction.ACTION_DEFINITION),
