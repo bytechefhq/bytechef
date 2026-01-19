@@ -29,6 +29,7 @@ import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.COMPANY
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.COUNTRY;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.PAGE_NUMBER;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.PAGE_SIZE;
+import static com.bytechef.component.zoominfo.util.ZoominfoUtils.checkIfNull;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -37,6 +38,7 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -85,21 +87,24 @@ public class ZoominfoSearchCompanyAction {
         int totalResults;
 
         do {
+            Map<String, Object> attributes = new LinkedHashMap<>();
+
+            checkIfNull(attributes, COMPANY_NAME, inputParameters.getString(COMPANY_NAME));
+            checkIfNull(attributes, COMPANY_DESCRIPTION, inputParameters.getString(COMPANY_DESCRIPTION));
+            checkIfNull(attributes, COMPANY_TYPE, inputParameters.getString(COMPANY_TYPE));
+            checkIfNull(attributes, BUSINESS_MODEL, inputParameters.getString(BUSINESS_MODEL));
+            checkIfNull(attributes, COUNTRY, inputParameters.getString(COUNTRY));
+
+            Map<String, Object> data = Map.of(
+                "type", "CompanySearch",
+                "attributes", attributes);
+
+            Map<String, Object> requestBody = Map.of("data", data);
+
             Map<String, Object> body = context.http(http -> http.post("/companies/search"))
                 .queryParameters(PAGE_SIZE, pageSize, PAGE_NUMBER, nextPageNumber)
                 .body(
-                    Body.of(
-                        "data", new Object[] {
-                            "type", "CompanySearch",
-                            "attributes",
-                            new Object[] {
-                                COMPANY_NAME, inputParameters.getString(COMPANY_NAME),
-                                COMPANY_DESCRIPTION, inputParameters.getString(COMPANY_DESCRIPTION),
-                                COMPANY_TYPE, inputParameters.getString(COMPANY_TYPE),
-                                BUSINESS_MODEL, inputParameters.getString(BUSINESS_MODEL),
-                                COUNTRY, inputParameters.getString(COUNTRY)
-                            }
-                        }))
+                    Body.of(requestBody))
                 .configuration(responseType(ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});

@@ -31,6 +31,7 @@ import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.JOB_TIT
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.LAST_NAME;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.PAGE_NUMBER;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.PAGE_SIZE;
+import static com.bytechef.component.zoominfo.util.ZoominfoUtils.checkIfNull;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -39,6 +40,7 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,23 +97,26 @@ public class ZoominfoSearchContactAction {
         int totalResults;
 
         do {
+            Map<String, Object> attributes = new LinkedHashMap<>();
+
+            checkIfNull(attributes, EMAIL, inputParameters.getString(EMAIL));
+            checkIfNull(attributes, FULL_NAME, inputParameters.getString(FULL_NAME));
+            checkIfNull(attributes, FIRST_NAME, inputParameters.getString(FIRST_NAME));
+            checkIfNull(attributes, LAST_NAME, inputParameters.getString(LAST_NAME));
+            checkIfNull(attributes, JOB_TITLE, inputParameters.getString(JOB_TITLE));
+            checkIfNull(attributes, DEPARTMENT, inputParameters.getString(DEPARTMENT));
+            checkIfNull(attributes, COMPANY_NAME, inputParameters.getString(COMPANY_NAME));
+
+            Map<String, Object> data = Map.of(
+                "type", "ContactSearch",
+                "attributes", attributes);
+
+            Map<String, Object> requestBody = Map.of("data", data);
+
             Map<String, Object> body = context.http(http -> http.post("/contacts/search"))
                 .queryParameters(PAGE_SIZE, pageSize, PAGE_NUMBER, nextPageNumber)
                 .body(
-                    Body.of(
-                        "data", new Object[] {
-                            "type", "ContactSearch",
-                            "attributes",
-                            new Object[] {
-                                EMAIL, inputParameters.getString(EMAIL),
-                                FULL_NAME, inputParameters.getString(FULL_NAME),
-                                FIRST_NAME, inputParameters.getString(FIRST_NAME),
-                                LAST_NAME, inputParameters.getString(LAST_NAME),
-                                JOB_TITLE, inputParameters.getString(JOB_TITLE),
-                                DEPARTMENT, inputParameters.getString(DEPARTMENT),
-                                COMPANY_NAME, inputParameters.getString(COMPANY_NAME)
-                            }
-                        }))
+                    Body.of(requestBody))
                 .configuration(responseType(ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
