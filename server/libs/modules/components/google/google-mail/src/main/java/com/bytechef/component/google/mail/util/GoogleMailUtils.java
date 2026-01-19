@@ -123,7 +123,10 @@ public class GoogleMailUtils {
                 .description("The HTML body of the message."),
             array(ATTACHMENTS)
                 .description("List of attachments of the message.")
-                .items(fileEntry()));
+                .items(fileEntry()),
+            array(LABEL_IDS)
+                .description("List of IDs of labels applied to this message.")
+                .items(string()));
 
     protected static final ModifiableObjectProperty RAW_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
@@ -394,12 +397,14 @@ public class GoogleMailUtils {
 
         List<FileEntry> fileEntries = getFileEntries(message, context, service);
 
-        return createSimpleMessage(message, messagePartHeaders, bodyPlain, bodyHtml, fileEntries);
+        List<String> labels = getLabels(message);
+
+        return createSimpleMessage(message, messagePartHeaders, bodyPlain, bodyHtml, fileEntries, labels);
     }
 
     private static SimpleMessage createSimpleMessage(
         Message message, List<MessagePartHeader> messagePartHeaders, String bodyPlain, String bodyHtml,
-        List<FileEntry> fileEntries) {
+        List<FileEntry> fileEntries, List<String> labels) {
 
         String subject = null;
         String from = null;
@@ -428,7 +433,7 @@ public class GoogleMailUtils {
 
         return new SimpleMessage(
             message.getId(), message.getThreadId(), message.getHistoryId(), subject, from, to, cc, bcc, bodyPlain,
-            bodyHtml, fileEntries, "https://mail.google.com/mail/u/0/#all/" + message.getId());
+            bodyHtml, fileEntries, labels, "https://mail.google.com/mail/u/0/#all/" + message.getId());
     }
 
     private static List<FileEntry> getFileEntries(Message message, Context context, Gmail service) {
@@ -478,6 +483,16 @@ public class GoogleMailUtils {
         }
     }
 
+    private static List<String> getLabels(Message message) {
+        List<String> labels = message.getLabelIds();
+
+        if (labels == null) {
+            return List.of();
+        }
+
+        return labels;
+    }
+
     public static Message sendMail(Gmail service, Message message) {
         try {
             return service.users()
@@ -493,6 +508,6 @@ public class GoogleMailUtils {
     public record SimpleMessage(
         String id, String threadId, BigInteger historyId, String subject, String from, List<String> to,
         List<String> cc, List<String> bcc, String bodyPlain, String bodyHtml,
-        List<FileEntry> attachments, String webLink) {
+        List<FileEntry> attachments, List<String> labels, String webLink) {
     }
 }
