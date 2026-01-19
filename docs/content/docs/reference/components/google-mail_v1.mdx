@@ -189,6 +189,49 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+### List Labels
+Name: listLabels
+
+`Lists labels that are connected to your Google Mail account.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Labels",
+  "name" : "listLabels",
+  "type" : "googleMail/v1/listLabels"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING | Name of the label. |
+| id | STRING | Id of the label. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "name" : "",
+  "id" : ""
+} ]
+```
+
+
 ### Remove Labels
 Name: removeLabels
 
