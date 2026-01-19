@@ -594,10 +594,17 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 }
             }
         } else {
-            boolean result = evaluate(displayCondition, MapUtils.concat(inputMap, (Map<String, Object>) parameterMap));
+            if (displayCondition.contains("[index]")) {
+                evaluateArray(
+                    property.getName(), displayCondition, displayConditionMap, inputMap, Map.of(),
+                    parameterMap);
+            } else {
+                boolean result = evaluate(
+                    displayCondition, MapUtils.concat(inputMap, (Map<String, Object>) parameterMap));
 
-            if (result) {
-                displayConditionMap.put(displayCondition, property.getName());
+                if (result) {
+                    displayConditionMap.put(displayCondition, property.getName());
+                }
             }
         }
 
@@ -986,6 +993,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     } else {
                         findIndexes(indexGroup + remainingExpression, nextParameters, currentIndexes, allIndexes);
                     }
+                } else if (!currentIndexes.isEmpty()) {
+                    allIndexes.add(new ArrayList<>(currentIndexes));
                 }
             } else if (currentParameters instanceof List<?> currentList) {
                 for (int i = 0; i < currentList.size(); i++) {
@@ -1281,8 +1290,15 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     private static String replaceIndexes(String expression, List<Integer> indexes) {
+        Integer lastIndex = null;
+
         for (Integer index : indexes) {
             expression = expression.replaceFirst("\\[index]", "[" + index + "]");
+            lastIndex = index;
+        }
+
+        if (lastIndex != null && expression.contains("[index]")) {
+            expression = expression.replace("[index]", "[" + lastIndex + "]");
         }
 
         return expression;

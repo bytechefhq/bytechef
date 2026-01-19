@@ -208,7 +208,6 @@ public class WorkflowNodeParameterFacadeTest {
         String clusterElementWorkflowNodeName = "loopTask";
         String path = "param1";
 
-        // Setup ClusterElementDefinition mock directly
         ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
 
         when(clusterElementDefinition.getProperties()).thenReturn(new ArrayList<>());
@@ -216,7 +215,6 @@ public class WorkflowNodeParameterFacadeTest {
             .thenReturn(clusterElementDefinition);
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             Map<String, Object> clusterElementMap = new HashMap<>();
 
@@ -276,10 +274,7 @@ public class WorkflowNodeParameterFacadeTest {
         String clusterElementWorkflowNodeName = "loopTask";
         String path = "param1";
 
-        // Note: ClusterElementDefinition mock not needed since ConfigurationException is thrown before it's used
-
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Create task definition without the requested cluster element type
             Map<String, Object> task = new HashMap<>();
 
             task.put("name", workflowNodeName);
@@ -318,14 +313,16 @@ public class WorkflowNodeParameterFacadeTest {
         String clusterElementWorkflowNodeName = "listTask";
         String parameterPath = "items.config";
 
-        // Setup cluster elements in list structure using mutable maps
         Map<String, Object> configMap = new HashMap<>();
+
         configMap.put("key", "value");
 
         Map<String, Object> itemsMap = new HashMap<>();
+
         itemsMap.put("config", configMap);
 
         Map<String, Object> parameters = new HashMap<>();
+
         parameters.put("items", itemsMap);
 
         Map<String, Object> clusterElement = new HashMap<>();
@@ -335,8 +332,8 @@ public class WorkflowNodeParameterFacadeTest {
         clusterElement.put("parameters", parameters);
         clusterElement.put("metadata", new HashMap<>());
 
-        // Create cluster elements map structure as expected by the implementation
         Map<String, Object> clusterElementsMap = new HashMap<>();
+
         clusterElementsMap.put(clusterElementTypeName, List.of(clusterElement));
 
         Map<String, Object> caseMap = new HashMap<>();
@@ -398,7 +395,6 @@ public class WorkflowNodeParameterFacadeTest {
         String clusterElementWorkflowNodeName = "nestedLoopTask";
         String path = "param1";
 
-        // Setup ClusterElementDefinition mock directly
         ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
 
         when(clusterElementDefinition.getProperties()).thenReturn(new ArrayList<>());
@@ -406,7 +402,6 @@ public class WorkflowNodeParameterFacadeTest {
             .thenReturn(clusterElementDefinition);
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Create nested cluster element structure
             Map<String, Object> nestedLoopParams = new HashMap<>();
             Map<String, Object> nestedLoopElement = new HashMap<>();
 
@@ -440,6 +435,7 @@ public class WorkflowNodeParameterFacadeTest {
             task.put("clusterElements", clusterElements);
 
             List<Map<String, Object>> tasks = new ArrayList<>();
+
             tasks.add(task);
 
             Map<String, Object> definitionMap = new HashMap<>();
@@ -474,15 +470,14 @@ public class WorkflowNodeParameterFacadeTest {
         String workflowNodeName = "task1";
         String path = "param1";
 
-        // Setup ActionDefinition mock outside of JsonUtils mocking
         ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
         when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
 
         when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(actionDefinition);
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             Map<String, Object> task = new HashMap<>();
 
@@ -527,14 +522,13 @@ public class WorkflowNodeParameterFacadeTest {
         String workflowNodeName = "task1";
         String parameterPath = "items[1].value";
 
-        // Setup ActionDefinition mock directly
         ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
         when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
         when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(actionDefinition);
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Create workflow with array data
             Map<String, Object> parameters = new HashMap<>();
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item1 = new HashMap<>();
@@ -593,10 +587,9 @@ public class WorkflowNodeParameterFacadeTest {
         String path = "param1";
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Create workflow definition with a different task name
             Map<String, Object> task = new HashMap<>();
 
-            task.put("name", "task1"); // Different from nonExistentTask
+            task.put("name", "task1");
             task.put("type", "component/v1/action");
             task.put("parameters", new HashMap<>());
             task.put("metadata", new HashMap<>());
@@ -633,13 +626,11 @@ public class WorkflowNodeParameterFacadeTest {
         String workflowNodeName = "task1";
         String path = "nested.param.value";
 
-        // Setup ActionDefinition mock directly
         ActionDefinition actionDefinition = mock(ActionDefinition.class);
 
         when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             Map<String, Object> task = new HashMap<>();
 
@@ -779,6 +770,39 @@ public class WorkflowNodeParameterFacadeTest {
     }
 
     @Test
+    public void testEvaluateArraySingleLevel() {
+        // Test single-level array displayCondition like list[index].type == 'ARRAY'
+        Map<String, Object> parametersMap = Map.of(
+            "list",
+            List.of(
+                Map.of("key", "foo", "type", "ARRAY"),
+                Map.of("key", "bar", "type", "STRING")));
+
+        Map<String, String> displayConditionMap = new HashMap<>();
+
+        WORKFLOW_NODE_PARAMETER_FACADE.evaluateArray(
+            "value", "list[index].type == 'ARRAY'", displayConditionMap, Map.of(), Map.of(),
+            parametersMap);
+
+        assertEquals(1, displayConditionMap.size());
+        assertEquals(
+            Map.of("list[0].type == 'ARRAY'", "0_value"),
+            displayConditionMap);
+
+        // Test STRING type
+        displayConditionMap = new HashMap<>();
+
+        WORKFLOW_NODE_PARAMETER_FACADE.evaluateArray(
+            "value", "list[index].type == 'STRING'", displayConditionMap, Map.of(), Map.of(),
+            parametersMap);
+
+        assertEquals(1, displayConditionMap.size());
+        assertEquals(
+            Map.of("list[1].type == 'STRING'", "1_value"),
+            displayConditionMap);
+    }
+
+    @Test
     public void testHasExpressionVariable() {
         String[] expressions = {
             "variableName == 45", "'string' == variableName", "prefixVariableName!= newValue1 && !variableName ",
@@ -885,12 +909,10 @@ public class WorkflowNodeParameterFacadeTest {
         String clusterElementTypeName = "loop";
         String clusterElementWorkflowNodeName = "loopTask";
 
-        // Setup ClusterElementDefinition mock directly
         ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
         when(clusterElementDefinition.getProperties()).thenReturn(new ArrayList<>());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             Map<String, Object> clusterElementMap = new HashMap<>();
 
@@ -953,7 +975,6 @@ public class WorkflowNodeParameterFacadeTest {
         String innerTypeName = "case";
         String targetChildName = "childA";
 
-        // Build child cluster elements
         Map<String, Object> childA = new HashMap<>();
 
         childA.put("name", targetChildName);
@@ -968,7 +989,6 @@ public class WorkflowNodeParameterFacadeTest {
         childB.put("parameters", new HashMap<>());
         childB.put("metadata", new HashMap<>());
 
-        // Build two sibling nested cluster roots of the same type under the task
         Map<String, Object> rootA = new HashMap<>();
 
         rootA.put("name", "rootA");
@@ -1004,6 +1024,7 @@ public class WorkflowNodeParameterFacadeTest {
         task.put("clusterElements", topClusterElements);
 
         Map<String, Object> definitionMap = new HashMap<>();
+
         definitionMap.put("tasks", List.of(task));
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -1040,16 +1061,18 @@ public class WorkflowNodeParameterFacadeTest {
         String workflowId = "workflow1";
         String workflowNodeName = "forkJoinTask";
 
-        // Setup workflow with fork/join structure (List<List<Map>>) using mutable maps
         Map<String, Object> task1 = new HashMap<>();
+
         task1.put("name", "task1");
         task1.put("type", "component/v1/action");
 
         Map<String, Object> targetTask = new HashMap<>();
+
         targetTask.put("name", workflowNodeName);
         targetTask.put("type", "component/v1/action");
 
         Map<String, Object> task2 = new HashMap<>();
+
         task2.put("name", "task2");
         task2.put("type", "component/v1/action");
 
@@ -1058,14 +1081,17 @@ public class WorkflowNodeParameterFacadeTest {
             List.of(task2));
 
         Map<String, Object> forkJoinParameters = new HashMap<>();
+
         forkJoinParameters.put("forks", forkJoinTasks);
 
         Map<String, Object> forkJoinTask = new HashMap<>();
+
         forkJoinTask.put("name", "forkJoin");
         forkJoinTask.put("type", "fork/v1");
         forkJoinTask.put("parameters", forkJoinParameters);
 
         Map<String, Object> definitionMap = new HashMap<>();
+
         definitionMap.put("tasks", List.of(forkJoinTask));
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -1073,11 +1099,12 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn(definitionMap);
 
             Workflow workflow = mock(Workflow.class);
+
             when(workflow.getDefinition()).thenReturn("{}");
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
 
-            // Mock ActionDefinition for the component tasks
             ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
             when(actionDefinition.getProperties()).thenReturn(List.of());
             when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
                 .thenReturn(actionDefinition);
@@ -1090,7 +1117,6 @@ public class WorkflowNodeParameterFacadeTest {
 
             // Then
             assertNotNull(result);
-            // The method should be able to find the nested task within the fork/join structure
         }
     }
 
@@ -1102,33 +1128,39 @@ public class WorkflowNodeParameterFacadeTest {
         String clusterElementTypeName = "case";
         String clusterElementWorkflowNodeName = "subtask1";
 
-        // Setup workflow with cluster elements in a list structure using mutable maps
         Map<String, Object> clusterElementParams = new HashMap<>();
+
         clusterElementParams.put("param1", "value1");
 
         Map<String, Object> clusterElement = new HashMap<>();
+
         clusterElement.put("name", clusterElementWorkflowNodeName);
         clusterElement.put("type", "component/v1/action");
         clusterElement.put("parameters", clusterElementParams);
 
         // Create cluster elements map structure as expected by the implementation
         Map<String, Object> clusterElementsMap = new HashMap<>();
+
         clusterElementsMap.put(clusterElementTypeName, List.of(clusterElement));
 
         Map<String, Object> caseMap = new HashMap<>();
+
         caseMap.put("key", "case1");
         caseMap.put("clusterElements", clusterElementsMap);
 
         Map<String, Object> taskParameters = new HashMap<>();
+
         taskParameters.put("cases", List.of(caseMap));
 
         Map<String, Object> taskWithClusterElements = new HashMap<>();
+
         taskWithClusterElements.put("name", workflowNodeName);
         taskWithClusterElements.put("type", "branch/v1");
         taskWithClusterElements.put("parameters", taskParameters);
         taskWithClusterElements.put("clusterElements", clusterElementsMap);
 
         Map<String, Object> definitionMap = new HashMap<>();
+
         definitionMap.put("tasks", List.of(taskWithClusterElements));
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -1138,6 +1170,7 @@ public class WorkflowNodeParameterFacadeTest {
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
+
             when(workflow.getDefinition()).thenReturn("{}");
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
 
@@ -1153,7 +1186,6 @@ public class WorkflowNodeParameterFacadeTest {
 
             // Then
             assertNotNull(result);
-            // The method should be able to find cluster elements within list structures
         }
     }
 
@@ -1163,13 +1195,11 @@ public class WorkflowNodeParameterFacadeTest {
         String workflowId = "workflow1";
         String workflowNodeName = "task1";
 
-        // Setup ActionDefinition mock directly
         ActionDefinition actionDefinition = mock(ActionDefinition.class);
 
         when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             Map<String, Object> task = new HashMap<>();
 
@@ -1235,7 +1265,6 @@ public class WorkflowNodeParameterFacadeTest {
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             Map<String, Object> task = new HashMap<>();
 
@@ -1290,7 +1319,6 @@ public class WorkflowNodeParameterFacadeTest {
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             Map<String, Object> task = new HashMap<>();
 
@@ -1330,9 +1358,8 @@ public class WorkflowNodeParameterFacadeTest {
     void testGetWorkflowNodeDisplayConditionsWithTrigger() {
         // Given
         String workflowId = "workflow1";
-        String workflowNodeName = "manual"; // This will be treated as a trigger
+        String workflowNodeName = "manual";
 
-        // Setup TriggerDefinition mock
         TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
 
         when(triggerDefinition.getProperties()).thenReturn(new ArrayList<>());
@@ -1343,7 +1370,6 @@ public class WorkflowNodeParameterFacadeTest {
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Create trigger definition map
             Map<String, Object> trigger = new HashMap<>();
 
             trigger.put("name", "manual");
@@ -1390,7 +1416,6 @@ public class WorkflowNodeParameterFacadeTest {
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> task = new HashMap<>();
             task.put("name", "loop1");
             task.put("type", "loop/v1");
@@ -1454,17 +1479,16 @@ public class WorkflowNodeParameterFacadeTest {
         when(workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(anyString(), anyString(), anyLong()))
             .thenReturn(Map.of());
 
-        // Mock evaluator to return proper boolean values
         when(evaluator.evaluate(any(Map.class), any(Map.class)))
             .thenReturn(Map.of("displayCondition", false));
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             List<Map<String, Object>> items = new ArrayList<>();
 
             items.add(Map.of("value", "item1"));
             items.add(Map.of("value", "item2"));
+
             parameters.put("items", items);
 
             Map<String, Object> task = new HashMap<>();
@@ -1520,7 +1544,6 @@ public class WorkflowNodeParameterFacadeTest {
             .thenReturn(Map.of());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             Map<String, Object> task = new HashMap<>();
 
@@ -1559,181 +1582,6 @@ public class WorkflowNodeParameterFacadeTest {
     }
 
     @Test
-    void testUpdateWorkflowNodeParameterNullValue() {
-        // Given
-        String workflowId = "workflow1";
-        String workflowNodeName = "task1";
-        String parameterPath = "param1";
-        Object value = null;
-        String type = null;
-        boolean includeInMetadata = false;
-
-        // Setup ActionDefinition mock directly
-        ActionDefinition actionDefinition = mock(ActionDefinition.class);
-
-        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
-
-        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
-            Map<String, Object> parameters = new HashMap<>();
-            Map<String, Object> task = new HashMap<>();
-
-            task.put("name", "task1");
-            task.put("type", "component/v1/action");
-            task.put("parameters", parameters);
-            task.put("metadata", new HashMap<>());
-
-            List<Map<String, Object>> tasks = new ArrayList<>();
-
-            tasks.add(task);
-
-            Map<String, Object> definitionMap = new HashMap<>();
-
-            definitionMap.put("tasks", tasks);
-
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
-                .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
-                .thenReturn("{}");
-
-            Workflow workflow = mock(Workflow.class);
-
-            when(workflow.getId()).thenReturn(workflowId);
-            when(workflow.getDefinition()).thenReturn("{}");
-            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
-            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
-                .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
-                .thenReturn(Map.of());
-
-            // When
-            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
-
-            // Then
-            assertNotNull(result);
-            verify(workflowService).update(anyString(), anyString(), anyInt());
-        }
-    }
-
-    @Test
-    void testUpdateWorkflowNodeParameterWithArrayPath() {
-        // Given
-        String workflowId = "workflow1";
-        String workflowNodeName = "task1";
-        String parameterPath = "items[0].name";
-        Object value = "arrayValue";
-        String type = "STRING";
-        boolean includeInMetadata = true;
-
-        // Setup ActionDefinition mock directly
-        ActionDefinition actionDefinition = mock(ActionDefinition.class);
-
-        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
-
-        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
-            Map<String, Object> parameters = new HashMap<>();
-            Map<String, Object> task = new HashMap<>();
-
-            task.put("name", "task1");
-            task.put("type", "component/v1/action");
-            task.put("parameters", parameters);
-            task.put("metadata", new HashMap<>());
-
-            List<Map<String, Object>> tasks = new ArrayList<>();
-            tasks.add(task);
-
-            Map<String, Object> definitionMap = new HashMap<>();
-            definitionMap.put("tasks", tasks);
-
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
-                .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
-                .thenReturn("{}");
-
-            Workflow workflow = mock(Workflow.class);
-
-            when(workflow.getId()).thenReturn(workflowId);
-            when(workflow.getDefinition()).thenReturn("{}");
-            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
-            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
-                .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
-                .thenReturn(Map.of());
-
-            // When
-            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
-
-            // Then
-            assertNotNull(result);
-            verify(workflowService).update(anyString(), anyString(), anyInt());
-        }
-    }
-
-    @Test
-    void testUpdateWorkflowNodeParameterTaskDispatcher() {
-        // Given
-        String workflowId = "workflow1";
-        String workflowNodeName = "task1";
-        String parameterPath = "param1";
-        Object value = "testValue";
-        String type = "STRING";
-        boolean includeInMetadata = true;
-
-        // Setup ActionDefinition for component/v1/action workflow type
-        ActionDefinition actionDefinition = mock(ActionDefinition.class);
-
-        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
-        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
-            .thenReturn(actionDefinition);
-
-        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
-            .thenReturn(Map.of());
-
-        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Create task dispatcher definition
-            Map<String, Object> parameters = new HashMap<>();
-            Map<String, Object> task = new HashMap<>();
-
-            task.put("name", "task1");
-            task.put("type", "dispatcher/v1/dispatcher");
-            task.put("parameters", parameters);
-            task.put("metadata", new HashMap<>());
-
-            List<Map<String, Object>> tasks = new ArrayList<>();
-
-            tasks.add(task);
-
-            Map<String, Object> definitionMap = new HashMap<>();
-
-            definitionMap.put("tasks", tasks);
-
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
-                .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
-                .thenReturn("{}");
-
-            Workflow workflow = mock(Workflow.class);
-
-            when(workflow.getId()).thenReturn(workflowId);
-            when(workflow.getDefinition()).thenReturn("{}");
-            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
-
-            // When
-            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
-
-            // Then
-            assertNotNull(result);
-            // Note: Implementation uses ActionDefinitionService, not TaskDispatcherDefinitionService for this workflow
-            // type
-            verify(workflowService).update(anyString(), anyString(), anyInt());
-        }
-    }
-
-    @Test
     void testUpdateClusterElementParameterWithMetadataManagement() {
         // Given
         String workflowId = "workflow1";
@@ -1745,13 +1593,11 @@ public class WorkflowNodeParameterFacadeTest {
         String type = "OBJECT";
         boolean includeInMetadata = true;
 
-        // Setup ClusterElementDefinition mock directly
         ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
 
         when(clusterElementDefinition.getProperties()).thenReturn(new ArrayList<>());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             Map<String, Object> clusterElementMap = new HashMap<>();
 
@@ -1808,63 +1654,6 @@ public class WorkflowNodeParameterFacadeTest {
             assertNotNull(metadata);
             assertTrue(metadata.containsKey("ui"));
 
-            verify(workflowService).update(anyString(), anyString(), anyInt());
-        }
-    }
-
-    @Test
-    void testUpdateWorkflowNodeParameterWithDependentProperties() {
-        // Given
-        String workflowId = "workflow1";
-        String workflowNodeName = "task1";
-        String parameterPath = "connectionId";
-        Object value = "new_connection";
-        String type = "STRING";
-        boolean includeInMetadata = true;
-
-        ActionDefinition actionDefinition = createMockActionDefinitionWithDependentProperties();
-
-        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
-            .thenReturn(actionDefinition);
-
-        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
-            .thenReturn(Map.of());
-
-        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Create task definition
-            Map<String, Object> parameters = new HashMap<>();
-            Map<String, Object> task = new HashMap<>();
-
-            task.put("name", "task1");
-            task.put("type", "component/v1/action");
-            task.put("parameters", parameters);
-            task.put("metadata", new HashMap<>());
-
-            List<Map<String, Object>> tasks = new ArrayList<>();
-
-            tasks.add(task);
-
-            Map<String, Object> definitionMap = new HashMap<>();
-
-            definitionMap.put("tasks", tasks);
-
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
-                .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
-                .thenReturn("{}");
-
-            Workflow workflow = mock(Workflow.class);
-
-            when(workflow.getId()).thenReturn(workflowId);
-            when(workflow.getDefinition()).thenReturn("{}");
-            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
-
-            // When
-            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
-
-            // Then
-            assertNotNull(result);
             verify(workflowService).update(anyString(), anyString(), anyInt());
         }
     }
@@ -1944,68 +1733,6 @@ public class WorkflowNodeParameterFacadeTest {
     }
 
     @Test
-    void testUpdateWorkflowNodeParameterSuccess() {
-        // Given
-        String workflowId = "workflow1";
-        String workflowNodeName = "task1";
-        String parameterPath = "param1";
-        Object value = "testValue";
-        String type = "STRING";
-        boolean includeInMetadata = true;
-
-        // Setup ActionDefinition mock directly
-        ActionDefinition actionDefinition = mock(ActionDefinition.class);
-
-        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
-
-        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
-            Map<String, Object> parameters = new HashMap<>();
-            Map<String, Object> task = new HashMap<>();
-
-            task.put("name", "task1");
-            task.put("type", "component/v1/action");
-            task.put("parameters", parameters);
-            task.put("metadata", new HashMap<>());
-
-            List<Map<String, Object>> tasks = new ArrayList<>();
-
-            tasks.add(task);
-
-            Map<String, Object> definitionMap = new HashMap<>();
-
-            definitionMap.put("tasks", tasks);
-
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
-                .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
-                .thenReturn("{}");
-
-            Workflow workflow = mock(Workflow.class);
-
-            when(workflow.getId()).thenReturn(workflowId);
-            when(workflow.getDefinition()).thenReturn("{}");
-            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
-            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
-                .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
-                .thenReturn(Map.of());
-
-            // When
-            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
-
-            // Then
-            assertNotNull(result);
-            assertNotNull(result.displayConditions());
-            assertNotNull(result.metadata());
-            assertNotNull(result.parameters());
-            verify(workflowService).getWorkflow(workflowId);
-            verify(workflowService).update(anyString(), anyString(), anyInt());
-        }
-    }
-
-    @Test
     void testUpdateClusterElementParameterSuccess() {
         // Given
         String workflowId = "workflow1";
@@ -2017,13 +1744,11 @@ public class WorkflowNodeParameterFacadeTest {
         String type = "STRING";
         boolean includeInMetadata = false;
 
-        // Setup ClusterElementDefinition mock directly
         ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
 
         when(clusterElementDefinition.getProperties()).thenReturn(new ArrayList<>());
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
             Map<String, Object> parameters = new HashMap<>();
             Map<String, Object> clusterElementMap = new HashMap<>();
 
@@ -2094,7 +1819,6 @@ public class WorkflowNodeParameterFacadeTest {
         String type = "STRING";
         boolean includeInMetadata = true;
 
-        // Setup complex nested structure with cluster elements
         Map<String, Object> clusterElement = new HashMap<>();
 
         clusterElement.put("name", clusterElementWorkflowNodeName);
@@ -2102,16 +1826,17 @@ public class WorkflowNodeParameterFacadeTest {
         clusterElement.put("parameters", new HashMap<>());
         clusterElement.put("metadata", new HashMap<>());
 
-        // Create cluster elements map structure as expected by the implementation
         Map<String, Object> clusterElementsMap = new HashMap<>();
 
         clusterElementsMap.put(clusterElementTypeName, List.of(clusterElement));
 
         Map<String, Object> caseMap = new HashMap<>();
+
         caseMap.put("key", "case1");
         caseMap.put("clusterElements", clusterElementsMap);
 
         Map<String, Object> taskParameters = new HashMap<>();
+
         taskParameters.put("cases", List.of(caseMap));
 
         Map<String, Object> task = new HashMap<>();
@@ -2123,6 +1848,7 @@ public class WorkflowNodeParameterFacadeTest {
         task.put("clusterElements", clusterElementsMap);
 
         Map<String, Object> definitionMap = new HashMap<>();
+
         definitionMap.put("tasks", List.of(task));
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -2153,94 +1879,110 @@ public class WorkflowNodeParameterFacadeTest {
             // Then
             assertNotNull(result);
             verify(workflowService).update(anyString(), anyString(), anyInt());
-            // Verify that the parameter was set in the nested structure
         }
     }
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     @Test
-    void testUpdateWorkflowNodeParameterWithComplexPath() {
-        // Given
+    void testUpdateWorkflowNodeParameterCompoundDisplayConditionEvaluated() {
         String workflowId = "workflow1";
-        String workflowNodeName = "task1";
-        String parameterPath = "nested.param[0].value";
-        Object value = "complexValue";
-        String type = "STRING";
-        boolean includeInMetadata = true;
-
-        // Setup ActionDefinition mock directly
-        ActionDefinition actionDefinition = mock(ActionDefinition.class);
-
-        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
-
-        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
-            Map<String, Object> parameters = new HashMap<>();
-            Map<String, Object> task = new HashMap<>();
-
-            task.put("name", "task1");
-            task.put("type", "component/v1/action");
-            task.put("parameters", parameters);
-            task.put("metadata", new HashMap<>());
-
-            List<Map<String, Object>> tasks = new ArrayList<>();
-
-            tasks.add(task);
-
-            Map<String, Object> definitionMap = new HashMap<>();
-
-            definitionMap.put("tasks", tasks);
-
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
-                .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
-                .thenReturn("{}");
-
-            Workflow workflow = mock(Workflow.class);
-
-            when(workflow.getId()).thenReturn(workflowId);
-            when(workflow.getDefinition()).thenReturn("{}");
-            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
-            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
-                .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
-                .thenReturn(Map.of());
-
-            // When
-            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
-
-            // Then
-            assertNotNull(result);
-            verify(workflowService).update(anyString(), anyString(), anyInt());
-        }
-    }
-
-    @Test
-    void testUpdateWorkflowNodeParameterWithTriggerNode() {
-        // Given
-        String workflowId = "workflow1";
-        String workflowNodeName = "triggerNode";
-        String parameterPath = "param1";
-        Object value = "triggerValue";
-        String type = "STRING";
-        boolean includeInMetadata = true;
+        String workflowNodeName = "formTrigger";
+        String parameterPath = "inputs[0].multipleChoice";
+        Object value = true;
+        String type = "BOOLEAN";
+        boolean includeInMetadata = false;
 
         TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+        List<Property> properties = new ArrayList<>();
 
-        when(triggerDefinition.getProperties()).thenReturn(new ArrayList<>());
+        ArrayProperty inputsArrayProperty = mock(ArrayProperty.class);
+
+        when(inputsArrayProperty.getName()).thenReturn("inputs");
+        lenient().when(inputsArrayProperty.getDisplayCondition())
+            .thenReturn(null);
+
+        ObjectProperty inputObjectProperty = mock(ObjectProperty.class);
+
+        when(inputObjectProperty.getName()).thenReturn(null);
+
+        List<Property> inputObjectProperties = new ArrayList<>();
+
+        Property fieldTypeProperty = mock(Property.class);
+
+        lenient().when(fieldTypeProperty.getName())
+            .thenReturn("fieldType");
+        lenient().when(fieldTypeProperty.getDisplayCondition())
+            .thenReturn(null);
+
+        inputObjectProperties.add(fieldTypeProperty);
+
+        Property multipleChoiceProperty = mock(Property.class);
+
+        when(multipleChoiceProperty.getName()).thenReturn("multipleChoice");
+        when(multipleChoiceProperty.getDisplayCondition()).thenReturn("inputs[index].fieldType == 7");
+
+        inputObjectProperties.add(multipleChoiceProperty);
+
+        Property minSelectionProperty = mock(Property.class);
+
+        when(minSelectionProperty.getName()).thenReturn("minSelection");
+        when(minSelectionProperty.getDisplayCondition())
+            .thenReturn("inputs[index].fieldType == 7 and inputs[index].multipleChoice == true");
+
+        inputObjectProperties.add(minSelectionProperty);
+
+        when(inputObjectProperty.getProperties()).thenReturn((List) inputObjectProperties);
+
+        when(inputsArrayProperty.getItems()).thenReturn((List) List.of(inputObjectProperty));
+
+        properties.add(inputsArrayProperty);
+
+        when(triggerDefinition.getProperties()).thenReturn((List) properties);
         when(triggerDefinitionService.getTriggerDefinition(anyString(), anyInt(), anyString()))
             .thenReturn(triggerDefinition);
-
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
+        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+            .thenAnswer(invocation -> {
+                Map<String, Object> map = invocation.getArgument(0);
+
+                if (map.containsKey("displayCondition")) {
+                    String condition = (String) map.get("displayCondition");
+
+                    if (condition.equals("=inputs[0].fieldType == 7")) {
+                        return Map.of("displayCondition", true);
+                    }
+
+                    if (condition.equals("=inputs[0].fieldType == 7 and inputs[0].multipleChoice == true")) {
+                        return Map.of("displayCondition", true);
+                    }
+                }
+
+                return map;
+            });
+
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Create trigger definition
+            Map<String, Object> inputItem = new HashMap<>();
+
+            inputItem.put("fieldType", 7); // SELECT
+            inputItem.put("multipleChoice", false);
+
+            List<Map<String, Object>> inputs = new ArrayList<>();
+
+            inputs.add(inputItem);
+
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("inputs", inputs);
+
             Map<String, Object> trigger = new HashMap<>();
 
             trigger.put("name", workflowNodeName);
-            trigger.put("type", "webhook/v1/webhook");
-            trigger.put("parameters", new HashMap<>());
+            trigger.put("type", "form/v1/newFormRequest");
+            trigger.put("parameters", parameters);
             trigger.put("metadata", new HashMap<>());
 
             List<Map<String, Object>> triggers = new ArrayList<>();
@@ -2268,43 +2010,130 @@ public class WorkflowNodeParameterFacadeTest {
 
             // Then
             assertNotNull(result);
+            assertNotNull(result.displayConditions());
+
+            Map<String, Boolean> displayConditions = result.displayConditions();
+
+            assertTrue(displayConditions.containsKey("inputs[0].fieldType == 7"),
+                "Simple display condition 'inputs[0].fieldType == 7' should be in displayConditions");
+            assertTrue(displayConditions.containsKey("inputs[0].fieldType == 7 and inputs[0].multipleChoice == true"),
+                "Compound display condition should be in displayConditions");
+
             verify(triggerDefinitionService).getTriggerDefinition(anyString(), anyInt(), anyString());
             verify(workflowService).update(anyString(), anyString(), anyInt());
         }
     }
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     @Test
-    void testUpdateWorkflowNodeParameterMultipleArrayIndexes() {
-        // Given
+    void testUpdateWorkflowNodeParameterCompoundDisplayConditionWithMultipleArrayItems() {
+        // Given - Testing compound display condition with multiple array items
+        // Ensures that each array item gets its own display condition evaluated correctly
         String workflowId = "workflow1";
-        String workflowNodeName = "task1";
-        String parameterPath = "matrix[0][1][2].value";
-        Object value = "deepArrayValue";
-        String type = "STRING";
-        boolean includeInMetadata = true;
+        String workflowNodeName = "formTrigger";
+        String parameterPath = "inputs[1].multipleChoice";
+        Object value = true;
+        String type = "BOOLEAN";
+        boolean includeInMetadata = false;
 
-        // Setup ActionDefinition mock directly
-        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+        List<Property> properties = new ArrayList<>();
 
-        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+        ArrayProperty inputsArrayProperty = mock(ArrayProperty.class);
+
+        when(inputsArrayProperty.getName()).thenReturn("inputs");
+        lenient().when(inputsArrayProperty.getDisplayCondition())
+            .thenReturn(null);
+
+        ObjectProperty inputObjectProperty = mock(ObjectProperty.class);
+
+        when(inputObjectProperty.getName()).thenReturn(null);
+
+        List<Property> inputObjectProperties = new ArrayList<>();
+
+        Property fieldTypeProperty = mock(Property.class);
+
+        lenient().when(fieldTypeProperty.getName())
+            .thenReturn("fieldType");
+        lenient().when(fieldTypeProperty.getDisplayCondition())
+            .thenReturn(null);
+
+        inputObjectProperties.add(fieldTypeProperty);
+
+        Property minSelectionProperty = mock(Property.class);
+
+        when(minSelectionProperty.getName()).thenReturn("minSelection");
+        when(minSelectionProperty.getDisplayCondition())
+            .thenReturn("inputs[index].fieldType == 7 and inputs[index].multipleChoice == true");
+
+        inputObjectProperties.add(minSelectionProperty);
+
+        when(inputObjectProperty.getProperties()).thenReturn((List) inputObjectProperties);
+        when(inputsArrayProperty.getItems()).thenReturn((List) List.of(inputObjectProperty));
+
+        properties.add(inputsArrayProperty);
+
+        when(triggerDefinition.getProperties()).thenReturn((List) properties);
+        when(triggerDefinitionService.getTriggerDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(triggerDefinition);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+            .thenAnswer(invocation -> {
+                Map<String, Object> map = invocation.getArgument(0);
+
+                if (map.containsKey("displayCondition")) {
+                    String condition = (String) map.get("displayCondition");
+
+                    if (condition.equals("=inputs[0].fieldType == 7 and inputs[0].multipleChoice == true")) {
+                        return Map.of("displayCondition", false);
+                    }
+
+                    if (condition.equals("=inputs[1].fieldType == 7 and inputs[1].multipleChoice == true")) {
+                        return Map.of("displayCondition", true);
+                    }
+                }
+
+                return map;
+            });
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
+            Map<String, Object> inputItem0 = new HashMap<>();
+
+            inputItem0.put("fieldType", 6); // INPUT - doesn't match condition
+            inputItem0.put("multipleChoice", false);
+
+            Map<String, Object> inputItem1 = new HashMap<>();
+
+            inputItem1.put("fieldType", 7); // SELECT - matches condition
+            inputItem1.put("multipleChoice", false);
+
+            List<Map<String, Object>> inputs = new ArrayList<>();
+
+            inputs.add(inputItem0);
+            inputs.add(inputItem1);
+
             Map<String, Object> parameters = new HashMap<>();
-            Map<String, Object> task = new HashMap<>();
 
-            task.put("name", "task1");
-            task.put("type", "component/v1/action");
-            task.put("parameters", parameters);
-            task.put("metadata", new HashMap<>());
+            parameters.put("inputs", inputs);
 
-            List<Map<String, Object>> tasks = new ArrayList<>();
+            Map<String, Object> trigger = new HashMap<>();
 
-            tasks.add(task);
+            trigger.put("name", workflowNodeName);
+            trigger.put("type", "form/v1/newFormRequest");
+            trigger.put("parameters", parameters);
+            trigger.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> triggers = new ArrayList<>();
+
+            triggers.add(trigger);
 
             Map<String, Object> definitionMap = new HashMap<>();
 
-            definitionMap.put("tasks", tasks);
+            definitionMap.put("triggers", triggers);
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
@@ -2316,10 +2145,6 @@ public class WorkflowNodeParameterFacadeTest {
             when(workflow.getId()).thenReturn(workflowId);
             when(workflow.getDefinition()).thenReturn("{}");
             when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
-            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
-                .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
-                .thenReturn(Map.of());
 
             // When
             ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
@@ -2327,6 +2152,155 @@ public class WorkflowNodeParameterFacadeTest {
 
             // Then
             assertNotNull(result);
+            assertNotNull(result.displayConditions());
+
+            Map<String, Boolean> displayConditions = result.displayConditions();
+
+            assertTrue(
+                displayConditions.containsKey("inputs[1].fieldType == 7 and inputs[1].multipleChoice == true"),
+                "Compound condition for inputs[1] should be in displayConditions. Actual: " + displayConditions);
+            assertFalse(
+                displayConditions.containsKey("inputs[0].fieldType == 7 and inputs[0].multipleChoice == true"),
+                "Compound condition for inputs[0] should NOT be in displayConditions (evaluates to false). " +
+                    "Actual: " + displayConditions);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    @Test
+    void testUpdateWorkflowNodeParameterDisplayConditionEvaluatedForArrayItem() {
+        // Given - Testing display condition evaluation for array items in form trigger
+        // When updating inputs[0].fieldType from 6 (INPUT) to 8 (EMAIL_INPUT),
+        // the display condition "inputs[index].fieldType != 12" for fieldName should evaluate to true
+        // and be included in displayConditions as "inputs[0].fieldType != 12: true"
+        String workflowId = "workflow1";
+        String workflowNodeName = "formTrigger";
+        String parameterPath = "inputs[0].fieldType";
+        Object value = 8; // EMAIL_INPUT
+        String type = "INTEGER";
+        boolean includeInMetadata = true;
+
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+        List<Property> properties = new ArrayList<>();
+
+        ArrayProperty inputsArrayProperty = mock(ArrayProperty.class);
+
+        when(inputsArrayProperty.getName()).thenReturn("inputs");
+        when(inputsArrayProperty.getDisplayCondition()).thenReturn(null);
+
+        ObjectProperty inputObjectProperty = mock(ObjectProperty.class);
+
+        when(inputObjectProperty.getName()).thenReturn(null); // Array items typically have no name
+
+        List<Property> inputObjectProperties = new ArrayList<>();
+
+        Property fieldTypeProperty = mock(Property.class);
+
+        lenient().when(fieldTypeProperty.getName())
+            .thenReturn("fieldType");
+        lenient().when(fieldTypeProperty.getDisplayCondition())
+            .thenReturn(null);
+
+        inputObjectProperties.add(fieldTypeProperty);
+
+        Property fieldNameProperty = mock(Property.class);
+
+        when(fieldNameProperty.getName()).thenReturn("fieldName");
+        when(fieldNameProperty.getDisplayCondition()).thenReturn("inputs[index].fieldType != 12");
+
+        inputObjectProperties.add(fieldNameProperty);
+
+        when(inputObjectProperty.getProperties()).thenReturn((List) inputObjectProperties);
+
+        when(inputsArrayProperty.getItems()).thenReturn((List) List.of(inputObjectProperty));
+
+        properties.add(inputsArrayProperty);
+
+        when(triggerDefinition.getProperties()).thenReturn((List) properties);
+        when(triggerDefinitionService.getTriggerDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(triggerDefinition);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+            .thenAnswer(invocation -> {
+                Map<String, Object> map = invocation.getArgument(0);
+
+                if (map.containsKey("displayCondition")) {
+                    String condition = (String) map.get("displayCondition");
+
+                    if (condition.equals("=inputs[0].fieldType != 12")) {
+                        return Map.of("displayCondition", true);
+                    }
+                }
+
+                return map;
+            });
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> inputItem = new HashMap<>();
+
+            inputItem.put("fieldType", 6); // INPUT
+            inputItem.put("fieldName", "myField");
+
+            List<Map<String, Object>> inputs = new ArrayList<>();
+
+            inputs.add(inputItem);
+
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("inputs", inputs);
+
+            Map<String, Object> trigger = new HashMap<>();
+
+            trigger.put("name", workflowNodeName);
+            trigger.put("type", "form/v1/newFormRequest");
+            trigger.put("parameters", parameters);
+            trigger.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> triggers = new ArrayList<>();
+
+            triggers.add(trigger);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("triggers", triggers);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            assertNotNull(result.displayConditions());
+
+            Map<String, Boolean> displayConditions = result.displayConditions();
+
+            assertTrue(
+                displayConditions.containsKey("inputs[0].fieldType != 12"),
+                "Display condition 'inputs[0].fieldType != 12' should be evaluated and included in displayConditions. "
+                    +
+                    "Actual displayConditions: " + displayConditions);
+
+            assertTrue(
+                displayConditions.get("inputs[0].fieldType != 12"),
+                "Display condition 'inputs[0].fieldType != 12' should evaluate to true since fieldType (8) != 12");
+
+            verify(triggerDefinitionService).getTriggerDefinition(anyString(), anyInt(), anyString());
             verify(workflowService).update(anyString(), anyString(), anyInt());
         }
     }
@@ -2390,7 +2364,6 @@ public class WorkflowNodeParameterFacadeTest {
 
         arrayItems.add(numberObjectProperty);
 
-        // STRING variant object with its properties
         ObjectProperty stringObjectProperty = mock(ObjectProperty.class);
 
         when(stringObjectProperty.getName()).thenReturn("string");
@@ -2525,21 +2498,725 @@ public class WorkflowNodeParameterFacadeTest {
                     "Metadata should be updated with the new property type");
             }
 
-            // Main assertions: NUMBER type conditions should NOT be evaluated
             assertFalse(
                 displayConditions.containsKey("conditions[0][0].operation != 'EMPTY'"),
                 "NUMBER type display condition should NOT be evaluated for STRING type parameter");
-
-            // STRING type conditions SHOULD be evaluated
             assertTrue(
                 displayConditions.containsKey("!contains({'EMPTY','REGEX'}, conditions[0][0].operation)"),
                 "STRING type display condition should be evaluated for STRING type parameter");
-
-            // The parent array's condition should also be evaluated (not type-specific)
             assertTrue(
                 displayConditions.containsKey("rawExpression == false"),
                 "Parent array display condition should be evaluated");
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    @Test
+    void testUpdateWorkflowNodeParameterDisplayConditionNotIncludedWhenFalse() {
+        // Given - Testing that when the display condition evaluates to false, it's NOT included in displayConditions
+        // When updating inputs[0].fieldType from 8 (EMAIL_INPUT) to 12 (CUSTOM_HTML), the display condition
+        // "inputs[index].fieldType != 12" should evaluate to false and should NOT be included in displayConditions
+        String workflowId = "workflow1";
+        String workflowNodeName = "formTrigger";
+        String parameterPath = "inputs[0].fieldType";
+        Object value = 12; // CUSTOM_HTML - same as the value in the condition
+        String type = "INTEGER";
+        boolean includeInMetadata = true;
+
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+        List<Property> properties = new ArrayList<>();
+
+        ArrayProperty inputsArrayProperty = mock(ArrayProperty.class);
+
+        when(inputsArrayProperty.getName()).thenReturn("inputs");
+        lenient().when(inputsArrayProperty.getDisplayCondition())
+            .thenReturn(null);
+
+        ObjectProperty inputObjectProperty = mock(ObjectProperty.class);
+
+        when(inputObjectProperty.getName()).thenReturn(null);
+
+        List<Property> inputObjectProperties = new ArrayList<>();
+
+        Property fieldTypeProperty = mock(Property.class);
+
+        lenient().when(fieldTypeProperty.getName())
+            .thenReturn("fieldType");
+        lenient().when(fieldTypeProperty.getDisplayCondition())
+            .thenReturn(null);
+
+        inputObjectProperties.add(fieldTypeProperty);
+
+        Property fieldNameProperty = mock(Property.class);
+
+        when(fieldNameProperty.getName()).thenReturn("fieldName");
+        when(fieldNameProperty.getDisplayCondition()).thenReturn("inputs[index].fieldType != 12");
+
+        inputObjectProperties.add(fieldNameProperty);
+
+        when(inputObjectProperty.getProperties()).thenReturn((List) inputObjectProperties);
+
+        when(inputsArrayProperty.getItems()).thenReturn((List) List.of(inputObjectProperty));
+
+        properties.add(inputsArrayProperty);
+
+        when(triggerDefinition.getProperties()).thenReturn((List) properties);
+        when(triggerDefinitionService.getTriggerDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(triggerDefinition);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+            .thenAnswer(invocation -> {
+                Map<String, Object> map = invocation.getArgument(0);
+
+                if (map.containsKey("displayCondition")) {
+                    String condition = (String) map.get("displayCondition");
+
+                    if (condition.equals("=inputs[0].fieldType != 12")) {
+                        return Map.of("displayCondition", false);
+                    }
+                }
+
+                return map;
+            });
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> inputItem = new HashMap<>();
+
+            inputItem.put("fieldType", 8); // EMAIL_INPUT - will be updated to 12
+            inputItem.put("fieldName", "myField");
+
+            List<Map<String, Object>> inputs = new ArrayList<>();
+
+            inputs.add(inputItem);
+
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("inputs", inputs);
+
+            Map<String, Object> trigger = new HashMap<>();
+
+            trigger.put("name", workflowNodeName);
+            trigger.put("type", "form/v1/newFormRequest");
+            trigger.put("parameters", parameters);
+            trigger.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> triggers = new ArrayList<>();
+
+            triggers.add(trigger);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("triggers", triggers);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            assertNotNull(result.displayConditions());
+
+            Map<String, Boolean> displayConditions = result.displayConditions();
+
+            assertFalse(
+                displayConditions.containsKey("inputs[0].fieldType != 12"),
+                "Display condition 'inputs[0].fieldType != 12' should NOT be included in displayConditions " +
+                    "when it evaluates to false. Actual displayConditions: " + displayConditions);
+
+            verify(triggerDefinitionService).getTriggerDefinition(anyString(), anyInt(), anyString());
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterMultipleArrayIndexes() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "matrix[0][1][2].value";
+        Object value = "deepArrayValue";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", "task1");
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(actionDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterNullValue() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "param1";
+        Object value = null;
+        String type = null;
+        boolean includeInMetadata = false;
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", "task1");
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(actionDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterSuccess() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "param1";
+        Object value = "testValue";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", "task1");
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(actionDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            assertNotNull(result.displayConditions());
+            assertNotNull(result.metadata());
+            assertNotNull(result.parameters());
+            verify(workflowService).getWorkflow(workflowId);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterTaskDispatcher() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "param1";
+        Object value = "testValue";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            // Create task dispatcher definition
+            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", "task1");
+            task.put("type", "dispatcher/v1/dispatcher");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    @Test
+    void testUpdateWorkflowNodeParameterTripleCompoundDisplayCondition() {
+        // Given - Testing compound display condition with three same-level array references
+        // e.g., "inputs[index].a == 1 and inputs[index].b == 2 and inputs[index].c == 3"
+        String workflowId = "workflow1";
+        String workflowNodeName = "formTrigger";
+        String parameterPath = "inputs[0].c";
+        Object value = 3;
+        String type = "INTEGER";
+        boolean includeInMetadata = false;
+
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+        List<Property> properties = new ArrayList<>();
+
+        ArrayProperty inputsArrayProperty = mock(ArrayProperty.class);
+
+        when(inputsArrayProperty.getName()).thenReturn("inputs");
+        lenient().when(inputsArrayProperty.getDisplayCondition())
+            .thenReturn(null);
+
+        ObjectProperty inputObjectProperty = mock(ObjectProperty.class);
+
+        when(inputObjectProperty.getName()).thenReturn(null);
+
+        List<Property> inputObjectProperties = new ArrayList<>();
+
+        // Property with triple compound condition
+        Property tripleConditionProperty = mock(Property.class);
+
+        when(tripleConditionProperty.getName()).thenReturn("result");
+        when(tripleConditionProperty.getDisplayCondition())
+            .thenReturn("inputs[index].a == 1 and inputs[index].b == 2 and inputs[index].c == 3");
+
+        inputObjectProperties.add(tripleConditionProperty);
+
+        when(inputObjectProperty.getProperties()).thenReturn((List) inputObjectProperties);
+        when(inputsArrayProperty.getItems()).thenReturn((List) List.of(inputObjectProperty));
+
+        properties.add(inputsArrayProperty);
+
+        when(triggerDefinition.getProperties()).thenReturn((List) properties);
+        when(triggerDefinitionService.getTriggerDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(triggerDefinition);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+            .thenAnswer(invocation -> {
+                Map<String, Object> map = invocation.getArgument(0);
+
+                if (map.containsKey("displayCondition")) {
+                    String condition = (String) map.get("displayCondition");
+
+                    if (condition.equals("=inputs[0].a == 1 and inputs[0].b == 2 and inputs[0].c == 3")) {
+                        return Map.of("displayCondition", true);
+                    }
+                }
+
+                return map;
+            });
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> inputItem = new HashMap<>();
+
+            inputItem.put("a", 1);
+            inputItem.put("b", 2);
+            inputItem.put("c", 0); // Will be updated to 3
+
+            List<Map<String, Object>> inputs = new ArrayList<>();
+
+            inputs.add(inputItem);
+
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("inputs", inputs);
+
+            Map<String, Object> trigger = new HashMap<>();
+
+            trigger.put("name", workflowNodeName);
+            trigger.put("type", "form/v1/newFormRequest");
+            trigger.put("parameters", parameters);
+            trigger.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> triggers = new ArrayList<>();
+
+            triggers.add(trigger);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("triggers", triggers);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            assertNotNull(result.displayConditions());
+
+            Map<String, Boolean> displayConditions = result.displayConditions();
+
+            assertTrue(
+                displayConditions.containsKey("inputs[0].a == 1 and inputs[0].b == 2 and inputs[0].c == 3"),
+                "Triple compound condition should be in displayConditions. Actual: " + displayConditions);
+
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterWithArrayPath() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "items[0].name";
+        Object value = "arrayValue";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", "task1");
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(actionDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterWithComplexPath() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "nested.param[0].value";
+        Object value = "complexValue";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", "task1");
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(actionDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterWithDependentProperties() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "connectionId";
+        Object value = "new_connection";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        ActionDefinition actionDefinition = createMockActionDefinitionWithDependentProperties();
+
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", "task1");
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterWithTriggerNode() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "triggerNode";
+        String parameterPath = "param1";
+        Object value = "triggerValue";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+
+        when(triggerDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(triggerDefinitionService.getTriggerDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(triggerDefinition);
+
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> trigger = new HashMap<>();
+
+            trigger.put("name", workflowNodeName);
+            trigger.put("type", "webhook/v1/webhook");
+            trigger.put("parameters", new HashMap<>());
+            trigger.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> triggers = new ArrayList<>();
+
+            triggers.add(trigger);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("triggers", triggers);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            verify(triggerDefinitionService).getTriggerDefinition(anyString(), anyInt(), anyString());
             verify(workflowService).update(anyString(), anyString(), anyInt());
         }
     }
@@ -2551,14 +3228,12 @@ public class WorkflowNodeParameterFacadeTest {
         ActionDefinition actionDefinition = mock(ActionDefinition.class);
         List<Property> properties = new ArrayList<>();
 
-        // Create array property with display condition
         ArrayProperty arrayProperty = mock(ArrayProperty.class);
 
         when(arrayProperty.getName()).thenReturn("items");
 
         properties.add(arrayProperty);
 
-        // Create object property with display condition
         ObjectProperty objectProperty = mock(ObjectProperty.class);
 
         when(objectProperty.getName()).thenReturn("config");
@@ -2566,6 +3241,7 @@ public class WorkflowNodeParameterFacadeTest {
         properties.add(objectProperty);
 
         when(actionDefinition.getProperties()).thenReturn((List) properties);
+
         return actionDefinition;
     }
 
@@ -2576,12 +3252,14 @@ public class WorkflowNodeParameterFacadeTest {
         ActionDefinition actionDefinition = mock(ActionDefinition.class);
         List<Property> properties = new ArrayList<>();
 
-        // Create property with options data source that depends on connectionId
         Property dependentProperty = mock(Property.class);
+
         when(dependentProperty.getName()).thenReturn("tableName");
+
         properties.add(dependentProperty);
 
         when(actionDefinition.getProperties()).thenReturn((List) properties);
+
         return actionDefinition;
     }
 
@@ -2593,12 +3271,15 @@ public class WorkflowNodeParameterFacadeTest {
         List<Property> properties = new ArrayList<>();
 
         ArrayProperty arrayProperty = mock(ArrayProperty.class);
+
         when(arrayProperty.getName()).thenReturn("conditions");
         when(arrayProperty.getDisplayCondition()).thenReturn("items[index].enabled == true");
         when(arrayProperty.getItems()).thenReturn(List.of());
+
         properties.add(arrayProperty);
 
         when(actionDefinition.getProperties()).thenReturn((List) properties);
+
         return actionDefinition;
     }
 
@@ -2609,15 +3290,15 @@ public class WorkflowNodeParameterFacadeTest {
         ActionDefinition actionDefinition = mock(ActionDefinition.class);
         List<Property> properties = new ArrayList<>();
 
-        // Create object property with required nested properties
         ObjectProperty objectProperty = mock(ObjectProperty.class);
+
         when(objectProperty.getName()).thenReturn("config");
         when(objectProperty.getRequired()).thenReturn(true);
 
         properties.add(objectProperty);
 
-        // Create array property with required nested properties
         ArrayProperty arrayProperty = mock(ArrayProperty.class);
+
         when(arrayProperty.getName()).thenReturn("items");
         when(arrayProperty.getRequired()).thenReturn(false);
 

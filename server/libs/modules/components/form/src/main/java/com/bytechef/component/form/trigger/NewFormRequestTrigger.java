@@ -132,13 +132,6 @@ public class NewFormRequestTrigger {
                 .items(
                     object()
                         .properties(
-                            string(FIELD_LABEL)
-                                .label("Field Label")
-                                .description("The label of the form field"),
-                            string(FIELD_NAME)
-                                .label("Field Name")
-                                .description("The name of the form field")
-                                .displayCondition("fieldType != %s".formatted(CUSTOM_HTML.getValue())),
                             integer(FIELD_TYPE)
                                 .label("Field Type")
                                 .description("The type of the form field")
@@ -157,6 +150,13 @@ public class NewFormRequestTrigger {
                                     option("Select", SELECT.getValue()),
                                     option("Textarea", TEXTAREA.getValue()))
                                 .required(true),
+                            string(FIELD_LABEL)
+                                .label("Field Label")
+                                .description("The label of the form field"),
+                            string(FIELD_NAME)
+                                .label("Field Name")
+                                .description("The name of the form field")
+                                .displayCondition("inputs[index].fieldType != %s".formatted(CUSTOM_HTML.getValue())),
                             string(FIELD_DESCRIPTION)
                                 .label("Field Description")
                                 .description("Description of the form field")
@@ -165,19 +165,19 @@ public class NewFormRequestTrigger {
                                 .label("Placeholder")
                                 .description("The placeholder text.")
                                 .required(false)
-                                .displayCondition("contains({%s,%s,%s,%s,%s}, fieldType)".formatted(
+                                .displayCondition("contains({%s,%s,%s,%s,%s}, inputs[index].fieldType)".formatted(
                                     EMAIL_INPUT.getValue(), INPUT.getValue(), NUMBER_INPUT.getValue(),
                                     PASSWORD_INPUT.getValue(), TEXTAREA.getValue())),
                             string(DEFAULT_VALUE)
                                 .label("Default value")
                                 .description("Pre-filled or pre-selected value for compatible fields.")
-                                .displayCondition("fieldType != %s".formatted(CUSTOM_HTML.getValue()))
+                                .displayCondition("inputs[index].fieldType != %s".formatted(CUSTOM_HTML.getValue()))
                                 .required(false),
                             string(DEFAULT_VALUE)
                                 .label("Default value")
                                 .description("Pre-filled or pre-selected value for compatible fields.")
                                 .controlType(TEXT_AREA)
-                                .displayCondition("fieldType == %s".formatted(CUSTOM_HTML.getValue()))
+                                .displayCondition("inputs[index].fieldType == %s".formatted(CUSTOM_HTML.getValue()))
                                 .required(false),
                             array(FIELD_OPTIONS)
                                 .label("Field Options")
@@ -193,26 +193,29 @@ public class NewFormRequestTrigger {
                                                 .required(true)))
                                 .required(false)
                                 .displayCondition(
-                                    "contains({%s,%s}, fieldType)".formatted(RADIO.getValue(), SELECT.getValue())),
+                                    "contains({%s,%s}, inputs[index].fieldType)".formatted(
+                                        RADIO.getValue(), SELECT.getValue())),
                             bool(MULTIPLE_CHOICE)
                                 .label("Multiple Choice")
                                 .description("Allow multiple selections.")
                                 .defaultValue(false)
                                 .required(false)
                                 .displayCondition(
-                                    "fieldType == %s".formatted(SELECT.getValue())),
+                                    "inputs[index].fieldType == %s".formatted(SELECT.getValue())),
                             integer(MIN_SELECTION)
                                 .label("Min selection")
                                 .description("Minimum selections required.")
                                 .required(false)
                                 .displayCondition(
-                                    "fieldType == %s and multipleChoice == true".formatted(SELECT.getValue())),
+                                    "inputs[index].fieldType == %s and inputs[index].multipleChoice == true".formatted(
+                                        SELECT.getValue())),
                             integer(MAX_SELECTION)
                                 .label("Max selection")
                                 .description("Maximum selections allowed.")
                                 .required(false)
                                 .displayCondition(
-                                    "fieldType == %s and multipleChoice == true".formatted(SELECT.getValue())),
+                                    "inputs[index].fieldType == %s and inputs[index].multipleChoice == true".formatted(
+                                        SELECT.getValue())),
                             bool(REQUIRED)
                                 .label("Required")
                                 .description("Whether this field is required")
