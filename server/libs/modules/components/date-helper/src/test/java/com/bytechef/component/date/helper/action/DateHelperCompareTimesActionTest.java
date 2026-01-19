@@ -16,17 +16,18 @@
 
 package com.bytechef.component.date.helper.action;
 
+import static com.bytechef.component.date.helper.constants.DateHelperComparisonEnum.IS_AFTER;
+import static com.bytechef.component.date.helper.constants.DateHelperComparisonEnum.IS_AFTER_OR_EQUAL;
+import static com.bytechef.component.date.helper.constants.DateHelperComparisonEnum.IS_BEFORE;
+import static com.bytechef.component.date.helper.constants.DateHelperComparisonEnum.IS_BEFORE_OR_EQUAL;
+import static com.bytechef.component.date.helper.constants.DateHelperComparisonEnum.IS_EQUAL;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.COMPARISON;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_A;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_B;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_AFTER;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_AFTER_OR_EQUAL;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_BEFORE;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_BEFORE_OR_EQUAL;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_EQUAL;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.bytechef.component.date.helper.constants.DateHelperComparisonEnum;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDateTime;
@@ -38,12 +39,9 @@ import org.junit.jupiter.api.Test;
  */
 class DateHelperCompareTimesActionTest {
 
-    private boolean run(String comparison, LocalDateTime dateA, LocalDateTime dateB) {
+    private boolean run(DateHelperComparisonEnum comparison, LocalDateTime dateA, LocalDateTime dateB) {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(
-                COMPARISON, comparison,
-                DATE_A, dateA,
-                DATE_B, dateB));
+            Map.of(COMPARISON, comparison.name(), DATE_A, dateA, DATE_B, dateB));
 
         return DateHelperCompareTimesAction.perform(mockedParameters, null, null);
     }

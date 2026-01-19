@@ -16,16 +16,16 @@
 
 package com.bytechef.component.date.helper.action;
 
+import static com.bytechef.component.date.helper.constants.DateHelperComparisonEnum.IS_AFTER;
+import static com.bytechef.component.date.helper.constants.DateHelperComparisonEnum.IS_AFTER_OR_EQUAL;
+import static com.bytechef.component.date.helper.constants.DateHelperComparisonEnum.IS_BEFORE;
+import static com.bytechef.component.date.helper.constants.DateHelperComparisonEnum.IS_BEFORE_OR_EQUAL;
+import static com.bytechef.component.date.helper.constants.DateHelperComparisonEnum.IS_EQUAL;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.COMPARISON;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_A;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_B;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_AFTER;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_AFTER_OR_EQUAL;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_BEFORE;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_BEFORE_OR_EQUAL;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_EQUAL;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MINUTE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.RESOLUTION;
@@ -34,6 +34,7 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.Y
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.bytechef.component.date.helper.constants.DateHelperComparisonEnum;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDateTime;
@@ -45,9 +46,10 @@ import org.junit.jupiter.api.Test;
  */
 class DateHelperCompareDatesActionTest {
 
-    private boolean run(String resolution, String comparison, LocalDateTime dateA, LocalDateTime dateB) {
+    private boolean
+        run(String resolution, DateHelperComparisonEnum comparison, LocalDateTime dateA, LocalDateTime dateB) {
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(RESOLUTION, resolution, COMPARISON, comparison, DATE_A, dateA, DATE_B, dateB));
+            Map.of(RESOLUTION, resolution, COMPARISON, comparison.name(), DATE_A, dateA, DATE_B, dateB));
 
         return DateHelperCompareDatesAction.perform(mockedParameters, null, null);
     }

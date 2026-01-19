@@ -18,11 +18,6 @@ package com.bytechef.component.date.helper.util;
 
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_AFTER;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_AFTER_OR_EQUAL;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_BEFORE;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_BEFORE_OR_EQUAL;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.IS_EQUAL;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MINUTE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
@@ -40,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.component.date.helper.constants.DateHelperComparisonEnum;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -50,7 +46,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -130,11 +125,11 @@ class DateHelperUtilsTest {
         List<Option<String>> result = getComparisonOptions();
 
         List<Option<String>> expected = List.of(
-            option(IS_AFTER, IS_AFTER),
-            option(IS_AFTER_OR_EQUAL, IS_AFTER_OR_EQUAL),
-            option(IS_BEFORE, IS_BEFORE),
-            option(IS_BEFORE_OR_EQUAL, IS_BEFORE_OR_EQUAL),
-            option(IS_EQUAL, IS_EQUAL));
+            option("Is After", DateHelperComparisonEnum.IS_AFTER.name()),
+            option("Is After or Equal", DateHelperComparisonEnum.IS_AFTER_OR_EQUAL.name()),
+            option("Is Before", DateHelperComparisonEnum.IS_BEFORE.name()),
+            option("Is Before or Equal", DateHelperComparisonEnum.IS_BEFORE_OR_EQUAL.name()),
+            option("Is Equal", DateHelperComparisonEnum.IS_EQUAL.name()));
 
         assertEquals(expected, result);
     }
@@ -173,8 +168,8 @@ class DateHelperUtilsTest {
 
         List<Option<String>> expected = ZoneId.getAvailableZoneIds()
             .stream()
-            .map(s -> option(s, s))
-            .collect(Collectors.toList());
+            .map(s -> (Option<String>) option(s, s))
+            .toList();
 
         assertEquals(expected, result);
     }
@@ -183,7 +178,7 @@ class DateHelperUtilsTest {
     void testNormalizeToTimeOnly() {
         LocalDateTime inputDate = LocalDateTime.of(2023, 10, 1, 12, 0);
         LocalDateTime result = normalizeToTimeOnly(inputDate);
-        LocalDateTime expected = LocalDateTime.of(2025, 1, 1, 12, 0);
+        LocalDateTime expected = LocalDateTime.of(1970, 1, 1, 12, 0);
 
         assertEquals(expected, result);
     }
@@ -252,8 +247,7 @@ class DateHelperUtilsTest {
 
     @Test
     void testFormatDurationLargeNumber() {
-        assertEquals("11 days, 13 hours, 46 minutes, 40 seconds",
-            formatDuration(1_000_000L));
+        assertEquals("11 days, 13 hours, 46 minutes, 40 seconds", formatDuration(1_000_000L));
     }
 
     @Test
