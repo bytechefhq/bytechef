@@ -20,9 +20,7 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.EX
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -38,7 +36,7 @@ class TextHelperContainsActionTest {
         Parameters parameters = MockParametersFactory.create(
             Map.of(TEXT, "This is a sample text.", EXPRESSION, "sample"));
 
-        assertTrue(TextHelperContainsAction.perform(parameters, parameters, mock(Context.class)));
+        assertTrue(TextHelperContainsAction.perform(parameters, parameters, null));
     }
 
     @Test
@@ -46,6 +44,6 @@ class TextHelperContainsActionTest {
         Parameters parameters = MockParametersFactory.create(
             Map.of(TEXT, "This is a sample text.", EXPRESSION, "missing"));
 
-        assertFalse(TextHelperContainsAction.perform(parameters, parameters, mock(Context.class)));
+        assertFalse(TextHelperContainsAction.perform(parameters, parameters, null));
     }
 }

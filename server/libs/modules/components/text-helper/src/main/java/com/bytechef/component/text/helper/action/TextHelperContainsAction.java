@@ -49,7 +49,6 @@ public class TextHelperContainsAction {
     }
 
     public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         String text = inputParameters.getRequiredString(TEXT);
 
         return text.contains(inputParameters.getRequiredString(EXPRESSION));

@@ -45,9 +45,7 @@ public class TextHelperGetDomainFromEmailAction {
     private TextHelperGetDomainFromEmailAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String regexStr = "([A-Za-z0-9.-]+\\.[A-Za-z]{2,})";
         String emailAddress = inputParameters.getRequiredString(TEXT);
 

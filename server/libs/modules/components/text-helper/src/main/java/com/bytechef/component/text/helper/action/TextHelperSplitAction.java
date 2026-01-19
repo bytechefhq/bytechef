@@ -52,9 +52,7 @@ public class TextHelperSplitAction {
     private TextHelperSplitAction() {
     }
 
-    public static String[] perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String[] perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String text = inputParameters.getRequiredString(TEXT);
 
         return text.split(inputParameters.getRequiredString(DELIMITER));

@@ -61,9 +61,7 @@ public class TextHelperExtractKeyRegExAction {
     private TextHelperExtractKeyRegExAction() {
     }
 
-    public static List<String> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static List<String> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Map<String, Object> keyValueMap = inputParameters.getRequiredMap(KEY_VALUE_OBJECT, Object.class);
         String regex = inputParameters.getRequiredString(REGULAR_EXPRESSION);
 

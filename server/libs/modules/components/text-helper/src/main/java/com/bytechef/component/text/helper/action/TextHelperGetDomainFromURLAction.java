@@ -47,8 +47,8 @@ public class TextHelperGetDomainFromURLAction {
     private TextHelperGetDomainFromURLAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws MalformedURLException {
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws MalformedURLException {
 
         Pattern pattern = Pattern.compile("^(?:https?://)?(?:www\\.)?([^:/\\n?]+)");
         Matcher matcher = pattern.matcher(inputParameters.getRequiredString(TEXT));

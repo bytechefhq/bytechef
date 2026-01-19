@@ -18,9 +18,7 @@ package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -33,12 +31,9 @@ class TextHelperGetDomainFromEmailActionTest {
 
     @Test
     void testPerform() {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, "example@example.com"));
-        Context mockedContext = mock(Context.class);
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "example@example.com"));
 
-        String result = TextHelperGetDomainFromEmailAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        String result = TextHelperGetDomainFromEmailAction.perform(mockedParameters, null, null);
 
         assertEquals("example.com", result);
     }

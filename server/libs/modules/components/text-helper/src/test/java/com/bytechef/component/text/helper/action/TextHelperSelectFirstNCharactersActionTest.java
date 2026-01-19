@@ -19,9 +19,7 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.NUMBER_OF_CHARACTERS;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -37,8 +35,7 @@ class TextHelperSelectFirstNCharactersActionTest {
         Parameters parameters = MockParametersFactory.create(
             Map.of(TEXT, "The quick brown fox jumps over the lazy dog.", NUMBER_OF_CHARACTERS, 10));
 
-        String result =
-            TextHelperSelectFirstNCharactersAction.perform(parameters, parameters, mock(Context.class));
+        String result = TextHelperSelectFirstNCharactersAction.perform(parameters, null, null);
 
         assertEquals("The quick ", result);
     }

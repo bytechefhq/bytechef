@@ -52,9 +52,7 @@ public class TextHelperMarkdownToHTMLAction {
     private TextHelperMarkdownToHTMLAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         DataHolder dataHolder = PegdownOptionsAdapter.flexmarkOptions(true, Extensions.ALL);
 
         Document document = Parser

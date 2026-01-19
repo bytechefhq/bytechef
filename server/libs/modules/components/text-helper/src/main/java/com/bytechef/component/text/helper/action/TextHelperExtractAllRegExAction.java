@@ -58,11 +58,8 @@ public class TextHelperExtractAllRegExAction {
     private TextHelperExtractAllRegExAction() {
     }
 
-    public static List<String> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static List<String> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return extractByRegEx(
-            inputParameters.getRequiredString(TEXT),
-            inputParameters.getRequiredString(REGULAR_EXPRESSION));
+            inputParameters.getRequiredString(TEXT), inputParameters.getRequiredString(REGULAR_EXPRESSION));
     }
 }

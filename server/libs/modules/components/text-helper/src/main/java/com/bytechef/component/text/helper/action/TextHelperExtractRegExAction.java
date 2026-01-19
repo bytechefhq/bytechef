@@ -50,12 +50,9 @@ public class TextHelperExtractRegExAction {
     private TextHelperExtractRegExAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return extractByRegEx(
-            inputParameters.getRequiredString(TEXT),
-            inputParameters.getRequiredString(REGULAR_EXPRESSION))
+            inputParameters.getRequiredString(TEXT), inputParameters.getRequiredString(REGULAR_EXPRESSION))
                 .getFirst();
     }
 }

@@ -19,9 +19,7 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -35,10 +33,8 @@ class TextHelperChangeTypeActionTest {
     @Test
     void testPerformValidNumber() {
         Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "42"));
-        Context mockedContext = mock(Context.class);
 
-        double result = TextHelperChangeTypeAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        double result = TextHelperChangeTypeAction.perform(mockedParameters, null, null);
 
         assertEquals(42.0, result);
     }
@@ -46,9 +42,8 @@ class TextHelperChangeTypeActionTest {
     @Test
     void testPerformInvalidNumber() {
         Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "not a number"));
-        Context mockedContext = mock(Context.class);
 
         assertThrows(NumberFormatException.class,
-            () -> TextHelperChangeTypeAction.perform(mockedParameters, mockedParameters, mockedContext));
+            () -> TextHelperChangeTypeAction.perform(mockedParameters, null, null));
     }
 }

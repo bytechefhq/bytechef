@@ -88,5 +88,4 @@ public class TextHelperHexEncodeDecodeAction {
 
         return hexEncodedStringBuilder.toString();
     }
-
 }

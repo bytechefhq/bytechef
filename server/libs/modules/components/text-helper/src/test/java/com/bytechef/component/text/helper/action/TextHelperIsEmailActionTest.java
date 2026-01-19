@@ -32,22 +32,18 @@ class TextHelperIsEmailActionTest {
 
     @Test
     void testPerformValidEmail() {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, "alice@example.com"));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "alice@example.com"));
 
-        boolean result = TextHelperIsEmailAction.perform(
-            mockedParameters, null, null);
+        boolean result = TextHelperIsEmailAction.perform(mockedParameters, null, null);
 
         assertTrue(result);
     }
 
     @Test
     void testPerformInvalidEmail() {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, "invalid-email"));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "invalid-email"));
 
-        boolean result = TextHelperIsEmailAction.perform(
-            mockedParameters, null, null);
+        boolean result = TextHelperIsEmailAction.perform(mockedParameters, null, null);
 
         assertFalse(result);
     }

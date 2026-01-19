@@ -22,14 +22,10 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.IS
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.LAST_NAME;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.MIDDLE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -38,128 +34,78 @@ import org.junit.jupiter.api.Test;
  */
 class TextHelperGetFirstMiddleLastNameActionTest {
 
-    private final Context mockedContext = mock(Context.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private Parameters mockedParameters;
 
     @Test
     void testPerformWithTwoPartNameFirstNameFirst() {
-        when(mockedParameters.getRequiredString(FULL_NAME)).thenReturn("John Doe");
-        when(mockedParameters.getRequiredBoolean(IS_FIRST_NAME_FIRST)).thenReturn(true);
+        mockedParameters = MockParametersFactory.create(Map.of(FULL_NAME, "John Doe", IS_FIRST_NAME_FIRST, true));
 
-        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(mockedParameters, null, null);
 
-        assertEquals("John", result.get(FIRST_NAME));
-        assertEquals("", result.get(MIDDLE_NAME));
-        assertEquals("Doe", result.get(LAST_NAME));
+        assertEquals(Map.of(FIRST_NAME, "John", MIDDLE_NAME, "", LAST_NAME, "Doe"), result);
     }
 
     @Test
     void testPerformWithTwoPartNameLastNameFirst() {
-        when(mockedParameters.getRequiredString(FULL_NAME)).thenReturn("Doe John");
-        when(mockedParameters.getRequiredBoolean(IS_FIRST_NAME_FIRST)).thenReturn(false);
+        mockedParameters = MockParametersFactory.create(Map.of(FULL_NAME, "Doe John", IS_FIRST_NAME_FIRST, false));
 
-        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(mockedParameters, null, null);
 
-        assertEquals("John", result.get(FIRST_NAME));
-        assertEquals("", result.get(MIDDLE_NAME));
-        assertEquals("Doe", result.get(LAST_NAME));
+        assertEquals(Map.of(FIRST_NAME, "John", MIDDLE_NAME, "", LAST_NAME, "Doe"), result);
     }
 
     @Test
     void testPerformWithThreePartNameFirstNameFirst() {
-        when(mockedParameters.getRequiredString(FULL_NAME)).thenReturn("John Michael Doe");
-        when(mockedParameters.getRequiredBoolean(IS_FIRST_NAME_FIRST)).thenReturn(true);
+        mockedParameters = MockParametersFactory.create(
+            Map.of(FULL_NAME, "John Michael Doe", IS_FIRST_NAME_FIRST, true));
 
-        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(mockedParameters, null, null);
 
-        assertEquals("John", result.get(FIRST_NAME));
-        assertEquals("Michael", result.get(MIDDLE_NAME));
-        assertEquals("Doe", result.get(LAST_NAME));
+        assertEquals(Map.of(FIRST_NAME, "John", MIDDLE_NAME, "Michael", LAST_NAME, "Doe"), result);
     }
 
     @Test
     void testPerformWithThreePartNameLastNameFirst() {
-        when(mockedParameters.getRequiredString(FULL_NAME)).thenReturn("Doe Michael John");
-        when(mockedParameters.getRequiredBoolean(IS_FIRST_NAME_FIRST)).thenReturn(false);
+        mockedParameters = MockParametersFactory.create(
+            Map.of(FULL_NAME, "Doe Michael John", IS_FIRST_NAME_FIRST, false));
 
-        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(mockedParameters, null, null);
 
-        assertEquals("John", result.get(FIRST_NAME));
-        assertEquals("Michael", result.get(MIDDLE_NAME));
-        assertEquals("Doe", result.get(LAST_NAME));
+        assertEquals(Map.of(FIRST_NAME, "John", MIDDLE_NAME, "Michael", LAST_NAME, "Doe"), result);
     }
 
     @Test
     void testPerformNamesWithMultipleSpaces() {
-        when(mockedParameters.getRequiredString(FULL_NAME)).thenReturn("John  Doe");
-        when(mockedParameters.getRequiredBoolean(IS_FIRST_NAME_FIRST)).thenReturn(true);
+        mockedParameters = MockParametersFactory.create(Map.of(FULL_NAME, "John  Doe", IS_FIRST_NAME_FIRST, true));
 
-        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(mockedParameters, null, null);
 
-        assertNotNull(result);
+        assertEquals(Map.of(FIRST_NAME, "John", MIDDLE_NAME, "", LAST_NAME, "Doe"), result);
     }
 
     @Test
     void testPerformThrowExceptionForSinglePartName() {
-        when(mockedParameters.getRequiredString(FULL_NAME)).thenReturn("John");
-        when(mockedParameters.getRequiredBoolean(IS_FIRST_NAME_FIRST)).thenReturn(true);
+        mockedParameters = MockParametersFactory.create(Map.of(FULL_NAME, "John", IS_FIRST_NAME_FIRST, true));
 
         assertThrows(ArrayIndexOutOfBoundsException.class,
-            () -> TextHelperGetFirstMiddleLastNameAction.perform(
-                mockedParameters, mockedParameters, mockedContext));
+            () -> TextHelperGetFirstMiddleLastNameAction.perform(mockedParameters, null, null));
     }
 
     @Test
     void testPerformHandleEmptyString() {
-        when(mockedParameters.getRequiredString(FULL_NAME)).thenReturn("");
-        when(mockedParameters.getRequiredBoolean(IS_FIRST_NAME_FIRST)).thenReturn(true);
+        mockedParameters = MockParametersFactory.create(Map.of(FULL_NAME, "", IS_FIRST_NAME_FIRST, true));
 
         assertThrows(ArrayIndexOutOfBoundsException.class,
-            () -> TextHelperGetFirstMiddleLastNameAction.perform(
-                mockedParameters, mockedParameters, mockedContext));
+            () -> TextHelperGetFirstMiddleLastNameAction.perform(mockedParameters, null, null));
     }
 
     @Test
     void testPerformNamesWithSpecialCharacters() {
-        when(mockedParameters.getRequiredString(FULL_NAME)).thenReturn("Jean-Paul Sartre");
-        when(mockedParameters.getRequiredBoolean(IS_FIRST_NAME_FIRST)).thenReturn(true);
+        mockedParameters = MockParametersFactory.create(
+            Map.of(FULL_NAME, "Jean-Paul Sartre", IS_FIRST_NAME_FIRST, true));
 
-        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(mockedParameters, null, null);
 
-        assertEquals("Jean-Paul", result.get(FIRST_NAME));
-        assertEquals("", result.get(MIDDLE_NAME));
-        assertEquals("Sartre", result.get(LAST_NAME));
-    }
-
-    @Test
-    void shouldVerifyAllMapKeysPresent() {
-        when(mockedParameters.getRequiredString(FULL_NAME)).thenReturn("John Doe");
-        when(mockedParameters.getRequiredBoolean(IS_FIRST_NAME_FIRST)).thenReturn(true);
-
-        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
-
-        assertTrue(result.containsKey(FIRST_NAME));
-        assertTrue(result.containsKey(MIDDLE_NAME));
-        assertTrue(result.containsKey(LAST_NAME));
-        assertEquals(3, result.size());
-    }
-
-    @Test
-    void shouldNotModifyMiddleNameForTwoPartNames() {
-        when(mockedParameters.getRequiredString(FULL_NAME)).thenReturn("John Doe");
-        when(mockedParameters.getRequiredBoolean(IS_FIRST_NAME_FIRST)).thenReturn(true);
-
-        Map<String, String> result = TextHelperGetFirstMiddleLastNameAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals("", result.get(MIDDLE_NAME));
-        assertNotNull(result.get(MIDDLE_NAME));
+        assertEquals(Map.of(FIRST_NAME, "Jean-Paul", MIDDLE_NAME, "", LAST_NAME, "Sartre"), result);
     }
 }

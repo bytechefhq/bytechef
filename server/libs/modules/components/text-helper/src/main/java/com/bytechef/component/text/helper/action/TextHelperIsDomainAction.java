@@ -47,14 +47,11 @@ public class TextHelperIsDomainAction {
     }
 
     public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String domain = inputParameters.getRequiredString(TEXT);
-
         String domainRegex = "^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)"
             + "(\\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$";
 
-        Pattern domainPattern = Pattern.compile(domainRegex);
-
-        return domainPattern.matcher(domain)
+        return Pattern.compile(domainRegex)
+            .matcher(inputParameters.getRequiredString(TEXT))
             .matches();
     }
 }

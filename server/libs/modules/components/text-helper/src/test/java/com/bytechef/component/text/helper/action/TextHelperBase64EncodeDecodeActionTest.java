@@ -19,9 +19,7 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.OPERATION;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.text.helper.constant.OperationType;
@@ -33,15 +31,12 @@ import org.junit.jupiter.api.Test;
  */
 class TextHelperBase64EncodeDecodeActionTest {
 
-    private final Context mockedContext = mock(Context.class);
-
     @Test
     void testPerformEncode() {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "SGVsbG8gd29ybGQ=", OPERATION, OperationType.DECODE.name()));
 
-        Object result =
-            TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, null);
 
         assertEquals("Hello world", result);
     }
@@ -51,8 +46,7 @@ class TextHelperBase64EncodeDecodeActionTest {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "Hello world", OPERATION, OperationType.ENCODE.name()));
 
-        Object result =
-            TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, null);
 
         assertEquals("SGVsbG8gd29ybGQ=", result);
     }
@@ -62,8 +56,7 @@ class TextHelperBase64EncodeDecodeActionTest {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(TEXT, "", OPERATION, OperationType.DECODE.name()));
 
-        Object result =
-            TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, null);
 
         assertEquals("", result);
     }

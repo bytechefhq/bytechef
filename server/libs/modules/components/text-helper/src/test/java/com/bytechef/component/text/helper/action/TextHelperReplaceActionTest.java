@@ -21,9 +21,7 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.RE
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.SEARCH_VALUE;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -40,7 +38,7 @@ class TextHelperReplaceActionTest {
             Map.of(TEXT, "apple banana apple", SEARCH_VALUE, "apple", REPLACE_VALUE, "orange", REPLACE_ONLY_FIRST,
                 false));
 
-        String result = TextHelperReplaceAction.perform(parameters, parameters, mock(Context.class));
+        String result = TextHelperReplaceAction.perform(parameters, parameters, null);
 
         String expected = "orange banana orange";
 
@@ -53,7 +51,7 @@ class TextHelperReplaceActionTest {
             Map.of(TEXT, "apple banana apple", SEARCH_VALUE, "apple", REPLACE_VALUE, "orange", REPLACE_ONLY_FIRST,
                 true));
 
-        String result = TextHelperReplaceAction.perform(parameters, parameters, mock(Context.class));
+        String result = TextHelperReplaceAction.perform(parameters, parameters, null);
 
         String expected = "orange banana apple";
 

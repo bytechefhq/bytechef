@@ -53,9 +53,7 @@ public class TextHelperConcatenateAction {
     private TextHelperConcatenateAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<String> texts = inputParameters.getRequiredList(TEXTS, String.class);
 
         return String.join(inputParameters.getString(SEPARATOR, ""), texts);
