@@ -16,20 +16,15 @@
 
 package com.bytechef.component.google.mail.action;
 
-import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
+import com.google.api.services.gmail.model.Label;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -39,43 +34,28 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailListLabelsActionTest {
 
-    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor = ArgumentCaptor.forClass(
-        ActionContext.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final ArgumentCaptor<Object> objectArgumentCaptor = ArgumentCaptor.forClass(Object.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() {
-
-        List<Option<String>> mockedLabelOptions = List.of(
-            option("label1", "1"),
-            option("label2", "2"),
-            option("label3", "3"));
+        List<Label> labels = List.of(
+            new Label().setId("1")
+                .setName("label1"),
+            new Label().setId("2")
+                .setName("label2"),
+            new Label().setId("3")
+                .setName("label3"));
 
         try (MockedStatic<GoogleMailUtils> googleServicesMockedStatic = mockStatic(GoogleMailUtils.class)) {
-            googleServicesMockedStatic.when(() -> GoogleMailUtils.getLabelOptions(
-                parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture(),
-                (Map<String, String>) objectArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                actionContextArgumentCaptor.capture()))
-                .thenReturn(mockedLabelOptions);
+            googleServicesMockedStatic.when(() -> GoogleMailUtils.getLabels(parametersArgumentCaptor.capture()))
+                .thenReturn(labels);
 
-            List<Map<String, String>> result = GoogleMailListLabelsAction.perform(
-                mockedParameters, mockedParameters, mockedActionContext);
+            List<Label> result = GoogleMailListLabelsAction.perform(null, mockedParameters, mockedActionContext);
 
-            List<Map<String, String>> expected = List.of(
-                Map.of(NAME, "label1", ID, "1"),
-                Map.of(NAME, "label2", ID, "2"),
-                Map.of(NAME, "label3", ID, "3"));
-
-            assertEquals(expected, result);
-
-            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
-            assertNotNull(stringArgumentCaptor.getValue());
-            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
-            assertEquals(Map.of(), objectArgumentCaptor.getValue());
+            assertEquals(labels, result);
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
         }
     }
 }
