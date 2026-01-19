@@ -20,38 +20,40 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.EXPRESSION;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT_PROPERTY;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import java.util.regex.Pattern;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Špehar
  */
-public class TextHelperContainsAction {
+public class TextHelperIsEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("contains")
-        .title("Contains")
-        .description("Check if text contains the specified sequence of characters.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("isEmail")
+        .title("Is Email?")
+        .description("Check if a string is a valid email address.")
         .properties(
-            TEXT_PROPERTY,
-            string(EXPRESSION)
-                .label("Expression")
-                .description("Text to search for.")
+            string(TEXT)
+                .label("Text")
+                .description("The text to be checked as a valid email address.")
                 .required(true))
-        .output(outputSchema(bool().description("True if the text contains the expression, false otherwise.")))
-        .perform(TextHelperContainsAction::perform);
+        .output(outputSchema(bool().description("Whether the text is a valid email address.")))
+        .perform(TextHelperIsEmailAction::perform);
 
-    private TextHelperContainsAction() {
+    private TextHelperIsEmailAction() {
     }
 
     public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String email = inputParameters.getRequiredString(TEXT);
 
-        String text = inputParameters.getRequiredString(TEXT);
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 
-        return text.contains(inputParameters.getRequiredString(EXPRESSION));
+        Pattern emailPattern = Pattern.compile(emailRegex);
+
+        return emailPattern.matcher(email)
+            .matches();
     }
 }

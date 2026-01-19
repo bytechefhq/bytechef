@@ -16,7 +16,7 @@
 
 package com.bytechef.component.text.helper.action;
 
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.OPERATION;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.REGULAR_EXPRESSION;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -24,47 +24,41 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.bytechef.component.text.helper.constant.OperationType;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Spehar
  */
-class TextHelperUrlEncodeDecodeActionTest {
+class TextHelperExtractRegExActionTest {
 
-    private final Context mockedContext = mock(Context.class);
+    static final Context mockedContext = mock(Context.class);
 
     @Test
-    void testPerformEncode() {
+    void testPerformSingleMatch() {
+        String input = "My email is test@example.com";
+        String regex = "[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}";
+
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, "Hello+World%21", OPERATION, OperationType.DECODE.name()));
+            Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
 
-        Object result =
-            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
+        String result = TextHelperExtractRegExAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals("Hello World!", result);
+        assertEquals("test@example.com", result);
     }
 
     @Test
-    void testPerformDecode() {
+    void testPerformMultipleMatches() {
+        String input = "Contact: test@example.com or admin@site.org";
+        String regex = "[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}";
+
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, "Hello World!", OPERATION, OperationType.ENCODE.name()));
+            Map.of(TEXT, input, REGULAR_EXPRESSION, regex));
 
-        Object result =
-            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
+        String result = TextHelperExtractRegExAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals("Hello+World%21", result);
-    }
-
-    @Test
-    void testPerformWithEmptyContent() {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TEXT, "", OPERATION, OperationType.DECODE.name()));
-
-        Object result =
-            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals("", result);
+        assertEquals("test@example.com", result);
     }
 }

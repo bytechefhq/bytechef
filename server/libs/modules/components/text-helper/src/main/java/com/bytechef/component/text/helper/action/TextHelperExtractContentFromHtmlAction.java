@@ -25,8 +25,8 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.QU
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.RETURN_ARRAY;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.RETURN_VALUE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.text.helper.constant.TextHelperConstants;
@@ -83,8 +83,8 @@ public class TextHelperExtractContentFromHtmlAction {
         .output()
         .perform(TextHelperExtractContentFromHtmlAction::perform);
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Object result;
 

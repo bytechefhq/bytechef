@@ -24,7 +24,7 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.TH
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -41,7 +41,7 @@ class TextHelperFormatCurrencyActionTest {
             Map.of(CURRENCY, "USD", AMOUNT, 1234567.89, DECIMAL_DIGITS, 2, DECIMAL_SEPARATOR, ".", THOUSANDS_SEPARATOR,
                 ","));
 
-        String result = TextHelperFormatCurrencyAction.perform(parameters, parameters, mock(ActionContext.class));
+        String result = TextHelperFormatCurrencyAction.perform(parameters, parameters, mock(Context.class));
 
         assertEquals("1,234,567.89 $", result);
     }

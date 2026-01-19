@@ -26,8 +26,8 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.SE
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT_PROPERTY;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -59,8 +59,8 @@ public class TextHelperReplaceAction {
     private TextHelperReplaceAction() {
     }
 
-    protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    public static String perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         String text = inputParameters.getRequiredString(TEXT);
         String searchValue = inputParameters.getRequiredString(SEARCH_VALUE);

@@ -16,30 +16,39 @@
 
 package com.bytechef.component.text.helper.action;
 
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.MARKDOWN;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Spehar
  */
-class TextHelperMarkdownToHTMLActionTest {
-
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(MARKDOWN, "# Hello World"));
+class TextHelperIsEmailActionTest {
 
     @Test
-    void testPerform() {
-        String result = TextHelperMarkdownToHTMLAction.perform(
-            mockedParameters, mockedParameters, mock(Context.class));
+    void testPerformValidEmail() {
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(TEXT, "alice@example.com"));
 
-        String expected = "<h1><a href=\"#hello-world\" id=\"hello-world\">Hello World</a></h1>\n";
+        boolean result = TextHelperIsEmailAction.perform(
+            mockedParameters, null, null);
 
-        assertEquals(expected, result);
+        assertTrue(result);
+    }
+
+    @Test
+    void testPerformInvalidEmail() {
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(TEXT, "invalid-email"));
+
+        boolean result = TextHelperIsEmailAction.perform(
+            mockedParameters, null, null);
+
+        assertFalse(result);
     }
 }

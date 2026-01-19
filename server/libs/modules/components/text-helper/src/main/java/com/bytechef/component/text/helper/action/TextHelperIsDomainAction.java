@@ -20,38 +20,41 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.EXPRESSION;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT_PROPERTY;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import java.util.regex.Pattern;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Špehar
  */
-public class TextHelperContainsAction {
+public class TextHelperIsDomainAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("contains")
-        .title("Contains")
-        .description("Check if text contains the specified sequence of characters.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("isDomain")
+        .title("Is Domain?")
+        .description("Check if a string is a valid domain.")
         .properties(
-            TEXT_PROPERTY,
-            string(EXPRESSION)
-                .label("Expression")
-                .description("Text to search for.")
+            string(TEXT)
+                .label("Text")
+                .description("The text to be checked as a valid domain name.")
                 .required(true))
-        .output(outputSchema(bool().description("True if the text contains the expression, false otherwise.")))
-        .perform(TextHelperContainsAction::perform);
+        .output(outputSchema(bool().description("Whether the text is a valid domain.")))
+        .perform(TextHelperIsDomainAction::perform);
 
-    private TextHelperContainsAction() {
+    private TextHelperIsDomainAction() {
     }
 
     public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String domain = inputParameters.getRequiredString(TEXT);
 
-        String text = inputParameters.getRequiredString(TEXT);
+        String domainRegex = "^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)"
+            + "(\\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$";
 
-        return text.contains(inputParameters.getRequiredString(EXPRESSION));
+        Pattern domainPattern = Pattern.compile(domainRegex);
+
+        return domainPattern.matcher(domain)
+            .matches();
     }
 }

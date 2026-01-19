@@ -19,39 +19,38 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.HTML;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
+import static com.bytechef.component.text.helper.util.TextHelperUtils.extractByRegEx;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.ControlType;
-import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Špehar
  */
-public class TextHelperHTMLToMarkdownAction {
+public class TextHelperGetDomainFromEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("HTMLToMarkdown")
-        .title("HTML to Markdown")
-        .description("Converts HTML to markdown.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getDomainFromEmail")
+        .title("Get Domain From Email Address")
+        .description("Extracts domain from the given email address.")
         .properties(
-            string(HTML)
-                .label("HTML Content")
-                .description("HTML content to be converted to markdown.")
-                .controlType(ControlType.TEXT_AREA)
+            string(TEXT)
+                .description("The email you want to extract domain from.")
+                .label("Email")
                 .required(true))
-        .output(outputSchema(string().description("Markdown content.")))
-        .perform(TextHelperHTMLToMarkdownAction::perform);
+        .output(outputSchema(string().description("Extracted domain")))
+        .perform(TextHelperGetDomainFromEmailAction::perform);
 
-    private TextHelperHTMLToMarkdownAction() {
+    private TextHelperGetDomainFromEmailAction() {
     }
 
     public static String perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return FlexmarkHtmlConverter.builder()
-            .build()
-            .convert(inputParameters.getRequiredString(HTML));
+        String regexStr = "([A-Za-z0-9.-]+\\.[A-Za-z]{2,})";
+        String emailAddress = inputParameters.getRequiredString(TEXT);
+
+        return extractByRegEx(emailAddress, regexStr).getFirst();
     }
 }

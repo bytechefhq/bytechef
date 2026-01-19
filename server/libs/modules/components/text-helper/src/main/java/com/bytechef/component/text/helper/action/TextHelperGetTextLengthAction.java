@@ -17,41 +17,37 @@
 package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.HTML;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.ControlType;
-import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Špehar
  */
-public class TextHelperHTMLToMarkdownAction {
+public class TextHelperGetTextLengthAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("HTMLToMarkdown")
-        .title("HTML to Markdown")
-        .description("Converts HTML to markdown.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getTextLength")
+        .title("Get Text Length")
+        .description("Returns length of the given text.")
         .properties(
-            string(HTML)
-                .label("HTML Content")
-                .description("HTML content to be converted to markdown.")
-                .controlType(ControlType.TEXT_AREA)
+            string(TEXT)
+                .label("Text")
+                .description("The text of which the length will be returned of.")
                 .required(true))
-        .output(outputSchema(string().description("Markdown content.")))
-        .perform(TextHelperHTMLToMarkdownAction::perform);
+        .output(outputSchema(integer().description("Length of the text.")))
+        .perform(TextHelperGetTextLengthAction::perform);
 
-    private TextHelperHTMLToMarkdownAction() {
+    private TextHelperGetTextLengthAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static int perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String text = inputParameters.getRequiredString(TEXT);
 
-        return FlexmarkHtmlConverter.builder()
-            .build()
-            .convert(inputParameters.getRequiredString(HTML));
+        return text.length();
     }
 }

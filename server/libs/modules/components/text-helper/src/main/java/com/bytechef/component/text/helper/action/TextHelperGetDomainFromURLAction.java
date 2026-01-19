@@ -17,41 +17,48 @@
 package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.EXPRESSION;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT_PROPERTY;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import java.net.MalformedURLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Špehar
  */
-public class TextHelperContainsAction {
+public class TextHelperGetDomainFromURLAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("contains")
-        .title("Contains")
-        .description("Check if text contains the specified sequence of characters.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getDomainFromURL")
+        .title("Get Domain From URL")
+        .description("Extracts domain from the given URL.")
         .properties(
-            TEXT_PROPERTY,
-            string(EXPRESSION)
-                .label("Expression")
-                .description("Text to search for.")
+            string(TEXT)
+                .description("The URL you want to extract domain from.")
+                .label("URL")
                 .required(true))
-        .output(outputSchema(bool().description("True if the text contains the expression, false otherwise.")))
-        .perform(TextHelperContainsAction::perform);
+        .output(outputSchema(string().description("Extracted domain")))
+        .perform(TextHelperGetDomainFromURLAction::perform);
 
-    private TextHelperContainsAction() {
+    private TextHelperGetDomainFromURLAction() {
     }
 
-    public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static String perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws MalformedURLException {
 
-        String text = inputParameters.getRequiredString(TEXT);
+        Pattern pattern = Pattern.compile("^(?:https?://)?(?:www\\.)?([^:/\\n?]+)");
+        Matcher matcher = pattern.matcher(inputParameters.getRequiredString(TEXT));
 
-        return text.contains(inputParameters.getRequiredString(EXPRESSION));
+        String domain = "";
+
+        while (matcher.find()) {
+            domain = matcher.group(1);
+        }
+
+        return domain;
     }
 }

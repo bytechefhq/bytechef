@@ -17,41 +17,39 @@
 package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.HTML;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.ControlType;
-import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Špehar
  */
-public class TextHelperHTMLToMarkdownAction {
+public class TextHelperChangeTypeAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("HTMLToMarkdown")
-        .title("HTML to Markdown")
-        .description("Converts HTML to markdown.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("changeType")
+        .title("Change Type")
+        .description("Change the type of the input text to number.")
         .properties(
-            string(HTML)
-                .label("HTML Content")
-                .description("HTML content to be converted to markdown.")
-                .controlType(ControlType.TEXT_AREA)
+            string(TEXT)
+                .description("The input text to be changed to a number.")
+                .label("Text")
                 .required(true))
-        .output(outputSchema(string().description("Markdown content.")))
-        .perform(TextHelperHTMLToMarkdownAction::perform);
+        .output(outputSchema(number().description("Number input text")))
+        .perform(TextHelperChangeTypeAction::perform);
 
-    private TextHelperHTMLToMarkdownAction() {
+    private TextHelperChangeTypeAction() {
     }
 
-    public static String perform(
+    public static double perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return FlexmarkHtmlConverter.builder()
-            .build()
-            .convert(inputParameters.getRequiredString(HTML));
+        String text = inputParameters.getRequiredString(TEXT);
+
+        return Double.parseDouble(text);
     }
 }
