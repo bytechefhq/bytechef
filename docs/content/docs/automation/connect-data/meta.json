@@ -4,6 +4,11 @@
   "icon": "Link",
   "pages": [
     "overview",
+<<<<<<< HEAD
+    "how-to-guides/index"
+  ]
+=======
     "authentication",
     "troubleshooting"]
+>>>>>>> origin/master
 }

@@ -8,7 +8,12 @@
     "overview",
     "quick-start",
     "---Connect Data---",
+<<<<<<< HEAD
+    "connect-data/overview",
+    "connect-data/how-to-guides/index",
+=======
     "...connect-data",
+>>>>>>> origin/master
     "---Build Workflows---",
     "build/index",
     "...build",

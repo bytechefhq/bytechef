@@ -1,9 +1,7 @@
 ---
-title: "Condition"
-description: "Directs a stream based on true/false results of comparisons."
+description: "Condition flow control. Direct workflow based on true/false results. Learn how to implement this in your ByteChef workflows."
+title: Condition
 ---
-
-
 
 Type: condition/v1
 
@@ -17,8 +15,3 @@ Type: condition/v1
 | rawExpression | Raw Expression | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>true</span> </details> | Set condition as raw expression or list of conditions. | true |
 | conditions | OR Conditions | ARRAY <details> <summary> Items </summary> [[&#123;STRING\(type), BOOLEAN\(value1), STRING\(operation), BOOLEAN\(value2)&#125;\($boolean), &#123;STRING\(type), DATE_TIME\(value1), STRING\(operation), DATE_TIME\(value2)&#125;\($dateTime), &#123;STRING\(type), NUMBER\(value1), STRING\(operation), NUMBER\(value2)&#125;\($number), &#123;STRING\(type), STRING\(value1), STRING\(operation), STRING\(value2), STRING\(value2)&#125;\($string)]] </details> | OR Condition array that contains AND Condition arrays | false |
 | expression | Expression | STRING | The raw expression. | true |
-
-
-
-
-
