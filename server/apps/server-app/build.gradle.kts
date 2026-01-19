@@ -211,6 +211,11 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:core:tenant:tenant-api"))
+    testImplementation("org.springframework.boot:spring-boot-jdbc")
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:junit-jupiter")
 }
 
 configure<com.gorylenko.GitPropertiesPluginExtension> {
