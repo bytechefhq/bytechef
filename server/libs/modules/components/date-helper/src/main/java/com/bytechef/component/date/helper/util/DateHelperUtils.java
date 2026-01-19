@@ -145,7 +145,7 @@ public class DateHelperUtils {
     }
 
     public static LocalDateTime normalizeToTimeOnly(LocalDateTime localDateTime) {
-        return localDateTime.withYear(2025)
+        return localDateTime.withYear(1970)
             .withMonth(1)
             .withDayOfMonth(1);
     }
