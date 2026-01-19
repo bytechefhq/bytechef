@@ -21,12 +21,17 @@ import static com.bytechef.component.heygen.constant.HeyGenConstants.TITLE;
 import static com.bytechef.component.heygen.constant.HeyGenConstants.TRANSLATE_AUDIO_ONLY;
 import static com.bytechef.component.heygen.constant.HeyGenConstants.VIDEO_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
@@ -41,21 +46,34 @@ import org.mockito.ArgumentCaptor;
  */
 class HeyGenTranslateVideoActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
+    private final Http mockedHttp = mock(Http.class);
     private final Object mockedObject = mock(Object.class);
     private final Response mockedResponse = mock(Response.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(VIDEO_URL, "1", OUTPUT_LANGUAGE, "English", TITLE, "Test", TRANSLATE_AUDIO_ONLY, false));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -66,10 +84,20 @@ class HeyGenTranslateVideoActionTest {
 
         assertEquals(mockedObject, result);
 
-        Body body = bodyArgumentCaptor.getValue();
-        Map<String, Object> expected = Map.of(
-            VIDEO_URL, "1", OUTPUT_LANGUAGE, "English", TITLE, "Test", TRANSLATE_AUDIO_ONLY, false);
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-        assertEquals(expected, body.getContent());
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals("https://api.heygen.com/v2/video_translate", stringArgumentCaptor.getValue());
+        assertEquals(
+            Http.Body.of(
+                Map.of(VIDEO_URL, "1", OUTPUT_LANGUAGE, "English", TITLE, "Test", TRANSLATE_AUDIO_ONLY, false),
+                Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }

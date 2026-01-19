@@ -19,6 +19,7 @@ package com.bytechef.component.heygen.trigger;
 import static com.bytechef.component.heygen.constant.HeyGenConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.heygen.util.HeyGenUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -41,7 +42,7 @@ class HeyGenVideoGenerationCompletedTriggerTest extends AbstractHeyGenTriggerTes
             .thenReturn("123");
 
         WebhookEnableOutput webhookEnableOutput = HeyGenVideoGenerationCompletedTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhhookUrl, workflowExecutionId, mockedTriggerContext);
+            null, null, webhhookUrl, "", mockedTriggerContext);
 
         WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
@@ -52,10 +53,10 @@ class HeyGenVideoGenerationCompletedTriggerTest extends AbstractHeyGenTriggerTes
 
     @Test
     void testWebhookDisable() {
-        mockedParameters = MockParametersFactory.create(Map.of(ID, "123"));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, "123"));
 
         HeyGenVideoGenerationCompletedTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+            null, null, mockedParameters, "", mockedTriggerContext);
 
         heyGenUtilsMockedStatic.verify(() -> HeyGenUtils.deleteWebhook(mockedTriggerContext, "123"));
     }
@@ -68,8 +69,7 @@ class HeyGenVideoGenerationCompletedTriggerTest extends AbstractHeyGenTriggerTes
             .thenReturn(content);
 
         Object result = HeyGenVideoGenerationCompletedTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            null, null, null, null, mockedWebhookBody, null, null, null);
 
         assertEquals(content, result);
         assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());
