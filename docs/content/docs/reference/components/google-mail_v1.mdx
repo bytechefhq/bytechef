@@ -216,8 +216,11 @@ Items Type: OBJECT
 #### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| name | STRING | Name of the label. |
-| id | STRING | Id of the label. |
+| name | STRING | The display name of the label. |
+| id | STRING | ID of the label. |
+| messageListVisibility | STRING | The visibility of messages with this label in the message list in the Gmail web interface. |
+| labelListVisibility | STRING | The visibility of the label in the label list in the Gmail web interface. |
+| type | STRING | The owner type for the label. |
 
 
 
@@ -227,7 +230,10 @@ Items Type: OBJECT
 ```json
 [ {
   "name" : "",
-  "id" : ""
+  "id" : "",
+  "messageListVisibility" : "",
+  "labelListVisibility" : "",
+  "type" : ""
 } ]
 ```
 
