@@ -459,23 +459,23 @@
       "options": [ {
         "description": null,
         "label": "Is After",
-        "value": "Is After"
+        "value": "IS_AFTER"
       }, {
         "description": null,
         "label": "Is After or Equal",
-        "value": "Is After or Equal"
+        "value": "IS_AFTER_OR_EQUAL"
       }, {
         "description": null,
         "label": "Is Before",
-        "value": "Is Before"
+        "value": "IS_BEFORE"
       }, {
         "description": null,
         "label": "Is Before or Equal",
-        "value": "Is Before or Equal"
+        "value": "IS_BEFORE_OR_EQUAL"
       }, {
         "description": null,
         "label": "Is Equal",
-        "value": "Is Equal"
+        "value": "IS_EQUAL"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -610,23 +610,23 @@
       "options": [ {
         "description": null,
         "label": "Is After",
-        "value": "Is After"
+        "value": "IS_AFTER"
       }, {
         "description": null,
         "label": "Is After or Equal",
-        "value": "Is After or Equal"
+        "value": "IS_AFTER_OR_EQUAL"
       }, {
         "description": null,
         "label": "Is Before",
-        "value": "Is Before"
+        "value": "IS_BEFORE"
       }, {
         "description": null,
         "label": "Is Before or Equal",
-        "value": "Is Before or Equal"
+        "value": "IS_BEFORE_OR_EQUAL"
       }, {
         "description": null,
         "label": "Is Equal",
-        "value": "Is Equal"
+        "value": "IS_EQUAL"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -3677,23 +3677,23 @@
       "options": [ {
         "description": null,
         "label": "Is After",
-        "value": "Is After"
+        "value": "IS_AFTER"
       }, {
         "description": null,
         "label": "Is After or Equal",
-        "value": "Is After or Equal"
+        "value": "IS_AFTER_OR_EQUAL"
       }, {
         "description": null,
         "label": "Is Before",
-        "value": "Is Before"
+        "value": "IS_BEFORE"
       }, {
         "description": null,
         "label": "Is Before or Equal",
-        "value": "Is Before or Equal"
+        "value": "IS_BEFORE_OR_EQUAL"
       }, {
         "description": null,
         "label": "Is Equal",
-        "value": "Is Equal"
+        "value": "IS_EQUAL"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -3827,23 +3827,23 @@
       "options": [ {
         "description": null,
         "label": "Is After",
-        "value": "Is After"
+        "value": "IS_AFTER"
       }, {
         "description": null,
         "label": "Is After or Equal",
-        "value": "Is After or Equal"
+        "value": "IS_AFTER_OR_EQUAL"
       }, {
         "description": null,
         "label": "Is Before",
-        "value": "Is Before"
+        "value": "IS_BEFORE"
       }, {
         "description": null,
         "label": "Is Before or Equal",
-        "value": "Is Before or Equal"
+        "value": "IS_BEFORE_OR_EQUAL"
       }, {
         "description": null,
         "label": "Is Equal",
-        "value": "Is Equal"
+        "value": "IS_EQUAL"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
