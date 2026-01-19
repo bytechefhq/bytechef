@@ -37,27 +37,27 @@ const WorkflowExecutionsTestOutput = ({
 
     const job = workflowTestExecution?.job;
     const triggerExecution = workflowTestExecution?.triggerExecution;
+    const currentWorkflowId = job?.workflowId;
 
     useEffect(() => {
         setSelectedItem(getInitialSelectedItem(workflowTestExecution));
         setActiveTab('input');
     }, [workflowTestExecution]);
 
-    // Set workflow execution error in copilot store when an error exists
     useEffect(() => {
         const errorItem = getErrorItem(workflowTestExecution);
 
-        if (errorItem?.error) {
+        if (errorItem?.error && currentWorkflowId) {
             setWorkflowExecutionError({
                 errorMessage: errorItem.error.message,
                 stackTrace: errorItem.error.stackTrace,
                 title: errorItem.title,
+                workflowId: currentWorkflowId,
             });
-        } else {
-            // Clear error when workflow succeeds
+        } else if (!errorItem?.error) {
             setWorkflowExecutionError(undefined);
         }
-    }, [workflowTestExecution, setWorkflowExecutionError]);
+    }, [workflowTestExecution, currentWorkflowId, setWorkflowExecutionError]);
 
     const tasksTree = useMemo(() => (job ? getTasksTree(job) : []), [job]);
 

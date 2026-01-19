@@ -62,12 +62,26 @@ export function CopilotRuntimeProvider({
             id: getRandomId(),
             role: 'user',
         });
-        agent.setState({
-            ...context,
+
+        const {workflowExecutionError, ...contextWithoutError} = context as typeof context & {
+            workflowExecutionError?: {
+                errorMessage?: string;
+                stackTrace?: string[];
+                title?: string;
+                workflowId?: string;
+            };
+        };
+
+        const stateToSend = {
+            ...contextWithoutError,
             currentSelectedNode: currentComponent?.name,
-            workflowExecutionError: context.taskExecutionError,
             workflowId: workflow.id,
-        });
+            ...(workflow.id === workflowExecutionError?.workflowId
+                ? {workflowExecutionError: workflowExecutionError}
+                : {}),
+        };
+
+        agent.setState(stateToSend);
 
         // Prepare an empty assistant message to stream into
         addMessage({content: '', role: 'assistant'});
