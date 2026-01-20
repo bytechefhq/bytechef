@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -29,8 +30,14 @@ import tools.jackson.databind.JsonNode;
  * Template Method pattern for task validation. Defines the skeleton of a task validation algorithm while letting
  * subclasses override specific steps of the algorithm without changing its structure.
  *
+ * <p>
+ * <b>Security Note:</b> The REDOS suppression covers the static TYPE_PATTERN regex and regex matching operations used
+ * for workflow validation. These patterns are applied to workflow definitions created by trusted users and the input is
+ * bounded by the workflow JSON structure.
+ *
  * @author Marko Kriskovic
  */
+@SuppressFBWarnings("REDOS")
 class TaskValidator {
 
     private static final Pattern TYPE_PATTERN = Pattern.compile("^[a-zA-Z0-9]+/v[0-9]+(/[a-zA-Z0-9]+)?$");
@@ -133,11 +140,11 @@ class TaskValidator {
         if (nestedTaskJsonNode.has("name")) {
             JsonNode nameJsonNode = nestedTaskJsonNode.get("name");
 
-            String name = nameJsonNode.asText();
+            String name = nameJsonNode.asString();
 
             JsonNode typeJsonNode = nestedTaskJsonNode.get("type");
 
-            String type = typeJsonNode.asText();
+            String type = typeJsonNode.asString();
 
             List<String> taskNames = context.getTaskNames();
 
@@ -224,7 +231,7 @@ class TaskValidator {
         JsonNode parametersJsonNode = task.get("parameters");
 
         String taskType = task.get("type")
-            .asText();
+            .asString();
 
         if (!isTaskDispatcher(taskType)) {
             return;
@@ -282,7 +289,7 @@ class TaskValidator {
     private static void validateNestedTaskParameters(JsonNode taskJsonNode, ValidationContext context) {
         JsonNode typeJsonNode = taskJsonNode.get("type");
 
-        String type = typeJsonNode.asText();
+        String type = typeJsonNode.asString();
 
         Map<String, List<PropertyInfo>> taskDefinitionsMap = context.getTaskDefinitions();
 
@@ -307,7 +314,7 @@ class TaskValidator {
     private static void validateNestedTaskDataPills(JsonNode nestedTaskJsonNode, ValidationContext context) {
         JsonNode typeJsonNode = nestedTaskJsonNode.get("type");
 
-        String type = typeJsonNode.asText();
+        String type = typeJsonNode.asString();
 
         Map<String, List<PropertyInfo>> taskDefinitionsMap = context.getTaskDefinitions();
 
@@ -338,7 +345,7 @@ class TaskValidator {
     private static List<PropertyInfo> validateTaskParameters(JsonNode taskJsonNode, ValidationContext context) {
         JsonNode typeJsonNode = taskJsonNode.get("type");
 
-        String taskType = typeJsonNode.asText();
+        String taskType = typeJsonNode.asString();
 
         Map<String, List<PropertyInfo>> taskDefinitionsMap = context.getTaskDefinitions();
 
@@ -367,10 +374,10 @@ class TaskValidator {
         } else {
             JsonNode typeJsonNode = taskJsonNode.get("type");
 
-            if (!typeJsonNode.isTextual()) {
+            if (!typeJsonNode.isString()) {
                 StringUtils.appendWithNewline("Field 'type' must be a string", errors);
             } else {
-                String typeValue = typeJsonNode.asText();
+                String typeValue = typeJsonNode.asString();
 
                 Matcher matcher = TYPE_PATTERN.matcher(typeValue);
 

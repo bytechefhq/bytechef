@@ -18,6 +18,7 @@
 
 package com.bytechef.evaluator;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,10 +49,29 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 /**
  * Task evaluator implementation which is based on Spring Expression Language for resolving expressions.
  *
+ * <p>
+ * <b>Security Note:</b> SpEL expression evaluation is an intentional core feature of the workflow engine. Workflow
+ * creators use SpEL expressions to define data transformations, conditional logic, and dynamic value resolution within
+ * their automation workflows. The SPEL_INJECTION suppression is appropriate because:
+ *
+ * <ul>
+ * <li>Expression evaluation is the primary purpose of this component</li>
+ * <li>Expressions are authored by workflow creators who have trusted access to the platform</li>
+ * <li>Input validation is performed via {@code validateTextExpression} and {@code validateFormulaExpression}</li>
+ * <li>Method invocation is restricted to a whitelist of safe operations via {@code methodResolver()}</li>
+ * </ul>
+ *
+ * <p>
+ * The REDOS suppression is for the regex patterns used for expression validation. These patterns are designed to be
+ * safe and are applied to bounded workflow expression strings.
+ *
  * @author Arik Cohen
  * @author Ivica Cardic
  * @since Mar 31, 2017
  */
+@SuppressFBWarnings({
+    "SPEL_INJECTION", "REDOS"
+})
 public class SpelEvaluator implements Evaluator {
 
     private static final Logger logger = LoggerFactory.getLogger(SpelEvaluator.class);

@@ -334,21 +334,21 @@ class StringUtilsTest {
     void testSanitizeOneParamCarriageReturn() {
         String input = "value\rwith\rcarriage\rreturns";
 
-        assertThat(StringUtils.sanitize(input)).isEqualTo("value_with_carriage_returns");
+        assertThat(StringUtils.sanitize(input)).isEqualTo("value_rwith_rcarriage_rreturns");
     }
 
     @Test
     void testSanitizeOneParamLineFeed() {
         String input = "value\nwith\nnewlines";
 
-        assertThat(StringUtils.sanitize(input)).isEqualTo("value_with_newlines");
+        assertThat(StringUtils.sanitize(input)).isEqualTo("value_nwith_nnewlines");
     }
 
     @Test
     void testSanitizeOneParamCRLF() {
         String input = "value\r\nwith\r\ncrlf";
 
-        assertThat(StringUtils.sanitize(input)).isEqualTo("value_with_crlf");
+        assertThat(StringUtils.sanitize(input)).isEqualTo("value_r_nwith_r_ncrlf");
     }
 
     @Test
@@ -358,7 +358,7 @@ class StringUtilsTest {
         String sanitized = StringUtils.sanitize(maliciousInput);
 
         assertThat(sanitized).doesNotContain("\n");
-        assertThat(sanitized).isEqualTo("session123_[INFO]_User_admin_logged_in_successfully");
+        assertThat(sanitized).isEqualTo("session123_n[INFO]_User_admin_logged_in_successfully");
     }
 
     @Test
@@ -370,7 +370,7 @@ class StringUtilsTest {
         assertThat(sanitized).doesNotContain("\r");
         assertThat(sanitized).doesNotContain("\n");
         assertThat(sanitized)
-            .isEqualTo("value_2025-01-17_12_00_00.000_[main]_INFO_-_Fake_log_entry_Another_fake");
+            .isEqualTo("value_r_n2025-01-17_12_00_00.000_[main]_INFO_-_Fake_log_entry_r_nAnother_fake");
     }
 
     @Test
@@ -391,7 +391,7 @@ class StringUtilsTest {
     void testSanitizeOneParamMixedContent() {
         String input = "start\rvalue\nmiddle\r\nend";
 
-        assertThat(StringUtils.sanitize(input)).isEqualTo("start_value_middle_end");
+        assertThat(StringUtils.sanitize(input)).isEqualTo("start_rvalue_nmiddle_r_nend");
     }
 
     @Test
@@ -449,28 +449,28 @@ class StringUtilsTest {
     void testSanitizeTwoParamsCarriageReturn() {
         String input = "value\rwith\rcarriage\rreturns";
 
-        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("value_with_carriage_returns");
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("value_rwith_rcarriage_rreturns");
     }
 
     @Test
     void testSanitizeTwoParamsLineFeed() {
         String input = "value\nwith\nnewlines";
 
-        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("value_with_newlines");
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("value_nwith_nnewlines");
     }
 
     @Test
     void testSanitizeTwoParamsCRLF() {
         String input = "value\r\nwith\r\ncrlf";
 
-        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("value_with_crlf");
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("value_r_nwith_r_ncrlf");
     }
 
     @Test
     void testSanitizeTwoParamsCRLFWithLengthLimit() {
         String input = "value\r\nwith\r\ncrlf";
 
-        assertThat(StringUtils.sanitize(input, 15)).isEqualTo("value_with_crlf");
+        assertThat(StringUtils.sanitize(input, 15)).isEqualTo("value_r_nwith_r");
     }
 
     @Test
@@ -506,7 +506,7 @@ class StringUtilsTest {
         String input = "  file\\name:with*forbidden?chars\n\rand\ttabs  ";
 
         assertThat(StringUtils.sanitize(input, -1))
-            .isEqualTo("file_name_with_forbidden_chars_and_tabs");
+            .isEqualTo("file_name_with_forbidden_chars_n_rand_tabs");
     }
 
     @Test

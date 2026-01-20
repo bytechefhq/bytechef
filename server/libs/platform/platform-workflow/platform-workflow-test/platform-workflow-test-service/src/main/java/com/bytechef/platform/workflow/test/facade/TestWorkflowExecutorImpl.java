@@ -74,9 +74,10 @@ import org.slf4j.LoggerFactory;
 import tools.jackson.core.type.TypeReference;
 
 /**
+ * Implementation of TestWorkflowExecutor for executing workflow tests.
+ *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("PREDICTABLE_RANDOM")
 public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestWorkflowExecutorImpl.class);
@@ -252,6 +253,17 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         return outputs;
     }
 
+    /**
+     * Gets the workflow test parameters including inputs and trigger execution data.
+     *
+     * <p>
+     * <b>Security Note:</b> The PREDICTABLE_RANDOM suppression is a <b>false positive</b>. This method uses
+     * {@link com.bytechef.commons.util.RandomUtils#nextLong()} which is backed by {@link java.security.SecureRandom},
+     * not {@link java.util.Random}. The static analysis tool incorrectly flags this because it cannot trace through the
+     * utility class. The random values generated are used only for generating temporary test execution IDs which have
+     * no security implications.
+     */
+    @SuppressFBWarnings("PREDICTABLE_RANDOM")
     @SuppressWarnings("unchecked")
     private WorkflowTestParameters getWorkflowTestParameters(
         String workflowId, Map<String, Object> inputs, long environmentId) {

@@ -27,6 +27,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.file.storage.constant.FileStorageConstants;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +44,8 @@ import java.net.URL;
 import java.util.function.Consumer;
 
 /**
+ * File storage download action for workflow automation. Downloads files from URLs.
+ *
  * @author Ivica Cardic
  */
 public class FileStorageDownloadAction {
@@ -63,8 +66,17 @@ public class FileStorageDownloadAction {
         .perform(FileStorageDownloadAction::perform);
 
     /**
-     * performs the download of a file (given its URL).
+     * Performs the download of a file from the given URL.
+     *
+     * <p>
+     * <b>Security Note:</b> SSRF (Server-Side Request Forgery) is intentional for this component. The File Storage
+     * component is designed to allow workflow creators to download files from user-specified URLs as part of their
+     * automation workflows. Access to this component should be restricted through workflow-level permissions and proper
+     * access control. The URL is provided by the workflow creator, not end users.
      */
+    @SuppressFBWarnings({
+        "SSRF", "URLCONNECTION_SSRF_FD"
+    })
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 

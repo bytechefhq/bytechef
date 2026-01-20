@@ -31,6 +31,7 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.server.AbstractServer;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * @author Igor Beslic
  */
+@SuppressFBWarnings("HARD_CODE_PASSWORD")
 public class EmailActionIntTest {
 
     static {
