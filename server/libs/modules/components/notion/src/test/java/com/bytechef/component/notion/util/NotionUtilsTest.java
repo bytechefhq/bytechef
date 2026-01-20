@@ -144,7 +144,7 @@ class NotionUtilsTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/databases/db1", stringArgumentCaptor.getValue());
+        assertEquals("/data_sources/db1", stringArgumentCaptor.getValue());
     }
 
     @Test
@@ -237,7 +237,7 @@ class NotionUtilsTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/databases/xy", stringArgumentCaptor.getValue());
+        assertEquals("/data_sources/xy", stringArgumentCaptor.getValue());
     }
 
     @Test
@@ -321,7 +321,7 @@ class NotionUtilsTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/databases/xy", stringArgumentCaptor.getValue());
+        assertEquals("/data_sources/xy", stringArgumentCaptor.getValue());
     }
 
     @Test
@@ -370,9 +370,43 @@ class NotionUtilsTest {
         assertEquals("/search", stringArgumentCaptor.getValue());
         assertEquals(
             Http.Body.of(
-                Map.of("filter", Map.of("property", "object", "value", "database"), "page_size", 100),
+                Map.of("filter", Map.of("property", "object", "value", "data_source"), "page_size", 100),
                 Http.BodyContentType.JSON),
             bodyArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetDatabasePropertyOptions() {
+        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("properties", Map.of("p1", Map.of())));
+
+        List<Option<String>> result = NotionUtils.getDatabasePropertyOptions(
+            mockedParameters, null, null, null, mockedActionContext);
+
+        assertEquals(List.of(option("p1", "p1")), result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration configuration = configurationBuilderArgumentCaptor.getValue()
+            .build();
+
+        assertEquals(Http.ResponseType.Type.JSON, configuration.getResponseType()
+            .getType());
+        assertEquals("/data_sources/xy", stringArgumentCaptor.getValue());
     }
 
     @Test

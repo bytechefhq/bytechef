@@ -112,7 +112,7 @@ class NotionCreateDatabaseItemActionTest {
             assertEquals(List.of("123", "/pages"), stringArgumentCaptor.getAllValues());
 
             Map<String, Object> expectedBody = Map.of(
-                "parent", Map.of(TYPE, "database_id", "database_id", "123"),
+                "parent", Map.of(TYPE, "data_source_id", "data_source_id", "123"),
                 "properties", Map.of("ABC", Map.of("checkbox", true)),
                 "children", List.of(Map.of("object", "block", TYPE, "paragraph", "paragraph",
                     Map.of("rich_text", List.of(Map.of(TYPE, TEXT, TEXT, Map.of(CONTENT, "A")))))));
