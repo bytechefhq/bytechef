@@ -21,6 +21,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.tenant.TenantContext;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +44,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 /**
+ * Filesystem-based file storage service implementation.
+ *
+ * <p>
+ * <b>Security Note:</b> Path traversal is intentional for this component. This service manages file storage for
+ * workflow artifacts and is designed to access files under a configured base directory. File paths are derived from
+ * tenant context and internal directory parameters, not from untrusted user input. Access control is handled through
+ * tenant isolation.
+ *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class FilesystemFileStorageService implements FileStorageService {
 
     private static final String URL_PREFIX = "file:";

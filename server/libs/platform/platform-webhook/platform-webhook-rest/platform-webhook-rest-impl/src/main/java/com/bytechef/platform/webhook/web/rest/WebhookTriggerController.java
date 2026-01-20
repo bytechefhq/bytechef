@@ -52,6 +52,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
+ * Webhook trigger controller that handles incoming webhook requests from external services.
+ *
  * @author Ivica Cardic
  */
 @RestController
@@ -80,11 +82,17 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
      * Executes a workflow based on the provided webhook trigger. Supports HEAD, GET, and POST HTTP methods for
      * triggering different behaviors within the workflow.
      *
+     * <p>
+     * <b>Security Note:</b> CSRF protection is intentionally disabled for this endpoint. Webhook callbacks from
+     * external services cannot include CSRF tokens. Security is maintained through webhook secret validation and
+     * signature verification as implemented by individual webhook trigger components.
+     *
      * @param id                  the unique identifier of the workflow execution, extracted from the path variable.
      * @param httpServletRequest  the HTTP request object containing client request details and metadata.
      * @param httpServletResponse the HTTP response object to send responses back to the client.
      * @return a {@link ResponseEntity} object representing the outcome of the workflow execution.
      */
+    @SuppressFBWarnings("SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING")
     @RequestMapping(
         method = {
             RequestMethod.HEAD, RequestMethod.GET, RequestMethod.POST
@@ -124,10 +132,16 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
      * Handles Server-Sent Events (SSE) streaming for workflow execution based on the webhook trigger. This method
      * configures a REST endpoint to stream events in real time to the client.
      *
+     * <p>
+     * <b>Security Note:</b> CSRF protection is intentionally disabled for this endpoint. Webhook callbacks from
+     * external services cannot include CSRF tokens. Security is maintained through webhook secret validation and
+     * signature verification as implemented by individual webhook trigger components.
+     *
      * @param id                 the unique identifier of the workflow execution, extracted from the path variable.
      * @param httpServletRequest the HTTP request object containing client request details and metadata.
      * @return an {@link SseEmitter} object that streams events to the client.
      */
+    @SuppressFBWarnings("SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING")
     @RequestMapping(
         method = {
             RequestMethod.GET, RequestMethod.POST

@@ -16,23 +16,90 @@
 
 package com.bytechef.encryption;
 
-import org.junit.jupiter.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 
 /**
+ * Tests for encryption implementation including GCM mode and legacy ECB backwards compatibility.
+ *
  * @author Ivica Cardic
  */
-public class EncryptionTest {
+class EncryptionTest {
 
     private static final Encryption ENCRYPTION = new EncryptionImpl(() -> "tTB1/UBIbYLuCXVi4PPfzA==");
 
     @Test
-    public void testEncrypt() {
-        Assertions.assertEquals("EQuGMfU8kiNQIxJ/Y0xoeg==", ENCRYPTION.encrypt("text"));
+    void testEncryptDecryptRoundtrip() {
+        String originalText = "test text";
+
+        String encrypted = ENCRYPTION.encrypt(originalText);
+        String decrypted = ENCRYPTION.decrypt(encrypted);
+
+        assertThat(decrypted).isEqualTo(originalText);
     }
 
     @Test
-    public void testDecrypt() {
-        Assertions.assertEquals("text", ENCRYPTION.decrypt("EQuGMfU8kiNQIxJ/Y0xoeg=="));
+    void testEncryptedValueHasGcmPrefix() {
+        String encrypted = ENCRYPTION.encrypt("text");
+
+        assertThat(encrypted).startsWith("v2:");
+    }
+
+    @Test
+    void testEncryptProducesDifferentOutputsForSameInput() {
+        // GCM uses random IV, so same input should produce different ciphertext
+        String encrypted1 = ENCRYPTION.encrypt("same text");
+        String encrypted2 = ENCRYPTION.encrypt("same text");
+
+        assertThat(encrypted1).isNotEqualTo(encrypted2);
+    }
+
+    @Test
+    void testDecryptLegacyEcbFormat() {
+        // Legacy ECB-encrypted value (without v2: prefix)
+        String legacyEncrypted = "EQuGMfU8kiNQIxJ/Y0xoeg==";
+
+        String decrypted = ENCRYPTION.decrypt(legacyEncrypted);
+
+        assertThat(decrypted).isEqualTo("text");
+    }
+
+    @Test
+    void testEncryptDecryptEmptyString() {
+        String encrypted = ENCRYPTION.encrypt("");
+        String decrypted = ENCRYPTION.decrypt(encrypted);
+
+        assertThat(decrypted).isEmpty();
+    }
+
+    @Test
+    void testEncryptDecryptLongText() {
+        String longText = "a".repeat(10000);
+
+        String encrypted = ENCRYPTION.encrypt(longText);
+        String decrypted = ENCRYPTION.decrypt(encrypted);
+
+        assertThat(decrypted).isEqualTo(longText);
+    }
+
+    @Test
+    void testEncryptDecryptSpecialCharacters() {
+        String specialChars = "Hello 世界 🎉 <>&\"'\\n\\t";
+
+        String encrypted = ENCRYPTION.encrypt(specialChars);
+        String decrypted = ENCRYPTION.decrypt(encrypted);
+
+        assertThat(decrypted).isEqualTo(specialChars);
+    }
+
+    @Test
+    void testEncryptDecryptJsonContent() {
+        String jsonContent = "{\"key\": \"value\", \"number\": 123, \"nested\": {\"array\": [1, 2, 3]}}";
+
+        String encrypted = ENCRYPTION.encrypt(jsonContent);
+        String decrypted = ENCRYPTION.decrypt(encrypted);
+
+        assertThat(decrypted).isEqualTo(jsonContent);
     }
 }

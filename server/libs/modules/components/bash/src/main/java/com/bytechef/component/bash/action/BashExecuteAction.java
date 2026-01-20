@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -39,6 +40,8 @@ import java.util.concurrent.TimeoutException;
 import org.zeroturnaround.exec.ProcessExecutor;
 
 /**
+ * Bash script execution action for workflow automation. Allows workflows to execute arbitrary bash commands.
+ *
  * @author Ivica Cardic
  */
 public class BashExecuteAction {
@@ -61,6 +64,16 @@ public class BashExecuteAction {
             sampleOutput("Sample result"))
         .perform(BashExecuteAction::perform);
 
+    /**
+     * Executes the bash script.
+     *
+     * <p>
+     * <b>Security Note:</b> Command injection is intentional for this component. The Bash component is designed to
+     * allow workflow creators to execute arbitrary shell scripts as part of their automation workflows. Access to this
+     * component should be restricted through workflow-level permissions and proper access control. The script content
+     * is provided by the workflow creator, not end users.
+     */
+    @SuppressFBWarnings("COMMAND_INJECTION")
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException, InterruptedException, TimeoutException {

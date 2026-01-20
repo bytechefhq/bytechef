@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin
 @ConditionalOnCoordinator
+@SuppressFBWarnings("SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING")
 public class ApprovalController {
 
     private final JobFacade jobFacade;

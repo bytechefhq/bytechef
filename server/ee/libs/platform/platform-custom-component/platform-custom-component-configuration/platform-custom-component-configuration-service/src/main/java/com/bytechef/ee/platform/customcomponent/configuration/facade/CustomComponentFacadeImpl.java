@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @ConditionalOnEEVersion
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class CustomComponentFacadeImpl implements CustomComponentFacade {
 
     private final CacheManager cacheManager;

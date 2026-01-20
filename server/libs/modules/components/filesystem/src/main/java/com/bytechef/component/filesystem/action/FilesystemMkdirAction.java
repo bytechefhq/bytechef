@@ -25,11 +25,14 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.PAT
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
+ * Filesystem mkdir action for workflow automation. Creates directories at a specified path.
+ *
  * @author Ivica Cardic
  */
 public class FilesystemMkdirAction {
@@ -55,7 +58,14 @@ public class FilesystemMkdirAction {
      *
      * <p>
      * An exception is not thrown if the directory could not be created because it already exists.
+     *
+     * <p>
+     * <b>Security Note:</b> Path traversal is intentional for this component. The Filesystem component is designed to
+     * allow workflow creators to create directories as part of their automation workflows. Access to this component
+     * should be restricted through workflow-level permissions and proper access control. The path is provided by the
+     * workflow creator, not end users.
      */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
 
