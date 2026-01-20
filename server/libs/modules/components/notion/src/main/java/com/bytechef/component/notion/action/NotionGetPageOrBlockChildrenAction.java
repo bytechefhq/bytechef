@@ -91,6 +91,7 @@ public class NotionGetPageOrBlockChildrenAction {
 
                 @SuppressWarnings("unchecked")
                 Map<String, Object> childrenMap = (Map<String, Object>) map;
+
                 childrenMap.put("children", childrenRecursively);
             }
         }
