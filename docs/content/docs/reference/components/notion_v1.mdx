@@ -352,6 +352,70 @@ Type: OBJECT
 ```
 
 
+### Get Page or Block Children
+Name: getPageOrBlockChildren
+
+`Retrieve the actual content of a page (represented by blocks)`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Page or Parent Block ID | STRING |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Page or Block Children",
+  "name" : "getPageOrBlockChildren",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "notion/v1/getPageOrBlockChildren"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### List Database Items
+Name: listDatabaseItems
+
+`List all items in a Notion database.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Database ID | STRING | The ID of the database. | true |
+| property | Sort By | STRING | Property to sort the items by. | true |
+| direction | Sort Direction | STRING <details> <summary> Options </summary> <span>ascending</span>, <span>descending</span> </details> | The direction to sort the items. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Database Items",
+  "name" : "listDatabaseItems",
+  "parameters" : {
+    "id" : "",
+    "property" : "",
+    "direction" : ""
+  },
+  "type" : "notion/v1/listDatabaseItems"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
 ### Update Database Item
 Name: updateDatabaseItem
 
