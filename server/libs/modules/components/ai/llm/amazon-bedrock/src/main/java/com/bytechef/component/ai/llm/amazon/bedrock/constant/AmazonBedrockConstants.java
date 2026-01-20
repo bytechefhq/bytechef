@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,51 +16,35 @@
 
 package com.bytechef.component.ai.llm.amazon.bedrock.constant;
 
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
+import com.bytechef.component.ai.llm.util.ModelUtils;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.ai.bedrock.anthropic.api.AnthropicChatBedrockApi.AnthropicChatModel;
-import org.springframework.ai.bedrock.cohere.api.CohereChatBedrockApi.CohereChatModel;
-import org.springframework.ai.bedrock.jurassic2.api.Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel;
-import org.springframework.ai.bedrock.llama.api.LlamaChatBedrockApi.LlamaChatModel;
-import org.springframework.ai.bedrock.titan.api.TitanChatBedrockApi.TitanChatModel;
+import software.amazon.awssdk.regions.Region;
 
 /**
- * @author Monika Domiter
  * @author Marko Kriskovic
+ * @author Monika Kušter
  */
 public final class AmazonBedrockConstants {
 
-    public static final String ACCESS_KEY_ID = "accessKey";
-    public static final String BIAS_TOKEN = "biasToken";
-    public static final String BIAS_VALUE = "biasValue";
-    public static final String COUNT_PENALTY = "countPenalty";
-    public static final String MIN_TOKENS = "truncate";
+    public static final String ACCESS_KEY_ID = "accessKeyId";
     public static final String REGION = "region";
-    public static final String RETURN_LIKELIHOODS = "returnLikelihoods";
-    public static final String SECRET_ACCESS_KEY = "secretKey";
-    public static final String TRUNCATE = "truncate";
+    public static final String SECRET_ACCESS_KEY = "secretAccessKey";
 
-    public static final List<Option<String>> ANTHROPIC2_MODELS = LLMUtils.getEnumOptions(
-        Arrays.stream(AnthropicChatModel.values())
-            .collect(Collectors.toMap(AnthropicChatModel::getName, AnthropicChatModel::getName)));
-    public static final List<Option<String>> ANTHROPIC3_MODELS = LLMUtils.getEnumOptions(
-        Arrays.stream(AnthropicChatModel.values())
-            .collect(Collectors.toMap(AnthropicChatModel::getName, AnthropicChatModel::getName)));
-    public static final List<Option<String>> COHERE_MODELS = LLMUtils.getEnumOptions(
-        Arrays.stream(CohereChatModel.values())
-            .collect(Collectors.toMap(CohereChatModel::getName, CohereChatModel::getName)));
-    public static final List<Option<String>> JURASSIC2_MODELS = LLMUtils.getEnumOptions(
-        Arrays.stream(Ai21Jurassic2ChatModel.values())
-            .collect(Collectors.toMap(Ai21Jurassic2ChatModel::getName, Ai21Jurassic2ChatModel::getName)));
-    public static final List<Option<String>> LLAMA_MODELS = LLMUtils.getEnumOptions(
-        Arrays.stream(LlamaChatModel.values())
-            .collect(Collectors.toMap(LlamaChatModel::getName, LlamaChatModel::getName)));
-    public static final List<Option<String>> TITAN_MODELS = LLMUtils.getEnumOptions(
-        Arrays.stream(TitanChatModel.values())
-            .collect(Collectors.toMap(TitanChatModel::getName, TitanChatModel::getName)));
+    public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("ID of the model to use.")
+        .required(true);
+
+    public static final List<Option<String>> REGION_OPTIONS = ModelUtils.getEnumOptions(
+        Region.regions()
+            .stream()
+            .collect(Collectors.toMap(Region::id, Region::id)));
 
     private AmazonBedrockConstants() {
     }

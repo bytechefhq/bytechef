@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,19 @@ package com.bytechef.component.ai.llm.amazon.bedrock.connection;
 
 import static com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants.ACCESS_KEY_ID;
 import static com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants.REGION;
+import static com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants.REGION_OPTIONS;
 import static com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import software.amazon.awssdk.regions.Region;
 
 /**
- * @author Monika Domiter
  * @author Marko Kriskovic
+ * @author Monika Kušter
  */
 public final class AmazonBedrockConnection {
 
@@ -44,21 +45,9 @@ public final class AmazonBedrockConnection {
                         .label("Secret Access Key")
                         .required(true),
                     string(REGION)
-                        .options(
-                            option("US East (N. Virginia) [us-east-1]", "us-east-1"),
-                            option("US West (Oregon) [us-west-2]", "us-west-2"),
-                            option("Asia Pacific (Mumbai) [ap-south-1]", "ap-south-1"),
-                            option("Asia Pacific (Singapore) [ap-southeast-1]", "ap-southeast-1"),
-                            option("Asia Pacific (Sydney) [ap-southeast-2]", "ap-southeast-2"),
-                            option("Asia Pacific (Tokyo) [ap-northeast-1]", "ap-northeast-1"),
-                            option("Canada (Central) [ca-central-1]", "ca-central-1"),
-                            option("Europe (Frankfurt) [eu-central-1]", "eu-central-1"),
-                            option("Europe (Ireland) [eu-west-1]", "eu-west-1"),
-                            option("Europe (London) [eu-west-2]", "eu-west-2"),
-                            option("Europe (Paris) [eu-west-3]", "eu-west-3"),
-                            option("South America (São Paulo) [sa-east-1]", "sa-east-1"))
-                        .required(true)
-                        .defaultValue("us-east-1")));
+                        .options(REGION_OPTIONS)
+                        .defaultValue(Region.US_EAST_1.id())
+                        .required(true)));
 
     private AmazonBedrockConnection() {
     }

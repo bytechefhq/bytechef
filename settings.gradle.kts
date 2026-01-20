@@ -201,7 +201,7 @@ include("server:libs:modules:components:ai:agent:rag:rag-modular:query-augmenter
 include("server:libs:modules:components:ai:agent:rag:rag-modular:document-retriever")
 include("server:libs:modules:components:ai:agent:rag:rag-modular:document-joiner")
 include("server:libs:modules:components:ai:agent:rag:rag-questionanswer")
-//include("server:libs:modules:components:ai:llm:amazon-bedrock")
+include("server:libs:modules:components:ai:llm:amazon-bedrock")
 include("server:libs:modules:components:ai:llm:anthropic")
 include("server:libs:modules:components:ai:llm:azure-open-ai")
 include("server:libs:modules:components:ai:llm:deepseek")
