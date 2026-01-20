@@ -87,7 +87,7 @@ public class NotionConnection {
             .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
                 Map.of(
                     AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(ACCESS_TOKEN)),
-                    "Notion-Version", List.of("2022-06-28")))));
+                    "Notion-Version", List.of("2025-09-03")))));
 
     private NotionConnection() {
     }
