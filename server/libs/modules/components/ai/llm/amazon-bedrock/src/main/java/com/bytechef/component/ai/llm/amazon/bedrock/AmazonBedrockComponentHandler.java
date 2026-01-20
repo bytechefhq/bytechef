@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,15 @@ package com.bytechef.component.ai.llm.amazon.bedrock;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockAnthropic2ChatAction;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockAnthropic3ChatAction;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockCohereChatAction;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockJurassic2ChatAction;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockLlamaChatAction;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockTitanChatAction;
+import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockChatAction;
+import com.bytechef.component.ai.llm.amazon.bedrock.cluster.AmazonBedrockChatModel;
 import com.bytechef.component.ai.llm.amazon.bedrock.connection.AmazonBedrockConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 @AutoService(ComponentHandler.class)
 public class AmazonBedrockComponentHandler implements ComponentHandler {
@@ -44,13 +40,8 @@ public class AmazonBedrockComponentHandler implements ComponentHandler {
         .icon("path:assets/amazon-bedrock.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(AmazonBedrockConnection.CONNECTION_DEFINITION)
-        .actions(
-            AmazonBedrockAnthropic3ChatAction.ACTION_DEFINITION,
-            AmazonBedrockAnthropic2ChatAction.ACTION_DEFINITION,
-            AmazonBedrockCohereChatAction.ACTION_DEFINITION,
-            AmazonBedrockJurassic2ChatAction.ACTION_DEFINITION,
-            AmazonBedrockLlamaChatAction.ACTION_DEFINITION,
-            AmazonBedrockTitanChatAction.ACTION_DEFINITION);
+        .actions(AmazonBedrockChatAction.ACTION_DEFINITION)
+        .clusterElements(AmazonBedrockChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

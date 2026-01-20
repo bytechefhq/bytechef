@@ -1,0 +1,977 @@
+{
+  "actions": [ {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Ask anything you want.",
+    "help": null,
+    "metadata": null,
+    "name": "ask",
+    "outputDefinition": {
+      "output": { },
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "ID of the model to use.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "model",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "SIMPLE",
+      "description": "Format of providing the prompt to the model.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "format",
+      "options": [ {
+        "description": "User prompt and optional system prompt.",
+        "label": "Simple",
+        "value": "SIMPLE"
+      }, {
+        "description": "Full control over the messages sent to the model.",
+        "label": "Advanced",
+        "value": "ADVANCED"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT_AREA",
+      "defaultValue": null,
+      "description": "User prompt to the model.",
+      "displayCondition": "format == 'SIMPLE'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Prompt",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "userPrompt",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT_AREA",
+      "defaultValue": null,
+      "description": "System prompt to the model.",
+      "displayCondition": "format == 'SIMPLE'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "System Prompt",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "systemPrompt",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "A list of messages comprising the conversation so far.",
+      "displayCondition": "format == 'ADVANCED'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Message",
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "The role of the messages author.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Role",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "role",
+          "options": [ {
+            "description": null,
+            "label": "System",
+            "value": "SYSTEM"
+          }, {
+            "description": null,
+            "label": "User",
+            "value": "USER"
+          }, {
+            "description": null,
+            "label": "Assistant",
+            "value": "ASSISTANT"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT_AREA",
+          "defaultValue": null,
+          "description": "The contents of the message.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Content",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "content",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "ARRAY_BUILDER",
+          "defaultValue": null,
+          "description": "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.",
+          "displayCondition": "messages[index].role == 'USER'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "items": [ {
+            "advancedOption": null,
+            "controlType": "FILE_ENTRY",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "name": null,
+            "placeholder": null,
+            "properties": [ {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "extension",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": true,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "mimeType",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": true,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "name",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": true,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "url",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": true,
+              "type": "STRING"
+            } ],
+            "required": null,
+            "type": "FILE_ENTRY"
+          } ],
+          "label": "Attachments",
+          "maxItems": null,
+          "metadata": { },
+          "minItems": null,
+          "multipleValues": null,
+          "name": "attachments",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": false,
+          "type": "ARRAY"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      } ],
+      "label": "Messages",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "messages",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": "Add message",
+      "required": true,
+      "type": "ARRAY"
+    }, {
+      "additionalProperties": null,
+      "advancedOption": null,
+      "controlType": "OBJECT_BUILDER",
+      "defaultValue": null,
+      "description": "The response from the API.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Response",
+      "metadata": { },
+      "multipleValues": null,
+      "name": "response",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "properties": [ {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": "TEXT",
+        "description": "In which format do you want the response to be in?",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Response Format",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "responseFormat",
+        "options": [ {
+          "description": "Response as text",
+          "label": "Text",
+          "value": "TEXT"
+        }, {
+          "description": "Response as data in a simple format using keys and values",
+          "label": "Structured data",
+          "value": "JSON"
+        } ],
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
+      }, {
+        "advancedOption": null,
+        "controlType": "JSON_SCHEMA_BUILDER",
+        "defaultValue": null,
+        "description": "Define desired structure for the structured data response.",
+        "displayCondition": "response.responseFormat == 'JSON'",
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Response Schema",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "responseSchema",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
+      } ],
+      "required": true,
+      "type": "OBJECT"
+    }, {
+      "advancedOption": true,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The maximum number of tokens to generate in the chat completion.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Max Tokens",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "maxTokens",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": true,
+      "controlType": "NUMBER",
+      "defaultValue": 1.0,
+      "description": "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Temperature",
+      "maxNumberPrecision": null,
+      "maxValue": 2.0,
+      "metadata": { },
+      "minNumberPrecision": null,
+      "minValue": 0.0,
+      "name": "temperature",
+      "numberPrecision": null,
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "NUMBER"
+    }, {
+      "advancedOption": true,
+      "controlType": "NUMBER",
+      "defaultValue": 1.0,
+      "description": "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Top P",
+      "maxNumberPrecision": null,
+      "maxValue": null,
+      "metadata": { },
+      "minNumberPrecision": null,
+      "minValue": null,
+      "name": "topP",
+      "numberPrecision": null,
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "NUMBER"
+    } ],
+    "resumePerform": null,
+    "suspendPerform": null,
+    "title": "Ask",
+    "workflowNodeDescription": null
+  } ],
+  "clusterElements": [ {
+    "name": "model",
+    "description": "Amazon Bedrock model.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "ID of the model to use.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "model",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "additionalProperties": null,
+      "advancedOption": null,
+      "controlType": "OBJECT_BUILDER",
+      "defaultValue": null,
+      "description": "The response from the API.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Response",
+      "metadata": { },
+      "multipleValues": null,
+      "name": "response",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "properties": [ {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": "TEXT",
+        "description": "In which format do you want the response to be in?",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Response Format",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "responseFormat",
+        "options": [ {
+          "description": "Response as text",
+          "label": "Text",
+          "value": "TEXT"
+        }, {
+          "description": "Response as data in a simple format using keys and values",
+          "label": "Structured data",
+          "value": "JSON"
+        } ],
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
+      }, {
+        "advancedOption": null,
+        "controlType": "JSON_SCHEMA_BUILDER",
+        "defaultValue": null,
+        "description": "Define desired structure for the structured data response.",
+        "displayCondition": "response.responseFormat == 'JSON'",
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Response Schema",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "responseSchema",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
+      } ],
+      "required": true,
+      "type": "OBJECT"
+    }, {
+      "advancedOption": true,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The maximum number of tokens to generate in the chat completion.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Max Tokens",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "maxTokens",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": true,
+      "controlType": "NUMBER",
+      "defaultValue": 1.0,
+      "description": "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Temperature",
+      "maxNumberPrecision": null,
+      "maxValue": 2.0,
+      "metadata": { },
+      "minNumberPrecision": null,
+      "minValue": 0.0,
+      "name": "temperature",
+      "numberPrecision": null,
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "NUMBER"
+    }, {
+      "advancedOption": true,
+      "controlType": "NUMBER",
+      "defaultValue": 1.0,
+      "description": "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Top P",
+      "maxNumberPrecision": null,
+      "maxValue": null,
+      "metadata": { },
+      "minNumberPrecision": null,
+      "minValue": null,
+      "name": "topP",
+      "numberPrecision": null,
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "NUMBER"
+    } ],
+    "title": "Amazon Bedrock Model",
+    "type": {
+      "name": "MODEL",
+      "key": "model",
+      "label": "Model",
+      "multipleElements": false,
+      "required": true
+    },
+    "workflowNodeDescription": null
+  } ],
+  "componentCategories": [ {
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
+  } ],
+  "connection": {
+    "authorizationRequired": null,
+    "authorizations": [ {
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "description": null,
+      "detectOn": null,
+      "name": "custom",
+      "oauth2AuthorizationExtraQueryParameters": null,
+      "pkce": null,
+      "properties": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Access Key ID",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "accessKeyId",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
+      }, {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Secret Access Key",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "secretAccessKey",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
+      }, {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": "us-east-1",
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "region",
+        "options": [ {
+          "description": null,
+          "label": "af-south-1",
+          "value": "af-south-1"
+        }, {
+          "description": null,
+          "label": "ap-east-1",
+          "value": "ap-east-1"
+        }, {
+          "description": null,
+          "label": "ap-east-2",
+          "value": "ap-east-2"
+        }, {
+          "description": null,
+          "label": "ap-northeast-1",
+          "value": "ap-northeast-1"
+        }, {
+          "description": null,
+          "label": "ap-northeast-2",
+          "value": "ap-northeast-2"
+        }, {
+          "description": null,
+          "label": "ap-northeast-3",
+          "value": "ap-northeast-3"
+        }, {
+          "description": null,
+          "label": "ap-south-1",
+          "value": "ap-south-1"
+        }, {
+          "description": null,
+          "label": "ap-south-2",
+          "value": "ap-south-2"
+        }, {
+          "description": null,
+          "label": "ap-southeast-1",
+          "value": "ap-southeast-1"
+        }, {
+          "description": null,
+          "label": "ap-southeast-2",
+          "value": "ap-southeast-2"
+        }, {
+          "description": null,
+          "label": "ap-southeast-3",
+          "value": "ap-southeast-3"
+        }, {
+          "description": null,
+          "label": "ap-southeast-4",
+          "value": "ap-southeast-4"
+        }, {
+          "description": null,
+          "label": "ap-southeast-5",
+          "value": "ap-southeast-5"
+        }, {
+          "description": null,
+          "label": "ap-southeast-6",
+          "value": "ap-southeast-6"
+        }, {
+          "description": null,
+          "label": "ap-southeast-7",
+          "value": "ap-southeast-7"
+        }, {
+          "description": null,
+          "label": "aws-cn-global",
+          "value": "aws-cn-global"
+        }, {
+          "description": null,
+          "label": "aws-global",
+          "value": "aws-global"
+        }, {
+          "description": null,
+          "label": "aws-iso-b-global",
+          "value": "aws-iso-b-global"
+        }, {
+          "description": null,
+          "label": "aws-iso-e-global",
+          "value": "aws-iso-e-global"
+        }, {
+          "description": null,
+          "label": "aws-iso-f-global",
+          "value": "aws-iso-f-global"
+        }, {
+          "description": null,
+          "label": "aws-iso-global",
+          "value": "aws-iso-global"
+        }, {
+          "description": null,
+          "label": "aws-us-gov-global",
+          "value": "aws-us-gov-global"
+        }, {
+          "description": null,
+          "label": "ca-central-1",
+          "value": "ca-central-1"
+        }, {
+          "description": null,
+          "label": "ca-west-1",
+          "value": "ca-west-1"
+        }, {
+          "description": null,
+          "label": "cn-north-1",
+          "value": "cn-north-1"
+        }, {
+          "description": null,
+          "label": "cn-northwest-1",
+          "value": "cn-northwest-1"
+        }, {
+          "description": null,
+          "label": "eu-central-1",
+          "value": "eu-central-1"
+        }, {
+          "description": null,
+          "label": "eu-central-2",
+          "value": "eu-central-2"
+        }, {
+          "description": null,
+          "label": "eu-isoe-west-1",
+          "value": "eu-isoe-west-1"
+        }, {
+          "description": null,
+          "label": "eu-north-1",
+          "value": "eu-north-1"
+        }, {
+          "description": null,
+          "label": "eu-south-1",
+          "value": "eu-south-1"
+        }, {
+          "description": null,
+          "label": "eu-south-2",
+          "value": "eu-south-2"
+        }, {
+          "description": null,
+          "label": "eu-west-1",
+          "value": "eu-west-1"
+        }, {
+          "description": null,
+          "label": "eu-west-2",
+          "value": "eu-west-2"
+        }, {
+          "description": null,
+          "label": "eu-west-3",
+          "value": "eu-west-3"
+        }, {
+          "description": null,
+          "label": "eusc-de-east-1",
+          "value": "eusc-de-east-1"
+        }, {
+          "description": null,
+          "label": "il-central-1",
+          "value": "il-central-1"
+        }, {
+          "description": null,
+          "label": "me-central-1",
+          "value": "me-central-1"
+        }, {
+          "description": null,
+          "label": "me-south-1",
+          "value": "me-south-1"
+        }, {
+          "description": null,
+          "label": "mx-central-1",
+          "value": "mx-central-1"
+        }, {
+          "description": null,
+          "label": "sa-east-1",
+          "value": "sa-east-1"
+        }, {
+          "description": null,
+          "label": "us-east-1",
+          "value": "us-east-1"
+        }, {
+          "description": null,
+          "label": "us-east-2",
+          "value": "us-east-2"
+        }, {
+          "description": null,
+          "label": "us-gov-east-1",
+          "value": "us-gov-east-1"
+        }, {
+          "description": null,
+          "label": "us-gov-west-1",
+          "value": "us-gov-west-1"
+        }, {
+          "description": null,
+          "label": "us-iso-east-1",
+          "value": "us-iso-east-1"
+        }, {
+          "description": null,
+          "label": "us-iso-west-1",
+          "value": "us-iso-west-1"
+        }, {
+          "description": null,
+          "label": "us-isob-east-1",
+          "value": "us-isob-east-1"
+        }, {
+          "description": null,
+          "label": "us-isob-west-1",
+          "value": "us-isob-west-1"
+        }, {
+          "description": null,
+          "label": "us-isof-east-1",
+          "value": "us-isof-east-1"
+        }, {
+          "description": null,
+          "label": "us-isof-south-1",
+          "value": "us-isof-south-1"
+        }, {
+          "description": null,
+          "label": "us-west-1",
+          "value": "us-west-1"
+        }, {
+          "description": null,
+          "label": "us-west-2",
+          "value": "us-west-2"
+        } ],
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
+      } ],
+      "refresh": null,
+      "refreshOn": null,
+      "refreshToken": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "title": null,
+      "tokenUrl": null,
+      "type": "CUSTOM"
+    } ],
+    "baseUri": null,
+    "properties": null,
+    "test": null,
+    "version": 1
+  },
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "Amazon Bedrock is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies.",
+  "icon": "path:assets/amazon-bedrock.svg",
+  "metadata": null,
+  "name": "amazonBedrock",
+  "resources": null,
+  "tags": null,
+  "title": "Amazon Bedrock",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
+}
