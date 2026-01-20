@@ -95,8 +95,8 @@ class HttpClientExecutor {
     public Response execute(
         String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
         @Nullable Body body, Configuration configuration, RequestMethod requestMethod, String componentName,
-        int componentVersion, String componentOperationName, @Nullable ComponentConnection componentConnection,
-        Context context) throws Exception {
+        int componentVersion, @Nullable String componentOperationName,
+        @Nullable ComponentConnection componentConnection, Context context) throws Exception {
 
         HttpResponse<?> httpResponse;
 
@@ -145,7 +145,7 @@ class HttpClientExecutor {
 
     HttpClient createHttpClient(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Configuration configuration,
-        String componentName, int componentVersion, String componentOperationName,
+        String componentName, int componentVersion, @Nullable String componentOperationName,
         @Nullable ComponentConnection componentConnection, Context context) {
 
         Methanol.Builder builder = Methanol.newBuilder();
@@ -173,11 +173,13 @@ class HttpClientExecutor {
 
             boolean isAction = !(context instanceof TriggerContext);
 
-            builder.interceptor(
-                getInterceptor(
-                    componentName, componentVersion, componentOperationName, componentConnection.version(),
-                    componentConnection.authorizationType(), componentConnection.canCredentialsBeRefreshed(),
-                    isAction, context));
+            if (componentOperationName != null) {
+                builder.interceptor(
+                    getInterceptor(
+                        componentName, componentVersion, componentOperationName, componentConnection.version(),
+                        componentConnection.authorizationType(), componentConnection.canCredentialsBeRefreshed(),
+                        isAction, context));
+            }
         }
 
         if (configuration.isFollowRedirect()) {
@@ -414,7 +416,7 @@ class HttpClientExecutor {
      */
     private Methanol.Interceptor getInterceptor(
         String componentName, int componentVersion, String componentOperationName, int connectionVersion,
-        @Nullable AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean isAction,
+        AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean isAction,
         Context context) {
 
         return new Methanol.Interceptor() {

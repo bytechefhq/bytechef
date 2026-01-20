@@ -46,8 +46,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 /**
