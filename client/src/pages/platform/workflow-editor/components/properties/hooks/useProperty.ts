@@ -294,17 +294,10 @@ export const useProperty = ({
             displayConditionIndexes.push(parseInt(match[1], 10));
         }
 
-        // Replace [index] placeholders with actual indices from path
-        // For nested arrays, replace sequentially (first [index] with first path index, etc.)
-        // For compound conditions with same-level references, after sequential replacement,
-        // replace any remaining [index] with the last used index
         displayConditionIndexes.forEach((index) => {
             displayCondition = displayCondition!.replace('[index]', `[${index}]`);
         });
 
-        // Handle compound conditions with multiple same-level array references
-        // e.g., "inputs[index].fieldType == 7 and inputs[index].multipleChoice == true"
-        // After sequential replacement, any remaining [index] should use the last index
         if (displayConditionIndexes.length > 0 && displayCondition.includes('[index]')) {
             const lastIndex = displayConditionIndexes[displayConditionIndexes.length - 1];
 
