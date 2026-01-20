@@ -28,7 +28,6 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.copilot.repository.converter.ListDoubleToPGObjectConverter;
 import com.bytechef.ee.ai.copilot.repository.converter.MapToPGObjectConverter;
 import com.bytechef.ee.ai.copilot.repository.converter.PGObjectToListDoubleConverter;
@@ -46,6 +45,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import javax.sql.DataSource;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -80,15 +80,15 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class JdbcConfiguration extends AbstractJdbcConfiguration {
 
-    private final ApplicationProperties.Datasource datasource;
+    private final DataSourceProperties dataSourceProperties;
     private final Encryption encryption;
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
     public JdbcConfiguration(
-        ApplicationProperties applicationProperties, Encryption encryption, ObjectMapper objectMapper) {
+        DataSourceProperties dataSourceProperties, Encryption encryption, ObjectMapper objectMapper) {
 
-        this.datasource = applicationProperties.getDatasource();
+        this.dataSourceProperties = dataSourceProperties;
         this.encryption = encryption;
         this.objectMapper = objectMapper;
     }
@@ -111,9 +111,9 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     DataSource dataSource(DataSourceProperties properties) {
         return DataSourceBuilder.create(properties.getClassLoader())
             .type(HikariDataSource.class)
-            .url(datasource.getUrl())
-            .username(datasource.getUsername())
-            .password(datasource.getPassword())
+            .url(Objects.requireNonNull(dataSourceProperties.getUrl()))
+            .username(dataSourceProperties.getUsername())
+            .password(dataSourceProperties.getPassword())
             .build();
     }
 
