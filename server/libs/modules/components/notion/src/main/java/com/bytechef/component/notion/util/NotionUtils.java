@@ -189,7 +189,7 @@ public class NotionUtils {
     }
 
     public static Map<String, ?> getDatabase(String databaseId, Context context) {
-        return context.http(http -> http.get("/databases/%s".formatted(databaseId)))
+        return context.http(http -> http.get("/data_sources/%s".formatted(databaseId)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -202,7 +202,7 @@ public class NotionUtils {
         List<Option<String>> options = new ArrayList<>();
 
         List<Object> items = getAllItems(
-            context, "/search", false, "filter", Map.of("property", "object", "value", "database"));
+            context, "/search", false, "filter", Map.of("property", "object", "value", "data_source"));
 
         for (Object object : items) {
             if (object instanceof Map<?, ?> map) {

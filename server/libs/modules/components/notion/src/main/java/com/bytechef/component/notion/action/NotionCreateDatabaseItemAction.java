@@ -88,7 +88,7 @@ public class NotionCreateDatabaseItemAction {
         return context.http(http -> http.post("/pages"))
             .body(
                 Http.Body.of(
-                    "parent", Map.of(TYPE, "database_id", "database_id", databaseId),
+                    "parent", Map.of(TYPE, "data_source_id", "data_source_id", databaseId),
                     "properties", propertiesMap,
                     "children", children))
             .configuration(Http.responseType(Http.ResponseType.JSON))
