@@ -29,7 +29,6 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.REC
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,8 +40,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 
 /**
- * Filesystem list action for workflow automation. Lists files and directories at a specified path.
- *
  * @author Ivica Cardic
  */
 public class FilesystemLsAction {
@@ -76,16 +73,6 @@ public class FilesystemLsAction {
     private FilesystemLsAction() {
     }
 
-    /**
-     * Lists files at the given path.
-     *
-     * <p>
-     * <b>Security Note:</b> Path traversal is intentional for this component. The Filesystem component is designed to
-     * allow workflow creators to access files and directories as part of their automation workflows. Access to this
-     * component should be restricted through workflow-level permissions and proper access control. The path is provided
-     * by the workflow creator, not end users.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     protected static List<FileInfo> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
 

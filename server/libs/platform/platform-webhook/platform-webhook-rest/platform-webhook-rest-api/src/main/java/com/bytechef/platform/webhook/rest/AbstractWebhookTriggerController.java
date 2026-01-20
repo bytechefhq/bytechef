@@ -23,7 +23,6 @@ import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
-import com.bytechef.commons.util.RedirectValidator;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -42,7 +41,6 @@ import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -75,9 +73,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import tools.jackson.core.type.TypeReference;
 
 /**
- * Abstract controller for handling webhook triggers. Redirect URLs from workflow responses are validated to prevent
- * open redirect vulnerabilities - only relative paths and same-host redirects are allowed.
- *
  * @author Ivica Cardic
  */
 public abstract class AbstractWebhookTriggerController {
@@ -138,7 +133,7 @@ public abstract class AbstractWebhookTriggerController {
             if (outputs instanceof Map<?, ?> responseMap &&
                 responseMap.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
 
-                responseEntity = processWebhookResponse(httpServletRequest, httpServletResponse, responseMap);
+                responseEntity = processWebhookResponse(httpServletResponse, responseMap);
             } else {
                 responseEntity = ResponseEntity.ok(outputs);
             }
@@ -416,12 +411,8 @@ public abstract class AbstractWebhookTriggerController {
         return value;
     }
 
-    @SuppressFBWarnings(
-        value = "UNVALIDATED_REDIRECT",
-        justification = "Redirect URL is validated by RedirectValidator.isValidRedirect() before use")
     private ResponseEntity<Object> processWebhookResponse(
-        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Map<?, ?> responseMap)
-        throws IOException {
+        HttpServletResponse httpServletResponse, Map<?, ?> responseMap) throws IOException {
 
         ResponseEntity<Object> responseEntity;
 
@@ -463,26 +454,15 @@ public abstract class AbstractWebhookTriggerController {
 
                 break;
             case REDIRECT:
-                String redirectUrl = String.valueOf(webhookResponse.getBody());
-                String serverHost = httpServletRequest.getServerName();
+                responseEntity = ResponseEntity.noContent()
+                    .build();
 
-                if (RedirectValidator.isValidRedirect(redirectUrl, serverHost)) {
-                    responseEntity = ResponseEntity.noContent()
-                        .build();
-
-                    httpServletResponse.sendRedirect(redirectUrl);
-                } else {
-                    logger.warn("Blocked potentially unsafe redirect URL: {}", redirectUrl);
-
-                    responseEntity = ResponseEntity.badRequest()
-                        .body("Invalid redirect URL");
-                }
+                httpServletResponse.sendRedirect(String.valueOf(webhookResponse.getBody()));
 
                 break;
             default:
                 responseEntity = bodyBuilder.build();
         }
-
         return responseEntity;
     }
 

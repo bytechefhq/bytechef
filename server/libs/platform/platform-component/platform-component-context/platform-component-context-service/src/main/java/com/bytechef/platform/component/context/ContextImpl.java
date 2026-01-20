@@ -383,15 +383,6 @@ class ContextImpl implements Context {
         }
     }
 
-    /**
-     * File implementation for workflow context operations. Manages temporary files and file storage.
-     *
-     * <p>
-     * <b>Security Note:</b> Path traversal is intentional for this component. This class handles file operations for
-     * workflow execution contexts, including creating temporary files and accessing stored file content. File paths are
-     * derived from internal storage and controlled by the platform, not from untrusted user input.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private record FileImpl(TempFileStorage tempFileStorage) implements File {
 
         @Override

@@ -9,7 +9,6 @@ package com.bytechef.platform.codeworkflow.loader.automation;
 
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.workflow.ProjectHandler;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -22,7 +21,6 @@ import org.springframework.cache.CacheManager;
  *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class ProjectHandlerLoader {
 
     public static ProjectHandler loadProjectHandler(

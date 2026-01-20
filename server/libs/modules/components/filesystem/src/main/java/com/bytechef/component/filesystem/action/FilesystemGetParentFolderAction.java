@@ -25,13 +25,10 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.FIL
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.nio.file.NoSuchFileException;
 
 /**
- * Filesystem get parent folder action for workflow automation. Returns the parent directory of a specified file path.
- *
  * @author Ivica Cardic
  */
 public class FilesystemGetParentFolderAction {
@@ -60,14 +57,7 @@ public class FilesystemGetParentFolderAction {
      * <p>
      * This method will handle a file in either Unix or Windows format. The method is entirely text based and returns
      * the text before the last forward or backslash.
-     *
-     * <p>
-     * <b>Security Note:</b> Path traversal is intentional for this component. The Filesystem component is designed to
-     * allow workflow creators to access file paths as part of their automation workflows. Access to this component
-     * should be restricted through workflow-level permissions and proper access control. The file path is provided by
-     * the workflow creator, not end users.
      */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) throws NoSuchFileException {
         String filename = inputParameters.getRequiredString(FILENAME);

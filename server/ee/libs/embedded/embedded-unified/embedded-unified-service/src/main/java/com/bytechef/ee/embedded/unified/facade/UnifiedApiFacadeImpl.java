@@ -38,7 +38,6 @@ import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,9 +49,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Unified API facade implementation that provides CRUD operations for unified API models. Hash comparisons use
- * timing-safe comparison via {@link MessageDigest#isEqual} to prevent timing attacks.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -185,9 +181,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
             String prevHash = params[0];
 
-            // Use timing-safe comparison to prevent timing attacks
-            if (!MessageDigest.isEqual(hashed.getBytes(StandardCharsets.UTF_8),
-                prevHash.getBytes(StandardCharsets.UTF_8))) {
+            if (!hashed.equals(prevHash)) {
                 throw new CursorPaginationException("Can't modify search filter when using a continuationToken");
             }
 

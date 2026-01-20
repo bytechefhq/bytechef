@@ -592,27 +592,6 @@ class HttpClientExecutor {
         }
     }
 
-    /**
-     * Trust manager that accepts all certificates without validation.
-     *
-     * <p>
-     * <b>Security Note:</b> This weak trust manager is an intentional opt-in feature for development and testing
-     * environments where self-signed or invalid certificates are used. It is only activated when the
-     * {@code allowUnauthorizedCerts} configuration option is explicitly set to {@code true} by the workflow creator.
-     *
-     * <p>
-     * This feature exists because:
-     * <ul>
-     * <li>Development and testing environments often use self-signed certificates</li>
-     * <li>Internal services may not have properly configured SSL/TLS certificates</li>
-     * <li>Workflow creators need flexibility to integrate with various systems during development</li>
-     * </ul>
-     *
-     * <p>
-     * <b>Warning:</b> This should never be enabled in production environments as it disables certificate validation,
-     * making the connection vulnerable to man-in-the-middle attacks.
-     */
-    @SuppressFBWarnings("WEAK_TRUST_MANAGER")
     private static class UnauthorizedCertsX509ExtendedTrustManager extends X509ExtendedTrustManager {
 
         @Nullable

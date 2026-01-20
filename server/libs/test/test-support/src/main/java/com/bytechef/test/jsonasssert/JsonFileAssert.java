@@ -16,7 +16,6 @@
 
 package com.bytechef.test.jsonasssert;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -36,7 +35,6 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class JsonFileAssert {
 
     private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()

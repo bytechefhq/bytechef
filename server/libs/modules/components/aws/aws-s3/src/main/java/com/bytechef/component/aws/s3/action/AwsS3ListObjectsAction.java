@@ -28,7 +28,6 @@ import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -40,8 +39,6 @@ import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
- * AWS S3 list objects action for workflow automation. Lists objects in an S3 bucket with a given prefix.
- *
  * @author Ivica Cardic
  */
 public class AwsS3ListObjectsAction {
@@ -56,24 +53,9 @@ public class AwsS3ListObjectsAction {
                 .required(true))
         .output(
             outputSchema(
-                array()
-                    .items(
-                        object()
-                            .properties(
-                                string("key"),
-                                string("suffix"),
-                                string("uri")))))
+                array().items(object().properties(string("key"), string("suffix"), string("uri")))))
         .perform(AwsS3ListObjectsAction::perform);
 
-    /**
-     * Performs the S3 list objects operation.
-     *
-     * <p>
-     * <b>Security Note:</b> Path traversal is intentional for this component. The AWS S3 component is designed to allow
-     * workflow creators to list S3 objects as part of their automation workflows. The prefix is provided by the
-     * workflow creator, not end users, and access is controlled by AWS IAM credentials configured in the connection.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     protected static List<S3ObjectDescription> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
@@ -85,7 +67,8 @@ public class AwsS3ListObjectsAction {
 
             return response.contents()
                 .stream()
-                .map(o -> new S3ObjectDescription(connectionParameters.getRequiredString(BUCKET_NAME), o))
+                .map(o -> new S3ObjectDescription(
+                    connectionParameters.getRequiredString(BUCKET_NAME), o))
                 .collect(Collectors.toList());
         }
     }
@@ -96,9 +79,6 @@ public class AwsS3ListObjectsAction {
             return s3Object.key();
         }
 
-        @SuppressFBWarnings(
-            value = "PATH_TRAVERSAL_IN",
-            justification = "Paths.get() is only used to parse S3 key and extract filename; no file I/O is performed")
         public String getSuffix() {
             Path path = Paths.get(getKey());
 

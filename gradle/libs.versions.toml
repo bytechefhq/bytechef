@@ -1,7 +1,6 @@
 [versions]
 checkstyle = "12.3.1"
 com-google-auto-service = "1.1.1"
-findsecbugs = "1.14.0"
 graalvm = "25.0.1"
 jackson = "2.19.2"
 jacoco = "0.8.13"

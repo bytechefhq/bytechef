@@ -62,7 +62,6 @@ import org.springframework.core.io.ByteArrayResource;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class JGitWorkflowOperations implements GitWorkflowOperations {
 
     private static final Logger log = LoggerFactory.getLogger(JGitWorkflowOperations.class);

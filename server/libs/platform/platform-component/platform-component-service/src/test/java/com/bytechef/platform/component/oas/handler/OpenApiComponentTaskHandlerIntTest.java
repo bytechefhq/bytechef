@@ -45,7 +45,6 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -69,7 +68,6 @@ import wiremock.com.fasterxml.jackson.databind.node.JsonNodeFactory;
  */
 @SpringBootTest(classes = ComponentRegistryConfiguration.class)
 @ComponentRegistryConfigurationSharedMocks
-@SuppressFBWarnings("HARD_CODE_PASSWORD")
 public class OpenApiComponentTaskHandlerIntTest {
 
     @RegisterExtension

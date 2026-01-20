@@ -17,12 +17,11 @@ import org.quartz.impl.jdbcjobstore.LockException;
 import org.quartz.impl.jdbcjobstore.Semaphore;
 
 /**
- * Multi-tenant Quartz semaphore implementation that sets PostgreSQL search_path per tenant.
- *
  * @version ee
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("SQL_INJECTION_JDBC")
 public class MultiTenantSemaphore implements Semaphore {
 
     private final Semaphore semaphore;
@@ -68,16 +67,6 @@ public class MultiTenantSemaphore implements Semaphore {
         }
     }
 
-    /**
-     * Sets the PostgreSQL search_path to the specified schema.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL injection suppression is for schema name injection which cannot be parameterized in
-     * PostgreSQL. The search_path is set using a tenant ID that is validated to contain only alphanumeric characters,
-     * underscores, and hyphens. This is a PostgreSQL limitation for DDL/schema operations, not a security
-     * vulnerability.
-     */
-    @SuppressFBWarnings("SQL_INJECTION_JDBC")
     private static void setSearchPath(Connection connection, String databaseSchemaName) throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.execute("SET search_path TO " + databaseSchemaName);

@@ -23,7 +23,6 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,35 +33,12 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import tools.jackson.core.type.TypeReference;
 
 /**
- * Utility class for evaluating condition expressions in workflow condition dispatchers.
- *
  * @author Matija Petanjek
  */
 public class ConditionTaskUtils {
 
     private static final ExpressionParser expressionParser = new SpelExpressionParser();
 
-    /**
-     * Resolves the condition case by evaluating the expression from the task execution parameters.
-     *
-     * <p>
-     * <b>Security Note:</b> SpEL expression evaluation is an intentional core feature for workflow condition branching.
-     * This component evaluates conditions defined by workflow creators to determine workflow execution paths. The
-     * SPEL_INJECTION suppression is appropriate because:
-     *
-     * <ul>
-     * <li>Condition evaluation is the primary purpose of this component</li>
-     * <li>Expressions are constructed from predefined templates with URL-encoded user values</li>
-     * <li>Only specific comparison operations are supported (equals, contains, regex, etc.)</li>
-     * <li>Workflow conditions are authored by trusted users with platform access</li>
-     * </ul>
-     *
-     * <p>
-     * The REDOS suppression is for the regex pattern matching operations that are part of condition evaluation.
-     */
-    @SuppressFBWarnings({
-        "SPEL_INJECTION", "REDOS"
-    })
     public static boolean resolveCase(TaskExecution conditionTaskExecution) {
         Boolean result;
 

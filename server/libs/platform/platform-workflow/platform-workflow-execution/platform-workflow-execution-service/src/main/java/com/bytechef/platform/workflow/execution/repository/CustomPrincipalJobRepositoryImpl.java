@@ -30,9 +30,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Custom repository implementation for principal job queries with pagination. Uses parameterized queries to prevent SQL
- * injection.
- *
  * @author Ivica Cardic
  */
 public class CustomPrincipalJobRepositoryImpl implements CustomPrincipalJobRepository {
@@ -45,9 +42,6 @@ public class CustomPrincipalJobRepositoryImpl implements CustomPrincipalJobRepos
     }
 
     @Override
-    @SuppressFBWarnings(
-        value = "SQL_INJECTION_SPRING_JDBC",
-        justification = "Query is safely built using parameterized placeholders; all user input passed via arguments array")
     public Page<Long> findAllJobIds(
         Integer status, Instant startDate, Instant endDate, List<Long> instanceIds, int type,
         @NonNull List<String> workflowIds, Pageable pageable) {
@@ -125,10 +119,7 @@ public class CustomPrincipalJobRepositoryImpl implements CustomPrincipalJobRepos
         }
 
         if (!countQuery && pageable != null) {
-            query += "LIMIT ? OFFSET ?";
-
-            arguments.add(pageable.getPageSize());
-            arguments.add(pageable.getOffset());
+            query += "LIMIT %s OFFSET %s".formatted(pageable.getPageSize(), pageable.getOffset());
         }
 
         return new Query(query, arguments.toArray());

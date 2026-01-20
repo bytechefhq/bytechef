@@ -16,7 +16,6 @@
 
 package com.bytechef.component.claude.code.util;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -31,25 +30,12 @@ import java.util.concurrent.TimeoutException;
 import org.zeroturnaround.exec.ProcessExecutor;
 
 /**
- * Utility class for executing Claude Code CLI commands within workflow automation.
- *
  * @author Marko Kriskovic
  */
 public class ClaudeCodeUtil {
-
     private ClaudeCodeUtil() {
     }
 
-    /**
-     * Executes the provided bash command by writing it to a temporary script file and running it.
-     *
-     * <p>
-     * <b>Security Note:</b> Command injection is intentional for this component. The Claude Code component integrates
-     * the Claude Code CLI into workflows, allowing AI-assisted code generation and execution. Access to this component
-     * should be restricted through workflow-level permissions. Commands are constructed from workflow configuration,
-     * not from untrusted user input.
-     */
-    @SuppressFBWarnings("COMMAND_INJECTION")
     public static String execute(String bashCommand) throws IOException, InterruptedException, TimeoutException {
         File scriptFile = File.createTempFile("_script", ".sh");
 

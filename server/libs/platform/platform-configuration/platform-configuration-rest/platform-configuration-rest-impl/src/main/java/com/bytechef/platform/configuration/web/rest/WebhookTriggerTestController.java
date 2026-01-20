@@ -29,7 +29,6 @@ import com.bytechef.platform.configuration.web.rest.file.storage.TempFileStorage
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
 import org.slf4j.Logger;
@@ -43,8 +42,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Test webhook trigger controller for workflow testing and development.
- *
  * @author Ivica Cardic
  */
 @RestController
@@ -67,15 +64,6 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
         this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
     }
 
-    /**
-     * Executes a test workflow based on the provided webhook trigger.
-     *
-     * <p>
-     * <b>Security Note:</b> CSRF protection is intentionally disabled for this endpoint. Webhook callbacks from
-     * external services cannot include CSRF tokens. This endpoint is used for testing webhook triggers during workflow
-     * development. Security is maintained through authentication and authorization at the API level.
-     */
-    @SuppressFBWarnings("SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING")
     @RequestMapping(
         method = {
             RequestMethod.HEAD, RequestMethod.GET, RequestMethod.POST

@@ -39,7 +39,6 @@ import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
 import com.zaxxer.hikari.HikariDataSource;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
@@ -76,7 +75,6 @@ import tools.jackson.databind.ObjectMapper;
         "bytechef.tenant.mode=multi", "bytechef.edition=EE", "spring.main.allow-bean-definition-overriding=true"
     })
 @UserIntTestConfigurationSharedMocks
-@SuppressFBWarnings("HARD_CODE_PASSWORD")
 class MultiTenantAccountControllerIntTest {
 
     @MockitoBean
