@@ -98,10 +98,10 @@ public interface DataTableService {
      * @param description   A description of the table to provide additional context.
      * @param columnSpecs   A list of column specifications that define the structure of the table.
      * @param workspaceId   The unique identifier of the workspace where the table will be added.
-     * @param environmentUd The environment in which the table will be created.
+     * @param environmentId The environment in which the table will be created.
      */
     void createTable(
-        String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentUd);
+        String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId);
 
     /**
      * Deletes a dynamic data table in the specified environment with the given base name. This action is irreversible
