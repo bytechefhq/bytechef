@@ -123,6 +123,40 @@ public class ProjectDeploymentFacadeHelper {
             projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO));
     }
 
+    public ProjectDeploymentDTO createProjectDeploymentForEnvironment(
+        long workspaceId, ProjectDTO projectDTO, Environment environment) {
+
+        Project dbProject = projectRepository.findById(projectDTO.id())
+            .orElseThrow();
+
+        ProjectVersion lastPublishedVersion = dbProject.getProjectVersions()
+            .stream()
+            .filter(projectVersion -> projectVersion.getStatus() == ProjectVersion.Status.PUBLISHED)
+            .toList()
+            .getLast();
+
+        ProjectWorkflow projectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDTO.id(), lastPublishedVersion.getVersion())
+            .stream()
+            .findFirst()
+            .orElseThrow();
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
+            new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
+                0, projectWorkflow.getWorkflowId(), projectWorkflow.getUuidAsString());
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .projectId(projectDTO.id())
+            .name(PREFIX_PROJECT_DEPLOYMENT + environment.name())
+            .environment(environment)
+            .projectVersion(lastPublishedVersion.getVersion())
+            .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
+            .build();
+
+        return projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO));
+    }
+
     public ProjectWorkflowDTO addTestWorkflow(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
 

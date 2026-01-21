@@ -59,6 +59,11 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
     }
 
     @Override
+    public Optional<Long> fetchLastWorkflowJobId(long principalId, List<String> workflowIds, PlatformType type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<Long> fetchJobPrincipalId(long jobId, PlatformType type) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(

@@ -35,6 +35,8 @@ public interface PrincipalJobService {
 
     Optional<Long> fetchLastJobId(long principalId, PlatformType type);
 
+    Optional<Long> fetchLastWorkflowJobId(long principalId, List<String> workflowIds, PlatformType type);
+
     Optional<Long> fetchJobPrincipalId(long jobId, PlatformType type);
 
     long getJobPrincipalId(long jobId, PlatformType type);
