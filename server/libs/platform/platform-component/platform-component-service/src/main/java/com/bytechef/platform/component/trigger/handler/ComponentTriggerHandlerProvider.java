@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.trigger.handler;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
@@ -38,22 +39,28 @@ import java.util.stream.Collectors;
 @SuppressFBWarnings("EI")
 public final class ComponentTriggerHandlerProvider implements TriggerHandlerProvider {
 
+    private final List<ComponentHandler> componentHandlers;
     private final Supplier<List<ComponentHandlerLoader.ComponentHandlerEntry>> componentHandlerEntriesSupplier;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
 
     public ComponentTriggerHandlerProvider(
+        List<ComponentHandler> componentHandlers,
         Supplier<List<ComponentHandlerLoader.ComponentHandlerEntry>> componentHandlerEntriesSupplier,
         TriggerDefinitionFacade triggerDefinitionFacade) {
 
+        this.componentHandlers = componentHandlers;
         this.componentHandlerEntriesSupplier = componentHandlerEntriesSupplier;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
     }
 
     @Override
     public Map<String, TriggerHandler> getTriggerHandlerMap() {
-        return componentHandlerEntriesSupplier.get()
-            .stream()
-            .map(ComponentHandlerLoader.ComponentHandlerEntry::componentHandler)
+        List<ComponentHandler> mergedComponentHandlers = CollectionUtils.concat(
+            componentHandlers,
+            CollectionUtils.map(
+                componentHandlerEntriesSupplier.get(), ComponentHandlerLoader.ComponentHandlerEntry::componentHandler));
+
+        return mergedComponentHandlers.stream()
             .map(ComponentHandler::getDefinition)
             .map(componentDefinition -> collect(componentDefinition, triggerDefinitionFacade))
             .reduce(Map.of(), MapUtils::concat);

@@ -93,6 +93,7 @@ public class ComponentHandlerBeanFactoryPostProcessor
             BeanDefinitionBuilder.genericBeanDefinition(
                 ComponentTriggerHandlerProvider.class,
                 () -> new ComponentTriggerHandlerProvider(
+                    List.copyOf(getComponentHandler(beanFactory)),
                     COMPONENT_HANDLER_ENTRIES_SUPPLIER,
                     beanFactory.getBean("triggerDefinitionFacade", TriggerDefinitionFacade.class)))
                 .setLazyInit(true)
