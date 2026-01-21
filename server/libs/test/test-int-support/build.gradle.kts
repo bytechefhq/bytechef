@@ -1,6 +1,7 @@
 dependencies {
     api(project(":server:libs:config:jackson-config"))
 
+    implementation("com.graphql-java:graphql-java")
     implementation(rootProject.libs.loki.logback.appender)
     implementation("org.springframework:spring-test")
     implementation("org.springframework.boot:spring-boot-test")
