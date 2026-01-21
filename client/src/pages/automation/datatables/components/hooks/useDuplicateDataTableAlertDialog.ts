@@ -19,7 +19,7 @@ export default function useDuplicateDataTableAlertDialog(): UseDuplicateDataTabl
     const {clearTableToDuplicate, duplicateValue, setDuplicateValue, setTableToDuplicate, tableIdToDuplicate} =
         useDuplicateDataTableDialogStore();
 
-    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId) ?? 2;
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();
 

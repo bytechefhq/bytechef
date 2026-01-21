@@ -20,7 +20,7 @@ interface Props {
     trigger?: ReactNode;
 }
 
-const CreateDatatableDialog = ({trigger}: Props) => {
+const CreateDataTableDialog = ({trigger}: Props) => {
     const {
         baseName,
         canSubmit,
@@ -161,4 +161,4 @@ const CreateDatatableDialog = ({trigger}: Props) => {
     );
 };
 
-export default CreateDatatableDialog;
+export default CreateDataTableDialog;

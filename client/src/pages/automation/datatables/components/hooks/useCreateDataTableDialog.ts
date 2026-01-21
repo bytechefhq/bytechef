@@ -31,8 +31,8 @@ export default function useCreateDataTableDialog(): UseCreateDataTableDialogI {
     const [columns, setColumns] = useState<ColumnDefinitionType[]>([{name: '', type: ColumnType.String}]);
     const [description, setDescription] = useState('');
 
-    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId) ?? 2;
-    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId) ?? 1049;
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const queryClient = useQueryClient();
 
