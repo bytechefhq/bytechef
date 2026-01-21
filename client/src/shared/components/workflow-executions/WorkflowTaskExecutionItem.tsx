@@ -1,20 +1,17 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
+import {getExecutionStatusIcon} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {TaskExecution} from '@/shared/middleware/platform/workflow/execution';
-import {AlertTriangleIcon, CheckIcon} from 'lucide-react';
 
 const WorkflowTaskExecutionItem = ({taskExecution}: {taskExecution: TaskExecution}) => {
-    const {endDate, icon, startDate, title, workflowTask} = taskExecution;
+    const {endDate, icon, startDate, status, title, workflowTask} = taskExecution;
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
+    const statusIcon = getExecutionStatusIcon(status);
 
     return (
         <li className="flex w-full cursor-pointer items-center justify-between rounded-lg p-0 hover:bg-inherit">
             <div className="flex items-center gap-x-2 text-sm">
-                {taskExecution.status === 'COMPLETED' ? (
-                    <CheckIcon className="size-4 text-success" />
-                ) : (
-                    <AlertTriangleIcon className="size-4 text-destructive" />
-                )}
+                {statusIcon}
 
                 <div className="flex items-center gap-x-1">
                     {icon && <LazyLoadSVG className="size-5" src={icon} />}
