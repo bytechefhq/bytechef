@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import {Button} from '@/components/ui/button';
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
 import {Popover, PopoverTrigger} from '@/components/ui/popover';
 import {cn} from '@/shared/util/cn-utils';
