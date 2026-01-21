@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20251215000001-1" author="Ivica Cardic">
+        <createTable tableName="workspace_data_table">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="data_table_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_data_table"
+            baseColumnNames="data_table_id"
+            constraintName="fk_workspace_data_table_data_table"
+            referencedTableName="data_table"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_data_table"
+            baseColumnNames="workspace_id"
+            constraintName="fk_workspace_data_table_workspace"
+            referencedTableName="workspace"
+            referencedColumnNames="id"/>
+
+        <addUniqueConstraint
+            constraintName="uk_workspace_data_table_workspace_table"
+            tableName="workspace_data_table"
+            columnNames="workspace_id,data_table_id" />
+    </changeSet>
+
+    <changeSet id="20251215000001-2" author="Ivica Cardic">
+        <sql>
+            INSERT INTO workspace_data_table (data_table_id, workspace_id, created_date, created_by, last_modified_date, last_modified_by, version)
+            SELECT
+                dt.id,
+                1049,
+                COALESCE(dt.created_date, CURRENT_TIMESTAMP),
+                COALESCE(dt.created_by, 'system'),
+                COALESCE(dt.last_modified_date, CURRENT_TIMESTAMP),
+                COALESCE(dt.last_modified_by, 'system'),
+                1
+            FROM data_table dt;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

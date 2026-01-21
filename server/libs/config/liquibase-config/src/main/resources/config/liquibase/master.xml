@@ -35,6 +35,7 @@
     <includeAll path="classpath:config/liquibase/changelog/atlas/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/platform/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/data_entry/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/automation/data_table/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
 
     <!-- audit -->
     <includeAll path="classpath:config/liquibase/changelog/audit/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
