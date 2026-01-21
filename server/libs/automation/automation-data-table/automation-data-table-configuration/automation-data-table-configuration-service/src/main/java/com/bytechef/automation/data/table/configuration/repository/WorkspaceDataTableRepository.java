@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.data.table.domain;
+package com.bytechef.automation.data.table.configuration.repository;
 
-import java.util.Objects;
+import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
+import java.util.List;
+import org.springframework.data.repository.ListCrudRepository;
 
 /**
- * Column specification used for dynamic DDL operations.
+ * Repository for mapping workspaces to data tables.
  *
  * @author Ivica Cardic
  */
-public record ColumnSpec(String name, ColumnType type) {
+public interface WorkspaceDataTableRepository extends ListCrudRepository<WorkspaceDataTable, Long> {
 
-    public ColumnSpec {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(type, "type");
-    }
+    List<WorkspaceDataTable> findAllByWorkspaceId(Long workspaceId);
+
+    List<WorkspaceDataTable> findByDataTableId(Long dataTableId);
+
+    WorkspaceDataTable findByWorkspaceIdAndDataTableId(Long workspaceId, Long dataTableId);
 }

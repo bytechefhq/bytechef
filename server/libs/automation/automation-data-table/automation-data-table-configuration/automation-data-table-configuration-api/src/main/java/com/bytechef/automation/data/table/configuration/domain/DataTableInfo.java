@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.data.table.domain;
+package com.bytechef.automation.data.table.configuration.domain;
 
-import java.util.Objects;
+import com.bytechef.automation.data.table.domain.ColumnSpec;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
+import java.util.List;
 
 /**
- * Column specification used for dynamic DDL operations.
+ * Metadata description of a dynamic data table and its columns.
  *
  * @author Ivica Cardic
  */
-public record ColumnSpec(String name, ColumnType type) {
-
-    public ColumnSpec {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(type, "type");
-    }
+@SuppressFBWarnings("EI")
+public record DataTableInfo(
+    Long id, String baseName, String description, List<ColumnSpec> columns, Instant lastModifiedDate) {
 }

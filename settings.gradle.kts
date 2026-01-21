@@ -64,6 +64,9 @@ include("server:libs:automation:automation-configuration:automation-configuratio
 include("server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl")
 include("server:libs:automation:automation-configuration:automation-configuration-service")
 include("server:libs:automation:automation-data-table:automation-data-table-api")
+include("server:libs:automation:automation-data-table:automation-data-table-configuration:automation-data-table-configuration-api")
+include("server:libs:automation:automation-data-table:automation-data-table-configuration:automation-data-table-configuration-graphql")
+include("server:libs:automation:automation-data-table:automation-data-table-configuration:automation-data-table-configuration-service")
 include("server:libs:automation:automation-execution:automation-execution-api")
 include("server:libs:automation:automation-execution:automation-execution-service")
 include("server:libs:automation:automation-mcp:automation-mcp-api")
@@ -464,6 +467,7 @@ include("server:ee:libs:automation:automation-configuration:automation-configura
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-rest")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-rest")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-service")
+include("server:ee:libs:automation:automation-data-table:automation-data-table-configuration-remote-client")
 include("server:ee:libs:automation:automation-security-web:automation-security-web-impl")
 
 include("server:ee:libs:config:cloud-config")

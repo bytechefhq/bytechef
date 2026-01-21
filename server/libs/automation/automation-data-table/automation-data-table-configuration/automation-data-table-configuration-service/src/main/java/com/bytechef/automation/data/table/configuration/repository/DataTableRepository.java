@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.data.table.domain;
+package com.bytechef.automation.data.table.configuration.repository;
 
-import java.util.Objects;
+import com.bytechef.automation.data.table.configuration.domain.DataTable;
+import java.util.Optional;
+import org.springframework.data.repository.CrudRepository;
 
 /**
- * Column specification used for dynamic DDL operations.
- *
  * @author Ivica Cardic
  */
-public record ColumnSpec(String name, ColumnType type) {
+public interface DataTableRepository extends CrudRepository<DataTable, Long> {
 
-    public ColumnSpec {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(type, "type");
-    }
+    Optional<DataTable> findByName(String name);
+
+    long deleteByName(String name);
 }

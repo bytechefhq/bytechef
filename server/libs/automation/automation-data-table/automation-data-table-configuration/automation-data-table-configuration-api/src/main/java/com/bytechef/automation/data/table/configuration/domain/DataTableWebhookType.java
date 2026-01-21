@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.data.table.domain;
-
-import java.util.Objects;
+package com.bytechef.automation.data.table.configuration.domain;
 
 /**
- * Column specification used for dynamic DDL operations.
+ * Webhook types for Data Table row events.
  *
  * @author Ivica Cardic
  */
-public record ColumnSpec(String name, ColumnType type) {
+public enum DataTableWebhookType {
 
-    public ColumnSpec {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(type, "type");
-    }
+    RECORD_CREATED,
+    RECORD_DELETED,
+    RECORD_UPDATED
 }
