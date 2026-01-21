@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Textarea} from '@/components/ui/textarea';

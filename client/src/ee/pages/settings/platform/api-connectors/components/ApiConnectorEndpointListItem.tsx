@@ -1,5 +1,5 @@
 import Badge from '@/components/Badge/Badge';
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
@@ -98,9 +98,11 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                            <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
-                        </Button>
+                        <Button
+                            icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
+                            size="icon"
+                            variant="ghost"
+                        />
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">

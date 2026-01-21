@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import ApiPlatformLeftSidebarNav from '@/ee/pages/automation/api-platform/ApiPlatformLeftSidebarNav';
 import ApiClientDialog from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientDialog';
 import ApiClientTable from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientTable';

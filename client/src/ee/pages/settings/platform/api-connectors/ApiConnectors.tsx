@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import ApiConnectorImportDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorImportDialog';
 import ApiConnectorList from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorList';
 import {useGetApiConnectorsQuery} from '@/ee/shared/queries/platform/apiConnectors.queries';

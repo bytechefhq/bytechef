@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -66,9 +66,12 @@ const IntegrationHeaderIntegrationDropDownMenu = ({
                     <div>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button className="hover:bg-background/70 [&_svg]:size-5" size="icon" variant="ghost">
-                                    <SettingsIcon />
-                                </Button>
+                                <Button
+                                    className="hover:bg-background/70 [&_svg]:size-5"
+                                    icon={<SettingsIcon />}
+                                    size="icon"
+                                    variant="ghost"
+                                />
                             </TooltipTrigger>
 
                             <TooltipContent>Integration Settings</TooltipContent>

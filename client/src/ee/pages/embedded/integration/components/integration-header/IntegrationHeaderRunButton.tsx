@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {PlayIcon} from 'lucide-react';
 
@@ -9,12 +9,11 @@ const IntegrationHeaderRunButton = ({onRunClick, runDisabled}: {onRunClick: () =
                 <Button
                     className="hover:bg-background/70 [&_svg]:size-5"
                     disabled={runDisabled}
+                    icon={<PlayIcon className="text-success" />}
                     onClick={() => onRunClick()}
                     size="icon"
                     variant="ghost"
-                >
-                    <PlayIcon className="text-success" />
-                </Button>
+                />
             </TooltipTrigger>
 
             <TooltipContent>

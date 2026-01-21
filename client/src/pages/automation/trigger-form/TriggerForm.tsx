@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
 import {PRODUCTION_ENVIRONMENT, toEnvironmentName} from '@/shared/constants';
 import {TriggerFormInput} from '@/shared/middleware/platform/configuration';

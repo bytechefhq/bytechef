@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {
@@ -88,9 +88,11 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                            <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
-                        </Button>
+                        <Button
+                            icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
+                            size="icon"
+                            variant="ghost"
+                        />
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">

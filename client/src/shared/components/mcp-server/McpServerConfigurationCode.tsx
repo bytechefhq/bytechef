@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Card} from '@/components/ui/card';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {AlertTriangleIcon, CheckIcon, CopyIcon, RefreshCwIcon} from 'lucide-react';
@@ -31,11 +31,12 @@ const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: stri
                 <div className="flex items-center gap-2">
                     <Tooltip>
                         <TooltipTrigger>
-                            <Badge className="flex items-center gap-1 border border-destructive" variant="outline">
-                                <AlertTriangleIcon className="size-4 text-destructive" />
-
-                                <span className="text-xs font-medium text-destructive">Sensitive</span>
-                            </Badge>
+                            <Badge
+                                className="flex items-center gap-1 border border-destructive"
+                                icon={<AlertTriangleIcon className="size-4 text-destructive" />}
+                                label="Sensitive"
+                                styleType="outline-outline"
+                            />
                         </TooltipTrigger>
 
                         <TooltipContent>
