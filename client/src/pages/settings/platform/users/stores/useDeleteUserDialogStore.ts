@@ -2,27 +2,27 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface DeleteUserDialogStateI {
-    handleClose: () => void;
-    handleOpen: (login: string | null) => void;
+    clearLoginToDelete: () => void;
     loginToDelete: string | null;
+    setLoginToDelete: (login: string | null) => void;
 }
 
 export const useDeleteUserDialogStore = create<DeleteUserDialogStateI>()(
     devtools(
         (set) => ({
-            handleClose: () => {
+            clearLoginToDelete: () => {
                 set(() => ({
                     loginToDelete: null,
                 }));
             },
 
-            handleOpen: (login: string | null) => {
+            loginToDelete: null,
+
+            setLoginToDelete: (login: string | null) => {
                 set(() => ({
                     loginToDelete: login,
                 }));
             },
-
-            loginToDelete: null,
         }),
         {
             name: 'bytechef.delete-user-dialog',

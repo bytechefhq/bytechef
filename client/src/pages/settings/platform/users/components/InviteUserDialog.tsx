@@ -19,6 +19,7 @@ const InviteUserDialog = () => {
         handleClose,
         handleEmailChange,
         handleInvite,
+        handleOpenChange,
         handleRegeneratePassword,
         handleRoleChange,
         inviteDisabled,
@@ -29,7 +30,7 @@ const InviteUserDialog = () => {
     } = useInviteUserDialog();
 
     return (
-        <Dialog onOpenChange={(isOpen) => !isOpen && handleClose()} open={open}>
+        <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent>
                 <div className="flex flex-col gap-4">
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0">

@@ -6,20 +6,29 @@ interface UseDeleteUserAlertDialogI {
     handleClose: () => void;
     handleDelete: () => void;
     handleOpen: (login: string | null) => void;
+    handleOpenChange: (open: boolean) => void;
     open: boolean;
 }
 
 export default function useDeleteUserAlertDialog(): UseDeleteUserAlertDialogI {
-    const {handleClose, handleOpen, loginToDelete} = useDeleteUserDialogStore();
+    const {clearLoginToDelete, loginToDelete, setLoginToDelete} = useDeleteUserDialogStore();
 
     const queryClient = useQueryClient();
 
     const deleteUserMutation = useDeleteUserMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['users']});
-            handleClose();
+            clearLoginToDelete();
         },
     });
+
+    const handleClose = () => {
+        clearLoginToDelete();
+    };
+
+    const handleOpen = (login: string | null) => {
+        setLoginToDelete(login);
+    };
 
     const handleDelete = () => {
         if (loginToDelete) {
@@ -27,10 +36,17 @@ export default function useDeleteUserAlertDialog(): UseDeleteUserAlertDialogI {
         }
     };
 
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            handleClose();
+        }
+    };
+
     return {
         handleClose,
         handleDelete,
         handleOpen,
+        handleOpenChange,
         open: loginToDelete !== null,
     };
 }

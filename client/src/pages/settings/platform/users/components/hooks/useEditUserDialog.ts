@@ -9,6 +9,7 @@ interface UseEditUserDialogI {
     editUser: {email?: string | null; login?: string | null; authorities?: (string | null)[] | null} | null;
     handleClose: () => void;
     handleOpen: (login: string) => void;
+    handleOpenChange: (open: boolean) => void;
     handleRoleChange: (role: string) => void;
     handleUpdate: () => void;
     open: boolean;
@@ -16,7 +17,7 @@ interface UseEditUserDialogI {
 }
 
 export default function useEditUserDialog(): UseEditUserDialogI {
-    const {editRole, handleClose, handleOpen, handleRoleChange, loginToEdit} = useEditUserDialogStore();
+    const {clearLoginToEdit, editRole, loginToEdit, setEditRole, setLoginToEdit} = useEditUserDialogStore();
 
     const {data: usersData} = useUsersQuery({});
     const {data: authoritiesData} = useAuthoritiesQuery({});
@@ -26,7 +27,7 @@ export default function useEditUserDialog(): UseEditUserDialogI {
     const updateUserMutation = useUpdateUserMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['users']});
-            handleClose();
+            clearLoginToEdit();
         },
     });
 
@@ -42,10 +43,22 @@ export default function useEditUserDialog(): UseEditUserDialogI {
             const currentRole = current?.authorities?.[0] ?? authorities[0] ?? null;
 
             if (currentRole) {
-                handleRoleChange(currentRole);
+                setEditRole(currentRole);
             }
         }
-    }, [loginToEdit, users, authorities, handleRoleChange]);
+    }, [loginToEdit, users, authorities, setEditRole]);
+
+    const handleClose = () => {
+        clearLoginToEdit();
+    };
+
+    const handleOpen = (login: string) => {
+        setLoginToEdit(login);
+    };
+
+    const handleRoleChange = (role: string) => {
+        setEditRole(role);
+    };
 
     const handleUpdate = () => {
         if (loginToEdit && editRole) {
@@ -56,12 +69,19 @@ export default function useEditUserDialog(): UseEditUserDialogI {
         }
     };
 
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            handleClose();
+        }
+    };
+
     return {
         authorities,
         editRole,
         editUser,
         handleClose,
         handleOpen,
+        handleOpenChange,
         handleRoleChange,
         handleUpdate,
         open: loginToEdit !== null,
