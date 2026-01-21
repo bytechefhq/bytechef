@@ -683,6 +683,7 @@ export type Mutation = {
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpServer?: Maybe<McpServer>;
   createMcpTool?: Maybe<McpTool>;
+  createTask?: Maybe<Task>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteApiKey: Scalars['Boolean']['output'];
@@ -693,6 +694,7 @@ export type Mutation = {
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
+  deleteTask?: Maybe<Scalars['Boolean']['output']>;
   deleteUser: Scalars['Boolean']['output'];
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -717,6 +719,7 @@ export type Mutation = {
   updateMcpServer?: Maybe<McpServer>;
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
+  updateTask?: Maybe<Task>;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
 };
@@ -769,6 +772,11 @@ export type MutationCreateMcpToolArgs = {
 };
 
 
+export type MutationCreateTaskArgs = {
+  task: TaskInput;
+};
+
+
 export type MutationCreateWorkspaceApiKeyArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -818,6 +826,11 @@ export type MutationDeleteSharedProjectArgs = {
 
 export type MutationDeleteSharedWorkflowArgs = {
   workflowId: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteTaskArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -946,6 +959,11 @@ export type MutationUpdateMcpServerTagsArgs = {
 
 export type MutationUpdateMcpServerUrlArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateTaskArgs = {
+  task: TaskInput;
 };
 
 
@@ -1213,9 +1231,12 @@ export type Query = {
   projects?: Maybe<Array<Maybe<Project>>>;
   sharedProject?: Maybe<SharedProject>;
   sharedWorkflow?: Maybe<SharedWorkflow>;
+  task?: Maybe<Task>;
   taskDispatcherDefinition: TaskDispatcherDefinition;
   taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
   taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
+  tasks?: Maybe<Array<Maybe<Task>>>;
+  tasksByIds?: Maybe<Array<Maybe<Task>>>;
   triggerDefinition: TriggerDefinition;
   triggerDefinitions: Array<TriggerDefinition>;
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
@@ -1470,6 +1491,11 @@ export type QuerySharedWorkflowArgs = {
 };
 
 
+export type QueryTaskArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type QueryTaskDispatcherDefinitionArgs = {
   name: Scalars['String']['input'];
   version: Scalars['Int']['input'];
@@ -1478,6 +1504,11 @@ export type QueryTaskDispatcherDefinitionArgs = {
 
 export type QueryTaskDispatcherDefinitionVersionsArgs = {
   name: Scalars['String']['input'];
+};
+
+
+export type QueryTasksByIdsArgs = {
+  ids: Array<Scalars['ID']['input']>;
 };
 
 
@@ -1620,6 +1651,18 @@ export type TagInput = {
   name: Scalars['String']['input'];
 };
 
+export type Task = {
+  __typename?: 'Task';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  version: Scalars['Int']['output'];
+};
+
 export type TaskDispatcherDefinition = {
   __typename?: 'TaskDispatcherDefinition';
   description?: Maybe<Scalars['String']['output']>;
@@ -1634,6 +1677,13 @@ export type TaskDispatcherDefinition = {
   title?: Maybe<Scalars['String']['output']>;
   variablePropertiesDefined?: Maybe<Scalars['Boolean']['output']>;
   version: Scalars['Int']['output'];
+};
+
+export type TaskInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name: Scalars['String']['input'];
+  version?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type TimeProperty = Property & {
