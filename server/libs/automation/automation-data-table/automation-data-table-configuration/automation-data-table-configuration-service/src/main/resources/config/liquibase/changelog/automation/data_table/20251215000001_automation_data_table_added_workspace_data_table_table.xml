@@ -50,19 +50,4 @@
             tableName="workspace_data_table"
             columnNames="workspace_id,data_table_id" />
     </changeSet>
-
-    <changeSet id="20251215000001-2" author="Ivica Cardic">
-        <sql>
-            INSERT INTO workspace_data_table (data_table_id, workspace_id, created_date, created_by, last_modified_date, last_modified_by, version)
-            SELECT
-                dt.id,
-                1049,
-                COALESCE(dt.created_date, CURRENT_TIMESTAMP),
-                COALESCE(dt.created_by, 'system'),
-                COALESCE(dt.last_modified_date, CURRENT_TIMESTAMP),
-                COALESCE(dt.last_modified_by, 'system'),
-                1
-            FROM data_table dt;
-        </sql>
-    </changeSet>
 </databaseChangeLog>
