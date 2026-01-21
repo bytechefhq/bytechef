@@ -63,6 +63,16 @@ public class PrincipalJobServiceImpl implements PrincipalJobService {
     }
 
     @Override
+    public Optional<Long> fetchLastWorkflowJobId(long principalId, List<String> workflowIds, PlatformType type) {
+        Page<Long> page = principalJobRepository.findAllJobIds(
+            null, null, null, List.of(principalId), type.ordinal(), workflowIds, PageRequest.of(0, 1));
+
+        return page.getContent()
+            .stream()
+            .findFirst();
+    }
+
+    @Override
     public Optional<Long> fetchJobPrincipalId(long jobId, PlatformType type) {
         return principalJobRepository.findByJobIdAndType(jobId, type.ordinal())
             .map(PrincipalJob::getPrincipalId);

@@ -795,9 +795,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return webhookUrl.replace("{id}", workflowExecutionId.toString());
     }
 
-    private Instant getWorkflowLastExecutionDate(List<String> workflowIds) {
-        return jobService.fetchLastWorkflowJob(workflowIds)
-            .map(Job::getEndDate)
+    private Instant getWorkflowLastExecutionDate(long projectDeploymentId, List<String> workflowIds) {
+        return principalJobService.fetchLastWorkflowJobId(projectDeploymentId, workflowIds, PlatformType.AUTOMATION)
+            .map(this::getJobEndDate)
             .orElse(null);
     }
 
@@ -828,7 +828,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         return new ProjectDeploymentWorkflowDTO(
             projectDeploymentWorkflow,
-            getWorkflowLastExecutionDate(workflowUuidWorkflowIds),
+            getWorkflowLastExecutionDate(projectDeployment.getId(), workflowUuidWorkflowIds),
             getStaticWebhookUrl(
                 projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectDeploymentWorkflow.getWorkflowId()),
