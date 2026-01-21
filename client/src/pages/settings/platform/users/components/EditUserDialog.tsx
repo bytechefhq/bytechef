@@ -13,11 +13,20 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import useEditUserDialog from './hooks/useEditUserDialog';
 
 const EditUserDialog = () => {
-    const {authorities, editRole, editUser, handleClose, handleRoleChange, handleUpdate, open, updateDisabled} =
-        useEditUserDialog();
+    const {
+        authorities,
+        editRole,
+        editUser,
+        handleClose,
+        handleOpenChange,
+        handleRoleChange,
+        handleUpdate,
+        open,
+        updateDisabled,
+    } = useEditUserDialog();
 
     return (
-        <Dialog onOpenChange={(isOpen) => !isOpen && handleClose()} open={open}>
+        <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent>
                 <div className="flex flex-col gap-4">
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0">

@@ -7,9 +7,9 @@ const hoisted = vi.hoisted(() => {
     return {
         deleteUserMutate: vi.fn(),
         storeState: {
-            handleClose: vi.fn(),
-            handleOpen: vi.fn(),
+            clearLoginToDelete: vi.fn(),
             loginToDelete: null as string | null,
+            setLoginToDelete: vi.fn(),
         },
     };
 });
@@ -17,15 +17,15 @@ const hoisted = vi.hoisted(() => {
 vi.mock('@/pages/settings/platform/users/stores/useDeleteUserDialogStore', () => ({
     useDeleteUserDialogStore: vi.fn(() => {
         return {
-            handleClose: () => {
+            clearLoginToDelete: () => {
                 hoisted.storeState.loginToDelete = null;
-                hoisted.storeState.handleClose();
-            },
-            handleOpen: (login: string | null) => {
-                hoisted.storeState.loginToDelete = login;
-                hoisted.storeState.handleOpen(login);
+                hoisted.storeState.clearLoginToDelete();
             },
             loginToDelete: hoisted.storeState.loginToDelete,
+            setLoginToDelete: (login: string | null) => {
+                hoisted.storeState.loginToDelete = login;
+                hoisted.storeState.setLoginToDelete(login);
+            },
         };
     }),
 }));

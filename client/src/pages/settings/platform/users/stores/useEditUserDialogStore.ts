@@ -2,38 +2,38 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface EditUserDialogStateI {
+    clearLoginToEdit: () => void;
     editRole: string | null;
-    handleClose: () => void;
-    handleOpen: (login: string) => void;
-    handleRoleChange: (role: string) => void;
     loginToEdit: string | null;
+    setEditRole: (role: string) => void;
+    setLoginToEdit: (login: string) => void;
 }
 
 export const useEditUserDialogStore = create<EditUserDialogStateI>()(
     devtools(
         (set) => ({
-            editRole: null,
-
-            handleClose: () => {
+            clearLoginToEdit: () => {
                 set(() => ({
                     editRole: null,
                     loginToEdit: null,
                 }));
             },
 
-            handleOpen: (login: string) => {
-                set(() => ({
-                    loginToEdit: login,
-                }));
-            },
+            editRole: null,
 
-            handleRoleChange: (role: string) => {
+            loginToEdit: null,
+
+            setEditRole: (role: string) => {
                 set(() => ({
                     editRole: role,
                 }));
             },
 
-            loginToEdit: null,
+            setLoginToEdit: (login: string) => {
+                set(() => ({
+                    loginToEdit: login,
+                }));
+            },
         }),
         {
             name: 'bytechef.edit-user-dialog',

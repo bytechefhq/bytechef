@@ -6,11 +6,11 @@ import useEditUserDialog from '../useEditUserDialog';
 const hoisted = vi.hoisted(() => {
     return {
         storeState: {
+            clearLoginToEdit: vi.fn(),
             editRole: null as string | null,
-            handleClose: vi.fn(),
-            handleOpen: vi.fn(),
-            handleRoleChange: vi.fn(),
             loginToEdit: null as string | null,
+            setEditRole: vi.fn(),
+            setLoginToEdit: vi.fn(),
         },
         updateUserMutate: vi.fn(),
     };
@@ -19,21 +19,21 @@ const hoisted = vi.hoisted(() => {
 vi.mock('@/pages/settings/platform/users/stores/useEditUserDialogStore', () => ({
     useEditUserDialogStore: vi.fn(() => {
         return {
-            editRole: hoisted.storeState.editRole,
-            handleClose: () => {
+            clearLoginToEdit: () => {
                 hoisted.storeState.editRole = null;
                 hoisted.storeState.loginToEdit = null;
-                hoisted.storeState.handleClose();
+                hoisted.storeState.clearLoginToEdit();
             },
-            handleOpen: (login: string) => {
-                hoisted.storeState.loginToEdit = login;
-                hoisted.storeState.handleOpen(login);
-            },
-            handleRoleChange: (role: string) => {
-                hoisted.storeState.editRole = role;
-                hoisted.storeState.handleRoleChange(role);
-            },
+            editRole: hoisted.storeState.editRole,
             loginToEdit: hoisted.storeState.loginToEdit,
+            setEditRole: (role: string) => {
+                hoisted.storeState.editRole = role;
+                hoisted.storeState.setEditRole(role);
+            },
+            setLoginToEdit: (login: string) => {
+                hoisted.storeState.loginToEdit = login;
+                hoisted.storeState.setLoginToEdit(login);
+            },
         };
     }),
 }));

@@ -10,6 +10,7 @@ interface UseInviteUserDialogI {
     handleEmailChange: (email: string) => void;
     handleInvite: () => void;
     handleOpen: () => void;
+    handleOpenChange: (open: boolean) => void;
     handleRegeneratePassword: () => void;
     handleRoleChange: (role: string) => void;
     inviteDisabled: boolean;
@@ -21,15 +22,15 @@ interface UseInviteUserDialogI {
 
 export default function useInviteUserDialog(): UseInviteUserDialogI {
     const {
-        handleClose,
-        handleEmailChange,
-        handleOpen: storeHandleOpen,
-        handleRegeneratePassword,
-        handleRoleChange,
         inviteEmail,
         invitePassword,
         inviteRole,
         open,
+        regeneratePassword,
+        reset,
+        setInviteEmail,
+        setInviteRole,
+        setOpen,
     } = useInviteUserDialogStore();
 
     const {data: authoritiesData} = useAuthoritiesQuery({});
@@ -39,7 +40,7 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
     const inviteUserMutation = useInviteUserMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['users']});
-            handleClose();
+            reset();
         },
     });
 
@@ -48,12 +49,34 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
 
     useEffect(() => {
         if (open && !inviteRole && authorities.length > 0) {
-            handleRoleChange(authorities[0]);
+            setInviteRole(authorities[0]);
         }
-    }, [open, inviteRole, authorities, handleRoleChange]);
+    }, [open, inviteRole, authorities, setInviteRole]);
+
+    const handleClose = () => {
+        reset();
+    };
 
     const handleOpen = () => {
-        storeHandleOpen();
+        setOpen();
+    };
+
+    const handleEmailChange = (email: string) => {
+        setInviteEmail(email);
+    };
+
+    const handleRoleChange = (role: string) => {
+        setInviteRole(role);
+    };
+
+    const handleRegeneratePassword = () => {
+        regeneratePassword();
+    };
+
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            handleClose();
+        }
     };
 
     const handleInvite = () => {
@@ -72,6 +95,7 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
         handleEmailChange,
         handleInvite,
         handleOpen,
+        handleOpenChange,
         handleRegeneratePassword,
         handleRoleChange,
         inviteDisabled,

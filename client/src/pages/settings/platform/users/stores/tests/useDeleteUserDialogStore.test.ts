@@ -6,7 +6,7 @@ import {useDeleteUserDialogStore} from '../useDeleteUserDialogStore';
 describe('useDeleteUserDialogStore', () => {
     beforeEach(() => {
         act(() => {
-            useDeleteUserDialogStore.getState().handleClose();
+            useDeleteUserDialogStore.getState().clearLoginToDelete();
         });
     });
 
@@ -18,10 +18,10 @@ describe('useDeleteUserDialogStore', () => {
         });
     });
 
-    describe('handleOpen', () => {
+    describe('setLoginToDelete', () => {
         it('sets loginToDelete to the provided login', () => {
             act(() => {
-                useDeleteUserDialogStore.getState().handleOpen('user@example.com');
+                useDeleteUserDialogStore.getState().setLoginToDelete('user@example.com');
             });
 
             const state = useDeleteUserDialogStore.getState();
@@ -31,7 +31,7 @@ describe('useDeleteUserDialogStore', () => {
 
         it('allows null value for login', () => {
             act(() => {
-                useDeleteUserDialogStore.getState().handleOpen(null);
+                useDeleteUserDialogStore.getState().setLoginToDelete(null);
             });
 
             const state = useDeleteUserDialogStore.getState();
@@ -41,11 +41,11 @@ describe('useDeleteUserDialogStore', () => {
 
         it('updates loginToDelete when called multiple times', () => {
             act(() => {
-                useDeleteUserDialogStore.getState().handleOpen('user1@example.com');
+                useDeleteUserDialogStore.getState().setLoginToDelete('user1@example.com');
             });
 
             act(() => {
-                useDeleteUserDialogStore.getState().handleOpen('user2@example.com');
+                useDeleteUserDialogStore.getState().setLoginToDelete('user2@example.com');
             });
 
             const state = useDeleteUserDialogStore.getState();
@@ -54,14 +54,14 @@ describe('useDeleteUserDialogStore', () => {
         });
     });
 
-    describe('handleClose', () => {
+    describe('clearLoginToDelete', () => {
         it('resets loginToDelete to null', () => {
             act(() => {
-                useDeleteUserDialogStore.getState().handleOpen('user@example.com');
+                useDeleteUserDialogStore.getState().setLoginToDelete('user@example.com');
             });
 
             act(() => {
-                useDeleteUserDialogStore.getState().handleClose();
+                useDeleteUserDialogStore.getState().clearLoginToDelete();
             });
 
             const state = useDeleteUserDialogStore.getState();

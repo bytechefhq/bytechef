@@ -10,7 +10,7 @@ vi.mock('@/pages/settings/platform/users/util/password-utils', () => ({
 describe('useInviteUserDialogStore', () => {
     beforeEach(() => {
         act(() => {
-            useInviteUserDialogStore.getState().handleClose();
+            useInviteUserDialogStore.getState().reset();
         });
     });
 
@@ -40,10 +40,10 @@ describe('useInviteUserDialogStore', () => {
         });
     });
 
-    describe('handleOpen', () => {
+    describe('setOpen', () => {
         it('sets open to true', () => {
             act(() => {
-                useInviteUserDialogStore.getState().handleOpen();
+                useInviteUserDialogStore.getState().setOpen();
             });
 
             const state = useInviteUserDialogStore.getState();
@@ -52,10 +52,10 @@ describe('useInviteUserDialogStore', () => {
         });
     });
 
-    describe('handleEmailChange', () => {
+    describe('setInviteEmail', () => {
         it('sets inviteEmail to the provided value', () => {
             act(() => {
-                useInviteUserDialogStore.getState().handleEmailChange('newuser@example.com');
+                useInviteUserDialogStore.getState().setInviteEmail('newuser@example.com');
             });
 
             const state = useInviteUserDialogStore.getState();
@@ -64,10 +64,10 @@ describe('useInviteUserDialogStore', () => {
         });
     });
 
-    describe('handleRoleChange', () => {
+    describe('setInviteRole', () => {
         it('sets inviteRole to the provided value', () => {
             act(() => {
-                useInviteUserDialogStore.getState().handleRoleChange('ROLE_ADMIN');
+                useInviteUserDialogStore.getState().setInviteRole('ROLE_ADMIN');
             });
 
             const state = useInviteUserDialogStore.getState();
@@ -76,10 +76,10 @@ describe('useInviteUserDialogStore', () => {
         });
     });
 
-    describe('handleRegeneratePassword', () => {
+    describe('regeneratePassword', () => {
         it('regenerates the password', () => {
             act(() => {
-                useInviteUserDialogStore.getState().handleRegeneratePassword();
+                useInviteUserDialogStore.getState().regeneratePassword();
             });
 
             const state = useInviteUserDialogStore.getState();
@@ -88,22 +88,22 @@ describe('useInviteUserDialogStore', () => {
         });
     });
 
-    describe('handleClose', () => {
+    describe('reset', () => {
         it('resets all state and closes dialog', () => {
             act(() => {
-                useInviteUserDialogStore.getState().handleOpen();
+                useInviteUserDialogStore.getState().setOpen();
             });
 
             act(() => {
-                useInviteUserDialogStore.getState().handleEmailChange('user@example.com');
+                useInviteUserDialogStore.getState().setInviteEmail('user@example.com');
             });
 
             act(() => {
-                useInviteUserDialogStore.getState().handleRoleChange('ROLE_ADMIN');
+                useInviteUserDialogStore.getState().setInviteRole('ROLE_ADMIN');
             });
 
             act(() => {
-                useInviteUserDialogStore.getState().handleClose();
+                useInviteUserDialogStore.getState().reset();
             });
 
             const state = useInviteUserDialogStore.getState();

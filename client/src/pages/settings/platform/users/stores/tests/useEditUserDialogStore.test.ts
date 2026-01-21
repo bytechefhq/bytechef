@@ -6,7 +6,7 @@ import {useEditUserDialogStore} from '../useEditUserDialogStore';
 describe('useEditUserDialogStore', () => {
     beforeEach(() => {
         act(() => {
-            useEditUserDialogStore.getState().handleClose();
+            useEditUserDialogStore.getState().clearLoginToEdit();
         });
     });
 
@@ -24,10 +24,10 @@ describe('useEditUserDialogStore', () => {
         });
     });
 
-    describe('handleOpen', () => {
+    describe('setLoginToEdit', () => {
         it('sets loginToEdit to the provided login', () => {
             act(() => {
-                useEditUserDialogStore.getState().handleOpen('user@example.com');
+                useEditUserDialogStore.getState().setLoginToEdit('user@example.com');
             });
 
             const state = useEditUserDialogStore.getState();
@@ -36,14 +36,14 @@ describe('useEditUserDialogStore', () => {
         });
     });
 
-    describe('handleRoleChange', () => {
+    describe('setEditRole', () => {
         it('sets editRole to the provided role', () => {
             act(() => {
-                useEditUserDialogStore.getState().handleOpen('user@example.com');
+                useEditUserDialogStore.getState().setLoginToEdit('user@example.com');
             });
 
             act(() => {
-                useEditUserDialogStore.getState().handleRoleChange('ROLE_ADMIN');
+                useEditUserDialogStore.getState().setEditRole('ROLE_ADMIN');
             });
 
             const state = useEditUserDialogStore.getState();
@@ -53,11 +53,11 @@ describe('useEditUserDialogStore', () => {
 
         it('updates editRole when called multiple times', () => {
             act(() => {
-                useEditUserDialogStore.getState().handleRoleChange('ROLE_ADMIN');
+                useEditUserDialogStore.getState().setEditRole('ROLE_ADMIN');
             });
 
             act(() => {
-                useEditUserDialogStore.getState().handleRoleChange('ROLE_USER');
+                useEditUserDialogStore.getState().setEditRole('ROLE_USER');
             });
 
             const state = useEditUserDialogStore.getState();
@@ -66,18 +66,18 @@ describe('useEditUserDialogStore', () => {
         });
     });
 
-    describe('handleClose', () => {
+    describe('clearLoginToEdit', () => {
         it('resets all state to initial values', () => {
             act(() => {
-                useEditUserDialogStore.getState().handleOpen('user@example.com');
+                useEditUserDialogStore.getState().setLoginToEdit('user@example.com');
             });
 
             act(() => {
-                useEditUserDialogStore.getState().handleRoleChange('ROLE_ADMIN');
+                useEditUserDialogStore.getState().setEditRole('ROLE_ADMIN');
             });
 
             act(() => {
-                useEditUserDialogStore.getState().handleClose();
+                useEditUserDialogStore.getState().clearLoginToEdit();
             });
 
             const state = useEditUserDialogStore.getState();

@@ -7,15 +7,15 @@ const hoisted = vi.hoisted(() => {
     return {
         inviteUserMutate: vi.fn(),
         storeState: {
-            handleClose: vi.fn(),
-            handleEmailChange: vi.fn(),
-            handleOpen: vi.fn(),
-            handleRegeneratePassword: vi.fn(),
-            handleRoleChange: vi.fn(),
             inviteEmail: '',
             invitePassword: 'GeneratedPass1',
             inviteRole: null as string | null,
             open: false,
+            regeneratePassword: vi.fn(),
+            reset: vi.fn(),
+            setInviteEmail: vi.fn(),
+            setInviteRole: vi.fn(),
+            setOpen: vi.fn(),
         },
     };
 });
@@ -23,32 +23,32 @@ const hoisted = vi.hoisted(() => {
 vi.mock('@/pages/settings/platform/users/stores/useInviteUserDialogStore', () => ({
     useInviteUserDialogStore: vi.fn(() => {
         return {
-            handleClose: () => {
-                hoisted.storeState.inviteEmail = '';
-                hoisted.storeState.invitePassword = 'GeneratedPass1';
-                hoisted.storeState.inviteRole = null;
-                hoisted.storeState.open = false;
-                hoisted.storeState.handleClose();
-            },
-            handleEmailChange: (email: string) => {
-                hoisted.storeState.inviteEmail = email;
-                hoisted.storeState.handleEmailChange(email);
-            },
-            handleOpen: () => {
-                hoisted.storeState.open = true;
-                hoisted.storeState.handleOpen();
-            },
-            handleRegeneratePassword: () => {
-                hoisted.storeState.handleRegeneratePassword();
-            },
-            handleRoleChange: (role: string) => {
-                hoisted.storeState.inviteRole = role;
-                hoisted.storeState.handleRoleChange(role);
-            },
             inviteEmail: hoisted.storeState.inviteEmail,
             invitePassword: hoisted.storeState.invitePassword,
             inviteRole: hoisted.storeState.inviteRole,
             open: hoisted.storeState.open,
+            regeneratePassword: () => {
+                hoisted.storeState.regeneratePassword();
+            },
+            reset: () => {
+                hoisted.storeState.inviteEmail = '';
+                hoisted.storeState.invitePassword = 'GeneratedPass1';
+                hoisted.storeState.inviteRole = null;
+                hoisted.storeState.open = false;
+                hoisted.storeState.reset();
+            },
+            setInviteEmail: (email: string) => {
+                hoisted.storeState.inviteEmail = email;
+                hoisted.storeState.setInviteEmail(email);
+            },
+            setInviteRole: (role: string) => {
+                hoisted.storeState.inviteRole = role;
+                hoisted.storeState.setInviteRole(role);
+            },
+            setOpen: () => {
+                hoisted.storeState.open = true;
+                hoisted.storeState.setOpen();
+            },
         };
     }),
 }));
