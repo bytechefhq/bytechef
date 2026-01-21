@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import {Avatar, AvatarImage} from '@/components/ui/avatar';
-import {Button} from '@/components/ui/button';
 import {ChangeEvent, useRef, useState} from 'react';
 import {ControllerRenderProps, FieldPath, FieldValues} from 'react-hook-form';
 

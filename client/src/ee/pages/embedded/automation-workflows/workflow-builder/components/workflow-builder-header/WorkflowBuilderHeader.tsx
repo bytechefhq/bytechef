@@ -1,5 +1,5 @@
 import Badge from '@/components/Badge/Badge';
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import LoaderNotification from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/LoaderNotification';
 import OutputPanelButton from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/PublishPopover';
@@ -76,12 +76,11 @@ const WorkflowBuilderHeader = ({
 
                 <Button
                     className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
+                    icon={<EditIcon />}
                     onClick={() => setShowEditWorkflowDialog(true)}
                     size="icon"
                     variant="ghost"
-                >
-                    <EditIcon />
-                </Button>
+                />
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 

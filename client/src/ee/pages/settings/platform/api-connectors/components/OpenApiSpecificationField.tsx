@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {ChangeEvent, useRef, useState} from 'react';
 import {ControllerRenderProps, FieldPath, FieldValues} from 'react-hook-form';
 

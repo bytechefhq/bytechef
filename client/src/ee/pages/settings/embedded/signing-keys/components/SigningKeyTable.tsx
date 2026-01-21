@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import SigningKeyDeleteDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDeleteDialog';
 import SigningKeyDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
@@ -36,12 +36,11 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
 
                         <Button
                             className="invisible group-hover:visible"
+                            icon={<ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />}
                             onClick={() => copyToClipboard(info.getValue())}
                             size="icon"
                             variant="ghost"
-                        >
-                            <ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />
-                        </Button>
+                        />
                     </div>
                 ),
                 header: 'Key Id',
@@ -63,26 +62,24 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                 cell: (info) => (
                     <>
                         <Button
+                            icon={<EditIcon className="size-4" />}
                             onClick={() => {
                                 setCurrentSigningKey(info.row.original);
                                 setShowEditDialog(true);
                             }}
                             size="icon"
                             variant="ghost"
-                        >
-                            <EditIcon className="size-4" />
-                        </Button>
+                        />
 
                         <Button
+                            icon={<Trash2Icon className="h-4 text-destructive" />}
                             onClick={() => {
                                 setCurrentSigningKey(info.row.original);
                                 setShowDeleteDialog(true);
                             }}
                             size="icon"
                             variant="ghost"
-                        >
-                            <Trash2Icon className="h-4 text-destructive" />
-                        </Button>
+                        />
                     </>
                 ),
                 header: '',
