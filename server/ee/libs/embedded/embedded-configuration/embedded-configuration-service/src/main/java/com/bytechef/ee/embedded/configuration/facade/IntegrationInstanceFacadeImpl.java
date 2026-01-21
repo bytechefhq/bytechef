@@ -325,7 +325,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                 getConnectionId(integrationInstanceConfiguration.getIntegrationId(),
                     integrationInstanceConfiguration.getId(), integrationInstanceWorkflow.getIntegrationInstanceId(),
                     workflow.getId(), workflowTrigger),
-                getWebhookUrl(workflowExecutionId));
+                getWebhookUrl(workflowExecutionId), integrationInstanceConfiguration.getEnvironmentId());
         }
     }
 

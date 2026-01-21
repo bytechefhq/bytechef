@@ -82,7 +82,8 @@ public interface TriggerDefinitionService extends OperationDefinitionService {
     @Nullable
     WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, String webhookUrl, @Nullable ComponentConnection componentConnection);
+        String workflowExecutionId, String webhookUrl, @Nullable ComponentConnection componentConnection,
+        long environmentId);
 
     WebhookValidateResponse executeWebhookValidate(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,

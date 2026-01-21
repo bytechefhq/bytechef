@@ -251,8 +251,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
-            environmentId, type,
-            editorEnvironment);
+            environmentId, type, editorEnvironment);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext,
@@ -262,8 +261,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
                 componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection1,
-                environmentId, type,
-                editorEnvironment));
+                environmentId, type, editorEnvironment));
     }
 
     @Override
@@ -291,10 +289,11 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public @Nullable WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, String webhookUrl, @Nullable ComponentConnection componentConnection) {
+        String workflowExecutionId, String webhookUrl, @Nullable ComponentConnection componentConnection,
+        long environmentId) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false);
+            componentName, componentVersion, triggerName, null, null, componentConnection, environmentId, null, false);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext,
@@ -302,8 +301,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             (componentConnection1, triggerContext1) -> executeWebhookEnable(
                 componentName, componentVersion, triggerName, inputParameters,
                 webhookUrl, workflowExecutionId, componentConnection1, triggerContext1),
-            componentConnection1 -> contextFactory.createTriggerContext(componentName, componentVersion, triggerName,
-                null, null, componentConnection1, null, null, false));
+            componentConnection1 -> contextFactory.createTriggerContext(
+                componentName, componentVersion, triggerName, null, null, componentConnection1, environmentId, null,
+                false));
     }
 
     @Override
@@ -520,7 +520,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
             triggerOutput = triggerDefinition.getWebhookRequest()
                 .map(webhookRequestFunction -> executeWebhookTrigger(
-                    triggerDefinition, inputParameters, toWebhookEnabledOutputParameters((Map<?, ?>) triggerState),
+                    triggerDefinition, inputParameters, toWebhookEnabledOutputParameters(triggerState),
                     webhookRequest, componentConnection, context, webhookRequestFunction))
                 .orElseThrow();
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {

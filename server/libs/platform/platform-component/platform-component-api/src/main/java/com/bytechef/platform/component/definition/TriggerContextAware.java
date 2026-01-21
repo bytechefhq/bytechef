@@ -26,6 +26,9 @@ import org.jspecify.annotations.Nullable;
 public interface TriggerContextAware extends TriggerContext {
 
     @Nullable
+    Long getEnvironmentId();
+
+    @Nullable
     Long getJobPrincipalId();
 
     String getTriggerName();

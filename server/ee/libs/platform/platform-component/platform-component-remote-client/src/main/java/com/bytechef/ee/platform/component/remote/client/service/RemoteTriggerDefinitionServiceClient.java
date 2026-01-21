@@ -64,7 +64,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String webhookUrl, String workflowExecutionId, ComponentConnection componentConnection) {
+        String webhookUrl, String workflowExecutionId, ComponentConnection componentConnection, long environmentId) {
 
         throw new UnsupportedOperationException();
     }

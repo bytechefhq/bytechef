@@ -103,11 +103,10 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
     @Override
     public void executeTriggerEnable(
         String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
-        Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
+        Map<String, ?> triggerParameters, Long connectionId, String webhookUrl, long environmentId) {
 
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
-            triggerWorkflowNodeType.operation());
+            triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(), triggerWorkflowNodeType.operation());
 
         switch (triggerDefinition.getType()) {
             case DYNAMIC_WEBHOOK, HYBRID, STATIC_WEBHOOK -> {
@@ -115,7 +114,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
                     triggerDefinitionFacade.executeWebhookEnable(
                         triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
                         triggerWorkflowNodeType.operation(), triggerParameters,
-                        workflowExecutionId.toString(), connectionId, webhookUrl);
+                        workflowExecutionId.toString(), connectionId, webhookUrl, environmentId);
 
                 if (output != null) {
                     triggerStateService.save(workflowExecutionId, output);
