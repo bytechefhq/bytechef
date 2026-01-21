@@ -1,14 +1,13 @@
 import Badge from '@/components/Badge/Badge';
+import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {Job, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
-import {CheckIcon} from 'lucide-react';
-import {twMerge} from 'tailwind-merge';
+import {CheckIcon, LoaderCircleIcon} from 'lucide-react';
 
 const WorkflowExecutionsHeader = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
     const startTime = job?.startDate?.getTime();
     const endTime = job?.endDate?.getTime();
 
-    const taskExecutionsCompleted = job?.status === 'COMPLETED';
-    const triggerExecutionCompleted = !triggerExecution || triggerExecution?.status === 'COMPLETED';
+    const workflowStatus = getWorkflowStatusType(job, triggerExecution);
 
     let duration = 0;
 
@@ -21,20 +20,26 @@ const WorkflowExecutionsHeader = ({job, triggerExecution}: {job: Job; triggerExe
     return (
         <header className="flex w-full items-center gap-x-3 px-3 py-4">
             <div className="flex items-center gap-x-2">
-                <span
-                    className={twMerge(
-                        (!taskExecutionsCompleted || !triggerExecutionCompleted) && 'text-destructive',
-                        'text-base font-bold uppercase'
-                    )}
-                >
-                    {taskExecutionsCompleted && triggerExecutionCompleted ? (
+                <span className="text-base font-bold uppercase">
+                    {workflowStatus === 'completed' && (
                         <Badge
                             icon={<CheckIcon className="size-5 text-success" />}
                             label="DONE"
                             styleType="success-outline"
                             weight="semibold"
                         />
-                    ) : (
+                    )}
+
+                    {workflowStatus === 'running' && (
+                        <Badge
+                            icon={<LoaderCircleIcon className="size-5 animate-spin" />}
+                            label="Running"
+                            styleType="primary-outline"
+                            weight="semibold"
+                        />
+                    )}
+
+                    {workflowStatus === 'failed' && (
                         <Badge label="Workflow failed" styleType="destructive-filled" weight="semibold" />
                     )}
                 </span>
