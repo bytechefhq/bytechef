@@ -1,0 +1,128 @@
+# Test-only GraphQL schema for automation-mcp GraphQL slice tests.
+# Contains all types, queries, and mutations needed by the integration tests.
+
+# Custom scalars
+scalar Long
+scalar Map
+
+# Enums
+enum PlatformType {
+    AUTOMATION
+    EMBEDDED
+}
+
+# Base Query type with all query fields
+type Query {
+    # WorkspaceMcpServer queries
+    workspaceMcpServers(workspaceId: ID!): [McpServer]
+
+    # McpProject queries
+    mcpProject(id: ID): McpProject
+    mcpProjects: [McpProject]
+    mcpProjectsByServerId(mcpServerId: ID): [McpProject]
+
+    # McpProjectWorkflow queries
+    mcpProjectWorkflow(id: ID): McpProjectWorkflow
+    mcpProjectWorkflows: [McpProjectWorkflow]
+    mcpProjectWorkflowsByMcpProjectId(mcpProjectId: ID): [McpProjectWorkflow]
+    mcpProjectWorkflowsByProjectDeploymentWorkflowId(projectDeploymentWorkflowId: ID): [McpProjectWorkflow]
+}
+
+# Base Mutation type with all mutation fields
+type Mutation {
+    # WorkspaceMcpServer mutations
+    createWorkspaceMcpServer(input: CreateWorkspaceMcpServerInput!): McpServer
+    deleteWorkspaceMcpServer(mcpServerId: ID!): Boolean
+
+    # McpProject mutations
+    createMcpProject(input: CreateMcpProjectInput!): McpProject
+    deleteMcpProject(id: ID!): Boolean
+
+    # McpProjectWorkflow mutations
+    createMcpProjectWorkflow(input: McpProjectWorkflowInput!): McpProjectWorkflow
+    updateMcpProjectWorkflow(id: ID!, input: McpProjectWorkflowUpdateInput!): McpProjectWorkflow
+    deleteMcpProjectWorkflow(id: ID!): Boolean
+}
+
+# Input types
+input CreateWorkspaceMcpServerInput {
+    name: String!
+    type: PlatformType!
+    environmentId: ID!
+    enabled: Boolean
+    workspaceId: ID!
+}
+
+input CreateMcpProjectInput {
+    mcpServerId: ID!
+    projectId: ID!
+    projectVersion: Int!
+    selectedWorkflowIds: [String!]!
+}
+
+input McpProjectWorkflowInput {
+    mcpProjectId: Long!
+    projectDeploymentWorkflowId: Long!
+}
+
+input McpProjectWorkflowUpdateInput {
+    mcpProjectId: Long
+    projectDeploymentWorkflowId: Long
+}
+
+# Main types
+type McpServer {
+    id: ID!
+    name: String
+    type: PlatformType
+    enabled: Boolean
+    secretKey: String
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+type McpProject {
+    id: ID!
+    projectDeploymentId: ID!
+    mcpServerId: ID!
+    mcpProjectWorkflows: [McpProjectWorkflow]
+    project: Project
+    projectVersion: Int
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+type McpProjectWorkflow {
+    id: ID!
+    mcpProjectId: Long!
+    projectDeploymentWorkflowId: Long!
+    projectDeploymentWorkflow: ProjectDeploymentWorkflow
+    workflow: Workflow
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+# Referenced type stubs
+type Project {
+    id: ID
+    name: String
+}
+
+type ProjectDeploymentWorkflow {
+    id: ID
+    workflowId: String
+}
+
+type Workflow {
+    id: ID
+    label: String
+}
