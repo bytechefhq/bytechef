@@ -84,7 +84,7 @@ public interface TriggerDefinitionFacade {
 
     TriggerDefinition.WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, @Nullable Long connectionId, String webhookUrl);
+        String workflowExecutionId, @Nullable Long connectionId, String webhookUrl, long environmentId);
 
     WebhookValidateResponse executeWebhookValidate(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,

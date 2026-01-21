@@ -225,7 +225,8 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
                 WebhookEnableOutput webhookEnableOutput = triggerDefinitionFacade.executeWebhookEnable(
                     triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
                     triggerWorkflowNodeType.operation(), triggerParameters,
-                    workflowExecutionId.toString(), connectionId, getWebhookUrl(workflowExecutionId, environmentId));
+                    workflowExecutionId.toString(), connectionId, getWebhookUrl(workflowExecutionId, environmentId),
+                    environmentId);
 
                 if (webhookEnableOutput != null) {
                     Cache cache = Objects.requireNonNull(cacheManager.getCache(WEBHOOK_ENABLE_OUTPUT_CACHE));

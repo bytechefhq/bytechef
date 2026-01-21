@@ -47,7 +47,7 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
     @Override
     public void executeTriggerEnable(
         String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
-        Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
+        Map<String, ?> triggerParameters, Long connectionId, String webhookUrl, long environmentId) {
 
         post(
             TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-disable",

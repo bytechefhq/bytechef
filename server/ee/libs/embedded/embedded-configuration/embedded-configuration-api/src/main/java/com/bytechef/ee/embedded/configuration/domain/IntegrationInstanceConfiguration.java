@@ -128,6 +128,10 @@ public class IntegrationInstanceConfiguration {
         return Environment.values()[environment];
     }
 
+    public long getEnvironmentId() {
+        return environment;
+    }
+
     public Long getId() {
         return id;
     }

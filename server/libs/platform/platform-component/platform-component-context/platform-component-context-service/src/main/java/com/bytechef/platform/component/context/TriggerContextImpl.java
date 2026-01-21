@@ -36,6 +36,7 @@ import org.springframework.cache.CacheManager;
 class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerContextAware {
 
     private final Data data;
+    private final @Nullable Long environmentId;
     private final @Nullable Long jobPrincipalId;
     private final String triggerName;
     private final @Nullable PlatformType type;
@@ -55,6 +56,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         this.data = new DataImpl(
             dataStorage, componentName, componentVersion, triggerName, workflowUuid, cacheManager, environmentId, type,
             editorEnvironment);
+        this.environmentId = environmentId;
         this.jobPrincipalId = jobPrincipalId;
         this.triggerName = triggerName;
         this.type = type;
@@ -68,6 +70,11 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public @Nullable Long getEnvironmentId() {
+        return environmentId;
     }
 
     @Override

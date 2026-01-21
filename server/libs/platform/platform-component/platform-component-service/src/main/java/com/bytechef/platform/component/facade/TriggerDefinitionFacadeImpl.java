@@ -146,13 +146,13 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Long connectionId, String webhookUrl) {
+        String workflowExecutionId, Long connectionId, String webhookUrl, long environmentId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeWebhookEnable(
             componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, webhookUrl,
-            componentConnection);
+            componentConnection, environmentId);
     }
 
     @Override

@@ -649,6 +649,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
+            projectDeploymentWorkflow.getProjectDeploymentId());
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
@@ -665,7 +667,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 workflow.getId(), workflowExecutionId, workflowNodeType,
                 workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
                 getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger),
-                getWebhookUrl(workflowExecutionId));
+                getWebhookUrl(workflowExecutionId), projectDeployment.getEnvironmentId());
         }
     }
 
