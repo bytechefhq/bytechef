@@ -1,0 +1,25 @@
+# Test-only GraphQL base operations and minimal type stubs for GraphQL slice tests.
+
+# Note: Query is already defined in base.graphqls from platform-configuration, only Mutation needs to be defined
+type Mutation {
+    _placeholder: Boolean
+}
+
+# Minimal type stubs referenced by mcp graphqls files
+scalar Long
+scalar Map
+
+type Tag {
+    id: ID
+    name: String
+}
+
+input TagInput {
+    id: ID
+    name: String!
+}
+
+enum PlatformType {
+    AUTOMATION
+    EMBEDDED
+}
