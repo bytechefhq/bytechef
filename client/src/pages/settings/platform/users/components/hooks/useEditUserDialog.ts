@@ -1,22 +1,22 @@
+import {useEditUserDialogStore} from '@/pages/settings/platform/users/stores/useEditUserDialogStore';
 import {useAuthoritiesQuery, useUpdateUserMutation, useUsersQuery} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {Dispatch, SetStateAction, useMemo, useState} from 'react';
+import {useEffect, useMemo} from 'react';
 
 interface UseEditUserDialogI {
     authorities: string[];
     editRole: string | null;
     editUser: {email?: string | null; login?: string | null; authorities?: (string | null)[] | null} | null;
-    handleEditUserDialogClose: () => void;
-    handleEditUserDialogOpen: (login: string) => void;
-    handleEditUserDialogUpdate: () => void;
+    handleClose: () => void;
+    handleOpen: (login: string) => void;
+    handleRoleChange: (role: string) => void;
+    handleUpdate: () => void;
     open: boolean;
-    setEditRole: Dispatch<SetStateAction<string | null>>;
     updateDisabled: boolean;
 }
 
 export default function useEditUserDialog(): UseEditUserDialogI {
-    const [editLogin, setEditLogin] = useState<string | null>(null);
-    const [editRole, setEditRole] = useState<string | null>(null);
+    const {editRole, handleClose, handleOpen, handleRoleChange, loginToEdit} = useEditUserDialogStore();
 
     const {data: usersData} = useUsersQuery({});
     const {data: authoritiesData} = useAuthoritiesQuery({});
@@ -26,34 +26,31 @@ export default function useEditUserDialog(): UseEditUserDialogI {
     const updateUserMutation = useUpdateUserMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['users']});
-            setEditLogin(null);
+            handleClose();
         },
     });
 
     const authorities = useMemo(() => authoritiesData?.authorities ?? [], [authoritiesData]);
     const users = useMemo(() => usersData?.users?.content ?? [], [usersData]);
-    const updateDisabled = !editLogin || !editRole;
+    const updateDisabled = !loginToEdit || !editRole;
 
-    const editUser = users.find((user) => user?.login === editLogin) || null;
+    const editUser = users.find((user) => user?.login === loginToEdit) || null;
 
-    const handleOpen = (login: string) => {
-        setEditLogin(login);
+    useEffect(() => {
+        if (loginToEdit) {
+            const current = users.find((user) => user?.login === loginToEdit);
+            const currentRole = current?.authorities?.[0] ?? authorities[0] ?? null;
 
-        const current = users.find((user) => user?.login === login);
-
-        const currentRole = current?.authorities?.[0] ?? null;
-
-        setEditRole(currentRole ?? authorities[0] ?? null);
-    };
-
-    const handleClose = () => {
-        setEditLogin(null);
-    };
+            if (currentRole) {
+                handleRoleChange(currentRole);
+            }
+        }
+    }, [loginToEdit, users, authorities, handleRoleChange]);
 
     const handleUpdate = () => {
-        if (editLogin && editRole) {
+        if (loginToEdit && editRole) {
             updateUserMutation.mutate({
-                login: editLogin,
+                login: loginToEdit,
                 role: editRole,
             });
         }
@@ -63,11 +60,11 @@ export default function useEditUserDialog(): UseEditUserDialogI {
         authorities,
         editRole,
         editUser,
-        handleEditUserDialogClose: handleClose,
-        handleEditUserDialogOpen: handleOpen,
-        handleEditUserDialogUpdate: handleUpdate,
-        open: !!editLogin,
-        setEditRole,
+        handleClose,
+        handleOpen,
+        handleRoleChange,
+        handleUpdate,
+        open: loginToEdit !== null,
         updateDisabled,
     };
 }

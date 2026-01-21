@@ -1,42 +1,20 @@
 import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import UsersTableSkeleton from '@/pages/settings/platform/users/components/UsersTableSkeleton';
+import useDeleteUserAlertDialog from '@/pages/settings/platform/users/components/hooks/useDeleteUserAlertDialog';
+import useEditUserDialog from '@/pages/settings/platform/users/components/hooks/useEditUserDialog';
 import {EditIcon, Trash2Icon} from 'lucide-react';
-import {forwardRef, useImperativeHandle} from 'react';
 
 import useUsersTable from './hooks/useUsersTable';
 
-export interface UsersTableRefI {
-    isLoading: boolean;
-    pageNumber: number;
-    pageSize: number;
-    totalElements: number;
-    totalPages: number;
-}
-
 interface UsersTableProps {
-    onOpenDelete: (login: string | null) => void;
-    onOpenEdit: (login: string) => void;
     pageNumber: number;
 }
 
-const UsersTable = forwardRef<UsersTableRefI, UsersTableProps>(function UsersTable(
-    {onOpenDelete, onOpenEdit, pageNumber},
-    ref
-) {
-    const {error, isLoading, pageSize, totalElements, totalPages, users} = useUsersTable({pageNumber});
-
-    useImperativeHandle(
-        ref,
-        () => ({
-            isLoading,
-            pageNumber,
-            pageSize,
-            totalElements,
-            totalPages,
-        }),
-        [isLoading, pageNumber, pageSize, totalElements, totalPages]
-    );
+const UsersTable = ({pageNumber}: UsersTableProps) => {
+    const {error, isLoading, users} = useUsersTable({pageNumber});
+    const {handleOpen: handleOpenDelete} = useDeleteUserAlertDialog();
+    const {handleOpen: handleOpenEdit} = useEditUserDialog();
 
     if (error) {
         return <div className="text-destructive">Error: {(error as Error).message}</div>;
@@ -88,14 +66,14 @@ const UsersTable = forwardRef<UsersTableRefI, UsersTableProps>(function UsersTab
                                 <TableCell className="flex justify-end whitespace-nowrap">
                                     <Button
                                         icon={<EditIcon className="size-4" />}
-                                        onClick={() => onOpenEdit(user?.login ?? '')}
+                                        onClick={() => handleOpenEdit(user?.login ?? '')}
                                         size="icon"
                                         variant="ghost"
                                     />
 
                                     <Button
                                         icon={<Trash2Icon className="size-4 text-destructive" />}
-                                        onClick={() => onOpenDelete(user?.login ?? null)}
+                                        onClick={() => handleOpenDelete(user?.login ?? null)}
                                         size="icon"
                                         variant="ghost"
                                     />
@@ -115,6 +93,6 @@ const UsersTable = forwardRef<UsersTableRefI, UsersTableProps>(function UsersTab
             </TableBody>
         </Table>
     );
-});
+};
 
 export default UsersTable;

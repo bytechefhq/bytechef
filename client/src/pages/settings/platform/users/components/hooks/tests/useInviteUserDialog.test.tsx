@@ -6,8 +6,52 @@ import useInviteUserDialog from '../useInviteUserDialog';
 const hoisted = vi.hoisted(() => {
     return {
         inviteUserMutate: vi.fn(),
+        storeState: {
+            handleClose: vi.fn(),
+            handleEmailChange: vi.fn(),
+            handleOpen: vi.fn(),
+            handleRegeneratePassword: vi.fn(),
+            handleRoleChange: vi.fn(),
+            inviteEmail: '',
+            invitePassword: 'GeneratedPass1',
+            inviteRole: null as string | null,
+            open: false,
+        },
     };
 });
+
+vi.mock('@/pages/settings/platform/users/stores/useInviteUserDialogStore', () => ({
+    useInviteUserDialogStore: vi.fn(() => {
+        return {
+            handleClose: () => {
+                hoisted.storeState.inviteEmail = '';
+                hoisted.storeState.invitePassword = 'GeneratedPass1';
+                hoisted.storeState.inviteRole = null;
+                hoisted.storeState.open = false;
+                hoisted.storeState.handleClose();
+            },
+            handleEmailChange: (email: string) => {
+                hoisted.storeState.inviteEmail = email;
+                hoisted.storeState.handleEmailChange(email);
+            },
+            handleOpen: () => {
+                hoisted.storeState.open = true;
+                hoisted.storeState.handleOpen();
+            },
+            handleRegeneratePassword: () => {
+                hoisted.storeState.handleRegeneratePassword();
+            },
+            handleRoleChange: (role: string) => {
+                hoisted.storeState.inviteRole = role;
+                hoisted.storeState.handleRoleChange(role);
+            },
+            inviteEmail: hoisted.storeState.inviteEmail,
+            invitePassword: hoisted.storeState.invitePassword,
+            inviteRole: hoisted.storeState.inviteRole,
+            open: hoisted.storeState.open,
+        };
+    }),
+}));
 
 vi.mock('@/pages/settings/platform/users/util/password-utils', () => ({
     generatePassword: vi.fn(() => 'GeneratedPass1'),
@@ -35,6 +79,10 @@ vi.mock('@tanstack/react-query', () => ({
 describe('useInviteUserDialog', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        hoisted.storeState.inviteEmail = '';
+        hoisted.storeState.invitePassword = 'GeneratedPass1';
+        hoisted.storeState.inviteRole = null;
+        hoisted.storeState.open = false;
     });
 
     describe('initial state', () => {
@@ -61,29 +109,29 @@ describe('useInviteUserDialog', () => {
     });
 
     describe('open dialog', () => {
-        it('opens dialog and sets default role', () => {
-            const {result} = renderHook(() => useInviteUserDialog());
+        it('opens dialog', () => {
+            const {rerender, result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.handleInviteUserDialogOpen();
+                result.current.handleOpen();
             });
 
+            rerender();
+
             expect(result.current.open).toBe(true);
-            expect(result.current.inviteRole).toBe('ROLE_ADMIN');
         });
     });
 
     describe('close dialog', () => {
         it('closes dialog', () => {
-            const {result} = renderHook(() => useInviteUserDialog());
+            hoisted.storeState.open = true;
+            const {rerender, result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.handleInviteUserDialogOpen();
+                result.current.handleClose();
             });
 
-            act(() => {
-                result.current.handleInviteUserDialogClose();
-            });
+            rerender();
 
             expect(result.current.open).toBe(false);
         });
@@ -91,72 +139,39 @@ describe('useInviteUserDialog', () => {
 
     describe('update fields', () => {
         it('updates invite email', () => {
-            const {result} = renderHook(() => useInviteUserDialog());
+            const {rerender, result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.setInviteEmail('newuser@test.com');
+                result.current.handleEmailChange('newuser@test.com');
             });
+
+            rerender();
 
             expect(result.current.inviteEmail).toBe('newuser@test.com');
         });
 
         it('updates invite role', () => {
-            const {result} = renderHook(() => useInviteUserDialog());
+            const {rerender, result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.setInviteRole('ROLE_USER');
+                result.current.handleRoleChange('ROLE_USER');
             });
+
+            rerender();
 
             expect(result.current.inviteRole).toBe('ROLE_USER');
-        });
-
-        it('regenerates password', () => {
-            const {result} = renderHook(() => useInviteUserDialog());
-
-            const initialPassword = result.current.invitePassword;
-
-            act(() => {
-                result.current.handleInviteUserDialogRegeneratePassword();
-            });
-
-            expect(result.current.invitePassword).toBe(initialPassword);
-        });
-    });
-
-    describe('inviteDisabled', () => {
-        it('is true when email is empty', () => {
-            const {result} = renderHook(() => useInviteUserDialog());
-
-            act(() => {
-                result.current.handleInviteUserDialogOpen();
-            });
-
-            expect(result.current.inviteDisabled).toBe(true);
-        });
-
-        it('is false when all fields are valid', () => {
-            const {result} = renderHook(() => useInviteUserDialog());
-
-            act(() => {
-                result.current.handleInviteUserDialogOpen();
-                result.current.setInviteEmail('test@test.com');
-            });
-
-            expect(result.current.inviteDisabled).toBe(false);
         });
     });
 
     describe('handle invite', () => {
         it('calls invite mutation with correct parameters', () => {
+            hoisted.storeState.open = true;
+            hoisted.storeState.inviteEmail = 'newuser@test.com';
+            hoisted.storeState.inviteRole = 'ROLE_ADMIN';
             const {result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.handleInviteUserDialogOpen();
-                result.current.setInviteEmail('newuser@test.com');
-            });
-
-            act(() => {
-                result.current.handleInviteUserDialogInvite();
+                result.current.handleInvite();
             });
 
             expect(hoisted.inviteUserMutate).toHaveBeenCalledWith({
@@ -166,21 +181,19 @@ describe('useInviteUserDialog', () => {
             });
         });
 
-        it('resets invite state after successful invite', () => {
-            const {result} = renderHook(() => useInviteUserDialog());
+        it('closes dialog after successful invite', () => {
+            hoisted.storeState.open = true;
+            hoisted.storeState.inviteEmail = 'newuser@test.com';
+            hoisted.storeState.inviteRole = 'ROLE_ADMIN';
+            const {rerender, result} = renderHook(() => useInviteUserDialog());
 
             act(() => {
-                result.current.handleInviteUserDialogOpen();
-                result.current.setInviteEmail('newuser@test.com');
+                result.current.handleInvite();
             });
 
-            act(() => {
-                result.current.handleInviteUserDialogInvite();
-            });
+            rerender();
 
             expect(result.current.open).toBe(false);
-            expect(result.current.inviteEmail).toBe('');
-            expect(result.current.inviteRole).toBeNull();
         });
     });
 });

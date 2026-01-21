@@ -1,46 +1,36 @@
+import {useDeleteUserDialogStore} from '@/pages/settings/platform/users/stores/useDeleteUserDialogStore';
 import {useDeleteUserMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
 
 interface UseDeleteUserAlertDialogI {
-    deleteLogin: string | null;
-    handleDeleteUserAlertDialogClose: () => void;
-    handleDeleteUserAlertDialogDelete: () => void;
-    handleDeleteUserAlertDialogOpen: (login: string | null) => void;
+    handleClose: () => void;
+    handleDelete: () => void;
+    handleOpen: (login: string | null) => void;
     open: boolean;
 }
 
 export default function useDeleteUserAlertDialog(): UseDeleteUserAlertDialogI {
-    const [deleteLogin, setDeleteLogin] = useState<string | null>(null);
+    const {handleClose, handleOpen, loginToDelete} = useDeleteUserDialogStore();
 
     const queryClient = useQueryClient();
 
     const deleteUserMutation = useDeleteUserMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['users']});
-            setDeleteLogin(null);
+            handleClose();
         },
     });
 
-    const handleClose = () => {
-        setDeleteLogin(null);
-    };
-
     const handleDelete = () => {
-        if (deleteLogin) {
-            deleteUserMutation.mutate({login: deleteLogin});
+        if (loginToDelete) {
+            deleteUserMutation.mutate({login: loginToDelete});
         }
     };
 
-    const handleOpen = (login: string | null) => {
-        setDeleteLogin(login);
-    };
-
     return {
-        deleteLogin,
-        handleDeleteUserAlertDialogClose: handleClose,
-        handleDeleteUserAlertDialogDelete: handleDelete,
-        handleDeleteUserAlertDialogOpen: handleOpen,
-        open: !!deleteLogin,
+        handleClose,
+        handleDelete,
+        handleOpen,
+        open: loginToDelete !== null,
     };
 }

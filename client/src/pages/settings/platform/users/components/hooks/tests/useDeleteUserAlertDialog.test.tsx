@@ -6,8 +6,29 @@ import useDeleteUserAlertDialog from '../useDeleteUserAlertDialog';
 const hoisted = vi.hoisted(() => {
     return {
         deleteUserMutate: vi.fn(),
+        storeState: {
+            handleClose: vi.fn(),
+            handleOpen: vi.fn(),
+            loginToDelete: null as string | null,
+        },
     };
 });
+
+vi.mock('@/pages/settings/platform/users/stores/useDeleteUserDialogStore', () => ({
+    useDeleteUserDialogStore: vi.fn(() => {
+        return {
+            handleClose: () => {
+                hoisted.storeState.loginToDelete = null;
+                hoisted.storeState.handleClose();
+            },
+            handleOpen: (login: string | null) => {
+                hoisted.storeState.loginToDelete = login;
+                hoisted.storeState.handleOpen(login);
+            },
+            loginToDelete: hoisted.storeState.loginToDelete,
+        };
+    }),
+}));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useDeleteUserMutation: vi.fn((options: {onSuccess: () => void}) => ({
@@ -27,6 +48,7 @@ vi.mock('@tanstack/react-query', () => ({
 describe('useDeleteUserAlertDialog', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        hoisted.storeState.loginToDelete = null;
     });
 
     describe('initial state', () => {
@@ -34,89 +56,83 @@ describe('useDeleteUserAlertDialog', () => {
             const {result} = renderHook(() => useDeleteUserAlertDialog());
 
             expect(result.current.open).toBe(false);
-            expect(result.current.deleteLogin).toBeNull();
         });
     });
 
     describe('open dialog', () => {
         it('opens dialog with login', () => {
-            const {result} = renderHook(() => useDeleteUserAlertDialog());
+            const {rerender, result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleDeleteUserAlertDialogOpen('admin');
+                result.current.handleOpen('admin');
             });
 
+            rerender();
+
             expect(result.current.open).toBe(true);
-            expect(result.current.deleteLogin).toBe('admin');
         });
 
         it('opens dialog with null login', () => {
-            const {result} = renderHook(() => useDeleteUserAlertDialog());
+            const {rerender, result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleDeleteUserAlertDialogOpen(null);
+                result.current.handleOpen(null);
             });
 
+            rerender();
+
             expect(result.current.open).toBe(false);
-            expect(result.current.deleteLogin).toBeNull();
         });
     });
 
     describe('close dialog', () => {
         it('closes dialog', () => {
-            const {result} = renderHook(() => useDeleteUserAlertDialog());
+            hoisted.storeState.loginToDelete = 'admin';
+            const {rerender, result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleDeleteUserAlertDialogOpen('admin');
+                result.current.handleClose();
             });
 
-            act(() => {
-                result.current.handleDeleteUserAlertDialogClose();
-            });
+            rerender();
 
             expect(result.current.open).toBe(false);
-            expect(result.current.deleteLogin).toBeNull();
         });
     });
 
     describe('handle delete', () => {
         it('calls delete mutation with correct login', () => {
+            hoisted.storeState.loginToDelete = 'admin';
             const {result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleDeleteUserAlertDialogOpen('admin');
-            });
-
-            act(() => {
-                result.current.handleDeleteUserAlertDialogDelete();
+                result.current.handleDelete();
             });
 
             expect(hoisted.deleteUserMutate).toHaveBeenCalledWith({login: 'admin'});
         });
 
-        it('does not call delete mutation when deleteLogin is null', () => {
+        it('does not call delete mutation when loginToDelete is null', () => {
             const {result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleDeleteUserAlertDialogDelete();
+                result.current.handleDelete();
             });
 
             expect(hoisted.deleteUserMutate).not.toHaveBeenCalled();
         });
 
         it('closes dialog after successful delete', () => {
-            const {result} = renderHook(() => useDeleteUserAlertDialog());
+            hoisted.storeState.loginToDelete = 'admin';
+            const {rerender, result} = renderHook(() => useDeleteUserAlertDialog());
 
             act(() => {
-                result.current.handleDeleteUserAlertDialogOpen('admin');
+                result.current.handleDelete();
             });
 
-            act(() => {
-                result.current.handleDeleteUserAlertDialogDelete();
-            });
+            rerender();
 
             expect(result.current.open).toBe(false);
-            expect(result.current.deleteLogin).toBeNull();
         });
     });
 });

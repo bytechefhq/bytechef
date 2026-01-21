@@ -1,16 +1,14 @@
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
-import {createRef} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import EditUserDialog, {EditUserDialogRefI} from '../EditUserDialog';
+import EditUserDialog from '../EditUserDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
-        handleEditUserDialogClose: vi.fn(),
-        handleEditUserDialogOpen: vi.fn(),
-        handleEditUserDialogUpdate: vi.fn(),
+        handleClose: vi.fn(),
+        handleRoleChange: vi.fn(),
+        handleUpdate: vi.fn(),
         mockUseEditUserDialog: vi.fn(),
-        setEditRole: vi.fn(),
     };
 });
 
@@ -22,11 +20,11 @@ const defaultMockReturn = {
     authorities: ['ROLE_ADMIN', 'ROLE_USER'],
     editRole: 'ROLE_ADMIN',
     editUser: {email: 'admin@test.com', login: 'admin'},
-    handleEditUserDialogClose: hoisted.handleEditUserDialogClose,
-    handleEditUserDialogOpen: hoisted.handleEditUserDialogOpen,
-    handleEditUserDialogUpdate: hoisted.handleEditUserDialogUpdate,
+    handleClose: hoisted.handleClose,
+    handleOpen: vi.fn(),
+    handleRoleChange: hoisted.handleRoleChange,
+    handleUpdate: hoisted.handleUpdate,
     open: true,
-    setEditRole: hoisted.setEditRole,
     updateDisabled: false,
 };
 
@@ -41,10 +39,7 @@ afterEach(() => {
 });
 
 const renderEditUserDialog = () => {
-    const ref = createRef<EditUserDialogRefI>();
-    const result = render(<EditUserDialog ref={ref} />);
-
-    return {...result, ref};
+    return render(<EditUserDialog />);
 };
 
 describe('EditUserDialog', () => {
@@ -85,37 +80,22 @@ describe('EditUserDialog', () => {
         expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
     });
 
-    it('should call handleEditUserDialogUpdate when clicking Save button', async () => {
+    it('should call handleUpdate when clicking Save button', async () => {
         renderEditUserDialog();
 
         const saveButton = screen.getByRole('button', {name: 'Save'});
         await userEvent.click(saveButton);
 
-        expect(hoisted.handleEditUserDialogUpdate).toHaveBeenCalledTimes(1);
+        expect(hoisted.handleUpdate).toHaveBeenCalledTimes(1);
     });
 
-    it('should call handleEditUserDialogClose when clicking Cancel button', async () => {
+    it('should call handleClose when clicking Cancel button', async () => {
         renderEditUserDialog();
 
         const cancelButton = screen.getByRole('button', {name: 'Cancel'});
         await userEvent.click(cancelButton);
 
-        expect(hoisted.handleEditUserDialogClose).toHaveBeenCalled();
-    });
-
-    it('should expose open method via ref', () => {
-        const {ref} = renderEditUserDialog();
-
-        expect(ref.current).not.toBeNull();
-        expect(typeof ref.current?.open).toBe('function');
-    });
-
-    it('should call handleEditUserDialogOpen when open method is called via ref', () => {
-        const {ref} = renderEditUserDialog();
-
-        ref.current?.open('testuser');
-
-        expect(hoisted.handleEditUserDialogOpen).toHaveBeenCalledWith('testuser');
+        expect(hoisted.handleClose).toHaveBeenCalled();
     });
 });
 
@@ -125,11 +105,11 @@ describe('EditUserDialog closed state', () => {
             authorities: ['ROLE_ADMIN', 'ROLE_USER'],
             editRole: null,
             editUser: null,
-            handleEditUserDialogClose: hoisted.handleEditUserDialogClose,
-            handleEditUserDialogOpen: hoisted.handleEditUserDialogOpen,
-            handleEditUserDialogUpdate: hoisted.handleEditUserDialogUpdate,
+            handleClose: hoisted.handleClose,
+            handleOpen: vi.fn(),
+            handleRoleChange: hoisted.handleRoleChange,
+            handleUpdate: hoisted.handleUpdate,
             open: false,
-            setEditRole: hoisted.setEditRole,
             updateDisabled: true,
         });
     });
@@ -147,11 +127,11 @@ describe('EditUserDialog updateDisabled state', () => {
             authorities: ['ROLE_ADMIN', 'ROLE_USER'],
             editRole: 'ROLE_ADMIN',
             editUser: {email: 'admin@test.com', login: 'admin'},
-            handleEditUserDialogClose: hoisted.handleEditUserDialogClose,
-            handleEditUserDialogOpen: hoisted.handleEditUserDialogOpen,
-            handleEditUserDialogUpdate: hoisted.handleEditUserDialogUpdate,
+            handleClose: hoisted.handleClose,
+            handleOpen: vi.fn(),
+            handleRoleChange: hoisted.handleRoleChange,
+            handleUpdate: hoisted.handleUpdate,
             open: true,
-            setEditRole: hoisted.setEditRole,
             updateDisabled: true,
         });
     });
@@ -171,11 +151,11 @@ describe('EditUserDialog with null email', () => {
             authorities: ['ROLE_ADMIN', 'ROLE_USER'],
             editRole: 'ROLE_ADMIN',
             editUser: {email: null, login: 'username'},
-            handleEditUserDialogClose: hoisted.handleEditUserDialogClose,
-            handleEditUserDialogOpen: hoisted.handleEditUserDialogOpen,
-            handleEditUserDialogUpdate: hoisted.handleEditUserDialogUpdate,
+            handleClose: hoisted.handleClose,
+            handleOpen: vi.fn(),
+            handleRoleChange: hoisted.handleRoleChange,
+            handleUpdate: hoisted.handleUpdate,
             open: true,
-            setEditRole: hoisted.setEditRole,
             updateDisabled: false,
         });
     });

@@ -1,28 +1,36 @@
-import {generatePassword, isValidPassword} from '@/pages/settings/platform/users/util/password-utils';
+import {useInviteUserDialogStore} from '@/pages/settings/platform/users/stores/useInviteUserDialogStore';
+import {isValidPassword} from '@/pages/settings/platform/users/util/password-utils';
 import {useAuthoritiesQuery, useInviteUserMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {Dispatch, SetStateAction, useMemo, useState} from 'react';
+import {useEffect, useMemo} from 'react';
 
 interface UseInviteUserDialogI {
     authorities: string[];
-    handleInviteUserDialogClose: () => void;
-    handleInviteUserDialogInvite: () => void;
-    handleInviteUserDialogOpen: () => void;
-    handleInviteUserDialogRegeneratePassword: () => void;
+    handleClose: () => void;
+    handleEmailChange: (email: string) => void;
+    handleInvite: () => void;
+    handleOpen: () => void;
+    handleRegeneratePassword: () => void;
+    handleRoleChange: (role: string) => void;
     inviteDisabled: boolean;
     inviteEmail: string;
     invitePassword: string;
     inviteRole: string | null;
     open: boolean;
-    setInviteEmail: Dispatch<SetStateAction<string>>;
-    setInviteRole: Dispatch<SetStateAction<string | null>>;
 }
 
 export default function useInviteUserDialog(): UseInviteUserDialogI {
-    const [inviteOpen, setInviteOpen] = useState(false);
-    const [inviteEmail, setInviteEmail] = useState('');
-    const [invitePassword, setInvitePassword] = useState(generatePassword());
-    const [inviteRole, setInviteRole] = useState<string | null>(null);
+    const {
+        handleClose,
+        handleEmailChange,
+        handleOpen: storeHandleOpen,
+        handleRegeneratePassword,
+        handleRoleChange,
+        inviteEmail,
+        invitePassword,
+        inviteRole,
+        open,
+    } = useInviteUserDialogStore();
 
     const {data: authoritiesData} = useAuthoritiesQuery({});
 
@@ -30,54 +38,46 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
 
     const inviteUserMutation = useInviteUserMutation({
         onSuccess: () => {
-            const newPassword = generatePassword();
-
             queryClient.invalidateQueries({queryKey: ['users']});
-            setInviteOpen(false);
-            setInviteEmail('');
-            setInvitePassword(newPassword);
-            setInviteRole(null);
+            handleClose();
         },
     });
 
     const authorities = useMemo(() => authoritiesData?.authorities ?? [], [authoritiesData]);
     const inviteDisabled = !inviteEmail || !inviteRole || !isValidPassword(invitePassword);
 
-    const handleOpen = () => {
-        setInviteOpen(true);
-        setInviteRole((authorities && authorities.length > 0 && authorities[0]) || null);
-    };
+    useEffect(() => {
+        if (open && !inviteRole && authorities.length > 0) {
+            handleRoleChange(authorities[0]);
+        }
+    }, [open, inviteRole, authorities, handleRoleChange]);
 
-    const handleClose = () => {
-        setInviteOpen(false);
+    const handleOpen = () => {
+        storeHandleOpen();
     };
 
     const handleInvite = () => {
-        inviteUserMutation.mutate({
-            email: inviteEmail,
-            password: invitePassword,
-            role: inviteRole as string,
-        });
-    };
-
-    const handleRegeneratePassword = () => {
-        const newPassword = generatePassword();
-
-        setInvitePassword(newPassword);
+        if (inviteEmail && inviteRole) {
+            inviteUserMutation.mutate({
+                email: inviteEmail,
+                password: invitePassword,
+                role: inviteRole,
+            });
+        }
     };
 
     return {
         authorities,
-        handleInviteUserDialogClose: handleClose,
-        handleInviteUserDialogInvite: handleInvite,
-        handleInviteUserDialogOpen: handleOpen,
-        handleInviteUserDialogRegeneratePassword: handleRegeneratePassword,
+        handleClose,
+        handleEmailChange,
+        handleInvite,
+        handleOpen,
+        handleRegeneratePassword,
+        handleRoleChange,
         inviteDisabled,
         inviteEmail,
         invitePassword,
         inviteRole,
-        open: inviteOpen,
-        setInviteEmail,
-        setInviteRole,
+        open,
     };
 }

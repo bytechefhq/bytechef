@@ -10,36 +10,26 @@ import {
 } from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {forwardRef, useImperativeHandle} from 'react';
 
 import useInviteUserDialog from './hooks/useInviteUserDialog';
 
-export interface InviteUserDialogRefI {
-    open: () => void;
-}
-
-const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDialog(_, ref) {
+const InviteUserDialog = () => {
     const {
         authorities,
-        handleInviteUserDialogClose,
-        handleInviteUserDialogInvite,
-        handleInviteUserDialogOpen,
-        handleInviteUserDialogRegeneratePassword,
+        handleClose,
+        handleEmailChange,
+        handleInvite,
+        handleRegeneratePassword,
+        handleRoleChange,
         inviteDisabled,
         inviteEmail,
         invitePassword,
         inviteRole,
         open,
-        setInviteEmail,
-        setInviteRole,
     } = useInviteUserDialog();
 
-    useImperativeHandle(ref, () => ({
-        open: handleInviteUserDialogOpen,
-    }));
-
     return (
-        <Dialog onOpenChange={(isOpen) => !isOpen && handleInviteUserDialogClose()} open={open}>
+        <Dialog onOpenChange={(isOpen) => !isOpen && handleClose()} open={open}>
             <DialogContent>
                 <div className="flex flex-col gap-4">
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0">
@@ -58,7 +48,7 @@ const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDia
                             <label className="text-sm font-medium">Email</label>
 
                             <Input
-                                onChange={(event) => setInviteEmail(event.target.value)}
+                                onChange={(event) => handleEmailChange(event.target.value)}
                                 placeholder="user@example.com"
                                 type="email"
                                 value={inviteEmail}
@@ -71,7 +61,7 @@ const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDia
                             <Input readOnly type="text" value={invitePassword} />
 
                             <div>
-                                <Button onClick={handleInviteUserDialogRegeneratePassword} size="sm" variant="outline">
+                                <Button onClick={handleRegeneratePassword} size="sm" variant="outline">
                                     Regenerate
                                 </Button>
                             </div>
@@ -85,7 +75,7 @@ const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDia
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Role</label>
 
-                            <Select onValueChange={(value) => setInviteRole(value)} value={inviteRole ?? undefined}>
+                            <Select onValueChange={(value) => handleRoleChange(value)} value={inviteRole ?? undefined}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select role" />
                                 </SelectTrigger>
@@ -103,12 +93,12 @@ const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDia
 
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button onClick={handleInviteUserDialogClose} variant="outline">
+                            <Button onClick={handleClose} variant="outline">
                                 Cancel
                             </Button>
                         </DialogClose>
 
-                        <Button disabled={inviteDisabled} onClick={handleInviteUserDialogInvite}>
+                        <Button disabled={inviteDisabled} onClick={handleInvite}>
                             Invite
                         </Button>
                     </DialogFooter>
@@ -116,6 +106,6 @@ const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDia
             </DialogContent>
         </Dialog>
     );
-});
+};
 
 export default InviteUserDialog;

@@ -1,14 +1,12 @@
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
-import {createRef} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import DeleteUserAlertDialog, {DeleteUserAlertDialogRefI} from '../DeleteUserAlertDialog';
+import DeleteUserAlertDialog from '../DeleteUserAlertDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
-        handleDeleteUserAlertDialogClose: vi.fn(),
-        handleDeleteUserAlertDialogDelete: vi.fn(),
-        handleDeleteUserAlertDialogOpen: vi.fn(),
+        handleClose: vi.fn(),
+        handleDelete: vi.fn(),
         mockUseDeleteUserAlertDialog: vi.fn(),
     };
 });
@@ -18,10 +16,9 @@ vi.mock('../hooks/useDeleteUserAlertDialog', () => ({
 }));
 
 const defaultMockReturn = {
-    deleteLogin: 'admin',
-    handleDeleteUserAlertDialogClose: hoisted.handleDeleteUserAlertDialogClose,
-    handleDeleteUserAlertDialogDelete: hoisted.handleDeleteUserAlertDialogDelete,
-    handleDeleteUserAlertDialogOpen: hoisted.handleDeleteUserAlertDialogOpen,
+    handleClose: hoisted.handleClose,
+    handleDelete: hoisted.handleDelete,
+    handleOpen: vi.fn(),
     open: true,
 };
 
@@ -36,10 +33,7 @@ afterEach(() => {
 });
 
 const renderDeleteUserAlertDialog = () => {
-    const ref = createRef<DeleteUserAlertDialogRefI>();
-    const result = render(<DeleteUserAlertDialog ref={ref} />);
-
-    return {...result, ref};
+    return render(<DeleteUserAlertDialog />);
 };
 
 describe('DeleteUserAlertDialog', () => {
@@ -64,47 +58,31 @@ describe('DeleteUserAlertDialog', () => {
         expect(screen.getByRole('button', {name: 'Delete'})).toBeInTheDocument();
     });
 
-    it('should call handleDeleteUserAlertDialogDelete when clicking Delete button', async () => {
+    it('should call handleDelete when clicking Delete button', async () => {
         renderDeleteUserAlertDialog();
 
         const deleteButton = screen.getByRole('button', {name: 'Delete'});
         await userEvent.click(deleteButton);
 
-        expect(hoisted.handleDeleteUserAlertDialogDelete).toHaveBeenCalledTimes(1);
+        expect(hoisted.handleDelete).toHaveBeenCalledTimes(1);
     });
 
-    it('should call handleDeleteUserAlertDialogClose when clicking Cancel button', async () => {
+    it('should call handleClose when clicking Cancel button', async () => {
         renderDeleteUserAlertDialog();
 
         const cancelButton = screen.getByRole('button', {name: 'Cancel'});
         await userEvent.click(cancelButton);
 
-        expect(hoisted.handleDeleteUserAlertDialogClose).toHaveBeenCalledTimes(1);
-    });
-
-    it('should expose open method via ref', () => {
-        const {ref} = renderDeleteUserAlertDialog();
-
-        expect(ref.current).not.toBeNull();
-        expect(typeof ref.current?.open).toBe('function');
-    });
-
-    it('should call handleDeleteUserAlertDialogOpen when open method is called via ref', () => {
-        const {ref} = renderDeleteUserAlertDialog();
-
-        ref.current?.open('testuser');
-
-        expect(hoisted.handleDeleteUserAlertDialogOpen).toHaveBeenCalledWith('testuser');
+        expect(hoisted.handleClose).toHaveBeenCalledTimes(1);
     });
 });
 
 describe('DeleteUserAlertDialog closed state', () => {
     beforeEach(() => {
         hoisted.mockUseDeleteUserAlertDialog.mockReturnValue({
-            deleteLogin: null,
-            handleDeleteUserAlertDialogClose: hoisted.handleDeleteUserAlertDialogClose,
-            handleDeleteUserAlertDialogDelete: hoisted.handleDeleteUserAlertDialogDelete,
-            handleDeleteUserAlertDialogOpen: hoisted.handleDeleteUserAlertDialogOpen,
+            handleClose: hoisted.handleClose,
+            handleDelete: hoisted.handleDelete,
+            handleOpen: vi.fn(),
             open: false,
         });
     });

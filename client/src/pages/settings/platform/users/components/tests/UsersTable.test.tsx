@@ -1,8 +1,7 @@
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
-import {createRef} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import UsersTable, {UsersTableRefI} from '../UsersTable';
+import UsersTable from '../UsersTable';
 
 const mockUsers = [
     {
@@ -27,12 +26,24 @@ const mockUsers = [
 
 const hoisted = vi.hoisted(() => {
     return {
+        handleOpenDelete: vi.fn(),
+        handleOpenEdit: vi.fn(),
+        mockUseDeleteUserAlertDialog: vi.fn(),
+        mockUseEditUserDialog: vi.fn(),
         mockUseUsersTable: vi.fn(),
     };
 });
 
 vi.mock('../hooks/useUsersTable', () => ({
     default: hoisted.mockUseUsersTable,
+}));
+
+vi.mock('../hooks/useDeleteUserAlertDialog', () => ({
+    default: hoisted.mockUseDeleteUserAlertDialog,
+}));
+
+vi.mock('../hooks/useEditUserDialog', () => ({
+    default: hoisted.mockUseEditUserDialog,
 }));
 
 const defaultMockReturn = {
@@ -48,6 +59,23 @@ const defaultMockReturn = {
 beforeEach(() => {
     windowResizeObserver();
     hoisted.mockUseUsersTable.mockReturnValue({...defaultMockReturn});
+    hoisted.mockUseDeleteUserAlertDialog.mockReturnValue({
+        handleClose: vi.fn(),
+        handleDelete: vi.fn(),
+        handleOpen: hoisted.handleOpenDelete,
+        open: false,
+    });
+    hoisted.mockUseEditUserDialog.mockReturnValue({
+        authorities: [],
+        editRole: null,
+        editUser: null,
+        handleClose: vi.fn(),
+        handleOpen: hoisted.handleOpenEdit,
+        handleRoleChange: vi.fn(),
+        handleUpdate: vi.fn(),
+        open: false,
+        updateDisabled: true,
+    });
 });
 
 afterEach(() => {
@@ -56,15 +84,11 @@ afterEach(() => {
 });
 
 const renderUsersTable = (props = {}) => {
-    const ref = createRef<UsersTableRefI>();
     const defaultProps = {
-        onOpenDelete: vi.fn(),
-        onOpenEdit: vi.fn(),
         pageNumber: 0,
     };
-    const result = render(<UsersTable {...defaultProps} {...props} ref={ref} />);
 
-    return {...result, ref};
+    return render(<UsersTable {...defaultProps} {...props} />);
 };
 
 describe('UsersTable', () => {
@@ -130,10 +154,8 @@ describe('UsersTable', () => {
     });
 
     describe('user actions', () => {
-        it('should call onOpenEdit when clicking edit button', async () => {
-            const onOpenEdit = vi.fn();
-
-            renderUsersTable({onOpenEdit});
+        it('should call handleOpenEdit when clicking edit button', async () => {
+            renderUsersTable();
 
             const editButtons = screen.getAllByRole('button');
             const editButton = editButtons.find((btn) => btn.querySelector('.lucide-edit'));
@@ -142,15 +164,13 @@ describe('UsersTable', () => {
                 await userEvent.click(editButton);
 
                 await waitFor(() => {
-                    expect(onOpenEdit).toHaveBeenCalledWith('admin');
+                    expect(hoisted.handleOpenEdit).toHaveBeenCalledWith('admin');
                 });
             }
         });
 
-        it('should call onOpenDelete when clicking delete button', async () => {
-            const onOpenDelete = vi.fn();
-
-            renderUsersTable({onOpenDelete});
+        it('should call handleOpenDelete when clicking delete button', async () => {
+            renderUsersTable();
 
             const deleteButtons = screen.getAllByRole('button');
             const deleteButton = deleteButtons.find((btn) => btn.querySelector('.lucide-trash-2'));
@@ -159,18 +179,9 @@ describe('UsersTable', () => {
                 await userEvent.click(deleteButton);
 
                 await waitFor(() => {
-                    expect(onOpenDelete).toHaveBeenCalledWith('admin');
+                    expect(hoisted.handleOpenDelete).toHaveBeenCalledWith('admin');
                 });
             }
-        });
-    });
-
-    describe('ref', () => {
-        it('should expose isLoading via ref', () => {
-            const {ref} = renderUsersTable();
-
-            expect(ref.current).not.toBeNull();
-            expect(ref.current?.isLoading).toBe(false);
         });
     });
 
@@ -219,12 +230,6 @@ describe('UsersTable loading state', () => {
         renderUsersTable();
 
         expect(screen.queryByText('admin@test.com')).not.toBeInTheDocument();
-    });
-
-    it('should expose isLoading as true via ref', () => {
-        const {ref} = renderUsersTable();
-
-        expect(ref.current?.isLoading).toBe(true);
     });
 });
 
