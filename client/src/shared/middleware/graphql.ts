@@ -55,7 +55,7 @@ export type ActionDefinition = {
 
 export type AddColumnInput = {
   column: ColumnInput;
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
 };
 
@@ -336,7 +336,7 @@ export type CreateDataTableInput = {
   baseName: Scalars['String']['input'];
   columns: Array<ColumnInput>;
   description?: InputMaybe<Scalars['String']['input']>;
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -399,9 +399,9 @@ export type DataTableWebhook = {
 };
 
 export enum DataTableWebhookType {
-  Delete = 'DELETE',
-  Insert = 'INSERT',
-  Update = 'UPDATE'
+  RecordCreated = 'RECORD_CREATED',
+  RecordDeleted = 'RECORD_DELETED',
+  RecordUpdated = 'RECORD_UPDATED'
 }
 
 export type DateProperty = Property & {
@@ -439,13 +439,13 @@ export type DateTimeProperty = Property & {
 };
 
 export type DeleteRowInput = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   id: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 export type DuplicateDataTableInput = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   newBaseName: Scalars['String']['input'];
   tableId: Scalars['ID']['input'];
 };
@@ -501,12 +501,12 @@ export type Help = {
 
 export type ImportCsvInput = {
   csv: Scalars['String']['input'];
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 export type InsertRowInput = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
   values: Scalars['Map']['input'];
 };
@@ -1335,13 +1335,13 @@ export type QueryConnectionDefinitionsArgs = {
 
 
 export type QueryDataTableRowsArgs = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 
 export type QueryDataTableRowsPageArgs = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   tableId: Scalars['ID']['input'];
@@ -1349,19 +1349,19 @@ export type QueryDataTableRowsPageArgs = {
 
 
 export type QueryDataTableWebhooksArgs = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 
 export type QueryDataTablesArgs = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
 };
 
 
 export type QueryExportDataTableCsvArgs = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
 };
 
@@ -1536,24 +1536,24 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
 
 export type RemoveColumnInput = {
   columnId: Scalars['ID']['input'];
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 export type RemoveTableInput = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 export type RenameColumnInput = {
   columnId: Scalars['ID']['input'];
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   newName: Scalars['String']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 export type RenameDataTableInput = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   newBaseName: Scalars['String']['input'];
   tableId: Scalars['ID']['input'];
 };
@@ -1617,7 +1617,7 @@ export type Tag = {
 
 export type TagInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
 };
 
 export type TaskDispatcherDefinition = {
@@ -1694,7 +1694,7 @@ export type UpdateDataTableTagsInput = {
 };
 
 export type UpdateRowInput = {
-  environmentId: Scalars['Int']['input'];
+  environmentId: Scalars['ID']['input'];
   id: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
   values: Scalars['Map']['input'];
@@ -1952,6 +1952,134 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 
 
 export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+
+export type AddDataTableColumnMutationVariables = Exact<{
+  input: AddColumnInput;
+}>;
+
+
+export type AddDataTableColumnMutation = { __typename?: 'Mutation', addDataTableColumn: boolean };
+
+export type CreateDataTableMutationVariables = Exact<{
+  input: CreateDataTableInput;
+}>;
+
+
+export type CreateDataTableMutation = { __typename?: 'Mutation', createDataTable: boolean };
+
+export type DataTableRowsQueryVariables = Exact<{
+  environmentId: Scalars['ID']['input'];
+  tableId: Scalars['ID']['input'];
+}>;
+
+
+export type DataTableRowsQuery = { __typename?: 'Query', dataTableRows: Array<{ __typename?: 'DataTableRow', id: string, values: any }> };
+
+export type DataTableRowsPageQueryVariables = Exact<{
+  environmentId: Scalars['ID']['input'];
+  tableId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type DataTableRowsPageQuery = { __typename?: 'Query', dataTableRowsPage: { __typename?: 'DataTableRowPage', hasMore: boolean, nextOffset?: number | null, items: Array<{ __typename?: 'DataTableRow', id: string, values: any }> } };
+
+export type DataTableTagsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DataTableTagsQuery = { __typename?: 'Query', dataTableTags: Array<{ __typename?: 'Tag', id: string, name: string }> };
+
+export type DataTableTagsByTableQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DataTableTagsByTableQuery = { __typename?: 'Query', dataTableTagsByTable: Array<{ __typename?: 'DataTableTagsEntry', tableId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> };
+
+export type DataTablesQueryVariables = Exact<{
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+}>;
+
+
+export type DataTablesQuery = { __typename?: 'Query', dataTables: Array<{ __typename?: 'DataTable', id: string, baseName: string, lastModifiedDate?: any | null, columns: Array<{ __typename?: 'DataTableColumn', id: string, name: string, type: ColumnType }> }> };
+
+export type DeleteDataTableRowMutationVariables = Exact<{
+  input: DeleteRowInput;
+}>;
+
+
+export type DeleteDataTableRowMutation = { __typename?: 'Mutation', deleteDataTableRow: boolean };
+
+export type DropDataTableMutationVariables = Exact<{
+  input: RemoveTableInput;
+}>;
+
+
+export type DropDataTableMutation = { __typename?: 'Mutation', dropDataTable: boolean };
+
+export type DuplicateDataTableMutationVariables = Exact<{
+  input: DuplicateDataTableInput;
+}>;
+
+
+export type DuplicateDataTableMutation = { __typename?: 'Mutation', duplicateDataTable: boolean };
+
+export type ExportDataTableCsvQueryVariables = Exact<{
+  environmentId: Scalars['ID']['input'];
+  tableId: Scalars['ID']['input'];
+}>;
+
+
+export type ExportDataTableCsvQuery = { __typename?: 'Query', exportDataTableCsv: string };
+
+export type ImportDataTableCsvMutationVariables = Exact<{
+  input: ImportCsvInput;
+}>;
+
+
+export type ImportDataTableCsvMutation = { __typename?: 'Mutation', importDataTableCsv: boolean };
+
+export type InsertDataTableRowMutationVariables = Exact<{
+  input: InsertRowInput;
+}>;
+
+
+export type InsertDataTableRowMutation = { __typename?: 'Mutation', insertDataTableRow: { __typename?: 'DataTableRow', id: string, values: any } };
+
+export type RemoveDataTableColumnMutationVariables = Exact<{
+  input: RemoveColumnInput;
+}>;
+
+
+export type RemoveDataTableColumnMutation = { __typename?: 'Mutation', removeDataTableColumn: boolean };
+
+export type RenameDataTableMutationVariables = Exact<{
+  input: RenameDataTableInput;
+}>;
+
+
+export type RenameDataTableMutation = { __typename?: 'Mutation', renameDataTable: boolean };
+
+export type RenameDataTableColumnMutationVariables = Exact<{
+  input: RenameColumnInput;
+}>;
+
+
+export type RenameDataTableColumnMutation = { __typename?: 'Mutation', renameDataTableColumn: boolean };
+
+export type UpdateDataTableRowMutationVariables = Exact<{
+  input: UpdateRowInput;
+}>;
+
+
+export type UpdateDataTableRowMutation = { __typename?: 'Mutation', updateDataTableRow: { __typename?: 'DataTableRow', id: string, values: any } };
+
+export type UpdateDataTableTagsMutationVariables = Exact<{
+  input: UpdateDataTableTagsInput;
+}>;
+
+
+export type UpdateDataTableTagsMutation = { __typename?: 'Mutation', updateDataTableTags: boolean };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
@@ -2911,6 +3039,405 @@ export const useWorkspaceMcpServersQuery = <
       {
     queryKey: ['workspaceMcpServers', variables],
     queryFn: fetcher<WorkspaceMcpServersQuery, WorkspaceMcpServersQueryVariables>(WorkspaceMcpServersDocument, variables),
+    ...options
+  }
+    )};
+
+export const AddDataTableColumnDocument = `
+    mutation addDataTableColumn($input: AddColumnInput!) {
+  addDataTableColumn(input: $input)
+}
+    `;
+
+export const useAddDataTableColumnMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddDataTableColumnMutation, TError, AddDataTableColumnMutationVariables, TContext>) => {
+    
+    return useMutation<AddDataTableColumnMutation, TError, AddDataTableColumnMutationVariables, TContext>(
+      {
+    mutationKey: ['addDataTableColumn'],
+    mutationFn: (variables?: AddDataTableColumnMutationVariables) => fetcher<AddDataTableColumnMutation, AddDataTableColumnMutationVariables>(AddDataTableColumnDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateDataTableDocument = `
+    mutation createDataTable($input: CreateDataTableInput!) {
+  createDataTable(input: $input)
+}
+    `;
+
+export const useCreateDataTableMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateDataTableMutation, TError, CreateDataTableMutationVariables, TContext>) => {
+    
+    return useMutation<CreateDataTableMutation, TError, CreateDataTableMutationVariables, TContext>(
+      {
+    mutationKey: ['createDataTable'],
+    mutationFn: (variables?: CreateDataTableMutationVariables) => fetcher<CreateDataTableMutation, CreateDataTableMutationVariables>(CreateDataTableDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DataTableRowsDocument = `
+    query dataTableRows($environmentId: ID!, $tableId: ID!) {
+  dataTableRows(environmentId: $environmentId, tableId: $tableId) {
+    id
+    values
+  }
+}
+    `;
+
+export const useDataTableRowsQuery = <
+      TData = DataTableRowsQuery,
+      TError = unknown
+    >(
+      variables: DataTableRowsQueryVariables,
+      options?: Omit<UseQueryOptions<DataTableRowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableRowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataTableRowsQuery, TError, TData>(
+      {
+    queryKey: ['dataTableRows', variables],
+    queryFn: fetcher<DataTableRowsQuery, DataTableRowsQueryVariables>(DataTableRowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const DataTableRowsPageDocument = `
+    query dataTableRowsPage($environmentId: ID!, $tableId: ID!, $limit: Int, $offset: Int) {
+  dataTableRowsPage(
+    environmentId: $environmentId
+    tableId: $tableId
+    limit: $limit
+    offset: $offset
+  ) {
+    items {
+      id
+      values
+    }
+    hasMore
+    nextOffset
+  }
+}
+    `;
+
+export const useDataTableRowsPageQuery = <
+      TData = DataTableRowsPageQuery,
+      TError = unknown
+    >(
+      variables: DataTableRowsPageQueryVariables,
+      options?: Omit<UseQueryOptions<DataTableRowsPageQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableRowsPageQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataTableRowsPageQuery, TError, TData>(
+      {
+    queryKey: ['dataTableRowsPage', variables],
+    queryFn: fetcher<DataTableRowsPageQuery, DataTableRowsPageQueryVariables>(DataTableRowsPageDocument, variables),
+    ...options
+  }
+    )};
+
+export const DataTableTagsDocument = `
+    query dataTableTags {
+  dataTableTags {
+    id
+    name
+  }
+}
+    `;
+
+export const useDataTableTagsQuery = <
+      TData = DataTableTagsQuery,
+      TError = unknown
+    >(
+      variables?: DataTableTagsQueryVariables,
+      options?: Omit<UseQueryOptions<DataTableTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataTableTagsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['dataTableTags'] : ['dataTableTags', variables],
+    queryFn: fetcher<DataTableTagsQuery, DataTableTagsQueryVariables>(DataTableTagsDocument, variables),
+    ...options
+  }
+    )};
+
+export const DataTableTagsByTableDocument = `
+    query dataTableTagsByTable {
+  dataTableTagsByTable {
+    tableId
+    tags {
+      id
+      name
+    }
+  }
+}
+    `;
+
+export const useDataTableTagsByTableQuery = <
+      TData = DataTableTagsByTableQuery,
+      TError = unknown
+    >(
+      variables?: DataTableTagsByTableQueryVariables,
+      options?: Omit<UseQueryOptions<DataTableTagsByTableQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsByTableQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataTableTagsByTableQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['dataTableTagsByTable'] : ['dataTableTagsByTable', variables],
+    queryFn: fetcher<DataTableTagsByTableQuery, DataTableTagsByTableQueryVariables>(DataTableTagsByTableDocument, variables),
+    ...options
+  }
+    )};
+
+export const DataTablesDocument = `
+    query dataTables($environmentId: ID!, $workspaceId: ID!) {
+  dataTables(environmentId: $environmentId, workspaceId: $workspaceId) {
+    id
+    baseName
+    lastModifiedDate
+    columns {
+      id
+      name
+      type
+    }
+  }
+}
+    `;
+
+export const useDataTablesQuery = <
+      TData = DataTablesQuery,
+      TError = unknown
+    >(
+      variables: DataTablesQueryVariables,
+      options?: Omit<UseQueryOptions<DataTablesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTablesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataTablesQuery, TError, TData>(
+      {
+    queryKey: ['dataTables', variables],
+    queryFn: fetcher<DataTablesQuery, DataTablesQueryVariables>(DataTablesDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteDataTableRowDocument = `
+    mutation deleteDataTableRow($input: DeleteRowInput!) {
+  deleteDataTableRow(input: $input)
+}
+    `;
+
+export const useDeleteDataTableRowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteDataTableRowMutation, TError, DeleteDataTableRowMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteDataTableRowMutation, TError, DeleteDataTableRowMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteDataTableRow'],
+    mutationFn: (variables?: DeleteDataTableRowMutationVariables) => fetcher<DeleteDataTableRowMutation, DeleteDataTableRowMutationVariables>(DeleteDataTableRowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DropDataTableDocument = `
+    mutation dropDataTable($input: RemoveTableInput!) {
+  dropDataTable(input: $input)
+}
+    `;
+
+export const useDropDataTableMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DropDataTableMutation, TError, DropDataTableMutationVariables, TContext>) => {
+    
+    return useMutation<DropDataTableMutation, TError, DropDataTableMutationVariables, TContext>(
+      {
+    mutationKey: ['dropDataTable'],
+    mutationFn: (variables?: DropDataTableMutationVariables) => fetcher<DropDataTableMutation, DropDataTableMutationVariables>(DropDataTableDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DuplicateDataTableDocument = `
+    mutation duplicateDataTable($input: DuplicateDataTableInput!) {
+  duplicateDataTable(input: $input)
+}
+    `;
+
+export const useDuplicateDataTableMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DuplicateDataTableMutation, TError, DuplicateDataTableMutationVariables, TContext>) => {
+    
+    return useMutation<DuplicateDataTableMutation, TError, DuplicateDataTableMutationVariables, TContext>(
+      {
+    mutationKey: ['duplicateDataTable'],
+    mutationFn: (variables?: DuplicateDataTableMutationVariables) => fetcher<DuplicateDataTableMutation, DuplicateDataTableMutationVariables>(DuplicateDataTableDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ExportDataTableCsvDocument = `
+    query exportDataTableCsv($environmentId: ID!, $tableId: ID!) {
+  exportDataTableCsv(environmentId: $environmentId, tableId: $tableId)
+}
+    `;
+
+export const useExportDataTableCsvQuery = <
+      TData = ExportDataTableCsvQuery,
+      TError = unknown
+    >(
+      variables: ExportDataTableCsvQueryVariables,
+      options?: Omit<UseQueryOptions<ExportDataTableCsvQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ExportDataTableCsvQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ExportDataTableCsvQuery, TError, TData>(
+      {
+    queryKey: ['exportDataTableCsv', variables],
+    queryFn: fetcher<ExportDataTableCsvQuery, ExportDataTableCsvQueryVariables>(ExportDataTableCsvDocument, variables),
+    ...options
+  }
+    )};
+
+export const ImportDataTableCsvDocument = `
+    mutation importDataTableCsv($input: ImportCsvInput!) {
+  importDataTableCsv(input: $input)
+}
+    `;
+
+export const useImportDataTableCsvMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ImportDataTableCsvMutation, TError, ImportDataTableCsvMutationVariables, TContext>) => {
+    
+    return useMutation<ImportDataTableCsvMutation, TError, ImportDataTableCsvMutationVariables, TContext>(
+      {
+    mutationKey: ['importDataTableCsv'],
+    mutationFn: (variables?: ImportDataTableCsvMutationVariables) => fetcher<ImportDataTableCsvMutation, ImportDataTableCsvMutationVariables>(ImportDataTableCsvDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const InsertDataTableRowDocument = `
+    mutation insertDataTableRow($input: InsertRowInput!) {
+  insertDataTableRow(input: $input) {
+    id
+    values
+  }
+}
+    `;
+
+export const useInsertDataTableRowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<InsertDataTableRowMutation, TError, InsertDataTableRowMutationVariables, TContext>) => {
+    
+    return useMutation<InsertDataTableRowMutation, TError, InsertDataTableRowMutationVariables, TContext>(
+      {
+    mutationKey: ['insertDataTableRow'],
+    mutationFn: (variables?: InsertDataTableRowMutationVariables) => fetcher<InsertDataTableRowMutation, InsertDataTableRowMutationVariables>(InsertDataTableRowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RemoveDataTableColumnDocument = `
+    mutation removeDataTableColumn($input: RemoveColumnInput!) {
+  removeDataTableColumn(input: $input)
+}
+    `;
+
+export const useRemoveDataTableColumnMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RemoveDataTableColumnMutation, TError, RemoveDataTableColumnMutationVariables, TContext>) => {
+    
+    return useMutation<RemoveDataTableColumnMutation, TError, RemoveDataTableColumnMutationVariables, TContext>(
+      {
+    mutationKey: ['removeDataTableColumn'],
+    mutationFn: (variables?: RemoveDataTableColumnMutationVariables) => fetcher<RemoveDataTableColumnMutation, RemoveDataTableColumnMutationVariables>(RemoveDataTableColumnDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RenameDataTableDocument = `
+    mutation renameDataTable($input: RenameDataTableInput!) {
+  renameDataTable(input: $input)
+}
+    `;
+
+export const useRenameDataTableMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RenameDataTableMutation, TError, RenameDataTableMutationVariables, TContext>) => {
+    
+    return useMutation<RenameDataTableMutation, TError, RenameDataTableMutationVariables, TContext>(
+      {
+    mutationKey: ['renameDataTable'],
+    mutationFn: (variables?: RenameDataTableMutationVariables) => fetcher<RenameDataTableMutation, RenameDataTableMutationVariables>(RenameDataTableDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RenameDataTableColumnDocument = `
+    mutation renameDataTableColumn($input: RenameColumnInput!) {
+  renameDataTableColumn(input: $input)
+}
+    `;
+
+export const useRenameDataTableColumnMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RenameDataTableColumnMutation, TError, RenameDataTableColumnMutationVariables, TContext>) => {
+    
+    return useMutation<RenameDataTableColumnMutation, TError, RenameDataTableColumnMutationVariables, TContext>(
+      {
+    mutationKey: ['renameDataTableColumn'],
+    mutationFn: (variables?: RenameDataTableColumnMutationVariables) => fetcher<RenameDataTableColumnMutation, RenameDataTableColumnMutationVariables>(RenameDataTableColumnDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateDataTableRowDocument = `
+    mutation updateDataTableRow($input: UpdateRowInput!) {
+  updateDataTableRow(input: $input) {
+    id
+    values
+  }
+}
+    `;
+
+export const useUpdateDataTableRowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateDataTableRowMutation, TError, UpdateDataTableRowMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateDataTableRowMutation, TError, UpdateDataTableRowMutationVariables, TContext>(
+      {
+    mutationKey: ['updateDataTableRow'],
+    mutationFn: (variables?: UpdateDataTableRowMutationVariables) => fetcher<UpdateDataTableRowMutation, UpdateDataTableRowMutationVariables>(UpdateDataTableRowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateDataTableTagsDocument = `
+    mutation updateDataTableTags($input: UpdateDataTableTagsInput!) {
+  updateDataTableTags(input: $input)
+}
+    `;
+
+export const useUpdateDataTableTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateDataTableTagsMutation, TError, UpdateDataTableTagsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateDataTableTagsMutation, TError, UpdateDataTableTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateDataTableTags'],
+    mutationFn: (variables?: UpdateDataTableTagsMutationVariables) => fetcher<UpdateDataTableTagsMutation, UpdateDataTableTagsMutationVariables>(UpdateDataTableTagsDocument, variables)(),
     ...options
   }
     )};
