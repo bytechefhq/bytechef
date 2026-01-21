@@ -1,0 +1,3 @@
+mutation dropDataTable($input: RemoveTableInput!) {
+    dropDataTable(input: $input)
+}

@@ -1,0 +1,3 @@
+mutation importDataTableCsv($input: ImportCsvInput!) {
+    importDataTableCsv(input: $input)
+}

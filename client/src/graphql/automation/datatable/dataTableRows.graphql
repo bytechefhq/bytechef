@@ -1,0 +1,6 @@
+query dataTableRows($environmentId: ID!, $tableId: ID!) {
+    dataTableRows(environmentId: $environmentId, tableId: $tableId) {
+        id
+        values
+    }
+}

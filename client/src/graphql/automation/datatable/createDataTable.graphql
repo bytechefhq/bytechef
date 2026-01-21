@@ -1,0 +1,3 @@
+mutation createDataTable($input: CreateDataTableInput!) {
+    createDataTable(input: $input)
+}
