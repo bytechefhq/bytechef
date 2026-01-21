@@ -1,4 +1,4 @@
 input TagInput {
     id: ID
-    name: String
+    name: String!
 }

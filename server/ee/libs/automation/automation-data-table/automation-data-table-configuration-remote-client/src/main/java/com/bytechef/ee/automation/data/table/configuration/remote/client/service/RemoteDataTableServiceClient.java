@@ -85,12 +85,12 @@ public class RemoteDataTableServiceClient implements DataTableService {
 
     @Override
     public void createTable(long workspaceId, String baseName, List<ColumnSpec> columnSpecs, long environmentId) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void createTable(
-        String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentUd) {
+        String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 }
