@@ -9,33 +9,15 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {forwardRef, useImperativeHandle} from 'react';
 
 import useEditUserDialog from './hooks/useEditUserDialog';
 
-export interface EditUserDialogRefI {
-    open: (login: string) => void;
-}
-
-const EditUserDialog = forwardRef<EditUserDialogRefI>(function EditUserDialog(_, ref) {
-    const {
-        authorities,
-        editRole,
-        editUser,
-        handleEditUserDialogClose,
-        handleEditUserDialogOpen,
-        handleEditUserDialogUpdate,
-        open,
-        setEditRole,
-        updateDisabled,
-    } = useEditUserDialog();
-
-    useImperativeHandle(ref, () => ({
-        open: handleEditUserDialogOpen,
-    }));
+const EditUserDialog = () => {
+    const {authorities, editRole, editUser, handleClose, handleRoleChange, handleUpdate, open, updateDisabled} =
+        useEditUserDialog();
 
     return (
-        <Dialog onOpenChange={(isOpen) => !isOpen && handleEditUserDialogClose()} open={open}>
+        <Dialog onOpenChange={(isOpen) => !isOpen && handleClose()} open={open}>
             <DialogContent>
                 <div className="flex flex-col gap-4">
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0">
@@ -56,7 +38,7 @@ const EditUserDialog = forwardRef<EditUserDialogRefI>(function EditUserDialog(_,
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Role</label>
 
-                            <Select onValueChange={(value) => setEditRole(value)} value={editRole ?? undefined}>
+                            <Select onValueChange={(value) => handleRoleChange(value)} value={editRole ?? undefined}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select role" />
                                 </SelectTrigger>
@@ -74,12 +56,12 @@ const EditUserDialog = forwardRef<EditUserDialogRefI>(function EditUserDialog(_,
 
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button onClick={handleEditUserDialogClose} variant="outline">
+                            <Button onClick={handleClose} variant="outline">
                                 Cancel
                             </Button>
                         </DialogClose>
 
-                        <Button disabled={updateDisabled} onClick={handleEditUserDialogUpdate}>
+                        <Button disabled={updateDisabled} onClick={handleUpdate}>
                             Save
                         </Button>
                     </DialogFooter>
@@ -87,6 +69,6 @@ const EditUserDialog = forwardRef<EditUserDialogRefI>(function EditUserDialog(_,
             </DialogContent>
         </Dialog>
     );
-});
+};
 
 export default EditUserDialog;
