@@ -80,6 +80,7 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
+import getOutputSchemaFromWorkflowNodeOutput from '../utils/getOutputSchemaFromWorkflowNodeOutput';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveClusterElementFieldChange from '../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
@@ -765,8 +766,7 @@ const WorkflowNodeDetailsPanel = ({
 
         const componentProperties: Array<ComponentPropertiesType> = previousComponentDefinitions.map(
             (componentDefinition, index) => {
-                const outputSchemaDefinition: PropertyAllType | undefined =
-                    workflowNodeOutputs[index]?.outputResponse?.outputSchema;
+                const outputSchemaDefinition = getOutputSchemaFromWorkflowNodeOutput(workflowNodeOutputs[index]);
 
                 const properties = outputSchemaDefinition?.properties?.length
                     ? outputSchemaDefinition.properties
