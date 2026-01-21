@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -765,13 +766,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .orElseThrow(() -> new IllegalArgumentException("Listener enable function is not defined."));
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<String, ?> toWebhookEnabledOutputParameters(@Nullable Map<?, ?> triggerState) {
+    private Map<String, ?> toWebhookEnabledOutputParameters(@Nullable Object triggerState) {
         if (triggerState == null) {
             return Map.of();
         }
 
-        return (Map<String, ?>) triggerState.get("parameters");
+        WebhookEnableOutput webhookEnableOutput = ConvertUtils.convertValue(triggerState, WebhookEnableOutput.class);
+
+        return webhookEnableOutput.parameters();
     }
 
     private static WrapResult wrap(
