@@ -162,6 +162,7 @@ function App() {
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
     const ff_2311 = useFeatureFlagsStore()('ff-2311');
     const ff_2894 = useFeatureFlagsStore()('ff-2894');
+    const ff_3955 = useFeatureFlagsStore()('ff-3955');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (
@@ -182,6 +183,10 @@ function App() {
 
         if (navItem.href === '/automation/chat') {
             return ff_2311 || ff_2894;
+        }
+
+        if (navItem.href === '/automation/datatables') {
+            return ff_3955;
         }
 
         return true;
