@@ -19,7 +19,7 @@ package com.bytechef.automation.data.table.domain;
 /**
  * Supported logical column types for dynamic tables.
  *
- *  @author Ivica Cardic
+ * @author Ivica Cardic
  */
 public enum ColumnType {
 
