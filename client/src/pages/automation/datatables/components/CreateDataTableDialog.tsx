@@ -16,11 +16,7 @@ import {ColumnType} from '@/shared/middleware/graphql';
 import {Plus, Trash2} from 'lucide-react';
 import {ReactNode} from 'react';
 
-interface Props {
-    trigger?: ReactNode;
-}
-
-const CreateDataTableDialog = ({trigger}: Props) => {
+const CreateDataTableDialog = ({trigger}: {trigger?: ReactNode}) => {
     const {
         baseName,
         canSubmit,
@@ -133,16 +129,16 @@ const CreateDataTableDialog = ({trigger}: Props) => {
                                         </Select>
                                     </div>
 
-                                    <div className="col-span-1 flex justify-end">
-                                        {columns.length > 1 && (
+                                    {columns.length > 1 && (
+                                        <div className="col-span-1 flex justify-end">
                                             <Button
                                                 icon={<Trash2 />}
                                                 onClick={() => handleRemoveColumn(index)}
                                                 size="icon"
                                                 variant="ghost"
                                             />
-                                        )}
-                                    </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>

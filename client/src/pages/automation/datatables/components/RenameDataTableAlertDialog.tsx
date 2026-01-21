@@ -24,13 +24,12 @@ const RenameDataTableAlertDialog = () => {
                     <AlertDialogDescription>Enter a new name for this data table.</AlertDialogDescription>
                 </AlertDialogHeader>
 
-                <div className="py-2">
-                    <Input
-                        autoFocus
-                        onChange={(event) => handleRenameValueChange(event.target.value)}
-                        value={renameValue}
-                    />
-                </div>
+                <Input
+                    autoFocus
+                    className="my-2"
+                    onChange={(event) => handleRenameValueChange(event.target.value)}
+                    value={renameValue}
+                />
 
                 <AlertDialogFooter>
                     <AlertDialogCancel className="shadow-none" onClick={handleClose}>

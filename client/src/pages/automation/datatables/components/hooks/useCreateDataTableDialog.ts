@@ -72,19 +72,19 @@ export default function useCreateDataTableDialog(): UseCreateDataTableDialogI {
 
     const handleColumnNameChange = (index: number, name: string) => {
         setColumns((previous) => {
-            const copy = [...previous];
-            copy[index] = {...copy[index], name};
+            const previousColumns = [...previous];
+            previousColumns[index] = {...previousColumns[index], name};
 
-            return copy;
+            return previousColumns;
         });
     };
 
     const handleColumnTypeChange = (index: number, type: ColumnType) => {
         setColumns((previous) => {
-            const copy = [...previous];
-            copy[index] = {...copy[index], type};
+            const previousColumns = [...previous];
+            previousColumns[index] = {...previousColumns[index], type};
 
-            return copy;
+            return previousColumns;
         });
     };
 
