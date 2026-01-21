@@ -67,6 +67,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,9 +102,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     @SuppressFBWarnings("EI")
     public ProjectDeploymentFacadeImpl(
         ConnectionService connectionService, Evaluator evaluator, EnvironmentService environmentService,
-        PrincipalJobFacade principalJobFacade,
-        PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
-        ProjectDeploymentService projectDeploymentService,
+        PrincipalJobFacade principalJobFacade, PrincipalJobService principalJobService, JobFacade jobFacade,
+        JobService jobService, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
@@ -676,7 +676,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         int pageNumber = 0;
 
         while (true) {
-            org.springframework.data.domain.Page<Long> page = principalJobService.getJobIds(
+            Page<Long> page = principalJobService.getJobIds(
                 Job.Status.STARTED, null, null, principalIds, PlatformType.AUTOMATION, workflowIds, pageNumber);
 
             List<Long> jobIds = page.getContent();
