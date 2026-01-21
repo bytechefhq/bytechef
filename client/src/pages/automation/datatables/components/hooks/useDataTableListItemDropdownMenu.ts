@@ -1,3 +1,4 @@
+import {useToast} from '@/hooks/use-toast';
 import useDeleteDataTableAlertDialog from '@/pages/automation/datatables/components/hooks/useDeleteDataTableAlertDialog';
 import useDuplicateDataTableAlertDialog from '@/pages/automation/datatables/components/hooks/useDuplicateDataTableAlertDialog';
 import useRenameDataTableAlertDialog from '@/pages/automation/datatables/components/hooks/useRenameDataTableAlertDialog';
@@ -21,7 +22,8 @@ export default function useDataTableListItemDropdownMenu({
     baseName,
     dataTableId,
 }: UseDataTableListItemDropdownMenuProps): UseDataTableListItemDropdownMenuI {
-    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId) ?? 2;
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const {toast} = useToast();
 
     const {handleOpen: handleOpenDeleteDataTableAlertDialog} = useDeleteDataTableAlertDialog();
     const {handleOpen: handleDuplicateDialogOpen} = useDuplicateDataTableAlertDialog();
@@ -69,11 +71,16 @@ export default function useDataTableListItemDropdownMenu({
                 anchor.download = `${baseName}.csv`;
                 anchor.click();
                 window.URL.revokeObjectURL(url);
-            } catch {
-                alert('Failed to export CSV');
+            } catch (error) {
+                console.error('Failed to export CSV:', error);
+
+                toast({
+                    description: 'Failed to export CSV',
+                    variant: 'destructive',
+                });
             }
         },
-        [baseName, refetchExportCsv]
+        [baseName, refetchExportCsv, toast]
     );
 
     const handleDeleteClick = useCallback(

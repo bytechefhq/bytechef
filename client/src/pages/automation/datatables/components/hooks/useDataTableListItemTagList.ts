@@ -32,7 +32,7 @@ export default function useDataTableListItemTagList({tableId}: UseDataTableListI
 
                 const withTempIds = (variables.input.tags ?? []).map((tag) => ({
                     ...tag,
-                    id: tag.id ?? -Math.floor(Date.now() + Math.random() * 1000),
+                    id: tag.id,
                 }));
 
                 const updated = previous.dataTableTagsByTable.map((entry) =>
