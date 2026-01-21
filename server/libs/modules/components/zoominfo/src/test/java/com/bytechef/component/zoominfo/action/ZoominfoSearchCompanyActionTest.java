@@ -19,19 +19,26 @@ package com.bytechef.component.zoominfo.action;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.BUSINESS_MODEL;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.COMPANY_DESCRIPTION;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.COMPANY_NAME;
+import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.COMPANY_OUTPUT_PROPERTY;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.COMPANY_TYPE;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.COUNTRY;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.PAGE_NUMBER;
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.PAGE_SIZE;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -45,41 +52,79 @@ import org.mockito.ArgumentCaptor;
  */
 class ZoominfoSearchCompanyActionTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(Configuration.ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<Context.ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
+        forClass(Context.ContextFunction.class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
-    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
+    private final Http mockedHttp = mock(Http.class);
     private final Response mockedResponse = mock(Response.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(COMPANY_NAME, "test", COMPANY_DESCRIPTION, "This is a description.",
             COMPANY_TYPE, "public", BUSINESS_MODEL, "B2C", COUNTRY, "Country"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                Context.ContextFunction<Http, Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(any()))
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(
-                Map.of(
-                    "data", List.of(
-                        Map.of("companyId", 1, "companyName", "Company")),
-                    "meta", Map.of("totalResults", 1)));
+                Map.of("data", List.of(COMPANY_OUTPUT_PROPERTY), "meta", Map.of("totalResults", 1)));
 
-        Object result = ZoominfoSearchCompanyAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = ZoominfoSearchCompanyAction.perform(
+            mockedParameters, null, mockedContext);
 
-        assertEquals(List.of(Map.of("companyId", 1, "companyName", "Company")), result);
+        assertEquals(List.of(COMPANY_OUTPUT_PROPERTY), result);
 
-        Object[] expectedQueryParameters = {
-            PAGE_SIZE, 25, PAGE_NUMBER, 1
+        Context.ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+        ResponseType responseType = configuration.getResponseType();
+
+        Map<String, Object> attributes = Map.of(
+            COMPANY_NAME, "test", COMPANY_DESCRIPTION, "This is a description.",
+            COMPANY_TYPE, "public", BUSINESS_MODEL, "B2C", COUNTRY, "Country");
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/companies/search", stringArgumentCaptor.getValue());
+        assertEquals(
+            Body.of(
+                Map.of("data", Map.of("type", "CompanySearch",
+                    "attributes", attributes)),
+                Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
+
+        List<Object[]> allQueryParams = objectsArgumentCaptor.getAllValues();
+
+        assertEquals(1, allQueryParams.size());
+
+        Object[] queryParameters1 = {
+            PAGE_SIZE, 25,
+            PAGE_NUMBER, 1
         };
 
-        assertArrayEquals(expectedQueryParameters, queryArgumentCaptor.getValue());
+        assertArrayEquals(queryParameters1, allQueryParams.getFirst());
     }
 }

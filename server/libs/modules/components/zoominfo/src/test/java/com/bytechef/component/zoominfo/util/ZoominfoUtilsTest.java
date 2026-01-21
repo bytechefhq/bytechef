@@ -18,35 +18,58 @@ package com.bytechef.component.zoominfo.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
 class ZoominfoUtilsTest {
 
-    private final Context mockedContext = mock(Context.class);
+    private final ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(Configuration.ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<Context.ContextFunction<Context.Http, Executor>> httpFunctionArgumentCaptor =
+        forClass(Context.ContextFunction.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
     private final Executor mockedExecutor = mock(Executor.class);
-    private final Response mockedResponse = mock(Response.class);
+    private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = mock(Parameters.class);
+    private final Response mockedResponse = mock(Response.class);
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testGetCompanyFieldOptions() {
-        when(mockedContext.http(any()))
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                Context.ContextFunction<Context.Http, Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -55,20 +78,40 @@ class ZoominfoUtilsTest {
                 Map.of("fieldName", "companyName", "accessGranted", true),
                 Map.of("fieldName", "companyId", "accessGranted", true)));
 
-        List<? extends Option<String>> options = ZoominfoUtils
-            .getCompanyFieldOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+        List<Option<String>> options = ZoominfoUtils
+            .getCompanyFieldOptions(mockedParameters, null, Map.of(), "", mockedContext);
 
         assertEquals(
             List.of(
                 option("companyName", "companyName"), option("companyId", "companyId")),
             options);
+
+        Context.ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(List.of("/lookup/outputfields/company/enrich"),
+            stringArgumentCaptor.getAllValues());
     }
 
     @Test
     void testGetContactFieldOptions() {
-        when(mockedContext.http(any()))
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                Context.ContextFunction<Context.Http, Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -77,12 +120,24 @@ class ZoominfoUtilsTest {
                 Map.of("fieldName", "firstName", "accessGranted", true),
                 Map.of("fieldName", "lastName", "accessGranted", true)));
 
-        List<? extends Option<String>> options = ZoominfoUtils
-            .getContactFieldOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+        List<Option<String>> options = ZoominfoUtils
+            .getContactFieldOptions(mockedParameters, null, Map.of(), "", mockedContext);
 
         assertEquals(
             List.of(
                 option("firstName", "firstName"), option("lastName", "lastName")),
             options);
+
+        Context.ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(List.of("/lookup/outputfields/contact/enrich"),
+            stringArgumentCaptor.getAllValues());
     }
 }
