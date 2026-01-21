@@ -51,7 +51,7 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
         if (open && !inviteRole && authorities.length > 0) {
             setInviteRole(authorities[0]);
         }
-    }, [open, inviteRole, authorities, setInviteRole]);
+    }, [open, inviteRole, authorities]);
 
     const handleClose = () => {
         reset();

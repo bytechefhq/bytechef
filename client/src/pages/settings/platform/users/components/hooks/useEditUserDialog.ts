@@ -46,7 +46,7 @@ export default function useEditUserDialog(): UseEditUserDialogI {
                 setEditRole(currentRole);
             }
         }
-    }, [loginToEdit, users, authorities, setEditRole]);
+    }, [loginToEdit, users, authorities]);
 
     const handleClose = () => {
         clearLoginToEdit();
