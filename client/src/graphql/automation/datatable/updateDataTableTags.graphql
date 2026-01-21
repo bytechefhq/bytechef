@@ -1,0 +1,3 @@
+mutation updateDataTableTags($input: UpdateDataTableTagsInput!) {
+    updateDataTableTags(input: $input)
+}

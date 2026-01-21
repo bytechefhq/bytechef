@@ -1,0 +1,3 @@
+mutation deleteDataTableRow($input: DeleteRowInput!) {
+    deleteDataTableRow(input: $input)
+}

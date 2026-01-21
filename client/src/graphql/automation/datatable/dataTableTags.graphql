@@ -1,0 +1,6 @@
+query dataTableTags {
+    dataTableTags {
+        id
+        name
+    }
+}

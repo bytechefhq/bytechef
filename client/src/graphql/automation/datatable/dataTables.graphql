@@ -1,0 +1,12 @@
+query dataTables($environmentId: ID!, $workspaceId: ID!) {
+    dataTables(environmentId: $environmentId, workspaceId: $workspaceId) {
+        id
+        baseName
+        lastModifiedDate
+        columns {
+            id
+            name
+            type
+        }
+    }
+}

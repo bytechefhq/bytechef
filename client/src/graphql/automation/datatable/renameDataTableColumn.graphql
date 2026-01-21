@@ -1,0 +1,3 @@
+mutation renameDataTableColumn($input: RenameColumnInput!) {
+    renameDataTableColumn(input: $input)
+}
