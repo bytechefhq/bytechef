@@ -1,8 +1,8 @@
 import {TriggerForm as TriggerFormType} from '@/shared/middleware/platform/configuration';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {fireEvent, render, screen, waitFor} from '../../../shared/util/test-utils';
-import TriggerForm, {FieldType} from './TriggerForm';
+import {fireEvent, render, screen, waitFor} from '../../../../shared/util/test-utils';
+import TriggerForm, {FieldType} from '../TriggerForm';
 
 const mockWorkflowExecutionId = 'test-id';
 const mockEnvironmentId = '0';
