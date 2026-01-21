@@ -31,13 +31,12 @@ const DuplicateDataTableAlertDialog = () => {
                     <AlertDialogDescription>Enter a name for the duplicated table.</AlertDialogDescription>
                 </AlertDialogHeader>
 
-                <div className="py-2">
-                    <Input
-                        autoFocus
-                        onChange={(event) => handleDuplicateValueChange(event.target.value)}
-                        value={duplicateValue}
-                    />
-                </div>
+                <Input
+                    autoFocus
+                    className="my-2"
+                    onChange={(event) => handleDuplicateValueChange(event.target.value)}
+                    value={duplicateValue}
+                />
 
                 <AlertDialogFooter>
                     <AlertDialogCancel className="shadow-none" onClick={handleClose}>

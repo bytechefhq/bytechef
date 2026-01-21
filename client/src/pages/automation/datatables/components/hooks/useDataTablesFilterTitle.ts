@@ -25,11 +25,13 @@ export default function useDataTablesFilterTitle({
 
         const fromGlobal = allTags.find((tag) => tag.id === tagId)?.name;
 
-        if (fromGlobal) return fromGlobal;
+        if (fromGlobal) {
+            return fromGlobal;
+        }
 
-        const flat = tagsByTableData.flatMap((entry) => entry.tags ?? []);
+        const flatTags = tagsByTableData.flatMap((entry) => entry.tags ?? []);
 
-        return flat.find((tag) => tag.id === tagId)?.name;
+        return flatTags.find((tag) => tag.id === tagId)?.name;
     }, [allTags, tagsByTableData, tagId]);
 
     return {

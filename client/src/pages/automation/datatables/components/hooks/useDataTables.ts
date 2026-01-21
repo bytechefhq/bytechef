@@ -46,14 +46,18 @@ export default function useDataTables(): UseDataTablesI {
     const allTags = useMemo(() => allTagsData?.dataTableTags ?? [], [allTagsData?.dataTableTags]);
 
     const filteredTables = useMemo(() => {
-        if (!tagId) return tables;
+        if (!tagId) {
+            return tables;
+        }
 
         const tableIdsWithTag = new Set<string>();
 
         for (const entry of tagsByTableData) {
             const hasTag = entry.tags?.some((tag) => tag.id === tagId);
 
-            if (hasTag) tableIdsWithTag.add(entry.tableId as string);
+            if (hasTag) {
+                tableIdsWithTag.add(entry.tableId as string);
+            }
         }
 
         return tables.filter((table) => tableIdsWithTag.has(table.id));

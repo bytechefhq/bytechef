@@ -9,7 +9,6 @@ interface DataTableListItemTagListProps {
     tags: Tag[];
 }
 
-// Convert Tag with string id to TagList's expected format with number id
 const convertTagToTagListFormat = (tag: Tag) => ({
     ...tag,
     id: tag.id ? Number(tag.id) : undefined,
