@@ -48,8 +48,3 @@ input McpServerUpdateInput {
     name: String
     enabled: Boolean
 }
-
-input TagInput {
-    id: ID
-    name: String!
-}
