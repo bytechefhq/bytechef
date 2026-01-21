@@ -30,6 +30,7 @@ import com.bytechef.component.github.action.GithubCreateCommentOnIssueAction;
 import com.bytechef.component.github.action.GithubCreateForkAction;
 import com.bytechef.component.github.action.GithubCreateIssueAction;
 import com.bytechef.component.github.action.GithubGetIssueAction;
+import com.bytechef.component.github.action.GithubGetRepositoryContentAction;
 import com.bytechef.component.github.action.GithubListIssuesAction;
 import com.bytechef.component.github.action.GithubListRepositoryIssuesAction;
 import com.bytechef.component.github.action.GithubStarRepositoryAction;
@@ -58,6 +59,7 @@ public class GithubComponentHandler implements ComponentHandler {
             GithubCreateIssueAction.ACTION_DEFINITION,
             GitHubCreatePullRequestAction.ACTION_DEFINITION,
             GithubGetIssueAction.ACTION_DEFINITION,
+            GithubGetRepositoryContentAction.ACTION_DEFINITION,
             GithubListIssuesAction.ACTION_DEFINITION,
             GithubListRepositoryIssuesAction.ACTION_DEFINITION,
             GithubStarRepositoryAction.ACTION_DEFINITION)
@@ -70,6 +72,7 @@ public class GithubComponentHandler implements ComponentHandler {
             tool(GithubCreateIssueAction.ACTION_DEFINITION),
             tool(GitHubCreatePullRequestAction.ACTION_DEFINITION),
             tool(GithubGetIssueAction.ACTION_DEFINITION),
+            tool(GithubGetRepositoryContentAction.ACTION_DEFINITION),
             tool(GithubListIssuesAction.ACTION_DEFINITION),
             tool(GithubListRepositoryIssuesAction.ACTION_DEFINITION),
             tool(GithubStarRepositoryAction.ACTION_DEFINITION))
