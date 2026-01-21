@@ -59,13 +59,10 @@ const OutputTabSampleDataDialog = ({onClose, onUpload, open, placeholder}: Outpu
 
     const handleOpenChange = (isOpen: boolean) => {
         if (!isOpen) {
-            const initialValue =
-                placeholder !== undefined && Object.keys(placeholder).length
-                    ? JSON.stringify(placeholder, null, SPACE)
-                    : '';
+            const hasPlaceholder = placeholder !== undefined && Object.keys(placeholder).length > 0;
 
-            setRawValue(initialValue);
-            setParsedValue(placeholder);
+            setRawValue(hasPlaceholder ? JSON.stringify(placeholder, null, SPACE) : '');
+            setParsedValue(hasPlaceholder ? placeholder : undefined);
             onClose();
         }
     };
