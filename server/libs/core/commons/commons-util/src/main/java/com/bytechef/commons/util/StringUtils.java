@@ -246,6 +246,8 @@ public class StringUtils {
         }
 
         String sanitized = value.trim()
+            .replace("\r", "\\r") // Windows line break
+            .replace("\n", "\\n") // Unix line break
             .replaceAll("[\\\\/:*?\"<>|]", "_") // Windows forbidden characters
             .replaceAll("\\s+", "_") // Replace whitespace with underscores
             .replaceAll("_{2,}", "_"); // Replace multiple underscores with single;
