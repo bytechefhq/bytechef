@@ -3,4 +3,4 @@ export {createDateCellRenderer, createDateEditCellRenderer} from './DateCellRend
 export {createDateTimeCellRenderer, createDateTimeEditCellRenderer} from './DateTimeCellRenderer';
 export {createNumberEditCellRenderer} from './NumberCellRenderer';
 export {createStringEditCellRenderer} from './StringCellRenderer';
-export type {CellRendererProps, GridRowType, SummaryRowType} from './types';
+export type {BooleanCellRendererProps, GridRowType, SummaryRowType} from './types';
