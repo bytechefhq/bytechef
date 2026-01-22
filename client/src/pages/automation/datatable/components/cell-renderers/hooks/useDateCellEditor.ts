@@ -12,9 +12,9 @@ interface UseDateCellEditorProps {
 interface UseDateCellEditorI {
     displayText: string;
     handleDateSelect: (selectedDate: Date | undefined) => void;
+    handleOpenChange: (open: boolean) => void;
     initialDate: Date | undefined;
     isPopoverOpen: boolean;
-    setIsPopoverOpen: (open: boolean) => void;
 }
 
 const parseDate = (value: unknown): Date | undefined => {
@@ -57,12 +57,16 @@ export default function useDateCellEditor({columnName, onRowChange, row}: UseDat
         setIsPopoverOpen(false);
     };
 
+    const handleOpenChange = (open: boolean) => {
+        setIsPopoverOpen(open);
+    };
+
     return {
         displayText,
         handleDateSelect,
+        handleOpenChange,
         initialDate,
         isPopoverOpen,
-        setIsPopoverOpen,
     };
 }
 

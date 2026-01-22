@@ -96,12 +96,12 @@ describe('useDateCellEditor', () => {
         });
     });
 
-    describe('setIsPopoverOpen', () => {
+    describe('handleOpenChange', () => {
         it('allows closing the popover', () => {
             const {result} = renderHook(() => useDateCellEditor(defaultProps));
 
             act(() => {
-                result.current.setIsPopoverOpen(false);
+                result.current.handleOpenChange(false);
             });
 
             expect(result.current.isPopoverOpen).toBe(false);
@@ -111,11 +111,11 @@ describe('useDateCellEditor', () => {
             const {result} = renderHook(() => useDateCellEditor(defaultProps));
 
             act(() => {
-                result.current.setIsPopoverOpen(false);
+                result.current.handleOpenChange(false);
             });
 
             act(() => {
-                result.current.setIsPopoverOpen(true);
+                result.current.handleOpenChange(true);
             });
 
             expect(result.current.isPopoverOpen).toBe(true);
