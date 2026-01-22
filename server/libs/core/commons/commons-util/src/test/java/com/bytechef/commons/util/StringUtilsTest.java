@@ -307,4 +307,233 @@ class StringUtilsTest {
     void testParseSqlTimestampEmptyString() {
         assertThat(StringUtils.parseSqlTimestamp("")).isNull();
     }
+
+    @Test
+    void testSanitizeOneParamNullValue() {
+        assertThat(StringUtils.sanitize(null)).isNull();
+    }
+
+    @Test
+    void testSanitizeOneParamEmptyString() {
+        assertThat(StringUtils.sanitize("")).isEmpty();
+    }
+
+    @Test
+    void testSanitizeOneParamBlankString() {
+        assertThat(StringUtils.sanitize("   ")).isEmpty();
+    }
+
+    @Test
+    void testSanitizeOneParamNormalValue() {
+        String input = "normal-session-id-12345";
+
+        assertThat(StringUtils.sanitize(input)).isEqualTo(input);
+    }
+
+    @Test
+    void testSanitizeOneParamCarriageReturn() {
+        String input = "value\rwith\rcarriage\rreturns";
+
+        assertThat(StringUtils.sanitize(input)).isEqualTo("value_rwith_rcarriage_rreturns");
+    }
+
+    @Test
+    void testSanitizeOneParamLineFeed() {
+        String input = "value\nwith\nnewlines";
+
+        assertThat(StringUtils.sanitize(input)).isEqualTo("value_nwith_nnewlines");
+    }
+
+    @Test
+    void testSanitizeOneParamCRLF() {
+        String input = "value\r\nwith\r\ncrlf";
+
+        assertThat(StringUtils.sanitize(input)).isEqualTo("value_r_nwith_r_ncrlf");
+    }
+
+    @Test
+    void testSanitizeOneParamLogInjectionAttempt() {
+        String maliciousInput = "session123\n[INFO] User admin logged in successfully";
+
+        String sanitized = StringUtils.sanitize(maliciousInput);
+
+        assertThat(sanitized).doesNotContain("\n");
+        assertThat(sanitized).isEqualTo("session123_n[INFO]_User_admin_logged_in_successfully");
+    }
+
+    @Test
+    void testSanitizeOneParamComplexLogInjection() {
+        String maliciousInput = "value\r\n2025-01-17 12:00:00.000 [main] INFO - Fake log entry\r\nAnother fake";
+
+        String sanitized = StringUtils.sanitize(maliciousInput);
+
+        assertThat(sanitized).doesNotContain("\r");
+        assertThat(sanitized).doesNotContain("\n");
+        assertThat(sanitized)
+            .isEqualTo("value_r_n2025-01-17_12_00_00.000_[main]_INFO_-_Fake_log_entry_r_nAnother_fake");
+    }
+
+    @Test
+    void testSanitizeOneParamOnlyCarriageReturns() {
+        String input = "\r\r\r";
+
+        assertThat(StringUtils.sanitize(input)).isEmpty();
+    }
+
+    @Test
+    void testSanitizeOneParamOnlyNewlines() {
+        String input = "\n\n\n";
+
+        assertThat(StringUtils.sanitize(input)).isEmpty();
+    }
+
+    @Test
+    void testSanitizeOneParamMixedContent() {
+        String input = "start\rvalue\nmiddle\r\nend";
+
+        assertThat(StringUtils.sanitize(input)).isEqualTo("start_rvalue_nmiddle_r_nend");
+    }
+
+    @Test
+    void testSanitizeOneParamPreservesOtherWhitespace() {
+        String input = "value with\ttabs and   spaces";
+
+        assertThat(StringUtils.sanitize(input)).isEqualTo("value_with_tabs_and_spaces");
+    }
+
+    @Test
+    void testSanitizeOneParamWindowsForbiddenCharacters() {
+        String input = "file\\name:with*forbidden?chars\"<>|";
+
+        assertThat(StringUtils.sanitize(input)).isEqualTo("file_name_with_forbidden_chars_");
+    }
+
+    @Test
+    void testSanitizeTwoParamsNullValue() {
+        assertThat(StringUtils.sanitize(null, 10)).isNull();
+    }
+
+    @Test
+    void testSanitizeTwoParamsEmptyString() {
+        assertThat(StringUtils.sanitize("", 10)).isEmpty();
+    }
+
+    @Test
+    void testSanitizeTwoParamsBlankString() {
+        assertThat(StringUtils.sanitize("   ", 10)).isEmpty();
+    }
+
+    @Test
+    void testSanitizeTwoParamsNormalValue() {
+        String input = "normal-session-id-12345";
+
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo(input);
+    }
+
+    @Test
+    void testSanitizeTwoParamsWithLengthLimit() {
+        String input = "this is a very long string that should be truncated";
+
+        assertThat(StringUtils.sanitize(input, 20)).isEqualTo("this_is_a_very_long_");
+    }
+
+    @Test
+    void testSanitizeTwoParamsNoLengthLimit() {
+        String input = "this is a very long string that should not be truncated";
+
+        assertThat(StringUtils.sanitize(input, -1))
+            .isEqualTo("this_is_a_very_long_string_that_should_not_be_truncated");
+    }
+
+    @Test
+    void testSanitizeTwoParamsCarriageReturn() {
+        String input = "value\rwith\rcarriage\rreturns";
+
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("value_rwith_rcarriage_rreturns");
+    }
+
+    @Test
+    void testSanitizeTwoParamsLineFeed() {
+        String input = "value\nwith\nnewlines";
+
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("value_nwith_nnewlines");
+    }
+
+    @Test
+    void testSanitizeTwoParamsCRLF() {
+        String input = "value\r\nwith\r\ncrlf";
+
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("value_r_nwith_r_ncrlf");
+    }
+
+    @Test
+    void testSanitizeTwoParamsCRLFWithLengthLimit() {
+        String input = "value\r\nwith\r\ncrlf";
+
+        assertThat(StringUtils.sanitize(input, 15)).isEqualTo("value_r_nwith_r");
+    }
+
+    @Test
+    void testSanitizeTwoParamsWindowsForbiddenCharacters() {
+        String input = "file\\name:with*forbidden?chars\"<>|.txt";
+
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("file_name_with_forbidden_chars_.txt");
+    }
+
+    @Test
+    void testSanitizeTwoParamsMultipleWhitespaces() {
+        String input = "multiple    spaces   and\ttabs";
+
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("multiple_spaces_and_tabs");
+    }
+
+    @Test
+    void testSanitizeTwoParamsMultipleUnderscores() {
+        String input = "multiple___underscores____here";
+
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("multiple_underscores_here");
+    }
+
+    @Test
+    void testSanitizeTwoParamsLeadingTrailingSpaces() {
+        String input = "   leading and trailing spaces   ";
+
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo("leading_and_trailing_spaces");
+    }
+
+    @Test
+    void testSanitizeTwoParamsComplexMixedContent() {
+        String input = "  file\\name:with*forbidden?chars\n\rand\ttabs  ";
+
+        assertThat(StringUtils.sanitize(input, -1))
+            .isEqualTo("file_name_with_forbidden_chars_n_rand_tabs");
+    }
+
+    @Test
+    void testSanitizeTwoParamsLengthLimitShorterThanString() {
+        String input = "short";
+
+        assertThat(StringUtils.sanitize(input, 100)).isEqualTo("short");
+    }
+
+    @Test
+    void testSanitizeTwoParamsLengthLimitZero() {
+        String input = "test";
+
+        assertThat(StringUtils.sanitize(input, 0)).isEmpty();
+    }
+
+    @Test
+    void testSanitizeTwoParamsExactLengthLimit() {
+        String input = "exactly20characters!";
+
+        assertThat(StringUtils.sanitize(input, 20)).hasSize(20);
+    }
+
+    @Test
+    void testSanitizeTwoParamsPreservesNormalCharacters() {
+        String input = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+        assertThat(StringUtils.sanitize(input, -1)).isEqualTo(input);
+    }
 }
