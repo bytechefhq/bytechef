@@ -1,0 +1,112 @@
+extend type Query {
+    dataTables(environmentId: ID!, workspaceId: ID!): [DataTable!]!
+    dataTableTags: [Tag!]!
+    dataTableTagsByTable: [DataTableTagsEntry!]!
+    dataTableWebhooks(environmentId: ID!, tableId: ID!): [DataTableWebhook!]!
+}
+
+extend type Mutation {
+    createDataTable(input: CreateDataTableInput!): Boolean!
+    addDataTableColumn(input: AddColumnInput!): Boolean!
+    removeDataTableColumn(input: RemoveColumnInput!): Boolean!
+    renameDataTableColumn(input: RenameColumnInput!): Boolean!
+    dropDataTable(input: RemoveTableInput!): Boolean!
+    renameDataTable(input: RenameDataTableInput!): Boolean!
+    duplicateDataTable(input: DuplicateDataTableInput!): Boolean!
+    updateDataTableTags(input: UpdateDataTableTagsInput!): Boolean!
+}
+
+type DataTable {
+    id: ID!
+    baseName: String!
+    description: String
+    columns: [DataTableColumn!]!
+    lastModifiedDate: Long
+}
+
+type DataTableColumn {
+    id: ID!
+    name: String!
+    type: ColumnType!
+}
+
+type DataTableTagsEntry {
+    tableId: ID!
+    tags: [Tag!]!
+}
+
+enum ColumnType {
+    STRING
+    NUMBER
+    INTEGER
+    DATE
+    DATE_TIME
+    BOOLEAN
+}
+
+input CreateDataTableInput {
+    environmentId: ID!
+    baseName: String!
+    description: String
+    columns: [ColumnInput!]!
+    workspaceId: ID!
+}
+
+input ColumnInput {
+    name: String!
+    type: ColumnType!
+}
+
+input AddColumnInput {
+    environmentId: ID!
+    tableId: ID!
+    column: ColumnInput!
+}
+
+input RemoveColumnInput {
+    environmentId: ID!
+    tableId: ID!
+    columnId: ID!
+}
+
+input RenameColumnInput {
+    environmentId: ID!
+    tableId: ID!
+    columnId: ID!
+    newName: String!
+}
+
+input RemoveTableInput {
+    environmentId: ID!
+    tableId: ID!
+}
+
+input RenameDataTableInput {
+    environmentId: ID!
+    tableId: ID!
+    newBaseName: String!
+}
+
+input DuplicateDataTableInput {
+    environmentId: ID!
+    tableId: ID!
+    newBaseName: String!
+}
+
+input UpdateDataTableTagsInput {
+    tableId: ID!
+    tags: [TagInput!]
+}
+
+type DataTableWebhook {
+    id: ID!
+    url: String!
+    type: DataTableWebhookType!
+    environmentId: Long!
+}
+
+enum DataTableWebhookType {
+    RECORD_CREATED
+    RECORD_UPDATED
+    RECORD_DELETED
+}
