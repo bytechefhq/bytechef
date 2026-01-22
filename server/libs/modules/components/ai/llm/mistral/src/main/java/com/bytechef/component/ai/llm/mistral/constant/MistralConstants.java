@@ -43,6 +43,7 @@ public final class MistralConstants {
 
     public static final List<Option<String>> CHAT_MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(MistralAiApi.ChatModel.values())
+            .filter(MistralConstants::isNotDeprecated)
             .collect(Collectors.toMap(MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue)));
 
     public static final List<Option<String>> EMBEDDING_MODELS = ModelUtils.getEnumOptions(
@@ -62,5 +63,15 @@ public final class MistralConstants {
         .advancedOption(true);
 
     private MistralConstants() {
+    }
+
+    private static boolean isNotDeprecated(Enum<?> enumConstant) {
+        try {
+            return enumConstant.getDeclaringClass()
+                .getField(enumConstant.name())
+                .getAnnotation(Deprecated.class) == null;
+        } catch (NoSuchFieldException exception) {
+            return true;
+        }
     }
 }

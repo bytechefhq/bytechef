@@ -138,6 +138,10 @@
         "value": "qwen2.5vl"
       }, {
         "description": null,
+        "label": "qwen3-embedding:8b",
+        "value": "qwen3-embedding:8b"
+      }, {
+        "description": null,
         "label": "qwen3:0.6b",
         "value": "qwen3:0.6b"
       }, {
@@ -1484,6 +1488,10 @@
         "description": null,
         "label": "qwen2.5vl",
         "value": "qwen2.5vl"
+      }, {
+        "description": null,
+        "label": "qwen3-embedding:8b",
+        "value": "qwen3-embedding:8b"
       }, {
         "description": null,
         "label": "qwen3:0.6b",

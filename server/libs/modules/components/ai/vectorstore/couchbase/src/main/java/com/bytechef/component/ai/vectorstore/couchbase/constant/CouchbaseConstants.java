@@ -21,9 +21,9 @@ import static com.bytechef.component.definition.Authorization.USERNAME;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.couchbase.client.java.Cluster;
-import org.springframework.ai.vectorstore.CouchbaseIndexOptimization;
-import org.springframework.ai.vectorstore.CouchbaseSearchVectorStore;
-import org.springframework.ai.vectorstore.CouchbaseSimilarityFunction;
+import org.springframework.ai.vectorstore.couchbase.CouchbaseIndexOptimization;
+import org.springframework.ai.vectorstore.couchbase.CouchbaseSearchVectorStore;
+import org.springframework.ai.vectorstore.couchbase.CouchbaseSimilarityFunction;
 
 /**
  * @author Monika Kušter
