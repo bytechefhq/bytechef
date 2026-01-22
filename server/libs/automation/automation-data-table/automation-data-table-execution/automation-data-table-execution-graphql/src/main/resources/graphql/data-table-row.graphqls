@@ -1,0 +1,48 @@
+extend type Query {
+    dataTableRows(environmentId: ID!, tableId: ID!): [DataTableRow!]!
+    dataTableRowsPage(environmentId: ID!, tableId: ID!, limit: Int, offset: Int): DataTableRowPage!
+    exportDataTableCsv(environmentId: ID!, tableId: ID!): String!
+}
+
+extend type Mutation {
+    insertDataTableRow(input: InsertRowInput!): DataTableRow!
+    updateDataTableRow(input: UpdateRowInput!): DataTableRow!
+    deleteDataTableRow(input: DeleteRowInput!): Boolean!
+    importDataTableCsv(input: ImportCsvInput!): Boolean!
+}
+
+type DataTableRow {
+    id: ID!
+    values: Map!
+}
+
+type DataTableRowPage {
+    items: [DataTableRow!]!
+    hasMore: Boolean!
+    nextOffset: Int
+}
+
+input InsertRowInput {
+    environmentId: ID!
+    tableId: ID!
+    values: Map!
+}
+
+input UpdateRowInput {
+    environmentId: ID!
+    tableId: ID!
+    id: ID!
+    values: Map!
+}
+
+input DeleteRowInput {
+    environmentId: ID!
+    tableId: ID!
+    id: ID!
+}
+
+input ImportCsvInput {
+    environmentId: ID!
+    tableId: ID!
+    csv: String!
+}
