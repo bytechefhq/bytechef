@@ -10,10 +10,11 @@ import {useShallow} from 'zustand/react/shallow';
 import {useActivateStore} from './stores/useActivateStore';
 
 const RegisterSuccess = () => {
-    const {activate, activationFailure, loading} = useActivateStore(
+    const {activate, activationFailure, activationSuccess, loading} = useActivateStore(
         useShallow((state) => ({
             activate: state.activate,
             activationFailure: state.activationFailure,
+            activationSuccess: state.activationSuccess,
             loading: state.loading,
         }))
     );
@@ -25,14 +26,16 @@ const RegisterSuccess = () => {
     const key = searchParams.get('key');
 
     useEffect(() => {
-        if (key) {
+        if (key && !activationSuccess) {
             activate(key);
         }
+    }, [key, activate, activationSuccess]);
 
-        if (key && activationFailure) {
+    useEffect(() => {
+        if (activationFailure) {
             navigate('/account-error', {state: {fromInternalFlow: true}});
         }
-    }, [activate, activationFailure, key, navigate]);
+    }, [activationFailure, navigate]);
 
     return (
         <PublicLayoutContainer>
