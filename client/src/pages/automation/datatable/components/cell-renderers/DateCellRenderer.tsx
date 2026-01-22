@@ -2,7 +2,8 @@ import Button from '@/components/Button/Button';
 import {Calendar} from '@/components/ui/calendar';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {format as formatDate} from 'date-fns';
-import {useState} from 'react';
+
+import useDateCellEditor, {formatDateValue} from './hooks/useDateCellEditor';
 
 import type {GridRowType} from './types';
 
@@ -12,22 +13,10 @@ interface DateCellRendererProps {
 }
 
 export const DateCellRenderer = ({columnName, row: {row}}: DateCellRendererProps) => {
-    const raw = (row as Record<string, unknown>)[columnName];
-    let text = '';
+    const cellValue = (row as Record<string, unknown>)[columnName];
+    const displayText = formatDateValue(cellValue);
 
-    if (raw) {
-        try {
-            const date = new Date(String(raw));
-
-            if (!isNaN(date.getTime())) {
-                text = formatDate(date, 'yyyy-MM-dd');
-            }
-        } catch {
-            text = String(raw);
-        }
-    }
-
-    return <span className="text-sm text-foreground">{text}</span>;
+    return <span className="text-sm text-foreground">{displayText}</span>;
 };
 
 interface DateEditCellRendererProps {
@@ -36,29 +25,12 @@ interface DateEditCellRendererProps {
     onRowChange: (row: GridRowType, commitChanges?: boolean) => void;
 }
 
-const getInitialDate = (row: GridRowType, columnName: string): Date | undefined => {
-    const cellValue = (row as Record<string, unknown>)[columnName];
-
-    if (!cellValue) return undefined;
-
-    const date = new Date(String(cellValue));
-
-    return isNaN(date.getTime()) ? undefined : date;
-};
-
 export const DateEditCellRenderer = ({columnName, onRowChange, row}: DateEditCellRendererProps) => {
-    const [isPopoverOpen, setIsPopoverOpen] = useState(true);
-
-    const initialDate = getInitialDate(row, columnName);
-
-    const handleDateSelect = (selectedDate: Date | undefined) => {
-        if (!selectedDate) return;
-
-        const formattedValue = formatDate(selectedDate, 'yyyy-MM-dd');
-
-        onRowChange({...row, [columnName]: formattedValue}, true);
-        setIsPopoverOpen(false);
-    };
+    const {handleDateSelect, initialDate, isPopoverOpen, setIsPopoverOpen} = useDateCellEditor({
+        columnName,
+        onRowChange,
+        row,
+    });
 
     return (
         <Popover onOpenChange={setIsPopoverOpen} open={isPopoverOpen}>

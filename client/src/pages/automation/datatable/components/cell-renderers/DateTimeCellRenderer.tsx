@@ -4,7 +4,8 @@ import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {format as formatDate} from 'date-fns';
 import {Clock} from 'lucide-react';
-import {type ChangeEvent, useState} from 'react';
+
+import useDateTimeCellEditor, {formatDateTimeValue} from './hooks/useDateTimeCellEditor';
 
 import type {GridRowType} from './types';
 
@@ -15,19 +16,7 @@ interface DateTimeCellRendererProps {
 
 export const DateTimeCellRenderer = ({columnName, row: {row}}: DateTimeCellRendererProps) => {
     const cellValue = (row as Record<string, unknown>)[columnName];
-    let displayText = '';
-
-    if (cellValue) {
-        try {
-            const date = new Date(String(cellValue));
-
-            if (!isNaN(date.getTime())) {
-                displayText = formatDate(date, 'yyyy-MM-dd HH:mm');
-            }
-        } catch {
-            displayText = String(cellValue);
-        }
-    }
+    const displayText = formatDateTimeValue(cellValue);
 
     return <span className="text-sm text-foreground">{displayText}</span>;
 };
@@ -38,60 +27,21 @@ interface DateTimeEditCellProps {
     onRowChange: (row: GridRowType, commitChanges?: boolean) => void;
 }
 
-const getInitialDate = (row: GridRowType, columnName: string): Date | undefined => {
-    const cellValue = (row as Record<string, unknown>)[columnName];
-
-    if (!cellValue) return undefined;
-
-    const date = new Date(String(cellValue));
-
-    return isNaN(date.getTime()) ? undefined : date;
-};
-
 export const DateTimeEditCell = ({columnName, onRowChange, row}: DateTimeEditCellProps) => {
-    const [isPopoverOpen, setIsPopoverOpen] = useState(true);
-    const [selectedDate, setSelectedDate] = useState<Date>(getInitialDate(row, columnName) ?? new Date());
-
-    const formattedHours = String(selectedDate.getHours()).padStart(2, '0');
-    const formattedMinutes = String(selectedDate.getMinutes()).padStart(2, '0');
-
-    const handleCommit = () => {
-        const formattedValue = formatDate(selectedDate, 'yyyy-MM-dd HH:mm:ss');
-
-        onRowChange({...row, [columnName]: formattedValue}, true);
-        setIsPopoverOpen(false);
-    };
-
-    const handleOpenChange = (isOpen: boolean) => {
-        if (!isOpen) {
-            handleCommit();
-        }
-
-        setIsPopoverOpen(isOpen);
-    };
-
-    const handleTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const [hour, minute] = event.target.value.split(':');
-        const updatedDate = new Date(selectedDate);
-
-        const clampedHours = Math.min(23, Math.max(0, Number(hour)));
-        const clampedMinutes = Math.min(59, Math.max(0, Number(minute)));
-
-        updatedDate.setHours(clampedHours);
-        updatedDate.setMinutes(clampedMinutes);
-
-        setSelectedDate(updatedDate);
-    };
-
-    const handleDateSelect = (calendarDate: Date | undefined) => {
-        if (!calendarDate) return;
-
-        const updatedDate = new Date(selectedDate);
-
-        updatedDate.setFullYear(calendarDate.getFullYear(), calendarDate.getMonth(), calendarDate.getDate());
-
-        setSelectedDate(updatedDate);
-    };
+    const {
+        formattedHours,
+        formattedMinutes,
+        handleCommit,
+        handleDateSelect,
+        handleOpenChange,
+        handleTimeChange,
+        isPopoverOpen,
+        selectedDate,
+    } = useDateTimeCellEditor({
+        columnName,
+        onRowChange,
+        row,
+    });
 
     return (
         <Popover onOpenChange={handleOpenChange} open={isPopoverOpen}>

@@ -1,5 +1,6 @@
 import {Input} from '@/components/ui/input';
-import {type ChangeEvent, type FocusEvent, type KeyboardEvent, useState} from 'react';
+
+import useNumberCellEditor from './hooks/useNumberCellEditor';
 
 import type {GridRowType} from './types';
 
@@ -10,42 +11,11 @@ interface NumberEditCellProps {
 }
 
 export const NumberEditCell = ({columnName, onRowChange, row}: NumberEditCellProps) => {
-    const cellValue = (row as Record<string, unknown>)[columnName];
-    const initialValue = cellValue === null || cellValue === undefined ? '' : String(cellValue);
-
-    const [inputValue, setInputValue] = useState(initialValue);
-
-    const commitValue = (value: string, shouldCommit: boolean) => {
-        const trimmedValue = value.trim();
-
-        if (trimmedValue === '') {
-            onRowChange({...row, [columnName]: null}, shouldCommit);
-
-            return;
-        }
-
-        const numericValue = Number(trimmedValue);
-
-        if (Number.isNaN(numericValue)) {
-            return;
-        }
-
-        onRowChange({...row, [columnName]: numericValue}, shouldCommit);
-    };
-
-    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
-        commitValue(event.target.value, true);
-    };
-
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setInputValue(event.target.value);
-    };
-
-    const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            commitValue(inputValue, true);
-        }
-    };
+    const {handleBlur, handleChange, handleKeyDown, inputValue} = useNumberCellEditor({
+        columnName,
+        onRowChange,
+        row,
+    });
 
     return (
         <Input
