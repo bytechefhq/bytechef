@@ -17,7 +17,11 @@ export const createBooleanCellRenderer = ({
         const checked = Boolean((row as Record<string, unknown>)[columnName]);
 
         const handleToggle = (next: boolean) => {
-            setLocalRows((prev) => prev.map((r) => (r.id === id ? {...r, [columnName]: next} : r)));
+            setLocalRows((previousRows) =>
+                previousRows.map((currentRow) =>
+                    currentRow.id === id ? {...currentRow, [columnName]: next} : currentRow
+                )
+            );
 
             updateRowMutation.mutate({
                 input: {environmentId, id, tableId, values: {[columnName]: next}},
@@ -29,7 +33,7 @@ export const createBooleanCellRenderer = ({
                 <Checkbox
                     aria-label={`Toggle ${columnName}`}
                     checked={checked}
-                    className="h-4 w-4 cursor-pointer"
+                    className="size-4 cursor-pointer"
                     onCheckedChange={(value) => handleToggle(value === true)}
                 />
             </div>

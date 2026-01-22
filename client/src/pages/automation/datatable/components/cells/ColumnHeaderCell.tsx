@@ -21,7 +21,7 @@ const ColumnHeaderCell = ({columnId, columnName, onDelete, onRename}: ColumnHead
                     <DropdownMenuTrigger asChild>
                         <Button
                             aria-label={`Column ${columnName} menu`}
-                            icon={<MoreVertical className="h-4 w-4" />}
+                            icon={<MoreVertical className="size-4" />}
                             variant="ghost"
                         />
                     </DropdownMenuTrigger>
@@ -30,7 +30,7 @@ const ColumnHeaderCell = ({columnId, columnName, onDelete, onRename}: ColumnHead
                         <DropdownMenuItem onClick={() => onRename(columnId, columnName)}>Rename</DropdownMenuItem>
 
                         <DropdownMenuItem
-                            className="text-red-600 focus:text-red-700"
+                            className="text-content-destructive focus:text-content-destructive-primary"
                             onClick={() => onDelete(columnId, columnName)}
                         >
                             Delete

@@ -31,7 +31,7 @@ const RowIdCell = ({
         return (
             <div className="flex h-full w-full items-center justify-center">
                 <Button
-                    icon={<Plus className="mr-1 h-4 w-4" />}
+                    icon={<Plus className="mr-1 size-4" />}
                     onClick={onAddRow}
                     size="icon"
                     title="Add row"
@@ -94,7 +94,7 @@ const RowIdCell = ({
                 <Checkbox
                     aria-label={`Select row ${rowNumber}`}
                     checked={isSelected}
-                    className="h-4 w-4 cursor-pointer"
+                    className="size-4 cursor-pointer"
                     onCheckedChange={handleCheckedChange}
                     onClick={(event) => event.stopPropagation()}
                 />

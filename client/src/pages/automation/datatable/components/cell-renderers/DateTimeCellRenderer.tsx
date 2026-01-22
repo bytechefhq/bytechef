@@ -97,7 +97,7 @@ export const DateTimeEditCell = ({columnName, onRowChange, row}: DateTimeEditCel
         <Popover onOpenChange={handleOpenChange} open={isPopoverOpen}>
             <PopoverTrigger asChild>
                 <Button className="h-7 w-full justify-start gap-2 px-2 text-xs" variant="outline">
-                    <Clock className="h-3.5 w-3.5" />
+                    <Clock className="size-3.5" />
 
                     {selectedDate ? formatDate(selectedDate, 'yyyy-MM-dd HH:mm') : 'Pick date & time'}
                 </Button>

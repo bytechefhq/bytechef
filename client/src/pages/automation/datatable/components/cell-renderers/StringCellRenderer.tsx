@@ -5,6 +5,8 @@ import {type KeyboardEvent, useRef, useState} from 'react';
 
 import type {GridRowType} from './types';
 
+const STRING_EDITOR_MIN_HEIGHT = 180;
+
 interface StringEditCellProps {
     columnName: string;
     row: GridRowType;
@@ -76,11 +78,12 @@ export const StringEditCell = ({columnName, onRowChange, row}: StringEditCellPro
                 <div className="flex flex-col gap-3">
                     <Textarea
                         autoFocus
-                        className="min-h-[180px] w-full resize-y"
+                        className="w-full resize-y"
                         onChange={(event) => setText(event.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder={`Enter ${columnName}`}
                         rows={10}
+                        style={{minHeight: `${STRING_EDITOR_MIN_HEIGHT}px`}}
                         value={text}
                     />
                 </div>
