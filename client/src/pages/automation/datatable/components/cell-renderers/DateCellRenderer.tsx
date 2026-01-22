@@ -26,14 +26,14 @@ interface DateEditCellRendererProps {
 }
 
 export const DateEditCellRenderer = ({columnName, onRowChange, row}: DateEditCellRendererProps) => {
-    const {handleDateSelect, initialDate, isPopoverOpen, setIsPopoverOpen} = useDateCellEditor({
+    const {handleDateSelect, handleOpenChange, initialDate, isPopoverOpen} = useDateCellEditor({
         columnName,
         onRowChange,
         row,
     });
 
     return (
-        <Popover onOpenChange={setIsPopoverOpen} open={isPopoverOpen}>
+        <Popover onOpenChange={handleOpenChange} open={isPopoverOpen}>
             <PopoverTrigger asChild>
                 <Button className="h-7 w-full justify-start px-2 text-xs" variant="outline">
                     {initialDate ? formatDate(initialDate, 'yyyy-MM-dd') : 'Pick a date'}
