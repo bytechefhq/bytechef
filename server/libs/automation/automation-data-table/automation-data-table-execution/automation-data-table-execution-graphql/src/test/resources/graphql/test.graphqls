@@ -1,6 +1,10 @@
 # Test-only GraphQL base operations and minimal type stubs for GraphQL slice tests.
 
-# Note: Query is already defined in base.graphqls from platform-configuration, only Mutation needs to be defined
+# Base operation types so that 'extend type Query/Mutation' from main resources can merge.
+type Query {
+    _placeholder: Boolean
+}
+
 type Mutation {
     _placeholder: Boolean
 }
