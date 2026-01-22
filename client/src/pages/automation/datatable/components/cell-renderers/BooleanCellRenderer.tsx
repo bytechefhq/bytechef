@@ -1,5 +1,7 @@
 import {Checkbox} from '@/components/ui/checkbox';
 
+import useBooleanCellEditor from './hooks/useBooleanCellEditor';
+
 import type {CellRendererProps, GridRowType} from './types';
 
 export const createBooleanCellRenderer = ({
@@ -10,23 +12,18 @@ export const createBooleanCellRenderer = ({
     updateRowMutation,
 }: CellRendererProps) => {
     return ({row}: {row: GridRowType}) => {
-        const id = row.id;
+        if (row.id === '-1') {
+            return null;
+        }
 
-        if (id === '-1') return null;
-
-        const checked = Boolean((row as Record<string, unknown>)[columnName]);
-
-        const handleToggle = (next: boolean) => {
-            setLocalRows((previousRows) =>
-                previousRows.map((currentRow) =>
-                    currentRow.id === id ? {...currentRow, [columnName]: next} : currentRow
-                )
-            );
-
-            updateRowMutation.mutate({
-                input: {environmentId, id, tableId, values: {[columnName]: next}},
-            });
-        };
+        const {checked, handleToggle} = useBooleanCellEditor({
+            columnName,
+            environmentId,
+            row,
+            setLocalRows,
+            tableId,
+            updateRowMutation,
+        });
 
         return (
             <div className="flex h-full w-full items-center justify-center">
