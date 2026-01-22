@@ -36,8 +36,8 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import org.springframework.ai.vectorstore.CouchbaseIndexOptimization;
-import org.springframework.ai.vectorstore.CouchbaseSimilarityFunction;
+import org.springframework.ai.vectorstore.couchbase.CouchbaseIndexOptimization;
+import org.springframework.ai.vectorstore.couchbase.CouchbaseSimilarityFunction;
 
 /**
  * @author Monika Kušter

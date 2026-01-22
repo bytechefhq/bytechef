@@ -38,6 +38,10 @@
         "value": "codestral-latest"
       }, {
         "description": null,
+        "label": "devstral-medium-latest",
+        "value": "devstral-medium-latest"
+      }, {
+        "description": null,
         "label": "devstral-small-latest",
         "value": "devstral-small-latest"
       }, {
@@ -48,6 +52,10 @@
         "description": null,
         "label": "magistral-small-latest",
         "value": "magistral-small-latest"
+      }, {
+        "description": null,
+        "label": "ministral-14b-latest",
+        "value": "ministral-14b-latest"
       }, {
         "description": null,
         "label": "ministral-3b-latest",
@@ -74,8 +82,8 @@
         "value": "open-mistral-nemo"
       }, {
         "description": null,
-        "label": "pixtral-12b-2409",
-        "value": "pixtral-12b-2409"
+        "label": "pixtral-12b-latest",
+        "value": "pixtral-12b-latest"
       }, {
         "description": null,
         "label": "pixtral-large-latest",
@@ -2426,6 +2434,10 @@
         "value": "codestral-latest"
       }, {
         "description": null,
+        "label": "devstral-medium-latest",
+        "value": "devstral-medium-latest"
+      }, {
+        "description": null,
         "label": "devstral-small-latest",
         "value": "devstral-small-latest"
       }, {
@@ -2436,6 +2448,10 @@
         "description": null,
         "label": "magistral-small-latest",
         "value": "magistral-small-latest"
+      }, {
+        "description": null,
+        "label": "ministral-14b-latest",
+        "value": "ministral-14b-latest"
       }, {
         "description": null,
         "label": "ministral-3b-latest",
@@ -2462,8 +2478,8 @@
         "value": "open-mistral-nemo"
       }, {
         "description": null,
-        "label": "pixtral-12b-2409",
-        "value": "pixtral-12b-2409"
+        "label": "pixtral-12b-latest",
+        "value": "pixtral-12b-latest"
       }, {
         "description": null,
         "label": "pixtral-large-latest",
