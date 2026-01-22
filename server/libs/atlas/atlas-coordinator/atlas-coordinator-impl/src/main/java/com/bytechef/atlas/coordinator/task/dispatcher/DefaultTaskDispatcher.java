@@ -62,11 +62,8 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
         TaskWorkerMessageRoute messageRoute = calculateQueueName(taskExecution);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
-                "Task id={}, type='{}' sent to route='{}'", taskExecution.getId(), taskExecution.getType(),
-                messageRoute);
-        }
+        logger.debug(
+            "Task id={}, type='{}' sent to route='{}'", taskExecution.getId(), taskExecution.getType(), messageRoute);
 
         eventPublisher.publishEvent(new TaskExecutionEvent(messageRoute, taskExecution));
     }
