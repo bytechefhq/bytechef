@@ -71,8 +71,8 @@ const ImportDataTableCsvDialog = () => {
                                     </div>
 
                                     <Button
-                                        className="h-6 w-6"
-                                        icon={<X className="h-3 w-3" />}
+                                        className="size-6"
+                                        icon={<X className="size-3" />}
                                         onClick={() => setImportFile(null)}
                                         type="button"
                                         variant="ghost"
