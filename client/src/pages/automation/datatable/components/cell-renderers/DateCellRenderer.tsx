@@ -47,9 +47,9 @@ const getInitialDate = (row: GridRowType, columnName: string): Date | undefined 
 };
 
 export const DateEditCellRenderer = ({columnName, onRowChange, row}: DateEditCellRendererProps) => {
-    const initialDate = getInitialDate(row, columnName);
-
     const [isPopoverOpen, setIsPopoverOpen] = useState(true);
+
+    const initialDate = getInitialDate(row, columnName);
 
     const handleDateSelect = (selectedDate: Date | undefined) => {
         if (!selectedDate) return;
