@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,9 +57,9 @@ class JdbcConfigurationIntTest {
         .withConfiguration(AutoConfigurations.of(DataSourceAutoConfiguration.class))
         .withUserConfiguration(JdbcConfiguration.class, TestConfiguration.class)
         .withPropertyValues(
-            "bytechef.datasource.url=" + postgreSQLContainer.getJdbcUrl(),
-            "bytechef.datasource.username=" + postgreSQLContainer.getUsername(),
-            "bytechef.datasource.password=" + postgreSQLContainer.getPassword());
+            "spring.datasource.url=" + postgreSQLContainer.getJdbcUrl(),
+            "spring.datasource.username=" + postgreSQLContainer.getUsername(),
+            "spring.datasource.password=" + postgreSQLContainer.getPassword());
 
     @Test
     void testDataSourceIsHikariDataSourceInSingleTenantMode() {
@@ -99,7 +100,9 @@ class JdbcConfigurationIntTest {
     }
 
     @Configuration
-    @EnableConfigurationProperties(ApplicationProperties.class)
+    @EnableConfigurationProperties({
+        ApplicationProperties.class, DataSourceProperties.class
+    })
     static class TestConfiguration {
 
         @Bean
