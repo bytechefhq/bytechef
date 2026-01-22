@@ -4,16 +4,14 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import useBooleanCellEditor from '../useBooleanCellEditor';
 
 describe('useBooleanCellEditor', () => {
+    const mockOnToggle = vi.fn();
     const mockSetLocalRows = vi.fn();
-    const mockMutate = vi.fn();
 
     const defaultProps = {
         columnName: 'isActive',
-        environmentId: 'env-123',
+        onToggle: mockOnToggle,
         row: {id: 'row-1', isActive: false},
         setLocalRows: mockSetLocalRows,
-        tableId: 'table-123',
-        updateRowMutation: {mutate: mockMutate},
     };
 
     beforeEach(() => {
@@ -99,22 +97,15 @@ describe('useBooleanCellEditor', () => {
             ]);
         });
 
-        it('calls mutation with correct parameters', () => {
+        it('calls onToggle with correct parameters', () => {
             const {result} = renderHook(() => useBooleanCellEditor(defaultProps));
 
             act(() => {
                 result.current.handleToggle(true);
             });
 
-            expect(mockMutate).toHaveBeenCalledTimes(1);
-            expect(mockMutate).toHaveBeenCalledWith({
-                input: {
-                    environmentId: 'env-123',
-                    id: 'row-1',
-                    tableId: 'table-123',
-                    values: {isActive: true},
-                },
-            });
+            expect(mockOnToggle).toHaveBeenCalledTimes(1);
+            expect(mockOnToggle).toHaveBeenCalledWith('row-1', 'isActive', true);
         });
 
         it('toggles from true to false', () => {
@@ -129,14 +120,7 @@ describe('useBooleanCellEditor', () => {
                 result.current.handleToggle(false);
             });
 
-            expect(mockMutate).toHaveBeenCalledWith({
-                input: {
-                    environmentId: 'env-123',
-                    id: 'row-1',
-                    tableId: 'table-123',
-                    values: {isActive: false},
-                },
-            });
+            expect(mockOnToggle).toHaveBeenCalledWith('row-1', 'isActive', false);
         });
     });
 });

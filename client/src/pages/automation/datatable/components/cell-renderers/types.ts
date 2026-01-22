@@ -4,19 +4,8 @@ export type GridRowType = {id: string} & Record<string, unknown>;
 
 export type SummaryRowType = object;
 
-export interface CellRendererProps {
+export interface BooleanCellRendererProps {
     columnName: string;
-    tableId: string;
-    environmentId: string;
+    onToggle: (rowId: string, columnName: string, value: boolean) => void;
     setLocalRows: Dispatch<SetStateAction<GridRowType[]>>;
-    updateRowMutation: {
-        mutate: (params: {
-            input: {
-                environmentId: string;
-                id: string;
-                tableId: string;
-                values: Record<string, unknown>;
-            };
-        }) => void;
-    };
 }

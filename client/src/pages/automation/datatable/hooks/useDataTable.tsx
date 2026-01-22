@@ -49,20 +49,14 @@ interface ColumnDefinitionI {
 
 interface BuildUserColumnParamsI {
     column: ColumnDefinitionI;
-    environmentId: string;
     isFetchingNextPage: boolean;
     isFirstNonFrozenColumn: boolean;
+    onBooleanToggle: (rowId: string, columnName: string, value: boolean) => void;
     onDeleteColumn: (columnId: string, columnName: string) => void;
     onRenameColumn: (columnId: string, columnName: string) => void;
     rowCount: number;
     setLocalRows: Dispatch<SetStateAction<GridRowType[]>>;
-    tableId: string;
     totalColumns: number;
-    updateRowMutation: {
-        mutate: (params: {
-            input: {environmentId: string; id: string; tableId: string; values: Record<string, unknown>};
-        }) => void;
-    };
 }
 
 interface BuildTrailingColumnParamsI {
@@ -74,38 +68,31 @@ interface BuildTrailingColumnParamsI {
 
 interface BuildGridColumnsParamsI {
     dataTable: DataTable | undefined;
-    environmentId: string;
     handleAddRow: () => void;
     handleSelectedRowsChange: (next: ReadonlySet<string>) => void;
     handleToggleSelectAll: (nextChecked: boolean) => void;
     hoveredRowId: string | null;
     isFetchingNextPage: boolean;
     localRowCount: number;
+    onBooleanToggle: (rowId: string, columnName: string, value: boolean) => void;
     selectedRows: ReadonlySet<string>;
     setAddColumnDialogOpen: (open: boolean) => void;
     setColumnToDelete: (columnId: string, columnName: string) => void;
     setColumnToRename: (columnId: string, columnName: string) => void;
     setHoveredRowId: Dispatch<SetStateAction<string | null>>;
     setLocalRows: Dispatch<SetStateAction<GridRowType[]>>;
-    updateRowMutation: {
-        mutate: (params: {
-            input: {environmentId: string; id: string; tableId: string; values: Record<string, unknown>};
-        }) => void;
-    };
 }
 
 function buildUserColumn({
     column,
-    environmentId,
     isFetchingNextPage,
     isFirstNonFrozenColumn,
+    onBooleanToggle,
     onDeleteColumn,
     onRenameColumn,
     rowCount,
     setLocalRows,
-    tableId,
     totalColumns,
-    updateRowMutation,
 }: BuildUserColumnParamsI): Column<GridRowType, SummaryRowType> {
     const baseColumnConfig = {
         cellClass: 'datatable-cell',
@@ -145,10 +132,8 @@ function buildUserColumn({
     if (column.type === 'BOOLEAN') {
         const BooleanRenderer = createBooleanCellRenderer({
             columnName: column.name,
-            environmentId,
+            onToggle: onBooleanToggle,
             setLocalRows,
-            tableId,
-            updateRowMutation,
         });
 
         columnDefinition = {
@@ -221,20 +206,19 @@ function buildTrailingColumn({
 
 function buildGridColumns({
     dataTable,
-    environmentId,
     handleAddRow,
     handleSelectedRowsChange,
     handleToggleSelectAll,
     hoveredRowId,
     isFetchingNextPage,
     localRowCount,
+    onBooleanToggle,
     selectedRows,
     setAddColumnDialogOpen,
     setColumnToDelete,
     setColumnToRename,
     setHoveredRowId,
     setLocalRows,
-    updateRowMutation,
 }: BuildGridColumnsParamsI): Column<GridRowType, SummaryRowType>[] {
     const columns: Column<GridRowType, SummaryRowType>[] = [];
     const totalColumnCount = 1 + (dataTable?.columns?.length ?? 0) + 1;
@@ -274,16 +258,14 @@ function buildGridColumns({
 
         const columnDefinition = buildUserColumn({
             column,
-            environmentId,
             isFetchingNextPage,
             isFirstNonFrozenColumn: !isSummaryRowAssigned,
+            onBooleanToggle,
             onDeleteColumn: setColumnToDelete,
             onRenameColumn: setColumnToRename,
             rowCount: localRowCount,
             setLocalRows,
-            tableId: dataTable.id,
             totalColumns: totalColumnCount,
-            updateRowMutation,
         });
 
         if (!isSummaryRowAssigned) {
@@ -443,6 +425,22 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         [localRows, setSelectedRows]
     );
 
+    const handleBooleanToggle = useCallback(
+        (rowId: string, columnName: string, value: boolean) => {
+            if (!dataTable?.id) return;
+
+            updateRowMutation.mutate({
+                input: {
+                    environmentId: String(environmentId),
+                    id: rowId,
+                    tableId: dataTable.id,
+                    values: {[columnName]: value},
+                },
+            });
+        },
+        [dataTable?.id, environmentId, updateRowMutation]
+    );
+
     const handleAddRow = useCallback(() => {
         if (!dataTable?.id) return;
 
@@ -457,25 +455,24 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         () =>
             buildGridColumns({
                 dataTable,
-                environmentId: String(environmentId),
                 handleAddRow,
                 handleSelectedRowsChange,
                 handleToggleSelectAll,
                 hoveredRowId,
                 isFetchingNextPage,
                 localRowCount,
+                onBooleanToggle: handleBooleanToggle,
                 selectedRows,
                 setAddColumnDialogOpen,
                 setColumnToDelete,
                 setColumnToRename,
                 setHoveredRowId,
                 setLocalRows,
-                updateRowMutation,
             }),
         [
             dataTable,
-            environmentId,
             handleAddRow,
+            handleBooleanToggle,
             handleSelectedRowsChange,
             handleToggleSelectAll,
             hoveredRowId,
@@ -485,7 +482,6 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
             setAddColumnDialogOpen,
             setColumnToDelete,
             setColumnToRename,
-            updateRowMutation,
         ]
     );
 
