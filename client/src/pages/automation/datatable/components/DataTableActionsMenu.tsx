@@ -25,7 +25,7 @@ const DataTableActionsMenu = ({
 
             <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={onImportCsv}>
-                    <Upload className="mr-2 h-4 w-4" /> Import CSV
+                    <Upload className="mr-2 size-4" /> Import CSV
                 </DropdownMenuItem>
 
                 <DropdownMenuItem onClick={onExportCsv}>
@@ -39,7 +39,10 @@ const DataTableActionsMenu = ({
                 )}
 
                 {tableId && (
-                    <DropdownMenuItem className="text-red-600 focus:text-red-700" onClick={onDeleteTable}>
+                    <DropdownMenuItem
+                        className="text-content-destructive focus:text-content-destructive-primary"
+                        onClick={onDeleteTable}
+                    >
                         <Trash2 className="mr-2 h-4 w-4" /> Delete Table
                     </DropdownMenuItem>
                 )}

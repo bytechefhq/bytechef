@@ -23,7 +23,7 @@ const DataTableHeader = () => {
                 <div className="flex items-center gap-2">
                     {selectedRowsCount > 0 && (
                         <Button onClick={handleOpenDeleteRowsDialog} variant="destructive">
-                            <Trash2 className="h-4 w-4" /> Delete ({selectedRowsCount})
+                            <Trash2 className="size-4" /> Delete ({selectedRowsCount})
                         </Button>
                     )}
 
