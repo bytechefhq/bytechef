@@ -54,6 +54,12 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     public void dispatch(TaskExecution taskExecution) {
         taskExecution = preProcess(taskExecution);
 
+        if (taskExecution.getStatus() == TaskExecution.Status.CANCELLED) {
+            logger.debug("Task id={} is not eligible for dispatching", taskExecution.getId());
+
+            return;
+        }
+
         TaskWorkerMessageRoute messageRoute = calculateQueueName(taskExecution);
 
         if (logger.isDebugEnabled()) {
@@ -83,18 +89,15 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     }
 
     private TaskExecution preProcess(TaskExecution taskExecution) {
-        TaskDispatcherPreSendProcessor taskDispatcherPreSendProcessor = null;
+        for (TaskDispatcherPreSendProcessor taskDispatcherPreSendProcessor : taskDispatcherPreSendProcessors) {
+            if (taskDispatcherPreSendProcessor.canProcess(taskExecution)) {
 
-        for (TaskDispatcherPreSendProcessor curTaskDispatcherPreSendProcessor : taskDispatcherPreSendProcessors) {
-            if (curTaskDispatcherPreSendProcessor.canProcess(taskExecution)) {
-                taskDispatcherPreSendProcessor = curTaskDispatcherPreSendProcessor;
+                taskExecution = taskDispatcherPreSendProcessor.process(taskExecution);
 
-                break;
+                if (taskExecution.getStatus() == TaskExecution.Status.CANCELLED) {
+                    break;
+                }
             }
-        }
-
-        if (taskDispatcherPreSendProcessor != null) {
-            taskExecution = taskDispatcherPreSendProcessor.process(taskExecution);
         }
 
         return taskExecution;
