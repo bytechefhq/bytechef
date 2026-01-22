@@ -37,6 +37,7 @@ const AutomationWorkflowExecutions = lazy(() =>
         default: module.WorkflowExecutions,
     }))
 );
+const DataTables = lazy(() => import('@/pages/automation/datatables/DataTables'));
 const Home = lazy(() => import('@/pages/home/Home'));
 const McpServer = lazy(() => import('@/pages/settings/platform/mcp-server/McpServer'));
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
@@ -587,6 +588,16 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'connections',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <DataTables />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'datatables',
                                 },
                                 {
                                     children: [

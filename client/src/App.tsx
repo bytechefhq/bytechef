@@ -25,6 +25,7 @@ import {
     ServerIcon,
     Settings2Icon,
     SquareIcon,
+    Table2Icon,
     UnplugIcon,
     UsersIcon,
     Workflow,
@@ -74,6 +75,11 @@ const automationNavigation: NavigationType[] = [
         name: 'Workflow Executions',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
+    {
+        href: '/automation/datatables',
+        icon: Table2Icon,
+        name: 'Data Tables',
+    },
     {href: '/automation/chat', icon: MessageCircleMoreIcon, name: 'Workflow Chat'},
 ];
 
