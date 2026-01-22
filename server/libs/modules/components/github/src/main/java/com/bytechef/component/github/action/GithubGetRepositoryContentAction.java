@@ -32,7 +32,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,24 +65,24 @@ public class GithubGetRepositoryContentAction {
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Object response = context
-            .http(http -> http.get("/repos/"
-                + inputParameters.getRequiredString(OWNER) + "/"
-                + inputParameters.getRequiredString(REPOSITORY) + "/contents/"
-                + inputParameters.getString(PATH)))
+            .http(http -> http.get("/repos/" +
+                inputParameters.getRequiredString(OWNER) + "/" +
+                inputParameters.getRequiredString(REPOSITORY) + "/contents/" +
+                inputParameters.getString(PATH)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<Object>() {});
+            .getBody(new TypeReference<>() {});
 
         if (response instanceof Map<?, ?> file) {
             String content = (String) file.get("content");
-            return content == null ? "" : new String(Base64.getDecoder()
-                .decode(content.replaceAll("\\s", "")),
+
+            return content == null ? "" : new String(
+                context.encoder(encoder -> encoder.base64Decode(content.replaceAll("\\s", ""))),
                 StandardCharsets.UTF_8);
         }
 
         if (response instanceof List<?> directory) {
-            return directory
-                .stream()
+            return directory.stream()
                 .filter(Map.class::isInstance)
                 .map(Map.class::cast)
                 .map(m -> m.get(NAME))
