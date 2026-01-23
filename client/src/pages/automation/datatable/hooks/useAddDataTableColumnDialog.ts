@@ -16,7 +16,6 @@ interface UseAddDataTableColumnDialogI {
 export default function useAddDataTableColumnDialog(): UseAddDataTableColumnDialogI {
     const {clearDialog, open, setOpen} = useAddDataTableColumnDialogStore();
     const {dataTable} = useCurrentDataTableStore();
-
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();

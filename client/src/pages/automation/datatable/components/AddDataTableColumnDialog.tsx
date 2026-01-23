@@ -18,10 +18,10 @@ const COLUMN_TYPES: ColumnType[] = [
 ];
 
 const AddDataTableColumnDialog = () => {
-    const {handleAdd, handleOpenChange, open} = useAddDataTableColumnDialog();
-
     const [columnName, setColumnName] = useState('');
     const [columnType, setColumnType] = useState<ColumnType>(ColumnType.String);
+
+    const {handleAdd, handleOpenChange, open} = useAddDataTableColumnDialog();
 
     useEffect(() => {
         if (!open) {

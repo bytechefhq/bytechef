@@ -2,7 +2,6 @@ import Button from '@/components/Button/Button';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     DataTable,
-    DataTableRow,
     useDataTablesQuery,
     useInsertDataTableRowMutation,
     useUpdateDataTableRowMutation,
@@ -86,8 +85,8 @@ interface BuildGridColumnsParamsI {
     setAddColumnDialogOpen: (open: boolean) => void;
     setColumnToDelete: (columnId: string, columnName: string) => void;
     setColumnToRename: (columnId: string, columnName: string) => void;
-    setHoveredRowId: React.Dispatch<React.SetStateAction<string | null>>;
-    setLocalRows: React.Dispatch<React.SetStateAction<GridRowType[]>>;
+    setHoveredRowId: Dispatch<SetStateAction<string | null>>;
+    setLocalRows: Dispatch<SetStateAction<GridRowType[]>>;
     updateRowMutation: {
         mutate: (params: {
             input: {environmentId: string; id: string; tableId: string; values: Record<string, unknown>};
@@ -108,7 +107,7 @@ function buildUserColumn({
     totalColumns,
     updateRowMutation,
 }: BuildUserColumnParamsI): Column<GridRowType, SummaryRowType> {
-    const baseCol = {
+    const baseColumnConfig = {
         cellClass: 'datatable-cell',
         editable: (row: GridRowType) => row.id !== '-1',
         headerCellClass: 'datatable-cell',
@@ -126,9 +125,9 @@ function buildUserColumn({
         width: DEFAULT_COLUMN_WIDTH,
     } satisfies Omit<Column<GridRowType, SummaryRowType>, 'colSpan' | 'renderSummaryCell'>;
 
-    let userCol: Column<GridRowType, SummaryRowType> = isFirstNonFrozenColumn
+    let columnDefinition: Column<GridRowType, SummaryRowType> = isFirstNonFrozenColumn
         ? {
-              ...baseCol,
+              ...baseColumnConfig,
               colSpan: (args: ColSpanArgs<GridRowType, SummaryRowType>) => {
                   if (args.type === 'SUMMARY') {
                       return (totalColumns - 2) as number;
@@ -140,7 +139,7 @@ function buildUserColumn({
               summaryCellClass: 'datatable-summary-row',
           }
         : {
-              ...baseCol,
+              ...baseColumnConfig,
           };
 
     if (column.type === 'BOOLEAN') {
@@ -152,44 +151,44 @@ function buildUserColumn({
             updateRowMutation,
         });
 
-        userCol = {
-            ...userCol,
+        columnDefinition = {
+            ...columnDefinition,
             editable: false,
             renderCell: ({row}) => <BooleanRenderer row={row} />,
         } satisfies Column<GridRowType, SummaryRowType>;
     }
 
     if (column.type === 'STRING') {
-        userCol = {
-            ...userCol,
+        columnDefinition = {
+            ...columnDefinition,
             renderEditCell: createStringEditCellRenderer(column.name),
         };
     }
 
     if (column.type === 'NUMBER' || column.type === 'INTEGER') {
-        userCol = {
-            ...userCol,
+        columnDefinition = {
+            ...columnDefinition,
             renderEditCell: createNumberEditCellRenderer(column.name),
         };
     }
 
     if (column.type === 'DATE') {
-        userCol = {
-            ...userCol,
+        columnDefinition = {
+            ...columnDefinition,
             renderCell: createDateCellRenderer(column.name),
             renderEditCell: createDateEditCellRenderer(column.name),
         };
     }
 
     if (column.type === 'DATE_TIME') {
-        userCol = {
-            ...userCol,
+        columnDefinition = {
+            ...columnDefinition,
             renderCell: createDateTimeCellRenderer(column.name),
             renderEditCell: createDateTimeEditCellRenderer(column.name),
         };
     }
 
-    return userCol;
+    return columnDefinition;
 }
 
 function buildTrailingColumn({
@@ -237,14 +236,13 @@ function buildGridColumns({
     setLocalRows,
     updateRowMutation,
 }: BuildGridColumnsParamsI): Column<GridRowType, SummaryRowType>[] {
-    const cols: Column<GridRowType, SummaryRowType>[] = [];
-    const totalCols = 1 + (dataTable?.columns?.length ?? 0) + 1;
+    const columns: Column<GridRowType, SummaryRowType>[] = [];
+    const totalColumnCount = 1 + (dataTable?.columns?.length ?? 0) + 1;
     const selectedCount = selectedRows.size;
-    const allSelected = localRowCount > 0 && selectedCount === localRowCount;
-    const someSelected = selectedCount > 0 && selectedCount < localRowCount;
+    const isAllSelected = localRowCount > 0 && selectedCount === localRowCount;
+    const isSomeSelected = selectedCount > 0 && selectedCount < localRowCount;
 
-    // ID column
-    cols.push({
+    columns.push({
         frozen: true,
         key: 'id',
         name: 'id',
@@ -261,42 +259,42 @@ function buildGridColumns({
         ),
         renderHeaderCell: () => (
             <SelectAllHeaderCell
-                allSelected={allSelected}
+                allSelected={isAllSelected}
                 onToggleSelectAll={handleToggleSelectAll}
-                someSelected={someSelected}
+                someSelected={isSomeSelected}
             />
         ),
         width: 80,
     });
 
-    let summaryAssigned = false;
+    let isSummaryRowAssigned = false;
 
     (dataTable?.columns ?? []).forEach((column) => {
         if (!dataTable?.id) return;
 
-        const userCol = buildUserColumn({
+        const columnDefinition = buildUserColumn({
             column,
             environmentId,
             isFetchingNextPage,
-            isFirstNonFrozenColumn: !summaryAssigned,
+            isFirstNonFrozenColumn: !isSummaryRowAssigned,
             onDeleteColumn: setColumnToDelete,
             onRenameColumn: setColumnToRename,
             rowCount: localRowCount,
             setLocalRows,
             tableId: dataTable.id,
-            totalColumns: totalCols,
+            totalColumns: totalColumnCount,
             updateRowMutation,
         });
 
-        if (!summaryAssigned) {
-            summaryAssigned = true;
+        if (!isSummaryRowAssigned) {
+            isSummaryRowAssigned = true;
         }
 
-        cols.push(userCol);
+        columns.push(columnDefinition);
     });
 
     // Trailing column with + in the header to add a column
-    cols.push(
+    columns.push(
         buildTrailingColumn({
             hasColumns: (dataTable?.columns?.length ?? 0) > 0,
             isFetchingNextPage,
@@ -305,43 +303,21 @@ function buildGridColumns({
         })
     );
 
-    return cols;
+    return columns;
 }
 
 export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     const [localRows, setLocalRows] = useState<GridRowType[]>([]);
-
-    const {selectedRows, setSelectedRows} = useSelectedRowsStore();
-    const {setColumnToDelete} = useDeleteDataTableColumnDialogStore();
-    const {setColumnToRename} = useRenameDataTableColumnDialogStore();
-    const {setOpen: setAddColumnDialogOpen} = useAddDataTableColumnDialogStore();
     const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
 
+    const {setOpen: setAddColumnDialogOpen} = useAddDataTableColumnDialogStore();
+    const {dataTable, setDataTable} = useCurrentDataTableStore();
+    const {setColumnToDelete} = useDeleteDataTableColumnDialogStore();
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const {setColumnToRename} = useRenameDataTableColumnDialogStore();
+    const {selectedRows, setSelectedRows} = useSelectedRowsStore();
     const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const queryClient = useQueryClient();
-
-    // Tables query
-    const {
-        data: tablesData,
-        error: tablesError,
-        isLoading: tablesLoading,
-    } = useDataTablesQuery({
-        environmentId: String(environmentId),
-        workspaceId: String(workspaceId),
-    });
-
-    // Current data table from store
-    const {dataTable, setDataTable} = useCurrentDataTableStore();
-
-    // Update store when table data changes
-    useEffect(() => {
-        const foundTable = tablesData?.dataTables?.find((table) => (tableId != null ? table.id === tableId : false));
-        setDataTable(foundTable);
-    }, [tablesData, tableId, setDataTable]);
-
-    // Rows query with infinite scrolling
     const {
         data: pagesData,
         error: rowsError,
@@ -354,22 +330,35 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         {enabled: Boolean(dataTable && dataTable.id != null)}
     );
 
-    // Infinite scrolling refs
     const fetchNextPageRef = useRef(fetchNextPage);
     const hasNextPageRef = useRef(hasNextPage);
     const isFetchingNextPageRef = useRef(isFetchingNextPage);
 
-    const rows: DataTableRow[] = useMemo(
-        () => pagesData?.pages.flatMap((page) => page.dataTableRowsPage.items) ?? [],
-        [pagesData]
-    );
+    const gridRows: GridRowType[] = useMemo(() => {
+        const fetchedRows = pagesData?.pages.flatMap((page) => page.dataTableRowsPage.items) ?? [];
 
-    // Invalidate helper
+        return fetchedRows.map((row) => ({id: row.id, ...row.values}));
+    }, [pagesData]);
+
+    const gridRowsWithAdd: GridRowType[] = useMemo(() => {
+        return [...localRows, {id: '-1'} as GridRowType];
+    }, [localRows]);
+
+    const queryClient = useQueryClient();
+
+    const {
+        data: tablesData,
+        error: tablesError,
+        isLoading: tablesLoading,
+    } = useDataTablesQuery({
+        environmentId: String(environmentId),
+        workspaceId: String(workspaceId),
+    });
+
     const invalidateRows = useCallback(() => {
         queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
     }, [queryClient]);
 
-    // Mutations
     const insertRowMutation = useInsertDataTableRowMutation({
         onSuccess: invalidateRows,
     });
@@ -378,76 +367,74 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         onSuccess: invalidateRows,
     });
 
-    // Source of truth for grid rows + synthetic last "+" row for adding new records
-    const gridRowsWithAdd: GridRowType[] = useMemo(() => {
-        return [...localRows, {id: '-1'} as GridRowType];
-    }, [localRows]);
-
     const handleGridScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
-        const element = event.currentTarget;
-        const nearBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 60;
+        const scrollContainer = event.currentTarget;
+        const isNearBottom =
+            scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 60;
 
-        if (nearBottom && hasNextPageRef.current && !isFetchingNextPageRef.current) {
+        if (isNearBottom && hasNextPageRef.current && !isFetchingNextPageRef.current) {
             fetchNextPageRef.current();
         }
     }, []);
 
-    // Row change handler
     const handleRowsChange = useCallback(
-        (newRows: GridRowType[], data: RowsChangeData<GridRowType, SummaryRowType>) => {
-            if (data.indexes.length === 1) {
-                const idx = data.indexes[0];
-                const updated = newRows[idx];
-                const original = localRows.find((row) => row.id === updated.id);
+        (updatedRows: GridRowType[], changeData: RowsChangeData<GridRowType, SummaryRowType>) => {
+            if (changeData.indexes.length === 1) {
+                const rowIndex = changeData.indexes[0];
+                const updatedRow = updatedRows[rowIndex];
+                const originalRow = localRows.find((row) => row.id === updatedRow.id);
 
-                if (!original) return;
+                if (!originalRow) {
+                    return;
+                }
 
-                const changed: Record<string, unknown> = {};
+                const changedValues: Record<string, unknown> = {};
 
-                Object.keys(updated).forEach((key) => {
-                    if (key === 'id') return;
+                Object.keys(updatedRow).forEach((columnKey) => {
+                    if (columnKey === 'id') return;
 
-                    if (updated[key] !== original[key]) {
-                        changed[key] = updated[key];
+                    if (updatedRow[columnKey] !== originalRow[columnKey]) {
+                        changedValues[columnKey] = updatedRow[columnKey];
                     }
                 });
 
-                if (Object.keys(changed).length > 0 && dataTable?.id) {
+                if (Object.keys(changedValues).length > 0 && dataTable?.id) {
                     updateRowMutation.mutate({
                         input: {
                             environmentId: String(environmentId),
-                            id: updated.id,
+                            id: updatedRow.id,
                             tableId: dataTable.id,
-                            values: changed,
+                            values: changedValues,
                         },
                     });
                 }
 
-                setLocalRows(newRows.filter((row) => row.id !== '-1'));
+                setLocalRows(updatedRows.filter((row) => row.id !== '-1'));
             }
         },
         [localRows, dataTable?.id, environmentId, updateRowMutation]
     );
 
-    // Selection handler
     const handleSelectedRowsChange = useCallback(
-        (next: ReadonlySet<string>) => {
-            if (next.has('-1')) {
-                const copy = new Set(next);
-                copy.delete('-1');
-                setSelectedRows(copy);
+        (nextSelectedRows: ReadonlySet<string>) => {
+            if (nextSelectedRows.has('-1')) {
+                const filteredSelection = new Set(nextSelectedRows);
+
+                filteredSelection.delete('-1');
+                setSelectedRows(filteredSelection);
             } else {
-                setSelectedRows(next);
+                setSelectedRows(nextSelectedRows);
             }
         },
         [setSelectedRows]
     );
 
     const handleToggleSelectAll = useCallback(
-        (nextChecked: boolean) => {
-            if (nextChecked) {
-                const all = new Set<string>(localRows.map((row) => String(row.id)));
-                setSelectedRows(all);
+        (isChecked: boolean) => {
+            if (isChecked) {
+                const allRowIds = new Set<string>(localRows.map((row) => String(row.id)));
+
+                setSelectedRows(allRowIds);
             } else {
                 setSelectedRows(new Set<string>());
             }
@@ -455,7 +442,6 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         [localRows, setSelectedRows]
     );
 
-    // Action handlers
     const handleAddRow = useCallback(() => {
         if (!dataTable?.id) return;
 
@@ -464,14 +450,13 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         });
     }, [dataTable?.id, environmentId, insertRowMutation]);
 
-    // Build grid columns: ID + user columns + trailing header + add column
-    const stringEnvironmentId = String(environmentId);
     const localRowCount = localRows.length;
+
     const gridColumns: Column<GridRowType, SummaryRowType>[] = useMemo(
         () =>
             buildGridColumns({
                 dataTable,
-                environmentId: stringEnvironmentId,
+                environmentId: String(environmentId),
                 handleAddRow,
                 handleSelectedRowsChange,
                 handleToggleSelectAll,
@@ -488,7 +473,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
             }),
         [
             dataTable,
-            stringEnvironmentId,
+            environmentId,
             handleAddRow,
             handleSelectedRowsChange,
             handleToggleSelectAll,
@@ -503,12 +488,12 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         ]
     );
 
-    // Grid rows transformation
-    const gridRows: GridRowType[] = useMemo(() => {
-        return rows.map((row) => ({id: row.id, ...row.values}));
-    }, [rows]);
+    useEffect(() => {
+        const selectedTable = tablesData?.dataTables?.find((tableItem) => tableId != null && tableItem.id === tableId);
 
-    // Clear selected rows when switching to a different table to avoid stale selections
+        setDataTable(selectedTable);
+    }, [tablesData, tableId, setDataTable]);
+
     useEffect(() => {
         handleSelectedRowsChange(new Set());
     }, [tableId, handleSelectedRowsChange]);

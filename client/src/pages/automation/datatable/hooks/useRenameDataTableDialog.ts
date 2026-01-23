@@ -18,7 +18,6 @@ interface UseRenameDataTableDialogI {
 export default function useRenameDataTableDialog(): UseRenameDataTableDialogI {
     const {baseName, clearTableToRename, renameValue, setRenameValue, setTableToRename, tableIdToRename} =
         useRenameDataTableDialogStore();
-
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();

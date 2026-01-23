@@ -18,7 +18,6 @@ export default function useDeleteDataTableRowsDialog(): UseDeleteDataTableRowsDi
     const {dataTable} = useCurrentDataTableStore();
     const {clearDialog, open, setOpen} = useDeleteDataTableRowsDialogStore();
     const {clearSelectedRows, selectedRows} = useSelectedRowsStore();
-
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();

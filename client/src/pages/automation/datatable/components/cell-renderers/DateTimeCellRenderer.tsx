@@ -14,22 +14,22 @@ interface DateTimeCellRendererProps {
 }
 
 export const DateTimeCellRenderer = ({columnName, row: {row}}: DateTimeCellRendererProps) => {
-    const raw = (row as Record<string, unknown>)[columnName];
-    let text = '';
+    const cellValue = (row as Record<string, unknown>)[columnName];
+    let displayText = '';
 
-    if (raw) {
+    if (cellValue) {
         try {
-            const date = new Date(String(raw));
+            const date = new Date(String(cellValue));
 
             if (!isNaN(date.getTime())) {
-                text = formatDate(date, 'yyyy-MM-dd HH:mm');
+                displayText = formatDate(date, 'yyyy-MM-dd HH:mm');
             }
         } catch {
-            text = String(raw);
+            displayText = String(cellValue);
         }
     }
 
-    return <span className="text-sm text-foreground">{text}</span>;
+    return <span className="text-sm text-foreground">{displayText}</span>;
 };
 
 interface DateTimeEditCellProps {
@@ -79,6 +79,7 @@ export const DateTimeEditCell = ({columnName, onRowChange, row}: DateTimeEditCel
 
         updatedDate.setHours(clampedHours);
         updatedDate.setMinutes(clampedMinutes);
+
         setSelectedDate(updatedDate);
     };
 
@@ -88,6 +89,7 @@ export const DateTimeEditCell = ({columnName, onRowChange, row}: DateTimeEditCel
         const updatedDate = new Date(selectedDate);
 
         updatedDate.setFullYear(calendarDate.getFullYear(), calendarDate.getMonth(), calendarDate.getDate());
+
         setSelectedDate(updatedDate);
     };
 

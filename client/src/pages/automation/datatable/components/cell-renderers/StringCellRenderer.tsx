@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Textarea} from '@/components/ui/textarea';
-import {useRef, useState} from 'react';
+import {type KeyboardEvent, useRef, useState} from 'react';
 
 import type {GridRowType} from './types';
 
@@ -12,35 +12,60 @@ interface StringEditCellProps {
 }
 
 export const StringEditCell = ({columnName, onRowChange, row}: StringEditCellProps) => {
-    const initial = String(((row as Record<string, unknown>)[columnName] ?? '') as string);
     const [open, setOpen] = useState(true);
-    const [text, setText] = useState<string>(initial);
+    const [text, setText] = useState<string>(String(((row as Record<string, unknown>)[columnName] ?? '') as string));
+
     const committedRef = useRef(false);
 
-    const doSave = () => {
+    const handleSave = () => {
         committedRef.current = true;
+
         onRowChange({...row, [columnName]: text}, true);
         setOpen(false);
     };
 
-    const doCancel = () => {
+    const handleCancel = () => {
         committedRef.current = true;
+
         onRowChange(row, true);
         setOpen(false);
     };
 
+    const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Enter' && event.shiftKey) {
+            event.stopPropagation();
+
+            return;
+        }
+
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            event.stopPropagation();
+
+            handleSave();
+
+            return;
+        }
+
+        if (event.key === 'Escape') {
+            event.stopPropagation();
+
+            handleCancel();
+
+            return;
+        }
+    };
+
+    const handleOpenChange = (isOpen: boolean) => {
+        if (!isOpen && !committedRef.current) {
+            onRowChange(row, true);
+        }
+
+        setOpen(isOpen);
+    };
+
     return (
-        <Popover
-            onOpenChange={(next) => {
-                if (!next) {
-                    if (!committedRef.current) {
-                        onRowChange(row, true);
-                    }
-                }
-                setOpen(next);
-            }}
-            open={open}
-        >
+        <Popover onOpenChange={handleOpenChange} open={open}>
             <PopoverTrigger asChild>
                 <Button className="h-7 w-full justify-start px-2 text-xs" variant="outline">
                     Edit text…
@@ -53,25 +78,7 @@ export const StringEditCell = ({columnName, onRowChange, row}: StringEditCellPro
                         autoFocus
                         className="min-h-[180px] w-full resize-y"
                         onChange={(event) => setText(event.target.value)}
-                        onKeyDown={(event) => {
-                            if (event.key === 'Enter' && event.shiftKey) {
-                                event.stopPropagation();
-                                return;
-                            }
-
-                            if (event.key === 'Enter') {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                doSave();
-                                return;
-                            }
-
-                            if (event.key === 'Escape') {
-                                event.stopPropagation();
-                                doCancel();
-                                return;
-                            }
-                        }}
+                        onKeyDown={handleKeyDown}
                         placeholder={`Enter ${columnName}`}
                         rows={10}
                         value={text}

@@ -17,7 +17,6 @@ interface UseDeleteDataTableColumnDialogI {
 export default function useDeleteDataTableColumnDialog(): UseDeleteDataTableColumnDialogI {
     const {clearDialog, columnId, columnName, setColumnToDelete} = useDeleteDataTableColumnDialogStore();
     const {dataTable} = useCurrentDataTableStore();
-
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();
