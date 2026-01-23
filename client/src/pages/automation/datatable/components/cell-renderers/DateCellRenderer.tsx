@@ -30,46 +30,46 @@ export const DateCellRenderer = ({columnName, row: {row}}: DateCellRendererProps
     return <span className="text-sm text-foreground">{text}</span>;
 };
 
-interface DateEditCellProps {
+interface DateEditCellRendererProps {
     columnName: string;
     row: GridRowType;
     onRowChange: (row: GridRowType, commitChanges?: boolean) => void;
 }
 
-export const DateEditCell = ({columnName, onRowChange, row}: DateEditCellProps) => {
-    const [open, setOpen] = useState(true);
-    const raw = (row as Record<string, unknown>)[columnName];
-    let initial: Date | undefined;
+const getInitialDate = (row: GridRowType, columnName: string): Date | undefined => {
+    const cellValue = (row as Record<string, unknown>)[columnName];
 
-    if (raw) {
-        const date = new Date(String(raw));
+    if (!cellValue) return undefined;
 
-        if (!isNaN(date.getTime())) {
-            initial = date;
-        }
-    }
+    const date = new Date(String(cellValue));
+
+    return isNaN(date.getTime()) ? undefined : date;
+};
+
+export const DateEditCellRenderer = ({columnName, onRowChange, row}: DateEditCellRendererProps) => {
+    const initialDate = getInitialDate(row, columnName);
+
+    const [isPopoverOpen, setIsPopoverOpen] = useState(true);
+
+    const handleDateSelect = (selectedDate: Date | undefined) => {
+        if (!selectedDate) return;
+
+        const formattedValue = formatDate(selectedDate, 'yyyy-MM-dd');
+
+        onRowChange({...row, [columnName]: formattedValue}, true);
+        setIsPopoverOpen(false);
+    };
 
     return (
-        <Popover onOpenChange={setOpen} open={open}>
+        <Popover onOpenChange={setIsPopoverOpen} open={isPopoverOpen}>
             <PopoverTrigger asChild>
                 <Button className="h-7 w-full justify-start px-2 text-xs" variant="outline">
-                    {initial ? formatDate(initial, 'yyyy-MM-dd') : 'Pick a date'}
+                    {initialDate ? formatDate(initialDate, 'yyyy-MM-dd') : 'Pick a date'}
                 </Button>
             </PopoverTrigger>
 
             <PopoverContent align="start" className="p-2" side="bottom">
-                <Calendar
-                    mode="single"
-                    onSelect={(date) => {
-                        if (!date) return;
-
-                        const value = formatDate(date, 'yyyy-MM-dd');
-
-                        onRowChange({...row, [columnName]: value}, true);
-                        setOpen(false);
-                    }}
-                    selected={initial}
-                />
+                <Calendar mode="single" onSelect={handleDateSelect} selected={initialDate} />
             </PopoverContent>
         </Popover>
     );
@@ -81,6 +81,6 @@ export const createDateCellRenderer = (columnName: string) => {
 
 export const createDateEditCellRenderer = (columnName: string) => {
     return (props: {row: GridRowType; onRowChange: (row: GridRowType, commitChanges?: boolean) => void}) => (
-        <DateEditCell columnName={columnName} onRowChange={props.onRowChange} row={props.row} />
+        <DateEditCellRenderer columnName={columnName} onRowChange={props.onRowChange} row={props.row} />
     );
 };

@@ -17,8 +17,8 @@ interface UseDeleteDataTableDialogI {
 export default function useDeleteDataTableDialog(): UseDeleteDataTableDialogI {
     const {clearTableToDelete, setTableToDelete, tableIdToDelete, tableNameToDelete} = useDeleteDataTableDialogStore();
 
-    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId) ?? 2;
-    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId) ?? 1049;
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const queryClient = useQueryClient();
     const navigate = useNavigate();

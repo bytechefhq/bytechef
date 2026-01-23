@@ -30,7 +30,7 @@ interface UseDataTableActionsMenuI {
 
 export default function useDataTableActionsMenu(): UseDataTableActionsMenuI {
     const {dataTable} = useCurrentDataTableStore();
-    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId) ?? 2;
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {
         handleDelete: handleDeleteTable,

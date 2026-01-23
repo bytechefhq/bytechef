@@ -16,7 +16,7 @@ export const createBooleanCellRenderer = ({
 
         const checked = Boolean((row as Record<string, unknown>)[columnName]);
 
-        const onToggle = (next: boolean) => {
+        const handleToggle = (next: boolean) => {
             setLocalRows((prev) => prev.map((r) => (r.id === id ? {...r, [columnName]: next} : r)));
 
             updateRowMutation.mutate({
@@ -30,7 +30,7 @@ export const createBooleanCellRenderer = ({
                     aria-label={`Toggle ${columnName}`}
                     checked={checked}
                     className="h-4 w-4 cursor-pointer"
-                    onCheckedChange={(value) => onToggle(value === true)}
+                    onCheckedChange={(value) => handleToggle(value === true)}
                 />
             </div>
         );

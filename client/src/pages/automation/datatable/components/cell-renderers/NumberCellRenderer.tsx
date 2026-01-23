@@ -1,4 +1,5 @@
 import {Input} from '@/components/ui/input';
+import {type ChangeEvent, type FocusEvent, type KeyboardEvent} from 'react';
 
 import type {GridRowType} from './types';
 
@@ -14,9 +15,38 @@ export const NumberEditCell = ({columnName, onRowChange, row}: NumberEditCellPro
 
     const commit = (inputValue: string, commitChanges: boolean) => {
         const trimmed = inputValue.trim();
-        const output: unknown = trimmed === '' ? null : trimmed;
 
-        onRowChange({...row, [columnName]: output}, commitChanges);
+        // Use null for empty input, otherwise convert to a number.
+        if (trimmed === '') {
+            onRowChange({...row, [columnName]: null}, commitChanges);
+
+            return;
+        }
+
+        const parsed = Number(trimmed);
+
+        // If the value cannot be parsed as a number, do not commit the change.
+        if (Number.isNaN(parsed)) {
+            return;
+        }
+
+        onRowChange({...row, [columnName]: parsed}, commitChanges);
+    };
+
+    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+        commit(event.target.value, true);
+    };
+
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        commit(event.target.value, false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            const target = event.target as HTMLInputElement;
+
+            commit(target.value, true);
+        }
     };
 
     return (
@@ -24,15 +54,9 @@ export const NumberEditCell = ({columnName, onRowChange, row}: NumberEditCellPro
             autoFocus
             className="h-7"
             inputMode="decimal"
-            onBlur={(event) => commit(event.target.value, true)}
-            onChange={(event) => commit(event.target.value, false)}
-            onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                    const target = event.target as HTMLInputElement;
-
-                    commit(target.value, true);
-                }
-            }}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
             type="number"
             value={value}
         />

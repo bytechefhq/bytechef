@@ -1,26 +1,26 @@
 import Button from '@/components/Button/Button';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Plus} from 'lucide-react';
-import {type Dispatch, type SetStateAction} from 'react';
+import {type Dispatch, type KeyboardEvent, type SetStateAction} from 'react';
 
 import {type GridRowType} from '../cell-renderers';
 
 interface RowIdCellProps {
     hoveredRowId: string | null;
-    localRows: GridRowType[];
     onAddRow: () => void;
     onSelectedRowsChange: (rows: ReadonlySet<string>) => void;
     row: GridRowType;
+    rowIdx: number;
     selectedRows: ReadonlySet<string>;
     setHoveredRowId: Dispatch<SetStateAction<string | null>>;
 }
 
 const RowIdCell = ({
     hoveredRowId,
-    localRows,
     onAddRow,
     onSelectedRowsChange,
     row,
+    rowIdx,
     selectedRows,
     setHoveredRowId,
 }: RowIdCellProps) => {
@@ -56,22 +56,30 @@ const RowIdCell = ({
         onSelectedRowsChange(next);
     };
 
-    // compute 1-based row number in current order
-    const rowIndex = localRows.findIndex((r) => r.id === id);
-    const rowNumber = rowIndex >= 0 ? rowIndex + 1 : undefined;
+    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toggleRow();
+        }
+    };
+
+    // Use rowIdx directly instead of O(n) findIndex
+    const rowNumber = rowIdx + 1;
 
     return (
         <div
-            className="flex w-full items-center justify-center gap-2"
+            className="flex w-full items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
             onClick={toggleRow}
+            onKeyDown={handleKeyDown}
             onMouseEnter={() => setHoveredRowId(id)}
             onMouseLeave={() => setHoveredRowId((curr) => (curr === id ? null : curr))}
             role="button"
-            title={rowNumber !== undefined ? `Row ${rowNumber}` : undefined}
+            tabIndex={0}
+            title={`Row ${rowNumber}`}
         >
             {showCheckbox ? (
                 <Checkbox
-                    aria-label={rowNumber !== undefined ? `Select row ${rowNumber}` : 'Select row'}
+                    aria-label={`Select row ${rowNumber}`}
                     checked={isSelected}
                     className="h-4 w-4 cursor-pointer"
                     onCheckedChange={(v) => {
@@ -88,7 +96,9 @@ const RowIdCell = ({
                     onClick={(e) => e.stopPropagation()}
                 />
             ) : (
-                <span className="select-none text-xs text-muted-foreground">{rowNumber}</span>
+                <span aria-hidden="true" className="select-none text-xs text-muted-foreground">
+                    {rowNumber}
+                </span>
             )}
         </div>
     );

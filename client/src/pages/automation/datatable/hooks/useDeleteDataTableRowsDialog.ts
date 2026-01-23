@@ -19,15 +19,11 @@ export default function useDeleteDataTableRowsDialog(): UseDeleteDataTableRowsDi
     const {clearDialog, open, setOpen} = useDeleteDataTableRowsDialogStore();
     const {clearSelectedRows, selectedRows} = useSelectedRowsStore();
 
-    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId) ?? 2;
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();
 
-    const deleteRowMutation = useDeleteDataTableRowMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
-        },
-    });
+    const deleteRowMutation = useDeleteDataTableRowMutation({});
 
     const handleClose = () => {
         clearDialog();
@@ -37,17 +33,23 @@ export default function useDeleteDataTableRowsDialog(): UseDeleteDataTableRowsDi
         setOpen();
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (!selectedRows || selectedRows.size === 0) return;
 
         if (!dataTable?.id) return;
 
-        Array.from(selectedRows).forEach((rowId) =>
-            deleteRowMutation.mutate({
-                input: {environmentId: String(environmentId), id: String(rowId), tableId: dataTable.id},
-            })
+        const tableId = dataTable.id;
+
+        // Batch all deletions and invalidate once after all complete
+        await Promise.all(
+            Array.from(selectedRows).map((rowId) =>
+                deleteRowMutation.mutateAsync({
+                    input: {environmentId: String(environmentId), id: String(rowId), tableId},
+                })
+            )
         );
 
+        queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
         clearDialog();
         clearSelectedRows();
     };
