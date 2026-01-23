@@ -46,7 +46,9 @@ import com.bytechef.component.definition.Authorization.TokenUrlFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
@@ -55,6 +57,7 @@ import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.exception.ConnectionDefinitionErrorType;
+import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
 import java.net.URI;
@@ -68,6 +71,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -85,12 +89,15 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
+    private final TokenRefreshHelper tokenRefreshHelper;
 
     public ConnectionDefinitionServiceImpl(
-        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
+        @Lazy TokenRefreshHelper tokenRefreshHelper) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
+        this.tokenRefreshHelper = tokenRefreshHelper;
     }
 
     @Override
@@ -138,25 +145,56 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection) {
-        return executeBaseUri(
-            componentName, componentConnection, contextFactory.createContext(componentName, componentConnection));
+    public Optional<String> executeBaseUri(
+        String componentName, ComponentConnection componentConnection, Context context) {
+
+        return executeBaseUriInternal(componentName, componentConnection, context);
     }
 
     @Override
-    public Optional<String> executeBaseUri(
+    public Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection) {
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName,
+            -1,
+            componentConnection,
+            contextFactory.createContext(componentName, componentConnection),
+            ConnectionDefinitionErrorType.INVALID_CLAIM,
+            (componentConnection1, context) -> executeBaseUriInternal(componentName, componentConnection1, context),
+            componentConnection1 -> contextFactory.createContext(componentName, componentConnection1));
+    }
+
+    private Optional<String> executeBaseUriInternal(
         String componentName, ComponentConnection componentConnection, Context context) {
 
         com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
             componentDefinitionRegistry.getConnectionDefinition(componentName, componentConnection.getVersion());
 
-        BaseUriFunction baseUriFunction =
-            OptionalUtils.orElse(
-                connectionDefinition.getBaseUri(),
-                (connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
+        BaseUriFunction baseUriFunction = OptionalUtils.orElse(
+            connectionDefinition.getBaseUri(),
+            (connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
 
         return Optional.ofNullable(
             baseUriFunction.apply(ParametersFactory.createParameters(componentConnection.parameters()), context));
+    }
+
+    @Override
+    public ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,
+        int statusCode, Object body) {
+
+        com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
+            componentDefinitionRegistry.getConnectionDefinition(componentName, connectionVersion);
+
+        Context context = contextFactory.createContext(componentName, null);
+
+        try {
+            return connectionDefinition.getProcessErrorResponse()
+                .orElseGet(() -> (statusCode1, body1, context1) -> ProviderException.getProviderException(
+                    statusCode1, body1))
+                .apply(statusCode, body, context);
+        } catch (Exception e) {
+            throw new ExecutionException(e, ConnectionDefinitionErrorType.INVALID_CLAIM);
+        }
     }
 
     @Override

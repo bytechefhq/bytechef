@@ -76,7 +76,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     public ActionDefinitionServiceImpl(
         @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
-        TokenRefreshHelper tokenRefreshHelper) {
+        @Lazy TokenRefreshHelper tokenRefreshHelper) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
@@ -240,7 +240,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body) {
+        String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,
+        int statusCode, Object body) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, componentOperationName);

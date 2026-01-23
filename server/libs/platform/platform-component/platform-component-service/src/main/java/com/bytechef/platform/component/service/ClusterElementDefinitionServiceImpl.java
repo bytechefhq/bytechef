@@ -113,7 +113,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body) {
+        String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,
+        int statusCode, Object body) {
 
         return executeProcessErrorResponse(
             componentName, componentVersion, componentOperationName, statusCode, body,
@@ -334,7 +335,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     private ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String clusterElementName, int statusCode, Object body,
+        String componentName, int componentVersion, @Nullable String clusterElementName, int statusCode, Object body,
         ClusterElementContext context) {
 
         com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition =

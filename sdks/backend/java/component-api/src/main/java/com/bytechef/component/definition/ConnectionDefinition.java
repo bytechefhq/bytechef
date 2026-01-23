@@ -16,6 +16,7 @@
 
 package com.bytechef.component.definition;
 
+import com.bytechef.component.exception.ProviderException;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +49,12 @@ public interface ConnectionDefinition {
      * @return
      */
     Optional<BaseUriFunction> getBaseUri();
+
+    /**
+     *
+     * @return
+     */
+    Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
 
     /**
      *
@@ -93,5 +100,18 @@ public interface ConnectionDefinition {
          * @param context
          */
         void accept(Parameters connectionParameters, Context context);
+    }
+
+    @FunctionalInterface
+    interface ProcessErrorResponseFunction {
+
+        /**
+         *
+         * @param statusCode
+         * @param body
+         * @return context
+         */
+        ProviderException apply(int statusCode, Object body, Context context) throws Exception;
+
     }
 }

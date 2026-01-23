@@ -90,7 +90,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     public TriggerDefinitionServiceImpl(
         @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
-        ApplicationEventPublisher eventPublisher, TokenRefreshHelper tokenRefreshHelper) {
+        ApplicationEventPublisher eventPublisher, @Lazy TokenRefreshHelper tokenRefreshHelper) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
@@ -224,7 +224,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body) {
+        String componentName, int componentVersion, int connectionVersion, String componentOperationName,
+        int statusCode, Object body) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, componentOperationName);
