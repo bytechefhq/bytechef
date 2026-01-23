@@ -50,7 +50,7 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl, long environmentId) {
 
         post(
-            TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-disable",
+            TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-enable",
             new TriggerRequest(
                 workflowId, workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId, webhookUrl,
                 environmentId));
