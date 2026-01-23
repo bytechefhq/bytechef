@@ -41,6 +41,11 @@ vi.mock('@/shared/queries/automation/projectTags.queries', () => ({
 
 vi.mock('@/shared/queries/automation/projects.queries', () => ({
     ProjectKeys: {
+        filteredProjects: (filters: {categoryId?: number; id: number; tagId?: number}) => [
+            'projects',
+            filters.id,
+            filters,
+        ],
         project: (id: number) => ['projects', id],
         projectWorkflows: (id: number) => ['projects', id, 'workflows'],
         projects: ['projects'],
