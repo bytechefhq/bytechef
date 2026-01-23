@@ -16,11 +16,13 @@
 
 package com.bytechef.component.test.definition.extension;
 
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
@@ -32,6 +34,7 @@ import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
@@ -44,8 +47,17 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
         Http.Executor mockedExecutor = mock(Http.Executor.class);
         Http.Response mockedResponse = mock(Http.Response.class);
 
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
+            forClass(ContextFunction.class);
+        Http mockedHttp = mock(Http.class);
+
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(any()))
@@ -59,6 +71,7 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
         extensionContextStore.put(Context.class, mockedContext);
         extensionContextStore.put(Response.class, mockedResponse);
         extensionContextStore.put(Executor.class, mockedExecutor);
+        extensionContextStore.put(Http.class, mockedHttp);
     }
 
     @Override
@@ -69,7 +82,8 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
 
         return parameter.getType() == Context.class ||
             parameter.getType() == Http.Response.class ||
-            parameter.getType() == Http.Executor.class;
+            parameter.getType() == Http.Executor.class ||
+            parameter.getType() == Http.class;
     }
 
     @Override
@@ -91,6 +105,10 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
 
         if (parameter.getType() == Http.Executor.class) {
             return extensionContextStore.get(Http.Executor.class);
+        }
+
+        if (parameter.getType() == Http.class) {
+            return extensionContextStore.get(Http.class);
         }
 
         throw new ParameterResolutionException(
