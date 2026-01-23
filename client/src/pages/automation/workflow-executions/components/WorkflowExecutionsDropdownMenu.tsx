@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {useToast} from '@/hooks/use-toast';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
@@ -46,9 +46,11 @@ const WorkflowExecutionsDropdownMenu = ({data}: {data: CellContext<WorkflowExecu
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost">
-                    <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
-                </Button>
+                <Button
+                    icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
+                    size="icon"
+                    variant="ghost"
+                />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="center" onClick={(e) => e.stopPropagation()}>
