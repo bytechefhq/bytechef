@@ -33,14 +33,14 @@ import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.COMPANY
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.OUTPUT_FIELDS;
 import static com.bytechef.component.zoominfo.util.ZoominfoUtils.checkIfNull;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.zoominfo.util.ZoominfoUtils;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -92,7 +92,7 @@ public class ZoominfoEnrichCompanyAction {
                 .label("Output Fields")
                 .description("Fields you want to get from employee.")
                 .items(string())
-                .options((ActionDefinition.OptionsFunction<String>) ZoominfoUtils::getCompanyFieldOptions)
+                .options((OptionsFunction<String>) ZoominfoUtils::getCompanyFieldOptions)
                 .required(false))
         .output()
         .perform(ZoominfoEnrichCompanyAction::perform);
@@ -101,32 +101,24 @@ public class ZoominfoEnrichCompanyAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        Map<String, Object> matchCompanyInput = ZoominfoUtils.createPropertyMap(
+            inputParameters, COMPANY_ID, COMPANY_NAME, COMPANY_WEBSITE, COMPANY_PHONE, COMPANY_STREET, COMPANY_CITY,
+            COMPANY_STATE, COMPANY_ZIPCODE, COMPANY_COUNTRY);
 
-        Map<String, Object> matchCompanyInput = new LinkedHashMap<>();
         matchCompanyInput.put(COMPANY_ID, inputParameters.getRequiredInteger(COMPANY_ID));
 
-        checkIfNull(matchCompanyInput, COMPANY_NAME, inputParameters.getString(COMPANY_NAME));
-        checkIfNull(matchCompanyInput, COMPANY_WEBSITE, inputParameters.getString(COMPANY_WEBSITE));
-        checkIfNull(matchCompanyInput, COMPANY_PHONE, inputParameters.getString(COMPANY_PHONE));
-        checkIfNull(matchCompanyInput, COMPANY_STREET, inputParameters.getString(COMPANY_STREET));
-        checkIfNull(matchCompanyInput, COMPANY_CITY, inputParameters.getString(COMPANY_CITY));
-        checkIfNull(matchCompanyInput, COMPANY_STATE, inputParameters.getString(COMPANY_STATE));
-        checkIfNull(matchCompanyInput, COMPANY_ZIPCODE, inputParameters.getString(COMPANY_ZIPCODE));
-        checkIfNull(matchCompanyInput, COMPANY_COUNTRY, inputParameters.getString(COMPANY_COUNTRY));
+        Map<String, Object> attributesMap = new HashMap<>();
 
-        Map<String, Object> attributes = new LinkedHashMap<>();
-        checkIfNull(attributes, OUTPUT_FIELDS, inputParameters.getList(OUTPUT_FIELDS));
-        attributes.put("matchCompanyInput", matchCompanyInput);
-
-        Map<String, Object> data = Map.of(
-            "type", "CompanyEnrich",
-            "attributes", attributes);
-
-        Map<String, Object> body = Map.of("data", data);
+        attributesMap.put("matchCompanyInput", matchCompanyInput);
+        checkIfNull(attributesMap, OUTPUT_FIELDS, inputParameters.getList(OUTPUT_FIELDS));
 
         return context.http(http -> http.post("/companies/enrich"))
             .body(
-                Body.of(body))
+                Body.of(
+                    "data", new Object[] {
+                        "type", "CompanyEnrich",
+                        "attributes", attributesMap
+                    }))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();

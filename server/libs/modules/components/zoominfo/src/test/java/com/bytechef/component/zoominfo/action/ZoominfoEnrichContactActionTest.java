@@ -34,9 +34,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
@@ -53,11 +55,11 @@ import org.mockito.ArgumentCaptor;
 class ZoominfoEnrichContactActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
-    private final ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(Configuration.ConfigurationBuilder.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
     @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<Context.ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
-        forClass(Context.ContextFunction.class);
+    private final ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Http mockedHttp = mock(Http.class);
@@ -76,7 +78,7 @@ class ZoominfoEnrichContactActionTest {
     void testPerform() {
         when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
-                Context.ContextFunction<Http, Executor> value = httpFunctionArgumentCaptor.getValue();
+                ContextFunction<Http, Executor> value = httpFunctionArgumentCaptor.getValue();
 
                 return value.apply(mockedHttp);
             });
@@ -91,32 +93,31 @@ class ZoominfoEnrichContactActionTest {
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
-        Object result = ZoominfoEnrichContactAction.perform(
-            mockedParameters, null, mockedContext);
+        Object result = ZoominfoEnrichContactAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
 
-        Context.ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
         ResponseType responseType = configuration.getResponseType();
-
-        Map<String, Object> attributes = Map.of(
-            OUTPUT_FIELDS, List.of("id", "firstName", "email"),
-            "matchPersonInput", Map.of(PERSON_ID, 1, FULL_NAME, "test test", FIRST_NAME, "test",
-                LAST_NAME, "test", EMAIL, "http://www.example.com", PHONE, "+123456789",
-                JOB_TITLE, "developer", EXTERNAL_URL, "http://www.url.com", COMPANY_ID, 2,
-                COMPANY_NAME, "Company"));
 
         assertEquals(ResponseType.Type.JSON, responseType.getType());
         assertEquals("/contacts/enrich", stringArgumentCaptor.getValue());
         assertEquals(
             Body.of(
-                Map.of("data", Map.of("type", "ContactEnrich",
-                    "attributes", attributes)),
+                Map.of("data", Map.of(
+                    "type", "ContactEnrich",
+                    "attributes", Map.of(
+                        OUTPUT_FIELDS, List.of("id", "firstName", "email"),
+                        "matchPersonInput", Map.of(
+                            PERSON_ID, 1, FULL_NAME, "test test", FIRST_NAME, "test",
+                            LAST_NAME, "test", EMAIL, "http://www.example.com", PHONE, "+123456789",
+                            JOB_TITLE, "developer", EXTERNAL_URL, "http://www.url.com", COMPANY_ID, 2,
+                            COMPANY_NAME, "Company")))),
                 Http.BodyContentType.JSON),
             bodyArgumentCaptor.getValue());
     }

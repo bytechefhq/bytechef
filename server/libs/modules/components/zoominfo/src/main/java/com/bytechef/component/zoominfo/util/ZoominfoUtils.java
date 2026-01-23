@@ -25,6 +25,7 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,17 +40,27 @@ public class ZoominfoUtils {
         }
     }
 
+    public static Map<String, Object> createPropertyMap(Parameters inputParameters, String... properties) {
+        Map<String, Object> map = new HashMap<>();
+
+        for (String property : properties) {
+            checkIfNull(map, property, inputParameters.getString(property));
+        }
+
+        return map;
+    }
+
     public static List<Option<String>> getCompanyFieldOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/lookup/outputfields/company/enrich"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> map : body) {
             if ((boolean) map.get("accessGranted")) {
@@ -61,16 +72,16 @@ public class ZoominfoUtils {
     }
 
     public static List<Option<String>> getContactFieldOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/lookup/outputfields/contact/enrich"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> map : body) {
             if ((boolean) map.get("accessGranted")) {
