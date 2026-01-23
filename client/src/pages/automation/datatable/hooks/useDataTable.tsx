@@ -337,7 +337,8 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     const gridRows: GridRowType[] = useMemo(() => {
         const fetchedRows = pagesData?.pages.flatMap((page) => page.dataTableRowsPage.items) ?? [];
 
-        return fetchedRows.map((row) => ({id: row.id, ...row.values}));
+        // Spread row.values first, then assign id to prevent user column named "id" from overwriting the row identifier
+        return fetchedRows.map((row) => ({...row.values, id: row.id}));
     }, [pagesData]);
 
     const gridRowsWithAdd: GridRowType[] = useMemo(() => {

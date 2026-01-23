@@ -1,5 +1,5 @@
 import {Input} from '@/components/ui/input';
-import {type ChangeEvent, type FocusEvent, type KeyboardEvent} from 'react';
+import {type ChangeEvent, type FocusEvent, type KeyboardEvent, useState} from 'react';
 
 import type {GridRowType} from './types';
 
@@ -11,10 +11,12 @@ interface NumberEditCellProps {
 
 export const NumberEditCell = ({columnName, onRowChange, row}: NumberEditCellProps) => {
     const cellValue = (row as Record<string, unknown>)[columnName];
-    const displayValue = cellValue === null || cellValue === undefined ? '' : String(cellValue);
+    const initialValue = cellValue === null || cellValue === undefined ? '' : String(cellValue);
 
-    const commitValue = (inputValue: string, shouldCommit: boolean) => {
-        const trimmedValue = inputValue.trim();
+    const [inputValue, setInputValue] = useState(initialValue);
+
+    const commitValue = (value: string, shouldCommit: boolean) => {
+        const trimmedValue = value.trim();
 
         if (trimmedValue === '') {
             onRowChange({...row, [columnName]: null}, shouldCommit);
@@ -36,14 +38,12 @@ export const NumberEditCell = ({columnName, onRowChange, row}: NumberEditCellPro
     };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        commitValue(event.target.value, false);
+        setInputValue(event.target.value);
     };
 
     const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
-            const inputElement = event.target as HTMLInputElement;
-
-            commitValue(inputElement.value, true);
+            commitValue(inputValue, true);
         }
     };
 
@@ -56,7 +56,7 @@ export const NumberEditCell = ({columnName, onRowChange, row}: NumberEditCellPro
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             type="number"
-            value={displayValue}
+            value={inputValue}
         />
     );
 };

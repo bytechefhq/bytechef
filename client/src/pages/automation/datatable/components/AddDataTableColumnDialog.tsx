@@ -32,8 +32,14 @@ const AddDataTableColumnDialog = () => {
 
     const trimmedColumnName = columnName.trim();
 
+    const isReservedName = trimmedColumnName.toLowerCase() === 'id';
+
+    const isValidColumnName = trimmedColumnName.length > 0 && !isReservedName;
+
     const handleAddClick = () => {
-        if (!trimmedColumnName) return;
+        if (!isValidColumnName) {
+            return;
+        }
 
         handleAdd(trimmedColumnName, columnType);
     };
@@ -50,6 +56,10 @@ const AddDataTableColumnDialog = () => {
                         <Label>Name</Label>
 
                         <Input onChange={(event) => setColumnName(event.target.value)} value={columnName} />
+
+                        {isReservedName && (
+                            <p className="text-sm text-destructive">&quot;id&quot; is a reserved column name</p>
+                        )}
                     </div>
 
                     <div className="space-y-1">
@@ -76,7 +86,7 @@ const AddDataTableColumnDialog = () => {
                         Cancel
                     </Button>
 
-                    <Button disabled={!trimmedColumnName} onClick={handleAddClick}>
+                    <Button disabled={!isValidColumnName} onClick={handleAddClick}>
                         Add
                     </Button>
                 </DialogFooter>
