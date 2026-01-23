@@ -527,7 +527,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        List<String> apply(Parameters connectionParameters, Context context) throws Exception;
+        Map<String, Boolean> apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**

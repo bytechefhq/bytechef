@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,5 +24,5 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record OAuth2AuthorizationParameters(
-    String authorizationUrl, String clientId, Map<String, String> extraQueryParameters, List<String> scopes) {
+    String authorizationUrl, String clientId, Map<String, String> extraQueryParameters, Map<String, Boolean> scopes) {
 }
