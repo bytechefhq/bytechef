@@ -12,6 +12,7 @@ import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
@@ -72,6 +73,14 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     @Override
     public Optional<String> executeBaseUri(
         String componentName, ComponentConnection componentConnection, Context context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, int connectionVersion, String componentOperationName,
+        int statusCode, Object body) {
 
         throw new UnsupportedOperationException();
     }

@@ -88,7 +88,8 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body) {
+        String componentName, int componentVersion, int connectionVersion, String componentOperationName,
+        int statusCode, Object body) {
 
         throw new UnsupportedOperationException();
     }

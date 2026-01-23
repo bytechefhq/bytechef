@@ -1566,6 +1566,7 @@ public final class ComponentDsl {
         private TestConsumer testConsumer;
         private int version = 1;
         private Boolean authorizationRequired;
+        private ProcessErrorResponseFunction processErrorResponseFunction;
 
         private ModifiableConnectionDefinition() {
         }
@@ -1605,6 +1606,12 @@ public final class ComponentDsl {
 
         public ModifiableConnectionDefinition version(int version) {
             this.version = version;
+
+            return this;
+        }
+
+        public ModifiableConnectionDefinition processErrorResponse(ProcessErrorResponseFunction processErrorResponse) {
+            this.processErrorResponseFunction = processErrorResponse;
 
             return this;
         }
@@ -1659,6 +1666,11 @@ public final class ComponentDsl {
         @Override
         public Optional<BaseUriFunction> getBaseUri() {
             return Optional.ofNullable(baseUriFunction);
+        }
+
+        @Override
+        public Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
+            return Optional.ofNullable(processErrorResponseFunction);
         }
 
         @Override

@@ -145,7 +145,7 @@ class HttpClientExecutor {
 
     HttpClient createHttpClient(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Configuration configuration,
-        String componentName, int componentVersion, @Nullable String componentOperationName,
+        String componentName, int componentVersion, String componentOperationName,
         @Nullable ComponentConnection componentConnection, Context context) {
 
         Methanol.Builder builder = Methanol.newBuilder();
@@ -171,15 +171,11 @@ class HttpClientExecutor {
 
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 
-            boolean isAction = !(context instanceof TriggerContext);
-
-            if (componentOperationName != null) {
-                builder.interceptor(
-                    getInterceptor(
-                        componentName, componentVersion, componentOperationName, componentConnection.version(),
-                        componentConnection.authorizationType(), componentConnection.canCredentialsBeRefreshed(),
-                        isAction, context));
-            }
+            builder.interceptor(
+                getInterceptor(
+                    componentName, componentVersion, componentOperationName, componentConnection.version(),
+                    componentConnection.authorizationType(), componentConnection.canCredentialsBeRefreshed(),
+                    context));
         }
 
         if (configuration.isFollowRedirect()) {
@@ -411,13 +407,11 @@ class HttpClientExecutor {
      * @param connectionVersion      the version of the connection
      * @param authorizationType      the type of authorization
      * @param credentialsBeRefreshed whether credentials can be refreshed
-     * @param isAction               whether this is an action operation
      * @return the Methanol interceptor
      */
     private Methanol.Interceptor getInterceptor(
-        String componentName, int componentVersion, String componentOperationName, int connectionVersion,
-        AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean isAction,
-        Context context) {
+        String componentName, int componentVersion, @Nullable String componentOperationName, int connectionVersion,
+        AuthorizationType authorizationType, boolean credentialsBeRefreshed, Context context) {
 
         return new Methanol.Interceptor() {
             @Override
@@ -428,9 +422,14 @@ class HttpClientExecutor {
 
                 HttpResponse<T> httpResponse = chain.forward(httpRequest);
 
-                OperationDefinitionService operationDefinitionService = getOperationDefinitionService(isAction);
-
                 ConnectionDefinitionService connectionDefinitionService = getConnectionDefinitionService();
+
+                OperationDefinitionService operationDefinitionService;
+                if (componentOperationName == null) {
+                    operationDefinitionService = connectionDefinitionService;
+                } else {
+                    operationDefinitionService = getOperationDefinitionService(!(context instanceof TriggerContext));
+                }
 
                 if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 400)) {
                     List<String> detectOn = connectionDefinitionService.getAuthorizationDetectOn(
@@ -441,7 +440,8 @@ class HttpClientExecutor {
 
                         if (body != null && RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
                             throw operationDefinitionService.executeProcessErrorResponse(
-                                componentName, componentVersion, componentOperationName, httpResponse.statusCode(),
+                                componentName, componentVersion, connectionVersion, componentOperationName,
+                                httpResponse.statusCode(),
                                 body);
                         }
                     }
@@ -452,7 +452,8 @@ class HttpClientExecutor {
                 Object body = httpResponse.body();
 
                 throw operationDefinitionService.executeProcessErrorResponse(
-                    componentName, componentVersion, componentOperationName, httpResponse.statusCode(), body);
+                    componentName, componentVersion, connectionVersion, componentOperationName,
+                    httpResponse.statusCode(), body);
             }
 
             @Override

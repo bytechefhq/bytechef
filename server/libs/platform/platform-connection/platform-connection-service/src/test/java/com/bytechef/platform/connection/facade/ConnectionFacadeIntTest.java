@@ -395,6 +395,11 @@ public class ConnectionFacadeIntTest {
         }
 
         @Override
+        public Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
+            return Optional.empty();
+        }
+
+        @Override
         public Optional<List<? extends Property>> getProperties() {
             return Optional.empty();
         }

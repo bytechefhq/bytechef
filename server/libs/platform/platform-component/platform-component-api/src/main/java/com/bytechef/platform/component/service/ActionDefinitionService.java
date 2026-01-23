@@ -153,7 +153,8 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @return a ProviderException detailing the processed error response
      */
     ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body);
+        String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,
+        int statusCode, Object body);
 
     /**
      * Executes a workflow node description based on the specified component, version, action, and input parameters.
