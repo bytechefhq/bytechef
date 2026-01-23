@@ -150,6 +150,7 @@
         --surface-warning-secondary-hover: 55 97% 88%;
         --surface-warning-secondary-active: 53 98% 77%;
         --workflow-nodes-popover-component-menu-width: 330px;
+        --rdg-color-scheme: light;
     }
 
     .dark {
@@ -282,6 +283,7 @@
         --surface-warning-secondary: 45 93% 47%;
         --surface-warning-secondary-hover: 45 93% 47%;
         --surface-warning-secondary-active: 45 93% 47%;
+        --rdg-color-scheme: dark;
     }
 
     * {

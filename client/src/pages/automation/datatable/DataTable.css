@@ -1,0 +1,9 @@
+.datatable-cell {
+    @apply border-t;
+    @apply border-r;
+}
+
+.datatable-summary-row {
+    @apply border-t;
+    @apply border-r;
+}
