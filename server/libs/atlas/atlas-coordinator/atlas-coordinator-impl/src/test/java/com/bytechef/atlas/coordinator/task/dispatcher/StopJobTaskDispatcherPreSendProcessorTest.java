@@ -71,5 +71,4 @@ public class StopJobTaskDispatcherPreSendProcessorTest {
 
         return processor.process(taskExecution);
     }
-
 }
