@@ -14,4 +14,8 @@ dependencies {
 
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
+
+    testCompileOnly("jakarta.servlet:jakarta.servlet-api")
+
+    testImplementation("org.mockito:mockito-core")
 }
