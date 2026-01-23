@@ -68,7 +68,15 @@ const Projects = () => {
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
-    const isRefetchingProjects = queryClient.isFetching({queryKey: ProjectKeys.projects}) > 0;
+    const isRefetchingProjects =
+        queryClient.isFetching({
+            exact: true,
+            queryKey: ProjectKeys.filteredProjects({
+                categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
+                id: currentWorkspaceId!,
+                tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
+            }),
+        }) > 0;
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
 
