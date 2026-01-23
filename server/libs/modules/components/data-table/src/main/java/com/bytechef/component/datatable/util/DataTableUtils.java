@@ -42,8 +42,6 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.configuration.domain.Environment;
-import org.jspecify.annotations.Nullable;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -51,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Utility to construct output schemas for Data Table actions using table metadata.
