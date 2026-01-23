@@ -21,7 +21,6 @@ import com.bytechef.automation.data.table.domain.ColumnSpec;
 import com.bytechef.automation.data.table.domain.ColumnType;
 import com.bytechef.automation.data.table.execution.domain.DataTableRow;
 import com.bytechef.automation.data.table.execution.event.DataTableWebhookEvent;
-import com.bytechef.platform.configuration.domain.Environment;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
 import de.siegmar.fastcsv.writer.CsvWriter;
@@ -93,10 +92,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
             payload.put("id", id);
 
-            Environment environment = Environment.values()[(int) environmentId];
-
             applicationEventPublisher.publishEvent(
-                new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, payload, environment));
+                new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, payload, environmentId));
 
             return true;
         }
@@ -367,10 +364,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         payload.put("id", result.id());
         payload.put("values", result.values());
 
-        Environment environment = Environment.values()[(int) environmentId];
-
         applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, payload, environment));
+            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, payload, environmentId));
 
         return result;
     }
@@ -523,10 +518,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         payload.put("id", updatedDataTableRow.id());
         payload.put("values", updatedDataTableRow.values());
 
-        Environment environment = Environment.values()[(int) environmentId];
-
         applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, payload, environment));
+            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, payload, environmentId));
 
         return updatedDataTableRow;
     }

@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * <p>
  * This service handles all data manipulation operations on dynamic data tables, while the structure (DDL) operations
- * are managed by {@link DataTableService}.
+ * are managed by {@link com.bytechef.automation.data.table.configuration.service.DataTableService}.
  * </p>
  *
  * @author Ivica Cardic

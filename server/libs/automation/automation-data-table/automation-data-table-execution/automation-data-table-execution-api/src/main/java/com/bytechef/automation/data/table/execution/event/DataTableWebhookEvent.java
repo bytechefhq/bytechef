@@ -17,7 +17,6 @@
 package com.bytechef.automation.data.table.execution.event;
 
 import com.bytechef.automation.data.table.configuration.domain.DataTableWebhookType;
-import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.Map;
@@ -31,18 +30,18 @@ import org.springframework.context.ApplicationEvent;
 public class DataTableWebhookEvent extends ApplicationEvent {
 
     private final String baseName;
-    private final Environment environment;
+    private final long environmentId;
     private final Map<String, Object> payload;
     private final DataTableWebhookType type;
 
     @SuppressFBWarnings("EI")
     public DataTableWebhookEvent(
-        String baseName, DataTableWebhookType type, Map<String, Object> payload, Environment environment) {
+        String baseName, DataTableWebhookType type, Map<String, Object> payload, long environmentId) {
 
         super(baseName);
 
         this.baseName = baseName;
-        this.environment = environment;
+        this.environmentId = environmentId;
         this.type = type;
         this.payload = payload;
     }
@@ -51,8 +50,8 @@ public class DataTableWebhookEvent extends ApplicationEvent {
         return baseName;
     }
 
-    public Environment getEnvironment() {
-        return environment;
+    public long getEnvironmentId() {
+        return environmentId;
     }
 
     public DataTableWebhookType getType() {
@@ -67,7 +66,7 @@ public class DataTableWebhookEvent extends ApplicationEvent {
     public String toString() {
         return "DataTableWebhookEvent{" +
             "baseName='" + baseName + '\'' +
-            ", environment=" + environment +
+            ", environmentId=" + environmentId +
             ", payload=" + payload +
             ", type=" + type +
             "} " + super.toString();

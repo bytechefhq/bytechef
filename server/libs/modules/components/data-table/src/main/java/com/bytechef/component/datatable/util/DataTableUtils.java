@@ -42,6 +42,8 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.configuration.domain.Environment;
+import org.jspecify.annotations.Nullable;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -104,6 +106,7 @@ public final class DataTableUtils {
      * @param environmentId    the environment ID
      * @return the DataTableInfo if found, null otherwise
      */
+    @Nullable
     public static DataTableInfo getDataTableInfo(
         DataTableService dataTableService, String baseName, long environmentId) {
 
