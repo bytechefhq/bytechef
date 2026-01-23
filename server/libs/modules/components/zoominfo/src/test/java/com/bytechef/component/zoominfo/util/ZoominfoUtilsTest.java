@@ -26,8 +26,10 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
@@ -44,11 +46,11 @@ import org.mockito.ArgumentCaptor;
  */
 class ZoominfoUtilsTest {
 
-    private final ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(Configuration.ConfigurationBuilder.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
     @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<Context.ContextFunction<Context.Http, Executor>> httpFunctionArgumentCaptor =
-        forClass(Context.ContextFunction.class);
+    private final ArgumentCaptor<ContextFunction<Context.Http, Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Http mockedHttp = mock(Http.class);
@@ -61,7 +63,7 @@ class ZoominfoUtilsTest {
     void testGetCompanyFieldOptions() {
         when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
-                Context.ContextFunction<Context.Http, Executor> value = httpFunctionArgumentCaptor.getValue();
+                ContextFunction<Context.Http, Executor> value = httpFunctionArgumentCaptor.getValue();
 
                 return value.apply(mockedHttp);
             });
@@ -78,32 +80,28 @@ class ZoominfoUtilsTest {
                 Map.of("fieldName", "companyName", "accessGranted", true),
                 Map.of("fieldName", "companyId", "accessGranted", true)));
 
-        List<Option<String>> options = ZoominfoUtils
-            .getCompanyFieldOptions(mockedParameters, null, Map.of(), "", mockedContext);
+        List<Option<String>> options = ZoominfoUtils.getCompanyFieldOptions(
+            mockedParameters, null, Map.of(), "", mockedContext);
 
-        assertEquals(
-            List.of(
-                option("companyName", "companyName"), option("companyId", "companyId")),
-            options);
+        assertEquals(List.of(option("companyName", "companyName"), option("companyId", "companyId")), options);
 
-        Context.ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
         ResponseType responseType = configuration.getResponseType();
 
         assertEquals(ResponseType.Type.JSON, responseType.getType());
-        assertEquals(List.of("/lookup/outputfields/company/enrich"),
-            stringArgumentCaptor.getAllValues());
+        assertEquals(List.of("/lookup/outputfields/company/enrich"), stringArgumentCaptor.getAllValues());
     }
 
     @Test
     void testGetContactFieldOptions() {
         when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
-                Context.ContextFunction<Context.Http, Executor> value = httpFunctionArgumentCaptor.getValue();
+                ContextFunction<Context.Http, Executor> value = httpFunctionArgumentCaptor.getValue();
 
                 return value.apply(mockedHttp);
             });
@@ -120,24 +118,20 @@ class ZoominfoUtilsTest {
                 Map.of("fieldName", "firstName", "accessGranted", true),
                 Map.of("fieldName", "lastName", "accessGranted", true)));
 
-        List<Option<String>> options = ZoominfoUtils
-            .getContactFieldOptions(mockedParameters, null, Map.of(), "", mockedContext);
+        List<Option<String>> options = ZoominfoUtils.getContactFieldOptions(
+            mockedParameters, null, Map.of(), "", mockedContext);
 
-        assertEquals(
-            List.of(
-                option("firstName", "firstName"), option("lastName", "lastName")),
-            options);
+        assertEquals(List.of(option("firstName", "firstName"), option("lastName", "lastName")), options);
 
-        Context.ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
         ResponseType responseType = configuration.getResponseType();
 
         assertEquals(ResponseType.Type.JSON, responseType.getType());
-        assertEquals(List.of("/lookup/outputfields/contact/enrich"),
-            stringArgumentCaptor.getAllValues());
+        assertEquals(List.of("/lookup/outputfields/contact/enrich"), stringArgumentCaptor.getAllValues());
     }
 }

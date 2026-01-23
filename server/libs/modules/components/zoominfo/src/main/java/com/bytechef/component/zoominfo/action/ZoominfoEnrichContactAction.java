@@ -34,20 +34,21 @@ import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.PERSON_
 import static com.bytechef.component.zoominfo.constant.ZoominfoConstants.PHONE;
 import static com.bytechef.component.zoominfo.util.ZoominfoUtils.checkIfNull;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.zoominfo.util.ZoominfoUtils;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Marija Horvat
  */
 public class ZoominfoEnrichContactAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("enrichContact")
         .title("Enrich Contact")
         .description("Enrich contact details.")
@@ -96,7 +97,7 @@ public class ZoominfoEnrichContactAction {
                 .label("Output Fields")
                 .description("Fields you want to get from employee. See documentation for available fields.")
                 .items(string())
-                .options((ActionDefinition.OptionsFunction<String>) ZoominfoUtils::getContactFieldOptions)
+                .options((OptionsFunction<String>) ZoominfoUtils::getContactFieldOptions)
                 .required(false))
         .output()
         .perform(ZoominfoEnrichContactAction::perform);
@@ -105,33 +106,24 @@ public class ZoominfoEnrichContactAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        Map<String, Object> matchPersonInput = ZoominfoUtils.createPropertyMap(inputParameters, FULL_NAME,
+            FIRST_NAME, LAST_NAME, EMAIL, PHONE, JOB_TITLE, EXTERNAL_URL, COMPANY_NAME);
 
-        Map<String, Object> matchPersonInput = new LinkedHashMap<>();
-        matchPersonInput.put(PERSON_ID, inputParameters.getRequiredInteger(PERSON_ID));
-
-        checkIfNull(matchPersonInput, FULL_NAME, inputParameters.getString(FULL_NAME));
-        checkIfNull(matchPersonInput, FIRST_NAME, inputParameters.getString(FIRST_NAME));
-        checkIfNull(matchPersonInput, LAST_NAME, inputParameters.getString(LAST_NAME));
-        checkIfNull(matchPersonInput, EMAIL, inputParameters.getString(EMAIL));
-        checkIfNull(matchPersonInput, PHONE, inputParameters.getString(PHONE));
-        checkIfNull(matchPersonInput, JOB_TITLE, inputParameters.getString(JOB_TITLE));
-        checkIfNull(matchPersonInput, EXTERNAL_URL, inputParameters.getString(EXTERNAL_URL));
+        checkIfNull(matchPersonInput, PERSON_ID, inputParameters.getRequiredInteger(PERSON_ID));
         checkIfNull(matchPersonInput, COMPANY_ID, inputParameters.getInteger(COMPANY_ID));
-        checkIfNull(matchPersonInput, COMPANY_NAME, inputParameters.getString(COMPANY_NAME));
 
-        Map<String, Object> attributes = new LinkedHashMap<>();
+        Map<String, Object> attributes = new HashMap<>();
+
         checkIfNull(attributes, OUTPUT_FIELDS, inputParameters.getList(OUTPUT_FIELDS));
         attributes.put("matchPersonInput", matchPersonInput);
 
-        Map<String, Object> data = Map.of(
-            "type", "ContactEnrich",
-            "attributes", attributes);
-
-        Map<String, Object> body = Map.of("data", data);
-
         return context.http(http -> http.post("/contacts/enrich"))
             .body(
-                Body.of(body))
+                Body.of(
+                    "data", new Object[] {
+                        "type", "ContactEnrich",
+                        "attributes", attributes
+                    }))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();

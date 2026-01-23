@@ -38,7 +38,8 @@ public class ZoominfoComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("zoominfo")
         .title("ZoomInfo")
         .description(
-            "ZoomInfo is a platform that provides companies with accurate contact data and sales insights to help them find and engage potential customers.")
+            "ZoomInfo is a platform that provides companies with accurate contact data and sales insights to help " +
+                "them find and engage potential customers.")
         .icon("path:assets/zoominfo.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .connection(ZoominfoConnection.CONNECTION_DEFINITION)
