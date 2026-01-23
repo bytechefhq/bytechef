@@ -5,6 +5,7 @@ graalvm = "25.0.1"
 jackson = "2.19.2"
 jacoco = "0.8.13"
 java = "25"
+jjwt = "0.12.5"
 org-mapstruct = "1.6.3"
 org-mapstruct-extensions-spring = "2.0.0"
 org-springdoc = "3.0.0"
@@ -28,6 +29,9 @@ com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 commons-validator = "commons-validator:commons-validator:1.10.1"
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.41"
 io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.37"
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 loki-logback-appender = "com.github.loki4j:loki-logback-appender:2.0.2"
 org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.44.0"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.5.1"

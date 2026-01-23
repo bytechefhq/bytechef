@@ -87,9 +87,9 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
         }
     }
 
-    private Jws<Claims> getJws(String secretKey, long environmentI) {
+    private Jws<Claims> getJws(String secretKey, long environmentId) {
         return Jwts.parser()
-            .keyLocator(new SigningKeyLocator(environmentI, signingKeyService))
+            .keyLocator(new SigningKeyLocator(environmentId, signingKeyService))
             .build()
             .parseSignedClaims(secretKey);
     }
