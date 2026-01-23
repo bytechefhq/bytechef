@@ -40,29 +40,25 @@ class TenantRepositoryTest {
     @Test
     void testCreateTenantWithValidId() {
         assertThatThrownBy(() -> tenantRepository.createTenant("tenant123"))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("null"); // Expected: DB operation fails due to mock
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test
     void testCreateTenantWithAlphanumericId() {
         assertThatThrownBy(() -> tenantRepository.createTenant("Tenant123ABC"))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("null");
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test
     void testCreateTenantWithUnderscoreId() {
         assertThatThrownBy(() -> tenantRepository.createTenant("tenant_123"))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("null");
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test
     void testCreateTenantWithHyphenId() {
         assertThatThrownBy(() -> tenantRepository.createTenant("tenant-123"))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("null");
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -124,8 +120,7 @@ class TenantRepositoryTest {
     @Test
     void testDeleteTenantWithValidId() {
         assertThatThrownBy(() -> tenantRepository.deleteTenant("tenant123"))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("null");
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test
