@@ -65,7 +65,7 @@ public class DataTableRowGraphQlController {
         @Argument Long environmentId, @Argument Long tableId, @Argument Integer limit, @Argument Integer offset) {
 
         String baseName = dataTableService.getBaseNameById(tableId);
-        int pageSize = (limit == null || limit <= 0) ? 100 : limit;
+        int pageSize = (limit == null || limit <= 0) ? 100 : Math.min(limit, Integer.MAX_VALUE - 1);
         int pageOffset = (offset == null || offset < 0) ? 0 : offset;
 
         List<DataTableRow> fetched = dataTableRowService.listRows(
