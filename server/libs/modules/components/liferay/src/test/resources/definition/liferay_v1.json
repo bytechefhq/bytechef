@@ -554,6 +554,7 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": null,
+    "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
       "controlType": "TEXT",

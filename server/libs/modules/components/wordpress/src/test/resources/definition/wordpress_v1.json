@@ -32386,6 +32386,7 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
+    "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1

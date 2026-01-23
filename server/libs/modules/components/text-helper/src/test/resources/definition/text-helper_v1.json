@@ -4812,10 +4812,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "base64EncodeDecode",
     "description": "Encode/decode a specified string.",
     "element": { },
     "help": null,
-    "name": "base64EncodeDecode",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4926,18 +4926,18 @@
     } ],
     "title": "Base64 Encode/Decode",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "changeType",
     "description": "Change the type of the input text to number.",
     "element": { },
     "help": null,
-    "name": "changeType",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5018,18 +5018,18 @@
     } ],
     "title": "Change Type",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "concatenate",
     "description": "Concatenate a list of texts.",
     "element": { },
     "help": null,
-    "name": "concatenate",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5153,18 +5153,18 @@
     } ],
     "title": "Concatenate",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "contains",
     "description": "Check if text contains the specified sequence of characters.",
     "element": { },
     "help": null,
-    "name": "contains",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5271,18 +5271,18 @@
     } ],
     "title": "Contains",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "escapeCharacters",
     "description": "Escape characters in a string, specified in the input.",
     "element": { },
     "help": null,
-    "name": "escapeCharacters",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5406,18 +5406,18 @@
     } ],
     "title": "Escape Characters",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "extractAllRegEx",
     "description": "Extract all strings that match a given pattern.",
     "element": { },
     "help": null,
-    "name": "extractAllRegEx",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5562,18 +5562,18 @@
     } ],
     "title": "Extract All by Regular Expression",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "extractContentFromHtml",
     "description": "Extract content from the HTML content.",
     "element": { },
     "help": null,
-    "name": "extractContentFromHtml",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -5708,18 +5708,18 @@
     } ],
     "title": "Extract Content from HTML",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "extractKeyRegEx",
     "description": "Extract first string that match a given pattern.",
     "element": { },
     "help": null,
-    "name": "extractKeyRegEx",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5862,18 +5862,18 @@
     } ],
     "title": "Extract Key by Regular Expression",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "extractRegEx",
     "description": "Extract first string that match a given pattern.",
     "element": { },
     "help": null,
-    "name": "extractRegEx",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5976,18 +5976,18 @@
     } ],
     "title": "Extract by Regular Expression",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "extractUrls",
     "description": "Extract all of the URLs from a given piece of text, returning them as a list.",
     "element": { },
     "help": null,
-    "name": "extractUrls",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6110,18 +6110,18 @@
     } ],
     "title": "Extract URLs",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "formatCurrency",
     "description": "Format currency to the specified denomination.",
     "element": { },
     "help": null,
-    "name": "formatCurrency",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7219,18 +7219,18 @@
     } ],
     "title": "Format Currency",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getDomainFromEmail",
     "description": "Extracts domain from the given email address.",
     "element": { },
     "help": null,
-    "name": "getDomainFromEmail",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7311,18 +7311,18 @@
     } ],
     "title": "Get Domain From Email Address",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getDomainFromURL",
     "description": "Extracts domain from the given URL.",
     "element": { },
     "help": null,
-    "name": "getDomainFromURL",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7403,18 +7403,18 @@
     } ],
     "title": "Get Domain From URL",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getFirstMiddleLastName",
     "description": "From full name extract first, middle and last name.",
     "element": { },
     "help": null,
-    "name": "getFirstMiddleLastName",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7647,18 +7647,18 @@
     } ],
     "title": "Get First Middle and Last Name",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getTextAfter",
     "description": "Given a string and a pattern, this operation will return the substring between where the pattern was found depending on the match number and ending of the string.",
     "element": { },
     "help": null,
-    "name": "getTextAfter",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7780,18 +7780,18 @@
     } ],
     "title": "Get Text After",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getTextBefore",
     "description": "Given a string and a pattern, this operation will return the substring between where the pattern was found depending on the match number and beginning of the string.",
     "element": { },
     "help": null,
-    "name": "getTextBefore",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7913,18 +7913,18 @@
     } ],
     "title": "Get Text Before",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getTextBetween",
     "description": "Extract text between two patterns.",
     "element": { },
     "help": null,
-    "name": "getTextBetween",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8049,18 +8049,18 @@
     } ],
     "title": "Get Text Between",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getTextLength",
     "description": "Returns length of the given text.",
     "element": { },
     "help": null,
-    "name": "getTextLength",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8135,18 +8135,18 @@
     } ],
     "title": "Get Text Length",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "hexEncodeDecode",
     "description": "Hex encode/decode a specified string.",
     "element": { },
     "help": null,
-    "name": "hexEncodeDecode",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8257,18 +8257,18 @@
     } ],
     "title": "Hex Encode/Decode",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "HTMLToMarkdown",
     "description": "Converts HTML to markdown.",
     "element": { },
     "help": null,
-    "name": "HTMLToMarkdown",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8349,18 +8349,18 @@
     } ],
     "title": "HTML to Markdown",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "isDomain",
     "description": "Check if a string is a valid domain.",
     "element": { },
     "help": null,
-    "name": "isDomain",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8445,18 +8445,18 @@
     } ],
     "title": "Is Domain?",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "lowerCase",
     "description": "Convert a string to lower case.",
     "element": { },
     "help": null,
-    "name": "lowerCase",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8537,18 +8537,18 @@
     } ],
     "title": "Lower Case",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "markdownToHTML",
     "description": "Converts markdown to HTML.",
     "element": { },
     "help": null,
-    "name": "markdownToHTML",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8629,18 +8629,18 @@
     } ],
     "title": "Markdown to HTML",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "replace",
     "description": "Replace all instances of any word, character, or phrase in text with another.",
     "element": { },
     "help": null,
-    "name": "replace",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8789,18 +8789,18 @@
     } ],
     "title": "Replace",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "selectFirstNCharacters",
     "description": "Select the first N characters from a string.",
     "element": { },
     "help": null,
-    "name": "selectFirstNCharacters",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8900,18 +8900,18 @@
     } ],
     "title": "Select First N Characters",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "selectLastNCharacters",
     "description": "Select the last N characters from a string.",
     "element": { },
     "help": null,
-    "name": "selectLastNCharacters",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9011,18 +9011,18 @@
     } ],
     "title": "Select Last N Characters",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "shorten",
     "description": "Shorten string to a max allowed length.",
     "element": { },
     "help": null,
-    "name": "shorten",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9122,18 +9122,18 @@
     } ],
     "title": "Shorten",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "split",
     "description": "Split the text by delimiter.",
     "element": { },
     "help": null,
-    "name": "split",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9278,18 +9278,18 @@
     } ],
     "title": "Split",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "trimWhitespace",
     "description": "Trim whitespace from the beginning and end of a string.",
     "element": { },
     "help": null,
-    "name": "trimWhitespace",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9370,18 +9370,18 @@
     } ],
     "title": "Trim Whitespace",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "upperCase",
     "description": "Convert a string to upper case.",
     "element": { },
     "help": null,
-    "name": "upperCase",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9462,18 +9462,18 @@
     } ],
     "title": "Upper Case",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "urlEncodeDecode",
     "description": "URL encode/decode a specified string.",
     "element": { },
     "help": null,
-    "name": "urlEncodeDecode",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9584,10 +9584,10 @@
     } ],
     "title": "URL Encode/Decode",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
