@@ -35,6 +35,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -71,7 +73,7 @@ public class DataTableWebhookEventListenerIntTest {
     }
 
     @Test
-    void testWebhookEventTriggersHttpCall() throws InterruptedException {
+    void testWebhookEventTriggersHttpCall() {
         String webhookPath = "/webhook/test";
 
         stubFor(post(urlPathEqualTo(webhookPath))
@@ -89,20 +91,20 @@ public class DataTableWebhookEventListenerIntTest {
             "orders",
             DataTableWebhookType.RECORD_CREATED,
             Map.of("id", 1L, "name", "Test Order"),
-            Environment.DEVELOPMENT);
+            Environment.DEVELOPMENT.ordinal());
 
         applicationEventPublisher.publishEvent(event);
 
-        Thread.sleep(2000);
-
-        verify(1, postRequestedFor(urlPathEqualTo(webhookPath))
-            .withRequestBody(containing("\"type\":\"RECORD_CREATED\""))
-            .withRequestBody(containing("\"table\":\"orders\""))
-            .withRequestBody(containing("\"payload\"")));
+        Awaitility.await()
+            .atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> verify(1, postRequestedFor(urlPathEqualTo(webhookPath))
+                .withRequestBody(containing("\"type\":\"RECORD_CREATED\""))
+                .withRequestBody(containing("\"table\":\"orders\""))
+                .withRequestBody(containing("\"payload\""))));
     }
 
     @Test
-    void testWebhookEventWithMultipleWebhooks() throws InterruptedException {
+    void testWebhookEventWithMultipleWebhooks() {
         String webhookPath1 = "/webhook/first";
         String webhookPath2 = "/webhook/second";
 
@@ -129,20 +131,22 @@ public class DataTableWebhookEventListenerIntTest {
             "products",
             DataTableWebhookType.RECORD_UPDATED,
             Map.of("id", 5L, "price", 99.99),
-            Environment.DEVELOPMENT);
+            Environment.DEVELOPMENT.ordinal());
 
         applicationEventPublisher.publishEvent(event);
 
-        Thread.sleep(2000);
-
-        verify(1, postRequestedFor(urlPathEqualTo(webhookPath1))
-            .withRequestBody(containing("\"type\":\"RECORD_UPDATED\"")));
-        verify(1, postRequestedFor(urlPathEqualTo(webhookPath2))
-            .withRequestBody(containing("\"type\":\"RECORD_UPDATED\"")));
+        Awaitility.await()
+            .atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                verify(1, postRequestedFor(urlPathEqualTo(webhookPath1))
+                    .withRequestBody(containing("\"type\":\"RECORD_UPDATED\"")));
+                verify(1, postRequestedFor(urlPathEqualTo(webhookPath2))
+                    .withRequestBody(containing("\"type\":\"RECORD_UPDATED\"")));
+            });
     }
 
     @Test
-    void testWebhookEventFiltersTypeCorrectly() throws InterruptedException {
+    void testWebhookEventFiltersTypeCorrectly() {
         String webhookPath = "/webhook/filtered";
 
         stubFor(post(urlPathEqualTo(webhookPath))
@@ -160,17 +164,17 @@ public class DataTableWebhookEventListenerIntTest {
             "customers",
             DataTableWebhookType.RECORD_CREATED,
             Map.of("id", 1L),
-            Environment.DEVELOPMENT);
+            Environment.DEVELOPMENT.ordinal());
 
         applicationEventPublisher.publishEvent(event);
 
-        Thread.sleep(500);
-
-        verify(0, postRequestedFor(urlPathEqualTo(webhookPath)));
+        Awaitility.await()
+            .atMost(1, TimeUnit.SECONDS)
+            .untilAsserted(() -> verify(0, postRequestedFor(urlPathEqualTo(webhookPath))));
     }
 
     @Test
-    void testWebhookEventWithNoWebhooks() throws InterruptedException {
+    void testWebhookEventWithNoWebhooks() {
         when(dataTableWebhookService.listWebhooks("empty_table", Environment.DEVELOPMENT.ordinal()))
             .thenReturn(Collections.emptyList());
 
@@ -178,15 +182,18 @@ public class DataTableWebhookEventListenerIntTest {
             "empty_table",
             DataTableWebhookType.RECORD_CREATED,
             Map.of("id", 1L),
-            Environment.DEVELOPMENT);
+            Environment.DEVELOPMENT.ordinal());
 
         applicationEventPublisher.publishEvent(event);
 
-        Thread.sleep(500);
+        Awaitility.await()
+            .during(500, TimeUnit.MILLISECONDS)
+            .atMost(1, TimeUnit.SECONDS)
+            .until(() -> true);
     }
 
     @Test
-    void testWebhookEventWithRecordDeletedType() throws InterruptedException {
+    void testWebhookEventWithRecordDeletedType() {
         String webhookPath = "/webhook/deleted";
 
         stubFor(post(urlPathEqualTo(webhookPath))
@@ -204,19 +211,19 @@ public class DataTableWebhookEventListenerIntTest {
             "records",
             DataTableWebhookType.RECORD_DELETED,
             Map.of("id", 42L),
-            Environment.DEVELOPMENT);
+            Environment.DEVELOPMENT.ordinal());
 
         applicationEventPublisher.publishEvent(event);
 
-        Thread.sleep(2000);
-
-        verify(1, postRequestedFor(urlPathEqualTo(webhookPath))
-            .withRequestBody(containing("\"type\":\"RECORD_DELETED\""))
-            .withRequestBody(containing("\"table\":\"records\"")));
+        Awaitility.await()
+            .atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> verify(1, postRequestedFor(urlPathEqualTo(webhookPath))
+                .withRequestBody(containing("\"type\":\"RECORD_DELETED\""))
+                .withRequestBody(containing("\"table\":\"records\""))));
     }
 
     @Test
-    void testWebhookEventIncludesTimestamp() throws InterruptedException {
+    void testWebhookEventIncludesTimestamp() {
         String webhookPath = "/webhook/timestamp";
 
         stubFor(post(urlPathEqualTo(webhookPath))
@@ -234,18 +241,18 @@ public class DataTableWebhookEventListenerIntTest {
             "timestamps",
             DataTableWebhookType.RECORD_CREATED,
             Map.of("id", 1L),
-            Environment.DEVELOPMENT);
+            Environment.DEVELOPMENT.ordinal());
 
         applicationEventPublisher.publishEvent(event);
 
-        Thread.sleep(2000);
-
-        verify(1, postRequestedFor(urlPathEqualTo(webhookPath))
-            .withRequestBody(containing("\"timestamp\"")));
+        Awaitility.await()
+            .atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> verify(1, postRequestedFor(urlPathEqualTo(webhookPath))
+                .withRequestBody(containing("\"timestamp\""))));
     }
 
     @Test
-    void testWebhookEventWithDifferentEnvironments() throws InterruptedException {
+    void testWebhookEventWithDifferentEnvironments() {
         String webhookPath = "/webhook/staging";
 
         stubFor(post(urlPathEqualTo(webhookPath))
@@ -263,18 +270,18 @@ public class DataTableWebhookEventListenerIntTest {
             "staging_table",
             DataTableWebhookType.RECORD_UPDATED,
             Map.of("id", 100L),
-            Environment.STAGING);
+            Environment.STAGING.ordinal());
 
         applicationEventPublisher.publishEvent(event);
 
-        Thread.sleep(2000);
-
-        verify(1, postRequestedFor(urlPathEqualTo(webhookPath))
-            .withRequestBody(containing("\"type\":\"RECORD_UPDATED\"")));
+        Awaitility.await()
+            .atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> verify(1, postRequestedFor(urlPathEqualTo(webhookPath))
+                .withRequestBody(containing("\"type\":\"RECORD_UPDATED\""))));
     }
 
     @Test
-    void testWebhookEventPayloadContainsCorrectData() throws InterruptedException {
+    void testWebhookEventPayloadContainsCorrectData() {
         String webhookPath = "/webhook/payload";
 
         stubFor(post(urlPathEqualTo(webhookPath))
@@ -292,14 +299,14 @@ public class DataTableWebhookEventListenerIntTest {
             "payload_test",
             DataTableWebhookType.RECORD_CREATED,
             Map.of("id", 1L, "name", "Test Item", "price", 25.50),
-            Environment.DEVELOPMENT);
+            Environment.DEVELOPMENT.ordinal());
 
         applicationEventPublisher.publishEvent(event);
 
-        Thread.sleep(2000);
-
-        verify(1, postRequestedFor(urlPathEqualTo(webhookPath))
-            .withRequestBody(containing("\"payload\""))
-            .withRequestBody(containing("Test Item")));
+        Awaitility.await()
+            .atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> verify(1, postRequestedFor(urlPathEqualTo(webhookPath))
+                .withRequestBody(containing("\"payload\""))
+                .withRequestBody(containing("Test Item"))));
     }
 }

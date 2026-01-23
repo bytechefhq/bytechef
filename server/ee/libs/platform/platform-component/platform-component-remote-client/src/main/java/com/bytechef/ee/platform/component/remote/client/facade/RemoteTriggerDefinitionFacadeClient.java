@@ -148,15 +148,15 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     @Override
     public WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId,
-        String webhookUrl, long environmentId) {
+        Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId, String webhookUrl,
+        long environmentId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-webhook-enable"),
             new DynamicWebhookEnableRequest(
                 componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, connectionId,
-                webhookUrl),
+                webhookUrl, environmentId),
             WebhookEnableOutput.class);
     }
 
@@ -204,7 +204,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     private record DynamicWebhookEnableRequest(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Long connectionId, String webhookUrl) {
+        String workflowExecutionId, Long connectionId, String webhookUrl, long environmentId) {
     }
 
     private record DynamicWebhookRefresh(

@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDe
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK;
-import static com.bytechef.platform.configuration.domain.Environment.DEVELOPMENT;
 
 import com.bytechef.automation.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.automation.data.table.configuration.service.DataTableService;
@@ -40,6 +39,7 @@ import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.component.definition.TriggerContextAware;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Record Updated trigger for Data Tables.
@@ -99,11 +99,10 @@ public class DataTableRecordUpdatedTrigger {
         TriggerContextAware triggerContextAware = (TriggerContextAware) triggerContext;
 
         String baseName = inputParameters.getRequiredString(TABLE);
-        Long environmentIdValue = triggerContextAware.getEnvironmentId();
-        long environmentId = environmentIdValue != null ? environmentIdValue : DEVELOPMENT.ordinal();
 
         long webhookId = dataTableWebhookService.addWebhook(
-            baseName, webhookUrl, DataTableWebhookType.RECORD_UPDATED, environmentId);
+            baseName, webhookUrl, DataTableWebhookType.RECORD_UPDATED,
+            Objects.requireNonNull(triggerContextAware.getEnvironmentId()));
 
         return new WebhookEnableOutput(Map.of("webhookId", webhookId), null);
     }

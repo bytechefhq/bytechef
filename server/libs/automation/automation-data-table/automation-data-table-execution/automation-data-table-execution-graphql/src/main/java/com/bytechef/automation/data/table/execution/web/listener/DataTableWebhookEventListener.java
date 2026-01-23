@@ -61,8 +61,7 @@ public class DataTableWebhookEventListener {
     @Async
     public void onDataTableWebhookEvent(DataTableWebhookEvent event) {
         String baseName = event.getBaseName();
-        long environmentId = event.getEnvironment()
-            .ordinal();
+        long environmentId = event.getEnvironmentId();
         DataTableWebhookType type = event.getType();
         Map<String, Object> payload = event.getPayload();
 

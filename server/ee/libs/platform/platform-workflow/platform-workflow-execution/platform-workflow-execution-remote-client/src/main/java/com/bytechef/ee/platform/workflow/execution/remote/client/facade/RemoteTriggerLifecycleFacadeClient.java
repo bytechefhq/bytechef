@@ -41,7 +41,7 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
         post(
             TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-enable",
             new TriggerRequest(
-                workflowId, workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId, null));
+                workflowId, workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId, null, -1));
     }
 
     @Override
@@ -52,7 +52,8 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
         post(
             TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-disable",
             new TriggerRequest(
-                workflowId, workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId, webhookUrl));
+                workflowId, workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId, webhookUrl,
+                environmentId));
     }
 
     private void post(String path, TriggerRequest workflowExecutionId) {
@@ -67,6 +68,6 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
     @SuppressFBWarnings("EI")
     private record TriggerRequest(
         String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
-        Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
+        Map<String, ?> triggerParameters, long connectionId, String webhookUrl, long environmentId) {
     }
 }
