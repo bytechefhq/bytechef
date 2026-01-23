@@ -29,47 +29,44 @@ import static com.bytechef.component.notion.constant.NotionConstants.NAME;
 import static com.bytechef.component.notion.constant.NotionConstants.TEXT;
 import static com.bytechef.component.notion.constant.NotionConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
-import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class NotionUtilsTest {
 
     private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
         forClass(ConfigurationBuilder.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, "xy"));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testConvertPropertiesToNotionValues() {
+    void testConvertPropertiesToNotionValues(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
         Map<String, Object> propertiesSchema = Map.ofEntries(
             Map.entry("cb", Map.of("type", "checkbox")),
             Map.entry("dt", Map.of("type", "date")),
@@ -83,18 +80,10 @@ class NotionUtilsTest {
             Map.entry("title", Map.of("type", "title")),
             Map.entry("url", Map.of("type", "url")));
 
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("properties", propertiesSchema));
 
@@ -112,7 +101,7 @@ class NotionUtilsTest {
             Map.entry("url", "https://example.com"));
 
         Map<String, Object> result = NotionUtils.convertPropertiesToNotionValues(
-            mockedActionContext, inputFields, "db1");
+            mockedContext, inputFields, "db1");
 
         Map<String, Object> expected = Map.ofEntries(
             Map.entry("cb", Map.of("checkbox", true)),
@@ -133,10 +122,6 @@ class NotionUtilsTest {
 
         assertEquals(expected, result);
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
         Http.Configuration configuration = configurationBuilder.build();
@@ -148,7 +133,9 @@ class NotionUtilsTest {
     }
 
     @Test
-    void testCreatePropertiesForDatabaseItem() {
+    void testCreatePropertiesForDatabaseItem(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
         Map<String, Object> propertiesSchema = Map.ofEntries(
             Map.entry("cb", Map.of("type", "checkbox")),
             Map.entry("dt", Map.of("type", "date")),
@@ -165,23 +152,15 @@ class NotionUtilsTest {
             Map.entry("title", Map.of("type", "title")),
             Map.entry("url", Map.of("type", "url")));
 
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("properties", propertiesSchema));
 
         List<ModifiableValueProperty<?, ?>> properties = NotionUtils.createPropertiesForDatabaseItem(
-            mockedParameters, null, null, mockedActionContext);
+            mockedParameters, null, null, mockedContext);
 
         List<ModifiableValueProperty<?, ?>> expectedProperties = List.of(
             bool("cb")
@@ -226,10 +205,6 @@ class NotionUtilsTest {
         assertTrue(expectedProperties.containsAll(properties));
         assertTrue(properties.containsAll(expectedProperties));
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
         Http.Configuration configuration = configurationBuilder.build();
@@ -241,33 +216,23 @@ class NotionUtilsTest {
     }
 
     @Test
-    void testGetAllItems() {
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+    void testGetAllItems(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
 
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(
                 Map.of("results", List.of(Map.of(ID, "123")), "next_cursor", "nc"),
                 Map.of("results", List.of(Map.of(ID, "345"))));
 
-        List<Object> result = NotionUtils.getAllItems(mockedActionContext, "url", false, "filter", "x");
+        List<Object> result = NotionUtils.getAllItems(mockedContext, "url", false, "filter", "x");
 
         assertEquals(List.of(Map.of(ID, "123"), Map.of(ID, "345")), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
@@ -288,31 +253,21 @@ class NotionUtilsTest {
     }
 
     @Test
-    void testGetDatabase() {
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+    void testGetDatabase(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
 
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of());
 
-        Map<String, ?> result = NotionUtils.getDatabase("xy", mockedActionContext);
+        Map<String, ?> result = NotionUtils.getDatabase("xy", mockedContext);
 
         assertEquals(Map.of(), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
@@ -325,20 +280,15 @@ class NotionUtilsTest {
     }
 
     @Test
-    void testGetDatabaseIdOptions() {
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-                return value.apply(mockedHttp);
-            });
+    void testGetDatabaseIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
         Map<String, Object> db1 = Map.of(
             ID, "db1",
@@ -354,13 +304,10 @@ class NotionUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("results", List.of(db1, db2)));
 
-        List<Option<String>> result = NotionUtils.getDatabaseIdOptions(null, null, null, null, mockedActionContext);
+        List<Option<String>> result = NotionUtils.getDatabaseIdOptions(
+            null, null, null, null, mockedContext);
 
         assertEquals(List.of(option("DB One", "db1"), option("DB Two", "db2")), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
 
         Http.Configuration configuration = configurationBuilderArgumentCaptor.getValue()
             .build();
@@ -376,30 +323,20 @@ class NotionUtilsTest {
     }
 
     @Test
-    void testGetDatabasePropertyOptions() {
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+    void testGetDatabasePropertyOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
 
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("properties", Map.of("p1", Map.of())));
 
         List<Option<String>> result = NotionUtils.getDatabasePropertyOptions(
-            mockedParameters, null, null, null, mockedActionContext);
+            mockedParameters, null, null, null, mockedContext);
 
         assertEquals(List.of(option("p1", "p1")), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
 
         Http.Configuration configuration = configurationBuilderArgumentCaptor.getValue()
             .build();
@@ -410,20 +347,15 @@ class NotionUtilsTest {
     }
 
     @Test
-    void testGetPageIdOptions() {
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-                return value.apply(mockedHttp);
-            });
+    void testGetPageIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
         Map<String, Object> page1 = Map.of(
             ID, "p1",
@@ -444,12 +376,10 @@ class NotionUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("results", List.of(page1, page2)));
 
-        List<Option<String>> result = NotionUtils.getPageIdOptions(null, null, null, null, mockedActionContext);
+        List<Option<String>> result = NotionUtils.getPageIdOptions(
+            null, null, null, null, mockedContext);
+
         assertEquals(List.of(option("Page One", "p1"), option("Page Two", "p2")), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
 
         Http.Configuration configuration = configurationBuilderArgumentCaptor.getValue()
             .build();
