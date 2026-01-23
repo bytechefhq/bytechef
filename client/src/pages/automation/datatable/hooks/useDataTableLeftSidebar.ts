@@ -19,8 +19,8 @@ interface UseDataTableLeftSidebarI {
 export default function useDataTableLeftSidebar(): UseDataTableLeftSidebarI {
     const [search, setSearch] = useState('');
 
-    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId) ?? 2;
-    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId) ?? 1049;
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {data, error, isLoading} = useDataTablesQuery({
         environmentId: String(environmentId),

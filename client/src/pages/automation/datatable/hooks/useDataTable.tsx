@@ -81,7 +81,7 @@ interface BuildGridColumnsParamsI {
     handleToggleSelectAll: (nextChecked: boolean) => void;
     hoveredRowId: string | null;
     isFetchingNextPage: boolean;
-    localRows: GridRowType[];
+    localRowCount: number;
     selectedRows: ReadonlySet<string>;
     setAddColumnDialogOpen: (open: boolean) => void;
     setColumnToDelete: (columnId: string, columnName: string) => void;
@@ -228,7 +228,7 @@ function buildGridColumns({
     handleToggleSelectAll,
     hoveredRowId,
     isFetchingNextPage,
-    localRows,
+    localRowCount,
     selectedRows,
     setAddColumnDialogOpen,
     setColumnToDelete,
@@ -239,23 +239,22 @@ function buildGridColumns({
 }: BuildGridColumnsParamsI): Column<GridRowType, SummaryRowType>[] {
     const cols: Column<GridRowType, SummaryRowType>[] = [];
     const totalCols = 1 + (dataTable?.columns?.length ?? 0) + 1;
-    const realRowCount = localRows.length;
     const selectedCount = selectedRows.size;
-    const allSelected = realRowCount > 0 && selectedCount === realRowCount;
-    const someSelected = selectedCount > 0 && selectedCount < realRowCount;
+    const allSelected = localRowCount > 0 && selectedCount === localRowCount;
+    const someSelected = selectedCount > 0 && selectedCount < localRowCount;
 
     // ID column
     cols.push({
         frozen: true,
         key: 'id',
         name: 'id',
-        renderCell: ({row}) => (
+        renderCell: ({row, rowIdx}) => (
             <RowIdCell
                 hoveredRowId={hoveredRowId}
-                localRows={localRows}
                 onAddRow={handleAddRow}
                 onSelectedRowsChange={handleSelectedRowsChange}
                 row={row as GridRowType}
+                rowIdx={rowIdx}
                 selectedRows={selectedRows}
                 setHoveredRowId={setHoveredRowId}
             />
@@ -282,7 +281,7 @@ function buildGridColumns({
             isFirstNonFrozenColumn: !summaryAssigned,
             onDeleteColumn: setColumnToDelete,
             onRenameColumn: setColumnToRename,
-            rowCount: realRowCount,
+            rowCount: localRowCount,
             setLocalRows,
             tableId: dataTable.id,
             totalColumns: totalCols,
@@ -301,7 +300,7 @@ function buildGridColumns({
         buildTrailingColumn({
             hasColumns: (dataTable?.columns?.length ?? 0) > 0,
             isFetchingNextPage,
-            rowCount: realRowCount,
+            rowCount: localRowCount,
             setAddColumnDialogOpen,
         })
     );
@@ -467,6 +466,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
 
     // Build grid columns: ID + user columns + trailing header + add column
     const stringEnvironmentId = String(environmentId);
+    const localRowCount = localRows.length;
     const gridColumns: Column<GridRowType, SummaryRowType>[] = useMemo(
         () =>
             buildGridColumns({
@@ -477,7 +477,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
                 handleToggleSelectAll,
                 hoveredRowId,
                 isFetchingNextPage,
-                localRows,
+                localRowCount,
                 selectedRows,
                 setAddColumnDialogOpen,
                 setColumnToDelete,
@@ -494,7 +494,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
             handleToggleSelectAll,
             hoveredRowId,
             isFetchingNextPage,
-            localRows,
+            localRowCount,
             selectedRows,
             setAddColumnDialogOpen,
             setColumnToDelete,
@@ -507,6 +507,11 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     const gridRows: GridRowType[] = useMemo(() => {
         return rows.map((row) => ({id: row.id, ...row.values}));
     }, [rows]);
+
+    // Clear selected rows when switching to a different table to avoid stale selections
+    useEffect(() => {
+        handleSelectedRowsChange(new Set());
+    }, [tableId, handleSelectedRowsChange]);
 
     useEffect(() => {
         setLocalRows(gridRows);

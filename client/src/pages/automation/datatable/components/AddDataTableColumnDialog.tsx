@@ -30,10 +30,12 @@ const AddDataTableColumnDialog = () => {
         }
     }, [open]);
 
-    const handleAddClick = () => {
-        if (!columnName) return;
+    const trimmedColumnName = columnName.trim();
 
-        handleAdd(columnName, columnType);
+    const handleAddClick = () => {
+        if (!trimmedColumnName) return;
+
+        handleAdd(trimmedColumnName, columnType);
     };
 
     return (
@@ -74,7 +76,9 @@ const AddDataTableColumnDialog = () => {
                         Cancel
                     </Button>
 
-                    <Button onClick={handleAddClick}>Add</Button>
+                    <Button disabled={!trimmedColumnName} onClick={handleAddClick}>
+                        Add
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

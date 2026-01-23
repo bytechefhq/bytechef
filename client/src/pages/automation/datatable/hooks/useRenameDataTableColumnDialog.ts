@@ -23,7 +23,7 @@ export default function useRenameDataTableColumnDialog(): UseRenameDataTableColu
         useRenameDataTableColumnDialogStore();
     const {dataTable} = useCurrentDataTableStore();
 
-    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId) ?? 2;
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();
 
