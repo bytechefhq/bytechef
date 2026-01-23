@@ -10,42 +10,40 @@ interface NumberEditCellProps {
 }
 
 export const NumberEditCell = ({columnName, onRowChange, row}: NumberEditCellProps) => {
-    const raw = (row as Record<string, unknown>)[columnName];
-    const value = raw === null || raw === undefined ? '' : String(raw);
+    const cellValue = (row as Record<string, unknown>)[columnName];
+    const displayValue = cellValue === null || cellValue === undefined ? '' : String(cellValue);
 
-    const commit = (inputValue: string, commitChanges: boolean) => {
-        const trimmed = inputValue.trim();
+    const commitValue = (inputValue: string, shouldCommit: boolean) => {
+        const trimmedValue = inputValue.trim();
 
-        // Use null for empty input, otherwise convert to a number.
-        if (trimmed === '') {
-            onRowChange({...row, [columnName]: null}, commitChanges);
+        if (trimmedValue === '') {
+            onRowChange({...row, [columnName]: null}, shouldCommit);
 
             return;
         }
 
-        const parsed = Number(trimmed);
+        const numericValue = Number(trimmedValue);
 
-        // If the value cannot be parsed as a number, do not commit the change.
-        if (Number.isNaN(parsed)) {
+        if (Number.isNaN(numericValue)) {
             return;
         }
 
-        onRowChange({...row, [columnName]: parsed}, commitChanges);
+        onRowChange({...row, [columnName]: numericValue}, shouldCommit);
     };
 
     const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
-        commit(event.target.value, true);
+        commitValue(event.target.value, true);
     };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        commit(event.target.value, false);
+        commitValue(event.target.value, false);
     };
 
     const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
-            const target = event.target as HTMLInputElement;
+            const inputElement = event.target as HTMLInputElement;
 
-            commit(target.value, true);
+            commitValue(inputElement.value, true);
         }
     };
 
@@ -58,7 +56,7 @@ export const NumberEditCell = ({columnName, onRowChange, row}: NumberEditCellPro
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             type="number"
-            value={value}
+            value={displayValue}
         />
     );
 };

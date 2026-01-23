@@ -17,7 +17,6 @@ interface UseImportDataTableCsvDialogI {
 export default function useImportDataTableCsvDialog(): UseImportDataTableCsvDialogI {
     const {clearDialog, open, setOpen} = useImportDataTableCsvDialogStore();
     const {dataTable} = useCurrentDataTableStore();
-
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();

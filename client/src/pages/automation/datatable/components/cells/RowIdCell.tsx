@@ -44,7 +44,7 @@ const RowIdCell = ({
     const isSelected = selectedRows.has(id);
     const showCheckbox = isSelected || hoveredRowId === id;
 
-    const toggleRow = () => {
+    const handleToggleRow = () => {
         const next = new Set<string>(selectedRows);
 
         if (next.has(id)) {
@@ -59,8 +59,21 @@ const RowIdCell = ({
     const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            toggleRow();
+
+            handleToggleRow();
         }
+    };
+
+    const handleCheckedChange = (isChecked: boolean | 'indeterminate') => {
+        const updatedSelection = new Set<string>(selectedRows);
+
+        if (isChecked === true) {
+            updatedSelection.add(id);
+        } else {
+            updatedSelection.delete(id);
+        }
+
+        onSelectedRowsChange(updatedSelection);
     };
 
     // Use rowIdx directly instead of O(n) findIndex
@@ -69,7 +82,7 @@ const RowIdCell = ({
     return (
         <div
             className="flex w-full items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-            onClick={toggleRow}
+            onClick={handleToggleRow}
             onKeyDown={handleKeyDown}
             onMouseEnter={() => setHoveredRowId(id)}
             onMouseLeave={() => setHoveredRowId((curr) => (curr === id ? null : curr))}
@@ -82,18 +95,8 @@ const RowIdCell = ({
                     aria-label={`Select row ${rowNumber}`}
                     checked={isSelected}
                     className="h-4 w-4 cursor-pointer"
-                    onCheckedChange={(v) => {
-                        const next = new Set<string>(selectedRows);
-
-                        if (v === true) {
-                            next.add(id);
-                        } else {
-                            next.delete(id);
-                        }
-
-                        onSelectedRowsChange(next);
-                    }}
-                    onClick={(e) => e.stopPropagation()}
+                    onCheckedChange={handleCheckedChange}
+                    onClick={(event) => event.stopPropagation()}
                 />
             ) : (
                 <span aria-hidden="true" className="select-none text-xs text-muted-foreground">

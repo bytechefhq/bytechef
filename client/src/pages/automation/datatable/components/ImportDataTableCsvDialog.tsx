@@ -8,9 +8,9 @@ import {useState} from 'react';
 import useImportDataTableCsvDialog from '../hooks/useImportDataTableCsvDialog';
 
 const ImportDataTableCsvDialog = () => {
-    const {handleImport, handleOpenChange, isPending, open} = useImportDataTableCsvDialog();
-
     const [importFile, setImportFile] = useState<File | null>(null);
+
+    const {handleImport, handleOpenChange, isPending, open} = useImportDataTableCsvDialog();
 
     const handleDialogOpenChange = (nextOpen: boolean) => {
         handleOpenChange(nextOpen);
