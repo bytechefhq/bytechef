@@ -80,18 +80,26 @@ public class AwsMessageBrokerConfiguration {
                     } else {
                         return objectMapper.readValue((byte[]) payload, javaType);
                     }
-                } else {
+                } else if (payload instanceof String payloadString) {
                     if (view != null) {
                         return objectMapper.readerWithView(view)
                             .forType(javaType)
-                            .readValue(payload.toString());
+                            .readValue(payloadString);
                     } else {
-                        Writer writer = new StringWriter(1024);
+                        return objectMapper.readValue(payloadString, javaType);
+                    }
+                } else {
+                    Writer writer = new StringWriter(1024);
 
-                        objectMapper.writeValue(writer, payload);
+                    objectMapper.writeValue(writer, payload);
 
-                        String payloadJSONString = writer.toString();
+                    String payloadJSONString = writer.toString();
 
+                    if (view != null) {
+                        return objectMapper.readerWithView(view)
+                            .forType(javaType)
+                            .readValue(payloadJSONString);
+                    } else {
                         return objectMapper.readValue(payloadJSONString, javaType);
                     }
                 }
