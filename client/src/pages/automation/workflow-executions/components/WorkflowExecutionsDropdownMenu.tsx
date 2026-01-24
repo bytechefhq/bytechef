@@ -3,16 +3,18 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {useToast} from '@/hooks/use-toast';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useStopJobMutation} from '@/shared/mutations/platform/jobs.mutations';
+import {WorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
+import {useQueryClient} from '@tanstack/react-query';
 import {CellContext} from '@tanstack/react-table';
 import {CircleStopIcon, EllipsisVerticalIcon, ViewIcon} from 'lucide-react';
-import {useState} from 'react';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const WorkflowExecutionsDropdownMenu = ({data}: {data: CellContext<WorkflowExecution, any>}) => {
-    const [disabled, setDisabled] = useState(data.getValue()?.status !== 'STARTED');
     const {toast} = useToast();
+
+    const queryClient = useQueryClient();
 
     const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore();
 
@@ -22,12 +24,19 @@ const WorkflowExecutionsDropdownMenu = ({data}: {data: CellContext<WorkflowExecu
                 className: 'mt-2 w-[340px] rounded-md bg-red-600 p-4 text-white',
                 description: 'Failed to stop Workflow Execution',
             }),
-        onSuccess: () =>
+        onSuccess: () => {
             toast({
                 className: 'mt-2 w-[340px] rounded-md bg-green-600 p-4 text-white',
                 description: 'Stopping Workflow Execution',
-            }),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowExecutionKeys.workflowExecutions,
+            });
+        },
     });
+
+    const disabled = data.getValue()?.status !== 'STARTED';
 
     const handleViewClick = () => {
         const id = data.row.original.id;
@@ -40,7 +49,6 @@ const WorkflowExecutionsDropdownMenu = ({data}: {data: CellContext<WorkflowExecu
 
     const handleStopWorkflowExecutionClick = (id: number) => {
         stopJobMutation.mutate(id);
-        setDisabled(true);
     };
 
     return (
