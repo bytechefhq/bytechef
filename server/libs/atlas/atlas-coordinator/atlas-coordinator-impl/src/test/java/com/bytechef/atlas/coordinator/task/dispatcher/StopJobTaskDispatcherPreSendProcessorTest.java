@@ -61,6 +61,7 @@ public class StopJobTaskDispatcherPreSendProcessorTest {
         taskExecution = process(Job.Status.STOPPED);
 
         assertThat(taskExecution.getStatus()).isEqualTo(TaskExecution.Status.CANCELLED);
+        assertThat(taskExecution.getEndDate()).isNotNull();
     }
 
     private TaskExecution process(Job.Status status) {
