@@ -75,15 +75,15 @@ docker compose -f docker-compose.dev.server.yml up -d
 ## Architecture Overview
 
 ### Core Technology Stack
-- **Backend**: Java 25 with Spring Boot 3.5.7
-- **Frontend**: React 19.2 with TypeScript 5.9, Vite 7.2, TailwindCSS 3.4
+- **Backend**: Java 25 with Spring Boot 4.0.2
+- **Frontend**: React 19.2 with TypeScript 5.9, Vite 7.3, TailwindCSS 3.4
 - **Database**: PostgreSQL 15+ with Liquibase migrations
 - **Message Broker**: Memory(default), Redis, RabbitMQ, Kafka, JMS, AMQP, AWS SQS
 - **Build System**: Gradle 8+ with Kotlin DSL
 - **Code Execution**: GraalVM Polyglot 25.0.1 (Java, JavaScript, Python, Ruby)
 - **Testing**: JUnit 5, Vitest 4, Testcontainers
 - **Node.js**: Version 20.19+ required for client development
-- **Additional Tools**: MapStruct 1.6.3, Jackson 2.19.2, SpringDoc OpenAPI 2.8.14
+- **Additional Tools**: MapStruct 1.6.3, Jackson 2.19.2, SpringDoc OpenAPI 3.0.0
 
 ### Main Server Module Structure
 
@@ -95,10 +95,14 @@ docker compose -f docker-compose.dev.server.yml up -d
     - `atlas-configuration/` - Workflow configuration management
 
 - **`automation/`** - iPaaS automation implementation
+    - `automation-ai/` - AI-powered automation features
     - `automation-configuration/` - Project and workflow configuration
-    - `automation-connection/` - Connection management
-    - `automation-workflow/` - Workflow coordination and execution
+    - `automation-data-table/` - Data table management
+    - `automation-execution/` - Workflow execution services
+    - `automation-knowledge-base/` - Knowledge base integration
+    - `automation-mcp/` - MCP (Model Context Protocol) integration
     - `automation-task/` - Task management services
+    - `automation-workflow/` - Workflow coordination and execution
 
 - **`platform/`** - Core infrastructure services
     - `platform-component/` - Component definition and management
@@ -709,8 +713,8 @@ tail -f server/apps/server-app/build/logs/application.log
 
 **Gradle Build Optimization**
 - Gradle JVM is configured with 4GB heap in `gradle.properties`
-- Parallel builds are disabled by default but can be enabled
-- Use build cache: `./gradlew --build-cache build`
+- Parallel builds are enabled by default
+- Build cache is enabled by default
 - Use configuration cache: `./gradlew --configuration-cache build`
 - Gradle daemon runs by default for faster subsequent builds
 
