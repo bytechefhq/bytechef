@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinitionBasic", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-02T08:44:56.413708+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.494207+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
 public class ActionDefinitionBasicModel {
 
   private String componentName;
@@ -41,6 +41,8 @@ public class ActionDefinitionBasicModel {
   private Boolean outputFunctionDefined;
 
   private @Nullable Boolean outputSchemaDefined;
+
+  private @Nullable Boolean sseStreamResponse;
 
   private @Nullable String title;
 
@@ -219,6 +221,26 @@ public class ActionDefinitionBasicModel {
     this.outputSchemaDefined = outputSchemaDefined;
   }
 
+  public ActionDefinitionBasicModel sseStreamResponse(@Nullable Boolean sseStreamResponse) {
+    this.sseStreamResponse = sseStreamResponse;
+    return this;
+  }
+
+  /**
+   * Does action support SSE streaming.
+   * @return sseStreamResponse
+   */
+  
+  @Schema(name = "sseStreamResponse", description = "Does action support SSE streaming.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sseStreamResponse")
+  public @Nullable Boolean getSseStreamResponse() {
+    return sseStreamResponse;
+  }
+
+  public void setSseStreamResponse(@Nullable Boolean sseStreamResponse) {
+    this.sseStreamResponse = sseStreamResponse;
+  }
+
   public ActionDefinitionBasicModel title(@Nullable String title) {
     this.title = title;
     return this;
@@ -256,12 +278,13 @@ public class ActionDefinitionBasicModel {
         Objects.equals(this.outputDefined, actionDefinitionBasic.outputDefined) &&
         Objects.equals(this.outputFunctionDefined, actionDefinitionBasic.outputFunctionDefined) &&
         Objects.equals(this.outputSchemaDefined, actionDefinitionBasic.outputSchemaDefined) &&
+        Objects.equals(this.sseStreamResponse, actionDefinitionBasic.sseStreamResponse) &&
         Objects.equals(this.title, actionDefinitionBasic.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, title);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, sseStreamResponse, title);
   }
 
   @Override
@@ -276,6 +299,7 @@ public class ActionDefinitionBasicModel {
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
+    sb.append("    sseStreamResponse: ").append(toIndentedString(sseStreamResponse)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");
     return sb.toString();

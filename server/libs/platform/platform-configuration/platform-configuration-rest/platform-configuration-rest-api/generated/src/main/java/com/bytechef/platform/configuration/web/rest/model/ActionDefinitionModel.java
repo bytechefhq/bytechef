@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-02T08:44:56.413708+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.494207+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
 public class ActionDefinitionModel {
 
   private String componentName;
@@ -48,6 +48,8 @@ public class ActionDefinitionModel {
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
+
+  private @Nullable Boolean sseStreamResponse;
 
   private @Nullable String title;
 
@@ -256,6 +258,26 @@ public class ActionDefinitionModel {
     this.properties = properties;
   }
 
+  public ActionDefinitionModel sseStreamResponse(@Nullable Boolean sseStreamResponse) {
+    this.sseStreamResponse = sseStreamResponse;
+    return this;
+  }
+
+  /**
+   * Does action support SSE streaming.
+   * @return sseStreamResponse
+   */
+  
+  @Schema(name = "sseStreamResponse", description = "Does action support SSE streaming.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sseStreamResponse")
+  public @Nullable Boolean getSseStreamResponse() {
+    return sseStreamResponse;
+  }
+
+  public void setSseStreamResponse(@Nullable Boolean sseStreamResponse) {
+    this.sseStreamResponse = sseStreamResponse;
+  }
+
   public ActionDefinitionModel title(@Nullable String title) {
     this.title = title;
     return this;
@@ -314,13 +336,14 @@ public class ActionDefinitionModel {
         Objects.equals(this.outputFunctionDefined, actionDefinition.outputFunctionDefined) &&
         Objects.equals(this.outputSchemaDefined, actionDefinition.outputSchemaDefined) &&
         Objects.equals(this.properties, actionDefinition.properties) &&
+        Objects.equals(this.sseStreamResponse, actionDefinition.sseStreamResponse) &&
         Objects.equals(this.title, actionDefinition.title) &&
         Objects.equals(this.workflowNodeDescriptionDefined, actionDefinition.workflowNodeDescriptionDefined);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, properties, title, workflowNodeDescriptionDefined);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, properties, sseStreamResponse, title, workflowNodeDescriptionDefined);
   }
 
   @Override
@@ -336,6 +359,7 @@ public class ActionDefinitionModel {
     sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+    sb.append("    sseStreamResponse: ").append(toIndentedString(sseStreamResponse)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    workflowNodeDescriptionDefined: ").append(toIndentedString(workflowNodeDescriptionDefined)).append("\n");
     sb.append("}");
