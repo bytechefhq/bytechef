@@ -241,6 +241,21 @@ public class ExampleComponentHandler implements ComponentHandler {
   }
   ```
 
+### Blank Line After Variable Modification (Java)
+- Insert exactly one empty line between a variable modification and a subsequent statement that uses that variable
+- This improves readability by visually separating the setup from the usage
+- Example:
+  ```java
+  // Bad
+  document.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
+  knowledgeBaseDocumentService.saveKnowledgeBaseDocument(document);
+
+  // Good
+  document.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
+
+  knowledgeBaseDocumentService.saveKnowledgeBaseDocument(document);
+  ```
+
 ### Method Chaining
 - Do not chain method calls except where this is natural and idiomatic
 - Allowed exceptions (non-exhaustive):
