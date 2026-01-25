@@ -16,6 +16,7 @@ Name | Type
 `outputFunctionDefined` | boolean
 `outputSchemaDefined` | boolean
 `properties` | [Array&lt;Property&gt;](Property.md)
+`sseStreamResponse` | boolean
 `title` | string
 `workflowNodeDescriptionDefined` | boolean
 
@@ -35,6 +36,7 @@ const example = {
   "outputFunctionDefined": null,
   "outputSchemaDefined": null,
   "properties": null,
+  "sseStreamResponse": null,
   "title": null,
   "workflowNodeDescriptionDefined": null,
 } satisfies ActionDefinition
