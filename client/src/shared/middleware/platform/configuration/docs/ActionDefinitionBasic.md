@@ -15,6 +15,7 @@ Name | Type
 `outputDefined` | boolean
 `outputFunctionDefined` | boolean
 `outputSchemaDefined` | boolean
+`sseStreamResponse` | boolean
 `title` | string
 
 ## Example
@@ -32,6 +33,7 @@ const example = {
   "outputDefined": null,
   "outputFunctionDefined": null,
   "outputSchemaDefined": null,
+  "sseStreamResponse": null,
   "title": null,
 } satisfies ActionDefinitionBasic
 

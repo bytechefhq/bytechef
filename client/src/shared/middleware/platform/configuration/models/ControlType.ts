@@ -23,6 +23,7 @@ export const ControlType = {
     Date: 'DATE',
     DateTime: 'DATE_TIME',
     Email: 'EMAIL',
+    FormulaMode: 'FORMULA_MODE',
     Integer: 'INTEGER',
     JsonSchemaBuilder: 'JSON_SCHEMA_BUILDER',
     FileEntry: 'FILE_ENTRY',
