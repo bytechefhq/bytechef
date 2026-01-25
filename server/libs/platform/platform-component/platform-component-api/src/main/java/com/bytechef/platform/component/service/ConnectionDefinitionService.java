@@ -21,7 +21,6 @@ import com.bytechef.component.definition.Authorization.AuthorizationCallbackResp
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
@@ -53,10 +52,6 @@ public interface ConnectionDefinitionService extends OperationDefinitionService 
     Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection);
 
     Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection, Context context);
-
-    ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,
-        int statusCode, Object body);
 
     RefreshTokenResponse executeRefresh(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
