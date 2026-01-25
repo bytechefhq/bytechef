@@ -66,7 +66,6 @@ public class TaskWorkerTest {
 
     private static final Evaluator EVALUATOR = SpelEvaluator.create();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
-    private static final ExecutorService NEW_FIXED_THREAD_POOL = Executors.newFixedThreadPool(2);
     private static final ExecutorService NEW_SINGLE_THREAD_EXECUTOR = Executors.newSingleThreadExecutor();
 
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
@@ -337,6 +336,7 @@ public class TaskWorkerTest {
     @Test
     public void test6() throws InterruptedException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
@@ -344,7 +344,7 @@ public class TaskWorkerTest {
         TaskWorker worker = new TaskWorker(
             null, EVALUATOR,
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            NEW_SINGLE_THREAD_EXECUTOR::execute,
+            singleThreadExecutor::execute,
             task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -365,8 +365,8 @@ public class TaskWorkerTest {
         // execute the task
         executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution)));
 
-        // give it a second to start executing
-        TimeUnit.SECONDS.sleep(2);
+        // wait for task to be registered
+        waitForCondition(() -> MapUtils.size(worker.getTaskExecutions()) == 1, 5000);
 
         Assertions.assertEquals(1, MapUtils.size(worker.getTaskExecutions()));
 
@@ -375,14 +375,17 @@ public class TaskWorkerTest {
             new CancelControlTaskEvent(new CancelControlTask(
                 Validate.notNull(taskExecution.getJobId(), "jobId"), Validate.notNull(taskExecution.getId(), "id"))));
 
-        // give it a second to cancel
-        TimeUnit.SECONDS.sleep(2);
+        // wait for cancellation to complete
+        waitForCondition(() -> MapUtils.size(worker.getTaskExecutions()) == 0, 5000);
 
         Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
+
+        singleThreadExecutor.shutdownNow();
     }
 
     @Test
     public void test7() throws InterruptedException {
+        ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
@@ -390,7 +393,7 @@ public class TaskWorkerTest {
         TaskWorker worker = new TaskWorker(
             null, EVALUATOR,
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            NEW_SINGLE_THREAD_EXECUTOR::execute,
+            singleThreadExecutor::execute,
             task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -421,8 +424,8 @@ public class TaskWorkerTest {
         // execute the task
         EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
 
-        // give it a second to start executing
-        TimeUnit.SECONDS.sleep(2);
+        // wait for both tasks to be registered
+        waitForCondition(() -> MapUtils.size(worker.getTaskExecutions()) == 2, 5000);
 
         Assertions.assertEquals(2, MapUtils.size(worker.getTaskExecutions()));
 
@@ -431,14 +434,27 @@ public class TaskWorkerTest {
             new CancelControlTaskEvent(new CancelControlTask(
                 Validate.notNull(taskExecution1.getJobId(), "jobId"), Validate.notNull(taskExecution1.getId(), "id"))));
 
-        // give it a second to cancel
-        TimeUnit.SECONDS.sleep(2);
+        // wait for cancellation to complete
+        waitForCondition(() -> MapUtils.size(worker.getTaskExecutions()) == 1, 5000);
 
         Assertions.assertEquals(1, MapUtils.size(worker.getTaskExecutions()));
+
+        singleThreadExecutor.shutdownNow();
+    }
+
+    private void waitForCondition(java.util.function.BooleanSupplier condition, long timeoutMs)
+        throws InterruptedException {
+
+        long deadline = System.currentTimeMillis() + timeoutMs;
+
+        while (!condition.getAsBoolean() && System.currentTimeMillis() < deadline) {
+            TimeUnit.MILLISECONDS.sleep(100);
+        }
     }
 
     @Test
     public void test8() throws InterruptedException {
+        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(2);
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
@@ -446,7 +462,7 @@ public class TaskWorkerTest {
         TaskWorker worker = new TaskWorker(
             null, EVALUATOR,
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            NEW_FIXED_THREAD_POOL::execute,
+            fixedThreadPool::execute,
             task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -478,8 +494,8 @@ public class TaskWorkerTest {
         // execute the task
         EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
 
-        // give it a second to start executing
-        TimeUnit.SECONDS.sleep(2);
+        // wait for both tasks to be registered
+        waitForCondition(() -> MapUtils.size(worker.getTaskExecutions()) == 2, 5000);
 
         Assertions.assertEquals(2, MapUtils.size(worker.getTaskExecutions()));
 
@@ -488,9 +504,11 @@ public class TaskWorkerTest {
             new CancelControlTaskEvent(new CancelControlTask(
                 Validate.notNull(taskExecution1.getJobId(), "jobId"), Validate.notNull(taskExecution1.getId(), "id"))));
 
-        // give it a second to cancel
-        TimeUnit.SECONDS.sleep(2);
+        // wait for cancellation to complete (both tasks share same jobId, so both should be cancelled)
+        waitForCondition(() -> MapUtils.size(worker.getTaskExecutions()) == 0, 5000);
 
         Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
+
+        fixedThreadPool.shutdownNow();
     }
 }
