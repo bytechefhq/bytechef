@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-02T08:44:57.044045+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.451933+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
 @Validated
 @Tag(name = "custom-component", description = "The Platform Custom Component Public API")
 public interface CustomComponentApi {

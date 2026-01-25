@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("create_update_account")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-02T08:44:56.735855+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.766054+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
 public class CreateUpdateAccountModel {
 
   private JsonNullable<String> accountNumber = JsonNullable.<String>undefined();
