@@ -2305,6 +2305,7 @@ components:
       - "DATE"
       - "DATE_TIME"
       - "EMAIL"
+      - "FORMULA_MODE"
       - "INTEGER"
       - "JSON_SCHEMA_BUILDER"
       - "FILE_ENTRY"

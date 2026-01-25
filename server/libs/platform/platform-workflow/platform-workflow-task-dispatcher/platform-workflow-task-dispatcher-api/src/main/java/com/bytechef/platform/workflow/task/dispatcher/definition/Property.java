@@ -41,6 +41,7 @@ public interface Property extends BaseProperty {
         DATE_TIME,
         EMAIL,
         FILE_ENTRY,
+        FORMULA_MODE,
         INTEGER,
         MULTI_SELECT,
         NUMBER,
