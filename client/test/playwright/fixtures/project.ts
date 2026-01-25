@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks -- Playwright fixtures use 'use' callback, not React hooks */
 import {test as base} from '@playwright/test';
 
-import {ensureAuthenticated} from '../utils/auth';
 import {ProjectsPage} from '../pages/projectsPage';
-import {createProject, type TestProjectI} from '../utils/projects';
+import {ensureAuthenticated} from '../utils/auth';
+import {type TestProjectI, createProject} from '../utils/projects';
 
 export type ProjectFixturesType = {
     project: TestProjectI;
