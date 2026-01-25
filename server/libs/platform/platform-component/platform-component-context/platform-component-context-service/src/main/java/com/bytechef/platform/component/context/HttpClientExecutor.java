@@ -145,7 +145,7 @@ class HttpClientExecutor {
 
     HttpClient createHttpClient(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Configuration configuration,
-        String componentName, int componentVersion, String componentOperationName,
+        String componentName, int componentVersion, @Nullable String componentOperationName,
         @Nullable ComponentConnection componentConnection, Context context) {
 
         Methanol.Builder builder = Methanol.newBuilder();

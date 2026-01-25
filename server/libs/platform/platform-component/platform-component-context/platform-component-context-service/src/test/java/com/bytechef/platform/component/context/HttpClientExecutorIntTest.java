@@ -81,9 +81,6 @@ import tools.jackson.dataformat.xml.XmlMapper;
  */
 class HttpClientExecutorIntTest {
 
-    private static final int WIREMOCK_PORT = 9998;
-    private static final String BASE_URL = "http://localhost:" + WIREMOCK_PORT;
-
     static {
         ObjectMapper objectMapper = JsonMapper.builder()
             .build();
@@ -98,7 +95,7 @@ class HttpClientExecutorIntTest {
     @RegisterExtension
     static WireMockExtension wireMock = WireMockExtension.newInstance()
         .options(wireMockConfig()
-            .port(WIREMOCK_PORT)
+            .dynamicPort()
             .http2PlainDisabled(true))
         .configureStaticDsl(true)
         .build();
@@ -108,9 +105,11 @@ class HttpClientExecutorIntTest {
     private TempFileStorage tempFileStorage;
     private ActionContext actionContext;
     private ConnectionDefinitionService connectionDefinitionService;
+    private String baseUrl;
 
     @BeforeEach
     void setUp() {
+        baseUrl = "http://localhost:" + wireMock.getPort();
         applicationContext = mock(ApplicationContext.class);
         tempFileStorage = mock(TempFileStorage.class);
         actionContext = mock(ActionContext.class);
@@ -144,7 +143,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/test",
+                baseUrl + "/api/test",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -184,7 +183,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/search",
+                baseUrl + "/api/search",
                 Collections.emptyMap(),
                 queryParameters,
                 null,
@@ -216,7 +215,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/protected",
+                baseUrl + "/api/protected",
                 headers,
                 Collections.emptyMap(),
                 null,
@@ -246,7 +245,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/text",
+                baseUrl + "/api/text",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -277,7 +276,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/xml",
+                baseUrl + "/api/xml",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -320,7 +319,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/binary",
+                baseUrl + "/api/binary",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -363,7 +362,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/create",
+                baseUrl + "/api/create",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 body,
@@ -405,7 +404,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/form",
+                baseUrl + "/api/form",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 body,
@@ -439,7 +438,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/xml",
+                baseUrl + "/api/xml",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 body,
@@ -467,7 +466,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/trigger",
+                baseUrl + "/api/trigger",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -507,7 +506,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/update/1",
+                baseUrl + "/api/update/1",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 body,
@@ -547,7 +546,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/patch/1",
+                baseUrl + "/api/patch/1",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 body,
@@ -578,7 +577,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/delete/1",
+                baseUrl + "/api/delete/1",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -611,7 +610,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/delete",
+                baseUrl + "/api/delete",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 body,
@@ -645,7 +644,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/bad-request",
+                baseUrl + "/api/bad-request",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -674,7 +673,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/unauthorized",
+                baseUrl + "/api/unauthorized",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -703,7 +702,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/not-found",
+                baseUrl + "/api/not-found",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -732,7 +731,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/server-error",
+                baseUrl + "/api/server-error",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -759,7 +758,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/no-content",
+                baseUrl + "/api/no-content",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -794,7 +793,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/with-headers",
+                baseUrl + "/api/with-headers",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -826,7 +825,7 @@ class HttpClientExecutorIntTest {
             stubFor(get(urlPathEqualTo("/api/redirect"))
                 .willReturn(aResponse()
                     .withStatus(302)
-                    .withHeader("Location", BASE_URL + "/api/final")));
+                    .withHeader("Location", baseUrl + "/api/final")));
 
             stubFor(get(urlPathEqualTo("/api/final"))
                 .willReturn(ok()
@@ -838,7 +837,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/redirect",
+                baseUrl + "/api/redirect",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -860,14 +859,14 @@ class HttpClientExecutorIntTest {
             stubFor(get(urlPathEqualTo("/api/redirect-no-follow"))
                 .willReturn(aResponse()
                     .withStatus(302)
-                    .withHeader("Location", BASE_URL + "/api/final")));
+                    .withHeader("Location", baseUrl + "/api/final")));
 
             Configuration configuration = Http.responseType(Http.ResponseType.JSON)
                 .followRedirect(false)
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/redirect-no-follow",
+                baseUrl + "/api/redirect-no-follow",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -903,7 +902,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/no-auth",
+                baseUrl + "/api/no-auth",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -940,7 +939,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/multi-query",
+                baseUrl + "/api/multi-query",
                 Collections.emptyMap(),
                 queryParameters,
                 null,
@@ -989,7 +988,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/download",
+                baseUrl + "/api/download",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -1022,7 +1021,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/head-test",
+                baseUrl + "/api/head-test",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -1055,7 +1054,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/json-charset",
+                baseUrl + "/api/json-charset",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -1083,7 +1082,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/vendor-json",
+                baseUrl + "/api/vendor-json",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -1118,7 +1117,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/slow",
+                baseUrl + "/api/slow",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -1151,7 +1150,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/empty",
+                baseUrl + "/api/empty",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -1179,7 +1178,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/whitespace",
+                baseUrl + "/api/whitespace",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -1212,7 +1211,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/array",
+                baseUrl + "/api/array",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -1253,7 +1252,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/unicode",
+                baseUrl + "/api/unicode",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
@@ -1309,7 +1308,7 @@ class HttpClientExecutorIntTest {
                 .build();
 
             Response response = httpClientExecutor.execute(
-                BASE_URL + "/api/large",
+                baseUrl + "/api/large",
                 Collections.emptyMap(),
                 Collections.emptyMap(),
                 null,
