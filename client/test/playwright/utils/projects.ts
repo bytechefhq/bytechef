@@ -1,6 +1,7 @@
 import {Page, expect} from '@playwright/test';
 
 import {ProjectsPage} from '../pages/projectsPage';
+import {clickAndExpectToBeVisible} from './clickAndExpectToBeVisible';
 import getRandomString from './getRandomString';
 
 export interface TestProjectI {
@@ -69,4 +70,49 @@ export async function createProjectWithWorkflow(
     const workflow = await createWorkflow(page, project.id, workflowName);
 
     return {project, workflow};
+}
+
+export async function importWorkflow(page: Page, projectId: string, workflowFilePath: string): Promise<TestWorkflowI> {
+    const projectsPage = new ProjectsPage(page);
+
+    await page.goto('/automation/projects');
+
+    await projectsPage.waitForPageLoad();
+
+    const projectItem = page.getByLabel(projectId);
+
+    await expect(projectItem).toBeVisible({timeout: 10000});
+
+    await projectItem.click();
+
+    await page.waitForTimeout(1000);
+
+    const workflowCreationOptionsButton = page.getByRole('button', {name: 'Workflow Creation Actions'});
+
+    await expect(workflowCreationOptionsButton).toBeVisible({timeout: 10000});
+
+    const importWorkflowMenuItem = page.getByRole('menuitem', {name: 'Import Workflow'});
+
+    await clickAndExpectToBeVisible({
+        target: importWorkflowMenuItem,
+        trigger: workflowCreationOptionsButton,
+    });
+
+    const fileInput = page.locator('input[type="file"][accept*=".json"]').last();
+
+    await fileInput.setInputFiles(workflowFilePath);
+
+    await importWorkflowMenuItem.click();
+
+    await expect(page).toHaveURL(new RegExp(`${projectId}.*project-workflows`), {timeout: 15000});
+
+    const url = page.url();
+
+    const workflowIdMatch = url.match(/project-workflows\/(\d+)/);
+
+    const workflowId = workflowIdMatch ? workflowIdMatch[1] : 'unknown';
+
+    const workflowName = 'Playwright Sample Workflow';
+
+    return {projectId, workflowId, workflowName};
 }
