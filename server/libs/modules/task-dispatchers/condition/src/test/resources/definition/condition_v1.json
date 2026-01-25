@@ -568,7 +568,7 @@
     "type": "ARRAY"
   }, {
     "advancedOption": null,
-    "controlType": "TEXT_AREA",
+    "controlType": "FORMULA_MODE",
     "defaultValue": null,
     "description": "The raw expression.",
     "displayCondition": "rawExpression == true",
