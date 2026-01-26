@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.jira.constant.JiraConstants.ASSIGNEE;
-import static com.bytechef.component.jira.constant.JiraConstants.CONTENT;
 import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
@@ -32,8 +31,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.PRIORITY;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.SELF;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
-import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
-import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -43,8 +40,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.jira.util.JiraOptionsUtils;
+import com.bytechef.component.jira.util.JiraUtils;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -127,7 +124,7 @@ public class JiraCreateIssueAction {
         addFieldIfNotNull(project, PARENT, inputParameters.getString(PARENT));
         addFieldIfNotNull(project, ASSIGNEE, inputParameters.getString(ASSIGNEE));
         addFieldIfNotNull(project, PRIORITY, inputParameters.getString(PRIORITY));
-        addDescriptionField(project, inputParameters.getString(DESCRIPTION));
+        JiraUtils.addDescriptionField(project, inputParameters.getString(DESCRIPTION));
 
         return project;
     }
@@ -135,21 +132,6 @@ public class JiraCreateIssueAction {
     private static void addFieldIfNotNull(Map<String, Object> project, String fieldName, String value) {
         if (value != null) {
             project.put(fieldName, Map.of(ID, value));
-        }
-    }
-
-    private static void addDescriptionField(Map<String, Object> project, String description) {
-        if (description != null) {
-            project.put(DESCRIPTION, Map.of(
-                CONTENT, List.of(
-                    Map.of(
-                        CONTENT, List.of(
-                            Map.of(
-                                TEXT, description,
-                                TYPE, TEXT)),
-                        TYPE, "paragraph")),
-                TYPE, "doc",
-                "version", 1));
         }
     }
 }
