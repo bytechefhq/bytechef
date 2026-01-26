@@ -1,0 +1,26 @@
+query ComponentDefinitionSearch($query: String!) {
+    componentDefinitionSearch(query: $query) {
+        name
+        title
+        icon
+        description
+        version
+        actionsCount
+        triggersCount
+        componentCategories {
+            name
+            label
+        }
+        actions {
+            name
+            title
+            description
+        }
+        triggers {
+            name
+            title
+            description
+        }
+    }
+}
+
