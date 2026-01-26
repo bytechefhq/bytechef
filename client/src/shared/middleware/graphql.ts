@@ -2111,6 +2111,13 @@ export type ApiKeysQueryVariables = Exact<{
 
 export type ApiKeysQuery = { __typename?: 'Query', apiKeys?: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null } | null> | null };
 
+export type ComponentDefinitionSearchQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+}>;
+
+
+export type ComponentDefinitionSearchQuery = { __typename?: 'Query', componentDefinitionSearch: Array<{ __typename?: 'ComponentDefinition', name: string, title?: string | null, icon?: string | null, description?: string | null, version?: number | null, actionsCount?: number | null, triggersCount?: number | null, componentCategories?: Array<{ __typename?: 'ComponentCategory', name: string, label?: string | null }> | null, actions?: Array<{ __typename?: 'ActionDefinition', name: string, title?: string | null, description?: string | null }> | null, triggers?: Array<{ __typename?: 'TriggerDefinition', name: string, title?: string | null, description?: string | null }> | null }> };
+
 export type CreateApiKeyMutationVariables = Exact<{
   name: Scalars['String']['input'];
   environmentId: Scalars['ID']['input'];
@@ -3579,6 +3586,50 @@ export const useApiKeysQuery = <
       {
     queryKey: ['apiKeys', variables],
     queryFn: fetcher<ApiKeysQuery, ApiKeysQueryVariables>(ApiKeysDocument, variables),
+    ...options
+  }
+    )};
+
+export const ComponentDefinitionSearchDocument = `
+    query ComponentDefinitionSearch($query: String!) {
+  componentDefinitionSearch(query: $query) {
+    name
+    title
+    icon
+    description
+    version
+    actionsCount
+    triggersCount
+    componentCategories {
+      name
+      label
+    }
+    actions {
+      name
+      title
+      description
+    }
+    triggers {
+      name
+      title
+      description
+    }
+  }
+}
+    `;
+
+export const useComponentDefinitionSearchQuery = <
+      TData = ComponentDefinitionSearchQuery,
+      TError = unknown
+    >(
+      variables: ComponentDefinitionSearchQueryVariables,
+      options?: Omit<UseQueryOptions<ComponentDefinitionSearchQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ComponentDefinitionSearchQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ComponentDefinitionSearchQuery, TError, TData>(
+      {
+    queryKey: ['ComponentDefinitionSearch', variables],
+    queryFn: fetcher<ComponentDefinitionSearchQuery, ComponentDefinitionSearchQueryVariables>(ComponentDefinitionSearchDocument, variables),
     ...options
   }
     )};
