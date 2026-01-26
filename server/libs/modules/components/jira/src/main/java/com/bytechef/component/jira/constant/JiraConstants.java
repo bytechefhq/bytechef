@@ -51,6 +51,9 @@ public class JiraConstants {
     public static final String TEXT = "text";
     public static final String TYPE = "type";
     public static final String ORDER_BY = "orderBy";
+    public static final String ADD_LABELS = "addLabels";
+    public static final String REMOVE_LABELS = "removeLabels";
+    public static final String UPDATE = "update";
 
     public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object()
         .properties(
