@@ -803,6 +803,46 @@ public class WorkflowNodeParameterFacadeTest {
     }
 
     @Test
+    public void testEvaluateArrayMultiLevelNested() {
+        Map<String, Object> parametersMap = Map.of(
+            "CHILDREN", List.of(
+                Map.of("caption", List.of(
+                    Map.of("TYPE", "text"),
+                    Map.of("TYPE", "image"))),
+                Map.of("caption", List.of(
+                    Map.of("TYPE", "video")))));
+
+        Map<String, String> displayConditionMap = new HashMap<>();
+
+        WORKFLOW_NODE_PARAMETER_FACADE.evaluateArray(
+            "prop", "CHILDREN[index].caption[index].TYPE == 'text'", displayConditionMap, Map.of(), Map.of(),
+            parametersMap);
+
+        assertEquals(1, displayConditionMap.size());
+        assertEquals(
+            Map.of("CHILDREN[0].caption[0].TYPE == 'text'", "0_0_prop"),
+            displayConditionMap);
+
+        displayConditionMap = new HashMap<>();
+        WORKFLOW_NODE_PARAMETER_FACADE.evaluateArray(
+            "prop", "CHILDREN[index].caption[index].TYPE == 'image'", displayConditionMap, Map.of(), Map.of(),
+            parametersMap);
+        assertEquals(1, displayConditionMap.size());
+        assertEquals(
+            Map.of("CHILDREN[0].caption[1].TYPE == 'image'", "0_1_prop"),
+            displayConditionMap);
+
+        displayConditionMap = new HashMap<>();
+        WORKFLOW_NODE_PARAMETER_FACADE.evaluateArray(
+            "prop", "CHILDREN[index].caption[index].TYPE == 'video'", displayConditionMap, Map.of(), Map.of(),
+            parametersMap);
+        assertEquals(1, displayConditionMap.size());
+        assertEquals(
+            Map.of("CHILDREN[1].caption[0].TYPE == 'video'", "1_0_prop"),
+            displayConditionMap);
+    }
+
+    @Test
     public void testHasExpressionVariable() {
         String[] expressions = {
             "variableName == 45", "'string' == variableName", "prefixVariableName!= newValue1 && !variableName ",
