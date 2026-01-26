@@ -3787,6 +3787,156 @@
     "suspendPerform": null,
     "title": "Search Issues",
     "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Move an issue to another status.",
+    "help": null,
+    "metadata": null,
+    "name": "transitionIssue",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the project where the issue is located.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Project ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "project",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the issue to be assigned.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Issue ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "issueId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "project" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the status you want to put the issue in.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Status ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "statusId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "issueId" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "suspendPerform": null,
+    "title": "Transition Issue",
+    "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
     "name": "assignIssue",
@@ -7561,6 +7711,155 @@
       "type": "STRING"
     } ],
     "title": "Search Issues",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "transitionIssue",
+    "description": "Move an issue to another status.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the project where the issue is located.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Project ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "project",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the issue to be assigned.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Issue ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "issueId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "project" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the status you want to put the issue in.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Status ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "statusId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "issueId" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Transition Issue",
     "type": {
       "name": "TOOLS",
       "key": "tools",

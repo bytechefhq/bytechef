@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
+import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.JQL;
 import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
@@ -244,5 +245,37 @@ class JiraOptionsUtilsTest {
         };
 
         assertArrayEquals(objects, objectsArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetStatusIdOptions() {
+
+        Map<String, Object> transition = Map.of(
+            "id", "123",
+            "to", Map.of("name", "In Progress"));
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("transitions", List.of(transition)));
+
+        Parameters parameters = MockParametersFactory.create(Map.of(ISSUE_ID, "testIssue"));
+
+        List<Option<String>> result = JiraOptionsUtils.getStatusIdOptions(
+            parameters, null, Map.of(), "", mockedActionContext);
+
+        List<Option<String>> expected = List.of(option("In Progress", "123"));
+        assertEquals(expected, result);
+
+        assertEquals(List.of("/issue/testIssue/transitions"), stringArgumentCaptor.getAllValues());
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
     }
 }
