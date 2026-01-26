@@ -16,10 +16,14 @@
 
 package com.bytechef.component.jira.util;
 
+import static com.bytechef.component.jira.constant.JiraConstants.CONTENT;
+import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
+import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
+import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -93,5 +97,20 @@ public class JiraUtils {
             .body(Http.Body.of("webhookIds", List.of(outputParameters.getInteger(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
+    }
+
+    public static void addDescriptionField(Map<String, Object> project, String description) {
+        if (description != null) {
+            project.put(DESCRIPTION, Map.of(
+                CONTENT, List.of(
+                    Map.of(
+                        CONTENT, List.of(
+                            Map.of(
+                                TEXT, description,
+                                TYPE, TEXT)),
+                        TYPE, "paragraph")),
+                TYPE, "doc",
+                "version", 1));
+        }
     }
 }
