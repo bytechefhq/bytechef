@@ -1,15 +1,35 @@
 import {Input} from '@/components/ui/input';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workflow-nodes-tabs/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import {useDebouncedValue} from '@/shared/hooks/useDebouncedValue';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {useGetComponentDefinitionsWithActionsQuery} from '@/shared/queries/platform/componentDefinitionsGraphQL.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
-import {memo, useEffect, useState} from 'react';
+import {memo, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import {convertNameToSnakeCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
+
+interface ComponentDefinitionWithActionsProps extends ComponentDefinitionBasic {
+    actions?: Array<{
+        name?: string;
+        title?: string;
+        description?: string;
+    }>;
+    triggers?: Array<{
+        name?: string;
+        title?: string;
+        description?: string;
+    }>;
+    clusterElements?: Array<{
+        type?: {
+            name?: string;
+        };
+    }>;
+}
 
 interface WorkflowNodesListProps {
     actionPanelOpen: boolean;
@@ -38,20 +58,23 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         sourceNodeId,
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
+
+        const debouncedFilter = useDebouncedValue(filter, 300);
+
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
-            Array<ComponentDefinitionBasic>
+            ComponentDefinitionWithActionsProps[]
         >([]);
 
         const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
-            Array<TaskDispatcherDefinition>
+            TaskDispatcherDefinition[]
         >([]);
 
         const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
-            Array<ComponentDefinitionBasic>
+            ComponentDefinitionWithActionsProps[]
         >([]);
 
         const [filteredClusterElementComponentDefinitions, setFilteredClusterElementComponentDefinitions] = useState<
-            Array<ComponentDefinitionBasic>
+            ComponentDefinitionWithActionsProps[]
         >([]);
 
         const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore(
@@ -67,24 +90,37 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const ff_3827 = useFeatureFlagsStore()('ff-3827');
         const ff_3839 = useFeatureFlagsStore()('ff-3839');
 
+        const trimmedFilter = debouncedFilter.trim();
+        const {data: searchedComponentDefinitions, isLoading: isSearchLoading} =
+            useGetComponentDefinitionsWithActionsQuery(trimmedFilter);
+
+        const componentsWithActions = useMemo(() => {
+            if (trimmedFilter && searchedComponentDefinitions && !isSearchLoading) {
+                return searchedComponentDefinitions as ComponentDefinitionWithActionsProps[];
+            }
+
+            return componentDefinitions as ComponentDefinitionWithActionsProps[];
+        }, [trimmedFilter, searchedComponentDefinitions, isSearchLoading, componentDefinitions]);
+
         useEffect(
             () =>
                 setFilteredTaskDispatcherDefinitions(
-                    filterTaskDispatcherDefinitions(taskDispatcherDefinitions, filter, edgeId, sourceNodeId, nodes)
+                    filterTaskDispatcherDefinitions(
+                        taskDispatcherDefinitions,
+                        debouncedFilter,
+                        edgeId,
+                        sourceNodeId,
+                        nodes
+                    )
                 ),
-            [taskDispatcherDefinitions, filter, sourceNodeId, edgeId, nodes]
+            [taskDispatcherDefinitions, debouncedFilter, sourceNodeId, edgeId, nodes]
         );
 
         useEffect(() => {
-            if (componentDefinitions) {
+            if (componentsWithActions) {
                 setFilteredActionComponentDefinitions(
-                    componentDefinitions
-                        .filter(
-                            ({actionsCount, name, title}) =>
-                                actionsCount &&
-                                (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                    title?.toLowerCase().includes(filter.toLowerCase()))
-                        )
+                    componentsWithActions
+                        .filter(({actionsCount}) => actionsCount && actionsCount > 0)
                         .filter(
                             ({name}) =>
                                 ((!ff_797 && name !== 'dataStream') || ff_797) &&
@@ -93,33 +129,35 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 );
 
                 setFilteredTriggerComponentDefinitions(
-                    componentDefinitions
-                        .filter(({name, title, triggersCount}) => {
-                            const nameIncludes = name?.toLowerCase().includes(filter.toLowerCase());
-                            const titleIncludes = title?.toLowerCase().includes(filter.toLowerCase());
-
-                            return triggersCount && (nameIncludes || titleIncludes);
-                        })
+                    componentsWithActions
+                        .filter(({triggersCount}) => triggersCount && triggersCount > 0)
                         .filter(({name}) => (!ff_3827 && name !== 'form') || ff_3827)
                 );
 
                 if (clusterElementType) {
                     setFilteredClusterElementComponentDefinitions(
-                        componentDefinitions
-                            .filter(({clusterElementsCount, name, title}) => {
-                                const nameIncludes = name?.toLowerCase().includes(filter.toLowerCase());
-                                const titleIncludes = title?.toLowerCase().includes(filter.toLowerCase());
+                        componentsWithActions
+                            .filter(({clusterElements, clusterElementsCount, name, title}) => {
+                                const nameIncludes = name?.toLowerCase().includes(trimmedFilter.toLowerCase());
+                                const titleIncludes = title?.toLowerCase().includes(trimmedFilter.toLowerCase());
+
+                                const hasClusterElementsCount =
+                                    clusterElementsCount?.[convertNameToSnakeCase(clusterElementType as string)];
+
+                                const hasClusterElements = clusterElements?.some(
+                                    (element) =>
+                                        element.type?.name === convertNameToSnakeCase(clusterElementType as string)
+                                );
 
                                 return (
-                                    clusterElementsCount?.[convertNameToSnakeCase(clusterElementType as string)] &&
-                                    (nameIncludes || titleIncludes)
+                                    (hasClusterElementsCount || hasClusterElements) && (nameIncludes || titleIncludes)
                                 );
                             })
                             .filter(({name}) => (!ff_3839 && name !== 'aiAgent') || ff_3839)
                     );
                 }
             }
-        }, [clusterElementType, componentDefinitions, filter, ff_797, ff_1652, ff_3827, ff_3839]);
+        }, [clusterElementType, componentsWithActions, trimmedFilter, ff_797, ff_1652, ff_3827, ff_3839]);
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>
@@ -212,7 +250,6 @@ const filterTaskDispatcherDefinitions = (
 
             const currentNodeData = currentNode.data as NodeDataType;
 
-            // If using edgeId (has full data), or using sourceNodeId (has restricted data)
             if (currentNode.data.workflowNodeName) {
                 parentId = currentNodeData.conditionData?.conditionId || currentNodeData.branchData?.branchId;
             } else {
@@ -227,7 +264,6 @@ const filterTaskDispatcherDefinitions = (
 
             if (isLoopSubtask(parentNode)) {
                 hasLoopTaskDispatcher = true;
-
                 break;
             }
 
