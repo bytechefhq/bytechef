@@ -30,16 +30,24 @@ import java.util.List;
  */
 public class NotionConstants {
 
+    public static final String CAPTION = "caption";
+    public static final String CHECKED = "checked";
+    public static final String CHILDREN = "children";
+    public static final String COLOR = "color";
     public static final String CONTENT = "content";
     public static final String DATABASE_ITEM_ID = "databaseItemId";
     public static final String DIRECTION = "direction";
+    public static final String EXPRESSION = "expression";
     public static final String ID = "id";
+    public static final String LANGUAGE = "language";
     public static final String FIELDS = "fields";
     public static final String NAME = "name";
     public static final String PROPERTY = "property";
+    public static final String RICH_TEXT = "rich_text";
     public static final String TITLE = "title";
     public static final String TEXT = "text";
     public static final String TYPE = "type";
+    public static final String URL = "url";
 
     public static final ModifiableObjectProperty PAGE_OUTPUT_PROPERTY = object()
         .properties(

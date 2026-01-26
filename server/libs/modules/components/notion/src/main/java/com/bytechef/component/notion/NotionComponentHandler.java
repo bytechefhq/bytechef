@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.notion.action.NotionAddBlockToPageAction;
 import com.bytechef.component.notion.action.NotionCreateDatabaseItemAction;
 import com.bytechef.component.notion.action.NotionCreatePageAction;
 import com.bytechef.component.notion.action.NotionGetDatabaseAction;
@@ -47,6 +48,7 @@ public class NotionComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .customAction(true)
         .actions(
+            NotionAddBlockToPageAction.ACTION_DEFINITION,
             NotionCreateDatabaseItemAction.ACTION_DEFINITION,
             NotionCreatePageAction.ACTION_DEFINITION,
             NotionGetDatabaseAction.ACTION_DEFINITION,
@@ -55,6 +57,7 @@ public class NotionComponentHandler implements ComponentHandler {
             NotionListDatabaseItemsAction.ACTION_DEFINITION,
             NotionUpdateDatabaseItemAction.ACTION_DEFINITION)
         .clusterElements(
+            tool(NotionAddBlockToPageAction.ACTION_DEFINITION),
             tool(NotionCreateDatabaseItemAction.ACTION_DEFINITION),
             tool(NotionCreatePageAction.ACTION_DEFINITION),
             tool(NotionGetDatabaseAction.ACTION_DEFINITION),
