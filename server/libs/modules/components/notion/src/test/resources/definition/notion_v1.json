@@ -5,6 +5,993 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
+    "description": "Adds a new content block to a page.",
+    "help": null,
+    "metadata": null,
+    "name": "addBlockToPage",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": null,
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Parent Page ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "id",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Child content to append to a container block as an array of block objects.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "The type of block to add.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Block Type",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "type",
+          "options": [ {
+            "description": null,
+            "label": "Bookmark",
+            "value": "bookmark"
+          }, {
+            "description": null,
+            "label": "Breadcrumb",
+            "value": "breadcrumb"
+          }, {
+            "description": null,
+            "label": "Bulleted List Item",
+            "value": "bulleted_list_item"
+          }, {
+            "description": null,
+            "label": "Callout",
+            "value": "callout"
+          }, {
+            "description": null,
+            "label": "Code",
+            "value": "code"
+          }, {
+            "description": "Embed block objects include information about another website displayed within the Notion UI.",
+            "label": "Embed",
+            "value": "embed"
+          }, {
+            "description": null,
+            "label": "Equation",
+            "value": "equation"
+          }, {
+            "description": null,
+            "label": "Heading 1",
+            "value": "heading_1"
+          }, {
+            "description": null,
+            "label": "Heading 2",
+            "value": "heading_2"
+          }, {
+            "description": null,
+            "label": "Heading 3",
+            "value": "heading_3"
+          }, {
+            "description": null,
+            "label": "Numbered List Item",
+            "value": "numbered_list_item"
+          }, {
+            "description": null,
+            "label": "Paragraph",
+            "value": "paragraph"
+          }, {
+            "description": null,
+            "label": "Quote",
+            "value": "quote"
+          }, {
+            "description": null,
+            "label": "Table of Contents",
+            "value": "table_of_contents"
+          }, {
+            "description": null,
+            "label": "To Do",
+            "value": "to_do"
+          }, {
+            "description": null,
+            "label": "Toggle",
+            "value": "toggle"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "ARRAY_BUILDER",
+          "defaultValue": null,
+          "description": "The caption for the bookmark.",
+          "displayCondition": "children[index].type == 'bookmark'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "items": [ {
+            "additionalProperties": null,
+            "advancedOption": null,
+            "controlType": "OBJECT_BUILDER",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "multipleValues": null,
+            "name": null,
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "properties": [ {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": "text",
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "type",
+              "options": [ {
+                "description": null,
+                "label": "Text",
+                "value": "text"
+              }, {
+                "description": null,
+                "label": "Equation",
+                "value": "equation"
+              } ],
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": true,
+              "type": "STRING"
+            }, {
+              "additionalProperties": null,
+              "advancedOption": null,
+              "controlType": "OBJECT_BUILDER",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": "children[index].caption[index].type == 'text'",
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": "Text",
+              "metadata": { },
+              "multipleValues": null,
+              "name": "text",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "properties": [ {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The actual text content of the text.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": "Content",
+                "languageId": null,
+                "maxLength": null,
+                "metadata": { },
+                "minLength": null,
+                "name": "content",
+                "options": null,
+                "optionsDataSource": null,
+                "optionsLoadedDynamically": null,
+                "placeholder": null,
+                "regex": null,
+                "required": true,
+                "type": "STRING"
+              } ],
+              "required": false,
+              "type": "OBJECT"
+            }, {
+              "additionalProperties": null,
+              "advancedOption": null,
+              "controlType": "OBJECT_BUILDER",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": "children[index].caption[index].type == 'equation'",
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": "Equation",
+              "metadata": { },
+              "multipleValues": null,
+              "name": "equation",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "properties": [ {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The LaTeX string representing the inline equation.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": "Expression",
+                "languageId": null,
+                "maxLength": null,
+                "metadata": { },
+                "minLength": null,
+                "name": "expression",
+                "options": null,
+                "optionsDataSource": null,
+                "optionsLoadedDynamically": null,
+                "placeholder": null,
+                "regex": null,
+                "required": true,
+                "type": "STRING"
+              } ],
+              "required": true,
+              "type": "OBJECT"
+            } ],
+            "required": null,
+            "type": "OBJECT"
+          } ],
+          "label": "Caption",
+          "maxItems": null,
+          "metadata": { },
+          "minItems": null,
+          "multipleValues": null,
+          "name": "caption",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": false,
+          "type": "ARRAY"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The link for the bookmark.",
+          "displayCondition": "children[index].type == 'bookmark'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Url",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "url",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The link to the website that the embed block displays.",
+          "displayCondition": "children[index].type == 'embed'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Url",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "url",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "A KaTeX compatible string.",
+          "displayCondition": "children[index].type == 'equation'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Expression",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "expression",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Whether the To do is checked.",
+          "displayCondition": "children[index].type == 'to_do'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Checked",
+          "metadata": { },
+          "name": "checked",
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": false,
+          "type": "BOOLEAN"
+        }, {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": "default",
+          "description": "The color of the block.",
+          "displayCondition": "children[index].type == 'bulleted_list_item' || children[index].type == 'callout' || children[index].type == 'to_do' || children[index].type == 'table_of_contents' || children[index].type == 'toggle'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Color",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "color",
+          "options": [ {
+            "description": null,
+            "label": "Blue",
+            "value": "blue"
+          }, {
+            "description": null,
+            "label": "Blue Background",
+            "value": "blue_background"
+          }, {
+            "description": null,
+            "label": "Brown",
+            "value": "brown"
+          }, {
+            "description": null,
+            "label": "Brown Background",
+            "value": "brown_background"
+          }, {
+            "description": null,
+            "label": "Default",
+            "value": "default"
+          }, {
+            "description": null,
+            "label": "Gray",
+            "value": "gray"
+          }, {
+            "description": null,
+            "label": "Gray Background",
+            "value": "gray_background"
+          }, {
+            "description": null,
+            "label": "Green",
+            "value": "green"
+          }, {
+            "description": null,
+            "label": "Green Background",
+            "value": "green_background"
+          }, {
+            "description": null,
+            "label": "Orange",
+            "value": "orange"
+          }, {
+            "description": null,
+            "label": "Orange Background",
+            "value": "orange_background"
+          }, {
+            "description": null,
+            "label": "Yellow",
+            "value": "yellow"
+          }, {
+            "description": null,
+            "label": "Green",
+            "value": "green"
+          }, {
+            "description": null,
+            "label": "Pink",
+            "value": "pink"
+          }, {
+            "description": null,
+            "label": "Pink Background",
+            "value": "pink_background"
+          }, {
+            "description": null,
+            "label": "Purple",
+            "value": "purple"
+          }, {
+            "description": null,
+            "label": "Purple Background",
+            "value": "purple_background"
+          }, {
+            "description": null,
+            "label": "Red",
+            "value": "red"
+          }, {
+            "description": null,
+            "label": "Red Background",
+            "value": "red_background"
+          }, {
+            "description": null,
+            "label": "Yellow Background",
+            "value": "yellow_background"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "ARRAY_BUILDER",
+          "defaultValue": null,
+          "description": "The rich text in the block.",
+          "displayCondition": "children[index].type == 'bulleted_list_item' || children[index].type == 'callout' || children[index].type == 'code' || children[index].type == 'heading_1' || children[index].type == 'heading_2' || children[index].type == 'heading_3' || children[index].type == 'numbered_list_item' || children[index].type == 'paragraph' || children[index].type == 'quote' || children[index].type == 'to_do' || children[index].type == 'toggle'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "items": [ {
+            "additionalProperties": null,
+            "advancedOption": null,
+            "controlType": "OBJECT_BUILDER",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "multipleValues": null,
+            "name": null,
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "properties": [ {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": "text",
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "type",
+              "options": [ {
+                "description": null,
+                "label": "Text",
+                "value": "text"
+              }, {
+                "description": null,
+                "label": "Equation",
+                "value": "equation"
+              } ],
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": true,
+              "type": "STRING"
+            }, {
+              "additionalProperties": null,
+              "advancedOption": null,
+              "controlType": "OBJECT_BUILDER",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": "children[index].rich_text[index].type == 'text'",
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": "Text",
+              "metadata": { },
+              "multipleValues": null,
+              "name": "text",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "properties": [ {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The actual text content of the text.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": "Content",
+                "languageId": null,
+                "maxLength": null,
+                "metadata": { },
+                "minLength": null,
+                "name": "content",
+                "options": null,
+                "optionsDataSource": null,
+                "optionsLoadedDynamically": null,
+                "placeholder": null,
+                "regex": null,
+                "required": true,
+                "type": "STRING"
+              } ],
+              "required": false,
+              "type": "OBJECT"
+            }, {
+              "additionalProperties": null,
+              "advancedOption": null,
+              "controlType": "OBJECT_BUILDER",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": "children[index].rich_text[index].type == 'equation'",
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": "Equation",
+              "metadata": { },
+              "multipleValues": null,
+              "name": "equation",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "properties": [ {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The LaTeX string representing the inline equation.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": "Expression",
+                "languageId": null,
+                "maxLength": null,
+                "metadata": { },
+                "minLength": null,
+                "name": "expression",
+                "options": null,
+                "optionsDataSource": null,
+                "optionsLoadedDynamically": null,
+                "placeholder": null,
+                "regex": null,
+                "required": true,
+                "type": "STRING"
+              } ],
+              "required": true,
+              "type": "OBJECT"
+            } ],
+            "required": null,
+            "type": "OBJECT"
+          } ],
+          "label": "Rich Text",
+          "maxItems": 1,
+          "metadata": { },
+          "minItems": null,
+          "multipleValues": null,
+          "name": "rich_text",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": true,
+          "type": "ARRAY"
+        }, {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": "children[index].type == 'code'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Language",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "language",
+          "options": [ {
+            "description": null,
+            "label": "abap",
+            "value": "abap"
+          }, {
+            "description": null,
+            "label": "arduino",
+            "value": "arduino"
+          }, {
+            "description": null,
+            "label": "bash",
+            "value": "bash"
+          }, {
+            "description": null,
+            "label": "basic",
+            "value": "basic"
+          }, {
+            "description": null,
+            "label": "c",
+            "value": "c"
+          }, {
+            "description": null,
+            "label": "clojure",
+            "value": "clojure"
+          }, {
+            "description": null,
+            "label": "coffeescript",
+            "value": "coffeescript"
+          }, {
+            "description": null,
+            "label": "c++",
+            "value": "c++"
+          }, {
+            "description": null,
+            "label": "c#",
+            "value": "c#"
+          }, {
+            "description": null,
+            "label": "css",
+            "value": "css"
+          }, {
+            "description": null,
+            "label": "dart",
+            "value": "dart"
+          }, {
+            "description": null,
+            "label": "diff",
+            "value": "diff"
+          }, {
+            "description": null,
+            "label": "docker",
+            "value": "docker"
+          }, {
+            "description": null,
+            "label": "elixir",
+            "value": "elixir"
+          }, {
+            "description": null,
+            "label": "elm",
+            "value": "elm"
+          }, {
+            "description": null,
+            "label": "erlang",
+            "value": "erlang"
+          }, {
+            "description": null,
+            "label": "flow",
+            "value": "flow"
+          }, {
+            "description": null,
+            "label": "fortran",
+            "value": "fortran"
+          }, {
+            "description": null,
+            "label": "f#",
+            "value": "f#"
+          }, {
+            "description": null,
+            "label": "gherkin",
+            "value": "gherkin"
+          }, {
+            "description": null,
+            "label": "glsl",
+            "value": "glsl"
+          }, {
+            "description": null,
+            "label": "go",
+            "value": "go"
+          }, {
+            "description": null,
+            "label": "graphql",
+            "value": "graphql"
+          }, {
+            "description": null,
+            "label": "groovy",
+            "value": "groovy"
+          }, {
+            "description": null,
+            "label": "haskell",
+            "value": "haskell"
+          }, {
+            "description": null,
+            "label": "html",
+            "value": "html"
+          }, {
+            "description": null,
+            "label": "java",
+            "value": "java"
+          }, {
+            "description": null,
+            "label": "javascript",
+            "value": "javascript"
+          }, {
+            "description": null,
+            "label": "json",
+            "value": "json"
+          }, {
+            "description": null,
+            "label": "julia",
+            "value": "julia"
+          }, {
+            "description": null,
+            "label": "kotlin",
+            "value": "kotlin"
+          }, {
+            "description": null,
+            "label": "latex",
+            "value": "latex"
+          }, {
+            "description": null,
+            "label": "less",
+            "value": "less"
+          }, {
+            "description": null,
+            "label": "lisp",
+            "value": "lisp"
+          }, {
+            "description": null,
+            "label": "livescript",
+            "value": "livescript"
+          }, {
+            "description": null,
+            "label": "lua",
+            "value": "lua"
+          }, {
+            "description": null,
+            "label": "makefile",
+            "value": "makefile"
+          }, {
+            "description": null,
+            "label": "markdown",
+            "value": "markdown"
+          }, {
+            "description": null,
+            "label": "markup",
+            "value": "markup"
+          }, {
+            "description": null,
+            "label": "matlab",
+            "value": "matlab"
+          }, {
+            "description": null,
+            "label": "mermaid",
+            "value": "mermaid"
+          }, {
+            "description": null,
+            "label": "nix",
+            "value": "nix"
+          }, {
+            "description": null,
+            "label": "objective-c",
+            "value": "objective-c"
+          }, {
+            "description": null,
+            "label": "ocaml",
+            "value": "ocaml"
+          }, {
+            "description": null,
+            "label": "pascal",
+            "value": "pascal"
+          }, {
+            "description": null,
+            "label": "perl",
+            "value": "perl"
+          }, {
+            "description": null,
+            "label": "php",
+            "value": "php"
+          }, {
+            "description": null,
+            "label": "plain text",
+            "value": "plain text"
+          }, {
+            "description": null,
+            "label": "powershell",
+            "value": "powershell"
+          }, {
+            "description": null,
+            "label": "prolog",
+            "value": "prolog"
+          }, {
+            "description": null,
+            "label": "protobuf",
+            "value": "protobuf"
+          }, {
+            "description": null,
+            "label": "python",
+            "value": "python"
+          }, {
+            "description": null,
+            "label": "r",
+            "value": "r"
+          }, {
+            "description": null,
+            "label": "reason",
+            "value": "reason"
+          }, {
+            "description": null,
+            "label": "ruby",
+            "value": "ruby"
+          }, {
+            "description": null,
+            "label": "rust",
+            "value": "rust"
+          }, {
+            "description": null,
+            "label": "sass",
+            "value": "sass"
+          }, {
+            "description": null,
+            "label": "scala",
+            "value": "scala"
+          }, {
+            "description": null,
+            "label": "scheme",
+            "value": "scheme"
+          }, {
+            "description": null,
+            "label": "scss",
+            "value": "scss"
+          }, {
+            "description": null,
+            "label": "shell",
+            "value": "shell"
+          }, {
+            "description": null,
+            "label": "sql",
+            "value": "sql"
+          }, {
+            "description": null,
+            "label": "swift",
+            "value": "swift"
+          }, {
+            "description": null,
+            "label": "typescript",
+            "value": "typescript"
+          }, {
+            "description": null,
+            "label": "vb.net",
+            "value": "vb.net"
+          }, {
+            "description": null,
+            "label": "verilog",
+            "value": "verilog"
+          }, {
+            "description": null,
+            "label": "vhdl",
+            "value": "vhdl"
+          }, {
+            "description": null,
+            "label": "visual basic",
+            "value": "visual basic"
+          }, {
+            "description": null,
+            "label": "webassembly",
+            "value": "webassembly"
+          }, {
+            "description": null,
+            "label": "xml",
+            "value": "xml"
+          }, {
+            "description": null,
+            "label": "yaml",
+            "value": "yaml"
+          }, {
+            "description": null,
+            "label": "java/c/c++/c#",
+            "value": "java/c/c++/c#"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      } ],
+      "label": "Children",
+      "maxItems": 100,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "children",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "ARRAY"
+    } ],
+    "resumePerform": null,
+    "suspendPerform": null,
+    "title": "Add Block to Page",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
     "description": "Creates a new item in Notion database.",
     "help": null,
     "metadata": null,
@@ -4663,6 +5650,992 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "addBlockToPage",
+    "description": "Adds a new content block to a page.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": null,
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Parent Page ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "id",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Child content to append to a container block as an array of block objects.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "The type of block to add.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Block Type",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "type",
+          "options": [ {
+            "description": null,
+            "label": "Bookmark",
+            "value": "bookmark"
+          }, {
+            "description": null,
+            "label": "Breadcrumb",
+            "value": "breadcrumb"
+          }, {
+            "description": null,
+            "label": "Bulleted List Item",
+            "value": "bulleted_list_item"
+          }, {
+            "description": null,
+            "label": "Callout",
+            "value": "callout"
+          }, {
+            "description": null,
+            "label": "Code",
+            "value": "code"
+          }, {
+            "description": "Embed block objects include information about another website displayed within the Notion UI.",
+            "label": "Embed",
+            "value": "embed"
+          }, {
+            "description": null,
+            "label": "Equation",
+            "value": "equation"
+          }, {
+            "description": null,
+            "label": "Heading 1",
+            "value": "heading_1"
+          }, {
+            "description": null,
+            "label": "Heading 2",
+            "value": "heading_2"
+          }, {
+            "description": null,
+            "label": "Heading 3",
+            "value": "heading_3"
+          }, {
+            "description": null,
+            "label": "Numbered List Item",
+            "value": "numbered_list_item"
+          }, {
+            "description": null,
+            "label": "Paragraph",
+            "value": "paragraph"
+          }, {
+            "description": null,
+            "label": "Quote",
+            "value": "quote"
+          }, {
+            "description": null,
+            "label": "Table of Contents",
+            "value": "table_of_contents"
+          }, {
+            "description": null,
+            "label": "To Do",
+            "value": "to_do"
+          }, {
+            "description": null,
+            "label": "Toggle",
+            "value": "toggle"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "ARRAY_BUILDER",
+          "defaultValue": null,
+          "description": "The caption for the bookmark.",
+          "displayCondition": "children[index].type == 'bookmark'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "items": [ {
+            "additionalProperties": null,
+            "advancedOption": null,
+            "controlType": "OBJECT_BUILDER",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "multipleValues": null,
+            "name": null,
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "properties": [ {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": "text",
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "type",
+              "options": [ {
+                "description": null,
+                "label": "Text",
+                "value": "text"
+              }, {
+                "description": null,
+                "label": "Equation",
+                "value": "equation"
+              } ],
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": true,
+              "type": "STRING"
+            }, {
+              "additionalProperties": null,
+              "advancedOption": null,
+              "controlType": "OBJECT_BUILDER",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": "children[index].caption[index].type == 'text'",
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": "Text",
+              "metadata": { },
+              "multipleValues": null,
+              "name": "text",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "properties": [ {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The actual text content of the text.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": "Content",
+                "languageId": null,
+                "maxLength": null,
+                "metadata": { },
+                "minLength": null,
+                "name": "content",
+                "options": null,
+                "optionsDataSource": null,
+                "optionsLoadedDynamically": null,
+                "placeholder": null,
+                "regex": null,
+                "required": true,
+                "type": "STRING"
+              } ],
+              "required": false,
+              "type": "OBJECT"
+            }, {
+              "additionalProperties": null,
+              "advancedOption": null,
+              "controlType": "OBJECT_BUILDER",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": "children[index].caption[index].type == 'equation'",
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": "Equation",
+              "metadata": { },
+              "multipleValues": null,
+              "name": "equation",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "properties": [ {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The LaTeX string representing the inline equation.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": "Expression",
+                "languageId": null,
+                "maxLength": null,
+                "metadata": { },
+                "minLength": null,
+                "name": "expression",
+                "options": null,
+                "optionsDataSource": null,
+                "optionsLoadedDynamically": null,
+                "placeholder": null,
+                "regex": null,
+                "required": true,
+                "type": "STRING"
+              } ],
+              "required": true,
+              "type": "OBJECT"
+            } ],
+            "required": null,
+            "type": "OBJECT"
+          } ],
+          "label": "Caption",
+          "maxItems": null,
+          "metadata": { },
+          "minItems": null,
+          "multipleValues": null,
+          "name": "caption",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": false,
+          "type": "ARRAY"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The link for the bookmark.",
+          "displayCondition": "children[index].type == 'bookmark'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Url",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "url",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The link to the website that the embed block displays.",
+          "displayCondition": "children[index].type == 'embed'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Url",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "url",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "A KaTeX compatible string.",
+          "displayCondition": "children[index].type == 'equation'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Expression",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "expression",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Whether the To do is checked.",
+          "displayCondition": "children[index].type == 'to_do'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Checked",
+          "metadata": { },
+          "name": "checked",
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": false,
+          "type": "BOOLEAN"
+        }, {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": "default",
+          "description": "The color of the block.",
+          "displayCondition": "children[index].type == 'bulleted_list_item' || children[index].type == 'callout' || children[index].type == 'to_do' || children[index].type == 'table_of_contents' || children[index].type == 'toggle'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Color",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "color",
+          "options": [ {
+            "description": null,
+            "label": "Blue",
+            "value": "blue"
+          }, {
+            "description": null,
+            "label": "Blue Background",
+            "value": "blue_background"
+          }, {
+            "description": null,
+            "label": "Brown",
+            "value": "brown"
+          }, {
+            "description": null,
+            "label": "Brown Background",
+            "value": "brown_background"
+          }, {
+            "description": null,
+            "label": "Default",
+            "value": "default"
+          }, {
+            "description": null,
+            "label": "Gray",
+            "value": "gray"
+          }, {
+            "description": null,
+            "label": "Gray Background",
+            "value": "gray_background"
+          }, {
+            "description": null,
+            "label": "Green",
+            "value": "green"
+          }, {
+            "description": null,
+            "label": "Green Background",
+            "value": "green_background"
+          }, {
+            "description": null,
+            "label": "Orange",
+            "value": "orange"
+          }, {
+            "description": null,
+            "label": "Orange Background",
+            "value": "orange_background"
+          }, {
+            "description": null,
+            "label": "Yellow",
+            "value": "yellow"
+          }, {
+            "description": null,
+            "label": "Green",
+            "value": "green"
+          }, {
+            "description": null,
+            "label": "Pink",
+            "value": "pink"
+          }, {
+            "description": null,
+            "label": "Pink Background",
+            "value": "pink_background"
+          }, {
+            "description": null,
+            "label": "Purple",
+            "value": "purple"
+          }, {
+            "description": null,
+            "label": "Purple Background",
+            "value": "purple_background"
+          }, {
+            "description": null,
+            "label": "Red",
+            "value": "red"
+          }, {
+            "description": null,
+            "label": "Red Background",
+            "value": "red_background"
+          }, {
+            "description": null,
+            "label": "Yellow Background",
+            "value": "yellow_background"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "ARRAY_BUILDER",
+          "defaultValue": null,
+          "description": "The rich text in the block.",
+          "displayCondition": "children[index].type == 'bulleted_list_item' || children[index].type == 'callout' || children[index].type == 'code' || children[index].type == 'heading_1' || children[index].type == 'heading_2' || children[index].type == 'heading_3' || children[index].type == 'numbered_list_item' || children[index].type == 'paragraph' || children[index].type == 'quote' || children[index].type == 'to_do' || children[index].type == 'toggle'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "items": [ {
+            "additionalProperties": null,
+            "advancedOption": null,
+            "controlType": "OBJECT_BUILDER",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "multipleValues": null,
+            "name": null,
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "properties": [ {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": "text",
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "type",
+              "options": [ {
+                "description": null,
+                "label": "Text",
+                "value": "text"
+              }, {
+                "description": null,
+                "label": "Equation",
+                "value": "equation"
+              } ],
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": true,
+              "type": "STRING"
+            }, {
+              "additionalProperties": null,
+              "advancedOption": null,
+              "controlType": "OBJECT_BUILDER",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": "children[index].rich_text[index].type == 'text'",
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": "Text",
+              "metadata": { },
+              "multipleValues": null,
+              "name": "text",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "properties": [ {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The actual text content of the text.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": "Content",
+                "languageId": null,
+                "maxLength": null,
+                "metadata": { },
+                "minLength": null,
+                "name": "content",
+                "options": null,
+                "optionsDataSource": null,
+                "optionsLoadedDynamically": null,
+                "placeholder": null,
+                "regex": null,
+                "required": true,
+                "type": "STRING"
+              } ],
+              "required": false,
+              "type": "OBJECT"
+            }, {
+              "additionalProperties": null,
+              "advancedOption": null,
+              "controlType": "OBJECT_BUILDER",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": "children[index].rich_text[index].type == 'equation'",
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": "Equation",
+              "metadata": { },
+              "multipleValues": null,
+              "name": "equation",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "properties": [ {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The LaTeX string representing the inline equation.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": "Expression",
+                "languageId": null,
+                "maxLength": null,
+                "metadata": { },
+                "minLength": null,
+                "name": "expression",
+                "options": null,
+                "optionsDataSource": null,
+                "optionsLoadedDynamically": null,
+                "placeholder": null,
+                "regex": null,
+                "required": true,
+                "type": "STRING"
+              } ],
+              "required": true,
+              "type": "OBJECT"
+            } ],
+            "required": null,
+            "type": "OBJECT"
+          } ],
+          "label": "Rich Text",
+          "maxItems": 1,
+          "metadata": { },
+          "minItems": null,
+          "multipleValues": null,
+          "name": "rich_text",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": true,
+          "type": "ARRAY"
+        }, {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": "children[index].type == 'code'",
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Language",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "language",
+          "options": [ {
+            "description": null,
+            "label": "abap",
+            "value": "abap"
+          }, {
+            "description": null,
+            "label": "arduino",
+            "value": "arduino"
+          }, {
+            "description": null,
+            "label": "bash",
+            "value": "bash"
+          }, {
+            "description": null,
+            "label": "basic",
+            "value": "basic"
+          }, {
+            "description": null,
+            "label": "c",
+            "value": "c"
+          }, {
+            "description": null,
+            "label": "clojure",
+            "value": "clojure"
+          }, {
+            "description": null,
+            "label": "coffeescript",
+            "value": "coffeescript"
+          }, {
+            "description": null,
+            "label": "c++",
+            "value": "c++"
+          }, {
+            "description": null,
+            "label": "c#",
+            "value": "c#"
+          }, {
+            "description": null,
+            "label": "css",
+            "value": "css"
+          }, {
+            "description": null,
+            "label": "dart",
+            "value": "dart"
+          }, {
+            "description": null,
+            "label": "diff",
+            "value": "diff"
+          }, {
+            "description": null,
+            "label": "docker",
+            "value": "docker"
+          }, {
+            "description": null,
+            "label": "elixir",
+            "value": "elixir"
+          }, {
+            "description": null,
+            "label": "elm",
+            "value": "elm"
+          }, {
+            "description": null,
+            "label": "erlang",
+            "value": "erlang"
+          }, {
+            "description": null,
+            "label": "flow",
+            "value": "flow"
+          }, {
+            "description": null,
+            "label": "fortran",
+            "value": "fortran"
+          }, {
+            "description": null,
+            "label": "f#",
+            "value": "f#"
+          }, {
+            "description": null,
+            "label": "gherkin",
+            "value": "gherkin"
+          }, {
+            "description": null,
+            "label": "glsl",
+            "value": "glsl"
+          }, {
+            "description": null,
+            "label": "go",
+            "value": "go"
+          }, {
+            "description": null,
+            "label": "graphql",
+            "value": "graphql"
+          }, {
+            "description": null,
+            "label": "groovy",
+            "value": "groovy"
+          }, {
+            "description": null,
+            "label": "haskell",
+            "value": "haskell"
+          }, {
+            "description": null,
+            "label": "html",
+            "value": "html"
+          }, {
+            "description": null,
+            "label": "java",
+            "value": "java"
+          }, {
+            "description": null,
+            "label": "javascript",
+            "value": "javascript"
+          }, {
+            "description": null,
+            "label": "json",
+            "value": "json"
+          }, {
+            "description": null,
+            "label": "julia",
+            "value": "julia"
+          }, {
+            "description": null,
+            "label": "kotlin",
+            "value": "kotlin"
+          }, {
+            "description": null,
+            "label": "latex",
+            "value": "latex"
+          }, {
+            "description": null,
+            "label": "less",
+            "value": "less"
+          }, {
+            "description": null,
+            "label": "lisp",
+            "value": "lisp"
+          }, {
+            "description": null,
+            "label": "livescript",
+            "value": "livescript"
+          }, {
+            "description": null,
+            "label": "lua",
+            "value": "lua"
+          }, {
+            "description": null,
+            "label": "makefile",
+            "value": "makefile"
+          }, {
+            "description": null,
+            "label": "markdown",
+            "value": "markdown"
+          }, {
+            "description": null,
+            "label": "markup",
+            "value": "markup"
+          }, {
+            "description": null,
+            "label": "matlab",
+            "value": "matlab"
+          }, {
+            "description": null,
+            "label": "mermaid",
+            "value": "mermaid"
+          }, {
+            "description": null,
+            "label": "nix",
+            "value": "nix"
+          }, {
+            "description": null,
+            "label": "objective-c",
+            "value": "objective-c"
+          }, {
+            "description": null,
+            "label": "ocaml",
+            "value": "ocaml"
+          }, {
+            "description": null,
+            "label": "pascal",
+            "value": "pascal"
+          }, {
+            "description": null,
+            "label": "perl",
+            "value": "perl"
+          }, {
+            "description": null,
+            "label": "php",
+            "value": "php"
+          }, {
+            "description": null,
+            "label": "plain text",
+            "value": "plain text"
+          }, {
+            "description": null,
+            "label": "powershell",
+            "value": "powershell"
+          }, {
+            "description": null,
+            "label": "prolog",
+            "value": "prolog"
+          }, {
+            "description": null,
+            "label": "protobuf",
+            "value": "protobuf"
+          }, {
+            "description": null,
+            "label": "python",
+            "value": "python"
+          }, {
+            "description": null,
+            "label": "r",
+            "value": "r"
+          }, {
+            "description": null,
+            "label": "reason",
+            "value": "reason"
+          }, {
+            "description": null,
+            "label": "ruby",
+            "value": "ruby"
+          }, {
+            "description": null,
+            "label": "rust",
+            "value": "rust"
+          }, {
+            "description": null,
+            "label": "sass",
+            "value": "sass"
+          }, {
+            "description": null,
+            "label": "scala",
+            "value": "scala"
+          }, {
+            "description": null,
+            "label": "scheme",
+            "value": "scheme"
+          }, {
+            "description": null,
+            "label": "scss",
+            "value": "scss"
+          }, {
+            "description": null,
+            "label": "shell",
+            "value": "shell"
+          }, {
+            "description": null,
+            "label": "sql",
+            "value": "sql"
+          }, {
+            "description": null,
+            "label": "swift",
+            "value": "swift"
+          }, {
+            "description": null,
+            "label": "typescript",
+            "value": "typescript"
+          }, {
+            "description": null,
+            "label": "vb.net",
+            "value": "vb.net"
+          }, {
+            "description": null,
+            "label": "verilog",
+            "value": "verilog"
+          }, {
+            "description": null,
+            "label": "vhdl",
+            "value": "vhdl"
+          }, {
+            "description": null,
+            "label": "visual basic",
+            "value": "visual basic"
+          }, {
+            "description": null,
+            "label": "webassembly",
+            "value": "webassembly"
+          }, {
+            "description": null,
+            "label": "xml",
+            "value": "xml"
+          }, {
+            "description": null,
+            "label": "yaml",
+            "value": "yaml"
+          }, {
+            "description": null,
+            "label": "java/c/c++/c#",
+            "value": "java/c/c++/c#"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      } ],
+      "label": "Children",
+      "maxItems": 100,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "children",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "ARRAY"
+    } ],
+    "title": "Add Block to Page",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "name": "createDatabaseItem",
     "description": "Creates a new item in Notion database.",
     "element": { },
