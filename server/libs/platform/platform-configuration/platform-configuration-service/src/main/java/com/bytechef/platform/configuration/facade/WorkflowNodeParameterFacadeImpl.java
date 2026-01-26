@@ -70,7 +70,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     protected static final Pattern ARRAY_INDEX_VALUE_PATTERN = Pattern.compile("\\[(\\d+)]");
     private static final Pattern ARRAY_INDEXES_PATTERN =
-        Pattern.compile("^.*(\\b\\w+\\b)((\\[index])+)(\\.\\b\\w+\\b.*)|.*((\\[index])+)(\\.\\b\\w+\\b.*)$");
+        Pattern.compile("(\\b\\w+\\b)?((\\[index])+)");
     private static final String DYNAMIC_PROPERTY_TYPES = "dynamicPropertyTypes";
     private static final String FROM_AI = "fromAi";
     private static final String METADATA = "metadata";
@@ -969,42 +969,51 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String displayCondition, Object currentParameters, List<Integer> currentIndexes,
         List<List<Integer>> allIndexes) {
 
+        if (displayCondition.startsWith(".")) {
+            displayCondition = displayCondition.substring(1);
+        }
+
         Matcher matcher = ARRAY_INDEXES_PATTERN.matcher(displayCondition);
 
         if (matcher.find()) {
             String key = matcher.group(1);
             String indexGroup = matcher.group(2);
-            String remainingExpression = matcher.group(4);
+            int matchEnd = matcher.end();
+            String remainingExpression = displayCondition.substring(matchEnd);
 
-            if (currentParameters instanceof Map<?, ?> currentParameterMap) {
-                if (currentParameterMap.containsKey(key)) {
-                    Object nextParameters = currentParameterMap.get(key);
+            if (key != null) {
+                if (currentParameters instanceof Map<?, ?> currentParameterMap) {
+                    if (currentParameterMap.containsKey(key)) {
+                        Object nextParameters = currentParameterMap.get(key);
 
-                    if (indexGroup != null && nextParameters instanceof List<?> nextList) {
-                        for (int i = 0; i < nextList.size(); i++) {
-                            currentIndexes.add(i);
+                        if (nextParameters instanceof List<?> nextList) {
+                            for (int i = 0; i < nextList.size(); i++) {
+                                currentIndexes.add(i);
 
-                            findIndexes(
-                                (indexGroup + remainingExpression).replaceFirst("\\[index]", ""), nextList.get(i),
-                                currentIndexes, allIndexes);
+                                findIndexes(
+                                    indexGroup.replaceFirst("\\[index]", "") + remainingExpression, nextList.get(i),
+                                    currentIndexes, allIndexes);
 
-                            currentIndexes.removeLast();
+                                currentIndexes.removeLast();
+                            }
+                        } else {
+                            findIndexes(indexGroup + remainingExpression, nextParameters, currentIndexes, allIndexes);
                         }
                     } else {
-                        findIndexes(indexGroup + remainingExpression, nextParameters, currentIndexes, allIndexes);
+                        findIndexes(remainingExpression, currentParameters, currentIndexes, allIndexes);
                     }
-                } else if (!currentIndexes.isEmpty()) {
-                    allIndexes.add(new ArrayList<>(currentIndexes));
                 }
-            } else if (currentParameters instanceof List<?> currentList) {
-                for (int i = 0; i < currentList.size(); i++) {
-                    currentIndexes.add(i);
+            } else {
+                if (currentParameters instanceof List<?> currentList) {
+                    for (int i = 0; i < currentList.size(); i++) {
+                        currentIndexes.add(i);
 
-                    findIndexes(
-                        (indexGroup + remainingExpression).replaceFirst("\\[index]", ""), currentList.get(i),
-                        currentIndexes, allIndexes);
+                        findIndexes(
+                            indexGroup.replaceFirst("\\[index]", "") + remainingExpression, currentList.get(i),
+                            currentIndexes, allIndexes);
 
-                    currentIndexes.removeLast();
+                        currentIndexes.removeLast();
+                    }
                 }
             }
         } else {
