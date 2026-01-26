@@ -16,10 +16,14 @@
 
 package com.bytechef.component.jira.util;
 
+import static com.bytechef.component.jira.constant.JiraConstants.CONTENT;
+import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
+import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
+import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -124,5 +128,26 @@ class JiraUtilsTest {
         Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("webhookIds", List.of(123)), body.getContent());
+    }
+
+    @Test
+    void testAddDescriptionField() {
+        Map<String, Object> fields = new HashMap<>();
+        String description = "description";
+
+        JiraUtils.addDescriptionField(fields, description);
+
+        Map<String, Object> expected = Map.of(DESCRIPTION, Map.of(
+            CONTENT, List.of(
+                Map.of(
+                    CONTENT, List.of(
+                        Map.of(
+                            TEXT, description,
+                            TYPE, TEXT)),
+                    TYPE, "paragraph")),
+            TYPE, "doc",
+            "version", 1));
+
+        assertEquals(expected, fields);
     }
 }
