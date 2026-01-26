@@ -38,6 +38,63 @@ Version: 1
 ## Actions
 
 
+### Add Block to Page
+Name: addBlockToPage
+
+`Adds a new content block to a page.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Parent Page ID | STRING |  | true |
+| children | Children | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), [&#123;STRING\(type), &#123;STRING\(content)&#125;\(text), &#123;STRING\(expression)&#125;\(equation)&#125;]\(caption), STRING\(url), STRING\(url), STRING\(expression), BOOLEAN\(checked), STRING\(color), [&#123;STRING\(type), &#123;STRING\(content)&#125;\(text), &#123;STRING\(expression)&#125;\(equation)&#125;]\(rich_text), STRING\(language)&#125;] </details> | Child content to append to a container block as an array of block objects. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Block to Page",
+  "name" : "addBlockToPage",
+  "parameters" : {
+    "id" : "",
+    "children" : [ {
+      "type" : "",
+      "caption" : [ {
+        "type" : "",
+        "text" : {
+          "content" : ""
+        },
+        "equation" : {
+          "expression" : ""
+        }
+      } ],
+      "url" : "",
+      "expression" : "",
+      "checked" : false,
+      "color" : "",
+      "rich_text" : [ {
+        "type" : "",
+        "text" : {
+          "content" : ""
+        },
+        "equation" : {
+          "expression" : ""
+        }
+      } ],
+      "language" : ""
+    } ]
+  },
+  "type" : "notion/v1/addBlockToPage"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
 ### Create Database Item
 Name: createDatabaseItem
 
