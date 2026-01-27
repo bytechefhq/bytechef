@@ -77,12 +77,8 @@ public class FilesystemLsAction {
     }
 
     /**
-     * Lists files at the given path.
-     *
-     * <p>
-     * <b>Security Note:</b> Path traversal is intentional for this component. The Filesystem component is designed to
-     * allow workflow creators to access files and directories as part of their automation workflows. Access to this
-     * component should be restricted through workflow-level permissions and proper access control. The path is provided
+     * Security Note: PATH_TRAVERSAL_IN - Path traversal is intentional. The Filesystem component allows workflow
+     * creators to list files/directories. Access is controlled through workflow-level permissions. The path is provided
      * by the workflow creator, not end users.
      */
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")

@@ -54,16 +54,9 @@ public class FilesystemMkdirAction {
     }
 
     /**
-     * Creates a directory by creating all nonexistent parent directories first.
-     *
-     * <p>
-     * An exception is not thrown if the directory could not be created because it already exists.
-     *
-     * <p>
-     * <b>Security Note:</b> Path traversal is intentional for this component. The Filesystem component is designed to
-     * allow workflow creators to create directories as part of their automation workflows. Access to this component
-     * should be restricted through workflow-level permissions and proper access control. The path is provided by the
-     * workflow creator, not end users.
+     * Security Note: PATH_TRAVERSAL_IN - Path traversal is intentional. The Filesystem component allows workflow
+     * creators to create directories. Access is controlled through workflow-level permissions. The path is provided by
+     * the workflow creator, not end users.
      */
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     protected static String perform(

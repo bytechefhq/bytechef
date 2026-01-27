@@ -54,13 +54,9 @@ public class FilesystemReadFileAction {
     }
 
     /**
-     * Reads the file at the given path.
-     *
-     * <p>
-     * <b>Security Note:</b> Path traversal is intentional for this component. The Filesystem component is designed to
-     * allow workflow creators to access files as part of their automation workflows. Access to this component should be
-     * restricted through workflow-level permissions and proper access control. The file path is provided by the
-     * workflow creator, not end users.
+     * Security Note: PATH_TRAVERSAL_IN - Path traversal is intentional. The Filesystem component allows workflow
+     * creators to access files. Access is controlled through workflow-level permissions. The file path is provided by
+     * the workflow creator, not end users.
      */
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     protected static FileEntry perform(

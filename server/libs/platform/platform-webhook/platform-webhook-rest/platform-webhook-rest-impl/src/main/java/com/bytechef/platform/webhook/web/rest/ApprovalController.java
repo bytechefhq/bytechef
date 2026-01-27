@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin
 @ConditionalOnCoordinator
-@SuppressFBWarnings("SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING")
 public class ApprovalController {
 
     private final JobFacade jobFacade;
@@ -44,6 +43,12 @@ public class ApprovalController {
         this.jobFacade = jobFacade;
     }
 
+    /**
+     * Security Note: SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING - CSRF protection is intentionally disabled for this
+     * endpoint. Approval links are sent via email with cryptographically secure tokens (UUID) embedded in the URL. The
+     * token itself provides authentication, and this endpoint must be accessible without a session.
+     */
+    @SuppressFBWarnings("SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING")
     @RequestMapping(method = {
         RequestMethod.GET, RequestMethod.POST
     }, value = "/approvals/{id}")
