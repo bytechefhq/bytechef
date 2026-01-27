@@ -31,9 +31,12 @@ import org.mockito.Mockito;
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 class FilesystemMkdirActionTest {
 
+    /**
+     * Security Note: PATH_TRAVERSAL_IN - Test uses system temp directory with generated UUID, not user input.
+     */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     @Test
     void testCreateDir1() throws IOException {
         Parameters parameters = Mockito.mock(Parameters.class);

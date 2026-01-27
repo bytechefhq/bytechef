@@ -66,12 +66,9 @@ public class AwsS3ListObjectsAction {
         .perform(AwsS3ListObjectsAction::perform);
 
     /**
-     * Performs the S3 list objects operation.
-     *
-     * <p>
-     * <b>Security Note:</b> Path traversal is intentional for this component. The AWS S3 component is designed to allow
-     * workflow creators to list S3 objects as part of their automation workflows. The prefix is provided by the
-     * workflow creator, not end users, and access is controlled by AWS IAM credentials configured in the connection.
+     * Security Note: PATH_TRAVERSAL_IN - Path traversal is intentional. The AWS S3 component allows workflow creators
+     * to list S3 objects. The prefix is provided by the workflow creator, not end users. Access is controlled by AWS
+     * IAM credentials configured in the connection.
      */
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     protected static List<S3ObjectDescription> perform(

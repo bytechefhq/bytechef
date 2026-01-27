@@ -22,9 +22,13 @@ import org.springframework.cache.CacheManager;
  *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class ComponentHandlerLoader {
 
+    /**
+     * Security Note: PATH_TRAVERSAL_IN - URL comes from internal file storage after admin upload, not direct user
+     * input. Access is controlled through admin-only upload permissions.
+     */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public static ComponentHandler loadComponentHandler(
         URL url, Language language, String cacheKey, CacheManager cacheManager) {
 
@@ -48,6 +52,11 @@ public class ComponentHandlerLoader {
         }
     }
 
+    /**
+     * Security Note: PATH_TRAVERSAL_IN - URL comes from internal file storage after admin upload, not direct user
+     * input.
+     */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private static ComponentHandler loadPolyglotComponentHandler(URL url, Language language)
         throws URISyntaxException, IOException {
 

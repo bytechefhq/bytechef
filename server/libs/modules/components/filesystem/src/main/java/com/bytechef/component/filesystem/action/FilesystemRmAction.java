@@ -59,16 +59,9 @@ public class FilesystemRmAction {
     }
 
     /**
-     * Deletes a file, never throwing an exception. If a file is a directory, delete it and all subdirectories.
-     *
-     * <p>
-     * A directory to be deleted does not have to be empty.
-     *
-     * <p>
-     * <b>Security Note:</b> Path traversal is intentional for this component. The Filesystem component is designed to
-     * allow workflow creators to delete files and directories as part of their automation workflows. Access to this
-     * component should be restricted through workflow-level permissions and proper access control. The path is provided
-     * by the workflow creator, not end users.
+     * Security Note: PATH_TRAVERSAL_IN - Path traversal is intentional. The Filesystem component allows workflow
+     * creators to delete files/directories. Access is controlled through workflow-level permissions. The path is
+     * provided by the workflow creator, not end users.
      */
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     protected static Boolean perform(

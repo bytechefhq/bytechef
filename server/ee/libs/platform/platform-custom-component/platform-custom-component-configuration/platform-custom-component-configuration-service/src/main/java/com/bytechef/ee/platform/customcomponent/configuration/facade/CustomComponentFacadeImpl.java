@@ -36,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class CustomComponentFacadeImpl implements CustomComponentFacade {
 
     private final CacheManager cacheManager;
@@ -104,6 +103,11 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
         customComponentService.create(customComponent);
     }
 
+    /**
+     * Security Note: PATH_TRAVERSAL_IN - Temporary files are created with system-generated names in the temp directory,
+     * not user-controlled paths. Access is restricted to administrators.
+     */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private ComponentDefinition loadComponentDefinition(Language language, byte[] bytes) throws IOException {
         Path path = Files.createTempFile("custom_component", language.getExtension());
 
