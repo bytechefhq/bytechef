@@ -10,7 +10,7 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock('../../hooks/useDeleteDataTableDialog', () => ({
+vi.mock('../../hooks/useDeleteDataTableAlertDialog', () => ({
     default: () => ({
         handleOpen: hoisted.mockHandleDeleteOpen,
     }),

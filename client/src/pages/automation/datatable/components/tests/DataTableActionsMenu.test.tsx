@@ -105,7 +105,7 @@ describe('DataTableActionsMenu', () => {
             expect(onExportCsv).toHaveBeenCalledTimes(1);
         });
 
-        it('should call onRenameTable when Rename table is clicked', async () => {
+        it('should call onRenameTable when Rename Table is clicked', async () => {
             const user = userEvent.setup();
             const onRenameTable = vi.fn();
 

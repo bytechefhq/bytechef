@@ -6,7 +6,7 @@ import RenameDataTableDialog from '../RenameDataTableDialog';
 const hoisted = vi.hoisted(() => {
     return {
         mockHandleOpenChange: vi.fn(),
-        mockHandleRename: vi.fn(),
+        mockHandleRenameSubmit: vi.fn(),
         mockHandleRenameValueChange: vi.fn(),
         storeState: {
             canRename: true,
@@ -20,7 +20,7 @@ vi.mock('../../hooks/useRenameDataTableDialog', () => ({
     default: () => ({
         canRename: hoisted.storeState.canRename,
         handleOpenChange: hoisted.mockHandleOpenChange,
-        handleRename: hoisted.mockHandleRename,
+        handleRenameSubmit: hoisted.mockHandleRenameSubmit,
         handleRenameValueChange: hoisted.mockHandleRenameValueChange,
         open: hoisted.storeState.open,
         renameValue: hoisted.storeState.renameValue,
@@ -94,7 +94,7 @@ describe('RenameDataTableDialog', () => {
 
             await user.click(renameButton);
 
-            expect(hoisted.mockHandleRename).toHaveBeenCalledTimes(1);
+            expect(hoisted.mockHandleRenameSubmit).toHaveBeenCalledTimes(1);
         });
 
         it('should call handleOpenChange when cancel is clicked', async () => {

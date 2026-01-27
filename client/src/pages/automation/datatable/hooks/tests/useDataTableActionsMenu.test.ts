@@ -46,7 +46,7 @@ vi.mock('../../stores/useCurrentDataTableStore', () => ({
     }),
 }));
 
-vi.mock('../useDeleteDataTableDialog', () => ({
+vi.mock('../useDeleteDataTableAlertDialog', () => ({
     default: () => ({
         handleDelete: vi.fn(),
         handleOpen: hoisted.mockOpenDeleteDialog,

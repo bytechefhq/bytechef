@@ -1,7 +1,7 @@
 import {act, renderHook, resetAll} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import useDeleteDataTableDialog from '../useDeleteDataTableDialog';
+import useDeleteDataTableAlertDialog from '../useDeleteDataTableAlertDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -72,8 +72,8 @@ vi.mock('react-router-dom', () => ({
     useNavigate: () => hoisted.mockNavigate,
 }));
 
-vi.mock('../../stores/useDeleteDataTableDialogStore', () => ({
-    useDeleteDataTableDialogStore: () => ({
+vi.mock('../../stores/useDeleteDataTableAlertDialogStore', () => ({
+    useDeleteDataTableAlertDialogStore: () => ({
         clearTableToDelete: hoisted.mockClearTableToDelete,
         setTableToDelete: hoisted.mockSetTableToDelete,
         tableIdToDelete: hoisted.storeState.tableIdToDelete,
@@ -96,16 +96,16 @@ afterEach(() => {
     vi.clearAllMocks();
 });
 
-describe('useDeleteDataTableDialog', () => {
+describe('useDeleteDataTableAlertDialog', () => {
     describe('initial state', () => {
         it('should return open as false when tableIdToDelete is null', () => {
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             expect(result.current.open).toBe(false);
         });
 
         it('should return empty tableName initially', () => {
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             expect(result.current.tableName).toBe('');
         });
@@ -116,7 +116,7 @@ describe('useDeleteDataTableDialog', () => {
             hoisted.storeState.tableIdToDelete = 'table-1';
             hoisted.storeState.tableNameToDelete = 'Alpha';
 
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             expect(result.current.open).toBe(true);
             expect(result.current.tableName).toBe('Alpha');
@@ -125,7 +125,7 @@ describe('useDeleteDataTableDialog', () => {
 
     describe('handleOpen', () => {
         it('should call setTableToDelete with tableId and tableName', () => {
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             act(() => {
                 result.current.handleOpen('table-456', 'Test Table');
@@ -137,7 +137,7 @@ describe('useDeleteDataTableDialog', () => {
 
     describe('handleClose', () => {
         it('should call clearTableToDelete', () => {
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             act(() => {
                 result.current.handleClose();
@@ -149,7 +149,7 @@ describe('useDeleteDataTableDialog', () => {
 
     describe('handleOpenChange', () => {
         it('should call clearTableToDelete when open is false', () => {
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             act(() => {
                 result.current.handleOpenChange(false);
@@ -159,7 +159,7 @@ describe('useDeleteDataTableDialog', () => {
         });
 
         it('should not call clearTableToDelete when open is true', () => {
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             act(() => {
                 result.current.handleOpenChange(true);
@@ -173,7 +173,7 @@ describe('useDeleteDataTableDialog', () => {
         it('should not call mutate when tableIdToDelete is null', () => {
             hoisted.storeState.tableIdToDelete = null;
 
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             act(() => {
                 result.current.handleDelete();
@@ -185,7 +185,7 @@ describe('useDeleteDataTableDialog', () => {
         it('should call mutate with correct parameters when tableIdToDelete exists', () => {
             hoisted.storeState.tableIdToDelete = 'table-2';
 
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             act(() => {
                 result.current.handleDelete();
@@ -202,7 +202,7 @@ describe('useDeleteDataTableDialog', () => {
         it('should navigate to next table after deletion', () => {
             hoisted.storeState.tableIdToDelete = 'table-1';
 
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             act(() => {
                 result.current.handleDelete();
@@ -214,7 +214,7 @@ describe('useDeleteDataTableDialog', () => {
         it('should navigate to datatables list when deleting last table', () => {
             hoisted.storeState.tableIdToDelete = 'table-3';
 
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             act(() => {
                 result.current.handleDelete();
@@ -227,7 +227,7 @@ describe('useDeleteDataTableDialog', () => {
             hoisted.storeState.dataTables = [{baseName: 'OnlyTable', id: 'table-only'}];
             hoisted.storeState.tableIdToDelete = 'table-only';
 
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             act(() => {
                 result.current.handleDelete();
@@ -239,7 +239,7 @@ describe('useDeleteDataTableDialog', () => {
         it('should invalidate queries and clear dialog on success', () => {
             hoisted.storeState.tableIdToDelete = 'table-1';
 
-            const {result} = renderHook(() => useDeleteDataTableDialog());
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
 
             act(() => {
                 result.current.handleDelete();

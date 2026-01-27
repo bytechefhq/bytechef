@@ -1,19 +1,19 @@
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import DuplicateDataTableAlertDialog from '../DuplicateDataTableAlertDialog';
+import DuplicateDataTableDialog from '../DuplicateDataTableDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
         handleClose: vi.fn(),
         handleDuplicateSubmit: vi.fn(),
         handleDuplicateValueChange: vi.fn(),
-        mockUseDuplicateDataTableAlertDialog: vi.fn(),
+        mockUseDuplicateDataTableDialog: vi.fn(),
     };
 });
 
-vi.mock('../hooks/useDuplicateDataTableAlertDialog', () => ({
-    default: hoisted.mockUseDuplicateDataTableAlertDialog,
+vi.mock('../hooks/useDuplicateDataTableDialog', () => ({
+    default: hoisted.mockUseDuplicateDataTableDialog,
 }));
 
 const defaultMockReturn = {
@@ -28,7 +28,7 @@ const defaultMockReturn = {
 
 beforeEach(() => {
     windowResizeObserver();
-    hoisted.mockUseDuplicateDataTableAlertDialog.mockReturnValue({...defaultMockReturn});
+    hoisted.mockUseDuplicateDataTableDialog.mockReturnValue({...defaultMockReturn});
 });
 
 afterEach(() => {
@@ -36,28 +36,28 @@ afterEach(() => {
     vi.clearAllMocks();
 });
 
-describe('DuplicateDataTableAlertDialog', () => {
+describe('DuplicateDataTableDialog', () => {
     it('should render the dialog when open is true', () => {
-        render(<DuplicateDataTableAlertDialog />);
+        render(<DuplicateDataTableDialog />);
 
         expect(screen.getByText('Duplicate table')).toBeInTheDocument();
     });
 
     it('should display the dialog description', () => {
-        render(<DuplicateDataTableAlertDialog />);
+        render(<DuplicateDataTableDialog />);
 
         expect(screen.getByText('Enter a name for the duplicated table.')).toBeInTheDocument();
     });
 
     it('should render Cancel and Duplicate buttons', () => {
-        render(<DuplicateDataTableAlertDialog />);
+        render(<DuplicateDataTableDialog />);
 
         expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Duplicate'})).toBeInTheDocument();
     });
 
     it('should display input with duplicate value', () => {
-        render(<DuplicateDataTableAlertDialog />);
+        render(<DuplicateDataTableDialog />);
 
         const input = screen.getByDisplayValue('orders_copy');
 
@@ -65,7 +65,7 @@ describe('DuplicateDataTableAlertDialog', () => {
     });
 
     it('should call handleDuplicateSubmit when clicking Duplicate button', async () => {
-        render(<DuplicateDataTableAlertDialog />);
+        render(<DuplicateDataTableDialog />);
 
         const duplicateButton = screen.getByRole('button', {name: 'Duplicate'});
         await userEvent.click(duplicateButton);
@@ -74,7 +74,7 @@ describe('DuplicateDataTableAlertDialog', () => {
     });
 
     it('should call handleClose when clicking Cancel button', async () => {
-        render(<DuplicateDataTableAlertDialog />);
+        render(<DuplicateDataTableDialog />);
 
         const cancelButton = screen.getByRole('button', {name: 'Cancel'});
         await userEvent.click(cancelButton);
@@ -83,24 +83,24 @@ describe('DuplicateDataTableAlertDialog', () => {
     });
 });
 
-describe('DuplicateDataTableAlertDialog closed state', () => {
+describe('DuplicateDataTableDialog closed state', () => {
     beforeEach(() => {
-        hoisted.mockUseDuplicateDataTableAlertDialog.mockReturnValue({
+        hoisted.mockUseDuplicateDataTableDialog.mockReturnValue({
             ...defaultMockReturn,
             open: false,
         });
     });
 
     it('should not render the dialog content when open is false', () => {
-        render(<DuplicateDataTableAlertDialog />);
+        render(<DuplicateDataTableDialog />);
 
         expect(screen.queryByText('Duplicate table')).not.toBeInTheDocument();
     });
 });
 
-describe('DuplicateDataTableAlertDialog canDuplicate disabled', () => {
+describe('DuplicateDataTableDialog canDuplicate disabled', () => {
     beforeEach(() => {
-        hoisted.mockUseDuplicateDataTableAlertDialog.mockReturnValue({
+        hoisted.mockUseDuplicateDataTableDialog.mockReturnValue({
             ...defaultMockReturn,
             canDuplicate: false,
             duplicateValue: '',
@@ -108,7 +108,7 @@ describe('DuplicateDataTableAlertDialog canDuplicate disabled', () => {
     });
 
     it('should disable Duplicate button when canDuplicate is false', () => {
-        render(<DuplicateDataTableAlertDialog />);
+        render(<DuplicateDataTableDialog />);
 
         const duplicateButton = screen.getByRole('button', {name: 'Duplicate'});
 
