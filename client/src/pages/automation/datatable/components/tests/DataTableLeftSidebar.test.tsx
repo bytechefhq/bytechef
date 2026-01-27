@@ -1,4 +1,4 @@
-import {useDeleteDataTableDialogStore} from '@/pages/automation/datatable/stores/useDeleteDataTableDialogStore';
+import {useDeleteDataTableAlertDialogStore} from '@/pages/automation/datatable/stores/useDeleteDataTableAlertDialogStore';
 import {useRenameDataTableDialogStore} from '@/pages/automation/datatable/stores/useRenameDataTableDialogStore';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -114,7 +114,7 @@ afterEach(() => {
     queryClient.clear();
 
     // Reset zustand stores
-    useDeleteDataTableDialogStore.getState().clearTableToDelete();
+    useDeleteDataTableAlertDialogStore.getState().clearTableToDelete();
     useRenameDataTableDialogStore.getState().clearTableToRename();
 });
 
@@ -236,7 +236,7 @@ describe('DataTableLeftSidebar', () => {
 
             await user.click(deleteOption);
 
-            expect(screen.getByText('Delete Table')).toBeInTheDocument();
+            expect(screen.getByText('Are you absolutely sure?')).toBeInTheDocument();
         });
 
         it('should close delete dialog when cancel is clicked', async () => {

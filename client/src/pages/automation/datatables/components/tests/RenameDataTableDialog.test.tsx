@@ -1,25 +1,26 @@
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import RenameDataTableAlertDialog from '../RenameDataTableAlertDialog';
+import RenameDataTableDialog from '../RenameDataTableDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
-        handleClose: vi.fn(),
+        handleOpenChange: vi.fn(),
         handleRenameSubmit: vi.fn(),
         handleRenameValueChange: vi.fn(),
-        mockUseRenameDataTableAlertDialog: vi.fn(),
+        mockUseRenameDataTableDialog: vi.fn(),
     };
 });
 
-vi.mock('../hooks/useRenameDataTableAlertDialog', () => ({
-    default: hoisted.mockUseRenameDataTableAlertDialog,
+vi.mock('../hooks/useRenameDataTableDialog', () => ({
+    default: hoisted.mockUseRenameDataTableDialog,
 }));
 
 const defaultMockReturn = {
     canRename: true,
-    handleClose: hoisted.handleClose,
+    handleClose: vi.fn(),
     handleOpen: vi.fn(),
+    handleOpenChange: hoisted.handleOpenChange,
     handleRenameSubmit: hoisted.handleRenameSubmit,
     handleRenameValueChange: hoisted.handleRenameValueChange,
     open: true,
@@ -28,7 +29,7 @@ const defaultMockReturn = {
 
 beforeEach(() => {
     windowResizeObserver();
-    hoisted.mockUseRenameDataTableAlertDialog.mockReturnValue({...defaultMockReturn});
+    hoisted.mockUseRenameDataTableDialog.mockReturnValue({...defaultMockReturn});
 });
 
 afterEach(() => {
@@ -36,28 +37,28 @@ afterEach(() => {
     vi.clearAllMocks();
 });
 
-describe('RenameDataTableAlertDialog', () => {
+describe('RenameDataTableDialog', () => {
     it('should render the dialog when open is true', () => {
-        render(<RenameDataTableAlertDialog />);
+        render(<RenameDataTableDialog />);
 
         expect(screen.getByText('Rename Table')).toBeInTheDocument();
     });
 
     it('should display the dialog description', () => {
-        render(<RenameDataTableAlertDialog />);
+        render(<RenameDataTableDialog />);
 
-        expect(screen.getByText('Enter a new name for this data table.')).toBeInTheDocument();
+        expect(screen.getByText('Enter a new base name for this table.')).toBeInTheDocument();
     });
 
     it('should render Cancel and Rename buttons', () => {
-        render(<RenameDataTableAlertDialog />);
+        render(<RenameDataTableDialog />);
 
         expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Rename'})).toBeInTheDocument();
     });
 
     it('should display input with rename value', () => {
-        render(<RenameDataTableAlertDialog />);
+        render(<RenameDataTableDialog />);
 
         const input = screen.getByDisplayValue('orders_renamed');
 
@@ -65,7 +66,7 @@ describe('RenameDataTableAlertDialog', () => {
     });
 
     it('should call handleRenameSubmit when clicking Rename button', async () => {
-        render(<RenameDataTableAlertDialog />);
+        render(<RenameDataTableDialog />);
 
         const renameButton = screen.getByRole('button', {name: 'Rename'});
         await userEvent.click(renameButton);
@@ -73,34 +74,34 @@ describe('RenameDataTableAlertDialog', () => {
         expect(hoisted.handleRenameSubmit).toHaveBeenCalledTimes(1);
     });
 
-    it('should call handleClose when clicking Cancel button', async () => {
-        render(<RenameDataTableAlertDialog />);
+    it('should call handleOpenChange with false when clicking Cancel button', async () => {
+        render(<RenameDataTableDialog />);
 
         const cancelButton = screen.getByRole('button', {name: 'Cancel'});
         await userEvent.click(cancelButton);
 
-        expect(hoisted.handleClose).toHaveBeenCalled();
+        expect(hoisted.handleOpenChange).toHaveBeenCalledWith(false);
     });
 });
 
-describe('RenameDataTableAlertDialog closed state', () => {
+describe('RenameDataTableDialog closed state', () => {
     beforeEach(() => {
-        hoisted.mockUseRenameDataTableAlertDialog.mockReturnValue({
+        hoisted.mockUseRenameDataTableDialog.mockReturnValue({
             ...defaultMockReturn,
             open: false,
         });
     });
 
     it('should not render the dialog content when open is false', () => {
-        render(<RenameDataTableAlertDialog />);
+        render(<RenameDataTableDialog />);
 
         expect(screen.queryByText('Rename Table')).not.toBeInTheDocument();
     });
 });
 
-describe('RenameDataTableAlertDialog canRename disabled', () => {
+describe('RenameDataTableDialog canRename disabled', () => {
     beforeEach(() => {
-        hoisted.mockUseRenameDataTableAlertDialog.mockReturnValue({
+        hoisted.mockUseRenameDataTableDialog.mockReturnValue({
             ...defaultMockReturn,
             canRename: false,
             renameValue: '',
@@ -108,7 +109,7 @@ describe('RenameDataTableAlertDialog canRename disabled', () => {
     });
 
     it('should disable Rename button when canRename is false', () => {
-        render(<RenameDataTableAlertDialog />);
+        render(<RenameDataTableDialog />);
 
         const renameButton = screen.getByRole('button', {name: 'Rename'});
 

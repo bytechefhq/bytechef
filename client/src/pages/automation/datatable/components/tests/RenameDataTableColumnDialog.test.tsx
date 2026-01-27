@@ -8,7 +8,7 @@ const hoisted = vi.hoisted(() => {
         mockCanRename: true,
         mockCurrentName: 'originalColumn',
         mockHandleOpenChange: vi.fn(),
-        mockHandleRename: vi.fn(),
+        mockHandleRenameSubmit: vi.fn(),
         mockHandleRenameValueChange: vi.fn(),
         mockOpen: true,
         mockRenameValue: 'originalColumn',
@@ -20,7 +20,7 @@ vi.mock('../../hooks/useRenameDataTableColumnDialog', () => ({
         canRename: hoisted.mockCanRename,
         currentName: hoisted.mockCurrentName,
         handleOpenChange: hoisted.mockHandleOpenChange,
-        handleRename: hoisted.mockHandleRename,
+        handleRenameSubmit: hoisted.mockHandleRenameSubmit,
         handleRenameValueChange: hoisted.mockHandleRenameValueChange,
         open: hoisted.mockOpen,
         renameValue: hoisted.mockRenameValue,
@@ -60,6 +60,12 @@ describe('RenameDataTableColumnDialog', () => {
             render(<RenameDataTableColumnDialog />);
 
             expect(screen.getByText('Rename Column')).toBeInTheDocument();
+        });
+
+        it('should display the dialog description', () => {
+            render(<RenameDataTableColumnDialog />);
+
+            expect(screen.getByText('Enter a new name for this column.')).toBeInTheDocument();
         });
 
         it('should render the current column name in label', () => {
@@ -154,7 +160,7 @@ describe('RenameDataTableColumnDialog', () => {
 
             await user.click(renameButton);
 
-            expect(hoisted.mockHandleRename).toHaveBeenCalled();
+            expect(hoisted.mockHandleRenameSubmit).toHaveBeenCalled();
         });
 
         it('should not call handleRename when Rename button is disabled', async () => {
@@ -168,7 +174,7 @@ describe('RenameDataTableColumnDialog', () => {
 
             await user.click(renameButton);
 
-            expect(hoisted.mockHandleRename).not.toHaveBeenCalled();
+            expect(hoisted.mockHandleRenameSubmit).not.toHaveBeenCalled();
         });
     });
 });

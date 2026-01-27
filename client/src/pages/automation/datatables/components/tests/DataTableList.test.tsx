@@ -15,7 +15,7 @@ vi.mock('../hooks/useDataTableList', () => ({
     default: hoisted.mockUseDataTableList,
 }));
 
-vi.mock('../hooks/useDeleteDataTableAlertDialog', () => ({
+vi.mock('@/pages/automation/datatable/hooks/useDeleteDataTableAlertDialog', () => ({
     default: hoisted.mockUseDeleteDataTableAlertDialog,
 }));
 
@@ -25,7 +25,7 @@ vi.mock('../DataTableListItem', () => ({
     ),
 }));
 
-vi.mock('../DeleteDataTableAlertDialog', () => ({
+vi.mock('@/pages/automation/datatable/components/DeleteDataTableAlertDialog', () => ({
     default: () => <div data-testid="delete-dialog" />,
 }));
 

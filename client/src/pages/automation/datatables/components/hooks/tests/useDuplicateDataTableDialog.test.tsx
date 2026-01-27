@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import useDuplicateDataTableAlertDialog from '../useDuplicateDataTableAlertDialog';
+import useDuplicateDataTableDialog from '../useDuplicateDataTableDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -44,20 +44,20 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
     useEnvironmentStore: vi.fn(() => 2),
 }));
 
-describe('useDuplicateDataTableAlertDialog', () => {
+describe('useDuplicateDataTableDialog', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
     describe('initial state', () => {
         it('returns open as false initially', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             expect(result.current.open).toBe(false);
         });
 
         it('returns empty duplicateValue initially', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             expect(result.current.duplicateValue).toBe('');
         });
@@ -65,7 +65,7 @@ describe('useDuplicateDataTableAlertDialog', () => {
 
     describe('dialog operations', () => {
         it('opens dialog with table id and base name', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             act(() => {
                 result.current.handleOpen('table-123', 'TestTable');
@@ -76,7 +76,7 @@ describe('useDuplicateDataTableAlertDialog', () => {
         });
 
         it('closes dialog', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             act(() => {
                 result.current.handleOpen('table-123', 'TestTable');
@@ -91,7 +91,7 @@ describe('useDuplicateDataTableAlertDialog', () => {
         });
 
         it('updates duplicate value', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             act(() => {
                 result.current.handleOpen('table-123', 'TestTable');
@@ -107,7 +107,7 @@ describe('useDuplicateDataTableAlertDialog', () => {
 
     describe('canDuplicate', () => {
         it('returns true when name is not empty', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             act(() => {
                 result.current.handleOpen('table-123', 'TestTable');
@@ -117,7 +117,7 @@ describe('useDuplicateDataTableAlertDialog', () => {
         });
 
         it('returns false when name is empty', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             act(() => {
                 result.current.handleOpen('table-123', 'TestTable');
@@ -131,7 +131,7 @@ describe('useDuplicateDataTableAlertDialog', () => {
         });
 
         it('returns false when name is whitespace only', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             act(() => {
                 result.current.handleOpen('table-123', 'TestTable');
@@ -147,7 +147,7 @@ describe('useDuplicateDataTableAlertDialog', () => {
 
     describe('submit', () => {
         it('submits duplicate with correct parameters', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             act(() => {
                 result.current.handleOpen('table-123', 'TestTable');
@@ -167,7 +167,7 @@ describe('useDuplicateDataTableAlertDialog', () => {
         });
 
         it('trims the duplicate value before submitting', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             act(() => {
                 result.current.handleOpen('table-123', 'TestTable');
@@ -191,7 +191,7 @@ describe('useDuplicateDataTableAlertDialog', () => {
         });
 
         it('closes dialog after successful submit', () => {
-            const {result} = renderHook(() => useDuplicateDataTableAlertDialog());
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
 
             act(() => {
                 result.current.handleOpen('table-123', 'TestTable');
