@@ -214,6 +214,52 @@ Type: OBJECT
 ```
 
 
+### Edit Issue
+Name: editIssue
+
+`Edits an issue.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | ID of the project where the issue is located. | true |
+| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue. | true |
+| summary | Summary | STRING | The summary that will be edited. | false |
+| description | Description | STRING | The description that will be edited. | false |
+| addLabels | Add labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of labels that will be added to the issue. | false |
+| removeLabels | Remove labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of labels that will be removed from the issue. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Edit Issue",
+  "name" : "editIssue",
+  "parameters" : {
+    "project" : "",
+    "issueId" : "",
+    "summary" : "",
+    "description" : "",
+    "addLabels" : [ "" ],
+    "removeLabels" : [ "" ]
+  },
+  "type" : "jira/v1/editIssue"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
 ### Get Issue
 Name: getIssue
 
