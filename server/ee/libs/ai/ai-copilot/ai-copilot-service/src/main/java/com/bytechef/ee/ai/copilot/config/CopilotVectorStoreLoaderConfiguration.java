@@ -12,6 +12,8 @@ import com.bytechef.ee.ai.copilot.service.CopilotVectorStoreService;
 import com.knuddels.jtokkit.api.EncodingType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,7 +26,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.MetadataMode;
-import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,6 +33,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
  * @version ee
@@ -44,7 +48,10 @@ import org.springframework.context.event.EventListener;
 public class CopilotVectorStoreLoaderConfiguration {
 
     private static final String CATEGORY = "category";
+    private static final String CLASSPATH_DOCS_PATTERN = "classpath*:docs/**/*.md*";
     private static final String COMPONENTS_PATH = "server/libs/modules/components";
+    private static final String DOCS = "docs";
+    private static final String DOCS_PATH = "server/ee/libs/ai/ai-copilot/ai-copilot-service/src/main/resources/docs";
     private static final int MAX_TOKENS = 1536;
     private static final String NAME = "name";
     private static final String README = "readme";
@@ -52,60 +59,69 @@ public class CopilotVectorStoreLoaderConfiguration {
     private static final String ROOT = "user.dir";
 
     private final TokenCountBatchingStrategy batchingStrategy;
-    private final VectorStore vectorStore;
     private final CopilotVectorStoreService copilotVectorStoreService;
+    private final ResourcePatternResolver resourcePatternResolver;
+    private final VectorStore vectorStore;
 
     @SuppressFBWarnings(value = "EI")
     public CopilotVectorStoreLoaderConfiguration(
+        @Qualifier("aiCopilotPgVectorStore") VectorStore vectorStore,
+        CopilotVectorStoreService copilotVectorStoreService) {
 
-        @Qualifier("aiCopilotPgVectorStore") VectorStore vectorStore, CopilotVectorStoreService copilotVectorStoreService) {
         this.batchingStrategy = new TokenCountBatchingStrategy(
             EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
-        this.vectorStore = vectorStore;
         this.copilotVectorStoreService = copilotVectorStoreService;
+        this.resourcePatternResolver = new PathMatchingResourcePatternResolver();
+        this.vectorStore = vectorStore;
     }
 
     @EventListener(ApplicationStartedEvent.class)
     public void onApplicationStartedEvent() {
+        List<Map<String, Object>> vectorsMetadataList = getVectorsMetadataList();
+
         Path projectRoot = Paths.get(System.getProperty(ROOT));
         Path componentsPath = projectRoot.resolve(COMPONENTS_PATH);
 
         if (Files.exists(componentsPath) && Files.isDirectory(componentsPath)) {
-            initializeVectorStoreTable(componentsPath);
+            storeComponentDocuments(vectorsMetadataList, componentsPath);
         }
+
+        storeDocsDocuments(vectorsMetadataList, projectRoot);
     }
 
-    private static void addToDocuments(String name, List<Document> documents, String cleanedDocument, int hash) {
+    private void addDocumentChunks(
+        String name, String category, List<Document> documents, String cleanedDocument, int hash) {
+
         List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
 
         for (String chunk : chunks) {
-            documents.add(new Document(chunk, Map.of(CATEGORY, README, NAME, name, "hash", hash)));
+            documents.add(new Document(chunk, Map.of(CATEGORY, category, NAME, name, "hash", hash)));
         }
     }
 
-    private static void addToDocuments(
-        List<Map<String, Object>> vectorStoreMetadataList, String name, String json, List<Document> documents,
-        VectorStore vectorStore) {
+    private void addToDocuments(
+        List<Map<String, Object>> vectorStoreMetadataList, String name, String category, String content,
+        List<Document> documents) {
 
-        String cleanedDocument = preprocessDocument(json);
+        String cleanedDocument = preprocessDocument(content);
         int hash = cleanedDocument.hashCode();
 
-        if (!containsVectorStoreFile(vectorStoreMetadataList, name, README)) {
+        if (!containsVectorStoreFile(vectorStoreMetadataList, name, category)) {
             if (!cleanedDocument.isEmpty()) {
-                addToDocuments(name, documents, cleanedDocument, hash);
+                addDocumentChunks(name, category, documents, cleanedDocument, hash);
             }
         } else {
             Optional<Map<String, Object>> vectorStoreFileMetadata = getVectorStoreFile(
-                vectorStoreMetadataList, name, README);
+                vectorStoreMetadataList, name, category);
+
             if (vectorStoreFileMetadata.isPresent()) {
                 Map<String, Object> fileMetadata = vectorStoreFileMetadata.get();
-
                 int vectorHash = (int) fileMetadata.get("hash");
 
                 if (vectorHash != hash) {
-                    deleteFromVectorStore(vectorStore, name, README, hash);
+                    deleteFromVectorStore(name, category, vectorHash);
 
-                    addToDocuments(name, documents, cleanedDocument, hash);
+                    addDocumentChunks(name, category, documents, cleanedDocument, hash);
                 }
             }
         }
@@ -118,21 +134,37 @@ public class CopilotVectorStoreLoaderConfiguration {
             .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
     }
 
-    private static void deleteFromVectorStore(VectorStore vectorStore, String name, String category, int hash) {
+    private void deleteFromVectorStore(String name, String category, int hash) {
         vectorStore.delete(String.format("name == '%s' AND category == '%s' AND hash == '%d'", name, category, hash));
     }
 
-    private void initializeVectorStoreTable(Path documentationPath) {
-        if (copilotVectorStoreService.count() > 0) {
-            List<Map<String, Object>> vectorsMetadataList = copilotVectorStoreService.findAll()
-                .stream()
-                .map(CopilotVectorStore::getMetadata)
-                .toList();
+    private static String extractDocName(Resource resource) {
+        try {
+            String uri = resource.getURI()
+                .toString();
+            int docsIndex = uri.indexOf("/docs/");
 
-            storeDocuments(vectorsMetadataList, documentationPath);
-        } else {
-            storeDocuments(List.of(), documentationPath);
+            if (docsIndex != -1) {
+                return uri.substring(docsIndex + 6)
+                    .replaceAll("\\.(md|mdx)$", "");
+            }
+
+            String filename = resource.getFilename();
+
+            if (filename != null) {
+                return filename.replaceAll("\\.(md|mdx)$", "");
+            }
+        } catch (IOException ignored) {
         }
+
+        return "unknown";
+    }
+
+    private static String extractDocNameFromPath(Path docsBasePath, Path filePath) {
+        Path relativePath = docsBasePath.relativize(filePath);
+
+        return relativePath.toString()
+            .replaceAll("\\.(md|mdx)$", "");
     }
 
     private static Optional<Map<String, Object>> getVectorStoreFile(
@@ -141,6 +173,17 @@ public class CopilotVectorStoreLoaderConfiguration {
         return vectorStoreList.stream()
             .filter(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)))
             .findFirst();
+    }
+
+    private List<Map<String, Object>> getVectorsMetadataList() {
+        if (copilotVectorStoreService.count() > 0) {
+            return copilotVectorStoreService.findAll()
+                .stream()
+                .map(CopilotVectorStore::getMetadata)
+                .toList();
+        }
+
+        return List.of();
     }
 
     private static String preprocessDocument(String document) {
@@ -174,7 +217,6 @@ public class CopilotVectorStoreLoaderConfiguration {
 
         document = headerMatcher.replaceAll("");
 
-        // properties and tables
         Pattern propertiesPattern = Pattern.compile("^#### Properties.*$", Pattern.MULTILINE);
 
         Matcher propertiesMatcher = propertiesPattern.matcher(document);
@@ -204,7 +246,7 @@ public class CopilotVectorStoreLoaderConfiguration {
         for (String token : tokens) {
             if (tokenCount + 1 > MAX_TOKENS) {
                 chunks.add(StringUtils.trim(currentChunk.toString()));
-                currentChunk.setLength(0); // Reset the current chunk
+                currentChunk.setLength(0);
 
                 tokenCount = 0;
             }
@@ -222,10 +264,7 @@ public class CopilotVectorStoreLoaderConfiguration {
         return chunks;
     }
 
-    private static void storeComponentDocuments(
-        Path componentsBasePath, BatchingStrategy batchingStrategy,
-        List<Map<String, Object>> vectorStoreMetadataList, VectorStore vectorStore) throws IOException {
-
+    private void storeComponentDocuments(List<Map<String, Object>> vectorsMetadataList, Path componentsBasePath) {
         List<Document> documentList = new ArrayList<>();
 
         if (!Files.exists(componentsBasePath) || !Files.isDirectory(componentsBasePath)) {
@@ -242,15 +281,17 @@ public class CopilotVectorStoreLoaderConfiguration {
                         if (Files.exists(readmePath) && Files.isReadable(readmePath)) {
                             String componentName = componentDir.getFileName()
                                 .toString();
-                            String document = Files.readString(readmePath);
+                            String content = Files.readString(readmePath);
 
-                            addToDocuments(vectorStoreMetadataList, componentName, document, documentList, vectorStore);
+                            addToDocuments(vectorsMetadataList, componentName, README, content, documentList);
                         }
-                    } catch (IOException e) {
-                        throw new RuntimeException("Error reading README.mdx for component: " +
-                            componentDir.getFileName(), e);
+                    } catch (IOException ioException) {
+                        throw new RuntimeException(
+                            "Error reading README.mdx for component: " + componentDir.getFileName(), ioException);
                     }
                 });
+        } catch (IOException ioException) {
+            throw new RuntimeException("Error listing component directories", ioException);
         }
 
         for (List<Document> batch : batchingStrategy.batch(documentList)) {
@@ -258,11 +299,67 @@ public class CopilotVectorStoreLoaderConfiguration {
         }
     }
 
-    private void storeDocuments(List<Map<String, Object>> vectorStoreMetadataList, Path componentsBasePath) {
-        try {
-            storeComponentDocuments(componentsBasePath, batchingStrategy, vectorStoreMetadataList, vectorStore);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private void storeDocsDocuments(List<Map<String, Object>> vectorsMetadataList, Path projectRoot) {
+        List<Document> documentList = new ArrayList<>();
+
+        Path docsPath = projectRoot.resolve(DOCS_PATH);
+
+        if (Files.exists(docsPath) && Files.isDirectory(docsPath)) {
+            storeDocsFromFilesystem(vectorsMetadataList, docsPath, documentList);
+        } else {
+            storeDocsFromClasspath(vectorsMetadataList, documentList);
+        }
+
+        for (List<Document> batch : batchingStrategy.batch(documentList)) {
+            vectorStore.add(batch);
         }
     }
+
+    private void storeDocsFromClasspath(List<Map<String, Object>> vectorsMetadataList, List<Document> documentList) {
+        try {
+            Resource[] resources = resourcePatternResolver.getResources(CLASSPATH_DOCS_PATTERN);
+
+            for (Resource resource : resources) {
+                if (resource.isReadable()) {
+                    try (InputStream inputStream = resource.getInputStream()) {
+                        String content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+                        String docName = extractDocName(resource);
+
+                        addToDocuments(vectorsMetadataList, docName, DOCS, content, documentList);
+                    }
+                }
+            }
+        } catch (IOException ioException) {
+            throw new RuntimeException("Error loading docs from classpath", ioException);
+        }
+    }
+
+    private void storeDocsFromFilesystem(
+        List<Map<String, Object>> vectorsMetadataList, Path docsPath, List<Document> documentList) {
+
+        try (var docFiles = Files.walk(docsPath)) {
+            docFiles
+                .filter(Files::isRegularFile)
+                .filter(path -> {
+                    String fileName = path.getFileName()
+                        .toString()
+                        .toLowerCase();
+
+                    return fileName.endsWith(".md") || fileName.endsWith(".mdx");
+                })
+                .forEach(docFile -> {
+                    try {
+                        String content = Files.readString(docFile);
+                        String docName = extractDocNameFromPath(docsPath, docFile);
+
+                        addToDocuments(vectorsMetadataList, docName, DOCS, content, documentList);
+                    } catch (IOException ioException) {
+                        throw new RuntimeException("Error reading doc file: " + docFile, ioException);
+                    }
+                });
+        } catch (IOException ioException) {
+            throw new RuntimeException("Error walking docs directory", ioException);
+        }
+    }
+
 }
