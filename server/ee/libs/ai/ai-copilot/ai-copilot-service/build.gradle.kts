@@ -1,21 +1,87 @@
 val copyDocs = tasks.register<Copy>("copyDocs") {
-    description = "Copies documentation files from docs/content/docs to resources"
+    description = "Copies documentation files to resources"
     group = "build"
 
     from(rootProject.file("docs/content/docs")) {
         include("**/*.md", "**/*.mdx")
+        exclude("reference/components/**", "reference/flow-controls/**")
     }
     into(layout.projectDirectory.dir("src/main/resources/docs"))
+}
 
-    dependsOn(tasks.compileJava)
+val copyComponentDocs = tasks.register<Copy>("copyComponentDocs") {
+    description = "Copies component README files to resources"
+    group = "build"
+
+    from(rootProject.file("server/libs/modules/components")) {
+        include("*/src/main/resources/README.md", "*/src/main/resources/README.mdx")
+        eachFile {
+            val componentName = relativePath.segments[0]
+            relativePath = RelativePath(true, "$componentName.mdx")
+        }
+        includeEmptyDirs = false
+    }
+    into(layout.projectDirectory.dir("src/main/resources/docs/reference/components"))
+}
+
+val copyEeComponentDocs = tasks.register<Copy>("copyEeComponentDocs") {
+    description = "Copies EE component README files to resources"
+    group = "build"
+
+    from(rootProject.file("server/ee/libs/modules/components")) {
+        include("*/src/main/resources/README.md", "*/src/main/resources/README.mdx")
+        eachFile {
+            val componentName = relativePath.segments[0]
+            relativePath = RelativePath(true, "$componentName.mdx")
+        }
+        includeEmptyDirs = false
+    }
+    into(layout.projectDirectory.dir("src/main/resources/docs/reference/components"))
+}
+
+val copyTaskDispatcherDocs = tasks.register<Copy>("copyTaskDispatcherDocs") {
+    description = "Copies task dispatcher README files to resources"
+    group = "build"
+
+    from(rootProject.file("server/libs/modules/task-dispatchers")) {
+        include("*/src/main/resources/README.md", "*/src/main/resources/README.mdx")
+        eachFile {
+            val dispatcherName = relativePath.segments[0]
+            relativePath = RelativePath(true, "$dispatcherName.mdx")
+        }
+        includeEmptyDirs = false
+    }
+    into(layout.projectDirectory.dir("src/main/resources/docs/reference/task-dispatchers"))
+}
+
+val copyEeTaskDispatcherDocs = tasks.register<Copy>("copyEeTaskDispatcherDocs") {
+    description = "Copies EE task dispatcher README files to resources"
+    group = "build"
+
+    from(rootProject.file("server/ee/libs/modules/task-dispatchers")) {
+        include("*/src/main/resources/README.md", "*/src/main/resources/README.mdx")
+        eachFile {
+            val dispatcherName = relativePath.segments[0]
+            relativePath = RelativePath(true, "$dispatcherName.mdx")
+        }
+        includeEmptyDirs = false
+    }
+    into(layout.projectDirectory.dir("src/main/resources/docs/reference/task-dispatchers"))
+}
+
+val copyAllDocs = tasks.register("copyAllDocs") {
+    description = "Copies all documentation files to resources"
+    group = "build"
+
+    dependsOn(copyDocs, copyComponentDocs, copyEeComponentDocs, copyTaskDispatcherDocs, copyEeTaskDispatcherDocs)
+}
+
+tasks.compileJava {
+    finalizedBy(copyAllDocs)
 }
 
 tasks.processResources {
-    dependsOn(copyDocs)
-}
-
-tasks.named("classes") {
-    dependsOn(copyDocs)
+    dependsOn(copyAllDocs)
 }
 
 dependencies {
