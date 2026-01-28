@@ -16,10 +16,11 @@
 
 package com.bytechef.automation.knowledgebase.worker.config;
 
-import com.bytechef.automation.knowledgebase.config.KnowledgeBaseProperties;
 import com.bytechef.automation.knowledgebase.worker.document.ocr.MistralOcrService;
 import com.bytechef.automation.knowledgebase.worker.document.ocr.NoOpOcrService;
 import com.bytechef.automation.knowledgebase.worker.document.ocr.OcrService;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.KnowledgeBase.Ocr;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,19 +33,20 @@ import org.springframework.context.annotation.Configuration;
 class OcrServiceConfiguration {
 
     @Bean
-    OcrService ocrService(KnowledgeBaseProperties properties) {
-        KnowledgeBaseProperties.Ocr ocrProperties = properties.getOcr();
+    OcrService ocrService(ApplicationProperties applicationProperties) {
+        Ocr ocrProperties = applicationProperties.getKnowledgeBase()
+            .getOcr();
 
-        KnowledgeBaseProperties.Ocr.Provider provider = ocrProperties.getProvider();
+        Ocr.Provider provider = ocrProperties.getProvider();
 
-        if (provider == KnowledgeBaseProperties.Ocr.Provider.MISTRAL) {
+        if (provider == Ocr.Provider.MISTRAL) {
             String apiKey = ocrProperties.getMistral()
                 .getApiKey();
 
             if (apiKey == null || apiKey.isBlank()) {
                 throw new IllegalStateException(
                     "Mistral OCR is enabled but API key is not configured. " +
-                        "Set bytechef.automation.knowledge-base.ocr.mistral.api-key");
+                        "Set bytechef.knowledge-base.ocr.mistral.api-key");
             }
 
             return new MistralOcrService(apiKey);
