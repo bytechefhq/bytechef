@@ -2198,6 +2198,9 @@ public class ApplicationProperties {
         /** Whether knowledge base is enabled */
         private boolean enabled;
 
+        /** OCR configuration */
+        private Ocr ocr = new Ocr();
+
         /** Event subscription configuration */
         private Subscriptions subscriptions = new Subscriptions();
 
@@ -2209,12 +2212,117 @@ public class ApplicationProperties {
             this.enabled = enabled;
         }
 
+        public Ocr getOcr() {
+            return ocr;
+        }
+
+        public void setOcr(Ocr ocr) {
+            this.ocr = ocr;
+        }
+
         public Subscriptions getSubscriptions() {
             return subscriptions;
         }
 
         public void setSubscriptions(Subscriptions subscriptions) {
             this.subscriptions = subscriptions;
+        }
+
+        /**
+         * Embedding configuration for knowledge base document processing.
+         */
+        public static class Embedding {
+
+            /**
+             * Embedding provider type.
+             */
+            public enum Provider {
+                /** OpenAI embedding provider */
+                OPENAI,
+                /** Ollama embedding provider */
+                OLLAMA,
+                /** Azure embedding provider */
+                AZURE
+            }
+
+            /** Embedding model name */
+            private String model = "text-embedding-3-small";
+
+            /** Embedding provider */
+            private Provider provider = Provider.OPENAI;
+
+            public String getModel() {
+                return model;
+            }
+
+            public void setModel(String model) {
+                this.model = model;
+            }
+
+            public Provider getProvider() {
+                return provider;
+            }
+
+            public void setProvider(Provider provider) {
+                this.provider = provider;
+            }
+        }
+
+        /**
+         * OCR configuration for knowledge base document processing.
+         */
+        public static class Ocr {
+
+            /**
+             * OCR provider type.
+             */
+            public enum Provider {
+                /** No OCR provider */
+                NONE,
+                /** Azure OCR provider */
+                AZURE,
+                /** Mistral OCR provider */
+                MISTRAL
+            }
+
+            /** OCR provider */
+            private Provider provider = Provider.NONE;
+
+            /** Mistral OCR configuration */
+            private Mistral mistral = new Mistral();
+
+            public Provider getProvider() {
+                return provider;
+            }
+
+            public void setProvider(Provider provider) {
+                this.provider = provider;
+            }
+
+            public Mistral getMistral() {
+                return mistral;
+            }
+
+            public void setMistral(Mistral mistral) {
+                this.mistral = mistral;
+            }
+
+            /**
+             * Mistral OCR configuration.
+             */
+            public static class Mistral {
+
+                /** Mistral API key */
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
         }
 
         /**
