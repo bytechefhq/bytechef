@@ -15,8 +15,8 @@ import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Ai.Copilot.Anthropic;
-import com.bytechef.config.ApplicationProperties.Ai.Copilot.OpenAi;
+import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
+import com.bytechef.config.ApplicationProperties.Ai.OpenAi;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.model.SafeAnthropicChatModel;
@@ -76,10 +76,9 @@ public class AiCopilotConfiguration {
         ApplicationProperties applicationProperties,
         @Value("classpath:system_prompt.txt") Resource systemPromptResource) {
 
-        ApplicationProperties.Ai.Copilot copilot = applicationProperties.getAi()
-            .getCopilot();
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
 
-        Anthropic anthropic = copilot.getAnthropic();
+        Anthropic anthropic = ai.getAnthropic();
 
         this.anthropicApiKey = anthropic.getApiKey();
 
@@ -95,7 +94,7 @@ public class AiCopilotConfiguration {
 
         this.anthropicEmbeddingModel = anthropicEmbeddingOpenAiOptions.getModel();
 
-        OpenAi openAi = copilot.getOpenAi();
+        OpenAi openAi = ai.getOpenAi();
 
         this.openAiApiKey = openAi.getApiKey();
 
