@@ -27,6 +27,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 public class JiraConstants {
 
     public static final String ASSIGNEE = "assignee";
+    public static final String ADD = "add";
+    public static final String ADD_LABELS = "addLabels";
     public static final String ACCOUNT_ID = "accountId";
     public static final String COMMENT = "comment";
     public static final String CONTENT = "content";
@@ -46,13 +48,13 @@ public class JiraConstants {
     public static final String PARENT = "parent";
     public static final String PRIORITY = "priority";
     public static final String PROJECT = "project";
+    public static final String REMOVE = "remove";
+    public static final String REMOVE_LABELS = "removeLabels";
     public static final String SELF = "self";
     public static final String SUMMARY = "summary";
     public static final String TEXT = "text";
     public static final String TYPE = "type";
     public static final String ORDER_BY = "orderBy";
-    public static final String ADD_LABELS = "addLabels";
-    public static final String REMOVE_LABELS = "removeLabels";
     public static final String UPDATE = "update";
 
     public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object()

@@ -16,11 +16,13 @@
 
 package com.bytechef.component.jira.action;
 
+import static com.bytechef.component.jira.constant.JiraConstants.ADD;
 import static com.bytechef.component.jira.constant.JiraConstants.ADD_LABELS;
 import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
+import static com.bytechef.component.jira.constant.JiraConstants.REMOVE;
 import static com.bytechef.component.jira.constant.JiraConstants.REMOVE_LABELS;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
 import static com.bytechef.component.jira.constant.JiraConstants.UPDATE;
@@ -35,7 +37,10 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.jira.util.JiraUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -47,15 +52,15 @@ import org.mockito.ArgumentCaptor;
 
 class JiraEditIssueActionTest {
 
-    private final ArgumentCaptor<Context.Http.Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(Context.Http.Configuration.ConfigurationBuilder.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
     @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<Context.ContextFunction<Context.Http, Context.Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(Context.ContextFunction.class);
-    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor = forClass(Context.Http.Body.class);
+    private final ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
-    private final Context.Http mockedHttp = mock(Context.Http.class);
+    private final Executor mockedExecutor = mock(Executor.class);
+    private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             PROJECT, "1",
@@ -72,6 +77,7 @@ class JiraEditIssueActionTest {
         when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> httpFunctionArgumentCaptor.getValue()
                 .apply(mockedHttp));
+
         when(mockedHttp.put(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
@@ -95,16 +101,17 @@ class JiraEditIssueActionTest {
 
         Http.ResponseType responseType = configuration.getResponseType();
 
-        assertEquals(Context.Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
         assertEquals("/issue/1", stringArgumentCaptor.getValue());
 
         Map<String, Object> expectedFields = new HashMap<>();
+
         expectedFields.put(SUMMARY, "summary");
         JiraUtils.addDescriptionField(expectedFields, "description");
 
         List<Map<String, Object>> expectedLabels = List.of(
-            Map.of("add", "test_add_labels"),
-            Map.of("remove", "test_remove_labels"));
+            Map.of(ADD, "test_add_labels"),
+            Map.of(REMOVE, "test_remove_labels"));
 
         Map<String, Object> expectedBody = Map.of(
             FIELDS, expectedFields,
@@ -112,5 +119,4 @@ class JiraEditIssueActionTest {
 
         assertEquals(Http.Body.of(expectedBody), bodyArgumentCaptor.getValue());
     }
-
 }

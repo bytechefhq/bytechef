@@ -42,6 +42,21 @@ public class JiraUtils {
     private JiraUtils() {
     }
 
+    public static void addDescriptionField(Map<String, Object> project, String description) {
+        if (description != null) {
+            project.put(DESCRIPTION, Map.of(
+                CONTENT, List.of(
+                    Map.of(
+                        CONTENT, List.of(
+                            Map.of(
+                                TEXT, description,
+                                TYPE, TEXT)),
+                        TYPE, "paragraph")),
+                TYPE, "doc",
+                "version", 1));
+        }
+    }
+
     public static String getProjectName(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
@@ -97,20 +112,5 @@ public class JiraUtils {
             .body(Http.Body.of("webhookIds", List.of(outputParameters.getInteger(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
-    }
-
-    public static void addDescriptionField(Map<String, Object> project, String description) {
-        if (description != null) {
-            project.put(DESCRIPTION, Map.of(
-                CONTENT, List.of(
-                    Map.of(
-                        CONTENT, List.of(
-                            Map.of(
-                                TEXT, description,
-                                TYPE, TEXT)),
-                        TYPE, "paragraph")),
-                TYPE, "doc",
-                "version", 1));
-        }
     }
 }
