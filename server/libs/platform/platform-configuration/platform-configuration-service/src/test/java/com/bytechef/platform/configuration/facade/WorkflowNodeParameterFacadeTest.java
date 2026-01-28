@@ -881,6 +881,29 @@ public class WorkflowNodeParameterFacadeTest {
     }
 
     @Test
+    void testHasExpressionVariableIgnoresStringLiterals() {
+        // Test that parameter names inside string literals are not matched (GitHub issue #3964)
+        // When option value equals parameter name, should not match the string literal
+
+        // Should return false when parameter name only appears inside single-quoted string
+        assertFalse(WorkflowNodeParameterFacadeImpl.hasExpressionVariable("otherParam == 'type'", "type"));
+        assertFalse(WorkflowNodeParameterFacadeImpl.hasExpressionVariable("field == 'value'", "value"));
+
+        // Should return false when parameter name only appears inside double-quoted string
+        assertFalse(WorkflowNodeParameterFacadeImpl.hasExpressionVariable("otherParam == \"type\"", "type"));
+
+        // Should return true when parameter name appears as variable (left side of comparison)
+        assertTrue(WorkflowNodeParameterFacadeImpl.hasExpressionVariable("type == 'type'", "type"));
+        assertTrue(WorkflowNodeParameterFacadeImpl.hasExpressionVariable("value == 'someValue'", "value"));
+
+        // Should return true when parameter name appears as variable even with same value in string
+        assertTrue(WorkflowNodeParameterFacadeImpl.hasExpressionVariable("param == 'param'", "param"));
+
+        // Should return false when parameter name only appears in the string value part
+        assertFalse(WorkflowNodeParameterFacadeImpl.hasExpressionVariable("someField == 'paramName'", "paramName"));
+    }
+
+    @Test
     void testHasExpressionVariableWithIndexesEdgeCases() {
         List<Integer> emptyIndexes = List.of();
         List<Integer> multipleIndexes = List.of(0, 1, 2);
