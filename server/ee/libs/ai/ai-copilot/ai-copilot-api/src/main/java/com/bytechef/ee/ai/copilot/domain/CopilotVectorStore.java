@@ -21,9 +21,9 @@ import org.springframework.data.relational.core.mapping.Table;
  *
  * @author Marko Kriskovic
  */
-@Table("vector_store")
+@Table("copilot_vector_store")
 @SuppressFBWarnings("EI")
-public class VectorStore {
+public class CopilotVectorStore {
 
     @Id
     private UUID id;
@@ -37,7 +37,7 @@ public class VectorStore {
     @Column
     private List<Double> embedding;
 
-    public VectorStore(UUID id, String content, Map<String, Object> metadata, List<Double> embedding) {
+    public CopilotVectorStore(UUID id, String content, Map<String, Object> metadata, List<Double> embedding) {
         this.id = id;
         this.content = content;
         this.metadata = metadata;
@@ -82,7 +82,7 @@ public class VectorStore {
             return false;
         }
 
-        VectorStore that = (VectorStore) o;
+        CopilotVectorStore that = (CopilotVectorStore) o;
 
         return Objects.equals(id, that.id) && Objects.equals(content, that.content)
             && Objects.equals(metadata, that.metadata) && Objects.equals(embedding, that.embedding);

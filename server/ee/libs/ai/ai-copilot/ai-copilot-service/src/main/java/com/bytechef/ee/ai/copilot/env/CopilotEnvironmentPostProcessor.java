@@ -20,7 +20,7 @@ import org.springframework.core.env.MutablePropertySources;
  *
  * @author Ivica Cardic
  */
-public class AiCopilotEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class CopilotEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {

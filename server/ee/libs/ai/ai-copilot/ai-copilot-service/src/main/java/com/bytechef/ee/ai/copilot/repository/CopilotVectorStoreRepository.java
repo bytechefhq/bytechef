@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.repository;
 
-import com.bytechef.ee.ai.copilot.domain.VectorStore;
+import com.bytechef.ee.ai.copilot.domain.CopilotVectorStore;
 import com.bytechef.platform.jdbc.ConditionalJdbcRepository;
 import org.springframework.data.repository.ListCrudRepository;
 
@@ -17,5 +17,5 @@ import org.springframework.data.repository.ListCrudRepository;
  * @author Marko Kriskovic
  */
 @ConditionalJdbcRepository
-public interface VectorStoreRepository extends ListCrudRepository<VectorStore, Long> {
+public interface CopilotVectorStoreRepository extends ListCrudRepository<CopilotVectorStore, Long> {
 }
