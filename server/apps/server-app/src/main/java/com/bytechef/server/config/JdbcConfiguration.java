@@ -41,6 +41,7 @@ import com.bytechef.platform.workflow.execution.repository.converter.StringToWor
 import com.bytechef.platform.workflow.execution.repository.converter.TriggerStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
+import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -107,7 +108,7 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     @Bean
     @Primary
     @ConditionalOnProperty(prefix = "bytechef.datasource", name = "url")
-    @ConditionalOnProperty(prefix = "bytechef.tenant", name = "mode", havingValue = "single", matchIfMissing = true)
+    @ConditionalOnSingleTenant
     DataSource dataSource(DataSourceProperties properties) {
         return DataSourceBuilder.create(properties.getClassLoader())
             .type(HikariDataSource.class)
