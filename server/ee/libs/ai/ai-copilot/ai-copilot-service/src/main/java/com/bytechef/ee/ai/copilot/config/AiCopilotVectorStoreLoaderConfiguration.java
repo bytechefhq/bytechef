@@ -26,6 +26,7 @@ import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +40,7 @@ import org.springframework.context.event.EventListener;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 @SuppressFBWarnings("PATH_TRAVERSAL_IN")
-public class VectorStoreLoaderConfiguration {
+public class AiCopilotVectorStoreLoaderConfiguration {
 
     private static final String CATEGORY = "category";
     private static final String COMPONENTS_PATH = "server/libs/modules/components";
@@ -49,13 +50,15 @@ public class VectorStoreLoaderConfiguration {
     private static final String README_PATH = "src/main/resources/README.mdx";
     private static final String ROOT = "user.dir";
 
-    private final TokenCountBatchingStrategy strategy;
+    private final TokenCountBatchingStrategy batchingStrategy;
     private final VectorStore vectorStore;
     private final VectorStoreService vectorStoreService;
 
     @SuppressFBWarnings("EI")
-    public VectorStoreLoaderConfiguration(VectorStore vectorStore, VectorStoreService vectorStoreService) {
-        this.strategy = new TokenCountBatchingStrategy(
+    public AiCopilotVectorStoreLoaderConfiguration(
+
+        @Qualifier("aiCopilotPgVectorStore") VectorStore vectorStore, VectorStoreService vectorStoreService) {
+        this.batchingStrategy = new TokenCountBatchingStrategy(
             EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
         this.vectorStore = vectorStore;
         this.vectorStoreService = vectorStoreService;
@@ -256,7 +259,7 @@ public class VectorStoreLoaderConfiguration {
 
     private void storeDocuments(List<Map<String, Object>> vectorStoreMetadataList, Path componentsBasePath) {
         try {
-            storeComponentDocuments(componentsBasePath, strategy, vectorStoreMetadataList, vectorStore);
+            storeComponentDocuments(componentsBasePath, batchingStrategy, vectorStoreMetadataList, vectorStore);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
