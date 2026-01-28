@@ -7,7 +7,8 @@
 
 package com.bytechef.ee.ai.copilot.config;
 
-import com.bytechef.ee.ai.copilot.service.VectorStoreService;
+import com.bytechef.ee.ai.copilot.domain.CopilotVectorStore;
+import com.bytechef.ee.ai.copilot.service.CopilotVectorStoreService;
 import com.knuddels.jtokkit.api.EncodingType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -40,7 +41,7 @@ import org.springframework.context.event.EventListener;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 @SuppressFBWarnings("PATH_TRAVERSAL_IN")
-public class AiCopilotVectorStoreLoaderConfiguration {
+public class CopilotVectorStoreLoaderConfiguration {
 
     private static final String CATEGORY = "category";
     private static final String COMPONENTS_PATH = "server/libs/modules/components";
@@ -52,16 +53,16 @@ public class AiCopilotVectorStoreLoaderConfiguration {
 
     private final TokenCountBatchingStrategy batchingStrategy;
     private final VectorStore vectorStore;
-    private final VectorStoreService vectorStoreService;
+    private final CopilotVectorStoreService copilotVectorStoreService;
 
-    @SuppressFBWarnings("EI")
-    public AiCopilotVectorStoreLoaderConfiguration(
+    @SuppressFBWarnings(value = "EI")
+    public CopilotVectorStoreLoaderConfiguration(
 
-        @Qualifier("aiCopilotPgVectorStore") VectorStore vectorStore, VectorStoreService vectorStoreService) {
+        @Qualifier("aiCopilotPgVectorStore") VectorStore vectorStore, CopilotVectorStoreService copilotVectorStoreService) {
         this.batchingStrategy = new TokenCountBatchingStrategy(
             EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
         this.vectorStore = vectorStore;
-        this.vectorStoreService = vectorStoreService;
+        this.copilotVectorStoreService = copilotVectorStoreService;
     }
 
     @EventListener(ApplicationStartedEvent.class)
@@ -122,10 +123,10 @@ public class AiCopilotVectorStoreLoaderConfiguration {
     }
 
     private void initializeVectorStoreTable(Path documentationPath) {
-        if (vectorStoreService.count() > 0) {
-            List<Map<String, Object>> vectorsMetadataList = vectorStoreService.findAll()
+        if (copilotVectorStoreService.count() > 0) {
+            List<Map<String, Object>> vectorsMetadataList = copilotVectorStoreService.findAll()
                 .stream()
-                .map(com.bytechef.ee.ai.copilot.domain.VectorStore::getMetadata)
+                .map(CopilotVectorStore::getMetadata)
                 .toList();
 
             storeDocuments(vectorsMetadataList, documentationPath);

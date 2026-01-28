@@ -37,7 +37,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
     jdbcAggregateOperationsRef = "pgVectorJdbcAggregateTemplate",
     transactionManagerRef = "pgVectorTransactionManager")
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
-public class AiCopilotPgVectorConfiguration {
+public class CopilotPgVectorConfiguration {
 
     @Bean
     public VectorStore aiCopilotPgVectorStore(

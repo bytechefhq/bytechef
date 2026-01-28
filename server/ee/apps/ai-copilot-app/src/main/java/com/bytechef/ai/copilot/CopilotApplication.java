@@ -17,7 +17,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Ivica Cardic
  */
 @SpringBootApplication(scanBasePackages = "com.bytechef")
-public class AiCopilotApplication extends AbstractApplication {
+public class CopilotApplication extends AbstractApplication {
 
     /**
      * Main method, used to run the application.
@@ -25,6 +25,6 @@ public class AiCopilotApplication extends AbstractApplication {
      * @param args the command line arguments.
      */
     public static void main(String[] args) {
-        SpringApplication.run(AiCopilotApplication.class, args);
+        SpringApplication.run(CopilotApplication.class, args);
     }
 }
