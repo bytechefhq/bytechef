@@ -16,7 +16,7 @@ services:
     environment:
       - "POSTGRES_PASSWORD=postgres"
       - "POSTGRES_USER=postgres"
-      - "POSTGRES_DB=bytechef_copilot"
+      - "POSTGRES_DB=bytechef_vectorstore"
   postgres:
     image: postgres:16-alpine
     platform: linux/amd64
