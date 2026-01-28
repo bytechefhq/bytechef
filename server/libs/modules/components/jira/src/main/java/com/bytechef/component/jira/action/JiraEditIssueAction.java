@@ -21,11 +21,13 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.jira.constant.JiraConstants.ADD;
 import static com.bytechef.component.jira.constant.JiraConstants.ADD_LABELS;
 import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
+import static com.bytechef.component.jira.constant.JiraConstants.REMOVE;
 import static com.bytechef.component.jira.constant.JiraConstants.REMOVE_LABELS;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
 import static com.bytechef.component.jira.constant.JiraConstants.UPDATE;
@@ -73,24 +75,29 @@ public class JiraEditIssueAction {
             array(ADD_LABELS)
                 .label("Add labels")
                 .description("List of labels that will be added to the issue.")
-                .items(string())
+                .items(
+                    string()
+                        .label("Label")
+                        .description("Label that will be added to the issue.")
+                        .required(false))
                 .required(false),
             array(REMOVE_LABELS)
                 .label("Remove labels")
                 .description("List of labels that will be removed from the issue.")
-                .items(string())
+                .items(
+                    string()
+                        .label("Label")
+                        .description("Label that will be removed from the issue.")
+                        .required(false))
                 .required(false))
-        .output(
-            outputSchema(
-                bool()))
+        .output(outputSchema(bool().description("Returns true if the issue was edited successfully.")))
         .perform(JiraEditIssueAction::perform);
 
     public static Boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Map<String, Object> body = addBody(inputParameters);
 
-        context
-            .http(http -> http.put("/issue/" + inputParameters.getRequiredString(ISSUE_ID)))
+        context.http(http -> http.put("/issue/" + inputParameters.getRequiredString(ISSUE_ID)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(body))
             .execute();
@@ -106,11 +113,13 @@ public class JiraEditIssueAction {
         if (summary != null) {
             fields.put(SUMMARY, summary);
         }
+
         JiraUtils.addDescriptionField(fields, inputParameters.getString(DESCRIPTION));
 
         List<Map<String, Object>> labelsToUpdate = new ArrayList<>();
-        addLabels(labelsToUpdate, "add", inputParameters.getList(ADD_LABELS, String.class));
-        addLabels(labelsToUpdate, "remove", inputParameters.getList(REMOVE_LABELS, String.class));
+
+        addLabels(labelsToUpdate, ADD, inputParameters.getList(ADD_LABELS, String.class));
+        addLabels(labelsToUpdate, REMOVE, inputParameters.getList(REMOVE_LABELS, String.class));
 
         return Map.of(
             FIELDS, fields,
@@ -119,7 +128,7 @@ public class JiraEditIssueAction {
 
     private static void addLabels(List<Map<String, Object>> labelsToUpdate, String operation, List<String> labels) {
 
-        if (labels != null && !labels.isEmpty()) {
+        if (labels != null) {
             labels.forEach(label -> labelsToUpdate.add(Map.of(operation, label)));
         }
     }
