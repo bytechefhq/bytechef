@@ -1,3 +1,23 @@
+val copyDocs = tasks.register<Copy>("copyDocs") {
+    description = "Copies documentation files from docs/content/docs to resources"
+    group = "build"
+
+    from(rootProject.file("docs/content/docs")) {
+        include("**/*.md", "**/*.mdx")
+    }
+    into(layout.projectDirectory.dir("src/main/resources/docs"))
+
+    dependsOn(tasks.compileJava)
+}
+
+tasks.processResources {
+    dependsOn(copyDocs)
+}
+
+tasks.named("classes") {
+    dependsOn(copyDocs)
+}
+
 dependencies {
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
