@@ -34,13 +34,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
-public class AiCopilotApiController {
+public class CopilotApiController {
 
     private final Map<String, LocalAgent> localAgentMap;
     private final AgUiService agUiService;
 
     @SuppressFBWarnings("EI")
-    public AiCopilotApiController(AgUiService agUiService, List<LocalAgent> localAgents) {
+    public CopilotApiController(AgUiService agUiService, List<LocalAgent> localAgents) {
         this.agUiService = agUiService;
         this.localAgentMap = localAgents.stream()
             .collect(Collectors.toMap(LocalAgent::getAgentId, localAgent -> localAgent));

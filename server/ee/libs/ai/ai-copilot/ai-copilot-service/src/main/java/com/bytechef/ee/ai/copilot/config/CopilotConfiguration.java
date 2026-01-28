@@ -59,7 +59,7 @@ import org.springframework.web.client.RestClient;
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
-public class AiCopilotConfiguration {
+public class CopilotConfiguration {
 
     private final String anthropicApiKey;
     private final String anthropicChatModel;
@@ -72,7 +72,7 @@ public class AiCopilotConfiguration {
     private final Resource systemPromptResource;
 
     @SuppressFBWarnings("EI")
-    public AiCopilotConfiguration(
+    public CopilotConfiguration(
         ApplicationProperties applicationProperties,
         @Value("classpath:system_prompt.txt") Resource systemPromptResource) {
 
