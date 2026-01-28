@@ -1,35 +1,20 @@
 import {Input} from '@/components/ui/input';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workflow-nodes-tabs/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import {useDebouncedValue} from '@/shared/hooks/useDebouncedValue';
-import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionsWithActionsQuery} from '@/shared/queries/platform/componentDefinitionsGraphQL.queries';
+import {TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentDefinitionWithActionsProps,
+    useGetComponentDefinitionsWithActionsQuery,
+} from '@/shared/queries/platform/componentDefinitionsGraphQL.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 import {memo, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useDebounce} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
 import {convertNameToSnakeCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
-
-interface ComponentDefinitionWithActionsProps extends ComponentDefinitionBasic {
-    actions?: Array<{
-        name?: string;
-        title?: string;
-        description?: string;
-    }>;
-    triggers?: Array<{
-        name?: string;
-        title?: string;
-        description?: string;
-    }>;
-    clusterElements?: Array<{
-        type?: {
-            name?: string;
-        };
-    }>;
-}
 
 interface WorkflowNodesListProps {
     actionPanelOpen: boolean;
@@ -58,8 +43,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         sourceNodeId,
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
-
-        const debouncedFilter = useDebouncedValue(filter, 300);
+        const [debouncedFilter] = useDebounce(filter, 300);
 
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
             ComponentDefinitionWithActionsProps[]
@@ -91,12 +75,13 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const ff_3839 = useFeatureFlagsStore()('ff-3839');
 
         const trimmedFilter = debouncedFilter.trim();
+
         const {data: searchedComponentDefinitions, isLoading: isSearchLoading} =
             useGetComponentDefinitionsWithActionsQuery(trimmedFilter);
 
         const componentsWithActions = useMemo(() => {
             if (trimmedFilter && searchedComponentDefinitions && !isSearchLoading) {
-                return searchedComponentDefinitions as ComponentDefinitionWithActionsProps[];
+                return searchedComponentDefinitions;
             }
 
             return componentDefinitions as ComponentDefinitionWithActionsProps[];

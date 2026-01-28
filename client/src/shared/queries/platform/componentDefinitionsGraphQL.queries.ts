@@ -1,5 +1,24 @@
 import {useComponentDefinitionSearchQuery} from '@/shared/middleware/graphql';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useMemo} from 'react';
+
+export interface ComponentDefinitionWithActionsProps extends ComponentDefinitionBasic {
+    actions?: Array<{
+        name?: string;
+        title?: string;
+        description?: string;
+    }>;
+    triggers?: Array<{
+        name?: string;
+        title?: string;
+        description?: string;
+    }>;
+    clusterElements?: Array<{
+        type?: {
+            name?: string;
+        };
+    }>;
+}
 
 export const useGetComponentDefinitionsWithActionsQuery = (searchQuery?: string) => {
     const trimmedQuery = searchQuery?.trim();
@@ -14,13 +33,15 @@ export const useGetComponentDefinitionsWithActionsQuery = (searchQuery?: string)
         }
     );
 
-    const transformedData = useMemo(() => {
-        if (!result.data?.componentDefinitionSearch) return null;
+    const transformedData = useMemo<ComponentDefinitionWithActionsProps[] | null>(() => {
+        if (!result.data?.componentDefinitionSearch) {
+            return null;
+        }
 
         return result.data.componentDefinitionSearch.map((component) => ({
             ...component,
             clusterElementsCount: {},
-        }));
+        })) as ComponentDefinitionWithActionsProps[];
     }, [result.data]);
 
     return {
