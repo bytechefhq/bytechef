@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.ai.copilot.config;
+package com.bytechef.server.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.micrometer.observation.ObservationRegistry;
 import javax.sql.DataSource;
-import org.springframework.ai.embedding.BatchingStrategy;
-import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
-import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
-import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -41,34 +34,33 @@ import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.QueryMappingConfiguration;
 import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
 import org.springframework.data.jdbc.core.convert.SqlParametersFactory;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionManager;
 
+/**
+ * @author Ivica Cardic
+ */
 @Configuration
-@EnableJdbcRepositories(
-    basePackages = "com.bytechef.ee.ai.copilot.repository",
-    jdbcAggregateOperationsRef = "pgVectorJdbcAggregateTemplate",
-    transactionManagerRef = "pgVectorTxManager")
-@ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
-public class PgVectorConfiguration {
+@ConditionalOnProperty(prefix = "spring.ai.vectorstore", name = "type", havingValue = "pgvector")
+class PgVectorJdbcConfiguration {
 
-    private final ApplicationProperties.Ai.Copilot.Vectorstore.PgVector pgVector;
+    private final ApplicationProperties.Ai.Vectorstore.PgVector pgVector;
 
     @SuppressFBWarnings("EI")
-    public PgVectorConfiguration(ApplicationProperties applicationProperties) {
+    PgVectorJdbcConfiguration(ApplicationProperties applicationProperties) {
         this.pgVector = applicationProperties.getAi()
-            .getCopilot()
             .getVectorstore()
             .getPgVector();
     }
 
-    @Bean(name = "pgVectorDataSource")
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.vectorstore.pgvector", name = "url")
+    @ConditionalOnProperty(prefix = "bytechef.tenant", name = "mode", havingValue = "single", matchIfMissing = true)
     DataSource pgVectorDataSource() {
         return DataSourceBuilder.create()
             .type(HikariDataSource.class)
@@ -78,67 +70,41 @@ public class PgVectorConfiguration {
             .build();
     }
 
-    @Bean(name = "pgVectorJdbcTemplate")
+    @Bean
     JdbcTemplate pgVectorJdbcTemplate(@Qualifier("pgVectorDataSource") DataSource pgVectorDataSource) {
         return new JdbcTemplate(pgVectorDataSource);
     }
 
-    @Bean(name = "pgVectorNamedParameterJdbcTemplate")
-    NamedParameterJdbcOperations pgVectorNamedParameterJdbcTemplate(
+    @Bean
+    NamedParameterJdbcOperations pgVectorNamedParameterJdbcOperations(
         @Qualifier("pgVectorDataSource") DataSource pgVectorDataSource) {
 
         return new NamedParameterJdbcTemplate(pgVectorDataSource);
     }
 
-    @Bean(name = "pgVectorTxManager")
-    PlatformTransactionManager pgVectorTransactionManager(
+    @Bean
+    TransactionManager pgVectorTransactionManager(
         @Qualifier("pgVectorDataSource") DataSource pgVectorDataSource) {
 
         return new JdbcTransactionManager(pgVectorDataSource);
     }
 
-    @Bean(name = "pgVectorDataAccessStrategy")
+    @Bean
     DataAccessStrategy pgVectorDataAccessStrategy(
-        @Qualifier("pgVectorNamedParameterJdbcTemplate") NamedParameterJdbcOperations operations,
+        @Qualifier("pgVectorNamedParameterJdbcOperations") NamedParameterJdbcOperations operations,
         JdbcConverter jdbcConverter, RelationalMappingContext context, Dialect jdbcDialect) {
 
-        return new DefaultDataAccessStrategy(new SqlGeneratorSource(context, jdbcConverter, jdbcDialect), context,
-            jdbcConverter, operations, new SqlParametersFactory(context, jdbcConverter),
-            new InsertStrategyFactory(operations, jdbcDialect), QueryMappingConfiguration.EMPTY);
+        return new DefaultDataAccessStrategy(
+            new SqlGeneratorSource(context, jdbcConverter, jdbcDialect), context, jdbcConverter, operations,
+            new SqlParametersFactory(context, jdbcConverter), new InsertStrategyFactory(operations, jdbcDialect),
+            QueryMappingConfiguration.EMPTY);
     }
 
-    @Bean(name = "pgVectorJdbcAggregateTemplate")
+    @Bean
     JdbcAggregateTemplate pgVectorJdbcAggregateTemplate(
         ApplicationContext applicationContext, RelationalMappingContext context, JdbcConverter jdbcConverter,
         @Qualifier("pgVectorDataAccessStrategy") DataAccessStrategy dataAccessStrategy) {
 
         return new JdbcAggregateTemplate(applicationContext, context, jdbcConverter, dataAccessStrategy);
-    }
-
-    @Bean
-    public PgVectorStore pgVectorStore(
-        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
-        EmbeddingModel embeddingModel, PgVectorStoreProperties properties,
-        ObjectProvider<ObservationRegistry> observationRegistry,
-        ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
-        BatchingStrategy batchingStrategy) {
-
-        var initializeSchema = properties.isInitializeSchema();
-
-        return PgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
-            .schemaName(properties.getSchemaName())
-            .idType(properties.getIdType())
-            .vectorTableName(properties.getTableName())
-            .vectorTableValidationsEnabled(properties.isSchemaValidation())
-            .dimensions(properties.getDimensions())
-            .distanceType(properties.getDistanceType())
-            .removeExistingVectorStoreTable(properties.isRemoveExistingVectorStoreTable())
-            .indexType(properties.getIndexType())
-            .initializeSchema(initializeSchema)
-            .observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
-            .customObservationConvention(customObservationConvention.getIfAvailable(() -> null))
-            .batchingStrategy(batchingStrategy)
-            .maxDocumentBatchSize(properties.getMaxDocumentBatchSize())
-            .build();
     }
 }
