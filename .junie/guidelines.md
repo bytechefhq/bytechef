@@ -366,4 +366,14 @@ Access the application at http://localhost:8080
   - Formatting rules:
     - Break each chained step onto its own line when there are 3+ operations or line length would exceed limits
     - Keep declarative chains (queries, reactive pipelines) as one logical block; prefer one operation per line
-    - Avoid chaining when side effects are involved or intermediate values deserve names for clarity/debugging
+- Avoid chaining when side effects are involved or intermediate values deserve names for clarity/debugging
+
+## Working with Tasks
+
+Follow these guidelines when working with the `docs/tasks.md` checklist:
+
+1. **Mark Completion**: Mark tasks as `[x]` as soon as they are completed.
+2. **Task Modification**: Keep existing phases intact. If additional steps are identified during development, add them as new tasks within the appropriate phase.
+3. **Traceability**: Ensure every new or modified task remains linked to both a requirement in `docs/requirements.md` and a plan item in `docs/plan.md`.
+4. **Consistency**: Maintain the existing formatting style for tasks, including headings, indentation, and linking format.
+5. **Periodic Review**: Regularly sync the task list with the actual progress of the development to ensure it remains an accurate source of truth.
