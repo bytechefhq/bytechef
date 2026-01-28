@@ -7,10 +7,8 @@
 
 package com.bytechef.ee.ai.copilot.env;
 
-import com.bytechef.config.ApplicationProperties.Ai.Copilot.Provider;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -33,14 +31,6 @@ public class AiCopilotEnvironmentPostProcessor implements EnvironmentPostProcess
 
             source.put("spring.ai.model.chat", provider);
             source.put("spring.ai.vectorstore.type", "pgvector");
-
-            if (Provider.valueOf(StringUtils.upperCase(provider)) == Provider.OPENAI) {
-                source.put("spring.ai.model.embedding", provider);
-            } else {
-                provider = environment.getProperty("bytechef.ai.copilot.anthropic.embedding.provider");
-
-                source.put("spring.ai.model.embedding", provider);
-            }
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom AI Copilot Config", source);

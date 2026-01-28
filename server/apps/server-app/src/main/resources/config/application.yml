@@ -130,17 +130,17 @@ spring:
       image: none
       moderation: none
     anthropic:
-      api-key: ${bytechef.ai.copilot.anthropic.api-key}
+      api-key: ${bytechef.ai.anthropic.api-key}
       chat:
         options:
-          model: ${bytechef.ai.copilot.anthropic.chat.options.model}
-          temperature: ${bytechef.ai.copilot.anthropic.chat.options.temperature}
+          model: ${bytechef.ai.anthropic.chat.options.model}
+          temperature: ${bytechef.ai.anthropic.chat.options.temperature}
     openai:
-      api-key: ${bytechef.ai.copilot.openai.api-key}
+      api-key: ${bytechef.ai.openai.api-key}
       chat:
         options:
-          model: ${bytechef.ai.copilot.openai.chat.options.model}
-          temperature: ${bytechef.ai.copilot.openai.chat.options.temperature}
+          model: ${bytechef.ai.openai.chat.options.model}
+          temperature: ${bytechef.ai.openai.chat.options.temperature}
     vectorstore:
       type: none
       pgvector:
@@ -148,7 +148,6 @@ spring:
         distance-type: cosine_distance
         dimensions: 1536
         max-document-batch-size: 10000
-        initialize-schema: true
   application:
     name: server-app
   autoconfigure:
@@ -267,27 +266,43 @@ templates:
 
 bytechef:
   ai:
-    copilot:
-      anthropic:
-        chat:
-          options:
-            model: claude-sonnet-4-5
-            temperature: 0.5
-        embedding:
-          provider: openai
-          openai:
-            options:
-              model: text-embedding-3-small
-      provider: openai
-      enabled: false
-      openai:
-        chat:
-          options:
-            model: gpt-5.1
-            temperature: 0.5
-        embedding:
+    anthropic:
+      chat:
+        options:
+          model: claude-sonnet-4-5
+          temperature: 0.5
+      embedding:
+        provider: openai
+        openai:
           options:
             model: text-embedding-3-small
+    copilot:
+      enabled: false
+      provider: openai
+      vectorstore:
+        provider: pgvector
+    knowledge-base:
+      embedding:
+        provider: openai
+        openai:
+          options:
+            model: text-embedding-3-small
+      enabled: false
+      vectorstore:
+        provider: pgvector
+    openai:
+      chat:
+        options:
+          model: gpt-5.2
+          temperature: 0.5
+      embedding:
+        options:
+          model: text-embedding-3-small
+    vectorstore:
+      pgvector:
+         url:
+         username:
+         password:
   analytics:
     enabled: false
   cache:

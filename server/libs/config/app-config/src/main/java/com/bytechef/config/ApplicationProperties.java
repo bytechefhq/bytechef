@@ -23,6 +23,9 @@ import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * Application configuration properties. Contains all configurable properties for the platform, including AI, messaging,
+ * storage, security, and workflow settings.
+ *
  * @author Ivica Cardic
  */
 @ConfigurationProperties(prefix = "bytechef", ignoreUnknownFields = false)
@@ -30,39 +33,100 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
 
     /**
-     * Edition.
+     * Application edition type.
      */
     public enum Edition {
-        CE, EE
+        /** Community Edition */
+        CE,
+        /** Enterprise Edition */
+        EE
     }
 
+    /** AI and machine learning configuration */
     private Ai ai = new Ai();
+
+    /** Analytics configuration */
     private Analytics analytics = new Analytics();
+
+    /** Cache provider configuration */
     private Cache cache = new Cache();
+
+    /** Cloud provider configuration */
     private Cloud cloud = new Cloud();
+
+    /** Component registry configuration */
     private Component component = new Component();
+
+    /** Workflow coordinator configuration */
     private Coordinator coordinator = new Coordinator();
+
+    /** Database datasource configuration */
     private Datasource datasource = new Datasource();
+
+    /** Data storage provider configuration */
     private DataStorage dataStorage;
+
+    /** Service discovery configuration */
     private DiscoveryService discoveryService = new DiscoveryService();
+
+    /** Application edition (CE or EE) */
     private Edition edition = Edition.EE;
+
+    /** Encryption configuration */
     private Encryption encryption;
+
+    /** List of enabled feature flags */
     private List<String> featureFlags = List.of();
+
+    /** File storage provider configuration */
     private FileStorage fileStorage = new FileStorage();
+
+    /** Help hub configuration */
     private HelpHub helpHub = new HelpHub();
+
+    /** Knowledge base configuration */
+    private KnowledgeBase knowledgeBase = new KnowledgeBase();
+
+    /** Observability and logging configuration */
     private Observability observability = new Observability();
+
+    /** Email configuration */
     private Mail mail = new Mail();
+
+    /** Model Context Protocol configuration */
     private Mcp mcp = new Mcp();
+
+    /** Message broker configuration */
     private MessageBroker messageBroker = new MessageBroker();
+
+    /** OAuth2 configuration */
     private Oauth2 oauth2 = new Oauth2();
+
+    /** Public URL for the application */
     private String publicUrl;
+
+    /** Static resources configuration */
     private Resources resources = new Resources();
+
+    /** Security configuration */
     private Security security;
+
+    /** User sign-up configuration */
     private SignUp signUp = new SignUp();
+
+    /** Multi-tenancy configuration */
     private Tenant tenant = new Tenant();
+
+    /** Webhook URL for external integrations */
     private String webhookUrl;
+
+    /** Distributed tracing configuration */
     private Tracing tracing = new Tracing();
+
+    /** Worker node configuration */
     private Worker worker = new Worker();
+
+    /** Workflow engine configuration */
     private Workflow workflow = new Workflow();
 
     public Ai getAi() {
@@ -119,6 +183,10 @@ public class ApplicationProperties {
 
     public HelpHub getHelpHub() {
         return helpHub;
+    }
+
+    public KnowledgeBase getKnowledgeBase() {
+        return knowledgeBase;
     }
 
     public Observability getObservability() {
@@ -233,6 +301,10 @@ public class ApplicationProperties {
         this.helpHub = helpHub;
     }
 
+    public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
+        this.knowledgeBase = knowledgeBase;
+    }
+
     public void setObservability(Observability observability) {
         this.observability = observability;
     }
@@ -289,8 +361,15 @@ public class ApplicationProperties {
         this.workflow = workflow;
     }
 
+    /**
+     * Observability and logging configuration for monitoring and diagnostics.
+     */
     public static class Observability {
+
+        /** Whether observability features are enabled */
         private boolean enabled;
+
+        /** Loki log aggregation configuration */
         private Loki loki;
 
         public boolean isEnabled() {
@@ -309,7 +388,12 @@ public class ApplicationProperties {
             this.loki = loki;
         }
 
+        /**
+         * Loki log aggregation system configuration.
+         */
         public static class Loki {
+
+            /** Loki appender configuration */
             private Appender appender = new Appender();
 
             public Appender getAppender() {
@@ -320,8 +404,15 @@ public class ApplicationProperties {
                 this.appender = appender;
             }
 
+            /**
+             * Loki log appender configuration.
+             */
             public static class Appender {
+
+                /** HTTP endpoint configuration for Loki */
                 private Http http;
+
+                /** Logging level for Loki appender */
                 private Level level = Level.OFF;
 
                 public Http getHttp() {
@@ -332,8 +423,24 @@ public class ApplicationProperties {
                     this.http = http;
                 }
 
+                /**
+                 * Logging levels for Loki appender.
+                 */
                 public enum Level {
-                    OFF, ERROR, WARN, INFO, DEBUG, TRACE, ALL
+                    /** Logging disabled */
+                    OFF,
+                    /** Error level */
+                    ERROR,
+                    /** Warning level */
+                    WARN,
+                    /** Info level */
+                    INFO,
+                    /** Debug level */
+                    DEBUG,
+                    /** Trace level */
+                    TRACE,
+                    /** All logging enabled */
+                    ALL
                 }
 
                 public Level getLevel() {
@@ -344,7 +451,12 @@ public class ApplicationProperties {
                     this.level = level;
                 }
 
+                /**
+                 * HTTP endpoint configuration for sending logs to Loki.
+                 */
                 public static class Http {
+
+                    /** Loki HTTP endpoint URL */
                     private String url;
 
                     public String getUrl() {
@@ -364,44 +476,238 @@ public class ApplicationProperties {
      */
     public static class Ai {
 
-        private Provider provider = new Provider();
+        private Anthropic anthropic = new Anthropic();
         private Copilot copilot = new Copilot();
+        private KnowledgeBase knowledgeBase = new KnowledgeBase();
+        private OpenAi openAi = new OpenAi();
+        private Provider provider = new Provider();
+        private Vectorstore vectorstore = new Vectorstore();
+
+        public Anthropic getAnthropic() {
+            return anthropic;
+        }
 
         public Copilot getCopilot() {
             return copilot;
+        }
+
+        public KnowledgeBase getKnowledgeBase() {
+            return knowledgeBase;
+        }
+
+        public OpenAi getOpenAi() {
+            return openAi;
         }
 
         public Provider getProvider() {
             return provider;
         }
 
+        public Vectorstore getVectorstore() {
+            return vectorstore;
+        }
+
+        public void setAnthropic(Anthropic anthropic) {
+            this.anthropic = anthropic;
+        }
+
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
+        }
+
+        public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
+            this.knowledgeBase = knowledgeBase;
+        }
+
+        public void setOpenAi(OpenAi openAi) {
+            this.openAi = openAi;
         }
 
         public void setProvider(Provider provider) {
             this.provider = provider;
         }
 
+        public void setVectorstore(Vectorstore vectorstore) {
+            this.vectorstore = vectorstore;
+        }
+
+        /**
+         * Anthropic AI provider configuration.
+         */
+        public static class Anthropic {
+
+            /** Anthropic API key */
+            private String apiKey;
+
+            /** Chat model configuration */
+            private Chat chat = new Chat();
+
+            /** Embedding model configuration */
+            private Embedding embedding = new Embedding();
+
+            public String getApiKey() {
+                return apiKey;
+            }
+
+            public Chat getChat() {
+                return chat;
+            }
+
+            public void setApiKey(String apiKey) {
+                this.apiKey = apiKey;
+            }
+
+            public void setChat(Chat chat) {
+                this.chat = chat;
+            }
+
+            public Embedding getEmbedding() {
+                return embedding;
+            }
+
+            public void setEmbedding(Embedding embedding) {
+                this.embedding = embedding;
+            }
+
+            /**
+             * Anthropic chat model configuration.
+             */
+            public static class Chat {
+
+                /** Chat model options */
+                private Options options = new Options();
+
+                public Options getOptions() {
+                    return options;
+                }
+
+                public void setOptions(Options options) {
+                    this.options = options;
+                }
+
+                /**
+                 * Chat model configuration options.
+                 */
+                public static class Options {
+
+                    /** AI model name (e.g., claude-3-opus-20240229) */
+                    private String model;
+
+                    /** Temperature for response randomness (0.0-1.0) */
+                    private Double temperature;
+
+                    public String getModel() {
+                        return model;
+                    }
+
+                    public void setModel(String model) {
+                        this.model = model;
+                    }
+
+                    public Double getTemperature() {
+                        return temperature;
+                    }
+
+                    public void setTemperature(Double temperature) {
+                        this.temperature = temperature;
+                    }
+                }
+            }
+
+            /**
+             * Anthropic embedding configuration (using external provider).
+             */
+            public static class Embedding {
+
+                /**
+                 * Embedding provider type for Anthropic.
+                 */
+                public enum Provider {
+                    /** OpenAI embedding provider */
+                    OPENAI
+                }
+
+                /** OpenAI embedding configuration */
+                private OpenAi openAi = new OpenAi();
+
+                /** Embedding provider */
+                private Provider provider = Provider.OPENAI;
+
+                public OpenAi getOpenAi() {
+                    return openAi;
+                }
+
+                public void setOpenAi(OpenAi openAi) {
+                    this.openAi = openAi;
+                }
+
+                public Provider getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(Provider provider) {
+                    this.provider = provider;
+                }
+
+                /**
+                 * OpenAI embedding configuration for Anthropic.
+                 */
+                public static class OpenAi {
+
+                    /** OpenAI embedding options */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * OpenAI embedding model options.
+                     */
+                    public static class Options {
+
+                        /** Embedding model name */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * AI Copilot configuration for workflow assistance.
+         */
         public static class Copilot {
 
+            /**
+             * AI provider for Copilot functionality.
+             */
             public enum Provider {
-                OPENAI, ANTHROPIC
+                /** OpenAI provider */
+                OPENAI,
+                /** Anthropic provider */
+                ANTHROPIC
             }
 
-            private Anthropic anthropic = new Anthropic();
+            /** Whether Copilot is enabled */
             private boolean enabled;
-            private OpenAi openAi = new OpenAi();
+
+            /** AI provider for Copilot */
             private Provider provider = Provider.OPENAI;
+
+            /** Vector store configuration for Copilot context */
             private Vectorstore vectorstore = new Vectorstore();
-
-            public Anthropic getAnthropic() {
-                return anthropic;
-            }
-
-            public void setAnthropic(Anthropic anthropic) {
-                this.anthropic = anthropic;
-            }
 
             public boolean isEnabled() {
                 return enabled;
@@ -409,14 +715,6 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
-            }
-
-            public OpenAi getOpenAi() {
-                return openAi;
-            }
-
-            public void setOpenAi(OpenAi openAi) {
-                this.openAi = openAi;
             }
 
             public Provider getProvider() {
@@ -435,280 +733,319 @@ public class ApplicationProperties {
                 this.vectorstore = vectorstore;
             }
 
-            public static class Anthropic {
-
-                private String apiKey;
-                private Chat chat = new Chat();
-                private Embedding embedding = new Embedding();
-
-                public String getApiKey() {
-                    return apiKey;
-                }
-
-                public Chat getChat() {
-                    return chat;
-                }
-
-                public void setApiKey(String apiKey) {
-                    this.apiKey = apiKey;
-                }
-
-                public void setChat(Chat chat) {
-                    this.chat = chat;
-                }
-
-                public Embedding getEmbedding() {
-                    return embedding;
-                }
-
-                public void setEmbedding(Embedding embedding) {
-                    this.embedding = embedding;
-                }
-
-                public static class Chat {
-
-                    private Options options = new Options();
-
-                    public Options getOptions() {
-                        return options;
-                    }
-
-                    public void setOptions(Options options) {
-                        this.options = options;
-                    }
-
-                    public static class Options {
-
-                        private String model;
-
-                        public String getModel() {
-                            return model;
-                        }
-
-                        public void setModel(String model) {
-                            this.model = model;
-                        }
-
-                        private Double temperature;
-
-                        public Double getTemperature() {
-                            return temperature;
-                        }
-
-                        public void setTemperature(Double temperature) {
-                            this.temperature = temperature;
-                        }
-                    }
-                }
-
-                public static class Embedding {
-
-                    public enum Provider {
-                        OPENAI
-                    }
-
-                    private OpenAi openAi = new OpenAi();
-                    private Provider provider = Provider.OPENAI;
-
-                    public OpenAi getOpenAi() {
-                        return openAi;
-                    }
-
-                    public void setOpenAi(OpenAi openAi) {
-                        this.openAi = openAi;
-                    }
-
-                    public Provider getProvider() {
-                        return provider;
-                    }
-
-                    public void setProvider(Provider provider) {
-                        this.provider = provider;
-                    }
-
-                    public static class OpenAi {
-
-                        private Options options = new Options();
-
-                        public Options getOptions() {
-                            return options;
-                        }
-
-                        public void setOptions(Options options) {
-                            this.options = options;
-                        }
-
-                        public static class Options {
-
-                            private String model;
-
-                            public String getModel() {
-                                return model;
-                            }
-
-                            public void setModel(String model) {
-                                this.model = model;
-                            }
-                        }
-
-                    }
-                }
-            }
-
-            public static class OpenAi {
-
-                private String apiKey;
-                private Chat chat = new Chat();
-                private Embedding embedding = new Embedding();
-
-                public String getApiKey() {
-                    return apiKey;
-                }
-
-                public void setApiKey(String apiKey) {
-                    this.apiKey = apiKey;
-                }
-
-                public Chat getChat() {
-                    return chat;
-                }
-
-                public Embedding getEmbedding() {
-                    return embedding;
-                }
-
-                public void setChat(Chat chat) {
-                    this.chat = chat;
-                }
-
-                public void setEmbedding(Embedding embedding) {
-                    this.embedding = embedding;
-                }
-
-                public static class Chat {
-
-                    private Options options = new Options();
-
-                    public Options getOptions() {
-                        return options;
-                    }
-
-                    public void setOptions(Options options) {
-                        this.options = options;
-                    }
-
-                    public static class Options {
-
-                        private String model;
-                        private Double temperature;
-
-                        public String getModel() {
-                            return model;
-                        }
-
-                        public void setModel(String model) {
-                            this.model = model;
-                        }
-
-                        public Double getTemperature() {
-                            return temperature;
-                        }
-
-                        public void setTemperature(Double temperature) {
-                            this.temperature = temperature;
-                        }
-                    }
-                }
-
-                public static class Embedding {
-
-                    private Options options = new Options();
-
-                    public Options getOptions() {
-                        return options;
-                    }
-
-                    public void setOptions(Options options) {
-                        this.options = options;
-                    }
-
-                    public static class Options {
-
-                        private String model;
-
-                        public String getModel() {
-                            return model;
-                        }
-
-                        public void setModel(String model) {
-                            this.model = model;
-                        }
-                    }
-                }
-            }
-
+            /**
+             * Vector store configuration for Copilot.
+             */
             public static class Vectorstore {
 
-                private PgVector pgVector = new PgVector();
+                /** Vector store provider */
+                private Ai.Vectorstore.Provider provider = Ai.Vectorstore.Provider.PGVECTOR;
 
-                public PgVector getPgVector() {
-                    return pgVector;
+                public Ai.Vectorstore.Provider getProvider() {
+                    return provider;
                 }
 
-                public void setPgVector(PgVector pgVector) {
-                    this.pgVector = pgVector;
+                public void setProvider(Ai.Vectorstore.Provider provider) {
+                    this.provider = provider;
+                }
+            }
+        }
+
+        /**
+         * Knowledge base AI configuration.
+         */
+        public static class KnowledgeBase {
+
+            /** Whether knowledge base AI features are enabled */
+            private boolean enabled;
+
+            /** Embedding model configuration for knowledge base */
+            private Embedding embedding = new Embedding();
+
+            /** Vector store configuration for knowledge base */
+            private Vectorstore vectorstore = new Vectorstore();
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public Embedding getEmbedding() {
+                return embedding;
+            }
+
+            public void setEmbedding(Embedding embedding) {
+                this.embedding = embedding;
+            }
+
+            public Vectorstore getVectorstore() {
+                return vectorstore;
+            }
+
+            public void setVectorstore(Vectorstore vectorstore) {
+                this.vectorstore = vectorstore;
+            }
+
+            /**
+             * Knowledge base embedding configuration.
+             */
+            public static class Embedding {
+
+                /**
+                 * Embedding provider for knowledge base.
+                 */
+                public enum Provider {
+                    /** OpenAI embedding provider */
+                    OPENAI
                 }
 
-                public static class PgVector {
+                /** OpenAI embedding configuration */
+                private OpenAi openAi = new OpenAi();
 
-                    private String url;
-                    private String username;
-                    private String password;
+                /** Embedding provider */
+                private Provider provider = Provider.OPENAI;
 
-                    public String getUrl() {
-                        return url;
+                public OpenAi getOpenAi() {
+                    return openAi;
+                }
+
+                public void setOpenAi(OpenAi openAi) {
+                    this.openAi = openAi;
+                }
+
+                public Provider getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(Provider provider) {
+                    this.provider = provider;
+                }
+
+                /**
+                 * OpenAI embedding configuration for knowledge base.
+                 */
+                public static class OpenAi {
+
+                    /** OpenAI embedding options */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
                     }
 
-                    public void setUrl(String url) {
-                        this.url = url;
+                    public void setOptions(Options options) {
+                        this.options = options;
                     }
 
-                    public String getUsername() {
-                        return username;
+                    /**
+                     * OpenAI embedding model options for knowledge base.
+                     */
+                    public static class Options {
+
+                        /** Embedding model name */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+            }
+
+            /**
+             * Knowledge base vector store configuration.
+             */
+            public static class Vectorstore {
+
+                /** Vector store provider */
+                private Ai.Vectorstore.Provider provider = Ai.Vectorstore.Provider.PGVECTOR;
+
+                public Ai.Vectorstore.Provider getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(Ai.Vectorstore.Provider provider) {
+                    this.provider = provider;
+                }
+            }
+        }
+
+        /**
+         * OpenAI provider configuration.
+         */
+        public static class OpenAi {
+
+            /** OpenAI API key */
+            private String apiKey;
+
+            /** Chat model configuration */
+            private Chat chat = new Chat();
+
+            /** Embedding model configuration */
+            private Embedding embedding = new Embedding();
+
+            public String getApiKey() {
+                return apiKey;
+            }
+
+            public void setApiKey(String apiKey) {
+                this.apiKey = apiKey;
+            }
+
+            public Chat getChat() {
+                return chat;
+            }
+
+            public Embedding getEmbedding() {
+                return embedding;
+            }
+
+            public void setChat(Chat chat) {
+                this.chat = chat;
+            }
+
+            public void setEmbedding(Embedding embedding) {
+                this.embedding = embedding;
+            }
+
+            /**
+             * OpenAI chat model configuration.
+             */
+            public static class Chat {
+
+                /** Chat model options */
+                private Options options = new Options();
+
+                public Options getOptions() {
+                    return options;
+                }
+
+                public void setOptions(Options options) {
+                    this.options = options;
+                }
+
+                /**
+                 * OpenAI chat model options.
+                 */
+                public static class Options {
+
+                    /** Chat model name (e.g., gpt-4, gpt-3.5-turbo) */
+                    private String model;
+
+                    /** Temperature for response randomness (0.0-2.0) */
+                    private Double temperature;
+
+                    public String getModel() {
+                        return model;
                     }
 
-                    public void setUsername(String username) {
-                        this.username = username;
+                    public void setModel(String model) {
+                        this.model = model;
                     }
 
-                    public String getPassword() {
-                        return password;
+                    public Double getTemperature() {
+                        return temperature;
                     }
 
-                    public void setPassword(String password) {
-                        this.password = password;
+                    public void setTemperature(Double temperature) {
+                        this.temperature = temperature;
+                    }
+                }
+            }
+
+            /**
+             * OpenAI embedding model configuration.
+             */
+            public static class Embedding {
+
+                /** Embedding model options */
+                private Options options = new Options();
+
+                public Options getOptions() {
+                    return options;
+                }
+
+                public void setOptions(Options options) {
+                    this.options = options;
+                }
+
+                /**
+                 * OpenAI embedding model options.
+                 */
+                public static class Options {
+
+                    /** Embedding model name (e.g., text-embedding-ada-002) */
+                    private String model;
+
+                    public String getModel() {
+                        return model;
+                    }
+
+                    public void setModel(String model) {
+                        this.model = model;
                     }
                 }
             }
         }
 
+        /**
+         * AI provider API key configuration for various AI services.
+         */
         public static class Provider {
 
+            /** Amazon Bedrock Anthropic Claude 2 configuration */
             private AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = new AmazonBedrockAnthropic2();
+
+            /** Amazon Bedrock Anthropic Claude 3 configuration */
             private AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = new AmazonBedrockAnthropic3();
+
+            /** Amazon Bedrock Cohere configuration */
             private AmazonBedrockCohere amazonBedrockCohere = new AmazonBedrockCohere();
+
+            /** Amazon Bedrock Jurassic-2 configuration */
             private AmazonBedrockJurassic2 amazonBedrockJurassic2 = new AmazonBedrockJurassic2();
+
+            /** Amazon Bedrock Llama configuration */
             private AmazonBedrockLlama amazonBedrockLlama = new AmazonBedrockLlama();
+
+            /** Amazon Bedrock Titan configuration */
             private AmazonBedrockTitan amazonBedrockTitan = new AmazonBedrockTitan();
+
+            /** Anthropic Claude configuration */
             private Anthropic anthropic = new Anthropic();
+
+            /** Azure OpenAI configuration */
             private AzureOpenAi azureOpenAi = new AzureOpenAi();
+
+            /** DeepSeek configuration */
             private DeepSeek deepSeek = new DeepSeek();
+
+            /** Groq configuration */
             private Groq groq = new Groq();
+
+            /** Mistral AI configuration */
             private Mistral mistral = new Mistral();
+
+            /** NVIDIA AI configuration */
             private Nvidia nvidia = new Nvidia();
+
+            /** OpenAI configuration */
             private OpenAi openAi = new OpenAi();
+
+            /** Perplexity AI configuration */
             private Perplexity perplexity = new Perplexity();
+
+            /** Stability AI configuration */
             private Stability stability = new Stability();
+
+            /** Google Vertex AI Gemini configuration */
             private VertexGemini vertexGemini = new VertexGemini();
 
             public AmazonBedrockAnthropic2 getAmazonBedrockAnthropic2() {
@@ -755,6 +1092,7 @@ public class ApplicationProperties {
                 return nvidia;
             }
 
+            /** HuggingFace configuration */
             private HuggingFace huggingFace = new HuggingFace();
 
             public HuggingFace getHuggingFace() {
@@ -849,8 +1187,9 @@ public class ApplicationProperties {
                 this.vertexGemini = vertexGemini;
             }
 
+            /** Amazon Bedrock Anthropic Claude 2 API configuration. */
             public static class AmazonBedrockAnthropic2 {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -862,8 +1201,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Amazon Bedrock Anthropic Claude 3 API configuration. */
             public static class AmazonBedrockAnthropic3 {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -875,8 +1215,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Amazon Bedrock Cohere API configuration. */
             public static class AmazonBedrockCohere {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -888,8 +1229,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Amazon Bedrock Jurassic-2 API configuration. */
             public static class AmazonBedrockJurassic2 {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -901,8 +1243,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Amazon Bedrock Llama API configuration. */
             public static class AmazonBedrockLlama {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -914,8 +1257,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Amazon Bedrock Titan API configuration. */
             public static class AmazonBedrockTitan {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -927,8 +1271,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Anthropic Claude API configuration. */
             public static class Anthropic {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -940,8 +1285,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Azure OpenAI API configuration. */
             public static class AzureOpenAi {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -953,8 +1299,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** DeepSeek API configuration. */
             public static class DeepSeek {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -966,8 +1313,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Groq API configuration. */
             public static class Groq {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -979,8 +1327,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** NVIDIA AI API configuration. */
             public static class Nvidia {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -992,8 +1341,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** HuggingFace API configuration. */
             public static class HuggingFace {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1005,8 +1355,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Mistral AI API configuration. */
             public static class Mistral {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1018,8 +1369,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** OpenAI API configuration. */
             public static class OpenAi {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1031,8 +1383,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Perplexity AI API configuration. */
             public static class Perplexity {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1044,8 +1397,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Stability AI API configuration. */
             public static class Stability {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1057,8 +1411,9 @@ public class ApplicationProperties {
                 }
             }
 
+            /** Google Vertex AI Gemini API configuration. */
             public static class VertexGemini {
-
+                /** API key */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1070,13 +1425,78 @@ public class ApplicationProperties {
                 }
             }
         }
+
+        /**
+         * Vector store configuration for AI embeddings storage.
+         */
+        public static class Vectorstore {
+
+            /**
+             * Vector store provider type.
+             */
+            public enum Provider {
+                /** PostgreSQL with pgvector extension */
+                PGVECTOR
+            }
+
+            /** PgVector configuration */
+            private PgVector pgVector = new PgVector();
+
+            public PgVector getPgVector() {
+                return pgVector;
+            }
+
+            public void setPgVector(PgVector pgVector) {
+                this.pgVector = pgVector;
+            }
+
+            /**
+             * PostgreSQL pgvector extension configuration for vector storage.
+             */
+            public static class PgVector {
+
+                /** Database password */
+                private String password;
+
+                /** JDBC URL for PostgreSQL database */
+                private String url;
+
+                /** Database username */
+                private String username;
+
+                public String getPassword() {
+                    return password;
+                }
+
+                public void setPassword(String password) {
+                    this.password = password;
+                }
+
+                public String getUrl() {
+                    return url;
+                }
+
+                public void setUrl(String url) {
+                    this.url = url;
+                }
+
+                public String getUsername() {
+                    return username;
+                }
+
+                public void setUsername(String username) {
+                    this.username = username;
+                }
+            }
+        }
     }
 
     /**
-     * Analytics properties.
+     * Analytics configuration for usage tracking and metrics.
      */
     public static class Analytics {
 
+        /** Whether analytics features are enabled */
         private boolean enabled;
 
         public boolean isEnabled() {
@@ -1089,17 +1509,21 @@ public class ApplicationProperties {
     }
 
     /**
-     * Cache properties.
+     * Cache provider configuration.
      */
     public static class Cache {
 
         /**
-         * Cache provider.
+         * Available cache providers.
          */
         public enum Provider {
-            REDIS, CAFFEINE
+            /** Redis cache */
+            REDIS,
+            /** Caffeine in-memory cache */
+            CAFFEINE
         }
 
+        /** Cache provider */
         private Provider provider = Provider.CAFFEINE;
 
         public Provider getProvider() {
@@ -1112,18 +1536,24 @@ public class ApplicationProperties {
     }
 
     /**
-     * Cloud properties.
+     * Cloud provider configuration for cloud-specific integrations.
      */
     public static class Cloud {
 
         /**
-         * Cloud provider.
+         * Supported cloud providers.
          */
         public enum Provider {
-            AWS, NONE
+            /** Amazon Web Services */
+            AWS,
+            /** No cloud provider */
+            NONE
         }
 
+        /** AWS configuration */
         private Aws aws;
+
+        /** Cloud provider */
         private Provider provider = Provider.NONE;
 
         public Aws getAws() {
@@ -1143,13 +1573,20 @@ public class ApplicationProperties {
         }
 
         /**
-         * AWS properties.
+         * Amazon Web Services configuration.
          */
         public static class Aws {
 
+            /** AWS access key ID */
             private String accessKeyId;
+
+            /** AWS region */
             private String region;
+
+            /** AWS secret access key */
             private String secretAccessKey;
+
+            /** AWS account ID */
             private String accountId;
 
             public String getAccountId() {
@@ -1187,10 +1624,11 @@ public class ApplicationProperties {
     }
 
     /**
-     * Component properties.
+     * Component registry configuration for managing available components.
      */
     public static class Component {
 
+        /** Component registry configuration */
         private Registry registry = new Registry();
 
         public Registry getRegistry() {
@@ -1202,10 +1640,11 @@ public class ApplicationProperties {
         }
 
         /**
-         * Registry properties.
+         * Component registry settings.
          */
         public static class Registry {
 
+            /** List of component names to exclude from registration */
             private List<String> exclude;
 
             public List<String> getExclude() {
@@ -1219,12 +1658,17 @@ public class ApplicationProperties {
     }
 
     /**
-     * Coordinator properties.
+     * Workflow coordinator configuration for orchestrating workflow execution.
      */
     public static class Coordinator {
 
+        /** Whether coordinator is enabled */
         private boolean enabled = true;
+
+        /** Task coordination configuration */
         private Task task = new Task();
+
+        /** Trigger coordination configuration */
         private Trigger trigger = new Trigger();
 
         public boolean isEnabled() {
@@ -1252,10 +1696,11 @@ public class ApplicationProperties {
         }
 
         /**
-         * Task properties.
+         * Task coordination configuration for workflow tasks.
          */
         public static class Task {
 
+            /** Event subscription configuration */
             private Subscriptions subscriptions = new Subscriptions();
 
             public Subscriptions getSubscriptions() {
@@ -1267,15 +1712,26 @@ public class ApplicationProperties {
             }
 
             /**
-             * Subscriptions properties.
+             * Event subscription configuration for task events.
              */
             public static class Subscriptions {
 
+                /** Number of subscribers for application events */
                 private int applicationEvents = 1;
+
+                /** Number of subscribers for resume job events */
                 private int resumeJobEvents = 1;
+
+                /** Number of subscribers for start job events */
                 private int startJobEvents = 1;
+
+                /** Number of subscribers for stop job events */
                 private int stopJobEvents = 1;
+
+                /** Number of subscribers for task execution complete events */
                 private int taskExecutionCompleteEvents = 1;
+
+                /** Number of subscribers for task execution error events */
                 private int taskExecutionErrorEvents = 1;
 
                 public int getApplicationEvents() {
@@ -1329,12 +1785,17 @@ public class ApplicationProperties {
         }
 
         /**
-         * Trigger properties.
+         * Trigger coordination configuration for workflow triggers.
          */
         public static class Trigger {
 
+            /** Polling configuration for trigger checks */
             private Polling polling = new Polling();
+
+            /** Event subscription configuration */
             private Subscriptions subscriptions = new Subscriptions();
+
+            /** Scheduler configuration */
             private Scheduler scheduler = new Scheduler();
 
             public Polling getPolling() {
@@ -1361,8 +1822,12 @@ public class ApplicationProperties {
                 this.subscriptions = subscriptions;
             }
 
+            /**
+             * Polling configuration for periodic trigger checks.
+             */
             public static class Polling {
 
+                /** Check period in seconds */
                 private int checkPeriod = 5;
 
                 public int getCheckPeriod() {
@@ -1375,17 +1840,21 @@ public class ApplicationProperties {
             }
 
             /**
-             * Scheduler properties.
+             * Scheduler configuration for scheduled triggers.
              */
             public static class Scheduler {
 
                 /**
-                 * Scheduler provider.
+                 * Available scheduler providers.
                  */
                 public enum Provider {
-                    AWS, QUARTZ
+                    /** AWS EventBridge Scheduler */
+                    AWS,
+                    /** Quartz Scheduler */
+                    QUARTZ
                 }
 
+                /** Scheduler provider */
                 private Provider provider = Provider.QUARTZ;
 
                 public Provider getProvider() {
@@ -1398,15 +1867,26 @@ public class ApplicationProperties {
             }
 
             /**
-             * Subscriptions properties.
+             * Event subscription configuration for trigger events.
              */
             public static class Subscriptions {
 
+                /** Number of subscribers for application events */
                 private int applicationEvents = 1;
+
+                /** Number of subscribers for trigger execution complete events */
                 private int triggerExecutionCompleteEvents = 1;
+
+                /** Number of subscribers for trigger execution error events */
                 private int triggerExecutionErrorEvents = 1;
+
+                /** Number of subscribers for trigger listener events */
                 private int triggerListenerEvents = 1;
+
+                /** Number of subscribers for trigger poll events */
                 private int triggerPollEvents = 1;
+
+                /** Number of subscribers for trigger webhook events */
                 private int triggerWebhookEvents = 1;
 
                 public int getApplicationEvents() {
@@ -1461,12 +1941,17 @@ public class ApplicationProperties {
     }
 
     /**
-     * Datasource properties.
+     * Database datasource configuration for the main application database.
      */
     public static class Datasource {
 
+        /** Database password */
         private String password;
+
+        /** JDBC URL for database connection */
         private String url;
+
+        /** Database username */
         private String username;
 
         public String getPassword() {
@@ -1495,14 +1980,23 @@ public class ApplicationProperties {
     }
 
     /**
-     *
+     * Data storage provider configuration for structured data persistence.
      */
     public static class DataStorage {
 
+        /**
+         * Available data storage providers.
+         */
         public enum Provider {
-            AWS, FILESYSTEM, JDBC
+            /** AWS-based storage */
+            AWS,
+            /** Filesystem-based storage */
+            FILESYSTEM,
+            /** JDBC database storage */
+            JDBC
         }
 
+        /** Data storage provider */
         private Provider provider = Provider.JDBC;
 
         public Provider getProvider() {
@@ -1515,10 +2009,19 @@ public class ApplicationProperties {
     }
 
     /**
-     * Discovery service properties.
+     * Service discovery configuration for microservices architecture.
      */
     public static class DiscoveryService {
 
+        /**
+         * Available service discovery providers.
+         */
+        public enum Provider {
+            /** Redis-based service discovery */
+            REDIS
+        }
+
+        /** Service discovery provider */
         private Provider provider = Provider.REDIS;
 
         public Provider getProvider() {
@@ -1528,29 +2031,32 @@ public class ApplicationProperties {
         public void setProvider(Provider provider) {
             this.provider = provider;
         }
-
-        /**
-         * Discovery service provider.
-         */
-        public enum Provider {
-            REDIS
-        }
     }
 
     /**
-     * FileStorage properties.
+     * File storage configuration for storing files and attachments.
      */
     public static class FileStorage {
 
         /**
-         * FileStorage provider.
+         * Available file storage providers.
          */
         public enum Provider {
-            AWS, FILESYSTEM, JDBC
+            /** AWS S3 storage */
+            AWS,
+            /** Local filesystem storage */
+            FILESYSTEM,
+            /** JDBC database storage */
+            JDBC
         }
 
+        /** AWS S3 configuration */
         private Aws aws = new Aws();
+
+        /** Filesystem storage configuration */
         private Filesystem filesystem = new Filesystem();
+
+        /** File storage provider */
         private Provider provider = Provider.FILESYSTEM;
 
         public Aws getAws() {
@@ -1578,10 +2084,11 @@ public class ApplicationProperties {
         }
 
         /**
-         * AWS properties.
+         * AWS S3 configuration for file storage.
          */
         public static class Aws {
 
+            /** S3 bucket name */
             private String bucket;
 
             public String getBucket() {
@@ -1594,10 +2101,11 @@ public class ApplicationProperties {
         }
 
         /**
-         * Filesystem properties.
+         * Local filesystem configuration for file storage.
          */
         public static class Filesystem {
 
+            /** Base directory for file storage */
             private String basedir = "";
 
             public String getBasedir() {
@@ -1611,18 +2119,24 @@ public class ApplicationProperties {
     }
 
     /**
-     * Encryption properties.
+     * Encryption configuration for sensitive data protection.
      */
     public static class Encryption {
 
         /**
-         * Encryption provider.
+         * Available encryption key providers.
          */
         public enum Provider {
-            FILESYSTEM, PROPERTY;
+            /** Filesystem-based key storage */
+            FILESYSTEM,
+            /** Property-based key storage */
+            PROPERTY;
         }
 
+        /** Encryption provider */
         private Provider provider = Provider.FILESYSTEM;
+
+        /** Property-based encryption configuration */
         private Property property = new Property();
 
         public Provider getProvider() {
@@ -1641,8 +2155,12 @@ public class ApplicationProperties {
             this.property = property;
         }
 
+        /**
+         * Property-based encryption key configuration.
+         */
         public static class Property {
 
+            /** Encryption key */
             private String key;
 
             public String getKey() {
@@ -1656,10 +2174,11 @@ public class ApplicationProperties {
     }
 
     /**
-     * HelpHub properties.
+     * Help hub configuration for in-application help features.
      */
     public static class HelpHub {
 
+        /** Whether help hub is enabled */
         private boolean enabled;
 
         public boolean isEnabled() {
@@ -1672,20 +2191,97 @@ public class ApplicationProperties {
     }
 
     /**
-     * Mail properties.
+     * Knowledge base configuration for document storage and retrieval.
+     */
+    public static class KnowledgeBase {
+
+        /** Whether knowledge base is enabled */
+        private boolean enabled;
+
+        /** Event subscription configuration */
+        private Subscriptions subscriptions = new Subscriptions();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public Subscriptions getSubscriptions() {
+            return subscriptions;
+        }
+
+        public void setSubscriptions(Subscriptions subscriptions) {
+            this.subscriptions = subscriptions;
+        }
+
+        /**
+         * Event subscription configuration for knowledge base events.
+         */
+        public static class Subscriptions {
+
+            /** Number of subscribers for document process events */
+            private int documentProcessEvents = 1;
+
+            /** Number of subscribers for document chunk update events */
+            private int documentChunkUpdateEvents = 1;
+
+            public int getDocumentProcessEvents() {
+                return documentProcessEvents;
+            }
+
+            public void setDocumentProcessEvents(int documentProcessEvents) {
+                this.documentProcessEvents = documentProcessEvents;
+            }
+
+            public int getDocumentChunkUpdateEvents() {
+                return documentChunkUpdateEvents;
+            }
+
+            public void setDocumentChunkUpdateEvents(int documentChunkUpdateEvents) {
+                this.documentChunkUpdateEvents = documentChunkUpdateEvents;
+            }
+        }
+    }
+
+    /**
+     * Email configuration for sending notifications and alerts.
      */
     public static class Mail {
 
+        /** Whether SMTP authentication is required */
         private boolean auth;
+
+        /** Whether to enable debug logging for mail */
         private boolean debug;
+
+        /** Email address to use as sender */
         private String from;
+
+        /** SMTP server hostname */
         private String host;
+
+        /** Base URL for email links */
         private String baseUrl;
+
+        /** SMTP server password */
         private String password;
+
+        /** Email protocol (e.g., smtp, smtps) */
         private String protocol;
+
+        /** SMTP server port */
         private int port = 25;
+
+        /** STARTTLS configuration */
         private Starttls starttls = new Starttls();
+
+        /** SSL configuration */
         private Ssl ssl = new Ssl();
+
+        /** SMTP server username */
         private String username;
 
         public boolean isAuth() {
@@ -1776,8 +2372,12 @@ public class ApplicationProperties {
             this.username = username;
         }
 
+        /**
+         * SSL configuration for email.
+         */
         public static class Ssl {
 
+            /** Whether SSL is enabled */
             private boolean enabled;
 
             public boolean isEnabled() {
@@ -1789,9 +2389,15 @@ public class ApplicationProperties {
             }
         }
 
+        /**
+         * STARTTLS configuration for email.
+         */
         public static class Starttls {
 
+            /** Whether STARTTLS is enabled */
             private boolean enable;
+
+            /** Whether STARTTLS is required */
             private boolean required;
 
             public boolean isEnable() {
@@ -1813,14 +2419,29 @@ public class ApplicationProperties {
     }
 
     /**
-     * MessageBroker properties.
+     * Message broker configuration for asynchronous messaging.
      */
     public static class MessageBroker {
 
+        /**
+         * Available message broker providers.
+         */
         public enum Provider {
-            AMQP, AWS, JMS, KAFKA, MEMORY, REDIS
+            /** AMQP (e.g., RabbitMQ) */
+            AMQP,
+            /** AWS SQS */
+            AWS,
+            /** JMS */
+            JMS,
+            /** Apache Kafka */
+            KAFKA,
+            /** In-memory message broker */
+            MEMORY,
+            /** Redis-based message broker */
+            REDIS
         }
 
+        /** Message broker provider */
         private Provider provider = Provider.JMS;
 
         public Provider getProvider() {
@@ -1866,11 +2487,14 @@ public class ApplicationProperties {
     }
 
     /**
-     * Oauth2 properties.
+     * OAuth2 configuration for third-party authentication.
      */
     public static class Oauth2 {
 
+        /** Predefined OAuth2 applications mapped by component name */
         private Map<String, OAuth2App> predefinedApps = new HashMap<>();
+
+        /** OAuth2 redirect URI */
         private String redirectUri;
 
         public Map<String, OAuth2App> getPredefinedApps() {
@@ -1889,8 +2513,15 @@ public class ApplicationProperties {
             this.redirectUri = redirectUri;
         }
 
+        /**
+         * OAuth2 application credentials.
+         */
         public static class OAuth2App {
+
+            /** OAuth2 client ID */
             private String clientId;
+
+            /** OAuth2 client secret */
             private String clientSecret;
 
             public String getClientId() {
@@ -1912,10 +2543,11 @@ public class ApplicationProperties {
     }
 
     /**
-     * Resources properties.
+     * Static resources configuration.
      */
     public static class Resources {
 
+        /** Web resources path */
         private String web;
 
         public String getWeb() {
@@ -1928,12 +2560,17 @@ public class ApplicationProperties {
     }
 
     /**
-     * Security properties.
+     * Security configuration for authentication and authorization.
      */
     public static class Security {
 
+        /** Content Security Policy header value */
         private String contentSecurityPolicy;
+
+        /** Remember-me authentication configuration */
         private RememberMe rememberMe = new RememberMe();
+
+        /** System user credentials configuration */
         private System system = new System();
 
         public String getContentSecurityPolicy() {
@@ -1961,10 +2598,11 @@ public class ApplicationProperties {
         }
 
         /**
-         * RememberMe properties.
+         * Remember-me authentication configuration.
          */
         public static class RememberMe {
 
+            /** Remember-me token encryption key */
             private String key;
 
             public String getKey() {
@@ -1977,11 +2615,14 @@ public class ApplicationProperties {
         }
 
         /**
-         * System properties.
+         * System user credentials for internal operations.
          */
         public static class System {
 
+            /** System user username */
             private String username;
+
+            /** System user password */
             private String password;
 
             public String getUsername() {
@@ -2003,11 +2644,14 @@ public class ApplicationProperties {
     }
 
     /**
-     * Sign up properties.
+     * User sign-up configuration.
      */
     public static class SignUp {
 
+        /** Whether email activation is required after sign-up */
         private boolean activationRequired;
+
+        /** Whether user sign-up is enabled */
         private boolean enabled = true;
 
         public boolean isActivationRequired() {
@@ -2028,17 +2672,21 @@ public class ApplicationProperties {
     }
 
     /**
-     * Tenant properties.
+     * Multi-tenancy configuration.
      */
     public static class Tenant {
 
         /**
-         * Tenant provider.
+         * Tenancy mode.
          */
         public enum Mode {
-            MULTI, SINGLE
+            /** Multi-tenant mode */
+            MULTI,
+            /** Single-tenant mode */
+            SINGLE
         }
 
+        /** Tenancy mode */
         private Mode mode = Mode.SINGLE;
 
         public Mode getMode() {
@@ -2050,8 +2698,12 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * Distributed tracing configuration using OpenTelemetry.
+     */
     public static class Tracing {
 
+        /** OTLP exporter configuration */
         private Otlp otlp = new Otlp();
 
         public Otlp getOtlp() {
@@ -2063,8 +2715,12 @@ public class ApplicationProperties {
         }
     }
 
+    /**
+     * OpenTelemetry Protocol (OTLP) exporter configuration.
+     */
     public static class Otlp {
 
+        /** OTLP collector endpoint URL */
         private String endpoint;
 
         public String getEndpoint() {
@@ -2077,11 +2733,14 @@ public class ApplicationProperties {
     }
 
     /**
-     * Worker properties.
+     * Worker node configuration for task execution.
      */
     public static class Worker {
 
+        /** Whether worker is enabled */
         private boolean enabled = true;
+
+        /** Task execution configuration */
         private Task task = new Task();
 
         public boolean isEnabled() {
@@ -2101,11 +2760,14 @@ public class ApplicationProperties {
         }
 
         /**
-         * Task properties.
+         * Task execution configuration for workers.
          */
         public static class Task {
 
+            /** Default timeout for task execution in milliseconds */
             private Long defaultTimeout;
+
+            /** Event subscriptions mapped by task type to number of subscribers */
             private Map<String, Integer> subscriptions = new HashMap<>();
 
             public Long getDefaultTimeout() {
@@ -2127,11 +2789,14 @@ public class ApplicationProperties {
     }
 
     /**
-     * Workflow properties.
+     * Workflow engine configuration.
      */
     public static class Workflow {
 
+        /** Output storage configuration for workflow results */
         private OutputStorage outputStorage = new OutputStorage();
+
+        /** Workflow repository configuration */
         private Repository repository = new Repository();
 
         public OutputStorage getOutputStorage() {
@@ -2151,17 +2816,23 @@ public class ApplicationProperties {
         }
 
         /**
-         * OutputStorage properties.
+         * Workflow output storage configuration for persisting execution results.
          */
         public static class OutputStorage {
 
             /**
-             * OutputStorage provider.
+             * Available output storage providers.
              */
             public enum Provider {
-                AWS, FILESYSTEM, JDBC
+                /** AWS S3 storage */
+                AWS,
+                /** Filesystem storage */
+                FILESYSTEM,
+                /** JDBC database storage */
+                JDBC
             }
 
+            /** Output storage provider */
             private Provider provider = Provider.JDBC;
 
             public Provider getProvider() {
@@ -2174,13 +2845,20 @@ public class ApplicationProperties {
         }
 
         /**
-         * Repository properties.
+         * Workflow repository configuration for storing workflow definitions.
          */
         public static class Repository {
 
+            /** Classpath-based workflow repository */
             private Classpath classpath = new Classpath();
+
+            /** Filesystem-based workflow repository */
             private Filesystem filesystem = new Filesystem();
+
+            /** Git-based workflow repository */
             private Git git = new Git();
+
+            /** JDBC-based workflow repository */
             private Jdbc jdbc = new Jdbc();
 
             public Classpath getClasspath() {
@@ -2216,11 +2894,14 @@ public class ApplicationProperties {
             }
 
             /**
-             * Filesystem properties.
+             * Classpath-based workflow repository configuration.
              */
             public static class Classpath {
 
+                /** Whether classpath repository is enabled */
                 private boolean enabled;
+
+                /** Ant-style pattern for locating workflow files */
                 private String locationPattern;
 
                 public String getLocationPattern() {
@@ -2241,11 +2922,14 @@ public class ApplicationProperties {
             }
 
             /**
-             * Filesystem properties.
+             * Filesystem-based workflow repository configuration.
              */
             public static class Filesystem {
 
+                /** Whether filesystem repository is enabled */
                 private boolean enabled;
+
+                /** Ant-style pattern for locating workflow files */
                 private String locationPattern;
 
                 public String getLocationPattern() {
@@ -2266,15 +2950,26 @@ public class ApplicationProperties {
             }
 
             /**
-             * Git properties.
+             * Git-based workflow repository configuration.
              */
             public static class Git {
 
+                /** Git branch to use */
                 private String branch;
+
+                /** Whether Git repository is enabled */
                 private boolean enabled;
+
+                /** Git repository password */
                 private String password;
+
+                /** Paths within repository to search for workflows */
                 private String[] searchPaths;
+
+                /** Git repository URL */
                 private String url;
+
+                /** Git repository username */
                 private String username;
 
                 public String getBranch() {
@@ -2327,10 +3022,11 @@ public class ApplicationProperties {
             }
 
             /**
-             * Jdbc properties.
+             * JDBC-based workflow repository configuration for database storage.
              */
             public static class Jdbc {
 
+                /** Whether JDBC repository is enabled */
                 private boolean enabled = true;
 
                 public boolean isEnabled() {
