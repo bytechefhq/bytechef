@@ -6,4 +6,9 @@ dependencies {
     implementation("org.springframework.graphql:spring-graphql")
     implementation("org.springframework:spring-web")
     implementation("io.projectreactor:reactor-core")
+
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
+    testImplementation(project(":server:libs:test:test-int-support"))
 }

@@ -14,37 +14,32 @@
  * limitations under the License.
  */
 
-package com.bytechef.configuration;
+package com.bytechef.automation.knowledgebase.web.graphql.config;
 
-import com.bytechef.automation.data.table.configuration.service.DataTableService;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
-import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
-import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import com.bytechef.platform.tag.service.TagService;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
+ * Shared mocks annotation for KnowledgeBase GraphQL integration tests.
+ *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = ConfigurationApplication.class)
-@Import({
-    PostgreSQLContainerConfiguration.class,
-})
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    DataTableService.class, KnowledgeBaseFacade.class, KnowledgeBaseDocumentChunkFacade.class,
-    KnowledgeBaseDocumentFacade.class, WorkspaceKnowledgeBaseFacade.class, KnowledgeBaseDocumentService.class,
-    KnowledgeBaseService.class, WorkspaceKnowledgeBaseService.class
+    KnowledgeBaseDocumentChunkFacade.class, KnowledgeBaseDocumentFacade.class,
+    KnowledgeBaseDocumentService.class, KnowledgeBaseFacade.class, KnowledgeBaseService.class,
+    TagService.class, WorkspaceKnowledgeBaseFacade.class
 })
-public class ConfigurationApplicationIntTest {
-
-    @Test
-    void testContextLoads() {
-    }
+public @interface AutomationKnowledgeBaseGraphQlConfigurationSharedMocks {
 }

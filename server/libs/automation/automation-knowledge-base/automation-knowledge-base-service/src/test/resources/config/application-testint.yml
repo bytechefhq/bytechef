@@ -1,3 +1,7 @@
+bytechef:
+  knowledgebase:
+    enabled: true
+
 spring:
   liquibase:
     contexts: configuration,connection,execution

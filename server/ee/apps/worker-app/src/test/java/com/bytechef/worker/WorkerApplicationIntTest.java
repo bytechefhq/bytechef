@@ -7,8 +7,10 @@
 
 package com.bytechef.worker;
 
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 /**
  * @version ee
@@ -16,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = WorkerApplication.class)
+@Import(PostgreSQLContainerConfiguration.class)
 public class WorkerApplicationIntTest {
 
     @Test
