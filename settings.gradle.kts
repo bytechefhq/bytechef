@@ -481,6 +481,7 @@ include("server:ee:libs:automation:automation-security-web:automation-security-w
 include("server:ee:libs:config:cloud-config")
 include("server:ee:libs:config:observability-config")
 include("server:ee:libs:config:tenant-multi-data-config")
+include("server:ee:libs:config:tenant-multi-knowledge-base-config")
 include("server:ee:libs:config:tenant-multi-pgvector-config")
 include("server:ee:libs:config:tenant-multi-security-config")
 
