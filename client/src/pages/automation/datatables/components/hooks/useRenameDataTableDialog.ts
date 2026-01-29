@@ -4,7 +4,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 
-interface UseRenameDataTableAlertDialogI {
+interface UseRenameDataTableDialogI {
     canRename: boolean;
     handleClose: () => void;
     handleOpen: (tableId: string, baseName: string) => void;
@@ -15,7 +15,7 @@ interface UseRenameDataTableAlertDialogI {
     renameValue: string;
 }
 
-export default function useRenameDataTableAlertDialog(): UseRenameDataTableAlertDialogI {
+export default function useRenameDataTableDialog(): UseRenameDataTableDialogI {
     const {baseName, clearTableToRename, renameValue, setRenameValue, setTableToRename, tableIdToRename} =
         useRenameDataTableDialogStore();
 

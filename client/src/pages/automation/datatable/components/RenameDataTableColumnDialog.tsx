@@ -1,19 +1,33 @@
 import Button from '@/components/Button/Button';
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 
 import useRenameDataTableColumnDialog from '../hooks/useRenameDataTableColumnDialog';
 
 const RenameDataTableColumnDialog = () => {
-    const {canRename, currentName, handleOpenChange, handleRename, handleRenameValueChange, open, renameValue} =
+    const {canRename, currentName, handleOpenChange, handleRenameSubmit, handleRenameValueChange, open, renameValue} =
         useRenameDataTableColumnDialog();
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Rename Column</DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
+                        <DialogTitle>Rename Column</DialogTitle>
+
+                        <DialogDescription>Enter a new name for this column.</DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <div className="space-y-3 py-2">
@@ -34,7 +48,7 @@ const RenameDataTableColumnDialog = () => {
                         Cancel
                     </Button>
 
-                    <Button disabled={!canRename} onClick={handleRename}>
+                    <Button disabled={!canRename} onClick={handleRenameSubmit}>
                         Rename
                     </Button>
                 </DialogFooter>

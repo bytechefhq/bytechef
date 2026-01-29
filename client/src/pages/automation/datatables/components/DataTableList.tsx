@@ -1,7 +1,7 @@
+import DeleteDataTableAlertDialog from '@/pages/automation/datatable/components/DeleteDataTableAlertDialog';
 import DataTableListItem from '@/pages/automation/datatables/components/DataTableListItem';
-import DeleteDataTableAlertDialog from '@/pages/automation/datatables/components/DeleteDataTableAlertDialog';
-import DuplicateDataTableAlertDialog from '@/pages/automation/datatables/components/DuplicateDataTableAlertDialog';
-import RenameDataTableAlertDialog from '@/pages/automation/datatables/components/RenameDataTableAlertDialog';
+import DuplicateDataTableDialog from '@/pages/automation/datatables/components/DuplicateDataTableDialog';
+import RenameDataTableDialog from '@/pages/automation/datatables/components/RenameDataTableDialog';
 import useDataTableList from '@/pages/automation/datatables/components/hooks/useDataTableList';
 import {DataTable, DataTableTagsEntry, Tag} from '@/shared/middleware/graphql';
 
@@ -30,9 +30,9 @@ const DataTableList = ({allTags, dataTables, tagsByTableData}: DataTableListProp
 
             <DeleteDataTableAlertDialog />
 
-            <DuplicateDataTableAlertDialog />
+            <DuplicateDataTableDialog />
 
-            <RenameDataTableAlertDialog />
+            <RenameDataTableDialog />
         </div>
     );
 };

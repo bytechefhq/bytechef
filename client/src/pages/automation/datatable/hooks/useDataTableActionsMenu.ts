@@ -3,7 +3,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useCallback} from 'react';
 
 import {useCurrentDataTableStore} from '../stores/useCurrentDataTableStore';
-import useDeleteDataTableDialog from './useDeleteDataTableDialog';
+import useDeleteDataTableAlertDialog from './useDeleteDataTableAlertDialog';
 import useImportDataTableCsvDialog from './useImportDataTableCsvDialog';
 import useRenameDataTableDialog from './useRenameDataTableDialog';
 
@@ -38,7 +38,7 @@ export default function useDataTableActionsMenu(): UseDataTableActionsMenuI {
         handleOpenChange: handleDeleteDialogOpenChange,
         open: deleteDialogOpen,
         tableName: deleteDialogTableName,
-    } = useDeleteDataTableDialog();
+    } = useDeleteDataTableAlertDialog();
 
     const {
         canRename: canRenameTable,

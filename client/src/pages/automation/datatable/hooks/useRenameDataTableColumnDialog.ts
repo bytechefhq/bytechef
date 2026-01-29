@@ -13,6 +13,7 @@ interface UseRenameDataTableColumnDialogI {
     handleOpen: (columnId: string, currentName: string) => void;
     handleOpenChange: (open: boolean) => void;
     handleRename: () => void;
+    handleRenameSubmit: () => void;
     handleRenameValueChange: (value: string) => void;
     open: boolean;
     renameValue: string;
@@ -53,7 +54,7 @@ export default function useRenameDataTableColumnDialog(): UseRenameDataTableColu
         setRenameValue(value);
     };
 
-    const handleRename = () => {
+    const handleRenameSubmit = () => {
         if (!dataTable?.id || !columnId || !canRename) return;
 
         renameColumnMutation.mutate({
@@ -73,7 +74,8 @@ export default function useRenameDataTableColumnDialog(): UseRenameDataTableColu
         handleClose,
         handleOpen,
         handleOpenChange,
-        handleRename,
+        handleRename: handleRenameSubmit,
+        handleRenameSubmit,
         handleRenameValueChange,
         open: columnId !== null,
         renameValue,

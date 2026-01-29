@@ -13,8 +13,8 @@ import './DataTable.css';
 import AddDataTableColumnDialog from './components/AddDataTableColumnDialog';
 import DataTableHeader from './components/DataTableHeader';
 import DataTableLeftSidebar from './components/DataTableLeftSidebar';
+import DeleteDataTableAlertDialog from './components/DeleteDataTableAlertDialog';
 import DeleteDataTableColumnDialog from './components/DeleteDataTableColumnDialog';
-import DeleteDataTableDialog from './components/DeleteDataTableDialog';
 import DeleteDataTableRowsDialog from './components/DeleteDataTableRowsDialog';
 import ImportDataTableCsvDialog from './components/ImportDataTableCsvDialog';
 import RenameDataTableColumnDialog from './components/RenameDataTableColumnDialog';
@@ -91,7 +91,7 @@ const DataTable = () => {
 
             <RenameDataTableDialog />
 
-            <DeleteDataTableDialog />
+            <DeleteDataTableAlertDialog />
         </LayoutContainer>
     );
 };

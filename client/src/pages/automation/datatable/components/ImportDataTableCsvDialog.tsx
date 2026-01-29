@@ -1,5 +1,13 @@
 import Button from '@/components/Button/Button';
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {FileText, Loader2, X} from 'lucide-react';
@@ -37,8 +45,14 @@ const ImportDataTableCsvDialog = () => {
     return (
         <Dialog onOpenChange={handleDialogOpenChange} open={open}>
             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Import CSV</DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
+                        <DialogTitle>Import CSV</DialogTitle>
+
+                        <DialogDescription>Upload a CSV file to add rows to this table.</DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <div className="space-y-3 py-2">

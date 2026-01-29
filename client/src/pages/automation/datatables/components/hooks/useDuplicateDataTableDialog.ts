@@ -4,7 +4,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 
-interface UseDuplicateDataTableAlertDialogI {
+interface UseDuplicateDataTableDialogI {
     canDuplicate: boolean;
     duplicateValue: string;
     handleClose: () => void;
@@ -15,7 +15,7 @@ interface UseDuplicateDataTableAlertDialogI {
     open: boolean;
 }
 
-export default function useDuplicateDataTableAlertDialog(): UseDuplicateDataTableAlertDialogI {
+export default function useDuplicateDataTableDialog(): UseDuplicateDataTableDialogI {
     const {clearTableToDuplicate, duplicateValue, setDuplicateValue, setTableToDuplicate, tableIdToDuplicate} =
         useDuplicateDataTableDialogStore();
 

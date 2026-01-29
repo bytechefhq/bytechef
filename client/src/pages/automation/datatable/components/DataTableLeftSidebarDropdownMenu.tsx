@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {MoreVertical, Pencil, Trash2} from 'lucide-react';
 
-import useDeleteDataTableDialog from '../hooks/useDeleteDataTableDialog';
+import useDeleteDataTableAlertDialog from '../hooks/useDeleteDataTableAlertDialog';
 import useRenameDataTableDialog from '../hooks/useRenameDataTableDialog';
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const DataTableLeftSidebarDropdownMenu = ({tableId, tableName}: Props) => {
-    const {handleOpen: handleDeleteOpen} = useDeleteDataTableDialog();
+    const {handleOpen: handleDeleteOpen} = useDeleteDataTableAlertDialog();
     const {handleOpen: handleRenameOpen} = useRenameDataTableDialog();
 
     return (
