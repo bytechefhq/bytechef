@@ -24,14 +24,6 @@ import java.util.Optional;
  */
 public class WorkflowDsl {
 
-    public static ModifiableIntegrationDefinition integration(String componentName, int componentVersion) {
-        return new ModifiableIntegrationDefinition(componentName, componentVersion);
-    }
-
-    public static ModifiableProjectDefinition project(String name) {
-        return new ModifiableProjectDefinition(name);
-    }
-
     public static ModifiableWorkflowDefinition workflow(String name) {
         return new ModifiableWorkflowDefinition(name);
     }
@@ -52,67 +44,6 @@ public class WorkflowDsl {
         return new ModifiableOutput();
     }
 
-    public static class ModifiableIntegrationDefinition implements IntegrationDefinition {
-
-        private final String componentName;
-        private final int componentVersion;
-        private String version;
-        private List<WorkflowDefinition> workflows;
-
-        public ModifiableIntegrationDefinition(String componentName, int componentVersion) {
-            this.componentName = componentName;
-            this.componentVersion = componentVersion;
-            this.version = "0.0.1";
-        }
-
-        public ModifiableIntegrationDefinition version(String version) {
-            this.version = version;
-
-            return this;
-        }
-
-        public ModifiableIntegrationDefinition workflows(WorkflowDefinition... workflows) {
-            this.workflows = List.of(workflows);
-
-            return this;
-        }
-
-        @Override
-        public Optional<String> getCategory() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<String> getDescription() {
-            return Optional.empty();
-        }
-
-        @Override
-        public String getComponentName() {
-            return componentName;
-        }
-
-        @Override
-        public int getComponentVersion() {
-            return componentVersion;
-        }
-
-        @Override
-        public Optional<List<WorkflowDefinition>> getWorkflows() {
-            return Optional.ofNullable(workflows);
-        }
-
-        @Override
-        public Optional<List<String>> getTags() {
-            return Optional.empty();
-        }
-
-        @Override
-        public String getVersion() {
-            return version;
-        }
-    }
-
     public static class ModifiableInput implements Input {
 
     }
@@ -123,67 +54,6 @@ public class WorkflowDsl {
 
     public static class ModifiableParameter implements Parameter {
 
-    }
-
-    public static class ModifiableProjectDefinition implements ProjectDefinition {
-
-        private String description;
-        private final String name;
-        private String version;
-        private List<WorkflowDefinition> workflows;
-
-        public ModifiableProjectDefinition(String name) {
-            this.name = name;
-            this.version = "0.0.1";
-        }
-
-        public ModifiableProjectDefinition description(String description) {
-            this.description = description;
-
-            return this;
-        }
-
-        public ModifiableProjectDefinition version(String version) {
-            this.version = version;
-
-            return this;
-        }
-
-        public ModifiableProjectDefinition workflows(WorkflowDefinition... workflows) {
-            this.workflows = List.of(workflows);
-
-            return this;
-        }
-
-        @Override
-        public Optional<String> getCategory() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<String> getDescription() {
-            return Optional.ofNullable(description);
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public List<WorkflowDefinition> getWorkflows() {
-            return workflows;
-        }
-
-        @Override
-        public Optional<List<String>> getTags() {
-            return Optional.empty();
-        }
-
-        @Override
-        public String getVersion() {
-            return version;
-        }
     }
 
     public static class ModifiableTaskDefinition implements TaskDefinition {

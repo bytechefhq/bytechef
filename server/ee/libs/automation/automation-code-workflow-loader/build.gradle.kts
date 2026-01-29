@@ -1,4 +1,5 @@
 dependencies {
+    api(project(":sdks:backend:automation:project-api"))
     api(project(":sdks:backend:java:workflow-api"))
 
     api(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))

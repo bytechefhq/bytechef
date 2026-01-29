@@ -14,35 +14,34 @@
  * limitations under the License.
  */
 
-package com.bytechef.workflow;
+package com.bytechef.automation.project;
 
-import com.bytechef.workflow.definition.IntegrationDefinition;
+import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface IntegrationHandler {
+public interface ProjectHandler {
 
-    IntegrationDefinition getDefinition();
+    ProjectDefinition getDefinition();
 
     default String getName() {
-        IntegrationDefinition integrationDefinition = getDefinition();
+        ProjectDefinition projectDefinition = getDefinition();
 
-        return integrationDefinition.getComponentName();
+        return projectDefinition.getName();
     }
 
     default String getVersion() {
-        IntegrationDefinition integrationDefinition = getDefinition();
+        ProjectDefinition projectDefinition = getDefinition();
 
-        return integrationDefinition.getVersion();
+        return projectDefinition.getVersion();
     }
 
     default List<WorkflowDefinition> getWorkflows() {
-        IntegrationDefinition integrationDefinition = getDefinition();
+        ProjectDefinition projectDefinition = getDefinition();
 
-        return integrationDefinition.getWorkflows()
-            .orElse(List.of());
+        return projectDefinition.getWorkflows();
     }
 }

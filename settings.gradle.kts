@@ -437,12 +437,15 @@ include("server:libs:modules:task-dispatchers:terminate")
 include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
 
-include("sdks:backend:java:ai-toolkit")
-include("sdks:backend:java:ai-toolkit-spring")
+include("sdks:backend:embedded:ai-toolkit")
+include("sdks:backend:embedded:ai-toolkit-spring")
+include("sdks:backend:embedded:integration-api")
 include("sdks:backend:java:component-api")
 include("sdks:backend:java:component-test")
 include("sdks:backend:java:definition-api")
 include("sdks:backend:java:workflow-api")
+
+include("sdks:backend:automation:project-api")
 
 // EE
 

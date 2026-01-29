@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.component.codeworkflow.task;
 
+import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
@@ -14,7 +15,6 @@ import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorag
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.workflow.ProjectHandler;
 import com.bytechef.workflow.definition.TaskDefinition.PerformFunction;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

@@ -7,11 +7,11 @@
 
 package com.bytechef.platform.codeworkflow.loader.automation;
 
-import com.bytechef.workflow.ProjectHandler;
+import com.bytechef.automation.project.ProjectHandler;
+import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.workflow.definition.Input;
 import com.bytechef.workflow.definition.Output;
 import com.bytechef.workflow.definition.Parameter;
-import com.bytechef.workflow.definition.ProjectDefinition;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.TriggerDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
