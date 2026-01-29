@@ -1,7 +1,7 @@
 import {useToast} from '@/hooks/use-toast';
-import useDeleteDataTableAlertDialog from '@/pages/automation/datatables/components/hooks/useDeleteDataTableAlertDialog';
-import useDuplicateDataTableAlertDialog from '@/pages/automation/datatables/components/hooks/useDuplicateDataTableAlertDialog';
-import useRenameDataTableAlertDialog from '@/pages/automation/datatables/components/hooks/useRenameDataTableAlertDialog';
+import useDeleteDataTableAlertDialog from '@/pages/automation/datatable/hooks/useDeleteDataTableAlertDialog';
+import useDuplicateDataTableDialog from '@/pages/automation/datatables/components/hooks/useDuplicateDataTableDialog';
+import useRenameDataTableDialog from '@/pages/automation/datatables/components/hooks/useRenameDataTableDialog';
 import {useExportDataTableCsvQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {MouseEvent, useCallback} from 'react';
@@ -26,8 +26,8 @@ export default function useDataTableListItemDropdownMenu({
     const {toast} = useToast();
 
     const {handleOpen: handleOpenDeleteDataTableAlertDialog} = useDeleteDataTableAlertDialog();
-    const {handleOpen: handleDuplicateDialogOpen} = useDuplicateDataTableAlertDialog();
-    const {handleOpen: handleRenameDialogOpen} = useRenameDataTableAlertDialog();
+    const {handleOpen: handleDuplicateDialogOpen} = useDuplicateDataTableDialog();
+    const {handleOpen: handleRenameDialogOpen} = useRenameDataTableDialog();
 
     const {refetch: refetchExportCsv} = useExportDataTableCsvQuery(
         {environmentId: String(environmentId), tableId: dataTableId},
@@ -88,9 +88,9 @@ export default function useDataTableListItemDropdownMenu({
             event.preventDefault();
             event.stopPropagation();
 
-            handleOpenDeleteDataTableAlertDialog(dataTableId);
+            handleOpenDeleteDataTableAlertDialog(dataTableId, baseName);
         },
-        [dataTableId, handleOpenDeleteDataTableAlertDialog]
+        [baseName, dataTableId, handleOpenDeleteDataTableAlertDialog]
     );
 
     return {

@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {
     Dialog,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -48,12 +49,16 @@ const CreateDataTableDialog = ({trigger}: {trigger?: ReactNode}) => {
             <DialogTrigger asChild>{trigger ?? <Button label="Create Table" />}</DialogTrigger>
 
             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Create Data Table</DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
+                        <DialogTitle>Create Data Table</DialogTitle>
 
-                    <DialogDescription>
-                        Provide a base name, an optional description, and at least one column.
-                    </DialogDescription>
+                        <DialogDescription>
+                            Provide a base name, an optional description, and at least one column.
+                        </DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <div className="space-y-4">

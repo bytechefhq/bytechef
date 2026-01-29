@@ -1,11 +1,11 @@
-import {useDeleteDataTableDialogStore} from '@/pages/automation/datatable/stores/useDeleteDataTableDialogStore';
+import {useDeleteDataTableAlertDialogStore} from '@/pages/automation/datatable/stores/useDeleteDataTableAlertDialogStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useDataTablesQuery, useDropDataTableMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
 
-interface UseDeleteDataTableDialogI {
+interface UseDeleteDataTableAlertDialogI {
     handleClose: () => void;
     handleDelete: () => void;
     handleOpen: (tableId: string, tableName: string) => void;
@@ -14,8 +14,9 @@ interface UseDeleteDataTableDialogI {
     tableName: string | null;
 }
 
-export default function useDeleteDataTableDialog(): UseDeleteDataTableDialogI {
-    const {clearTableToDelete, setTableToDelete, tableIdToDelete, tableNameToDelete} = useDeleteDataTableDialogStore();
+export default function useDeleteDataTableAlertDialog(): UseDeleteDataTableAlertDialogI {
+    const {clearTableToDelete, setTableToDelete, tableIdToDelete, tableNameToDelete} =
+        useDeleteDataTableAlertDialogStore();
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 

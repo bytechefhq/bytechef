@@ -1,14 +1,14 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-interface DeleteDataTableDialogStateI {
+interface DeleteDataTableAlertDialogStateI {
     clearTableToDelete: () => void;
     setTableToDelete: (tableId: string, tableName: string) => void;
     tableIdToDelete: string | null;
     tableNameToDelete: string | null;
 }
 
-export const useDeleteDataTableDialogStore = create<DeleteDataTableDialogStateI>()(
+export const useDeleteDataTableAlertDialogStore = create<DeleteDataTableAlertDialogStateI>()(
     devtools(
         (set) => ({
             clearTableToDelete: () => {

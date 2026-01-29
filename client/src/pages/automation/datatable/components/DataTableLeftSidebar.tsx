@@ -4,7 +4,7 @@ import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav
 
 import useDataTableLeftSidebar from '../hooks/useDataTableLeftSidebar';
 import DataTableLeftSidebarDropdownMenu from './DataTableLeftSidebarDropdownMenu';
-import DeleteDataTableDialog from './DeleteDataTableDialog';
+import DeleteDataTableAlertDialog from './DeleteDataTableAlertDialog';
 import RenameDataTableDialog from './RenameDataTableDialog';
 
 interface Props {
@@ -58,7 +58,7 @@ const DataTableLeftSidebar = ({currentId}: Props) => {
                 </PageLoader>
             </div>
 
-            <DeleteDataTableDialog />
+            <DeleteDataTableAlertDialog />
 
             <RenameDataTableDialog />
         </div>

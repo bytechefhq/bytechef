@@ -1,5 +1,13 @@
 import Button from '@/components/Button/Button';
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
@@ -47,8 +55,14 @@ const AddDataTableColumnDialog = () => {
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Add Column</DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
+                        <DialogTitle>Add Column</DialogTitle>
+
+                        <DialogDescription>Enter a new name for the column.</DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <div className="space-y-3 py-2">
