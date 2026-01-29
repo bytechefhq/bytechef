@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new row.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/baserow_v1#create-row"
+    },
     "metadata": null,
     "name": "createRow",
     "outputDefinition": {
@@ -87,7 +90,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes the specified row.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/baserow_v1#delete-row"
+    },
     "metadata": null,
     "name": "deleteRow",
     "outputDefinition": null,
@@ -143,7 +149,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Fetches a single table row.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/baserow_v1#get-row"
+    },
     "metadata": null,
     "name": "getRow",
     "outputDefinition": {
@@ -228,7 +237,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Lists table rows.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/baserow_v1#list-rows"
+    },
     "metadata": null,
     "name": "listRows",
     "outputDefinition": {
@@ -335,7 +347,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates the specified row.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/baserow_v1#update-row"
+    },
     "metadata": null,
     "name": "updateRow",
     "outputDefinition": {
@@ -905,13 +920,20 @@
       "type": "CUSTOM"
     } ],
     "baseUri": { },
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/baserow_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "Baserow API docs",
+    "learnMoreUrl": "https://baserow.io/api-docs"
+  },
   "description": "Baserow is an open-source, no-code database platform that enables users to create, manage, and collaborate on databases through a user-friendly interface.",
   "icon": "path:assets/baserow.svg",
   "metadata": null,
