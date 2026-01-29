@@ -37,6 +37,7 @@ public class BaserowGetRowAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getRow")
         .title("Get Row")
         .description("Fetches a single table row.")
+        .help("", "https://docs.bytechef.io/reference/components/baserow_v1#get-row")
         .properties(
             integer(TABLE_ID)
                 .label("Table ID")

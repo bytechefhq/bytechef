@@ -39,6 +39,7 @@ public class BaserowListRowsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listRows")
         .title("List Rows")
         .description("Lists table rows.")
+        .help("", "https://docs.bytechef.io/reference/components/baserow_v1#list-rows")
         .properties(
             integer(TABLE_ID)
                 .label("Table ID")

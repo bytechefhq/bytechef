@@ -38,6 +38,7 @@ public class BaserowCreateRowAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createRow")
         .title("Create Row")
         .description("Creates a new row.")
+        .help("", "https://docs.bytechef.io/reference/components/baserow_v1#create-row")
         .properties(
             integer(TABLE_ID)
                 .label("Table ID")

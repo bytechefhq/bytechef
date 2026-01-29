@@ -34,6 +34,7 @@ import java.util.Map;
 public class BaserowConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .help("", "https://docs.bytechef.io/reference/components/baserow_v1#connection-setup")
         .baseUri((connectionParameters, context) -> "https://api.baserow.io/api")
         .authorizations(
             authorization(AuthorizationType.CUSTOM)
@@ -42,7 +43,8 @@ public class BaserowConnection {
                         .label("Database Token")
                         .required(true))
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
-                    Map.of(AUTHORIZATION, List.of("Token " + connectionParameters.getRequiredString(TOKEN))))));
+                    Map.of(AUTHORIZATION, List.of("Token " + connectionParameters.getRequiredString(TOKEN))))))
+        .version(1);
 
     private BaserowConnection() {
     }

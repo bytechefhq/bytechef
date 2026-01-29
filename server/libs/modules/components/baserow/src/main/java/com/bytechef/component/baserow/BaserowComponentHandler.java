@@ -42,6 +42,7 @@ public class BaserowComponentHandler implements ComponentHandler {
             "Baserow is an open-source, no-code database platform that enables users to create, manage, and " +
                 "collaborate on databases through a user-friendly interface.")
         .customAction(true)
+        .customActionHelp("Baserow API docs", "https://baserow.io/api-docs")
         .icon("path:assets/baserow.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(BaserowConnection.CONNECTION_DEFINITION)
@@ -56,7 +57,8 @@ public class BaserowComponentHandler implements ComponentHandler {
             tool(BaserowDeleteRowAction.ACTION_DEFINITION),
             tool(BaserowGetRowAction.ACTION_DEFINITION),
             tool(BaserowListRowsAction.ACTION_DEFINITION),
-            tool(BaserowUpdateRowAction.ACTION_DEFINITION));
+            tool(BaserowUpdateRowAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

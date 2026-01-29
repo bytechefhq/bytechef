@@ -33,6 +33,7 @@ public class BaserowDeleteRowAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
         .title("Delete Row")
         .description("Deletes the specified row.")
+        .help("", "https://docs.bytechef.io/reference/components/baserow_v1#delete-row")
         .properties(
             integer(TABLE_ID)
                 .label("Table ID")

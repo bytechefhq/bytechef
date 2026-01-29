@@ -36,6 +36,7 @@ public class BaserowUpdateRowAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
         .title("Update Row")
         .description("Updates the specified row.")
+        .help("", "https://docs.bytechef.io/reference/components/baserow_v1#update-row")
         .properties(
             integer(TABLE_ID)
                 .label("Table ID")
