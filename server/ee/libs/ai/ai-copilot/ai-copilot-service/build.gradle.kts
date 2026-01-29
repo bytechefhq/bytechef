@@ -84,6 +84,17 @@ tasks.processResources {
     dependsOn(copyAllDocs)
 }
 
+spotless {
+    json {
+        target("src/**/*.json")
+        targetExclude("src/main/resources/docs/**")
+    }
+    yaml {
+        target("src/**/*.yaml")
+        targetExclude("src/main/resources/docs/**")
+    }
+}
+
 dependencies {
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
