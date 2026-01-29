@@ -50,6 +50,8 @@ public interface ConnectionDefinition {
      */
     Optional<BaseUriFunction> getBaseUri();
 
+    Optional<Help> getHelp();
+
     /**
      * Returns the optional function used to process HTTP error responses and map them to {@link ProviderException}
      * instances. This hook is invoked when an HTTP response returns an error status code, allowing components to

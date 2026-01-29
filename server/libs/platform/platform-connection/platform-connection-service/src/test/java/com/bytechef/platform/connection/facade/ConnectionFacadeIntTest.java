@@ -24,6 +24,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -391,6 +392,11 @@ public class ConnectionFacadeIntTest {
 
         @Override
         public Optional<BaseUriFunction> getBaseUri() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<Help> getHelp() {
             return Optional.empty();
         }
 

@@ -1568,6 +1568,7 @@ public final class ComponentDsl {
 
         private List<? extends ModifiableAuthorization> authorizations;
         private BaseUriFunction baseUriFunction;
+        private Help help;
         private List<? extends Property> properties;
         private TestConsumer testConsumer;
         private int version = 1;
@@ -1606,6 +1607,18 @@ public final class ComponentDsl {
 
         public ModifiableConnectionDefinition baseUri(BaseUriFunction baseUri) {
             this.baseUriFunction = Objects.requireNonNull(baseUri);
+
+            return this;
+        }
+
+        public ModifiableConnectionDefinition help(String body) {
+            this.help = new HelpImpl(body, null);
+
+            return this;
+        }
+
+        public ModifiableConnectionDefinition help(String body, String learnMoreUrl) {
+            this.help = new HelpImpl(body, learnMoreUrl);
 
             return this;
         }
@@ -1656,7 +1669,7 @@ public final class ComponentDsl {
         @Override
         public int hashCode() {
             return Objects.hash(
-                authorizationRequired, authorizations, baseUriFunction, properties, testConsumer, version);
+                authorizationRequired, authorizations, baseUriFunction, help, properties, testConsumer, version);
         }
 
         @Override
@@ -1672,6 +1685,11 @@ public final class ComponentDsl {
         @Override
         public Optional<BaseUriFunction> getBaseUri() {
             return Optional.ofNullable(baseUriFunction);
+        }
+
+        @Override
+        public Optional<Help> getHelp() {
+            return Optional.ofNullable(help);
         }
 
         @Override
@@ -1700,6 +1718,7 @@ public final class ComponentDsl {
                 "version=" + version +
                 ", authorizationRequired=" + authorizationRequired +
                 ", authorizations=" + authorizations +
+                ", help=" + help +
                 ", properties=" + properties +
                 '}';
         }
