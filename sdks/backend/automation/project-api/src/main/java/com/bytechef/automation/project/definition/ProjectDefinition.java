@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.workflow.definition;
+package com.bytechef.automation.project.definition;
 
+import com.bytechef.workflow.definition.WorkflowDefinition;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface IntegrationDefinition {
+public interface ProjectDefinition {
 
     Optional<String> getCategory();
 
     Optional<String> getDescription();
 
-    String getComponentName();
+    String getName();
 
-    int getComponentVersion();
-
-    Optional<List<WorkflowDefinition>> getWorkflows();
+    List<WorkflowDefinition> getWorkflows();
 
     Optional<List<String>> getTags();
 
