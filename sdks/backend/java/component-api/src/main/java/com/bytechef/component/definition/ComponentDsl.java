@@ -1349,6 +1349,12 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableComponentDefinition customActionHelp(String body, String learnMoreUrl) {
+            this.customActionHelp = new HelpImpl(body, learnMoreUrl);
+
+            return this;
+        }
+
         public ModifiableComponentDefinition description(String description) {
             this.description = description;
 
