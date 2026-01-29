@@ -2,7 +2,7 @@ group = "com.bytechef.ai.copilot"
 description = ""
 
 springBoot {
-    mainClass.set("com.bytechef.ai.copilot.AiCopilotApplication")
+    mainClass.set("com.bytechef.ai.copilot.CopilotApplication")
 }
 
 dependencies {

@@ -44,7 +44,7 @@ public class MultiTenantDataSourceConfiguration {
     }
 
     @Bean
-    MultiTenantLiquibaseChangelogLoader multiTenantLiquibaseCheck(TenantService tenantService) {
+    MultiTenantLiquibaseChangelogLoader multiTenantLiquibaseChangelogLoader(TenantService tenantService) {
         return new MultiTenantLiquibaseChangelogLoader(tenantService);
     }
 }

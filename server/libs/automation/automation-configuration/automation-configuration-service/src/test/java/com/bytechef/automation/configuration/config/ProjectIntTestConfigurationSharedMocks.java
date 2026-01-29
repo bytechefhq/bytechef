@@ -19,6 +19,10 @@ package com.bytechef.automation.configuration.config;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.automation.data.table.configuration.service.DataTableService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
@@ -51,11 +55,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
     ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class, ComponentConnectionFacade.class,
-    ComponentDefinitionService.class, ConnectionFacade.class, EnvironmentService.class, GitHubProxyClient.class,
-    JobFacade.class, JobService.class, ConnectionService.class, PrincipalJobFacade.class, PrincipalJobService.class,
+    ComponentDefinitionService.class, ConnectionFacade.class, DataTableService.class, EnvironmentService.class,
+    GitHubProxyClient.class, JobFacade.class, JobService.class, ConnectionService.class,
+    KnowledgeBaseDocumentService.class, KnowledgeBaseService.class, PrincipalJobFacade.class, PrincipalJobService.class,
     TaskExecutionService.class, TriggerDefinitionService.class, TriggerExecutionService.class,
     TriggerLifecycleFacade.class, UserService.class, WorkflowCacheManager.class, WorkflowNodeParameterFacade.class,
-    WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class
+    WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class, WorkspaceKnowledgeBaseService.class
 })
 public @interface ProjectIntTestConfigurationSharedMocks {
 }

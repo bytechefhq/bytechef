@@ -25,12 +25,11 @@ spring:
 
 bytechef:
   ai:
-    copilot:
-      vectorstore:
-        pgvector:
-          url: jdbc:postgresql://localhost:5433/bytechef_copilot
-          username: postgres
-          password: postgres
+    vectorstore:
+      pgvector:
+        url: jdbc:postgresql://localhost:5433/bytechef_vectorstore
+        username: postgres
+        password: postgres
   datasource:
     # PostgreSQL database
     #    url: jdbc:postgresql://localhost:5432/bytechef

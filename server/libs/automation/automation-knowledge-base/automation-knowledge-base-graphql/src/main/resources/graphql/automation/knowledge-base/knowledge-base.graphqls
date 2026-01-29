@@ -1,0 +1,44 @@
+extend type Query {
+    knowledgeBases(workspaceId: ID!): [KnowledgeBase]
+    knowledgeBase(id: ID!): KnowledgeBase
+    knowledgeBaseTags: [Tag!]!
+    knowledgeBaseTagsByKnowledgeBase: [KnowledgeBaseTagsEntry!]!
+    searchKnowledgeBase(id: ID!, query: String!, metadataFilters: String): [KnowledgeBaseDocumentChunk]
+}
+
+extend type Mutation {
+    createKnowledgeBase(knowledgeBase: KnowledgeBaseInput!, workspaceId: ID!): KnowledgeBase
+    updateKnowledgeBase(id: ID!, knowledgeBase: KnowledgeBaseInput!): KnowledgeBase
+    deleteKnowledgeBase(id: ID!): Boolean
+    updateKnowledgeBaseTags(input: UpdateKnowledgeBaseTagsInput!): Boolean!
+}
+
+type KnowledgeBase {
+    id: ID!
+    name: String!
+    description: String
+    maxChunkSize: Int
+    minChunkSizeChars: Int
+    overlap: Int
+    documents: [KnowledgeBaseDocument]
+    createdDate: Long
+    lastModifiedDate: Long
+}
+
+input KnowledgeBaseInput {
+    name: String!
+    description: String
+    maxChunkSize: Int
+    minChunkSizeChars: Int
+    overlap: Int
+}
+
+input UpdateKnowledgeBaseTagsInput {
+    knowledgeBaseId: ID!
+    tags: [TagInput!]
+}
+
+type KnowledgeBaseTagsEntry {
+    knowledgeBaseId: ID!
+    tags: [Tag!]!
+}

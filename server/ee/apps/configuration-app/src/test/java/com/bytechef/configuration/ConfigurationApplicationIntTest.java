@@ -16,10 +16,19 @@
 
 package com.bytechef.configuration;
 
+import com.bytechef.automation.data.table.configuration.service.DataTableService;
+import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
+import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentFacade;
+import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseFacade;
+import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -27,6 +36,11 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(classes = ConfigurationApplication.class)
 @Import({
     PostgreSQLContainerConfiguration.class,
+})
+@MockitoBean(types = {
+    DataTableService.class, KnowledgeBaseFacade.class, KnowledgeBaseDocumentChunkFacade.class,
+    KnowledgeBaseDocumentFacade.class, WorkspaceKnowledgeBaseFacade.class, KnowledgeBaseDocumentService.class,
+    KnowledgeBaseService.class, WorkspaceKnowledgeBaseService.class
 })
 public class ConfigurationApplicationIntTest {
 

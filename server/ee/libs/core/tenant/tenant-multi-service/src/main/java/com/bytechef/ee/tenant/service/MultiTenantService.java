@@ -21,6 +21,7 @@ import com.bytechef.ee.tenant.util.TenantUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.domain.Tenant;
+import com.bytechef.tenant.event.TenantSchemaCreatedEvent;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.text.DecimalFormat;
@@ -33,6 +34,7 @@ import liquibase.integration.spring.MultiTenantSpringLiquibase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -50,18 +52,22 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
 
     private static final ReentrantLock LOCK = new ReentrantLock();
 
-    private final TenantRepository tenantRepository;
     private final DataSource dataSource;
+    private final ApplicationEventPublisher eventPublisher;
     private final LiquibaseProperties liquibaseProperties;
+    private final TenantRepository tenantRepository;
+
     private ResourceLoader resourceLoader;
 
     @SuppressFBWarnings("EI")
     public MultiTenantService(
-        TenantRepository tenantRepository, DataSource dataSource, LiquibaseProperties liquibaseProperties) {
+        DataSource dataSource, ApplicationEventPublisher eventPublisher, LiquibaseProperties liquibaseProperties,
+        TenantRepository tenantRepository) {
 
-        this.tenantRepository = tenantRepository;
         this.dataSource = dataSource;
+        this.eventPublisher = eventPublisher;
         this.liquibaseProperties = liquibaseProperties;
+        this.tenantRepository = tenantRepository;
     }
 
     @Override
@@ -78,6 +84,8 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
             tenantRepository.createTenant(tenantId);
 
             initTenant(tenantId, "multitenant");
+
+            eventPublisher.publishEvent(new TenantSchemaCreatedEvent(tenantId));
 
             log.info("Tenant created: " + tenantId);
 

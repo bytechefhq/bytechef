@@ -102,5 +102,7 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")
 
+    testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
+    testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

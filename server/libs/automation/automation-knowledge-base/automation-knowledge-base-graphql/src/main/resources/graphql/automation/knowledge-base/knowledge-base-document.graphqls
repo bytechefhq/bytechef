@@ -1,0 +1,45 @@
+extend type Query {
+    knowledgeBaseDocument(id: ID!): KnowledgeBaseDocument
+    knowledgeBaseDocumentStatus(id: ID!): DocumentStatusUpdate
+    knowledgeBaseDocumentTags: [Tag!]!
+    knowledgeBaseDocumentTagsByDocument: [KnowledgeBaseDocumentTagsEntry!]!
+}
+
+extend type Mutation {
+    deleteKnowledgeBaseDocument(id: ID!): Boolean
+    updateKnowledgeBaseDocumentTags(input: UpdateKnowledgeBaseDocumentTagsInput!): Boolean!
+}
+
+type KnowledgeBaseDocument {
+    id: ID!
+    name: String!
+    document: FileEntry
+    status: Int!
+    chunks: [KnowledgeBaseDocumentChunk]
+    tags: [Tag!]
+    createdDate: Long
+}
+
+type FileEntry {
+    name: String!
+    extension: String
+    mimeType: String
+    url: String!
+}
+
+type DocumentStatusUpdate {
+    documentId: ID!
+    status: Int!
+    timestamp: Long!
+    message: String
+}
+
+input UpdateKnowledgeBaseDocumentTagsInput {
+    knowledgeBaseDocumentId: ID!
+    tags: [TagInput!]
+}
+
+type KnowledgeBaseDocumentTagsEntry {
+    knowledgeBaseDocumentId: ID!
+    tags: [Tag!]!
+}
