@@ -74,27 +74,26 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
     }
 
     protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
-        if (!MapUtils.containsKey(inputParameters, ITEMS)) {
-            return null;
-        }
-
         OutputResponse outputResponse;
         List<?> list = List.of();
 
-        // TODO Remove ince UI suppress executing outputs if previous nodes don't have defined output
-        try {
-            list = MapUtils.getList(inputParameters, ITEMS, List.of());
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(e.getMessage());
+        if (MapUtils.containsKey(inputParameters, ITEMS)) {
+            // TODO Remove once UI suppress executing outputs if previous nodes don't have defined output
+            try {
+                list = MapUtils.getList(inputParameters, ITEMS, List.of());
+            } catch (Exception e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(e.getMessage());
+                }
             }
         }
 
-        boolean allNull = list.stream()
+        boolean allNull = list.isEmpty() || list.stream()
             .allMatch(Objects::isNull);
 
-        if (list.isEmpty() || allNull) {
-            outputResponse = OutputResponse.of(object());
+        if (allNull) {
+            outputResponse = OutputResponse.of(
+                object().properties(object(ITEM), integer(INDEX)), Map.of(ITEM, Map.of(), INDEX, 0));
         } else {
             ModifiableValueProperty<?, ?> itemProperty = (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
                 ITEM, list.getFirst(), PropertyFactory.PROPERTY_FACTORY);
