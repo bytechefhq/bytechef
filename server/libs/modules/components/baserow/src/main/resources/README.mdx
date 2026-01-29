@@ -1,16 +1,51 @@
-## Connection Setup
+### How to find your table ID
 
-Connect Baserow to ByteChef using a Database Token.
+You have various methods to find your Baserow table ID:
 
-### Create a Database Token in Baserow
-1. Log in to Baserow.
-2. Open your avatar menu and go to **My settings**.
-3. In the left sidebar, select **Database tokens**.
-4. Click **Create token +**.
-5. Enter a clear name (for example, `ByteChef integration`).
-6. Choose the workspace this token should access and set the required permissions (read/create/update/delete) for the tables you plan to use.
-7. Click **Create token** and copy the generated token value.
+- **Method 1: Through database tokens**
 
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/QfJHcuWyOrS64tWpbTu2?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
-</div>
+1. Click on your workspace in the top left corner.
+2. Select **Settings** -> **Database tokens**.
+3. Click on your token.
+4. Select **Show databases**.
+5. Your table IDs will be listed alongside table names.
+
+- **Method 2: Check the database API documentation**
+
+Similar to finding your database ID, the API documentation displays all table IDs within your database.
+
+1. Go to your database settings.
+2. Look for the **View API docs** link.
+3. Baserow auto-generates documentation showing all table IDs and field structures.
+- Example URL: `https://api.baserow.io/api/database/tables/database/DATABASE_ID/`
+- Authorization: `Token YOUR_API_TOKEN`
+- Response includes all tables with their IDs.
+
+- **Method 3: Table options menu**
+
+1. Click the three dots next to any table name.
+2. The table ID appears in brackets next to the table name.
+- Example: `Customer Data (12345)` where `12345` is your table ID.
+
+- **Method 4: Browser URL**
+
+1. Open the table you want to connect in Baserow.
+2. Look at the browser address bar.
+3. The URL structure is: `https://baserow.io/database/DATABASE_ID/table/TABLE_ID/...`
+4. Extract the number after `/table/`.
+
+### How to find your record ID
+
+Baserow row IDs are permanent identifiers for each record. Unlike row counts, they don't change when you sort or delete other rows.
+
+- **Method 1: Grid view**
+
+The row ID is typically visible in the grid view. Note that if you switch to other views like Kanban or Form, the row ID column might not be visible by default.
+
+- **Method 2: Browser URL**
+
+1. Open the table in Baserow.
+2. Expand the row you want to identify to its full view.
+3. Look at your browser’s address bar.
+4. The URL structure will be: `https://baserow.io/database/DATABASE_ID/table/TABLE_ID/ROW_ID/row/RECORD_ID`
+5. The last part of the URL is your record ID.
