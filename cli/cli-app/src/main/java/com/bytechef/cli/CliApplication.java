@@ -17,8 +17,14 @@
 package com.bytechef.cli;
 
 import com.bytechef.cli.command.component.ComponentCommand;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.shell.core.NonInteractiveShellRunner;
+import org.springframework.shell.core.command.CommandRegistry;
+import org.springframework.shell.core.command.DefaultCommandParser;
 import org.springframework.shell.core.command.annotation.EnableCommand;
 
 /**
@@ -30,5 +36,15 @@ public class CliApplication {
 
     public static void main(String... args) {
         SpringApplication.run(CliApplication.class, args);
+    }
+
+    @Bean
+    ApplicationRunner shellRunner(CommandRegistry commandRegistry, ApplicationArguments applicationArguments) {
+        return args -> {
+            DefaultCommandParser commandParser = new DefaultCommandParser();
+            NonInteractiveShellRunner runner = new NonInteractiveShellRunner(commandParser, commandRegistry);
+
+            runner.run(applicationArguments.getSourceArgs());
+        };
     }
 }
