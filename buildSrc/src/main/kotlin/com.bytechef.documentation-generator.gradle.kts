@@ -16,6 +16,10 @@ open class FindJsonFilesTask : DefaultTask() {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Properties {
+        companion object {
+            lateinit var resourcesPath: String
+        }
+
         var controlType: String? = null
         var name: String? = null
         var description: String? = null
@@ -354,6 +358,7 @@ This action does not produce any output.
             val propertiesSection = createPropertiesSection()
             val jsonExample = createJsonExample()
             val formattedJson = formatJson(jsonExample)
+            val mdxContent = getMdxContent()
 
             return """
 ### $title
@@ -367,7 +372,19 @@ $formattedJson
 ```
 ${getOutputDefinitionString()}
 ${createOutputJson()}
+
+$mdxContent
 """
+        }
+
+        private fun getMdxContent(): String {
+            val mdxFile = File(Properties.resourcesPath, "$name.mdx")
+
+            return if (mdxFile.exists()) {
+                mdxFile.readText()
+            } else {
+                ""
+            }
         }
 
         private fun createJsonExample(): String {
@@ -449,6 +466,7 @@ This trigger does not produce any output.
             val jsonExample = createJsonExample()
             val formattedJson = formatJson(jsonExample)
             val propertiesSection = createPropertiesSection()
+            val mdxContent = getMdxContent()
 
             return """
 ### $title
@@ -463,7 +481,18 @@ ${getOutputResponseString()}
 ```json
 $formattedJson
 ```
+$mdxContent
 """
+        }
+
+        private fun getMdxContent(): String {
+            val mdxFile = File(Properties.resourcesPath, "$name.mdx")
+
+            return if (mdxFile.exists()) {
+                mdxFile.readText()
+            } else {
+                ""
+            }
         }
 
         private fun createJsonExample(): String {
@@ -531,6 +560,7 @@ ${properties?.joinToString("\n")}
         var version: Int? = null
 
         override fun toString(): String {
+            val mdxContent = getMdxContent()
             return """
 ## Connections
 
@@ -538,7 +568,18 @@ Version: $version
 
 ${authorizations?.joinToString("\n")}
 
+$mdxContent
 """
+        }
+
+        private fun getMdxContent(): String {
+            val mdxFile = File(Properties.resourcesPath, "connection.mdx")
+
+            return if (mdxFile.exists()) {
+                mdxFile.readText()
+            } else {
+                ""
+            }
         }
     }
 
@@ -677,6 +718,7 @@ ${getCustomActionString()}
         val componentsPath = "$rootPath/docs/content/docs/reference/components"
         val taskDispatchersPath = "$rootPath/docs/content/docs/reference/flow-controls"
         val currentPath = project.projectDir.path
+        Properties.resourcesPath = "$currentPath/src/main/resources"
 
         if (currentPath.contains(Regex("/modules/.+/"))) {
             val definitionDir = File("$currentPath/src/test/resources/definition")
