@@ -146,6 +146,34 @@ public class JiraOptionsUtils {
         return options;
     }
 
+    public static List<Option<String>> getStatusIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, ActionContext context) {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        Map<String, Object> body = context.http(
+            http -> http.get("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/transitions"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (body.get("transitions") instanceof List<?> list) {
+            for (Object object : list) {
+                if (object instanceof Map<?, ?> map &&
+                    map.get("to") instanceof Map<?, ?> to) {
+
+                    String name = (String) to.get("name");
+                    String id = (String) map.get("id");
+
+                    options.add(option(name, id));
+                }
+            }
+        }
+
+        return options;
+    }
+
     public static List<Option<String>> getUserIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
@@ -179,35 +207,6 @@ public class JiraOptionsUtils {
         for (Object object : body) {
             if (object instanceof Map<?, ?> map) {
                 options.add(option((String) map.get(NAME), (String) map.get(ID)));
-            }
-        }
-
-        return options;
-    }
-
-    public static List<Option<String>> getStatusIdOptions(
-        Parameters inputParameters, Parameters connectionParameters,
-        Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
-
-        List<Option<String>> options = new ArrayList<>();
-
-        Map<String, Object> body = context
-            .http(http -> http.get("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/transitions"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        if (body.get("transitions") instanceof List<?> list) {
-            for (Object object : list) {
-                if (object instanceof Map<?, ?> map) {
-                    Map<String, Object> to = (Map<String, Object>) map.get("to");
-
-                    String name = (String) to.get("name");
-                    String id = (String) map.get("id");
-
-                    options.add(option(name, id));
-                }
             }
         }
 
