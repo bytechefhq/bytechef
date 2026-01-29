@@ -17,7 +17,6 @@
 package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
@@ -25,34 +24,50 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.TE
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.exception.ProviderException;
 
 /**
  * @author Nikolina Špehar
  */
-public class TextHelperChangeTypeAction {
+public class TextHelperSentenceCaseAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("changeType")
-        .title("Change Type")
-        .description("Change the type of the input text to number.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sentenceCase")
+        .title("Sentence Case")
+        .description("Converts string into sentence case.")
         .properties(
             string(TEXT)
-                .description("The input text to be changed to a number.")
+                .description("The input text that will be converted to sentence case.")
                 .label("Text")
                 .required(true))
-        .output(outputSchema(number().description("Number input text")))
-        .perform(TextHelperChangeTypeAction::perform);
+        .output(outputSchema(string().description("Sentence case text")))
+        .perform(TextHelperSentenceCaseAction::perform);
 
-    private TextHelperChangeTypeAction() {
+    private TextHelperSentenceCaseAction() {
     }
 
-    public static double perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String text = inputParameters.getRequiredString(TEXT);
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        try {
-            return Double.parseDouble(text);
-        } catch (NumberFormatException numberFormatException) {
-            throw new ProviderException(text + " can not be converted to number.");
+        String text = inputParameters.getRequiredString(TEXT);
+        text = text.toLowerCase()
+            .trim();
+
+        StringBuilder sentenceCaseString = new StringBuilder(text.length());
+        boolean capitalizeNext = true;
+
+        for (int index = 0; index < text.length(); index++) {
+            char character = text.charAt(index);
+
+            if (capitalizeNext && Character.isLetter(character)) {
+                sentenceCaseString.append(Character.toUpperCase(character));
+                capitalizeNext = false;
+            } else {
+                sentenceCaseString.append(character);
+            }
+
+            if (character == '.' || character == '!' || character == '?') {
+                capitalizeNext = true;
+            }
         }
+
+        return sentenceCaseString.toString();
     }
 }

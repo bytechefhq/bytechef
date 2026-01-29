@@ -17,7 +17,6 @@
 package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
@@ -25,34 +24,41 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.TE
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.exception.ProviderException;
+import java.net.MalformedURLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Nikolina Špehar
  */
-public class TextHelperChangeTypeAction {
+public class TextHelperGetDomainFromUrlAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("changeType")
-        .title("Change Type")
-        .description("Change the type of the input text to number.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getDomainFromUrl")
+        .title("Get Domain From URL")
+        .description("Extracts domain from the given URL.")
         .properties(
             string(TEXT)
-                .description("The input text to be changed to a number.")
-                .label("Text")
+                .description("The URL you want to extract domain from.")
+                .label("URL")
                 .required(true))
-        .output(outputSchema(number().description("Number input text")))
-        .perform(TextHelperChangeTypeAction::perform);
+        .output(outputSchema(string().description("Extracted domain")))
+        .perform(TextHelperGetDomainFromUrlAction::perform);
 
-    private TextHelperChangeTypeAction() {
+    private TextHelperGetDomainFromUrlAction() {
     }
 
-    public static double perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String text = inputParameters.getRequiredString(TEXT);
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws MalformedURLException {
 
-        try {
-            return Double.parseDouble(text);
-        } catch (NumberFormatException numberFormatException) {
-            throw new ProviderException(text + " can not be converted to number.");
+        Pattern pattern = Pattern.compile("^(?:https?://)?(?:www\\.)?([^:/\\n?]+)");
+        Matcher matcher = pattern.matcher(inputParameters.getRequiredString(TEXT));
+
+        String domain = "";
+
+        while (matcher.find()) {
+            domain = matcher.group(1);
         }
+
+        return domain;
     }
 }

@@ -16,32 +16,27 @@
 
 package com.bytechef.component.text.helper.action;
 
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.HTML;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.net.MalformedURLException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Spehar
  */
-class TextHelperHTMLToMarkdownActionTest {
-
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(HTML, "<h1>Hello World</h1>"));
+class TextHelperGetDomainFromUrlActionTest {
 
     @Test
-    void testPerform() {
-        String result = TextHelperHTMLToMarkdownAction.perform(
-            mockedParameters, mockedParameters, null);
+    void testPerform() throws MalformedURLException {
+        Parameters mockedParameters =
+            MockParametersFactory.create(Map.of(TEXT, "https://subdomain.site.org/index.html"));
 
-        String expected = """
-            Hello World
-            ===========
+        String result = TextHelperGetDomainFromUrlAction.perform(mockedParameters, null, null);
 
-            """;
-
-        assertEquals(expected, result);
+        assertEquals("subdomain.site.org", result);
     }
 }

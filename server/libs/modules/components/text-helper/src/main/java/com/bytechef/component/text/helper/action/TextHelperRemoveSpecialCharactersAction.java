@@ -24,41 +24,31 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.TE
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import java.net.MalformedURLException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Nikolina Špehar
  */
-public class TextHelperGetDomainFromURLAction {
+public class TextHelperRemoveSpecialCharactersAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getDomainFromURL")
-        .title("Get Domain From URL")
-        .description("Extracts domain from the given URL.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("removeSpecialCharacters")
+        .title("Remove Special Characters")
+        .description("Remove special characters from a string.")
         .properties(
             string(TEXT)
-                .description("The URL you want to extract domain from.")
-                .label("URL")
+                .label("Text")
+                .description("The text that will be processed to remove special characters.")
                 .required(true))
-        .output(outputSchema(string().description("Extracted domain")))
-        .perform(TextHelperGetDomainFromURLAction::perform);
+        .output(outputSchema(string()
+            .description("Result of removing special characters from a string.")))
+        .perform(TextHelperRemoveSpecialCharactersAction::perform);
 
-    private TextHelperGetDomainFromURLAction() {
+    private TextHelperRemoveSpecialCharactersAction() {
     }
 
-    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws MalformedURLException {
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String text = inputParameters.getRequiredString(TEXT);
+        String regularExpression = "[^a-zA-Z0-9]";
 
-        Pattern pattern = Pattern.compile("^(?:https?://)?(?:www\\.)?([^:/\\n?]+)");
-        Matcher matcher = pattern.matcher(inputParameters.getRequiredString(TEXT));
-
-        String domain = "";
-
-        while (matcher.find()) {
-            domain = matcher.group(1);
-        }
-
-        return domain;
+        return text.replaceAll(regularExpression, "");
     }
 }

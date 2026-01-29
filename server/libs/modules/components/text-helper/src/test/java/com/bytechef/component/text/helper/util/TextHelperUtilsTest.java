@@ -16,6 +16,10 @@
 
 package com.bytechef.component.text.helper.util;
 
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.DISPLAY_NAME;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.DOMAIN;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.EMAIL;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.LOCAL_PART;
 import static com.bytechef.component.text.helper.util.TextHelperUtils.getPatternEndIndex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.component.exception.ProviderException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -105,5 +110,17 @@ class TextHelperUtilsTest {
         assertEquals(2, matches.size());
         assertEquals("\"Hello\"", matches.get(0));
         assertEquals("\"Hi\"", matches.get(1));
+    }
+
+    @Test
+    void testParseEmail() {
+        String mockedEmailInput = "John Doe <john.doe@example.com>";
+
+        Map<String, String> result = TextHelperUtils.parseEmail(mockedEmailInput);
+
+        assertEquals("John Doe", result.get(DISPLAY_NAME));
+        assertEquals("john.doe", result.get(LOCAL_PART));
+        assertEquals("example.com", result.get(DOMAIN));
+        assertEquals("john.doe@example.com", result.get(EMAIL));
     }
 }
