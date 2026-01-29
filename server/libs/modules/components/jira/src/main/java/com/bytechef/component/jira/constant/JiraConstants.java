@@ -45,17 +45,18 @@ public class JiraConstants {
     public static final String NAME = "name";
     public static final String NEXT_PAGE = "nextPage";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
+    public static final String ORDER_BY = "orderBy";
     public static final String PARENT = "parent";
     public static final String PRIORITY = "priority";
     public static final String PROJECT = "project";
     public static final String REMOVE = "remove";
     public static final String REMOVE_LABELS = "removeLabels";
     public static final String SELF = "self";
+    public static final String STATUS_ID = "statusId";
     public static final String SUMMARY = "summary";
     public static final String TEXT = "text";
+    public static final String TRANSITION = "transition";
     public static final String TYPE = "type";
-    public static final String ORDER_BY = "orderBy";
-    public static final String STATUS_ID = "statusId";
     public static final String UPDATE = "update";
 
     public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object()
