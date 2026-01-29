@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
+import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.JQL;
 import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
@@ -140,6 +141,34 @@ public class JiraOptionsUtils {
             }
 
             nextPage = (String) body1.get(NEXT_PAGE);
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getStatusIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, ActionContext context) {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        Map<String, Object> body = context.http(
+            http -> http.get("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/transitions"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (body.get("transitions") instanceof List<?> list) {
+            for (Object object : list) {
+                if (object instanceof Map<?, ?> map &&
+                    map.get("to") instanceof Map<?, ?> to) {
+
+                    String name = (String) to.get("name");
+                    String id = (String) map.get("id");
+
+                    options.add(option(name, id));
+                }
+            }
         }
 
         return options;
