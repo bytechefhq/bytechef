@@ -44,11 +44,13 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     return (
         <Fragment key={name}>
             <ul
+                aria-label={`${name} object properties`}
                 className={twMerge(
                     'space-y-4',
                     label && !isContainerObject && 'ml-2 border-l border-l-border/50',
                     arrayName && !isContainerObject && 'pl-2'
                 )}
+                role="list"
             >
                 {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => (
                     <Property

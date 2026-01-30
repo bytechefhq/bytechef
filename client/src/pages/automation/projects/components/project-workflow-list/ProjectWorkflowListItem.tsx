@@ -106,7 +106,9 @@ const ProjectWorkflowListItem = ({
             key={workflow.id}
         >
             <Link
+                aria-label={`Link to workflow ${workflow.label}`}
                 className="flex flex-1 items-center"
+                data-testid={`${workflow.projectWorkflowId}-link`}
                 to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`}
             >
                 <div className="w-80 pr-1 text-sm font-semibold">

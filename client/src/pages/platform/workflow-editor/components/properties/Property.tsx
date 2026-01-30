@@ -171,6 +171,7 @@ const Property = ({
 
     return (
         <li
+            aria-label={`${name} property`}
             className={twMerge(
                 'w-full',
                 hidden && 'hidden',
