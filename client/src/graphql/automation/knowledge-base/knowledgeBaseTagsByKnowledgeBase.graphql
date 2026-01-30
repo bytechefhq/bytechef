@@ -1,0 +1,9 @@
+query knowledgeBaseTagsByKnowledgeBase {
+    knowledgeBaseTagsByKnowledgeBase {
+        knowledgeBaseId
+        tags {
+            id
+            name
+        }
+    }
+}

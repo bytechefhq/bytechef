@@ -1,0 +1,8 @@
+mutation updateKnowledgeBaseDocumentChunk($id: ID!, $knowledgeBaseDocumentChunk: KnowledgeBaseDocumentChunkInput!) {
+    updateKnowledgeBaseDocumentChunk(id: $id, knowledgeBaseDocumentChunk: $knowledgeBaseDocumentChunk) {
+        id
+        knowledgeBaseDocumentId
+        content
+        metadata
+    }
+}

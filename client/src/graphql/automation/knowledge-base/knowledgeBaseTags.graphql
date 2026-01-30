@@ -1,0 +1,6 @@
+query knowledgeBaseTags {
+    knowledgeBaseTags {
+        id
+        name
+    }
+}
