@@ -56,7 +56,7 @@ public class SnowflakeConnection {
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/authorize"
                     .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
-                .scopes((connection, context) -> List.of("refresh_token"))
+                .scopes((connection, context) -> Map.of("refresh_token", true))
                 .tokenUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/token-request"
                     .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
                 .refreshUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/token-request"

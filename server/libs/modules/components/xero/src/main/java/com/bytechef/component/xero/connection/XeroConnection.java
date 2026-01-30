@@ -55,8 +55,9 @@ public class XeroConnection {
                         .required(true))
                 .apply(XeroConnection::getApplyResponse)
                 .authorizationUrl((connection, context) -> "https://login.xero.com/identity/connect/authorize")
-                .scopes((connection, context) -> List.of(
-                    "accounting.contacts", "accounting.transactions", "accounting.settings.read", "offline_access"))
+                .scopes((connection, context) -> Map.of(
+                    "accounting.contacts", true, "accounting.transactions", true, "accounting.settings.read", true,
+                    "offline_access", true))
                 .tokenUrl((connection, context) -> "https://identity.xero.com/connect/token")
                 .refreshUrl((connection, context) -> "https://identity.xero.com/connect/token"));
 

@@ -18,7 +18,7 @@ package com.bytechef.component.zoho.invoice.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.zoho.commons.ZohoConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -27,9 +27,9 @@ public class ZohoInvoiceConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = ZohoConnection.createConnection(
         "/invoice/v3",
-        List.of(
-            "ZohoInvoice.contacts.CREATE", "ZohoInvoice.contacts.READ", "ZohoInvoice.invoices.CREATE",
-            "ZohoInvoice.settings.CREATE", "ZohoInvoice.settings.READ"),
+        Map.of(
+            "ZohoInvoice.contacts.CREATE", true, "ZohoInvoice.contacts.READ", true, "ZohoInvoice.invoices.CREATE", true,
+            "ZohoInvoice.settings.CREATE", true, "ZohoInvoice.settings.READ", true),
         true);
 
     private ZohoInvoiceConnection() {

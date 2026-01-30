@@ -18,7 +18,7 @@ package com.bytechef.component.microsoft.todo.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.microsoft.commons.MicrosoftConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -26,7 +26,7 @@ import java.util.List;
 public class MicrosoftToDoConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        (connection, context) -> List.of("Tasks.ReadWrite", "offline_access"));
+        (connection, context) -> Map.of("Tasks.ReadWrite", true, "offline_access", true));
 
     private MicrosoftToDoConnection() {
     }

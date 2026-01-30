@@ -18,7 +18,7 @@ package com.bytechef.component.google.chat.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Nikolina Spehar
@@ -26,9 +26,11 @@ import java.util.List;
 public class GoogleChatConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        "https://chat.googleapis.com/v1", (connection, context) -> List.of(
-            "https://www.googleapis.com/auth/chat.spaces", "https://www.googleapis.com/auth/chat.spaces.create",
-            "https://www.googleapis.com/auth/chat.messages", "https://www.googleapis.com/auth/chat.messages.create"));
+        "https://chat.googleapis.com/v1", (connection, context) -> Map.of(
+            "https://www.googleapis.com/auth/chat.spaces", true,
+            "https://www.googleapis.com/auth/chat.spaces.create", true,
+            "https://www.googleapis.com/auth/chat.messages", true,
+            "https://www.googleapis.com/auth/chat.messages.create", true));
 
     private GoogleChatConnection() {
     }

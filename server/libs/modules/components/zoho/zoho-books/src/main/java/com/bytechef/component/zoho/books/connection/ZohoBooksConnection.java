@@ -19,7 +19,7 @@ package com.bytechef.component.zoho.books.connection;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.component.zoho.commons.ZohoConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -28,9 +28,9 @@ public class ZohoBooksConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = ZohoConnection.createConnection(
         "/books/v3",
-        List.of(
-            "ZohoBooks.contacts.CREATE", "ZohoBooks.invoices.CREATE", "ZohoBooks.salesorders.CREATE",
-            "ZohoBooks.settings.READ", "ZohoBooks.contacts.READ"),
+        Map.of(
+            "ZohoBooks.contacts.CREATE", true, "ZohoBooks.invoices.CREATE", true, "ZohoBooks.salesorders.CREATE", true,
+            "ZohoBooks.settings.READ", true, "ZohoBooks.contacts.READ", true),
         true);
 
     private ZohoBooksConnection() {

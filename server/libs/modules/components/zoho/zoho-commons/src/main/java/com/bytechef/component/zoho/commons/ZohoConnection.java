@@ -66,7 +66,7 @@ public class ZohoConnection {
         .required(true);
 
     public static ModifiableConnectionDefinition createConnection(
-        String baseUrl, List<String> scopes, boolean addOrganizationProperty) {
+        String baseUrl, Map<String, Boolean> scopes, boolean addOrganizationProperty) {
 
         return connection()
             .baseUri((connectionParameters, context) -> connectionParameters.getString("api_domain") + baseUrl)

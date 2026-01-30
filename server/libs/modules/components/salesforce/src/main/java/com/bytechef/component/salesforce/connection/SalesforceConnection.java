@@ -26,7 +26,7 @@ import static com.bytechef.component.salesforce.constant.SalesforceConstants.SUB
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -53,7 +53,8 @@ public class SalesforceConnection {
                 .authorizationUrl(
                     (connectionParameters, context) -> getUrl(connectionParameters, "oauth2/authorize"))
                 .refreshUrl((connectionParameters, context) -> getUrl(connectionParameters, "oauth2/token"))
-                .scopes((connectionParameters, context) -> List.of("full", "refresh_token", "offline_access"))
+                .scopes((connectionParameters, context) -> Map.of(
+                    "full", true, "refresh_token", true, "offline_access", true))
                 .tokenUrl((connectionParameters, context) -> getUrl(connectionParameters, "oauth2/token")));
 
     private SalesforceConnection() {

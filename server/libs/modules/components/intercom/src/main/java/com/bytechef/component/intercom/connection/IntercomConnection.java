@@ -51,8 +51,7 @@ public class IntercomConnection {
                     Map.of("Accept", List.of("application/json"),
                         "Authorization", List.of("Bearer " + connectionParameters.getString(ACCESS_TOKEN)))))
                 .authorizationUrl((connection, context) -> "https://app.intercom.com/oauth")
-                .tokenUrl((connection, context) -> "https://api.intercom.io/auth/eagle/token")
-                .scopes((connection, context) -> List.of()));
+                .tokenUrl((connection, context) -> "https://api.intercom.io/auth/eagle/token"));
 
     private IntercomConnection() {
     }

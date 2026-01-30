@@ -19,7 +19,7 @@ package com.bytechef.component.microsoft.teams.connection;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.microsoft.commons.MicrosoftConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -27,9 +27,9 @@ import java.util.List;
 public class MicrosoftTeamsConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        (connection, context) -> List.of(
-            "Channel.Create", "Channel.ReadBasic.All", "ChannelMessage.Send", "Chat.ReadWrite", "Team.ReadBasic.All",
-            "offline_access"));
+        (connection, context) -> Map.of(
+            "Channel.Create", true, "Channel.ReadBasic.All", true, "ChannelMessage.Send", true, "Chat.ReadWrite", true,
+            "Team.ReadBasic.All", true, "offline_access", true));
 
     private MicrosoftTeamsConnection() {
     }

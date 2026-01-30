@@ -19,7 +19,7 @@ package com.bytechef.component.microsoft.excel.connection;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.microsoft.commons.MicrosoftConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -27,7 +27,7 @@ import java.util.List;
 public class MicrosoftExcelConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        (connection, context) -> List.of("Files.ReadWrite", "offline_access"));
+        (connection, context) -> Map.of("Files.ReadWrite", true, "offline_access", true));
 
     private MicrosoftExcelConnection() {
     }

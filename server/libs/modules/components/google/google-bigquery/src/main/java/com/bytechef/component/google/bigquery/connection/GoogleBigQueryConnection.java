@@ -18,7 +18,7 @@ package com.bytechef.component.google.bigquery.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Nikolina Spehar
@@ -27,10 +27,10 @@ public class GoogleBigQueryConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         "https://bigquery.googleapis.com/bigquery/v2",
-        (connection, context) -> List.of(
-            "https://www.googleapis.com/auth/bigquery",
-            "https://www.googleapis.com/auth/cloud-platform",
-            "https://www.googleapis.com/auth/cloud-platform.read-only"));
+        (connection, context) -> Map.of(
+            "https://www.googleapis.com/auth/bigquery", true,
+            "https://www.googleapis.com/auth/cloud-platform", true,
+            "https://www.googleapis.com/auth/cloud-platform.read-only", true));
 
     private GoogleBigQueryConnection() {
     }

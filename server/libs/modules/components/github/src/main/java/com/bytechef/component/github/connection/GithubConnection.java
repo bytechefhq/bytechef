@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Luka Ljubić
@@ -45,12 +45,12 @@ public class GithubConnection {
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://github.com/login/oauth/authorize")
                 .tokenUrl((connection, context) -> "https://github.com/login/oauth/access_token")
-                .scopes((connection, context) -> List.of(
-                    "admin:repo_hook",
-                    "admin:org",
-                    "repo",
-                    "issues:write",
-                    "pull_requests:write")));
+                .scopes((connection, context) -> Map.of(
+                    "admin:repo_hook", true,
+                    "admin:org", true,
+                    "repo", true,
+                    "issues:write", true,
+                    "pull_requests:write", true)));
 
     private GithubConnection() {
     }

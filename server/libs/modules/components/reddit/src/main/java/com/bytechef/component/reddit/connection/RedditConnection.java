@@ -53,7 +53,7 @@ public class RedditConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://www.reddit.com/api/v1/authorize")
-                .scopes((connection, context) -> List.of("identity", "submit", "read"))
+                .scopes((connection, context) -> Map.of("identity", true, "submit", true, "read", true))
                 .tokenUrl((connectionParameters, context) -> "https://www.reddit.com/api/v1/access_token")
                 .refreshUrl((connectionParameters, context) -> "https://www.reddit.com/api/v1/access_token")
                 .authorizationCallback((connectionParameters, code, redirectUri, codeVerifier, context) -> {
