@@ -37,13 +37,13 @@ export default function useDeleteDataTableAlertDialog(): UseDeleteDataTableAlert
             const sorted = [...(tablesData?.dataTables ?? [])].sort((sortedTableA, sortedTableB) =>
                 collator.compare(sortedTableA.baseName.trim(), sortedTableB.baseName.trim())
             );
-            const currentIdx = sorted.findIndex((sortedTable) => sortedTable.id === tableIdToDelete);
-            const next = currentIdx >= 0 ? sorted[currentIdx + 1] : undefined;
+            const currentIndex = sorted.findIndex((sortedTable) => sortedTable.id === tableIdToDelete);
+            const nextTable = currentIndex >= 0 ? sorted[currentIndex + 1] : undefined;
 
             clearTableToDelete();
 
-            if (next?.id) {
-                navigate(`/automation/datatables/${next.id}`);
+            if (nextTable?.id) {
+                navigate(`/automation/datatables/${nextTable.id}`);
             } else {
                 navigate('/automation/datatables');
             }

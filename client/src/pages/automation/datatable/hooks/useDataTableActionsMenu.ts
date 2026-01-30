@@ -88,11 +88,17 @@ export default function useDataTableActionsMenu(): UseDataTableActionsMenuI {
     }, [dataTable?.id, dataTable?.baseName, refetchExportCsv]);
 
     const handleOpenDeleteDialog = useCallback(() => {
-        openDeleteDialog(dataTable?.id ?? '', dataTable?.baseName ?? '');
+        const tableId = dataTable?.id ?? '';
+        const tableName = dataTable?.baseName ?? '';
+
+        openDeleteDialog(tableId, tableName);
     }, [openDeleteDialog, dataTable?.id, dataTable?.baseName]);
 
     const handleOpenRenameDialog = useCallback(() => {
-        openRenameDialog(dataTable?.id ?? '', dataTable?.baseName ?? '');
+        const tableId = dataTable?.id ?? '';
+        const tableName = dataTable?.baseName ?? '';
+
+        openRenameDialog(tableId, tableName);
     }, [openRenameDialog, dataTable?.id, dataTable?.baseName]);
 
     const handleOpenImportCsvDialog = useCallback(() => {
