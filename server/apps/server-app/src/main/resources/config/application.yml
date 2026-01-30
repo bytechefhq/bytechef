@@ -296,11 +296,6 @@ bytechef:
       embedding:
         options:
           model: text-embedding-3-small
-    vectorstore:
-      pgvector:
-         url:
-         username:
-         password:
   analytics:
     enabled: false
   cache:
