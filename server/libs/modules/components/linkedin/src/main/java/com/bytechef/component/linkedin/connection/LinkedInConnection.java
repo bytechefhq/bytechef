@@ -49,8 +49,10 @@ public class LinkedInConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://www.linkedin.com/oauth/v2/authorization")
-                .scopes((connection, context) -> List.of(
-                    "w_member_social", "openid", "email", "profile", "w_organization_social", "r_organization_social"))
+                .scopes((connection, context) -> Map.of(
+                    "w_member_social", true,
+                    "openid", true, "email", true, "profile", true, "w_organization_social", true,
+                    "r_organization_social", true))
                 .tokenUrl((connection, context) -> "https://www.linkedin.com/oauth/v2/accessToken")
                 .refreshUrl((connectionParameters, context) -> "https://www.linkedin.com/oauth/v2/accessToken")
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(

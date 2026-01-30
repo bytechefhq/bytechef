@@ -18,7 +18,7 @@ package com.bytechef.component.zoho.crm.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.zoho.commons.ZohoConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Luka Ljubić
@@ -28,8 +28,9 @@ public class ZohoCrmConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = ZohoConnection.createConnection(
         "/crm/v7",
-        List.of("ZohoCRM.users.ALL", "ZohoCRM.org.READ", "ZohoCRM.settings.roles.READ",
-            "ZohoCRM.settings.profiles.READ"),
+        Map.of(
+            "ZohoCRM.users.ALL", true, "ZohoCRM.org.READ", true, "ZohoCRM.settings.roles.READ", true,
+            "ZohoCRM.settings.profiles.READ", true),
         false);
 
     private ZohoCrmConnection() {

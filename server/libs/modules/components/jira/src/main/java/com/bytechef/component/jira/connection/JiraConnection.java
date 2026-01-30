@@ -50,8 +50,9 @@ public class JiraConnection {
                 .authorizationUrl((parameters, context) -> "https://auth.atlassian.com/authorize")
                 .tokenUrl((parameters, context) -> "https://auth.atlassian.com/oauth/token")
                 .refreshUrl((parameters, context) -> "https://auth.atlassian.com/oauth/token")
-                .scopes((connection, context) -> List.of(
-                    "manage:jira-webhook", "read:jira-work", "write:jira-work", "read:jira-user", "offline_access")))
+                .scopes((connection, context) -> Map.of(
+                    "manage:jira-webhook", true, "read:jira-work", true, "write:jira-work", true,
+                    "read:jira-user", true, "offline_access", true)))
         .baseUri((connectionParameters, context) -> getBaseUrl(context))
         .help("", "https://docs.bytechef.io/reference/components/jira_v1#connection-setup")
         .version(1);

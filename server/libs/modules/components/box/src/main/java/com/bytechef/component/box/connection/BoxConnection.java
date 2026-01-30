@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -44,7 +44,8 @@ public class BoxConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://account.box.com/api/oauth2/authorize")
-                .scopes((connection, context) -> List.of("root_readonly", "root_readwrite", "manage_webhook"))
+                .scopes((connection, context) -> Map.of(
+                    "root_readonly", true, "root_readwrite", true, "manage_webhook", true))
                 .tokenUrl((connectionParameters, context) -> "https://api.box.com/oauth2/token")
                 .refreshUrl((connectionParameters, context) -> "https://api.box.com/oauth2/token"));
 
