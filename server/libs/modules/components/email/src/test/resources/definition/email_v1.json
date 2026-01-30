@@ -947,6 +947,7 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": null,
+    "help": null,
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,

@@ -393,6 +393,7 @@
       "type": "CUSTOM"
     } ],
     "baseUri": null,
+    "help": null,
     "processErrorResponse": null,
     "properties": null,
     "test": null,

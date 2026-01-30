@@ -1305,6 +1305,7 @@
       "type": "CUSTOM"
     } ],
     "baseUri": null,
+    "help": null,
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,

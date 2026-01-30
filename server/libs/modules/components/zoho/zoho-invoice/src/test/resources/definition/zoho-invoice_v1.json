@@ -3033,6 +3033,7 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
+    "help": null,
     "processErrorResponse": null,
     "properties": null,
     "test": null,

@@ -2687,6 +2687,7 @@
       "type": "CUSTOM"
     } ],
     "baseUri": { },
+    "help": null,
     "processErrorResponse": null,
     "properties": null,
     "test": null,

@@ -80,6 +80,7 @@
     "authorizationRequired": null,
     "authorizations": [ ],
     "baseUri": { },
+    "help": null,
     "processErrorResponse": null,
     "properties": null,
     "test": null,
