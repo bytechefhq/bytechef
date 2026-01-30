@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -45,7 +45,7 @@ public class AcceloConnection {
                     .required(true))
             .authorizationUrl(
                 (connectionParameters, context) -> "https://{deployment}.api.accelo.com/oauth2/v0/authorize")
-            .scopes((connection, context) -> List.of("write(all)"))
+            .scopes((connectionParameters, context) -> Map.of("write(all)", false))
             .tokenUrl((connectionParameters, context) -> "https://{deployment}.api.accelo.com/oauth2/v0/token"));
 
     private AcceloConnection() {

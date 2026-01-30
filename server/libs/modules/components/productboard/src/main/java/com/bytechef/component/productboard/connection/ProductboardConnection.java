@@ -25,7 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -51,8 +51,8 @@ public class ProductboardConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/authorize")
-                .scopes((connection, context) -> List.of("notes:create", "notes:read", "notes:manage",
-                    "product_hierarchy_data:read"))
+                .scopes((connectionParameters, context) -> Map.of("notes:create", false, "notes:read", false,
+                    "notes:manage", false, "product_hierarchy_data:read", false))
                 .tokenUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/token")
                 .refreshUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/token"));
 

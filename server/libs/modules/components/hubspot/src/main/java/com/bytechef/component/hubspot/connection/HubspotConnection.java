@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -44,9 +44,9 @@ public class HubspotConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://app.hubspot.com/oauth/authorize")
-            .scopes((connection, context) -> List.of("crm.objects.contacts.read", "crm.objects.contacts.write",
-                "crm.objects.deals.read", "crm.objects.deals.write", "crm.schemas.deals.read",
-                "crm.objects.owners.read", "tickets"))
+            .scopes((connectionParameters, context) -> Map.of("crm.objects.contacts.read", false,
+                "crm.objects.contacts.write", false, "crm.objects.deals.read", false, "crm.objects.deals.write", false,
+                "crm.schemas.deals.read", false, "crm.objects.owners.read", false, "tickets", false))
             .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token")
             .refreshUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
 

@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -44,7 +44,8 @@ public class AsanaConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://app.asana.com/-/oauth_authorize")
-            .scopes((connection, context) -> List.of("default", "openid", "email", "profile"))
+            .scopes((connectionParameters, context) -> Map.of("default", false, "openid", false, "email", false,
+                "profile", false))
             .tokenUrl((connectionParameters, context) -> "https://app.asana.com/-/oauth_token")
             .refreshUrl((connectionParameters, context) -> "https://app.asana.com/-/oauth_token"));
 

@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -44,7 +44,7 @@ public class TodoistConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://todoist.com/oauth/authorize")
-            .scopes((connection, context) -> List.of("data:read_write"))
+            .scopes((connectionParameters, context) -> Map.of("data:read_write", false))
             .tokenUrl((connectionParameters, context) -> "https://todoist.com/oauth/access_token"));
 
     private TodoistConnection() {

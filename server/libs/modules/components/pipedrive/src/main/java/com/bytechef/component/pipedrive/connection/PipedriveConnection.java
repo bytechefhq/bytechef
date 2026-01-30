@@ -24,7 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -44,10 +45,32 @@ public class PipedriveConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/authorize")
-            .scopes((connection, context) -> List.of("deals:read", "deals:full", "goals:read", "goals:full",
-                "leads:read", "leads:full", "activities:read", "activities:full", "contacts:read", "contacts:full",
-                "admin", "recents:read", "search:read", "mail:read", "mail:full", "products:read", "products:full",
-                "users:read", "base", "phone-integration"))
+            .scopes((connectionParameters, context) -> {
+                Map<String, Boolean> scopeMap = new HashMap<>();
+
+                scopeMap.put("deals:read", false);
+                scopeMap.put("deals:full", false);
+                scopeMap.put("goals:read", false);
+                scopeMap.put("goals:full", false);
+                scopeMap.put("leads:read", false);
+                scopeMap.put("leads:full", false);
+                scopeMap.put("activities:read", false);
+                scopeMap.put("activities:full", false);
+                scopeMap.put("contacts:read", false);
+                scopeMap.put("contacts:full", false);
+                scopeMap.put("admin", false);
+                scopeMap.put("recents:read", false);
+                scopeMap.put("search:read", false);
+                scopeMap.put("mail:read", false);
+                scopeMap.put("mail:full", false);
+                scopeMap.put("products:read", false);
+                scopeMap.put("products:full", false);
+                scopeMap.put("users:read", false);
+                scopeMap.put("base", false);
+                scopeMap.put("phone-integration", false);
+
+                return scopeMap;
+            })
             .tokenUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/token")
             .refreshUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/token"));
 
