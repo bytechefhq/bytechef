@@ -138,6 +138,7 @@ public class ComponentInitOpenApiGenerator {
     private final Map<String, String> dynamicOptionsMap = new HashMap<>();
     private final Set<String> dynamicProperties = new HashSet<>();
     private final List<ClassName> aiAgentTools = new ArrayList<>();
+    private final Set<String> requiredScopes = new HashSet<>();
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public ComponentInitOpenApiGenerator(
@@ -728,6 +729,19 @@ public class ComponentInitOpenApiGenerator {
             for (OperationItem operationItem : operationItemsEntry.getValue()) {
                 CodeBlock actionCodeBlock = getActionCodeBlock(operationItem, openAPI);
 
+                if (operationItem.operation()
+                    .getSecurity() != null) {
+                    List<SecurityRequirement> securityRequirements = operationItem.operation()
+                        .getSecurity();
+
+                    for (SecurityRequirement securityRequirement : securityRequirements) {
+                        if (securityRequirement.containsKey("oauth2")) {
+                            List<String> scopes = securityRequirement.get("oauth2");
+                            requiredScopes.addAll(scopes);
+                        }
+                    }
+                }
+
                 ClassName className = ClassName.get(
                     getPackageName() + ".action",
                     getComponentClassName(componentName) + StringUtils.capitalize(operationItem.getOperationId()) +
@@ -997,7 +1011,7 @@ public class ComponentInitOpenApiGenerator {
 
     private CodeBlock getAuthorizationOAuth2AuthorizationCodeCodeBlock(OAuthFlow oAuthFlow) {
         CodeBlock.Builder builder = CodeBlock.builder();
-        String oAuth2Scopes = getOAuth2Scopes(oAuthFlow.getScopes());
+        CodeBlock oAuth2Scopes = getOAuth2Scopes(oAuthFlow.getScopes());
 
         builder.add(
             """
@@ -1020,12 +1034,10 @@ public class ComponentInitOpenApiGenerator {
             "Client Secret",
             true,
             oAuthFlow.getAuthorizationUrl(),
-            StringUtils.isEmpty(oAuth2Scopes)
+            oAuth2Scopes.isEmpty()
                 ? CodeBlock.builder()
                     .build()
-                : CodeBlock.of(
-                    ".scopes((connectionParameters, context) -> $T.of($L, $L))", Map.class,
-                    getOAuth2Scopes(oAuthFlow.getScopes()), true),
+                : CodeBlock.of(".scopes((connectionParameters, context) -> $L)", oAuth2Scopes),
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
@@ -1037,6 +1049,7 @@ public class ComponentInitOpenApiGenerator {
 
     private CodeBlock getAuthorizationOAuth2ClientCredentialsCodeBlock(OAuthFlow oAuthFlow) {
         CodeBlock.Builder builder = CodeBlock.builder();
+        CodeBlock oAuth2Scopes = getOAuth2Scopes(oAuthFlow.getScopes());
 
         builder.add(
             """
@@ -1050,7 +1063,7 @@ public class ComponentInitOpenApiGenerator {
                             .label($S)
                             .required($L)
                     )
-                    .scopes((connectionParameters, context) -> $T.of($L))
+                     .scopes((connectionParameters, context) -> $L)
                     .tokenUrl((connectionParameters, context) -> $S)
                 """,
             "Client Credentials",
@@ -1058,8 +1071,7 @@ public class ComponentInitOpenApiGenerator {
             true,
             "OAuth2 Client Secret",
             true,
-            List.class,
-            getOAuth2Scopes(oAuthFlow.getScopes()),
+            oAuth2Scopes,
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
@@ -1071,6 +1083,7 @@ public class ComponentInitOpenApiGenerator {
 
     private CodeBlock getAuthorizationOAuth2ImplicitCodeBlock(OAuthFlow oAuthFlow) {
         CodeBlock.Builder builder = CodeBlock.builder();
+        CodeBlock oAuth2Scopes = getOAuth2Scopes(oAuthFlow.getScopes());
 
         builder.add(
             """
@@ -1085,7 +1098,7 @@ public class ComponentInitOpenApiGenerator {
                             .required($L)
                     )
                     .authorizationUrl((connectionParameters, context) -> $S)
-                    .scopes((connectionParameters, context) -> $T.of($L))
+                    .scopes((connectionParameters, context) -> $L)
                 """,
             "OAuth2 Implicit",
             "Client Id",
@@ -1093,8 +1106,7 @@ public class ComponentInitOpenApiGenerator {
             "Client Secret",
             true,
             oAuthFlow.getAuthorizationUrl(),
-            List.class,
-            getOAuth2Scopes(oAuthFlow.getScopes()));
+            oAuth2Scopes);
 
         if (oAuthFlow.getRefreshUrl() != null) {
             builder.add(".refreshUrl((connectionParameters, context) -> $S)", oAuthFlow.getRefreshUrl());
@@ -1105,6 +1117,7 @@ public class ComponentInitOpenApiGenerator {
 
     private CodeBlock getAuthorizationOAuth2PasswordCodeBlock(OAuthFlow oAuthFlow) {
         CodeBlock.Builder builder = CodeBlock.builder();
+        CodeBlock oAuth2Scopes = getOAuth2Scopes(oAuthFlow.getScopes());
 
         builder.add(
             """
@@ -1118,7 +1131,7 @@ public class ComponentInitOpenApiGenerator {
                             .label($S)
                             .required($L)
                     )
-                    .scopes((connectionParameters, context) -> $T.of($L))
+                    .scopes((connectionParameters, context) -> $L)
                     .tokenUrl((connectionParameters, context) -> $S)
                 """,
             "OAuth2 Resource Owner Password",
@@ -1126,8 +1139,7 @@ public class ComponentInitOpenApiGenerator {
             true,
             "Client Secret",
             true,
-            List.class,
-            getOAuth2Scopes(oAuthFlow.getScopes()),
+            oAuth2Scopes,
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
@@ -1404,23 +1416,25 @@ public class ComponentInitOpenApiGenerator {
         return mimeType;
     }
 
-    private String getOAuth2Scopes(Scopes scopes) {
+    private CodeBlock getOAuth2Scopes(Scopes scopes) {
         Collection<String> scopeNames;
 
         if (generatorConfig.openApi.oAuth2Scopes.isEmpty()) {
-            if (oAuth2Scopes.isEmpty()) {
-                scopeNames = scopes.keySet();
-            } else {
-                scopeNames = oAuth2Scopes;
-            }
+            scopeNames = scopes.keySet();
         } else {
             scopeNames = generatorConfig.openApi.oAuth2Scopes;
         }
 
-        return String.join(
-            ",", scopeNames.stream()
-                .map(scope -> "\"" + scope + "\"")
-                .toList());
+        if (scopeNames.isEmpty()) {
+            return CodeBlock.builder()
+                .build();
+        }
+
+        return CodeBlock.of(
+            "$T.of($L)", Map.class,
+            scopeNames.stream()
+                .map(scope -> "\"" + scope + "\", " + requiredScopes.contains(scope))
+                .collect(Collectors.joining(", ")));
     }
 
     private CodeBlock getObjectPropertiesCodeBlock(
