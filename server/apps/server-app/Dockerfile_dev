@@ -16,7 +16,7 @@ WORKDIR ./
 
 RUN gradle bootJar --no-daemon
 
-FROM ghcr.io/graalvm/graalvm-community:25.0.0
+FROM ghcr.io/graalvm/graalvm-community:25.0.2
 
 WORKDIR /opt
 
