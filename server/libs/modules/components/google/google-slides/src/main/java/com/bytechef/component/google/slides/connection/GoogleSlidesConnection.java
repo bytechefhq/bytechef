@@ -18,7 +18,7 @@ package com.bytechef.component.google.slides.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -29,7 +29,7 @@ public class GoogleSlidesConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        "https://slides.googleapis.com/v1", (connection, context) -> List.of(
-            "https://www.googleapis.com/auth/drive",
-            "https://www.googleapis.com/auth/presentations"));
+        "https://slides.googleapis.com/v1", (connection, context) -> Map.of(
+            "https://www.googleapis.com/auth/drive", true,
+            "https://www.googleapis.com/auth/presentations", true));
 }

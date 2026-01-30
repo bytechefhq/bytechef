@@ -18,7 +18,7 @@ package com.bytechef.component.youtube.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Nikolina Spehar
@@ -26,8 +26,8 @@ import java.util.List;
 public class YoutubeConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        "https://www.googleapis.com/youtube/v3", (connection, context) -> List.of(
-            "https://www.googleapis.com/auth/youtube", "https://www.googleapis.com/auth/youtube.upload"));
+        "https://www.googleapis.com/youtube/v3", (connection, context) -> Map.of(
+            "https://www.googleapis.com/auth/youtube", true, "https://www.googleapis.com/auth/youtube.upload", true));
 
     private YoutubeConnection() {
     }

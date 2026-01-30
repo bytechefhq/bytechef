@@ -18,7 +18,7 @@ package com.bytechef.component.google.sheets.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -29,7 +29,8 @@ public class GoogleSheetsConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        null, (connection, context) -> List.of(
-            "https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.readonly",
-            "https://www.googleapis.com/auth/drive"));
+        null, (connection, context) -> Map.of(
+            "https://www.googleapis.com/auth/spreadsheets", true,
+            "https://www.googleapis.com/auth/drive.readonly", true,
+            "https://www.googleapis.com/auth/drive", true));
 }

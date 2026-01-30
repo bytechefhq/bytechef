@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -44,7 +44,7 @@ public class LinearConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://linear.app/oauth/authorize")
-                .scopes((connection, context) -> List.of("read", "write", "admin"))
+                .scopes((connection, context) -> Map.of("read", true, "write", true, "admin", true))
                 .tokenUrl((connectionParameters, context) -> "https://api.linear.app/oauth/token")
                 .refreshUrl((connectionParameters, context) -> "https://api.linear.app/oauth/token"));
 

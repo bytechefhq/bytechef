@@ -18,7 +18,7 @@ package com.bytechef.component.google.photos.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -26,10 +26,10 @@ import java.util.List;
 public class GooglePhotosConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        "https://photoslibrary.googleapis.com/v1", (connection, context) -> List.of(
-            "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata",
-            "https://www.googleapis.com/auth/photoslibrary.appendonly",
-            "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata"));
+        "https://photoslibrary.googleapis.com/v1", (connection, context) -> Map.of(
+            "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata", true,
+            "https://www.googleapis.com/auth/photoslibrary.appendonly", true,
+            "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata", true));
 
     private GooglePhotosConnection() {
     }

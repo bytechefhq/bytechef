@@ -27,7 +27,7 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.BAS
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -63,7 +63,7 @@ public class QuickbooksConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://appcenter.intuit.com/connect/oauth2")
-                .scopes((connection, context) -> List.of("com.intuit.quickbooks.accounting"))
+                .scopes((connection, context) -> Map.of("com.intuit.quickbooks.accounting", true))
                 .tokenUrl((connection, context) -> "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer")
                 .refreshUrl((connection, context) -> "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"));
 

@@ -18,7 +18,7 @@ package com.bytechef.component.google.mail.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -29,8 +29,11 @@ public class GoogleMailConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        null, (connection, context) -> List.of(
-            "https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.readonly",
-            "https://www.googleapis.com/auth/gmail.compose", "email", "https://mail.google.com/",
-            "https://www.googleapis.com/auth/calendar.settings.readonly"));
+        null, (connection, context) -> Map.of(
+            "https://www.googleapis.com/auth/gmail.send", true,
+            "https://www.googleapis.com/auth/gmail.readonly", true,
+            "https://www.googleapis.com/auth/gmail.compose", true,
+            "email", true,
+            "https://mail.google.com/", true,
+            "https://www.googleapis.com/auth/calendar.settings.readonly", true));
 }

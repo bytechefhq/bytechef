@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -78,7 +79,7 @@ public class AcceloComponentHandler extends AbstractAcceloComponentHandler {
             modifiableAuthorization.authorizationUrl(
                 (connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
                     ".api.accelo.com/oauth2/v0/authorize");
-            modifiableAuthorization.scopes((connection, context) -> List.of("write(all)"));
+            modifiableAuthorization.scopes((connection, context) -> Map.of("write(all)", true));
             modifiableAuthorization
                 .tokenUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
                     ".api.accelo.com/oauth2/v0/token");

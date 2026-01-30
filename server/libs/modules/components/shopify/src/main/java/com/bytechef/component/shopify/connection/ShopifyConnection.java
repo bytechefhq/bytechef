@@ -57,7 +57,7 @@ public class ShopifyConnection {
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://%s/admin/oauth/authorize"
                     .formatted(connectionParameters.getRequiredString(SHOP_NAME)))
-                .scopes((connection, context) -> List.of("write_orders"))
+                .scopes((connection, context) -> Map.of("write_orders", true))
                 .tokenUrl((connectionParameters, context) -> "https://%s/admin/oauth/access_token"
                     .formatted(connectionParameters.getRequiredString(SHOP_NAME)))
                 .refreshUrl((connectionParameters, context) -> "https://%s/admin/oauth/access_token"

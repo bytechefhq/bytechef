@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -45,9 +45,11 @@ public class SlackConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://slack.com/oauth/authorize")
-                .scopes((connection, context) -> List.of(
-                    "channels:read", "channels:write", "channels:history", "chat:write:bot", "groups:read",
-                    "reactions:read", "reactions:write", "mpim:read", "users:read", "incoming-webhook"))
+                .scopes((connection, context) -> Map.of(
+                    "channels:read", true, "channels:write", true, "channels:history", true, "chat:write:bot", true,
+                    "groups:read", true,
+                    "reactions:read", true, "reactions:write", true, "mpim:read", true, "users:read", true,
+                    "incoming-webhook", true))
                 .tokenUrl((connection, context) -> "https://slack.com/api/oauth.access"));
 
     private SlackConnection() {

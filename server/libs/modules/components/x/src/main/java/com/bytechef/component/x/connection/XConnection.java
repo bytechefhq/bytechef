@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,8 +46,9 @@ public class XConnection {
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://x.com/i/oauth2/authorize")
                 .refreshUrl((connection, context) -> "https://api.x.com/2/oauth2/token")
-                .scopes((connection, context) -> List.of(
-                    "tweet.read", "tweet.write", "users.read", "media.write", "like.write", "offline.access"))
+                .scopes((connection, context) -> Map.of(
+                    "tweet.read", true, "tweet.write", true, "users.read", true, "media.write", true,
+                    "like.write", true, "offline.access", true))
                 .tokenUrl((connection, context) -> "https://api.x.com/2/oauth2/token")
                 .pkce((verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(
                     "challenge", null, "plain"))
