@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.file.storage.aws.env;
+package com.bytechef.automation.knowledgebase.boot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -28,18 +27,17 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class AwsFileStorageEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class KnowledgeBaseVectorStoreEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.file.storage.provider", String.class), "aws")) {
-            source.put("spring.cloud.aws.s3.enabled", true);
+        if (environment.getProperty("bytechef.ai.knowledge-base.enabled", Boolean.class, false)) {
+            source.put("spring.ai.vectorstore.type", "pgvector");
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource(
-            "Custom Spring Cloud AWS S3 File Storage Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Knowledge Base VectorStore Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

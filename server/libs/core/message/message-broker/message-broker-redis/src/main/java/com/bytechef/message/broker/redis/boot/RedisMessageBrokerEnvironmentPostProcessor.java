@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.message.broker.jms.env;
+package com.bytechef.message.broker.redis.boot;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -29,23 +28,22 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class JmsMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class RedisMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (!Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "jms")) {
-            source.put(
+        if (Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "redis")) {
+            source.put("management.health.redis.enabled", true);
+
+            source.computeIfPresent(
                 "spring.autoconfigure.exclude",
-                StringUtils.join(
-                    environment.getProperty("spring.autoconfigure.exclude"),
-                    StringUtils.join(
-                        ",org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration",
-                        ",org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration")));
+                (k, v) -> ((String) v).replace(
+                    ", org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration", ""));
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom JMS Message Broker Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Redis Message Broker Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

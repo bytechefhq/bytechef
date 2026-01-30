@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.knowledgebase.env;
+package com.bytechef.message.broker.kafka.boot;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -27,17 +29,21 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class KnowledgeBaseVectorStoreEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class KafkaMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (environment.getProperty("bytechef.ai.knowledge-base.enabled", Boolean.class, false)) {
-            source.put("spring.ai.vectorstore.type", "pgvector");
+        if (!Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "kafka")) {
+            source.put(
+                "spring.autoconfigure.exclude",
+                StringUtils.join(
+                    environment.getProperty("spring.autoconfigure.exclude"),
+                    ",org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration"));
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Knowledge Base VectorStore Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Kafka Message Broker Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

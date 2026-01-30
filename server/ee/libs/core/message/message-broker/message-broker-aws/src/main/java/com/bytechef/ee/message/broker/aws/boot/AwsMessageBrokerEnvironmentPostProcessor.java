@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.message.broker.amqp.env;
+package com.bytechef.ee.message.broker.aws.boot;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -29,25 +28,18 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class AmqpMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class AwsMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "amqp")) {
-            source.put("management.health.rabbit.enabled", true);
-        } else {
-            source.put("management.health.rabbit.enabled", false);
-
-            source.put(
-                "spring.autoconfigure.exclude",
-                StringUtils.join(
-                    environment.getProperty("spring.autoconfigure.exclude"),
-                    ",org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration"));
+        if (Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "aws")) {
+            source.put("spring.cloud.aws.sqs.enabled", true);
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Rabbit Message Broker Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource(
+            "Custom Spring Cloud AWS SQS Message Broker Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 
