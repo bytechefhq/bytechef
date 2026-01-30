@@ -26,7 +26,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -46,7 +46,7 @@ public class PetstoreConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://petstore3.swagger.io/oauth/authorize")
-            .scopes((connectionParameters, context) -> List.of("write:pets", "read:pets")),
+            .scopes((connectionParameters, context) -> Map.of("write:pets", false, "read:pets", false)),
             authorization(AuthorizationType.API_KEY)
                 .title("API Key")
                 .properties(

@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -44,8 +44,8 @@ public class GoogleSearchConsoleConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://accounts.google.com/o/oauth2/auth")
-            .scopes((connection, context) -> List.of("https://www.googleapis.com/auth/webmasters",
-                "https://www.googleapis.com/auth/webmasters.readonly"))
+            .scopes((connection, context) -> Map.of("https://www.googleapis.com/auth/webmasters", true,
+                "https://www.googleapis.com/auth/webmasters.readonly", true))
             .tokenUrl((connectionParameters, context) -> "https://accounts.google.com/o/oauth2/token"));
 
     private GoogleSearchConsoleConnection() {

@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -44,7 +44,8 @@ public class WebflowConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://webflow.com/oauth/authorize")
-            .scopes((connection, context) -> List.of("cms:read", "ecommerce:read", "ecommerce:write", "sites:read"))
+            .scopes((connectionParameters, context) -> Map.of("cms:read", false, "ecommerce:read", false,
+                "ecommerce:write", false, "sites:read", false))
             .tokenUrl((connectionParameters, context) -> "https://api.webflow.com/oauth/access_token")
             .refreshUrl((connectionParameters, context) -> "https://api.webflow.com/oauth/access_token"));
 

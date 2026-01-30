@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -44,7 +44,8 @@ public class FigmaConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://www.figma.com/oauth")
-            .scopes((connection, context) -> List.of("file_comments:read", "file_comments:write", "webhooks:write"))
+            .scopes((connectionParameters, context) -> Map.of("file_comments:read", false, "file_comments:write", false,
+                "webhooks:write", false))
             .tokenUrl((connectionParameters, context) -> "https://api.figma.com/v1/oauth/token")
             .refreshUrl((connectionParameters, context) -> "https://api.figma.com/v1/oauth/refresh"));
 

@@ -61,8 +61,7 @@ public class ScrapeGraphAiStartCrawlAction {
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Extraction Mode")
-                .description(
-                    "When false, enables markdown conversion mode (NO AI/LLM processing, 2 credits per page). Default is true.")
+                .description("When false, enables markdown conversion mode (2 credits per page). Default is true.")
                 .defaultValue(true)
                 .required(false),
             bool("cache_website").metadata(
