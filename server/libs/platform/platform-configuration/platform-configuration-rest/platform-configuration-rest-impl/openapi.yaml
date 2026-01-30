@@ -2434,9 +2434,9 @@ components:
         clientId:
           type: "string"
         scopes:
-          type: "array"
-          items:
-            type: "string"
+          type: "object"
+          additionalProperties:
+            type: "boolean"
     OAuth2Properties:
       properties:
         redirectUri:
