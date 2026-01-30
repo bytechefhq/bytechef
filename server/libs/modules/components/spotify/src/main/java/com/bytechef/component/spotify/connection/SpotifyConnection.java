@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -44,8 +44,8 @@ public class SpotifyConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://accounts.spotify.com/authorize")
-            .scopes((connection, context) -> List.of("playlist-modify-private", "playlist-modify-public",
-                "user-modify-playback-state", "user-read-playback-state"))
+            .scopes((connectionParameters, context) -> Map.of("playlist-modify-private", false,
+                "playlist-modify-public", false, "user-modify-playback-state", false))
             .tokenUrl((connectionParameters, context) -> "https://accounts.spotify.com/api/token")
             .refreshUrl((connectionParameters, context) -> "https://accounts.spotify.com/api/token"));
 
