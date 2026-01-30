@@ -444,6 +444,14 @@ export type DeleteRowInput = {
   tableId: Scalars['ID']['input'];
 };
 
+export type DocumentStatusUpdate = {
+  __typename?: 'DocumentStatusUpdate';
+  documentId: Scalars['ID']['output'];
+  message?: Maybe<Scalars['String']['output']>;
+  status: Scalars['Int']['output'];
+  timestamp: Scalars['Long']['output'];
+};
+
 export type DuplicateDataTableInput = {
   environmentId: Scalars['ID']['input'];
   newBaseName: Scalars['String']['input'];
@@ -475,6 +483,14 @@ export enum EnvironmentEnum {
   Production = 'PRODUCTION',
   Staging = 'STAGING'
 }
+
+export type FileEntry = {
+  __typename?: 'FileEntry';
+  extension?: Maybe<Scalars['String']['output']>;
+  mimeType?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
 
 export type FileEntryProperty = Property & {
   __typename?: 'FileEntryProperty';
@@ -536,6 +552,63 @@ export type Integration = {
   __typename?: 'Integration';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+};
+
+export type KnowledgeBase = {
+  __typename?: 'KnowledgeBase';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  documents?: Maybe<Array<Maybe<KnowledgeBaseDocument>>>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  maxChunkSize?: Maybe<Scalars['Int']['output']>;
+  minChunkSizeChars?: Maybe<Scalars['Int']['output']>;
+  name: Scalars['String']['output'];
+  overlap?: Maybe<Scalars['Int']['output']>;
+};
+
+export type KnowledgeBaseDocument = {
+  __typename?: 'KnowledgeBaseDocument';
+  chunks?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  document?: Maybe<FileEntry>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  status: Scalars['Int']['output'];
+  tags?: Maybe<Array<Tag>>;
+};
+
+export type KnowledgeBaseDocumentChunk = {
+  __typename?: 'KnowledgeBaseDocumentChunk';
+  content: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  knowledgeBaseDocumentId: Scalars['ID']['output'];
+  metadata?: Maybe<Scalars['Map']['output']>;
+  score?: Maybe<Scalars['Float']['output']>;
+};
+
+export type KnowledgeBaseDocumentChunkInput = {
+  content: Scalars['String']['input'];
+};
+
+export type KnowledgeBaseDocumentTagsEntry = {
+  __typename?: 'KnowledgeBaseDocumentTagsEntry';
+  knowledgeBaseDocumentId: Scalars['ID']['output'];
+  tags: Array<Tag>;
+};
+
+export type KnowledgeBaseInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  maxChunkSize?: InputMaybe<Scalars['Int']['input']>;
+  minChunkSizeChars?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  overlap?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type KnowledgeBaseTagsEntry = {
+  __typename?: 'KnowledgeBaseTagsEntry';
+  knowledgeBaseId: Scalars['ID']['output'];
+  tags: Array<Tag>;
 };
 
 export type McpComponent = {
@@ -677,6 +750,7 @@ export type Mutation = {
   addDataTableColumn: Scalars['Boolean']['output'];
   createApiKey: Scalars['String']['output'];
   createDataTable: Scalars['Boolean']['output'];
+  createKnowledgeBase?: Maybe<KnowledgeBase>;
   createMcpComponent?: Maybe<McpComponent>;
   createMcpComponentWithTools?: Maybe<McpComponent>;
   createMcpProject?: Maybe<McpProject>;
@@ -688,6 +762,9 @@ export type Mutation = {
   createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteApiKey: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
+  deleteKnowledgeBase?: Maybe<Scalars['Boolean']['output']>;
+  deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
+  deleteKnowledgeBaseDocumentChunk?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProject?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
@@ -713,6 +790,10 @@ export type Mutation = {
   updateApiKey: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
+  updateKnowledgeBase?: Maybe<KnowledgeBase>;
+  updateKnowledgeBaseDocumentChunk?: Maybe<KnowledgeBaseDocumentChunk>;
+  updateKnowledgeBaseDocumentTags: Scalars['Boolean']['output'];
+  updateKnowledgeBaseTags: Scalars['Boolean']['output'];
   updateManagementMcpServerUrl: Scalars['String']['output'];
   updateMcpComponentWithTools?: Maybe<McpComponent>;
   updateMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
@@ -739,6 +820,12 @@ export type MutationCreateApiKeyArgs = {
 
 export type MutationCreateDataTableArgs = {
   input: CreateDataTableInput;
+};
+
+
+export type MutationCreateKnowledgeBaseArgs = {
+  knowledgeBase: KnowledgeBaseInput;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -796,6 +883,21 @@ export type MutationDeleteApiKeyArgs = {
 
 export type MutationDeleteDataTableRowArgs = {
   input: DeleteRowInput;
+};
+
+
+export type MutationDeleteKnowledgeBaseArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteKnowledgeBaseDocumentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteKnowledgeBaseDocumentChunkArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -930,6 +1032,28 @@ export type MutationUpdateDataTableRowArgs = {
 
 export type MutationUpdateDataTableTagsArgs = {
   input: UpdateDataTableTagsInput;
+};
+
+
+export type MutationUpdateKnowledgeBaseArgs = {
+  id: Scalars['ID']['input'];
+  knowledgeBase: KnowledgeBaseInput;
+};
+
+
+export type MutationUpdateKnowledgeBaseDocumentChunkArgs = {
+  id: Scalars['ID']['input'];
+  knowledgeBaseDocumentChunk: KnowledgeBaseDocumentChunkInput;
+};
+
+
+export type MutationUpdateKnowledgeBaseDocumentTagsArgs = {
+  input: UpdateKnowledgeBaseDocumentTagsInput;
+};
+
+
+export type MutationUpdateKnowledgeBaseTagsArgs = {
+  input: UpdateKnowledgeBaseTagsInput;
 };
 
 
@@ -1206,6 +1330,14 @@ export type Query = {
   environments?: Maybe<Array<Maybe<Environment>>>;
   exportDataTableCsv: Scalars['String']['output'];
   integration?: Maybe<Integration>;
+  knowledgeBase?: Maybe<KnowledgeBase>;
+  knowledgeBaseDocument?: Maybe<KnowledgeBaseDocument>;
+  knowledgeBaseDocumentStatus?: Maybe<DocumentStatusUpdate>;
+  knowledgeBaseDocumentTags: Array<Tag>;
+  knowledgeBaseDocumentTagsByDocument: Array<KnowledgeBaseDocumentTagsEntry>;
+  knowledgeBaseTags: Array<Tag>;
+  knowledgeBaseTagsByKnowledgeBase: Array<KnowledgeBaseTagsEntry>;
+  knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpComponent?: Maybe<McpComponent>;
   mcpComponents?: Maybe<Array<Maybe<McpComponent>>>;
@@ -1229,6 +1361,7 @@ export type Query = {
   projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
   projectTemplate?: Maybe<ProjectTemplate>;
   projects?: Maybe<Array<Maybe<Project>>>;
+  searchKnowledgeBase?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
   sharedProject?: Maybe<SharedProject>;
   sharedWorkflow?: Maybe<SharedWorkflow>;
   task?: Maybe<Task>;
@@ -1392,6 +1525,26 @@ export type QueryIntegrationArgs = {
 };
 
 
+export type QueryKnowledgeBaseArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryKnowledgeBaseDocumentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryKnowledgeBaseDocumentStatusArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryKnowledgeBasesArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryMcpComponentArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -1478,6 +1631,13 @@ export type QueryProjectDeploymentWorkflowArgs = {
 export type QueryProjectTemplateArgs = {
   id: Scalars['String']['input'];
   sharedProject: Scalars['Boolean']['input'];
+};
+
+
+export type QuerySearchKnowledgeBaseArgs = {
+  id: Scalars['ID']['input'];
+  metadataFilters?: InputMaybe<Scalars['String']['input']>;
+  query: Scalars['String']['input'];
 };
 
 
@@ -1740,6 +1900,16 @@ export enum UnifiedApiCategory {
 
 export type UpdateDataTableTagsInput = {
   tableId: Scalars['ID']['input'];
+  tags?: InputMaybe<Array<TagInput>>;
+};
+
+export type UpdateKnowledgeBaseDocumentTagsInput = {
+  knowledgeBaseDocumentId: Scalars['ID']['input'];
+  tags?: InputMaybe<Array<TagInput>>;
+};
+
+export type UpdateKnowledgeBaseTagsInput = {
+  knowledgeBaseId: Scalars['ID']['input'];
   tags?: InputMaybe<Array<TagInput>>;
 };
 
@@ -2130,6 +2300,115 @@ export type UpdateDataTableTagsMutationVariables = Exact<{
 
 
 export type UpdateDataTableTagsMutation = { __typename?: 'Mutation', updateDataTableTags: boolean };
+
+export type CreateKnowledgeBaseMutationVariables = Exact<{
+  knowledgeBase: KnowledgeBaseInput;
+  workspaceId: Scalars['ID']['input'];
+}>;
+
+
+export type CreateKnowledgeBaseMutation = { __typename?: 'Mutation', createKnowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string } | null };
+
+export type DeleteKnowledgeBaseMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteKnowledgeBaseMutation = { __typename?: 'Mutation', deleteKnowledgeBase?: boolean | null };
+
+export type DeleteKnowledgeBaseDocumentMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteKnowledgeBaseDocumentMutation = { __typename?: 'Mutation', deleteKnowledgeBaseDocument?: boolean | null };
+
+export type DeleteKnowledgeBaseDocumentChunkMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteKnowledgeBaseDocumentChunkMutation = { __typename?: 'Mutation', deleteKnowledgeBaseDocumentChunk?: boolean | null };
+
+export type KnowledgeBaseQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type KnowledgeBaseQuery = { __typename?: 'Query', knowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, documents?: Array<{ __typename?: 'KnowledgeBaseDocument', id: string, name: string, status: number, createdDate?: any | null, document?: { __typename?: 'FileEntry', name: string, extension?: string | null, mimeType?: string | null, url: string } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string }> | null, chunks?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content: string, metadata?: any | null } | null> | null } | null> | null } | null };
+
+export type KnowledgeBaseDocumentStatusQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type KnowledgeBaseDocumentStatusQuery = { __typename?: 'Query', knowledgeBaseDocumentStatus?: { __typename?: 'DocumentStatusUpdate', documentId: string, status: number, timestamp: any, message?: string | null } | null };
+
+export type KnowledgeBaseDocumentTagsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type KnowledgeBaseDocumentTagsQuery = { __typename?: 'Query', knowledgeBaseDocumentTags: Array<{ __typename?: 'Tag', id: string, name: string }> };
+
+export type KnowledgeBaseDocumentTagsByDocumentQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type KnowledgeBaseDocumentTagsByDocumentQuery = { __typename?: 'Query', knowledgeBaseDocumentTagsByDocument: Array<{ __typename?: 'KnowledgeBaseDocumentTagsEntry', knowledgeBaseDocumentId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> };
+
+export type KnowledgeBaseTagsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type KnowledgeBaseTagsQuery = { __typename?: 'Query', knowledgeBaseTags: Array<{ __typename?: 'Tag', id: string, name: string }> };
+
+export type KnowledgeBaseTagsByKnowledgeBaseQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type KnowledgeBaseTagsByKnowledgeBaseQuery = { __typename?: 'Query', knowledgeBaseTagsByKnowledgeBase: Array<{ __typename?: 'KnowledgeBaseTagsEntry', knowledgeBaseId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> };
+
+export type KnowledgeBasesQueryVariables = Exact<{
+  workspaceId: Scalars['ID']['input'];
+}>;
+
+
+export type KnowledgeBasesQuery = { __typename?: 'Query', knowledgeBases?: Array<{ __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null, createdDate?: any | null, lastModifiedDate?: any | null } | null> | null };
+
+export type SearchKnowledgeBaseQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+  query: Scalars['String']['input'];
+  metadataFilters?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type SearchKnowledgeBaseQuery = { __typename?: 'Query', searchKnowledgeBase?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content: string, metadata?: any | null, score?: number | null } | null> | null };
+
+export type UpdateKnowledgeBaseMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  knowledgeBase: KnowledgeBaseInput;
+}>;
+
+
+export type UpdateKnowledgeBaseMutation = { __typename?: 'Mutation', updateKnowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null } | null };
+
+export type UpdateKnowledgeBaseDocumentChunkMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  knowledgeBaseDocumentChunk: KnowledgeBaseDocumentChunkInput;
+}>;
+
+
+export type UpdateKnowledgeBaseDocumentChunkMutation = { __typename?: 'Mutation', updateKnowledgeBaseDocumentChunk?: { __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content: string, metadata?: any | null } | null };
+
+export type UpdateKnowledgeBaseDocumentTagsMutationVariables = Exact<{
+  input: UpdateKnowledgeBaseDocumentTagsInput;
+}>;
+
+
+export type UpdateKnowledgeBaseDocumentTagsMutation = { __typename?: 'Mutation', updateKnowledgeBaseDocumentTags: boolean };
+
+export type UpdateKnowledgeBaseTagsMutationVariables = Exact<{
+  input: UpdateKnowledgeBaseTagsInput;
+}>;
+
+
+export type UpdateKnowledgeBaseTagsMutation = { __typename?: 'Mutation', updateKnowledgeBaseTags: boolean };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
@@ -3495,6 +3774,421 @@ export const useUpdateDataTableTagsMutation = <
       {
     mutationKey: ['updateDataTableTags'],
     mutationFn: (variables?: UpdateDataTableTagsMutationVariables) => fetcher<UpdateDataTableTagsMutation, UpdateDataTableTagsMutationVariables>(UpdateDataTableTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateKnowledgeBaseDocument = `
+    mutation createKnowledgeBase($knowledgeBase: KnowledgeBaseInput!, $workspaceId: ID!) {
+  createKnowledgeBase(knowledgeBase: $knowledgeBase, workspaceId: $workspaceId) {
+    id
+    name
+  }
+}
+    `;
+
+export const useCreateKnowledgeBaseMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateKnowledgeBaseMutation, TError, CreateKnowledgeBaseMutationVariables, TContext>) => {
+    
+    return useMutation<CreateKnowledgeBaseMutation, TError, CreateKnowledgeBaseMutationVariables, TContext>(
+      {
+    mutationKey: ['createKnowledgeBase'],
+    mutationFn: (variables?: CreateKnowledgeBaseMutationVariables) => fetcher<CreateKnowledgeBaseMutation, CreateKnowledgeBaseMutationVariables>(CreateKnowledgeBaseDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteKnowledgeBaseDocument = `
+    mutation deleteKnowledgeBase($id: ID!) {
+  deleteKnowledgeBase(id: $id)
+}
+    `;
+
+export const useDeleteKnowledgeBaseMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteKnowledgeBaseMutation, TError, DeleteKnowledgeBaseMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteKnowledgeBaseMutation, TError, DeleteKnowledgeBaseMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteKnowledgeBase'],
+    mutationFn: (variables?: DeleteKnowledgeBaseMutationVariables) => fetcher<DeleteKnowledgeBaseMutation, DeleteKnowledgeBaseMutationVariables>(DeleteKnowledgeBaseDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteKnowledgeBaseDocumentDocument = `
+    mutation deleteKnowledgeBaseDocument($id: ID!) {
+  deleteKnowledgeBaseDocument(id: $id)
+}
+    `;
+
+export const useDeleteKnowledgeBaseDocumentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteKnowledgeBaseDocumentMutation, TError, DeleteKnowledgeBaseDocumentMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteKnowledgeBaseDocumentMutation, TError, DeleteKnowledgeBaseDocumentMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteKnowledgeBaseDocument'],
+    mutationFn: (variables?: DeleteKnowledgeBaseDocumentMutationVariables) => fetcher<DeleteKnowledgeBaseDocumentMutation, DeleteKnowledgeBaseDocumentMutationVariables>(DeleteKnowledgeBaseDocumentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteKnowledgeBaseDocumentChunkDocument = `
+    mutation deleteKnowledgeBaseDocumentChunk($id: ID!) {
+  deleteKnowledgeBaseDocumentChunk(id: $id)
+}
+    `;
+
+export const useDeleteKnowledgeBaseDocumentChunkMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteKnowledgeBaseDocumentChunkMutation, TError, DeleteKnowledgeBaseDocumentChunkMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteKnowledgeBaseDocumentChunkMutation, TError, DeleteKnowledgeBaseDocumentChunkMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteKnowledgeBaseDocumentChunk'],
+    mutationFn: (variables?: DeleteKnowledgeBaseDocumentChunkMutationVariables) => fetcher<DeleteKnowledgeBaseDocumentChunkMutation, DeleteKnowledgeBaseDocumentChunkMutationVariables>(DeleteKnowledgeBaseDocumentChunkDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const KnowledgeBaseDocument = `
+    query knowledgeBase($id: ID!) {
+  knowledgeBase(id: $id) {
+    id
+    name
+    description
+    maxChunkSize
+    minChunkSizeChars
+    overlap
+    documents {
+      id
+      name
+      document {
+        name
+        extension
+        mimeType
+        url
+      }
+      status
+      tags {
+        id
+        name
+      }
+      createdDate
+      chunks {
+        id
+        knowledgeBaseDocumentId
+        content
+        metadata
+      }
+    }
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useKnowledgeBaseQuery = <
+      TData = KnowledgeBaseQuery,
+      TError = unknown
+    >(
+      variables: KnowledgeBaseQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseQuery, TError, TData>(
+      {
+    queryKey: ['knowledgeBase', variables],
+    queryFn: fetcher<KnowledgeBaseQuery, KnowledgeBaseQueryVariables>(KnowledgeBaseDocument, variables),
+    ...options
+  }
+    )};
+
+export const KnowledgeBaseDocumentStatusDocument = `
+    query knowledgeBaseDocumentStatus($id: ID!) {
+  knowledgeBaseDocumentStatus(id: $id) {
+    documentId
+    status
+    timestamp
+    message
+  }
+}
+    `;
+
+export const useKnowledgeBaseDocumentStatusQuery = <
+      TData = KnowledgeBaseDocumentStatusQuery,
+      TError = unknown
+    >(
+      variables: KnowledgeBaseDocumentStatusQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseDocumentStatusQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentStatusQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseDocumentStatusQuery, TError, TData>(
+      {
+    queryKey: ['knowledgeBaseDocumentStatus', variables],
+    queryFn: fetcher<KnowledgeBaseDocumentStatusQuery, KnowledgeBaseDocumentStatusQueryVariables>(KnowledgeBaseDocumentStatusDocument, variables),
+    ...options
+  }
+    )};
+
+export const KnowledgeBaseDocumentTagsDocument = `
+    query knowledgeBaseDocumentTags {
+  knowledgeBaseDocumentTags {
+    id
+    name
+  }
+}
+    `;
+
+export const useKnowledgeBaseDocumentTagsQuery = <
+      TData = KnowledgeBaseDocumentTagsQuery,
+      TError = unknown
+    >(
+      variables?: KnowledgeBaseDocumentTagsQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseDocumentTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseDocumentTagsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['knowledgeBaseDocumentTags'] : ['knowledgeBaseDocumentTags', variables],
+    queryFn: fetcher<KnowledgeBaseDocumentTagsQuery, KnowledgeBaseDocumentTagsQueryVariables>(KnowledgeBaseDocumentTagsDocument, variables),
+    ...options
+  }
+    )};
+
+export const KnowledgeBaseDocumentTagsByDocumentDocument = `
+    query knowledgeBaseDocumentTagsByDocument {
+  knowledgeBaseDocumentTagsByDocument {
+    knowledgeBaseDocumentId
+    tags {
+      id
+      name
+    }
+  }
+}
+    `;
+
+export const useKnowledgeBaseDocumentTagsByDocumentQuery = <
+      TData = KnowledgeBaseDocumentTagsByDocumentQuery,
+      TError = unknown
+    >(
+      variables?: KnowledgeBaseDocumentTagsByDocumentQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['knowledgeBaseDocumentTagsByDocument'] : ['knowledgeBaseDocumentTagsByDocument', variables],
+    queryFn: fetcher<KnowledgeBaseDocumentTagsByDocumentQuery, KnowledgeBaseDocumentTagsByDocumentQueryVariables>(KnowledgeBaseDocumentTagsByDocumentDocument, variables),
+    ...options
+  }
+    )};
+
+export const KnowledgeBaseTagsDocument = `
+    query knowledgeBaseTags {
+  knowledgeBaseTags {
+    id
+    name
+  }
+}
+    `;
+
+export const useKnowledgeBaseTagsQuery = <
+      TData = KnowledgeBaseTagsQuery,
+      TError = unknown
+    >(
+      variables?: KnowledgeBaseTagsQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseTagsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['knowledgeBaseTags'] : ['knowledgeBaseTags', variables],
+    queryFn: fetcher<KnowledgeBaseTagsQuery, KnowledgeBaseTagsQueryVariables>(KnowledgeBaseTagsDocument, variables),
+    ...options
+  }
+    )};
+
+export const KnowledgeBaseTagsByKnowledgeBaseDocument = `
+    query knowledgeBaseTagsByKnowledgeBase {
+  knowledgeBaseTagsByKnowledgeBase {
+    knowledgeBaseId
+    tags {
+      id
+      name
+    }
+  }
+}
+    `;
+
+export const useKnowledgeBaseTagsByKnowledgeBaseQuery = <
+      TData = KnowledgeBaseTagsByKnowledgeBaseQuery,
+      TError = unknown
+    >(
+      variables?: KnowledgeBaseTagsByKnowledgeBaseQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['knowledgeBaseTagsByKnowledgeBase'] : ['knowledgeBaseTagsByKnowledgeBase', variables],
+    queryFn: fetcher<KnowledgeBaseTagsByKnowledgeBaseQuery, KnowledgeBaseTagsByKnowledgeBaseQueryVariables>(KnowledgeBaseTagsByKnowledgeBaseDocument, variables),
+    ...options
+  }
+    )};
+
+export const KnowledgeBasesDocument = `
+    query knowledgeBases($workspaceId: ID!) {
+  knowledgeBases(workspaceId: $workspaceId) {
+    id
+    name
+    description
+    maxChunkSize
+    minChunkSizeChars
+    overlap
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useKnowledgeBasesQuery = <
+      TData = KnowledgeBasesQuery,
+      TError = unknown
+    >(
+      variables: KnowledgeBasesQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBasesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBasesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBasesQuery, TError, TData>(
+      {
+    queryKey: ['knowledgeBases', variables],
+    queryFn: fetcher<KnowledgeBasesQuery, KnowledgeBasesQueryVariables>(KnowledgeBasesDocument, variables),
+    ...options
+  }
+    )};
+
+export const SearchKnowledgeBaseDocument = `
+    query searchKnowledgeBase($id: ID!, $query: String!, $metadataFilters: String) {
+  searchKnowledgeBase(id: $id, query: $query, metadataFilters: $metadataFilters) {
+    id
+    knowledgeBaseDocumentId
+    content
+    metadata
+    score
+  }
+}
+    `;
+
+export const useSearchKnowledgeBaseQuery = <
+      TData = SearchKnowledgeBaseQuery,
+      TError = unknown
+    >(
+      variables: SearchKnowledgeBaseQueryVariables,
+      options?: Omit<UseQueryOptions<SearchKnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SearchKnowledgeBaseQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<SearchKnowledgeBaseQuery, TError, TData>(
+      {
+    queryKey: ['searchKnowledgeBase', variables],
+    queryFn: fetcher<SearchKnowledgeBaseQuery, SearchKnowledgeBaseQueryVariables>(SearchKnowledgeBaseDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateKnowledgeBaseDocument = `
+    mutation updateKnowledgeBase($id: ID!, $knowledgeBase: KnowledgeBaseInput!) {
+  updateKnowledgeBase(id: $id, knowledgeBase: $knowledgeBase) {
+    id
+    name
+    description
+    maxChunkSize
+    minChunkSizeChars
+    overlap
+  }
+}
+    `;
+
+export const useUpdateKnowledgeBaseMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateKnowledgeBaseMutation, TError, UpdateKnowledgeBaseMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateKnowledgeBaseMutation, TError, UpdateKnowledgeBaseMutationVariables, TContext>(
+      {
+    mutationKey: ['updateKnowledgeBase'],
+    mutationFn: (variables?: UpdateKnowledgeBaseMutationVariables) => fetcher<UpdateKnowledgeBaseMutation, UpdateKnowledgeBaseMutationVariables>(UpdateKnowledgeBaseDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateKnowledgeBaseDocumentChunkDocument = `
+    mutation updateKnowledgeBaseDocumentChunk($id: ID!, $knowledgeBaseDocumentChunk: KnowledgeBaseDocumentChunkInput!) {
+  updateKnowledgeBaseDocumentChunk(
+    id: $id
+    knowledgeBaseDocumentChunk: $knowledgeBaseDocumentChunk
+  ) {
+    id
+    knowledgeBaseDocumentId
+    content
+    metadata
+  }
+}
+    `;
+
+export const useUpdateKnowledgeBaseDocumentChunkMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateKnowledgeBaseDocumentChunkMutation, TError, UpdateKnowledgeBaseDocumentChunkMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateKnowledgeBaseDocumentChunkMutation, TError, UpdateKnowledgeBaseDocumentChunkMutationVariables, TContext>(
+      {
+    mutationKey: ['updateKnowledgeBaseDocumentChunk'],
+    mutationFn: (variables?: UpdateKnowledgeBaseDocumentChunkMutationVariables) => fetcher<UpdateKnowledgeBaseDocumentChunkMutation, UpdateKnowledgeBaseDocumentChunkMutationVariables>(UpdateKnowledgeBaseDocumentChunkDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateKnowledgeBaseDocumentTagsDocument = `
+    mutation updateKnowledgeBaseDocumentTags($input: UpdateKnowledgeBaseDocumentTagsInput!) {
+  updateKnowledgeBaseDocumentTags(input: $input)
+}
+    `;
+
+export const useUpdateKnowledgeBaseDocumentTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateKnowledgeBaseDocumentTagsMutation, TError, UpdateKnowledgeBaseDocumentTagsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateKnowledgeBaseDocumentTagsMutation, TError, UpdateKnowledgeBaseDocumentTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateKnowledgeBaseDocumentTags'],
+    mutationFn: (variables?: UpdateKnowledgeBaseDocumentTagsMutationVariables) => fetcher<UpdateKnowledgeBaseDocumentTagsMutation, UpdateKnowledgeBaseDocumentTagsMutationVariables>(UpdateKnowledgeBaseDocumentTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateKnowledgeBaseTagsDocument = `
+    mutation updateKnowledgeBaseTags($input: UpdateKnowledgeBaseTagsInput!) {
+  updateKnowledgeBaseTags(input: $input)
+}
+    `;
+
+export const useUpdateKnowledgeBaseTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateKnowledgeBaseTagsMutation, TError, UpdateKnowledgeBaseTagsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateKnowledgeBaseTagsMutation, TError, UpdateKnowledgeBaseTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateKnowledgeBaseTags'],
+    mutationFn: (variables?: UpdateKnowledgeBaseTagsMutationVariables) => fetcher<UpdateKnowledgeBaseTagsMutation, UpdateKnowledgeBaseTagsMutationVariables>(UpdateKnowledgeBaseTagsDocument, variables)(),
     ...options
   }
     )};
