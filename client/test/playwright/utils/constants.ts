@@ -14,3 +14,7 @@ export const ROUTES = {
         `/automation/projects/${projectId}/project-workflows/${workflowId}`,
     projects: '/automation/projects',
 } as const;
+
+export const SAMPLE_WORKFLOW_PATH = 'test/playwright/sampleWorkflow.json';
+
+export const SAMPLE_WORKFLOW_NAME = 'Playwright Sample Workflow';

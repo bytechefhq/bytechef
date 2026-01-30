@@ -3,7 +3,7 @@ import {test as base} from '@playwright/test';
 
 import {ProjectsPage} from '../pages/projectsPage';
 import {ensureAuthenticated} from '../utils/auth';
-import {type TestProjectI, createProject} from '../utils/projects';
+import {type TestProjectI, createProject} from '../utils/projectUtils';
 
 export type ProjectFixturesType = {
     project: TestProjectI;

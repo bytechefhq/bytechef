@@ -2,6 +2,7 @@ import {Page, expect} from '@playwright/test';
 
 import {ProjectsPage} from '../pages/projectsPage';
 import {clickAndExpectToBeVisible} from './clickAndExpectToBeVisible';
+import {SAMPLE_WORKFLOW_NAME} from './constants';
 import getRandomString from './getRandomString';
 
 export interface TestProjectI {
@@ -72,7 +73,13 @@ export async function createProjectWithWorkflow(
     return {project, workflow};
 }
 
-export async function importWorkflow(page: Page, projectId: string, workflowFilePath: string): Promise<TestWorkflowI> {
+interface ImportWorkflowProps {
+    page: Page;
+    projectId: string;
+    workflowFilePath: string;
+}
+
+export async function importWorkflow({page, projectId, workflowFilePath}: ImportWorkflowProps): Promise<TestWorkflowI> {
     const projectsPage = new ProjectsPage(page);
 
     await page.goto('/automation/projects');
@@ -87,7 +94,7 @@ export async function importWorkflow(page: Page, projectId: string, workflowFile
 
     await page.waitForTimeout(1000);
 
-    const workflowCreationOptionsButton = page.getByRole('button', {name: 'Workflow Creation Actions'});
+    const workflowCreationOptionsButton = projectItem.getByRole('button', {name: 'Workflow Creation Actions'});
 
     await expect(workflowCreationOptionsButton).toBeVisible({timeout: 10000});
 
@@ -98,11 +105,15 @@ export async function importWorkflow(page: Page, projectId: string, workflowFile
         trigger: workflowCreationOptionsButton,
     });
 
-    const fileInput = page.locator('input[type="file"][accept*=".json"]').last();
+    const fileInput = page.getByTestId(`${projectId}-importWorkflowHiddenInput`);
 
     await fileInput.setInputFiles(workflowFilePath);
 
-    await importWorkflowMenuItem.click();
+    const workflowLink = page.getByLabel(`Link to workflow ${SAMPLE_WORKFLOW_NAME}`);
+
+    await expect(workflowLink).toBeVisible({timeout: 10000});
+
+    await workflowLink.dispatchEvent('click');
 
     await expect(page).toHaveURL(new RegExp(`${projectId}.*project-workflows`), {timeout: 15000});
 
@@ -112,7 +123,5 @@ export async function importWorkflow(page: Page, projectId: string, workflowFile
 
     const workflowId = workflowIdMatch ? workflowIdMatch[1] : 'unknown';
 
-    const workflowName = 'Playwright Sample Workflow';
-
-    return {projectId, workflowId, workflowName};
+    return {projectId, workflowId, workflowName: SAMPLE_WORKFLOW_NAME};
 }
