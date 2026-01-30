@@ -1,0 +1,3 @@
+mutation updateKnowledgeBaseDocumentTags($input: UpdateKnowledgeBaseDocumentTagsInput!) {
+    updateKnowledgeBaseDocumentTags(input: $input)
+}

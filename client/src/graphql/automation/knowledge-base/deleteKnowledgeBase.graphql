@@ -1,0 +1,3 @@
+mutation deleteKnowledgeBase($id: ID!) {
+    deleteKnowledgeBase(id: $id)
+}

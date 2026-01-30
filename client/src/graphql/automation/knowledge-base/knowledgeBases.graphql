@@ -1,0 +1,12 @@
+query knowledgeBases($workspaceId: ID!) {
+    knowledgeBases(workspaceId: $workspaceId) {
+        id
+        name
+        description
+        maxChunkSize
+        minChunkSizeChars
+        overlap
+        createdDate
+        lastModifiedDate
+    }
+}

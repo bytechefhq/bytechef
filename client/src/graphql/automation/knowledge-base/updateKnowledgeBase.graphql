@@ -1,0 +1,10 @@
+mutation updateKnowledgeBase($id: ID!, $knowledgeBase: KnowledgeBaseInput!) {
+    updateKnowledgeBase(id: $id, knowledgeBase: $knowledgeBase) {
+        id
+        name
+        description
+        maxChunkSize
+        minChunkSizeChars
+        overlap
+    }
+}

@@ -1,0 +1,3 @@
+mutation deleteKnowledgeBaseDocumentChunk($id: ID!) {
+    deleteKnowledgeBaseDocumentChunk(id: $id)
+}

@@ -1,0 +1,3 @@
+mutation deleteKnowledgeBaseDocument($id: ID!) {
+    deleteKnowledgeBaseDocument(id: $id)
+}
