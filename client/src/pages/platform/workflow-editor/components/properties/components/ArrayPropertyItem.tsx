@@ -34,7 +34,11 @@ const ArrayPropertyItem = ({
     };
 
     return (
-        <div className="flex" key={`${arrayName}_${arrayItem.name}`}>
+        <div
+            aria-label={`Array property item at index ${index}`}
+            className="flex"
+            key={`${arrayName}_${arrayItem.name}`}
+        >
             <Property
                 arrayIndex={index}
                 arrayName={arrayName}

@@ -276,7 +276,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
-                                <ButtonGroup>
+                                <ButtonGroup aria-label="Workflow Creation Actions">
                                     <Button
                                         aria-label="Create Workflow"
                                         onClick={(event) => {
@@ -293,7 +293,11 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button size="xs" variant="outline">
+                                            <Button
+                                                aria-label="More Workflow Creation Actions"
+                                                size="xs"
+                                                variant="outline"
+                                            >
                                                 <ChevronDownIcon />
                                             </Button>
                                         </DropdownMenuTrigger>
@@ -301,6 +305,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         <DropdownMenuContent align="end">
                                             {ff_1041 && (
                                                 <DropdownMenuItem
+                                                    aria-label="Create Workflow from Template"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
 
@@ -312,6 +317,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             )}
 
                                             <DropdownMenuItem
+                                                aria-label="Import Workflow"
                                                 onClick={(event) => {
                                                     event.stopPropagation();
 
@@ -598,6 +604,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 accept=".json,.yaml,.yml"
                 alt="file"
                 className="hidden"
+                data-testid={`${project.id}-importWorkflowHiddenInput`}
                 onChange={(event) => handleImportWorkflow(event, project.id!, importProjectWorkflowMutation)}
                 ref={hiddenFileInputRef}
                 type="file"
