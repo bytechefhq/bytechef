@@ -125,6 +125,7 @@
     "authorizationRequired": null,
     "authorizations": null,
     "baseUri": null,
+    "help": null,
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,

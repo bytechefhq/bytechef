@@ -5162,6 +5162,7 @@
       "type": "OAUTH2_CLIENT_CREDENTIALS"
     } ],
     "baseUri": null,
+    "help": null,
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,

@@ -324,10 +324,10 @@
       "outputResponse": {
         "outputSchema": null,
         "placeholder": {
-          "body": { },
-          "parameters": { },
+          "headers": { },
           "method": "POST",
-          "headers": { }
+          "parameters": { },
+          "body": { }
         },
         "sampleOutput": null
       },
@@ -362,10 +362,10 @@
       "outputResponse": {
         "outputSchema": null,
         "placeholder": {
-          "body": { },
-          "parameters": { },
+          "headers": { },
           "method": "POST",
-          "headers": { }
+          "parameters": { },
+          "body": { }
         },
         "sampleOutput": null
       },
@@ -422,10 +422,10 @@
       "outputResponse": {
         "outputSchema": null,
         "placeholder": {
-          "body": { },
-          "parameters": { },
+          "headers": { },
           "method": "POST",
-          "headers": { }
+          "parameters": { },
+          "body": { }
         },
         "sampleOutput": null
       },

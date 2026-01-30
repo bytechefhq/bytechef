@@ -2664,6 +2664,7 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
+    "help": null,
     "processErrorResponse": null,
     "properties": null,
     "test": null,
