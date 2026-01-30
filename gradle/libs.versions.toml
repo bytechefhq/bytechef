@@ -15,7 +15,7 @@ spotbugs = "4.9.8"
 spring-ai = "2.0.0-M2"
 spring-boot = "4.0.2"
 spring-cloud-aws = "4.0.0-RC1"
-spring-cloud-dependencies = "2025.1.0"
+spring-cloud-dependencies = "2025.1.1"
 spring-shell = "4.0.0"
 testcontainers = "1.21.3"
 
