@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks -- Playwright fixtures use 'use' callback, not React hooks */
 import {test as base} from '@playwright/test';
 
-import {type TestWorkflowI, createWorkflow} from '../utils/projects';
+import {type TestWorkflowI, createWorkflow} from '../utils/projectUtils';
 import {type ProjectFixturesType} from './project';
 
 export type WorkflowFixturesType = {
