@@ -1024,7 +1024,8 @@ public class ComponentInitOpenApiGenerator {
                 ? CodeBlock.builder()
                     .build()
                 : CodeBlock.of(
-                    ".scopes((connection, context) -> $T.of($L))", List.class, getOAuth2Scopes(oAuthFlow.getScopes())),
+                    ".scopes((connectionParameters, context) -> $T.of($L, $L))", Map.class,
+                    getOAuth2Scopes(oAuthFlow.getScopes()), true),
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
@@ -1126,7 +1127,6 @@ public class ComponentInitOpenApiGenerator {
             "Client Secret",
             true,
             List.class,
-            oAuthFlow.getRefreshUrl(),
             getOAuth2Scopes(oAuthFlow.getScopes()),
             oAuthFlow.getTokenUrl());
 
