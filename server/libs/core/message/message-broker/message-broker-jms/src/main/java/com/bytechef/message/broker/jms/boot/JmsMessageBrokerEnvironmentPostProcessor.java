@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.observability.env;
+package com.bytechef.message.broker.jms.boot;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -26,31 +27,25 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 
 /**
- * @author Matija Petanjek
+ * @author Ivica Cardic
  */
-public class ObservabilityEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class JmsMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (!environment.getProperty("bytechef.observability.enabled", Boolean.class, false)) {
+        if (!Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "jms")) {
             source.put(
                 "spring.autoconfigure.exclude",
                 StringUtils.join(
                     environment.getProperty("spring.autoconfigure.exclude"),
-                    """
-                        ,org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.tracing.otlp.OtlpTracingAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.tracing.OpenTelemetryTracingAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.logging.OpenTelemetryLoggingAutoConfiguration
-                        """));
-
-            source.put("bytechef.observability.loki.appender.level", "OFF");
+                    StringUtils.join(
+                        ",org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration",
+                        ",org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration")));
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Observability Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom JMS Message Broker Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

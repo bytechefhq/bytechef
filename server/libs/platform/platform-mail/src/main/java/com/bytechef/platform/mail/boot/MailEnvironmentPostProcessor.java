@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.message.broker.aws.env;
+package com.bytechef.platform.mail.boot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -28,18 +28,19 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class AwsMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class MailEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "aws")) {
-            source.put("spring.cloud.aws.sqs.enabled", true);
+        if (StringUtils.isBlank(environment.getProperty("bytechef.mail.host", String.class))) {
+            source.put("management.health.mail.enabled", false);
+        } else {
+            source.put("management.health.mail.enabled", true);
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource(
-            "Custom Spring Cloud AWS SQS Message Broker Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Mail Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

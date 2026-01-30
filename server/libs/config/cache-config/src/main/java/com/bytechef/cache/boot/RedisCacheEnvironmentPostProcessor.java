@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.message.broker.kafka.env;
+package com.bytechef.cache.boot;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -29,21 +28,22 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class KafkaMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class RedisCacheEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (!Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "kafka")) {
-            source.put(
+        if (Objects.equals(environment.getProperty("bytechef.cache.provider", String.class), "redis")) {
+            source.put("management.health.redis.enabled", true);
+
+            source.computeIfPresent(
                 "spring.autoconfigure.exclude",
-                StringUtils.join(
-                    environment.getProperty("spring.autoconfigure.exclude"),
-                    ",org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration"));
+                (k, v) -> ((String) v).replace(
+                    ", org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration", ""));
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Kafka Message Broker Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Redis Cache Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

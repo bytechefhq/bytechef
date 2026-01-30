@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.mail.env;
+package com.bytechef.ee.observability.boot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,21 +26,31 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 
 /**
- * @author Ivica Cardic
+ * @author Matija Petanjek
  */
-public class MailEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class ObservabilityEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (StringUtils.isBlank(environment.getProperty("bytechef.mail.host", String.class))) {
-            source.put("management.health.mail.enabled", false);
-        } else {
-            source.put("management.health.mail.enabled", true);
+        if (!environment.getProperty("bytechef.observability.enabled", Boolean.class, false)) {
+            source.put(
+                "spring.autoconfigure.exclude",
+                StringUtils.join(
+                    environment.getProperty("spring.autoconfigure.exclude"),
+                    """
+                        ,org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration
+                        ,org.springframework.boot.actuate.autoconfigure.tracing.otlp.OtlpTracingAutoConfiguration
+                        ,org.springframework.boot.actuate.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration
+                        ,org.springframework.boot.actuate.autoconfigure.tracing.OpenTelemetryTracingAutoConfiguration
+                        ,org.springframework.boot.actuate.autoconfigure.logging.OpenTelemetryLoggingAutoConfiguration
+                        """));
+
+            source.put("bytechef.observability.loki.appender.level", "OFF");
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Mail Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Observability Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

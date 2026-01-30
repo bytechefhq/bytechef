@@ -1,2 +1,2 @@
 org.springframework.boot.EnvironmentPostProcessor=\
-com.bytechef.message.broker.kafka.env.KafkaMessageBrokerEnvironmentPostProcessor
+com.bytechef.message.broker.kafka.boot.KafkaMessageBrokerEnvironmentPostProcessor
