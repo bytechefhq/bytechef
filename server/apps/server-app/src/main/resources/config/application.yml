@@ -160,8 +160,6 @@ spring:
     aws:
       s3:
         enabled: false
-      secretsmanager:
-        enabled: false
       sqs:
         enabled: false
   datasource:
