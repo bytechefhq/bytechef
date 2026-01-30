@@ -1450,8 +1450,8 @@ components:
           description: "The redirect URI used for OAuth2 callback URL."
           type: "string"
         scopes:
-          type: "array"
-          items:
+          type: "object"
+          additionalProperties:
             type: "string"
     Workflow:
       description: "A group of tasks that make one logical workflow."
