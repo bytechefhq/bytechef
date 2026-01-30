@@ -1430,11 +1430,30 @@ public class ComponentInitOpenApiGenerator {
                 .build();
         }
 
-        return CodeBlock.of(
-            "$T.of($L)", Map.class,
-            scopeNames.stream()
-                .map(scope -> "\"" + scope + "\", " + requiredScopes.contains(scope))
-                .collect(Collectors.joining(", ")));
+        if (scopeNames.size() > 10) {
+            CodeBlock.Builder builder = CodeBlock.builder();
+
+            builder.add("{\n");
+            builder.addStatement("$T<String, Boolean> scopeMap = new $T<>()", Map.class, HashMap.class);
+            builder.add("\n");
+
+            for (String scopeName : scopeNames) {
+                builder.addStatement("scopeMap.put($S, $L)", scopeName, requiredScopes.contains(scopeName));
+            }
+
+            builder.add("\n");
+            builder.addStatement("return scopeMap");
+            builder.add("}");
+
+            return builder.build();
+        } else {
+            return CodeBlock.of(
+                "$T.of($L)", Map.class,
+                scopeNames.stream()
+                    .map(scope -> "\"" + scope + "\", " + requiredScopes.contains(scope))
+                    .collect(Collectors.joining(", ")));
+        }
+
     }
 
     private CodeBlock getObjectPropertiesCodeBlock(
