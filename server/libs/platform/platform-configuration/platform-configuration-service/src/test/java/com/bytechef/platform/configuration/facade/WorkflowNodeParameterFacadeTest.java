@@ -901,6 +901,14 @@ public class WorkflowNodeParameterFacadeTest {
 
         // Should return false when parameter name only appears in the string value part
         assertFalse(WorkflowNodeParameterFacadeImpl.hasExpressionVariable("someField == 'paramName'", "paramName"));
+
+        // Should handle escaped quotes in string literals
+        assertFalse(WorkflowNodeParameterFacadeImpl.hasExpressionVariable("field == 'it\\'s'", "s"));
+        assertFalse(
+            WorkflowNodeParameterFacadeImpl.hasExpressionVariable("field == \"He said \\\"hello\\\"\"", "hello"));
+
+        // Should still match variables outside escaped quote strings
+        assertTrue(WorkflowNodeParameterFacadeImpl.hasExpressionVariable("hello == 'He said \\\"hello\\\"'", "hello"));
     }
 
     @Test

@@ -382,8 +382,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             return false;
         }
 
-        // Remove string literals (single and double quoted) to avoid matching variable names inside quotes
-        String conditionWithoutStrings = displayCondition.replaceAll("'[^']*'|\"[^\"]*\"", "");
+        // Remove string literals (single and double quoted, including those with escaped quotes)
+        String conditionWithoutStrings = displayCondition.replaceAll(
+            "'(?:[^'\\\\]|\\\\.)*'|\"(?:[^\"\\\\]|\\\\.)*\"", "");
 
         String regex = "(^|.*\\W)" + parameterPath + "(\\W.*|$)";
 
