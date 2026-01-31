@@ -1,7 +1,6 @@
 import {
     CreateProjectWorkflowRequest,
     DeleteWorkflowRequest,
-    DuplicateWorkflow200Response,
     DuplicateWorkflowRequest,
     UpdateWorkflowRequest,
     WorkflowApi,
@@ -38,7 +37,7 @@ export const useDeleteWorkflowMutation = (mutationProps?: DeleteWorkflowMutation
     });
 
 interface DuplicateWorkflowMutationProps {
-    onSuccess?: (result: DuplicateWorkflow200Response, variables: DuplicateWorkflowRequest) => void;
+    onSuccess?: (result: string, variables: DuplicateWorkflowRequest) => void;
     onError?: (error: Error, variables: DuplicateWorkflowRequest) => void;
 }
 
