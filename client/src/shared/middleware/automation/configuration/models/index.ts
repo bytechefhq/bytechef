@@ -9,7 +9,6 @@ export * from './Connection';
 export * from './ConnectionBase';
 export * from './CreateProjectDeploymentWorkflowJob200Response';
 export * from './CredentialStatus';
-export * from './DuplicateWorkflow200Response';
 export * from './Project';
 export * from './ProjectBasic';
 export * from './ProjectDeployment';

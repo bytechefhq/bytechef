@@ -5,7 +5,6 @@
  */
 package com.bytechef.automation.configuration.web.rest;
 
-import com.bytechef.automation.configuration.web.rest.model.DuplicateWorkflow200ResponseModel;
 import org.springframework.lang.Nullable;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -124,7 +123,7 @@ public interface WorkflowApi {
         tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The id of a new duplicated workflow object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = DuplicateWorkflow200ResponseModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
             })
         }
     )
@@ -133,19 +132,10 @@ public interface WorkflowApi {
         value = WorkflowApi.PATH_DUPLICATE_WORKFLOW,
         produces = { "application/json" }
     )
-    default ResponseEntity<DuplicateWorkflow200ResponseModel> duplicateWorkflow(
+    default ResponseEntity<String> duplicateWorkflow(
         @NotNull @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @NotNull @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"id\" : \"id\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

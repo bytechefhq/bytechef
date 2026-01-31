@@ -791,11 +791,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  id:
-                    description: "The id of the duplicated workflow."
-                    type: "string"
+                type: string
   /users/{id}/workspaces:
     get:
       description: "Get all user workspaces."
