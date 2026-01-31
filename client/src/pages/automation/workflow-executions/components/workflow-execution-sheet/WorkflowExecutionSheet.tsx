@@ -2,16 +2,19 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Spinner} from '@/components/ui/spinner';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {WorkflowIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
-import {useCallback} from 'react';
+import {useCallback, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionSheetContent from './WorkflowExecutionSheetContent';
 import WorkflowExecutionSheetWorkflowPanel from './WorkflowExecutionSheetWorkflowPanel';
+
+const POLLING_INTERVAL_MS = 2000;
 
 const WorkflowExecutionSheet = () => {
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
@@ -28,6 +31,20 @@ const WorkflowExecutionSheet = () => {
             id: workflowExecutionId,
         },
         workflowExecutionSheetOpen
+    );
+
+    const isWorkflowRunning = useMemo(() => {
+        if (!workflowExecution?.job) {
+            return false;
+        }
+
+        return getWorkflowStatusType(workflowExecution.job, workflowExecution.triggerExecution) === 'running';
+    }, [workflowExecution]);
+
+    useGetProjectWorkflowExecutionQuery(
+        {id: workflowExecutionId},
+        workflowExecutionSheetOpen && isWorkflowRunning,
+        POLLING_INTERVAL_MS
     );
 
     const handleOpenChange = useCallback(() => {
