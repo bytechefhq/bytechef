@@ -155,7 +155,7 @@ No authorization required
 
 ## duplicateWorkflow
 
-> string duplicateWorkflow(id, workflowId)
+> DuplicateWorkflow200Response duplicateWorkflow(id, workflowId)
 
 Duplicates existing workflow.
 
@@ -203,7 +203,7 @@ example().catch(console.error);
 
 ### Return type
 
-**string**
+[**DuplicateWorkflow200Response**](DuplicateWorkflow200Response.md)
 
 ### Authorization
 
