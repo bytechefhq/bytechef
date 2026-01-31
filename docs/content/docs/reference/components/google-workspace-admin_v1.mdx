@@ -1,0 +1,695 @@
+---
+title: "Google Workspace Admin"
+description: "Google Workspace Admin is responsible for managing users, groups, devices, and security settings across the organization."
+---
+
+
+Categories: Productivity and Collaboration
+
+
+Type: googleWorkspaceAdmin/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create User
+Name: createUser
+
+`Creates a new user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| givenName | First Name | STRING | The user's first name. | true |
+| familyName | Last Name | STRING | The user's last name. | true |
+| primaryEmail | Email | STRING | The user's email address. | true |
+| password | Password | STRING | The password for the user account. | true |
+| changePasswordAtNextLogin | Change Password At Next Login | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user is forced to change their password at next login. | false |
+| addresses | Address | STRING | The user's full address. | false |
+| phones | Phone | STRING | The user's phone number. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create User",
+  "name" : "createUser",
+  "parameters" : {
+    "givenName" : "",
+    "familyName" : "",
+    "primaryEmail" : "",
+    "password" : "",
+    "changePasswordAtNextLogin" : false,
+    "addresses" : "",
+    "phones" : ""
+  },
+  "type" : "googleWorkspaceAdmin/v1/createUser"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique ID for the user. |
+| primaryEmail | STRING | The user's primary email address. |
+| password | STRING | The password for the user account. |
+| hashFunction | STRING | The hash format of the password property. |
+| isAdmin | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates a user with super administrator privileges. |
+| isDelegatedAdmin | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user is a delegated administrator. |
+| agreedToTerms | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user has completed an initial login and accepted the Terms of Service agreement. |
+| suspended | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if user is suspended. |
+| changePasswordAtNextLogin | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user is forced to change their password at next login. |
+| ipWhitelisted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, the user's IP address is subject to a deprecated IP address allowlist configuration. |
+| name | OBJECT <details> <summary> Properties </summary> &#123;STRING\(fullName), STRING\(familyName), STRING\(givenName), STRING\(displayName)&#125; </details> |  |
+| kind | STRING | The type of the API resource. |
+| etag | STRING | ETag of the resource. |
+| emails | ARRAY <details> <summary> Items </summary> [&#123;STRING\(address), STRING\(customType), BOOLEAN\(primary), STRING\(type)&#125;] </details> |  |
+| externalIds | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customType), STRING\(type), STRING\(value)&#125;] </details> |  |
+| relations | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customType), STRING\(type), STRING\(value)&#125;] </details> |  |
+| aliases | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of the user's alias email addresses. |
+| isMailboxSetup | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user's Google mailbox is created. |
+| customerId | STRING | The customer ID to retrieve all account users. |
+| addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(country), STRING\(countryCode), STRING\(customType), STRING\(extendedAddress), STRING\(formatted), STRING\(locality), STRING\(poBox), STRING\(postalCode), BOOLEAN\(primary), STRING\(region), BOOLEAN\(sourceIsStructured), STRING\(streetAddress), STRING\(type)&#125;] </details> |  |
+| organizations | ARRAY <details> <summary> Items </summary> [&#123;STRING\(costCenter), STRING\(customType), STRING\(department), STRING\(description), STRING\(domain), INTEGER\(fullTimeEquivalent), STRING\(location), STRING\(name), BOOLEAN\(primary), STRING\(symbol), STRING\(title), STRING\(type)&#125;] </details> |  |
+| lastLoginTime | STRING | The last time the user logged into the user's account. |
+| phones | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customType), BOOLEAN\(primary), STRING\(type), STRING\(value)&#125;] </details> |  |
+| suspensionReason | STRING | Has the reason a user account is suspended either by the administrator or by Google at the time of suspension. |
+| thumbnailPhotoUrl | STRING | The URL of the user's profile photo. |
+| languages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customLanguage), STRING\(languageCode), STRING\(preference)&#125;] </details> |  |
+| posixAccounts | ARRAY <details> <summary> Items </summary> [&#123;STRING\(accountId), STRING\(gecos), NUMBER\(gid), STRING\(homeDirectory), STRING\(operatingSystemType), BOOLEAN\(primary), STRING\(shell), STRING\(systemId), NUMBER\(uid), STRING\(username)&#125;] </details> |  |
+| creationTime | STRING | The time the user's account was created. |
+| nonEditableAliases | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of the user's non-editable alias email addresses. |
+| sshPublicKeys | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(expirationTimeUsec), STRING\(fingerprint), STRING\(key)&#125;] </details> |  |
+| notes | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(value)&#125; </details> |  |
+| websites | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customType), BOOLEAN\(primary), STRING\(type), STRING\(value)&#125;] </details> |  |
+| locations | ARRAY <details> <summary> Items </summary> [&#123;STRING\(area), STRING\(buildingId), STRING\(customType), STRING\(deskCode), STRING\(floorName), STRING\(floorSection), STRING\(type)&#125;] </details> |  |
+| includeInGlobalAddressList | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user's profile is visible in the Google Workspace global address list when the contact sharing feature is enabled for the domain. |
+| keywords | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customType), STRING\(type), STRING\(value)&#125;] </details> |  |
+| deletionTime | STRING | The time the user's account was deleted. |
+| gender | OBJECT <details> <summary> Properties </summary> &#123;STRING\(addressMeAs), STRING\(customGender), STRING\(type)&#125; </details> |  |
+| thumbnailPhotoEtag | STRING | ETag of the user's photo |
+| ims | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customProtocol), STRING\(customType), STRING\(im), BOOLEAN\(primary), STRING\(protocol), STRING\(type)&#125;] </details> |  |
+| customSchemas | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom fields of the user. |
+| isEnrolledIn2Sv | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Is enrolled in 2-step verification. |
+| isEnforcedIn2Sv | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Is 2-step verification enforced |
+| archived | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if user is archived. |
+| orgUnitPath | STRING | The full path of the parent organization associated with the user. |
+| recoveryEmail | STRING | Recovery email of the user. |
+| recoveryPhone | STRING | Recovery phone of the user. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "primaryEmail" : "",
+  "password" : "",
+  "hashFunction" : "",
+  "isAdmin" : false,
+  "isDelegatedAdmin" : false,
+  "agreedToTerms" : false,
+  "suspended" : false,
+  "changePasswordAtNextLogin" : false,
+  "ipWhitelisted" : false,
+  "name" : {
+    "fullName" : "",
+    "familyName" : "",
+    "givenName" : "",
+    "displayName" : ""
+  },
+  "kind" : "",
+  "etag" : "",
+  "emails" : [ {
+    "address" : "",
+    "customType" : "",
+    "primary" : false,
+    "type" : ""
+  } ],
+  "externalIds" : [ {
+    "customType" : "",
+    "type" : "",
+    "value" : ""
+  } ],
+  "relations" : [ {
+    "customType" : "",
+    "type" : "",
+    "value" : ""
+  } ],
+  "aliases" : [ "" ],
+  "isMailboxSetup" : false,
+  "customerId" : "",
+  "addresses" : [ {
+    "country" : "",
+    "countryCode" : "",
+    "customType" : "",
+    "extendedAddress" : "",
+    "formatted" : "",
+    "locality" : "",
+    "poBox" : "",
+    "postalCode" : "",
+    "primary" : false,
+    "region" : "",
+    "sourceIsStructured" : false,
+    "streetAddress" : "",
+    "type" : ""
+  } ],
+  "organizations" : [ {
+    "costCenter" : "",
+    "customType" : "",
+    "department" : "",
+    "description" : "",
+    "domain" : "",
+    "fullTimeEquivalent" : 1,
+    "location" : "",
+    "name" : "",
+    "primary" : false,
+    "symbol" : "",
+    "title" : "",
+    "type" : ""
+  } ],
+  "lastLoginTime" : "",
+  "phones" : [ {
+    "customType" : "",
+    "primary" : false,
+    "type" : "",
+    "value" : ""
+  } ],
+  "suspensionReason" : "",
+  "thumbnailPhotoUrl" : "",
+  "languages" : [ {
+    "customLanguage" : "",
+    "languageCode" : "",
+    "preference" : ""
+  } ],
+  "posixAccounts" : [ {
+    "accountId" : "",
+    "gecos" : "",
+    "gid" : 0.0,
+    "homeDirectory" : "",
+    "operatingSystemType" : "",
+    "primary" : false,
+    "shell" : "",
+    "systemId" : "",
+    "uid" : 0.0,
+    "username" : ""
+  } ],
+  "creationTime" : "",
+  "nonEditableAliases" : [ "" ],
+  "sshPublicKeys" : [ {
+    "expirationTimeUsec" : 0.0,
+    "fingerprint" : "",
+    "key" : ""
+  } ],
+  "notes" : {
+    "contentType" : "",
+    "value" : ""
+  },
+  "websites" : [ {
+    "customType" : "",
+    "primary" : false,
+    "type" : "",
+    "value" : ""
+  } ],
+  "locations" : [ {
+    "area" : "",
+    "buildingId" : "",
+    "customType" : "",
+    "deskCode" : "",
+    "floorName" : "",
+    "floorSection" : "",
+    "type" : ""
+  } ],
+  "includeInGlobalAddressList" : false,
+  "keywords" : [ {
+    "customType" : "",
+    "type" : "",
+    "value" : ""
+  } ],
+  "deletionTime" : "",
+  "gender" : {
+    "addressMeAs" : "",
+    "customGender" : "",
+    "type" : ""
+  },
+  "thumbnailPhotoEtag" : "",
+  "ims" : [ {
+    "customProtocol" : "",
+    "customType" : "",
+    "im" : "",
+    "primary" : false,
+    "protocol" : "",
+    "type" : ""
+  } ],
+  "customSchemas" : { },
+  "isEnrolledIn2Sv" : false,
+  "isEnforcedIn2Sv" : false,
+  "archived" : false,
+  "orgUnitPath" : "",
+  "recoveryEmail" : "",
+  "recoveryPhone" : ""
+}
+```
+
+
+### Assign Role To User
+Name: assignRoleToUser
+
+`Assigns a role to a user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| roleId | Role ID | STRING | The ID of the role that is assigned. | true |
+| userId | User ID | STRING | The unique ID of the user this role is assigned to. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Assign Role To User",
+  "name" : "assignRoleToUser",
+  "parameters" : {
+    "roleId" : "",
+    "userId" : ""
+  },
+  "type" : "googleWorkspaceAdmin/v1/assignRoleToUser"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| roleAssignmentId | STRING | ID of this roleAssignment. |
+| roleId | STRING | The ID of the role that is assigned. |
+| kind | STRING | The type of the API resource. |
+| etag | STRING | ETag of the resource. |
+| assignedTo | STRING | The unique ID of the entity this role is assigned to. |
+| assigneeType | STRING | The type of the assignee. |
+| scopeType | STRING | The scope in which this role is assigned. |
+| orgUnitId | STRING | If the role is restricted to an organization unit, this contains the ID for the organization unit the exercise of this role is restricted to. |
+| condition | STRING | The condition associated with this role assignment. |
+
+
+
+
+#### Output Example
+```json
+{
+  "roleAssignmentId" : "",
+  "roleId" : "",
+  "kind" : "",
+  "etag" : "",
+  "assignedTo" : "",
+  "assigneeType" : "",
+  "scopeType" : "",
+  "orgUnitId" : "",
+  "condition" : ""
+}
+```
+
+
+### Assign License
+Name: assignLicense
+
+`Assigns a product license to a user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| userId | User email | STRING | The user's current primary email address. | true |
+| productId | Product ID | STRING | A product's unique identifier. Use this documentation to find product ID: https://developers.google.com/workspace/admin/licensing/v1/how-tos/products. | true |
+| skuId | SKU ID | STRING | A SKU's unique identifier. Use this documentation to find SKU ID: https://developers.google.com/workspace/admin/licensing/v1/how-tos/products. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Assign License",
+  "name" : "assignLicense",
+  "parameters" : {
+    "userId" : "",
+    "productId" : "",
+    "skuId" : ""
+  },
+  "type" : "googleWorkspaceAdmin/v1/assignLicense"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| kind | STRING | Identifies the resource as a LicenseAssignment. |
+| etags | STRING | ETag of the resource. |
+| productId | STRING | A product's unique identifier. |
+| userId | STRING | The user's current primary email address. |
+| selfLink | STRING | Link to this page. |
+| skuId | STRING | A product SKU's unique identifier. |
+| skuName | STRING | Display Name of the sku of the product. |
+| productName | STRING | Display Name of the product. |
+
+
+
+
+#### Output Example
+```json
+{
+  "kind" : "",
+  "etags" : "",
+  "productId" : "",
+  "userId" : "",
+  "selfLink" : "",
+  "skuId" : "",
+  "skuName" : "",
+  "productName" : ""
+}
+```
+
+
+### Suspend User
+Name: suspendUser
+
+`Suspends a user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| userId | User ID | STRING | The unique ID of the user. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Suspend User",
+  "name" : "suspendUser",
+  "parameters" : {
+    "userId" : ""
+  },
+  "type" : "googleWorkspaceAdmin/v1/suspendUser"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique ID for the user. |
+| primaryEmail | STRING | The user's primary email address. |
+| password | STRING | The password for the user account. |
+| hashFunction | STRING | The hash format of the password property. |
+| isAdmin | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates a user with super administrator privileges. |
+| isDelegatedAdmin | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user is a delegated administrator. |
+| agreedToTerms | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user has completed an initial login and accepted the Terms of Service agreement. |
+| suspended | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if user is suspended. |
+| changePasswordAtNextLogin | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user is forced to change their password at next login. |
+| ipWhitelisted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, the user's IP address is subject to a deprecated IP address allowlist configuration. |
+| name | OBJECT <details> <summary> Properties </summary> &#123;STRING\(fullName), STRING\(familyName), STRING\(givenName), STRING\(displayName)&#125; </details> |  |
+| kind | STRING | The type of the API resource. |
+| etag | STRING | ETag of the resource. |
+| emails | ARRAY <details> <summary> Items </summary> [&#123;STRING\(address), STRING\(customType), BOOLEAN\(primary), STRING\(type)&#125;] </details> |  |
+| externalIds | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customType), STRING\(type), STRING\(value)&#125;] </details> |  |
+| relations | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customType), STRING\(type), STRING\(value)&#125;] </details> |  |
+| aliases | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of the user's alias email addresses. |
+| isMailboxSetup | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user's Google mailbox is created. |
+| customerId | STRING | The customer ID to retrieve all account users. |
+| addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(country), STRING\(countryCode), STRING\(customType), STRING\(extendedAddress), STRING\(formatted), STRING\(locality), STRING\(poBox), STRING\(postalCode), BOOLEAN\(primary), STRING\(region), BOOLEAN\(sourceIsStructured), STRING\(streetAddress), STRING\(type)&#125;] </details> |  |
+| organizations | ARRAY <details> <summary> Items </summary> [&#123;STRING\(costCenter), STRING\(customType), STRING\(department), STRING\(description), STRING\(domain), INTEGER\(fullTimeEquivalent), STRING\(location), STRING\(name), BOOLEAN\(primary), STRING\(symbol), STRING\(title), STRING\(type)&#125;] </details> |  |
+| lastLoginTime | STRING | The last time the user logged into the user's account. |
+| phones | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customType), BOOLEAN\(primary), STRING\(type), STRING\(value)&#125;] </details> |  |
+| suspensionReason | STRING | Has the reason a user account is suspended either by the administrator or by Google at the time of suspension. |
+| thumbnailPhotoUrl | STRING | The URL of the user's profile photo. |
+| languages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customLanguage), STRING\(languageCode), STRING\(preference)&#125;] </details> |  |
+| posixAccounts | ARRAY <details> <summary> Items </summary> [&#123;STRING\(accountId), STRING\(gecos), NUMBER\(gid), STRING\(homeDirectory), STRING\(operatingSystemType), BOOLEAN\(primary), STRING\(shell), STRING\(systemId), NUMBER\(uid), STRING\(username)&#125;] </details> |  |
+| creationTime | STRING | The time the user's account was created. |
+| nonEditableAliases | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of the user's non-editable alias email addresses. |
+| sshPublicKeys | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(expirationTimeUsec), STRING\(fingerprint), STRING\(key)&#125;] </details> |  |
+| notes | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(value)&#125; </details> |  |
+| websites | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customType), BOOLEAN\(primary), STRING\(type), STRING\(value)&#125;] </details> |  |
+| locations | ARRAY <details> <summary> Items </summary> [&#123;STRING\(area), STRING\(buildingId), STRING\(customType), STRING\(deskCode), STRING\(floorName), STRING\(floorSection), STRING\(type)&#125;] </details> |  |
+| includeInGlobalAddressList | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user's profile is visible in the Google Workspace global address list when the contact sharing feature is enabled for the domain. |
+| keywords | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customType), STRING\(type), STRING\(value)&#125;] </details> |  |
+| deletionTime | STRING | The time the user's account was deleted. |
+| gender | OBJECT <details> <summary> Properties </summary> &#123;STRING\(addressMeAs), STRING\(customGender), STRING\(type)&#125; </details> |  |
+| thumbnailPhotoEtag | STRING | ETag of the user's photo |
+| ims | ARRAY <details> <summary> Items </summary> [&#123;STRING\(customProtocol), STRING\(customType), STRING\(im), BOOLEAN\(primary), STRING\(protocol), STRING\(type)&#125;] </details> |  |
+| customSchemas | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom fields of the user. |
+| isEnrolledIn2Sv | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Is enrolled in 2-step verification. |
+| isEnforcedIn2Sv | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Is 2-step verification enforced |
+| archived | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if user is archived. |
+| orgUnitPath | STRING | The full path of the parent organization associated with the user. |
+| recoveryEmail | STRING | Recovery email of the user. |
+| recoveryPhone | STRING | Recovery phone of the user. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "primaryEmail" : "",
+  "password" : "",
+  "hashFunction" : "",
+  "isAdmin" : false,
+  "isDelegatedAdmin" : false,
+  "agreedToTerms" : false,
+  "suspended" : false,
+  "changePasswordAtNextLogin" : false,
+  "ipWhitelisted" : false,
+  "name" : {
+    "fullName" : "",
+    "familyName" : "",
+    "givenName" : "",
+    "displayName" : ""
+  },
+  "kind" : "",
+  "etag" : "",
+  "emails" : [ {
+    "address" : "",
+    "customType" : "",
+    "primary" : false,
+    "type" : ""
+  } ],
+  "externalIds" : [ {
+    "customType" : "",
+    "type" : "",
+    "value" : ""
+  } ],
+  "relations" : [ {
+    "customType" : "",
+    "type" : "",
+    "value" : ""
+  } ],
+  "aliases" : [ "" ],
+  "isMailboxSetup" : false,
+  "customerId" : "",
+  "addresses" : [ {
+    "country" : "",
+    "countryCode" : "",
+    "customType" : "",
+    "extendedAddress" : "",
+    "formatted" : "",
+    "locality" : "",
+    "poBox" : "",
+    "postalCode" : "",
+    "primary" : false,
+    "region" : "",
+    "sourceIsStructured" : false,
+    "streetAddress" : "",
+    "type" : ""
+  } ],
+  "organizations" : [ {
+    "costCenter" : "",
+    "customType" : "",
+    "department" : "",
+    "description" : "",
+    "domain" : "",
+    "fullTimeEquivalent" : 1,
+    "location" : "",
+    "name" : "",
+    "primary" : false,
+    "symbol" : "",
+    "title" : "",
+    "type" : ""
+  } ],
+  "lastLoginTime" : "",
+  "phones" : [ {
+    "customType" : "",
+    "primary" : false,
+    "type" : "",
+    "value" : ""
+  } ],
+  "suspensionReason" : "",
+  "thumbnailPhotoUrl" : "",
+  "languages" : [ {
+    "customLanguage" : "",
+    "languageCode" : "",
+    "preference" : ""
+  } ],
+  "posixAccounts" : [ {
+    "accountId" : "",
+    "gecos" : "",
+    "gid" : 0.0,
+    "homeDirectory" : "",
+    "operatingSystemType" : "",
+    "primary" : false,
+    "shell" : "",
+    "systemId" : "",
+    "uid" : 0.0,
+    "username" : ""
+  } ],
+  "creationTime" : "",
+  "nonEditableAliases" : [ "" ],
+  "sshPublicKeys" : [ {
+    "expirationTimeUsec" : 0.0,
+    "fingerprint" : "",
+    "key" : ""
+  } ],
+  "notes" : {
+    "contentType" : "",
+    "value" : ""
+  },
+  "websites" : [ {
+    "customType" : "",
+    "primary" : false,
+    "type" : "",
+    "value" : ""
+  } ],
+  "locations" : [ {
+    "area" : "",
+    "buildingId" : "",
+    "customType" : "",
+    "deskCode" : "",
+    "floorName" : "",
+    "floorSection" : "",
+    "type" : ""
+  } ],
+  "includeInGlobalAddressList" : false,
+  "keywords" : [ {
+    "customType" : "",
+    "type" : "",
+    "value" : ""
+  } ],
+  "deletionTime" : "",
+  "gender" : {
+    "addressMeAs" : "",
+    "customGender" : "",
+    "type" : ""
+  },
+  "thumbnailPhotoEtag" : "",
+  "ims" : [ {
+    "customProtocol" : "",
+    "customType" : "",
+    "im" : "",
+    "primary" : false,
+    "protocol" : "",
+    "type" : ""
+  } ],
+  "customSchemas" : { },
+  "isEnrolledIn2Sv" : false,
+  "isEnforcedIn2Sv" : false,
+  "archived" : false,
+  "orgUnitPath" : "",
+  "recoveryEmail" : "",
+  "recoveryPhone" : ""
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Create OAuth 2.0 Application
+
+Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
+
+### Enable Google Tasks API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Go to the **APIs & Services**.
+3. Click on **ENABLE APIS AND SERVICES**.
+4. Search for "admin sdk api" in the search bar.
+5. Click on **Admin SDK API**.
+6. Click **Enable**.
+7. Go back to **API Library** (previous page) and search for "enterprise license manager api".
+8. Click on **Enterprise License Manager API**.
+9. Click **Enable**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/GlHQogW1PtwQnSQsD37e?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+## Troubleshooting
+
+### Access Blocked: Verification Process Not Completed
+
+Documentation for how to add a test user can be found [here](/reference/components/google-application-setup_v1#access-blocked-verification-process-not-completed)
