@@ -1,10 +1,11 @@
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {KnowledgeBaseDocument} from '@/shared/middleware/graphql';
 
 import KnowledgeBaseDocumentChunkList from './KnowledgeBaseDocumentChunkList';
 import KnowledgeBaseDocumentListItem from './KnowledgeBaseDocumentListItem';
-import KnowledgeBaseDocumentListItemDeleteDialog from './KnowledgeBaseDocumentListItemDeleteDialog';
 import useKnowledgeBaseDocumentList from './hooks/useKnowledgeBaseDocumentList';
+import useKnowledgeBaseDocumentListItemDeleteDialog from './hooks/useKnowledgeBaseDocumentListItemDeleteDialog';
 
 interface KnowledgeBaseDocumentListProps {
     documents: KnowledgeBaseDocument[];
@@ -16,12 +17,18 @@ const KnowledgeBaseDocumentList = ({documents, knowledgeBaseId}: KnowledgeBaseDo
         documents,
     });
 
+    const {
+        handleClose: handleDeleteDialogClose,
+        handleConfirm: handleDeleteConfirm,
+        open: deleteDialogOpen,
+    } = useKnowledgeBaseDocumentListItemDeleteDialog({knowledgeBaseId});
+
     return (
-        <div className="w-full divide-y divide-border/50">
+        <div className="w-full divide-y divide-stroke-neutral-tertiary">
             {documents.length === 0 ? (
-                <div className="rounded-lg border border-gray-200 bg-gray-50 p-8 text-center">
-                    <p className="text-gray-500">No documents available. Upload documents to get started.</p>
-                </div>
+                <p className="rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-secondary p-8 text-center text-muted-foreground">
+                    No documents available. Upload documents to get started.
+                </p>
             ) : (
                 <>
                     {documents.map((document) => {
@@ -48,7 +55,11 @@ const KnowledgeBaseDocumentList = ({documents, knowledgeBaseId}: KnowledgeBaseDo
                         );
                     })}
 
-                    <KnowledgeBaseDocumentListItemDeleteDialog knowledgeBaseId={knowledgeBaseId} />
+                    <DeleteAlertDialog
+                        onCancel={handleDeleteDialogClose}
+                        onDelete={handleDeleteConfirm}
+                        open={deleteDialogOpen}
+                    />
                 </>
             )}
         </div>

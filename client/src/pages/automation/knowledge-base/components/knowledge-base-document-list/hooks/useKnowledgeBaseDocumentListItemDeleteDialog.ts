@@ -36,10 +36,6 @@ export default function useKnowledgeBaseDocumentListItemDeleteDialog({
         },
     });
 
-    const handleClose = () => {
-        clearDialog();
-    };
-
     const handleConfirm = () => {
         if (!documentId) {
             return;
@@ -48,21 +44,15 @@ export default function useKnowledgeBaseDocumentListItemDeleteDialog({
         deleteMutation.mutate({id: documentId});
     };
 
-    const handleOpen = (docId: string) => {
-        setDocumentId(docId);
-    };
-
-    const handleOpenChange = (open: boolean) => {
-        if (!open) {
-            handleClose();
-        }
-    };
-
     return {
-        handleClose,
+        handleClose: clearDialog,
         handleConfirm,
-        handleOpen,
-        handleOpenChange,
+        handleOpen: setDocumentId,
+        handleOpenChange: (open: boolean) => {
+            if (!open) {
+                clearDialog();
+            }
+        },
         isPending: deleteMutation.isPending,
         open: documentId !== null,
     };

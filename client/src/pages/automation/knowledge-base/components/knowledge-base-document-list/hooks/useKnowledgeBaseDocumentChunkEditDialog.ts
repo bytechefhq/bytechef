@@ -1,6 +1,6 @@
 import {useToast} from '@/hooks/use-toast';
 import {useKnowledgeBaseDocumentChunkEditDialogStore} from '@/pages/automation/knowledge-base/stores/useKnowledgeBaseDocumentChunkEditDialogStore';
-import {KnowledgeBaseDocumentChunk, useUpdateKnowledgeBaseDocumentChunkMutation} from '@/shared/middleware/graphql';
+import {useUpdateKnowledgeBaseDocumentChunkMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -37,24 +37,6 @@ export default function useKnowledgeBaseDocumentChunkEditDialog({
         },
     });
 
-    const handleClose = () => {
-        clearDialog();
-    };
-
-    const handleContentChange = (newContent: string) => {
-        setContent(newContent);
-    };
-
-    const handleEdit = (chunkToEdit: KnowledgeBaseDocumentChunk) => {
-        setChunk(chunkToEdit);
-    };
-
-    const handleOpenChange = (open: boolean) => {
-        if (!open) {
-            handleClose();
-        }
-    };
-
     const handleSave = () => {
         if (!chunk) {
             return;
@@ -70,10 +52,14 @@ export default function useKnowledgeBaseDocumentChunkEditDialog({
 
     return {
         content,
-        handleClose,
-        handleContentChange,
-        handleOpen: handleEdit,
-        handleOpenChange,
+        handleClose: clearDialog,
+        handleContentChange: setContent,
+        handleOpen: setChunk,
+        handleOpenChange: (open: boolean) => {
+            if (!open) {
+                clearDialog();
+            }
+        },
         handleSave,
         isPending: updateMutation.isPending,
         open: chunk !== null,

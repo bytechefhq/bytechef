@@ -40,10 +40,6 @@ export default function useKnowledgeBaseDocumentChunkDeleteDialog({
         },
     });
 
-    const handleClose = () => {
-        clearDialog();
-    };
-
     const handleConfirm = async () => {
         if (chunkIdsToDelete.length === 0) {
             return;
@@ -92,35 +88,21 @@ export default function useKnowledgeBaseDocumentChunkDeleteDialog({
         }
     };
 
-    const handleDeleteChunk = (chunkId: string) => {
-        setChunkIdsToDelete([chunkId]);
-    };
-
-    const handleDeleteChunks = (chunkIds: string[]) => {
-        if (chunkIds.length === 0) {
-            return;
-        }
-
-        setChunkIdsToDelete([...chunkIds]);
-    };
-
-    const handleDeleteSelectedChunks = () => {
-        handleDeleteChunks(selectedChunks);
-    };
-
-    const handleOpenChange = (open: boolean) => {
-        if (!open) {
-            handleClose();
-        }
-    };
-
     return {
         chunkCount: chunkIdsToDelete.length,
-        handleClose,
+        handleClose: clearDialog,
         handleConfirm,
-        handleDeleteChunk,
-        handleDeleteSelectedChunks,
-        handleOpenChange,
+        handleDeleteChunk: (chunkId: string) => setChunkIdsToDelete([chunkId]),
+        handleDeleteSelectedChunks: () => {
+            if (selectedChunks.length > 0) {
+                setChunkIdsToDelete([...selectedChunks]);
+            }
+        },
+        handleOpenChange: (open: boolean) => {
+            if (!open) {
+                clearDialog();
+            }
+        },
         isPending: isDeleting || deleteMutation.isPending,
         open: chunkIdsToDelete.length > 0,
     };

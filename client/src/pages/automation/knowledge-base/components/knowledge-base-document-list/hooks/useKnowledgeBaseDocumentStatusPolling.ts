@@ -39,7 +39,9 @@ export default function useKnowledgeBaseDocumentStatusPolling({
         if (data?.knowledgeBaseDocumentStatus) {
             const {message, status: documentStatus} = data.knowledgeBaseDocumentStatus;
 
-            onStatusChange?.(documentStatus, message || undefined);
+            if (onStatusChange) {
+                onStatusChange(documentStatus, message || undefined);
+            }
         }
     }, [data, onStatusChange]);
 

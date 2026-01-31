@@ -1,7 +1,8 @@
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import KnowledgeBaseDocumentListItemDropdownMenu from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentListItemDropdownMenu';
-import KnowledgeBaseDocumentListItemTagList from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentListItemTagList';
 import useKnowledgeBaseDocumentListItem from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentListItem';
+import useKnowledgeBaseDocumentListItemTagList from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentListItemTagList';
+import TagList from '@/shared/components/TagList';
 import {KnowledgeBaseDocument, Tag} from '@/shared/middleware/graphql';
 import {ChevronDownIcon} from 'lucide-react';
 
@@ -22,6 +23,12 @@ const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: Knowledg
         handleTagListClick,
         statusBadge,
     } = useKnowledgeBaseDocumentListItem({document});
+
+    const {convertedRemainingTags, convertedTags, updateTagsMutation} = useKnowledgeBaseDocumentListItemTagList({
+        knowledgeBaseDocumentId: document.id,
+        remainingTags,
+        tags,
+    });
 
     return (
         <div
@@ -44,9 +51,9 @@ const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: Knowledg
                             className="group flex items-center text-xs font-semibold text-muted-foreground"
                             ref={chunksCollapsibleTriggerRef}
                         >
-                            <div className="mr-1">
+                            <span className="mr-1">
                                 {chunkCount === 1 ? `${chunkCount} chunk` : `${chunkCount} chunks`}
-                            </div>
+                            </span>
 
                             <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                         </CollapsibleTrigger>
@@ -57,13 +64,20 @@ const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: Knowledg
                             </span>
                         )}
 
-                        <div onClick={handleTagListClick}>
-                            <KnowledgeBaseDocumentListItemTagList
-                                knowledgeBaseDocumentId={document.id}
-                                remainingTags={remainingTags}
-                                tags={tags}
+                        <span onClick={handleTagListClick}>
+                            <TagList
+                                getRequest={(_id, newTags) => ({
+                                    input: {
+                                        knowledgeBaseDocumentId: document.id,
+                                        tags: newTags.map((tag) => ({id: tag.id, name: tag.name})),
+                                    },
+                                })}
+                                id={+document.id}
+                                remainingTags={convertedRemainingTags}
+                                tags={convertedTags}
+                                updateTagsMutation={updateTagsMutation}
                             />
-                        </div>
+                        </span>
                     </div>
                 </div>
 
