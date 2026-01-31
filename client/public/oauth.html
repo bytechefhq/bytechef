@@ -31,6 +31,8 @@
     <script>
         // Constants
         const OAUTH_RESPONSE = 'react-use-oauth2-response';
+        const OAUTH_STORAGE_KEY = 'react-use-oauth2-storage-response';
+        const OAUTH_BROADCAST_CHANNEL = 'react-use-oauth2-broadcast-channel';
 
         // Utility function to convert query string to object
         function queryToObject(query) {
@@ -39,8 +41,48 @@
             return Object.fromEntries(parameters.entries());
         }
 
-        // We won't check state here due to cross-origin restrictions
-        // Instead, we'll pass the state to the parent window for validation
+        // Send message using available methods (postMessage, BroadcastChannel, localStorage)
+        function sendOAuthMessage(message, messageElement) {
+            let messageSent = false;
+
+            // Method 1: Try window.opener.postMessage (preferred)
+            if (window.opener) {
+                try {
+                    window.opener.postMessage(message, '*');
+                    messageSent = true;
+                } catch (error) {
+                    console.warn('Failed to send message via window.opener:', error);
+                }
+            }
+
+            // Method 2: Try BroadcastChannel API (fallback for lost opener)
+            if (typeof BroadcastChannel !== 'undefined') {
+                try {
+                    const channel = new BroadcastChannel(OAUTH_BROADCAST_CHANNEL);
+                    channel.postMessage(message);
+                    channel.close();
+                    messageSent = true;
+                } catch (error) {
+                    console.warn('Failed to send message via BroadcastChannel:', error);
+                }
+            }
+
+            // Method 3: Use localStorage as final fallback
+            try {
+                localStorage.setItem(OAUTH_STORAGE_KEY, JSON.stringify({
+                    ...message,
+                    timestamp: Date.now()
+                }));
+                messageSent = true;
+            } catch (error) {
+                console.warn('Failed to send message via localStorage:', error);
+            }
+
+            if (!messageSent) {
+                messageElement.textContent = 'Error: Could not communicate with parent window. Please close this window and try again.';
+                throw new Error('No communication method available');
+            }
+        }
 
         // Main function to handle OAuth response
         function handleOAuthResponse() {
@@ -56,39 +98,27 @@
                 ...hashParams
             };
 
-            const state = payload.state;
             const error = payload.error;
-
-            // Check if window opener exists
-            if (!window.opener) {
-                messageElement.textContent = 'Error: No window opener';
-                throw new Error('No window opener');
-            }
 
             // Handle error case
             if (error) {
                 const errorMessage = decodeURI(error) || 'OAuth error: An error has occurred.';
                 messageElement.textContent = errorMessage;
 
-                window.opener.postMessage({
+                sendOAuthMessage({
                     error: errorMessage,
                     type: OAUTH_RESPONSE
-                }, '*');
+                }, messageElement);
             }
             // Handle success case - let parent window validate state
             else {
                 messageElement.textContent = 'Authentication successful! You can close this window.';
 
-                window.opener.postMessage({
+                sendOAuthMessage({
                     payload,
                     type: OAUTH_RESPONSE
-                }, '*');
+                }, messageElement);
             }
-
-            // Auto-close window after successful authentication (optional)
-            // if (!error && state && checkState(state)) {
-            //     setTimeout(() => window.close(), 3000);
-            // }
         }
 
         // Execute when DOM is fully loaded
