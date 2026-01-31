@@ -17,6 +17,10 @@
 package com.bytechef.component.text.helper.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.DISPLAY_NAME;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.DOMAIN;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.EMAIL;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.LOCAL_PART;
 
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.exception.ProviderException;
@@ -24,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Currency;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -73,5 +78,25 @@ public class TextHelperUtils {
             .sorted(Comparator.comparing(Currency::getCurrencyCode))
             .map(currency -> option(currency.getCurrencyCode(), currency.getCurrencyCode()))
             .collect(Collectors.toList());
+    }
+
+    public static Map<String, String> parseEmail(String emailInput) {
+
+        Pattern pattern = Pattern.compile("\\s*(?:(.*?)\\s*<)?([\\w.+-]+)@([\\w.-]+)>?\\s*");
+        Matcher matcher = pattern.matcher(emailInput);
+
+        if (matcher.matches()) {
+
+            String displayName = matcher.group(1) != null ? matcher.group(1) : "";
+            String localPart = matcher.group(2);
+            String domain = matcher.group(3);
+
+            String email = localPart + "@" + domain;
+
+            return Map.of(DISPLAY_NAME, displayName, LOCAL_PART, localPart, DOMAIN, domain, EMAIL, email);
+
+        } else {
+            throw new ProviderException("Invalid email format: " + emailInput);
+        }
     }
 }

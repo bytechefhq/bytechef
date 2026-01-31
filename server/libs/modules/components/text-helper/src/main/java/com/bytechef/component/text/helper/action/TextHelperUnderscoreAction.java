@@ -17,7 +17,6 @@
 package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
@@ -25,34 +24,35 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.TE
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.exception.ProviderException;
 
 /**
  * @author Nikolina Špehar
  */
-public class TextHelperChangeTypeAction {
+public class TextHelperUnderscoreAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("changeType")
-        .title("Change Type")
-        .description("Change the type of the input text to number.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("underscore")
+        .title("Underscore")
+        .description(
+            "Convert text to snake case, lowercasing all text, removing special characters, and replacing spaces " +
+                "with underscores.")
         .properties(
             string(TEXT)
-                .description("The input text to be changed to a number.")
+                .description("The input text that will be converted to snake case.")
                 .label("Text")
                 .required(true))
-        .output(outputSchema(number().description("Number input text")))
-        .perform(TextHelperChangeTypeAction::perform);
+        .output(outputSchema(string().description("Text in snake case.")))
+        .perform(TextHelperUnderscoreAction::perform);
 
-    private TextHelperChangeTypeAction() {
+    private TextHelperUnderscoreAction() {
     }
 
-    public static double perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         String text = inputParameters.getRequiredString(TEXT);
 
-        try {
-            return Double.parseDouble(text);
-        } catch (NumberFormatException numberFormatException) {
-            throw new ProviderException(text + " can not be converted to number.");
-        }
+        return text.toLowerCase()
+            .replaceAll("[^a-z0-9\\s]", "")
+            .trim()
+            .replaceAll("\\s+", "_");
     }
 }

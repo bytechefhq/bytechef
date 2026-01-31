@@ -18,10 +18,8 @@ package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -29,22 +27,43 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Nikolina Spehar
  */
-class TextHelperChangeTypeActionTest {
+class TextHelperRemoveSpecialCharactersActionTest {
 
-    @Test
-    void testPerformValidNumber() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "42"));
+    private static String run(String input) {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input));
 
-        double result = TextHelperChangeTypeAction.perform(mockedParameters, null, null);
-
-        assertEquals(42.0, result);
+        return TextHelperRemoveSpecialCharactersAction.perform(mockedParameters, null, null);
     }
 
     @Test
-    void testPerformInvalidNumber() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "not a number"));
+    void removesSpacesAndSpecialCharacters() {
+        String input = "Hello, World! 123";
+        String result = run(input);
 
-        assertThrows(ProviderException.class,
-            () -> TextHelperChangeTypeAction.perform(mockedParameters, null, null));
+        assertEquals("HelloWorld123", result);
+    }
+
+    @Test
+    void returnsSameStringWhenAlreadyAlphanumeric() {
+        String input = "AbcXYZ123";
+        String result = run(input);
+
+        assertEquals("AbcXYZ123", result);
+    }
+
+    @Test
+    void returnsEmptyStringWhenOnlySpecialCharacters() {
+        String input = "!@#$%^&*() ";
+        String result = run(input);
+
+        assertEquals("", result);
+    }
+
+    @Test
+    void handlesEmptyString() {
+        String input = "";
+        String result = run(input);
+
+        assertEquals("", result);
     }
 }

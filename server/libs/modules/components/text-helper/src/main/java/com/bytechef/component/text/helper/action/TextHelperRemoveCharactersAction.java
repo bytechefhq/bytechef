@@ -17,42 +17,45 @@
 package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.CHARACTER;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.exception.ProviderException;
+import java.util.regex.Pattern;
 
 /**
  * @author Nikolina Špehar
  */
-public class TextHelperChangeTypeAction {
+public class TextHelperRemoveCharactersAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("changeType")
-        .title("Change Type")
-        .description("Change the type of the input text to number.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("removeCharacters")
+        .title("Remove Characters")
+        .description("Remove specified characters from a string.")
         .properties(
             string(TEXT)
-                .description("The input text to be changed to a number.")
                 .label("Text")
+                .description("The text that will be processed to remove specified characters.")
+                .required(true),
+            string(CHARACTER)
+                .label("Character")
+                .description("Character that will be removed from the text.")
+                .maxLength(1)
                 .required(true))
-        .output(outputSchema(number().description("Number input text")))
-        .perform(TextHelperChangeTypeAction::perform);
+        .output(outputSchema(string().description("Result of removing special characters from a string.")))
+        .perform(TextHelperRemoveCharactersAction::perform);
 
-    private TextHelperChangeTypeAction() {
+    private TextHelperRemoveCharactersAction() {
     }
 
-    public static double perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String text = inputParameters.getRequiredString(TEXT);
+        String character = inputParameters.getRequiredString(CHARACTER);
 
-        try {
-            return Double.parseDouble(text);
-        } catch (NumberFormatException numberFormatException) {
-            throw new ProviderException(text + " can not be converted to number.");
-        }
+        String regex = Pattern.quote(String.valueOf(character));
+        return text.replaceAll(regex, "");
     }
 }
