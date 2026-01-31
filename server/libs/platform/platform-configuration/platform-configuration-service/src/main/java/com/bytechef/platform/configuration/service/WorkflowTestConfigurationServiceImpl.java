@@ -69,6 +69,49 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
+    public void deleteWorkflowTestConfigurationConnection(long connectionId) {
+        List<Long> configurationIds =
+            workflowTestConfigurationConnectionRepository.findAllWorkflowTestConfigurationIdsByConnectionId(
+                connectionId);
+
+        for (Long configurationId : configurationIds) {
+            WorkflowTestConfiguration configuration = workflowTestConfigurationRepository.findById(configurationId)
+                .orElse(null);
+
+            if (configuration == null) {
+                continue;
+            }
+
+            List<WorkflowTestConfigurationConnection> filteredConnections = configuration.getConnections()
+                .stream()
+                .filter(connection -> !Objects.equals(connection.getConnectionId(), connectionId))
+                .toList();
+
+            configuration.setConnections(filteredConnections);
+
+            workflowTestConfigurationRepository.save(configuration);
+        }
+    }
+
+    @Override
+    public void deleteWorkflowTestConfigurationConnection(
+        String workflowId, String workflowNodeName, String key, long environmentId) {
+
+        WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId, environmentId);
+
+        List<WorkflowTestConfigurationConnection> filtered = workflowTestConfiguration
+            .getConnections()
+            .stream()
+            .filter(connection -> !(Objects.equals(connection.getWorkflowNodeName(), workflowNodeName)
+                && Objects.equals(connection.getWorkflowConnectionKey(), key)))
+            .toList();
+
+        workflowTestConfiguration.setConnections(filtered);
+
+        workflowTestConfigurationRepository.save(workflowTestConfiguration);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId, long environmentId) {
         return workflowTestConfigurationRepository.findByWorkflowIdAndEnvironmentId(workflowId, environmentId);
@@ -182,24 +225,6 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     @Override
     public void updateWorkflowId(String oldWorkflowId, String newWorkflowId) {
         workflowTestConfigurationRepository.updateWorkflowId(oldWorkflowId, newWorkflowId);
-    }
-
-    @Override
-    public void deleteWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String key, long environmentId) {
-
-        WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId, environmentId);
-
-        List<WorkflowTestConfigurationConnection> filtered = workflowTestConfiguration
-            .getConnections()
-            .stream()
-            .filter(connection -> !(Objects.equals(connection.getWorkflowNodeName(), workflowNodeName)
-                && Objects.equals(connection.getWorkflowConnectionKey(), key)))
-            .toList();
-
-        workflowTestConfiguration.setConnections(filtered);
-
-        workflowTestConfigurationRepository.save(workflowTestConfiguration);
     }
 
     private WorkflowTestConfiguration getWorkflowTestConfiguration(String workflowId, long environmentId) {

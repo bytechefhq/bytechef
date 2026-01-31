@@ -33,6 +33,8 @@ public interface WorkflowTestConfigurationService {
 
     void delete(List<String> workflowIds);
 
+    void deleteWorkflowTestConfigurationConnection(long connectionId);
+
     Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId, long environmentId);
 
     Optional<Long> fetchWorkflowTestConfigurationConnectionId(
