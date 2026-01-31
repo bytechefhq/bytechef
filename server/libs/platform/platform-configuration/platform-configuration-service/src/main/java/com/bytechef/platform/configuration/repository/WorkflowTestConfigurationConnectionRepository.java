@@ -41,4 +41,10 @@ public interface WorkflowTestConfigurationConnectionRepository
     List<WorkflowTestConfigurationConnection> findByWorkflowIdAndWorkflowNodeNameAndEnvironmentId(
         @Param("workflowId") String workflowId, @Param("workflowNodeName") String workflowNodeName,
         @Param("environmentId") long environmentId);
+
+    @Query("""
+            SELECT DISTINCT workflow_test_configuration_id FROM workflow_test_configuration_connection
+            WHERE connection_id = :connectionId
+        """)
+    List<Long> findAllWorkflowTestConfigurationIdsByConnectionId(@Param("connectionId") long connectionId);
 }

@@ -17,8 +17,10 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
@@ -35,13 +37,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade {
 
     private final ConnectionFacade connectionFacade;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkspaceConnectionService workspaceConnectionService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceConnectionFacadeImpl(
-        ConnectionFacade connectionFacade, WorkspaceConnectionService workspaceConnectionService) {
+        ConnectionFacade connectionFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService,
+        WorkspaceConnectionService workspaceConnectionService) {
 
         this.connectionFacade = connectionFacade;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
     }
 
@@ -59,6 +67,12 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
         connectionFacade.delete(connectionId);
+    }
+
+    @Override
+    public void disconnectConnection(long connectionId) {
+        projectDeploymentWorkflowService.deleteProjectDeploymentWorkflowConnection(connectionId);
+        workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(connectionId);
     }
 
     @Override
