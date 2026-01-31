@@ -28,9 +28,14 @@ export const useGetWorkspaceProjectWorkflowExecutionsQuery = (request: GetWorkfl
             }),
     });
 
-export const useGetProjectWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, enabled?: boolean) =>
+export const useGetProjectWorkflowExecutionQuery = (
+    request: GetWorkflowExecutionRequest,
+    enabled?: boolean,
+    refetchInterval?: number | false
+) =>
     useQuery<WorkflowExecution, Error>({
         queryKey: WorkflowExecutionKeys.workflowExecution(request.id),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecution(request),
         enabled: enabled === undefined ? true : enabled,
+        refetchInterval,
     });
