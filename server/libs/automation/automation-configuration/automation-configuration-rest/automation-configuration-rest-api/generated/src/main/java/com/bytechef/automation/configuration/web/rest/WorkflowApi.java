@@ -5,6 +5,7 @@
  */
 package com.bytechef.automation.configuration.web.rest;
 
+import com.bytechef.automation.configuration.web.rest.model.DuplicateWorkflow200ResponseModel;
 import org.springframework.lang.Nullable;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.892484+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-28T12:19:12.459673+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
 @Validated
 @Tag(name = "workflow", description = "The Automation Workflow Internal API")
 public interface WorkflowApi {
@@ -123,7 +124,7 @@ public interface WorkflowApi {
         tags = { "workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The id of a new duplicated workflow object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = DuplicateWorkflow200ResponseModel.class))
             })
         }
     )
@@ -132,10 +133,19 @@ public interface WorkflowApi {
         value = WorkflowApi.PATH_DUPLICATE_WORKFLOW,
         produces = { "application/json" }
     )
-    default ResponseEntity<String> duplicateWorkflow(
+    default ResponseEntity<DuplicateWorkflow200ResponseModel> duplicateWorkflow(
         @NotNull @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @NotNull @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
     ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"id\" : \"id\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

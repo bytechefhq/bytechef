@@ -17,33 +17,33 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreateProjectDeploymentWorkflowJob200ResponseModel
+ * DuplicateWorkflow200ResponseModel
  */
 
-@JsonTypeName("createProjectDeploymentWorkflowJob_200_response")
+@JsonTypeName("duplicateWorkflow_200_response")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-28T12:19:12.459673+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
-public class CreateProjectDeploymentWorkflowJob200ResponseModel {
+public class DuplicateWorkflow200ResponseModel {
 
-  private @Nullable Long jobId;
+  private @Nullable String id;
 
-  public CreateProjectDeploymentWorkflowJob200ResponseModel jobId(@Nullable Long jobId) {
-    this.jobId = jobId;
+  public DuplicateWorkflow200ResponseModel id(@Nullable String id) {
+    this.id = id;
     return this;
   }
 
   /**
-   * The id of an executed job.
-   * @return jobId
+   * The id of the duplicated workflow.
+   * @return id
    */
   
-  @Schema(name = "jobId", description = "The id of an executed job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("jobId")
-  public @Nullable Long getJobId() {
-    return jobId;
+  @Schema(name = "id", description = "The id of the duplicated workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
+  public @Nullable String getId() {
+    return id;
   }
 
-  public void setJobId(@Nullable Long jobId) {
-    this.jobId = jobId;
+  public void setId(@Nullable String id) {
+    this.id = id;
   }
 
   @Override
@@ -54,20 +54,20 @@ public class CreateProjectDeploymentWorkflowJob200ResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateProjectDeploymentWorkflowJob200ResponseModel createProjectDeploymentWorkflowJob200Response = (CreateProjectDeploymentWorkflowJob200ResponseModel) o;
-    return Objects.equals(this.jobId, createProjectDeploymentWorkflowJob200Response.jobId);
+    DuplicateWorkflow200ResponseModel duplicateWorkflow200Response = (DuplicateWorkflow200ResponseModel) o;
+    return Objects.equals(this.id, duplicateWorkflow200Response.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(jobId);
+    return Objects.hash(id);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateProjectDeploymentWorkflowJob200ResponseModel {\n");
-    sb.append("    jobId: ").append(toIndentedString(jobId)).append("\n");
+    sb.append("class DuplicateWorkflow200ResponseModel {\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("}");
     return sb.toString();
   }
