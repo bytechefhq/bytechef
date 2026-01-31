@@ -64,7 +64,7 @@ import tools.jackson.databind.ObjectMapper;
     basePackages = {
         "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.commons.util", "com.bytechef.jackson.config",
         "com.bytechef.platform.category", "com.bytechef.automation.configuration", "com.bytechef.platform.connection",
-        "com.bytechef.platform.tag"
+        "com.bytechef.platform.tag", "com.bytechef.platform.configuration.service"
     })
 @EnableAutoConfiguration
 @EnableCaching
