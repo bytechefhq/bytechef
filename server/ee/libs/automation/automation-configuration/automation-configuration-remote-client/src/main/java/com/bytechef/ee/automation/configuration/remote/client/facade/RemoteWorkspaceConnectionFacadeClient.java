@@ -32,6 +32,11 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
     }
 
     @Override
+    public void disconnectConnection(long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<com.bytechef.platform.connection.dto.ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long connectionEnvironment,
         Long tagId) {
