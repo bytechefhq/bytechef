@@ -21,11 +21,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Encoder;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import java.util.Optional;
@@ -38,9 +40,13 @@ abstract class AbstractGithubActionTest {
 
     protected final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> contextFunctionArgumentCaptor =
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpContextFunctionArgumentCaptor =
+        ArgumentCaptor.forClass(ContextFunction.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Encoder, ?>> encoderContextFunctionArgumentCaptor =
         ArgumentCaptor.forClass(ContextFunction.class);
     protected final ActionContext mockedActionContext = mock(ActionContext.class);
+    protected final Encoder mockedEncoder = mock(Encoder.class);
     protected final Http.Executor mockedExecutor = mock(Http.Executor.class);
     protected final Http mockedHttp = mock(Http.class);
     protected final Http.Response mockedResponse = mock(Http.Response.class);
@@ -56,9 +62,14 @@ abstract class AbstractGithubActionTest {
         PerformFunction singleConnectionPerformFunction =
             (PerformFunction) basePerformFunction.get();
 
-        when(mockedActionContext.http(contextFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> contextFunctionArgumentCaptor.getValue()
+        when(mockedActionContext.http(httpContextFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> httpContextFunctionArgumentCaptor.getValue()
                 .apply(mockedHttp));
+        when(mockedActionContext.encoder(encoderContextFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> encoderContextFunctionArgumentCaptor.getValue()
+                .apply(mockedEncoder));
+        when(mockedEncoder.base64Decode(any(String.class)))
+            .thenAnswer(inv -> EncodingUtils.base64Decode(inv.<String>getArgument(0)));
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
