@@ -22,16 +22,8 @@ export default function useKnowledgeBaseDocumentChunkListItemDropdownMenu({
         }))
     );
 
-    const handleEdit = () => {
-        setChunk(chunk);
-    };
-
-    const handleDelete = () => {
-        setChunkIdsToDelete([chunk.id]);
-    };
-
     return {
-        handleDelete,
-        handleEdit,
+        handleDelete: () => setChunkIdsToDelete([chunk.id]),
+        handleEdit: () => setChunk(chunk),
     };
 }

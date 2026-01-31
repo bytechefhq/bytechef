@@ -16,21 +16,10 @@ export default function useKnowledgeBaseDocumentChunkListSelectionBar() {
         }))
     );
 
-    const handleClearSelection = () => {
-        clearSelection();
-    };
-
-    const handleDeleteSelected = () => {
-        setChunkIdsToDelete(selectedChunks);
-    };
-
-    const selectedCount = selectedChunks.length;
-    const hasSelection = selectedCount > 0;
-
     return {
-        handleClearSelection,
-        handleDeleteSelected,
-        hasSelection,
-        selectedCount,
+        handleClearSelection: clearSelection,
+        handleDeleteSelected: () => setChunkIdsToDelete(selectedChunks),
+        hasSelection: selectedChunks.length > 0,
+        selectedCount: selectedChunks.length,
     };
 }

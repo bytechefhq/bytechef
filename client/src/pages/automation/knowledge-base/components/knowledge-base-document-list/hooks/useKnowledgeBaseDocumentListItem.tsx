@@ -7,7 +7,7 @@ import {
 } from '@/pages/automation/knowledge-base/util/knowledge-base-utils';
 import {KnowledgeBaseDocument} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {useCallback, useRef} from 'react';
+import {KeyboardEvent, MouseEvent, useCallback, useRef} from 'react';
 
 interface UseKnowledgeBaseDocumentListItemProps {
     document: KnowledgeBaseDocument;
@@ -44,7 +44,7 @@ export default function useKnowledgeBaseDocumentListItem({document}: UseKnowledg
     const displayName = document.document?.name || document.name;
     const statusBadge = getStatusBadge(currentStatus);
 
-    const handleDocumentListItemClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    const handleDocumentListItemClick = useCallback((event: MouseEvent<HTMLDivElement>) => {
         const target = event.target as HTMLElement;
 
         const interactiveSelectors = [
@@ -66,14 +66,14 @@ export default function useKnowledgeBaseDocumentListItem({document}: UseKnowledg
         chunksCollapsibleTriggerRef.current?.click();
     }, []);
 
-    const handleDocumentListItemKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+    const handleDocumentListItemKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             chunksCollapsibleTriggerRef.current?.click();
         }
     }, []);
 
-    const handleTagListClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const handleTagListClick = (event: MouseEvent<HTMLDivElement>) => {
         event.stopPropagation();
     };
 

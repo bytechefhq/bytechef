@@ -26,21 +26,21 @@ export default function useKnowledgeBaseDocumentListItemTagList({
     const queryClient = useQueryClient();
 
     const updateTagsMutation = useUpdateKnowledgeBaseDocumentTagsMutation({
-        onError: (_err, _vars, ctx) => {
-            if (ctx?.cachedTagsByDocumentData) {
-                queryClient.setQueryData(['knowledgeBaseDocumentTagsByDocument'], ctx.cachedTagsByDocumentData);
+        onError: (_error, _variables, context) => {
+            if (context?.cachedTagsByDocumentData) {
+                queryClient.setQueryData(['knowledgeBaseDocumentTagsByDocument'], context.cachedTagsByDocumentData);
             }
         },
         onMutate: async (variables: UpdateKnowledgeBaseDocumentTagsVarsI) => {
             await queryClient.cancelQueries({queryKey: ['knowledgeBaseDocumentTagsByDocument']});
 
-            const previous = queryClient.getQueryData<{
+            const previousTagsData = queryClient.getQueryData<{
                 knowledgeBaseDocumentTagsByDocument: KnowledgeBaseDocumentTagsEntry[];
             }>(['knowledgeBaseDocumentTagsByDocument']);
 
-            const next = (() => {
-                if (!previous?.knowledgeBaseDocumentTagsByDocument) {
-                    return previous;
+            const optimisticTagsData = (() => {
+                if (!previousTagsData?.knowledgeBaseDocumentTagsByDocument) {
+                    return previousTagsData;
                 }
 
                 const tagsWithTempIds = (variables.input.tags ?? []).map((tag: TagInput, index: number) => ({
@@ -48,30 +48,30 @@ export default function useKnowledgeBaseDocumentListItemTagList({
                     id: tag.id ?? -(Date.now() + index),
                 }));
 
-                const updatedTagsByDocument = previous.knowledgeBaseDocumentTagsByDocument.map((entry) =>
+                const updatedTagsByDocument = previousTagsData.knowledgeBaseDocumentTagsByDocument.map((entry) =>
                     entry.knowledgeBaseDocumentId === knowledgeBaseDocumentId
                         ? {...entry, tags: tagsWithTempIds}
                         : entry
                 );
 
-                const documentHasTagsEntry = previous.knowledgeBaseDocumentTagsByDocument.some(
+                const documentHasTagsEntry = previousTagsData.knowledgeBaseDocumentTagsByDocument.some(
                     (entry) => entry.knowledgeBaseDocumentId === knowledgeBaseDocumentId
                 );
 
                 return documentHasTagsEntry
-                    ? {...previous, knowledgeBaseDocumentTagsByDocument: updatedTagsByDocument}
+                    ? {...previousTagsData, knowledgeBaseDocumentTagsByDocument: updatedTagsByDocument}
                     : {
-                          ...previous,
+                          ...previousTagsData,
                           knowledgeBaseDocumentTagsByDocument: [
-                              ...previous.knowledgeBaseDocumentTagsByDocument,
+                              ...previousTagsData.knowledgeBaseDocumentTagsByDocument,
                               {knowledgeBaseDocumentId, tags: tagsWithTempIds},
                           ],
                       };
             })();
 
-            queryClient.setQueryData(['knowledgeBaseDocumentTagsByDocument'], next);
+            queryClient.setQueryData(['knowledgeBaseDocumentTagsByDocument'], optimisticTagsData);
 
-            return {cachedTagsByDocumentData: previous};
+            return {cachedTagsByDocumentData: previousTagsData};
         },
         onSettled: () => {
             queryClient.invalidateQueries({queryKey: ['knowledgeBaseDocumentTags']});

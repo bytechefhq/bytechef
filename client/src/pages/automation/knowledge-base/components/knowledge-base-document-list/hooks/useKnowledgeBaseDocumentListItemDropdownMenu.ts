@@ -14,11 +14,7 @@ export default function useKnowledgeBaseDocumentListItemDropdownMenu({
         }))
     );
 
-    const handleDelete = () => {
-        setDocumentId(documentId);
-    };
-
     return {
-        handleDelete,
+        handleDelete: () => setDocumentId(documentId),
     };
 }

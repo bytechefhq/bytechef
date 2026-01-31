@@ -1,8 +1,9 @@
-import KnowledgeBaseDocumentChunkDeleteDialog from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentChunkDeleteDialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import KnowledgeBaseDocumentChunkEditDialog from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentChunkEditDialog';
 import KnowledgeBaseDocumentChunkListItemDropdownMenu from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentChunkListItemDropdownMenu';
 import KnowledgeBaseDocumentChunkListItemHeader from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentChunkListItemHeader';
 import KnowledgeBaseDocumentChunkListSelectionBar from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentChunkListSelectionBar';
+import useKnowledgeBaseDocumentChunkDeleteDialog from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentChunkDeleteDialog';
 import {KnowledgeBaseDocumentChunk} from '@/shared/middleware/graphql';
 
 interface KnowledgeBaseDocumentChunkListProps {
@@ -16,20 +17,26 @@ const KnowledgeBaseDocumentChunkList = ({
     documentName,
     knowledgeBaseId,
 }: KnowledgeBaseDocumentChunkListProps) => {
+    const {
+        handleClose: handleDeleteDialogClose,
+        handleConfirm: handleDeleteConfirm,
+        open: deleteDialogOpen,
+    } = useKnowledgeBaseDocumentChunkDeleteDialog({knowledgeBaseId});
+
     if (chunks.length === 0) {
         return (
-            <div className="ml-7 border-l border-border/50 py-2 pl-4">
-                <p className="text-sm text-muted-foreground">No chunks available for this document.</p>
-            </div>
+            <p className="ml-7 border-l border-stroke-neutral-tertiary py-2 pl-4 text-sm text-muted-foreground">
+                No chunks available for this document.
+            </p>
         );
     }
 
     return (
-        <div className="ml-7 space-y-2 border-l border-border/50 py-2 pl-4">
+        <div className="ml-7 space-y-2 border-l border-stroke-neutral-tertiary py-2 pl-4">
             <KnowledgeBaseDocumentChunkListSelectionBar />
 
             {chunks.map((chunk, index) => (
-                <div className="rounded-lg border border-gray-200 bg-white p-4" key={chunk.id}>
+                <div className="rounded-lg border border-stroke-neutral-secondary bg-background p-4" key={chunk.id}>
                     <div className="mb-2 flex items-center justify-between">
                         <KnowledgeBaseDocumentChunkListItemHeader
                             chunkId={chunk.id}
@@ -40,21 +47,25 @@ const KnowledgeBaseDocumentChunkList = ({
                         <KnowledgeBaseDocumentChunkListItemDropdownMenu chunk={chunk} />
                     </div>
 
-                    <p className="ml-7 text-sm text-gray-700">{chunk.content}</p>
+                    <p className="ml-7 text-sm text-content-neutral-primary">{chunk.content}</p>
 
                     {chunk.metadata && (
-                        <div className="ml-7 mt-2 text-xs text-gray-400">
+                        <p className="ml-7 mt-2 text-xs text-content-neutral-tertiary">
                             <span className="font-medium">Metadata: </span>
 
                             {JSON.stringify(chunk.metadata)}
-                        </div>
+                        </p>
                     )}
                 </div>
             ))}
 
             <KnowledgeBaseDocumentChunkEditDialog knowledgeBaseId={knowledgeBaseId} />
 
-            <KnowledgeBaseDocumentChunkDeleteDialog knowledgeBaseId={knowledgeBaseId} />
+            <DeleteAlertDialog
+                onCancel={handleDeleteDialogClose}
+                onDelete={handleDeleteConfirm}
+                open={deleteDialogOpen}
+            />
         </div>
     );
 };

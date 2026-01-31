@@ -30,54 +30,81 @@ export const getStatusLabel = (status: number): string => {
     }
 };
 
-export const getDocumentIcon = (extension?: string, mimeType?: string) => {
-    const ext = extension?.toLowerCase();
+type DocumentType = 'image' | 'pdf' | 'word' | 'spreadsheet' | 'presentation' | 'code' | 'text' | 'unknown';
+
+const getDocumentType = (extension?: string, mimeType?: string): DocumentType => {
+    const ext = extension?.toLowerCase() || '';
     const mime = mimeType?.toLowerCase() || '';
 
-    if (mime.startsWith('image/') || ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'ico'].includes(ext || '')) {
-        return <FileImageIcon className="size-5 text-green-600" />;
-    }
-
-    if (mime === 'application/pdf' || ext === 'pdf') {
-        return <FileTextIcon className="size-5 text-red-600" />;
-    }
-
-    if (mime.includes('msword') || mime.includes('wordprocessingml') || ['doc', 'docx', 'odt'].includes(ext || '')) {
-        return <FileTypeIcon className="size-5 text-blue-600" />;
-    }
-
-    if (
-        mime.includes('spreadsheetml') ||
-        mime.includes('ms-excel') ||
-        ['xls', 'xlsx', 'csv', 'ods'].includes(ext || '')
-    ) {
-        return <FileSpreadsheetIcon className="size-5 text-green-700" />;
-    }
-
-    if (
-        mime.includes('presentationml') ||
-        mime.includes('ms-powerpoint') ||
-        ['ppt', 'pptx', 'odp'].includes(ext || '')
-    ) {
-        return <PresentationIcon className="size-5 text-orange-600" />;
-    }
-
-    if (
+    const isImage =
+        mime.startsWith('image/') || ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'ico'].includes(ext);
+    const isPdf = mime === 'application/pdf' || ext === 'pdf';
+    const isWord = mime.includes('msword') || mime.includes('wordprocessingml') || ['doc', 'docx', 'odt'].includes(ext);
+    const isSpreadsheet =
+        mime.includes('spreadsheetml') || mime.includes('ms-excel') || ['xls', 'xlsx', 'csv', 'ods'].includes(ext);
+    const isPresentation =
+        mime.includes('presentationml') || mime.includes('ms-powerpoint') || ['ppt', 'pptx', 'odp'].includes(ext);
+    const isCode =
         mime.includes('javascript') ||
         mime.includes('typescript') ||
         mime.includes('json') ||
         mime.includes('xml') ||
         mime.includes('html') ||
-        ['js', 'ts', 'jsx', 'tsx', 'json', 'xml', 'html', 'css', 'py', 'java', 'rb', 'go', 'rs'].includes(ext || '')
-    ) {
-        return <FileCodeIcon className="size-5 text-purple-600" />;
+        ['js', 'ts', 'jsx', 'tsx', 'json', 'xml', 'html', 'css', 'py', 'java', 'rb', 'go', 'rs'].includes(ext);
+    const isText = mime.startsWith('text/') || ['txt', 'md', 'rtf'].includes(ext);
+
+    if (isImage) {
+        return 'image';
     }
 
-    if (mime.startsWith('text/') || ['txt', 'md', 'rtf'].includes(ext || '')) {
-        return <FileTextIcon className="size-5 text-muted-foreground" />;
+    if (isPdf) {
+        return 'pdf';
     }
 
-    return <FileIcon className="size-5 text-muted-foreground" />;
+    if (isWord) {
+        return 'word';
+    }
+
+    if (isSpreadsheet) {
+        return 'spreadsheet';
+    }
+
+    if (isPresentation) {
+        return 'presentation';
+    }
+
+    if (isCode) {
+        return 'code';
+    }
+
+    if (isText) {
+        return 'text';
+    }
+
+    return 'unknown';
+};
+
+export const getDocumentIcon = (extension?: string, mimeType?: string) => {
+    const documentType = getDocumentType(extension, mimeType);
+
+    switch (documentType) {
+        case 'image':
+            return <FileImageIcon className="size-5 text-content-success-primary" />;
+        case 'pdf':
+            return <FileTextIcon className="size-5 text-content-destructive-primary" />;
+        case 'word':
+            return <FileTypeIcon className="size-5 text-content-brand-primary" />;
+        case 'spreadsheet':
+            return <FileSpreadsheetIcon className="size-5 text-content-success-primary" />;
+        case 'presentation':
+            return <PresentationIcon className="size-5 text-content-warning-primary" />;
+        case 'code':
+            return <FileCodeIcon className="size-5 text-content-brand-secondary" />;
+        case 'text':
+            return <FileTextIcon className="size-5 text-muted-foreground" />;
+        default:
+            return <FileIcon className="size-5 text-muted-foreground" />;
+    }
 };
 
 export const getStatusBadge = (status: number) => {

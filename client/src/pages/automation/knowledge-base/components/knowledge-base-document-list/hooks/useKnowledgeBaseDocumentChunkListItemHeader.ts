@@ -15,14 +15,8 @@ export default function useKnowledgeBaseDocumentChunkListItemHeader({
         }))
     );
 
-    const isSelected = selectedChunks.includes(chunkId);
-
-    const handleSelectionChange = () => {
-        toggleChunkSelection(chunkId);
-    };
-
     return {
-        handleSelectionChange,
-        isSelected,
+        handleSelectionChange: () => toggleChunkSelection(chunkId),
+        isSelected: selectedChunks.includes(chunkId),
     };
 }
