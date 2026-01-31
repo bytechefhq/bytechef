@@ -42,6 +42,8 @@ class MockBroadcastChannel {
 describe('useOAuth2', () => {
     let mockWindow: Window | null = null;
     const originalOpen = window.open;
+    const originalAddEventListener = window.addEventListener;
+    const registeredListeners: Array<{type: string; listener: EventListener}> = [];
 
     const defaultProps: Oauth2Props = {
         authorizationUrl: 'https://auth.example.com/authorize',
@@ -56,6 +58,13 @@ describe('useOAuth2', () => {
         vi.clearAllMocks();
         MockBroadcastChannel.reset();
         vi.stubGlobal('BroadcastChannel', MockBroadcastChannel);
+
+        // Track and wrap addEventListener to enable cleanup
+        registeredListeners.length = 0;
+        window.addEventListener = vi.fn((type: string, listener: EventListener) => {
+            registeredListeners.push({listener, type});
+            originalAddEventListener.call(window, type, listener);
+        }) as typeof window.addEventListener;
 
         // Mock window.open
         mockWindow = {
@@ -72,10 +81,22 @@ describe('useOAuth2', () => {
     });
 
     afterEach(() => {
+        // Remove all registered event listeners to prevent test pollution
+        for (const {listener, type} of registeredListeners) {
+            window.removeEventListener(type, listener);
+        }
+
+        registeredListeners.length = 0;
+
         vi.restoreAllMocks();
         vi.unstubAllGlobals();
+        window.addEventListener = originalAddEventListener;
         window.open = originalOpen;
         MockBroadcastChannel.reset();
+
+        // Clear any remaining storage
+        sessionStorage.clear();
+        localStorage.clear();
     });
 
     it('should initialize with loading false and no error', () => {
@@ -117,7 +138,7 @@ describe('useOAuth2', () => {
     });
 
     it('should save state to sessionStorage', () => {
-        const {result} = renderHook(() => useOAuth2(defaultProps));
+        const {result, unmount} = renderHook(() => useOAuth2(defaultProps));
 
         act(() => {
             result.current.getAuth();
@@ -126,20 +147,19 @@ describe('useOAuth2', () => {
         const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
 
         expect(savedState).toBeTruthy();
+
+        // Cleanup to prevent interference with subsequent tests
+        unmount();
     });
 
-    // Note: This test functionality is covered by "should handle successful token response via postMessage"
-    // The code path is the same for both code and token responses, just different callback
-    // This test is skipped due to test isolation issues with BroadcastChannel mocking
-    // The actual functionality works correctly in production
-    it.skip('should handle successful code response via postMessage', () => {
+    it('should handle successful code response via postMessage', () => {
         const onCodeSuccess = vi.fn();
         const props: Oauth2Props = {
             ...defaultProps,
             onCodeSuccess,
         };
 
-        const {result, unmount} = renderHook(() => useOAuth2(props));
+        const {result} = renderHook(() => useOAuth2(props));
 
         act(() => {
             result.current.getAuth();
@@ -168,14 +188,9 @@ describe('useOAuth2', () => {
         });
         expect(result.current.loading).toBe(false);
         expect(result.current.error).toBeNull();
-
-        // Cleanup to prevent interference with other tests
-        unmount();
     });
 
-    // Note: This test is skipped due to test isolation issues with event listener mocking
-    // The functionality is tested by the BroadcastChannel and storage event tests which work reliably
-    it.skip('should handle successful token response via postMessage', () => {
+    it('should handle successful token response via postMessage', () => {
         const onTokenSuccess = vi.fn();
         const props: Oauth2Props = {
             ...defaultProps,
@@ -214,9 +229,7 @@ describe('useOAuth2', () => {
         expect(result.current.loading).toBe(false);
     });
 
-    // Note: These tests are skipped due to test isolation issues with postMessage event listeners
-    // The functionality is tested by the BroadcastChannel and storage event tests which work reliably
-    it.skip('should handle OAuth error via postMessage', () => {
+    it('should handle OAuth error via postMessage', () => {
         const onError = vi.fn();
         const props: Oauth2Props = {
             ...defaultProps,
@@ -249,7 +262,7 @@ describe('useOAuth2', () => {
         expect(result.current.error).toBe('access_denied');
     });
 
-    it.skip('should handle state mismatch error', () => {
+    it('should handle state mismatch error', () => {
         const onError = vi.fn();
         const props: Oauth2Props = {
             ...defaultProps,
@@ -318,9 +331,7 @@ describe('useOAuth2', () => {
         expect(result.current.loading).toBe(false);
     });
 
-    // Note: This test is skipped due to test isolation issues with event listener mocking
-    // The storage event listener functionality is verified by the "should register storage event listener" test
-    it.skip('should handle storage event for cross-tab communication', () => {
+    it('should handle storage event for cross-tab communication', () => {
         const onCodeSuccess = vi.fn();
         const props: Oauth2Props = {
             ...defaultProps,
@@ -346,12 +357,12 @@ describe('useOAuth2', () => {
 
         // Simulate storage event (cross-tab communication)
         act(() => {
-            window.dispatchEvent(
-                new StorageEvent('storage', {
-                    key: OAUTH_STORAGE_KEY,
-                    newValue: storageData,
-                })
-            );
+            const storageEvent = new StorageEvent('storage', {
+                key: OAUTH_STORAGE_KEY,
+                newValue: storageData,
+            });
+
+            window.dispatchEvent(storageEvent);
         });
 
         expect(onCodeSuccess).toHaveBeenCalledWith({
@@ -378,18 +389,18 @@ describe('useOAuth2', () => {
 
         // Simulate storage event for a different key
         act(() => {
-            window.dispatchEvent(
-                new StorageEvent('storage', {
-                    key: 'some-other-key',
-                    newValue: JSON.stringify({
-                        payload: {
-                            code: 'should-be-ignored',
-                            state: savedState,
-                        },
-                        type: OAUTH_RESPONSE,
-                    }),
-                })
-            );
+            const storageEvent = new StorageEvent('storage', {
+                key: 'some-other-key',
+                newValue: JSON.stringify({
+                    payload: {
+                        code: 'should-be-ignored',
+                        state: savedState,
+                    },
+                    type: OAUTH_RESPONSE,
+                }),
+            });
+
+            window.dispatchEvent(storageEvent);
         });
 
         expect(onCodeSuccess).not.toHaveBeenCalled();
@@ -505,5 +516,78 @@ describe('useOAuth2', () => {
         });
 
         expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+    });
+
+    it('should handle popup closing with localStorage data', () => {
+        vi.useFakeTimers();
+
+        const onCodeSuccess = vi.fn();
+        const props: Oauth2Props = {
+            ...defaultProps,
+            onCodeSuccess,
+        };
+
+        const {result} = renderHook(() => useOAuth2(props));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+
+        // Simulate localStorage being populated by the OAuth callback page
+        localStorage.setItem(
+            OAUTH_STORAGE_KEY,
+            JSON.stringify({
+                payload: {
+                    code: 'auth-code-from-storage',
+                    state: savedState,
+                },
+                timestamp: Date.now(),
+                type: OAUTH_RESPONSE,
+            })
+        );
+
+        // Simulate popup closing
+        (mockWindow as Window & {window: {closed: boolean}}).window.closed = true;
+
+        // Advance timers to trigger the interval check
+        act(() => {
+            vi.advanceTimersByTime(300);
+        });
+
+        expect(onCodeSuccess).toHaveBeenCalledWith({
+            code: 'auth-code-from-storage',
+            state: savedState,
+        });
+        expect(result.current.loading).toBe(false);
+
+        vi.useRealTimers();
+    });
+
+    it('should set loading to false when popup closes without auth data', () => {
+        vi.useFakeTimers();
+
+        const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+        const {result} = renderHook(() => useOAuth2(defaultProps));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        // Simulate popup closing without any OAuth data
+        (mockWindow as Window & {window: {closed: boolean}}).window.closed = true;
+
+        // Advance timers to trigger the interval check
+        act(() => {
+            vi.advanceTimersByTime(300);
+        });
+
+        expect(result.current.loading).toBe(false);
+        expect(consoleWarnSpy).toHaveBeenCalledWith('Warning: Popup was closed before completing authentication.');
+
+        consoleWarnSpy.mockRestore();
+        vi.useRealTimers();
     });
 });

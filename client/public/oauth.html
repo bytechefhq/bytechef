@@ -42,13 +42,14 @@
         }
 
         // Send message using available methods (postMessage, BroadcastChannel, localStorage)
+        // Uses all available methods to ensure message delivery across different browser contexts
         function sendOAuthMessage(message, messageElement) {
             let messageSent = false;
 
             // Method 1: Try window.opener.postMessage (preferred)
             if (window.opener) {
                 try {
-                    window.opener.postMessage(message, '*');
+                    window.opener.postMessage(message, window.location.origin);
                     messageSent = true;
                 } catch (error) {
                     console.warn('Failed to send message via window.opener:', error);
@@ -56,6 +57,7 @@
             }
 
             // Method 2: Try BroadcastChannel API (fallback for lost opener)
+            // Always attempt this as window.opener may be null in some contexts (e.g., Slack OAuth)
             if (typeof BroadcastChannel !== 'undefined') {
                 try {
                     const channel = new BroadcastChannel(OAUTH_BROADCAST_CHANNEL);
@@ -68,6 +70,7 @@
             }
 
             // Method 3: Use localStorage as final fallback
+            // Always store to handle same-origin case where storage events don't fire
             try {
                 localStorage.setItem(OAUTH_STORAGE_KEY, JSON.stringify({
                     ...message,
