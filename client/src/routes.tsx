@@ -315,10 +315,6 @@ export const loadEnvironments = async (queryClient: QueryClient) => {
 
 export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
-        // {
-        //     element: <OAuthPopup />,
-        //     path: '/oauth',
-        // },
         {
             element: <Login />,
             path: '/login',
