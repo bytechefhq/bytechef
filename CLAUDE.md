@@ -194,6 +194,12 @@ public class ExampleComponentHandler implements ComponentHandler {
 
 ## Code Style and Best Practices
 
+### Client ESLint sort-keys Rule
+- Object keys must be in natural ascending (alphabetical) order in client code
+- Applies to mock objects, hoisted state, test data, and component props
+- ESLint `--fix` does NOT auto-fix sort-keys - must be fixed manually
+- Example: `{content: 'x', id: 'y'}` not `{id: 'y', content: 'x'}`
+
 ### Variable Naming
 - Do not use short or cryptic variable names on both the server and client sides; prefer clear, descriptive names that communicate intent.
 - This applies everywhere, including arrow function parameters and loop variables.
