@@ -16,20 +16,21 @@
 
 package com.bytechef.component.definition.datastream;
 
-import com.bytechef.component.definition.ClusterElementContext;
-import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
-import com.bytechef.component.definition.Parameters;
-import java.util.Map;
-
 /**
+ * Describes a single column/field exposed by a SOURCE or DESTINATION component.
+ *
+ * @param name  Column identifier (e.g., "firstName")
+ * @param label Display label (e.g., "First Name")
+ * @param type  Java type (String.class, Integer.class, etc.)
  * @author Ivica Cardic
  */
-public interface ItemProcessor<I, O> extends ItemStream {
+public record FieldDefinition(String name, String label, Class<?> type) {
 
-    ClusterElementType PROCESSOR = new ClusterElementType("PROCESSOR", "processor", "Processor");
+    public FieldDefinition(String name, String label) {
+        this(name, label, String.class);
+    }
 
-    Map<String, I> process(
-        Map<String, O> item, Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context)
-
-        throws Exception;
+    public FieldDefinition(String name) {
+        this(name, name, String.class);
+    }
 }
