@@ -40,10 +40,8 @@ import com.bytechef.component.script.engine.PolyglotEngine;
  */
 public class ScriptPythonAction {
 
-    public final ScriptActionDefinition actionDefinition;
-
-    public ScriptPythonAction(PolyglotEngine polyglotEngine) {
-        actionDefinition = new ScriptActionDefinition(
+    public static ScriptActionDefinition of(PolyglotEngine polyglotEngine) {
+        return new ScriptActionDefinition(
             action("python")
                 .title("Python")
                 .description("Executes custom Python code.")
@@ -64,5 +62,8 @@ public class ScriptPythonAction {
                         .required(true))
                 .output(),
             "python", polyglotEngine);
+    }
+
+    private ScriptPythonAction() {
     }
 }

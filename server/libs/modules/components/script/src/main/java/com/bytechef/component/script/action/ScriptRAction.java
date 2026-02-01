@@ -40,10 +40,8 @@ import com.bytechef.component.script.engine.PolyglotEngine;
  */
 public class ScriptRAction {
 
-    public final ScriptActionDefinition actionDefinition;
-
-    public ScriptRAction(PolyglotEngine polyglotEngine) {
-        actionDefinition = new ScriptActionDefinition(
+    public static ScriptActionDefinition of(PolyglotEngine polyglotEngine) {
+        return new ScriptActionDefinition(
             action("r")
                 .title("R")
                 .description("Executes custom R code.")
@@ -64,5 +62,8 @@ public class ScriptRAction {
                         .required(true))
                 .output(),
             "R", polyglotEngine);
+    }
+
+    private ScriptRAction() {
     }
 }

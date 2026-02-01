@@ -40,10 +40,8 @@ import com.bytechef.component.script.engine.PolyglotEngine;
  */
 public class ScriptJavaScriptAction {
 
-    public final ScriptActionDefinition actionDefinition;
-
-    public ScriptJavaScriptAction(PolyglotEngine polyglotEngine) {
-        this.actionDefinition = new ScriptActionDefinition(
+    public static ScriptActionDefinition of(PolyglotEngine polyglotEngine) {
+        return new ScriptActionDefinition(
             action("javascript")
                 .title("JavaScript")
                 .description("Executes custom JavaScript code.")
@@ -64,5 +62,8 @@ public class ScriptJavaScriptAction {
                         .required(true))
                 .output(),
             "js", polyglotEngine);
+    }
+
+    private ScriptJavaScriptAction() {
     }
 }
