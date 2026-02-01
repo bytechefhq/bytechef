@@ -135,12 +135,13 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @param inputParameters     a map of input parameters required for processing
      * @param componentConnection an instance of {@link ComponentConnection} used for external interactions
      * @param environmentId       the environment ID
-     * @param actionContext       the context in which the action is executed
+     * @param context             the context in which the action is executed
      * @return an object representing the result of the performed action
      */
+    @Nullable
     Object executePerformForPolyglot(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, Long environmentId, ActionContext actionContext);
+        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, ActionContext context);
 
     /**
      * Processes the error response for a given component and action and returns a ProviderException.

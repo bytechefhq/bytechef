@@ -216,9 +216,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public Object executePerformForPolyglot(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, Long environmentId, ActionContext actionContext) {
+        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, ActionContext context) {
 
-        ActionContextAware actionContextAware = (ActionContextAware) actionContext;
+        ActionContextAware actionContextAware = (ActionContextAware) context;
 
         PerformFunction performFunction =
             (PerformFunction) componentDefinitionRegistry
@@ -227,7 +227,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, actionContext,
+            componentName, componentVersion, componentConnection, context,
             ActionDefinitionErrorType.EXECUTE_PERFORM,
             (componentConnection1, actionContext1) -> executeSingleConnectionPerform(
                 performFunction, inputParameters, componentConnection1, actionContext1),
