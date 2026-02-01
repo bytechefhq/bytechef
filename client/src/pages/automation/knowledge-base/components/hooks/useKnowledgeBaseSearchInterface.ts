@@ -11,14 +11,14 @@ export default function useKnowledgeBaseSearchInterface({knowledgeBaseId}: UseKn
     const [searchQuery, setSearchQuery] = useState('');
     const [searchFilters, setSearchFilters] = useState<string | undefined>(undefined);
 
-    const {data, isLoading} = useSearchKnowledgeBaseQuery(
+    const {data, error, isLoading} = useSearchKnowledgeBaseQuery(
         {
             id: knowledgeBaseId,
             metadataFilters: searchFilters,
             query: searchQuery,
         },
         {
-            enabled: searchQuery.length > 0,
+            enabled: searchQuery.length > 0 && !!knowledgeBaseId,
         }
     );
 
@@ -48,6 +48,7 @@ export default function useKnowledgeBaseSearchInterface({knowledgeBaseId}: UseKn
 
     return {
         canSearch,
+        error,
         handleClearSearch,
         handleSearch,
         isLoading,

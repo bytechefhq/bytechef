@@ -14,7 +14,7 @@ const KnowledgeBase = () => {
         <LayoutContainer
             header={<KnowledgeBaseHeader knowledgeBaseName={knowledgeBase?.name} onBackClick={handleBackClick} />}
             leftSidebarBody={<KnowledgeBaseLeftSidebarNav />}
-            leftSidebarHeader={<Header position="sidebar" title="KnowledgeBase" />}
+            leftSidebarHeader={<Header position="sidebar" title="Knowledge Base" />}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[error]} loading={isLoading}>

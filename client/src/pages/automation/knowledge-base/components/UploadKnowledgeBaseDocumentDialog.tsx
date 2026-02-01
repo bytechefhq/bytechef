@@ -30,7 +30,6 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
         open,
         removeFile,
         selectedFiles,
-        setOpen,
         uploading,
     } = useUploadKnowledgeBaseDocumentDialog({knowledgeBaseId});
 
@@ -62,22 +61,23 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                     <div className="space-y-2">
                         <Label>Select Files</Label>
 
-                        <div
+                        <label
                             className={cn(
                                 'flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6',
                                 uploading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-50'
                             )}
-                            onClick={() => !uploading && document.getElementById('document-file-upload')?.click()}
+                            htmlFor="document-file-upload"
                         >
                             <Upload className="mb-2 size-8 text-gray-400" />
 
-                            <p className="text-sm text-gray-600">Drop files here or click to browse</p>
+                            <p className="text-sm text-gray-600">Click to browse files</p>
 
                             <p className="mt-1 text-xs text-gray-400">
-                                PDF, DOC, DOCX, TXT, CSV, XLS, XLSX, MD, PPT, PPTX, HTML (max 100MB each)
+                                Supported: PDF, DOC, DOCX, TXT, CSV, XLS, XLSX, MD, PPT, PPTX, HTML
                             </p>
 
                             <input
+                                accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.md,.ppt,.pptx,.html,.htm"
                                 className="hidden"
                                 disabled={uploading}
                                 id="document-file-upload"
@@ -85,7 +85,7 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                                 onChange={handleFileChange}
                                 type="file"
                             />
-                        </div>
+                        </label>
                     </div>
 
                     {selectedFiles.length > 0 && (
@@ -93,10 +93,10 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                             <Label>Selected Files ({selectedFiles.length})</Label>
 
                             <div className="max-h-[250px] space-y-2 overflow-y-auto">
-                                {selectedFiles.map((file, idx) => (
+                                {selectedFiles.map((file, fileIndex) => (
                                     <div
                                         className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 p-2 px-3"
-                                        key={idx}
+                                        key={`${file.file.name}-${file.file.size}-${file.file.lastModified}`}
                                     >
                                         <div className="flex flex-1 items-center space-x-2 overflow-hidden">
                                             <span className="truncate text-sm font-medium">{file.file.name}</span>
@@ -143,10 +143,11 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
 
                                             {!uploading && (
                                                 <button
+                                                    aria-label={`Remove ${file.file.name}`}
                                                     className="rounded-full p-1 hover:bg-gray-200"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
-                                                        removeFile(idx);
+                                                        removeFile(fileIndex);
                                                     }}
                                                     type="button"
                                                 >
@@ -162,7 +163,7 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                 </div>
 
                 <DialogFooter>
-                    <Button disabled={uploading} onClick={() => setOpen(false)} variant="ghost">
+                    <Button disabled={uploading} onClick={() => handleOpenChange(false)} variant="ghost">
                         Cancel
                     </Button>
 

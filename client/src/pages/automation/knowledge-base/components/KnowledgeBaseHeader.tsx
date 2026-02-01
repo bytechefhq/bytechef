@@ -14,7 +14,13 @@ const KnowledgeBaseHeader = ({knowledgeBaseName, onBackClick}: KnowledgeBaseHead
             position="main"
             title={
                 <div className="flex items-center space-x-2">
-                    <Button icon={<ArrowLeft className="size-5" />} onClick={onBackClick} size="icon" variant="ghost" />
+                    <Button
+                        aria-label="Back"
+                        icon={<ArrowLeft className="size-5" />}
+                        onClick={onBackClick}
+                        size="icon"
+                        variant="ghost"
+                    />
 
                     <span>{knowledgeBaseName || 'Loading...'}</span>
                 </div>
