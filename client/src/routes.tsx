@@ -41,6 +41,7 @@ const DataTables = lazy(() => import('@/pages/automation/datatables/DataTables')
 const DataTable = lazy(() => import('@/pages/automation/datatable/DataTable'));
 const Home = lazy(() => import('@/pages/home/Home'));
 const KnowledgeBase = lazy(() => import('@/pages/automation/knowledge-base/KnowledgeBase'));
+const KnowledgeBases = lazy(() => import('@/pages/automation/knowledge-bases/KnowledgeBases'));
 const McpServer = lazy(() => import('@/pages/settings/platform/mcp-server/McpServer'));
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const Notifications = lazy(() => import('@/pages/settings/platform/notifications/Notifications'));
@@ -604,7 +605,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
+                                            <LazyLoadWrapper hasLeftSidebar>
                                                 <DataTable />
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
@@ -614,7 +615,17 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <KnowledgeBases />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'knowledge-bases',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
                                                 <KnowledgeBase />
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
@@ -626,7 +637,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         {
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                                    <LazyLoadWrapper>
+                                                    <LazyLoadWrapper hasLeftSidebar>
                                                         <WorkflowChat />
                                                     </LazyLoadWrapper>
                                                 </PrivateRoute>

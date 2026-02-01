@@ -73,6 +73,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const ff_1652 = useFeatureFlagsStore()('ff-1652');
         const ff_3827 = useFeatureFlagsStore()('ff-3827');
         const ff_3839 = useFeatureFlagsStore()('ff-3839');
+        const ff_4000 = useFeatureFlagsStore()('ff-4000');
 
         const trimmedFilter = debouncedFilter.trim();
 
@@ -109,7 +110,8 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         .filter(
                             ({name}) =>
                                 ((!ff_797 && name !== 'dataStream') || ff_797) &&
-                                ((!ff_1652 && name !== 'aiAgent') || ff_1652)
+                                ((!ff_1652 && name !== 'aiAgent') || ff_1652) &&
+                                ((!ff_4000 && name !== 'knowledgeBase') || ff_4000)
                         )
                 );
 
@@ -142,7 +144,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     );
                 }
             }
-        }, [clusterElementType, componentsWithActions, trimmedFilter, ff_797, ff_1652, ff_3827, ff_3839]);
+        }, [clusterElementType, componentsWithActions, trimmedFilter, ff_797, ff_1652, ff_3827, ff_3839, ff_4000]);
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>
