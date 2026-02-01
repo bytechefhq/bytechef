@@ -49,10 +49,10 @@ import java.util.Map;
  */
 public class GenerateTextAction implements AiTextAction {
 
-    public final AiTextActionDefinition actionDefinition;
+    public static AiTextActionDefinition of(
+        ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
 
-    public GenerateTextAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
-        this.actionDefinition = new AiTextActionDefinition(
+        return new AiTextActionDefinition(
             action(AiTextConstants.TEXT_GENERATION)
                 .title("Text Generation")
                 .description("AI generates text based on the given prompt.")
@@ -73,9 +73,13 @@ public class GenerateTextAction implements AiTextAction {
                         string()
                             .description("Generated text.")),
                     sampleOutput("sample generated text.")),
-            provider, this, propertyService);
+            provider, new GenerateTextAction(), propertyService);
     }
 
+    private GenerateTextAction() {
+    }
+
+    @Override
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 

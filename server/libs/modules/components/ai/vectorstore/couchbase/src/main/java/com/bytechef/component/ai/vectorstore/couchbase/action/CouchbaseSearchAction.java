@@ -20,15 +20,16 @@ import static com.bytechef.component.ai.vectorstore.couchbase.constant.Couchbase
 import static com.bytechef.component.ai.vectorstore.couchbase.constant.CouchbaseConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractSearchAction;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class CouchbaseSearchAction extends AbstractSearchAction {
+public class CouchbaseSearchAction {
 
-    public CouchbaseSearchAction(ClusterElementDefinitionService clusterElementDefinitionService) {
-        super(COUCHBASE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractSearchAction.of(COUCHBASE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

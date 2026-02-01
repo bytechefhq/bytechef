@@ -61,7 +61,7 @@ public class AiImageComponentHandler implements ComponentHandler {
                     .icon("path:assets/ai-image.svg")
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                     .actions(
-                        new GenerateImageAction(provider, propertyService).actionDefinition));
+                        GenerateImageAction.of(provider, propertyService)));
         }
     }
 }

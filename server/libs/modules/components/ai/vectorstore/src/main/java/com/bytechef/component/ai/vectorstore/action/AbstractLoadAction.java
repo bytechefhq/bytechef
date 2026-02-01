@@ -48,24 +48,31 @@ import org.springframework.ai.document.DocumentTransformer;
  */
 public abstract class AbstractLoadAction {
 
-    public final ActionDefinition actionDefinition;
-
     private final String componentName;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final VectorStore vectorStore;
 
     protected AbstractLoadAction(
-        String componentName, VectorStore vectorStore, List<Property> properties,
+        String componentName, VectorStore vectorStore,
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        this.actionDefinition = action(LOAD)
-            .title("Load Data")
-            .description("Loads data into the vector store using LLM embeddings.")
-            .properties(properties)
-            .perform((MultipleConnectionsPerformFunction) this::perform);
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentName = componentName;
         this.vectorStore = vectorStore;
+    }
+
+    public static ActionDefinition of(
+        String componentName, VectorStore vectorStore, List<Property> properties,
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        AbstractLoadAction loadAction = new AbstractLoadAction(
+            componentName, vectorStore, clusterElementDefinitionService) {};
+
+        return action(LOAD)
+            .title("Load Data")
+            .description("Loads data into the vector store using LLM embeddings.")
+            .properties(properties)
+            .perform((MultipleConnectionsPerformFunction) loadAction::perform);
     }
 
     protected Object perform(

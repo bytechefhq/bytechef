@@ -268,9 +268,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         @Nullable ComponentConnection componentConnection) {
 
         return new ConvertResult(
-            ParametersFactory.createParameters(inputParameters),
-            ParametersFactory.createParameters(
-                componentConnection == null ? Map.of() : componentConnection.parameters()),
+            ParametersFactory.create(inputParameters),
+            ParametersFactory.create(componentConnection == null ? Map.of() : componentConnection.parameters()),
             getLookupDependsOnPathsMap(lookupDependsOnPaths));
     }
 
@@ -361,9 +360,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
         try {
             return toolFunction.apply(
-                ParametersFactory.createParameters(inputParameters),
-                ParametersFactory.createParameters(
-                    componentConnection == null ? Map.of() : componentConnection.getParameters()),
+                ParametersFactory.create(inputParameters),
+                ParametersFactory.create(componentConnection == null ? Map.of() : componentConnection.getParameters()),
                 context);
         } catch (Exception e) {
             if (e instanceof ProviderException) {
@@ -382,7 +380,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             componentName, componentVersion, clusterElementName);
 
         try {
-            return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
+            return workflowNodeDescriptionFunction.apply(ParametersFactory.create(inputParameters), context);
         } catch (Exception e) {
             throw new ConfigurationException(
                 e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);

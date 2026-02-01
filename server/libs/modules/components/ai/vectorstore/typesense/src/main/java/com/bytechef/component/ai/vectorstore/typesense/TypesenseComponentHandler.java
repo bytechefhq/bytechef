@@ -49,9 +49,9 @@ public class TypesenseComponentHandler implements ComponentHandler {
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
             .connection(TypesenseConnection.CONNECTION_DEFINITION)
             .actions(
-                new TypesenseSearchAction(clusterElementDefinitionService).actionDefinition,
-                new TypesenseLoadAction(clusterElementDefinitionService).actionDefinition)
-            .clusterElements(new TypesenseVectorStore(clusterElementDefinitionService).clusterElementDefinition));
+                TypesenseSearchAction.of(clusterElementDefinitionService),
+                TypesenseLoadAction.of(clusterElementDefinitionService))
+            .clusterElements(TypesenseVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override

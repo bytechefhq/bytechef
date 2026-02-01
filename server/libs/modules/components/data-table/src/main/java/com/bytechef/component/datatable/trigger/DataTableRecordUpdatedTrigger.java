@@ -48,21 +48,26 @@ import java.util.Objects;
  */
 public class DataTableRecordUpdatedTrigger {
 
-    public final ModifiableTriggerDefinition triggerDefinition;
-
     private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
     private final DataTableWebhookService dataTableWebhookService;
 
     @SuppressFBWarnings("EI")
-    public DataTableRecordUpdatedTrigger(
+    public static ModifiableTriggerDefinition of(
+        DataTableRowService dataTableRowService, DataTableService dataTableService,
+        DataTableWebhookService dataTableWebhookService) {
+
+        return new DataTableRecordUpdatedTrigger(
+            dataTableRowService, dataTableService, dataTableWebhookService).build();
+    }
+
+    private DataTableRecordUpdatedTrigger(
         DataTableRowService dataTableRowService, DataTableService dataTableService,
         DataTableWebhookService dataTableWebhookService) {
 
         this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
         this.dataTableWebhookService = dataTableWebhookService;
-        this.triggerDefinition = build();
     }
 
     private ModifiableTriggerDefinition build() {

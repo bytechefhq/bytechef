@@ -37,15 +37,15 @@ import java.util.List;
 
 public class AiAgentChatTool {
 
-    public final ClusterElementDefinition<MultipleConnectionsToolFunction> clusterElementDefinition;
+    public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
+        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition) {
 
-    public AiAgentChatTool(AiAgentChatAction aiAgentChatAction) {
         MultipleConnectionsPerformFunction performFn =
-            (MultipleConnectionsPerformFunction) aiAgentChatAction.actionDefinition
+            (MultipleConnectionsPerformFunction) chatActionDefinition
                 .getPerform()
                 .orElseThrow();
 
-        this.clusterElementDefinition = ComponentDsl.<MultipleConnectionsToolFunction>clusterElement("aiAgent")
+        return ComponentDsl.<MultipleConnectionsToolFunction>clusterElement("aiAgent")
             .title("AI Agent")
             .description("AI Agent tool")
             .properties(
@@ -65,6 +65,9 @@ public class AiAgentChatTool {
             .object(
                 () -> (inputParameters, connectionParameters, extensions, componentConnections, context) -> performFn
                     .apply(inputParameters, componentConnections, extensions, new ActionContextAdapter(context)));
+    }
+
+    private AiAgentChatTool() {
     }
 
     private static class ActionContextAdapter implements ActionContext {

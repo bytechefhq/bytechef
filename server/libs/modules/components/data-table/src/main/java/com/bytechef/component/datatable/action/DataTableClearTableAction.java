@@ -47,13 +47,16 @@ public class DataTableClearTableAction {
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
 
-    public final ModifiableActionDefinition actionDefinition;
-
     @SuppressFBWarnings("EI")
-    public DataTableClearTableAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    public static ModifiableActionDefinition of(
+        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+
+        return new DataTableClearTableAction(dataTableService, dataTableRowService).build();
+    }
+
+    private DataTableClearTableAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
-        this.actionDefinition = build();
     }
 
     private ModifiableActionDefinition build() {

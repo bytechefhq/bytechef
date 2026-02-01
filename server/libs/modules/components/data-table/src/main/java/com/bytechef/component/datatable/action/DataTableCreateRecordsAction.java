@@ -48,16 +48,19 @@ import java.util.Objects;
  */
 public class DataTableCreateRecordsAction {
 
-    public final ModifiableActionDefinition actionDefinition;
-
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
 
     @SuppressFBWarnings("EI")
-    public DataTableCreateRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    public static ModifiableActionDefinition of(
+        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+
+        return new DataTableCreateRecordsAction(dataTableService, dataTableRowService).build();
+    }
+
+    private DataTableCreateRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
-        this.actionDefinition = build();
     }
 
     private ModifiableActionDefinition build() {

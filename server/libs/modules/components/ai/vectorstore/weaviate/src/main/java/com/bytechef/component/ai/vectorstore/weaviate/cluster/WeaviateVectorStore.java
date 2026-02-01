@@ -19,14 +19,19 @@ package com.bytechef.component.ai.vectorstore.weaviate.cluster;
 import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 
 /**
  * @author Ivica Cardic
  */
-public class WeaviateVectorStore extends AbstractVectorStore {
+public class WeaviateVectorStore {
 
-    public WeaviateVectorStore(ClusterElementDefinitionService clusterElementDefinitionService) {
-        super("Weaviate", VECTOR_STORE, clusterElementDefinitionService);
+    public static ClusterElementDefinition<VectorStoreFunction> of(
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        return AbstractVectorStore.of(
+            "Weaviate", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

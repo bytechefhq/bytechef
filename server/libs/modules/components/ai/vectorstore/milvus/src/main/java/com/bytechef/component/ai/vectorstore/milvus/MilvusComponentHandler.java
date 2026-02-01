@@ -49,9 +49,9 @@ public class MilvusComponentHandler implements ComponentHandler {
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
             .connection(MilvusConnection.CONNECTION_DEFINITION)
             .actions(
-                new MilvusSearchAction(clusterElementDefinitionService).actionDefinition,
-                new MilvusLoadAction(clusterElementDefinitionService).actionDefinition)
-            .clusterElements(new MilvusVectorStore(clusterElementDefinitionService).clusterElementDefinition));
+                MilvusSearchAction.of(clusterElementDefinitionService),
+                MilvusLoadAction.of(clusterElementDefinitionService))
+            .clusterElements(MilvusVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override

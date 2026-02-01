@@ -50,10 +50,10 @@ public class CouchbaseComponentHandler implements ComponentHandler {
                 .connection(CouchbaseConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
-                    new CouchbaseLoadAction(clusterElementDefinitionService).actionDefinition,
-                    new CouchbaseSearchAction(clusterElementDefinitionService).actionDefinition)
+                    CouchbaseLoadAction.of(clusterElementDefinitionService),
+                    CouchbaseSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(
-                    new CouchbaseVectorStore(clusterElementDefinitionService).clusterElementDefinition));
+                    CouchbaseVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override

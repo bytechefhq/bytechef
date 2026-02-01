@@ -41,17 +41,27 @@ import org.springframework.ai.embedding.EmbeddingModel;
  */
 public abstract class AbstractSearchAction {
 
-    public final ActionDefinition actionDefinition;
-
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final String componentName;
     private final VectorStore vectorStore;
 
     protected AbstractSearchAction(
+        String componentName, VectorStore vectorStore,
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.componentName = componentName;
+        this.vectorStore = vectorStore;
+    }
+
+    public static ActionDefinition of(
         String componentName, VectorStore vectorStore, List<Property> properties,
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        this.actionDefinition = action(SEARCH)
+        AbstractSearchAction searchAction = new AbstractSearchAction(
+            componentName, vectorStore, clusterElementDefinitionService) {};
+
+        return action(SEARCH)
             .title("Search Data")
             .description("Query data from the vector store using LLM embeddings.")
             .properties(
@@ -65,10 +75,7 @@ public abstract class AbstractSearchAction {
                         properties.stream())
                     .toList())
             .output()
-            .perform((MultipleConnectionsPerformFunction) this::perform);
-        this.clusterElementDefinitionService = clusterElementDefinitionService;
-        this.componentName = componentName;
-        this.vectorStore = vectorStore;
+            .perform((MultipleConnectionsPerformFunction) searchAction::perform);
     }
 
     protected Object perform(

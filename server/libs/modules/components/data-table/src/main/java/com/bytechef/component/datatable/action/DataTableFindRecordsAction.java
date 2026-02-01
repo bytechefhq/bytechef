@@ -47,19 +47,19 @@ import java.util.Objects;
  */
 public class DataTableFindRecordsAction {
 
-    public final ModifiableActionDefinition actionDefinition;
-
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
 
     @SuppressFBWarnings("EI")
-    public DataTableFindRecordsAction(
-        DataTableService dataTableService,
-        DataTableRowService dataTableRowService) {
+    public static ModifiableActionDefinition of(
+        DataTableService dataTableService, DataTableRowService dataTableRowService) {
 
+        return new DataTableFindRecordsAction(dataTableService, dataTableRowService).build();
+    }
+
+    private DataTableFindRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
-        this.actionDefinition = build();
     }
 
     private ModifiableActionDefinition build() {

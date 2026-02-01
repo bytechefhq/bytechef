@@ -39,12 +39,16 @@ import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
  */
 public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
-    public final ChatActionDefinitionWrapper actionDefinition;
+    public static ChatActionDefinitionWrapper of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return new AiAgentChatAction(clusterElementDefinitionService).build();
+    }
 
-    public AiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
+    private AiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
         super(clusterElementDefinitionService);
+    }
 
-        actionDefinition = new ChatActionDefinitionWrapper(
+    private ChatActionDefinitionWrapper build() {
+        return new ChatActionDefinitionWrapper(
             action(CHAT)
                 .title("Chat")
                 .description("Chat with the AI agent.")

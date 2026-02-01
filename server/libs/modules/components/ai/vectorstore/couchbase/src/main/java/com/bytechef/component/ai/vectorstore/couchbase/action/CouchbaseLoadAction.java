@@ -17,18 +17,19 @@
 package com.bytechef.component.ai.vectorstore.couchbase.action;
 
 import static com.bytechef.component.ai.vectorstore.couchbase.constant.CouchbaseConstants.COUCHBASE;
+import static com.bytechef.component.ai.vectorstore.couchbase.constant.CouchbaseConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
-import com.bytechef.component.ai.vectorstore.couchbase.constant.CouchbaseConstants;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class CouchbaseLoadAction extends AbstractLoadAction {
+public class CouchbaseLoadAction {
 
-    public CouchbaseLoadAction(ClusterElementDefinitionService clusterElementDefinitionService) {
-        super(COUCHBASE, CouchbaseConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractLoadAction.of(COUCHBASE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

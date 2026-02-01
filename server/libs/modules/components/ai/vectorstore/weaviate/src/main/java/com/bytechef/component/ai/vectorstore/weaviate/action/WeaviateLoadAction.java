@@ -20,17 +20,17 @@ import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateCo
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
 import com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class WeaviateLoadAction extends AbstractLoadAction {
+public class WeaviateLoadAction {
 
-    public WeaviateLoadAction(
-        ClusterElementDefinitionService clusterElementDefinitionService) {
-
-        super(WEAVIATE, WeaviateConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractLoadAction.of(
+            WEAVIATE, WeaviateConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

@@ -46,16 +46,19 @@ import java.util.Objects;
  */
 public class DataTableDeleteRecordsAction {
 
-    public final ModifiableActionDefinition actionDefinition;
-
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
 
     @SuppressFBWarnings("EI")
-    public DataTableDeleteRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    public static ModifiableActionDefinition of(
+        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+
+        return new DataTableDeleteRecordsAction(dataTableService, dataTableRowService).build();
+    }
+
+    private DataTableDeleteRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
-        this.actionDefinition = build();
     }
 
     private ModifiableActionDefinition build() {

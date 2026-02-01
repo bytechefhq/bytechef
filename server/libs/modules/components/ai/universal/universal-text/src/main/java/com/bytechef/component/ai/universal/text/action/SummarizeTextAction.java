@@ -55,8 +55,6 @@ import java.util.Map;
  */
 public class SummarizeTextAction implements AiTextAction {
 
-    public final AiTextActionDefinition actionDefinition;
-
     public enum SummarizeFormat {
         STRUCTURED_SUMMARY,
         BRIEF_TITLE,
@@ -65,10 +63,10 @@ public class SummarizeTextAction implements AiTextAction {
         CUSTOM_PROMPT;
     }
 
-    public SummarizeTextAction(
+    public static AiTextActionDefinition of(
         ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
 
-        this.actionDefinition = new AiTextActionDefinition(
+        return new AiTextActionDefinition(
             action(AiTextConstants.SUMMARIZE_TEXT)
                 .title("Summarize Text")
                 .description("AI reads, analyzes and summarizes your text into a shorter format.")
@@ -104,8 +102,13 @@ public class SummarizeTextAction implements AiTextAction {
                         string()
                             .description("The summarized text.")),
                     sampleOutput("sample summarized text")),
-            provider, this, propertyService);
+            provider, new SummarizeTextAction(), propertyService);
     }
+
+    private SummarizeTextAction() {
+    }
+
+    @Override
 
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();

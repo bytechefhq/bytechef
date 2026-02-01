@@ -50,9 +50,9 @@ public class WeaviateComponentHandler implements ComponentHandler {
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
             .connection(WeaviateConnection.CONNECTION_DEFINITION)
             .actions(
-                new WeaviateSearchAction(clusterElementDefinitionService).actionDefinition,
-                new WeaviateLoadAction(clusterElementDefinitionService).actionDefinition)
-            .clusterElements(new WeaviateVectorStore(clusterElementDefinitionService).clusterElementDefinition));
+                WeaviateSearchAction.of(clusterElementDefinitionService),
+                WeaviateLoadAction.of(clusterElementDefinitionService))
+            .clusterElements(WeaviateVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override
