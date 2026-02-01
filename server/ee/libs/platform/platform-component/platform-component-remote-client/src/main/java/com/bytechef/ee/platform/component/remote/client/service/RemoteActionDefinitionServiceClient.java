@@ -81,7 +81,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public Object executePerformForPolyglot(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, Long environmentId, ActionContext actionContext) {
+        ComponentConnection componentConnection, Long environmentId, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }

@@ -16,10 +16,10 @@
 
 package com.bytechef.component.datastream.item;
 
-import static com.bytechef.component.definition.datastream.ItemProcessor.PROCESSOR;
+import static com.bytechef.platform.component.definition.datastream.ItemProcessor.PROCESSOR;
 
-import com.bytechef.component.definition.datastream.ItemProcessor;
 import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.definition.datastream.ItemProcessor;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;

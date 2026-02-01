@@ -16,20 +16,10 @@
 
 package com.bytechef.platform.component.definition;
 
-import static com.bytechef.component.definition.datastream.ItemReader.SOURCE;
-import static com.bytechef.component.definition.datastream.ItemWriter.DESTINATION;
-import static com.bytechef.platform.component.definition.datastream.ItemProcessor.PROCESSOR;
-
-import com.bytechef.component.definition.ClusterElementDefinition;
-import java.util.List;
+import com.bytechef.component.definition.ClusterElementContext;
 
 /**
  * @author Ivica Cardic
  */
-public interface DataStreamComponentDefinition extends ClusterRootComponentDefinition {
-
-    @Override
-    default List<ClusterElementDefinition.ClusterElementType> getClusterElementTypes() {
-        return List.of(SOURCE, DESTINATION, PROCESSOR);
-    }
+public interface ClusterElementContextAware extends ClusterElementContext, JobContextAware {
 }
