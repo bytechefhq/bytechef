@@ -23,8 +23,7 @@ import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.context.ContextFactory;
-import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -40,6 +39,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.Nullable;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.Value;
@@ -71,7 +71,7 @@ public class PolyglotEngine {
 
     public Object execute(
         String languageId, Parameters inputParameters, Map<String, ComponentConnection> componentConnections,
-        ActionContext actionContext) {
+        JobContextAware jobContextAware) {
 
         try (Context polyglotContext = getContext()) {
             polyglotContext.eval(languageId, inputParameters.getString(SCRIPT, switch (languageId) {
@@ -87,7 +87,7 @@ public class PolyglotEngine {
             Map<String, Object> inputMap = removeNotEvaluatedEntries(
                 inputParameters.getMap(INPUT, Object.class, Map.of()));
             ContextProxyObject contextProxyObject = new ContextProxyObject(
-                actionContext, applicationContext, languageId, componentConnections);
+                languageId, componentConnections, jobContextAware);
 
             Value value = polyglotContext.getBindings(languageId)
                 .getMember("perform")
@@ -109,7 +109,7 @@ public class PolyglotEngine {
     private static Object copyFromPolyglotContext(Object object) {
         switch (object) {
             case null -> {
-                return null;
+                return Map.of();
             }
             case Map<?, ?> map -> {
                 Map<String, Object> hashMap = new HashMap<>();
@@ -264,9 +264,22 @@ public class PolyglotEngine {
         return newMap;
     }
 
-    private record ActionProxyObject(
-        ActionContext actionContext, ApplicationContext applicationContext, ComponentDefinition componentDefinition,
-        String languageId, Map<String, ComponentConnection> componentConnections) implements ProxyObject {
+    private final class ActionProxyObject implements ProxyObject {
+
+        private final String languageId;
+        private final ComponentDefinition componentDefinition;
+        private final Map<String, ComponentConnection> componentConnections;
+        private final JobContextAware jobContextAware;
+
+        private ActionProxyObject(
+            String languageId, ComponentDefinition componentDefinition,
+            Map<String, ComponentConnection> componentConnections, JobContextAware jobContextAware) {
+
+            this.languageId = languageId;
+            this.componentDefinition = componentDefinition;
+            this.componentConnections = componentConnections;
+            this.jobContextAware = jobContextAware;
+        }
 
         @Override
         @SuppressWarnings({
@@ -296,18 +309,17 @@ public class PolyglotEngine {
                     }
                 }
 
-                ActionDefinitionService actionDefinitionService = getActionDefinitionService();
+                ActionDefinitionService actionDefinitionService = applicationContext.getBean(
+                    ActionDefinitionService.class);
 
-                ActionContextAware actionContextAware = (ActionContextAware) actionContext;
-
-                ActionContext newActionContext = createActionContext(
-                    componentDefinition.getName(), componentDefinition.getVersion(), actionName, actionContextAware,
+                ActionContext newActionContext = jobContextAware.toActionContext(
+                    componentDefinition.getName(), componentDefinition.getVersion(), actionName,
                     componentConnection);
 
                 Object result = actionDefinitionService.executePerformForPolyglot(
                     componentDefinition.getName(), componentDefinition.getVersion(), actionName,
                     (Map) copyFromPolyglotContext(inputParameters), componentConnection,
-                    actionContextAware.getEnvironmentId(), newActionContext);
+                    jobContextAware.getEnvironmentId(), newActionContext);
 
                 if (result == null) {
                     return null;
@@ -334,23 +346,6 @@ public class PolyglotEngine {
             throw new UnsupportedOperationException();
         }
 
-        private ActionContext createActionContext(
-            String componentName, int componentVersion, String actionName, ActionContextAware actionContextAware,
-            ComponentConnection componentConnection) {
-
-            ContextFactory contextFactory = applicationContext.getBean(ContextFactory.class);
-
-            return contextFactory.createActionContext(
-                componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
-                actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
-                actionContextAware.getWorkflowId(), componentConnection,
-                actionContextAware.getEnvironmentId(), actionContextAware.getPlatformType(), true);
-        }
-
-        private ActionDefinitionService getActionDefinitionService() {
-            return applicationContext.getBean(ActionDefinitionService.class);
-        }
-
         private Map.Entry<String, ComponentConnection> getComponentConnectionEntry(String connectionName) {
             return componentConnections
                 .entrySet()
@@ -362,7 +357,7 @@ public class PolyglotEngine {
                     "Connection with name %s does not exist".formatted(connectionName)));
         }
 
-        private Map.Entry<String, ComponentConnection> getFirstComponentConnectionEntry() {
+        private @Nullable Map.Entry<String, ComponentConnection> getFirstComponentConnectionEntry() {
             return componentConnections.entrySet()
                 .stream()
                 .filter(entry -> {
@@ -381,31 +376,71 @@ public class PolyglotEngine {
                 componentConnection.getConnectionId(), componentConnection.getParameters(),
                 componentConnection.getAuthorizationType());
         }
+
+        public String languageId() {
+            return languageId;
+        }
+
+        public ComponentDefinition componentDefinition() {
+            return componentDefinition;
+        }
+
+        public Map<String, ComponentConnection> componentConnections() {
+            return componentConnections;
+        }
+
+        public JobContextAware jobContextAware() {
+            return jobContextAware;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this)
+                return true;
+            if (obj == null || obj.getClass() != this.getClass())
+                return false;
+            var that = (ActionProxyObject) obj;
+            return Objects.equals(this.languageId, that.languageId) &&
+                Objects.equals(this.componentDefinition, that.componentDefinition) &&
+                Objects.equals(this.componentConnections, that.componentConnections) &&
+                Objects.equals(this.jobContextAware, that.jobContextAware);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(languageId, componentDefinition, componentConnections, jobContextAware);
+        }
+
+        @Override
+        public String toString() {
+            return "ActionProxyObject[" +
+                "languageId=" + languageId + ", " +
+                "componentDefinition=" + componentDefinition + ", " +
+                "componentConnections=" + componentConnections + ", " +
+                "jobContextAware=" + jobContextAware + ']';
+        }
+
     }
 
-    private static class ComponentProxyObject implements ProxyObject {
+    private class ComponentProxyObject implements ProxyObject {
 
-        private final ActionContext actionContext;
-        private final ApplicationContext applicationContext;
         private final Map<String, ComponentDefinition> componentDefinitionMap = new ConcurrentHashMap<>();
-        private final String languageId;
         private final Map<String, ComponentConnection> componentConnections;
+        private final JobContextAware jobContextAware;
+        private final String languageId;
 
         private ComponentProxyObject(
-            ActionContext actionContext, ApplicationContext applicationContext, String languageId,
-            Map<String, ComponentConnection> componentConnections) {
+            String languageId, Map<String, ComponentConnection> componentConnections, JobContextAware jobContextAware) {
 
-            this.actionContext = actionContext;
-            this.applicationContext = applicationContext;
-            this.languageId = languageId;
             this.componentConnections = componentConnections;
+            this.jobContextAware = jobContextAware;
+            this.languageId = languageId;
         }
 
         @Override
         public Object getMember(String componentName) {
             return new ActionProxyObject(
-                actionContext, applicationContext, componentDefinitionMap.get(componentName), languageId,
-                componentConnections);
+                languageId, componentDefinitionMap.get(componentName), componentConnections, jobContextAware);
         }
 
         @Override
@@ -430,14 +465,23 @@ public class PolyglotEngine {
         }
     }
 
-    private record ContextProxyObject(
-        ActionContext actionContext, ApplicationContext applicationContext, String languageId,
-        Map<String, ComponentConnection> componentConnections) implements ProxyObject {
+    private final class ContextProxyObject implements ProxyObject {
+
+        private final String languageId;
+        private final Map<String, ComponentConnection> componentConnections;
+        private final JobContextAware jobContextAware;
+
+        private ContextProxyObject(
+            String languageId, Map<String, ComponentConnection> componentConnections, JobContextAware jobContextAware) {
+            this.languageId = languageId;
+            this.componentConnections = componentConnections;
+            this.jobContextAware = jobContextAware;
+        }
 
         @Override
         public Object getMember(String name) {
             if (Objects.equals(name, "component")) {
-                return new ComponentProxyObject(actionContext, applicationContext, languageId, componentConnections);
+                return new ComponentProxyObject(languageId, componentConnections, jobContextAware);
             }
 
             return null;
@@ -457,5 +501,43 @@ public class PolyglotEngine {
         public void putMember(String key, Value value) {
             throw new UnsupportedOperationException();
         }
+
+        public String languageId() {
+            return languageId;
+        }
+
+        public Map<String, ComponentConnection> componentConnections() {
+            return componentConnections;
+        }
+
+        public JobContextAware jobContextAware() {
+            return jobContextAware;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this)
+                return true;
+            if (obj == null || obj.getClass() != this.getClass())
+                return false;
+            var that = (ContextProxyObject) obj;
+            return Objects.equals(this.languageId, that.languageId) &&
+                Objects.equals(this.componentConnections, that.componentConnections) &&
+                Objects.equals(this.jobContextAware, that.jobContextAware);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(languageId, componentConnections, jobContextAware);
+        }
+
+        @Override
+        public String toString() {
+            return "ContextProxyObject[" +
+                "languageId=" + languageId + ", " +
+                "componentConnections=" + componentConnections + ", " +
+                "jobContextAware=" + jobContextAware + ']';
+        }
+
     }
 }
