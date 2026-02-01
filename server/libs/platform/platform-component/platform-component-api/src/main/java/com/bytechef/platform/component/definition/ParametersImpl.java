@@ -36,7 +36,7 @@ import tools.jackson.core.type.TypeReference;
 /**
  * @author Ivica Cardic
  */
-public final class ParametersImpl implements Parameters {
+final class ParametersImpl implements Parameters {
 
     private final Map<String, Object> map;
 
