@@ -16,19 +16,20 @@
 
 package com.bytechef.ai.mcp.tool.automation.api;
 
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import java.util.List;
 
 /**
+ * Interface for read-only project tools operations.
+ *
  * @author Marko Kriskovic
  */
 public interface ReadProjectTools {
 
-    List<ProjectToolsImpl.ProjectInfo> listProjects();
+    List<ProjectInfo> listProjects();
 
-    ProjectToolsImpl.ProjectDetailInfo getProject(long projectId);
+    ProjectDetailInfo getProject(long projectId);
 
-    List<ProjectToolsImpl.ProjectInfo> searchProjects(String query);
+    List<ProjectInfo> searchProjects(String query);
 
-    ProjectToolsImpl.ProjectStatusInfo getProjectStatus(long projectId);
+    ProjectStatusInfo getProjectStatus(long projectId);
 }

@@ -16,21 +16,18 @@
 
 package com.bytechef.ai.mcp.tool.automation.api;
 
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
+ * Workflow validation result record for API responses.
+ *
  * @author Marko Kriskovic
  */
-public interface ReadProjectWorkflowTools {
-
-    ProjectWorkflowToolsImpl.WorkflowInfo getWorkflow(String workflowId);
-
-    String getWorkflowBuildInstructions();
-
-    List<ProjectWorkflowToolsImpl.WorkflowInfo> listWorkflows(long projectId);
-
-    List<ProjectWorkflowToolsImpl.WorkflowInfo> searchWorkflows(String query, Long projectId);
-
-    ProjectWorkflowToolsImpl.WorkflowValidationResult validateWorkflow(String workflowId);
+@SuppressFBWarnings("EI")
+public record WorkflowValidationResult(
+    @JsonProperty("valid") @JsonPropertyDescription("Whether the workflow is valid") boolean valid,
+    @JsonProperty("errors") @JsonPropertyDescription("Error details, which need to be fixed before the workflow can be valid") String errors,
+    @JsonProperty("warnings") @JsonPropertyDescription("Warning details that give additional information") String warnings) {
 }

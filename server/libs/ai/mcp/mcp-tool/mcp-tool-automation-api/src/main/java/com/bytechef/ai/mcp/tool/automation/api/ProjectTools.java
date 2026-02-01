@@ -16,21 +16,22 @@
 
 package com.bytechef.ai.mcp.tool.automation.api;
 
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import java.util.List;
 
 /**
+ * Interface for project tools operations including create, update, delete and publish.
+ *
  * @author Marko Kriskovic
  */
 public interface ProjectTools extends ReadProjectTools {
 
-    ProjectToolsImpl.ProjectInfo createProject(
+    ProjectInfo createProject(
         String name, String description, Long categoryId, Long workspaceId, List<Long> tagIds);
 
     String deleteProject(long projectId);
 
-    ProjectToolsImpl.ProjectInfo updateProject(
+    ProjectInfo updateProject(
         long projectId, String name, String description, Long categoryId, List<Long> tagIds);
 
-    ProjectToolsImpl.ProjectPublishInfo publishProject(long projectId, String description);
+    ProjectPublishInfo publishProject(long projectId, String description);
 }
