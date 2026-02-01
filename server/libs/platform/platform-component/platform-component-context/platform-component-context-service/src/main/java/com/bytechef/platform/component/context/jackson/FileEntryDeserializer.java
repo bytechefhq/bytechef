@@ -38,7 +38,7 @@ public class FileEntryDeserializer extends ValueDeserializer<FileEntry> {
         String url = asText("url", jsonNode);
 
         if (name == null || url == null) {
-            return null;
+            throw new IllegalArgumentException("FileEntry 'name' and 'url' are required");
         }
 
         return new FileEntryImpl(name, asText("extension", jsonNode), asText("mimeType", jsonNode), url);
