@@ -25,10 +25,25 @@ import org.jspecify.annotations.Nullable;
  */
 public interface JobContextAware {
 
+    /**
+     * Converts the provided component information and connection details into an {@link ActionContext} instance.
+     *
+     * @param componentName       the name of the component associated with the action context.
+     * @param componentVersion    the version of the component.
+     * @param actionName          the name of the action being executed.
+     * @param componentConnection an optional {@link ComponentConnection} containing connection details for the
+     *                            component; can be null.
+     * @return an instance of {@link ActionContext} representing the provided information and connection details.
+     */
     ActionContext toActionContext(
         String componentName, int componentVersion, String actionName,
         @Nullable ComponentConnection componentConnection);
 
+    /**
+     * Retrieves the unique identifier for the environment.
+     *
+     * @return the environment ID as a {@link Long}, or {@code null} if the ID is not available.
+     */
     @Nullable
     Long getEnvironmentId();
 }
