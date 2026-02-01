@@ -16,17 +16,18 @@
 
 package com.bytechef.ai.mcp.tool.automation.impl;
 
+import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.api.WorkflowInfo;
+import com.bytechef.ai.mcp.tool.automation.api.WorkflowValidationResult;
+import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.platform.workflow.validator.WorkflowValidator;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Component;
  * @author Marko Kriskovic
  */
 @Component
+@ConditionalOnAiEnabled
 public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowToolsImpl.class);
@@ -76,7 +78,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
     @Override
     @Tool(
         description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
-    public ProjectWorkflowToolsImpl.WorkflowInfo getWorkflow(
+    public WorkflowInfo getWorkflow(
         @ToolParam(description = "The ID of the workflow to retrieve") String workflowId) {
 
         try {
@@ -86,7 +88,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
                 logger.debug("Retrieved workflow {}", projectWorkflowDTO.getProjectWorkflowId());
             }
 
-            return new ProjectWorkflowToolsImpl.WorkflowInfo(
+            return new WorkflowInfo(
                 projectWorkflowDTO.getId(), projectWorkflowDTO.getProjectWorkflowId(),
                 projectWorkflowDTO.getWorkflowUuid(), projectWorkflowDTO.getLabel(),
                 projectWorkflowDTO.getDescription(), projectWorkflowDTO.getDefinition(),
@@ -130,8 +132,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         try {
             List<ProjectWorkflowDTO> workflows = projectWorkflowFacade.getProjectWorkflows(projectId);
 
-            List<ProjectWorkflowToolsImpl.WorkflowInfo> workflowInfos = workflows.stream()
-                .map(workflow -> new ProjectWorkflowToolsImpl.WorkflowInfo(workflow.getId(),
+            List<WorkflowInfo> workflowInfos = workflows.stream()
+                .map(workflow -> new WorkflowInfo(workflow.getId(),
                     workflow.getProjectWorkflowId(),
                     workflow.getWorkflowUuid(),
                     workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
@@ -154,7 +156,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
     @Override
     @Tool(
         description = "Full-text search across workflows in projects. Returns a list of workflows matching the search query in name or description.")
-    public List<ProjectWorkflowToolsImpl.WorkflowInfo> searchWorkflows(
+    public List<WorkflowInfo> searchWorkflows(
         @ToolParam(description = "The search query to match against workflow names and descriptions") String query,
         @ToolParam(required = false, description = "The ID of the project") Long projectId) {
 
@@ -165,7 +167,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
 
             String lowerQuery = StringUtils.trim(query.toLowerCase());
 
-            List<ProjectWorkflowToolsImpl.WorkflowInfo> matchingWorkflow = allWorkflows.stream()
+            List<WorkflowInfo> matchingWorkflow = allWorkflows.stream()
                 .filter(workflow -> {
                     String name = workflow.getLabel();
 
@@ -177,7 +179,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
 
                     return name.contains(lowerQuery) || description.contains(lowerQuery);
                 })
-                .map(workflow -> new ProjectWorkflowToolsImpl.WorkflowInfo(
+                .map(workflow -> new WorkflowInfo(
                     workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowUuid(), workflow.getLabel(),
                     workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
                     workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
@@ -198,7 +200,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
     @Override
     @Tool(
         description = "Validate a workflow configuration by checking its structure, properties and outputs against the task definitions. Returns validation results with any errors found")
-    public ProjectWorkflowToolsImpl.WorkflowValidationResult validateWorkflow(
+    public WorkflowValidationResult validateWorkflow(
         @ToolParam(description = "The JSON string of the workflow to validate") String workflow) {
 
         try {
@@ -224,7 +226,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
                     "Validated workflow. Valid: {}, Errors: {}, Warnings: {}", isValid, errorMessages, warningMessages);
             }
 
-            return new ProjectWorkflowToolsImpl.WorkflowValidationResult(isValid, errorMessages, warningMessages);
+            return new WorkflowValidationResult(isValid, errorMessages, warningMessages);
         } catch (Exception e) {
             logger.error("Failed to validate workflow", e);
 
@@ -350,72 +352,5 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         } else {
             return taskTools.getTaskProperties("action", split[2], split[0], version);
         }
-    }
-
-    /**
-     * Project workflow information record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record ProjectWorkflowInfo(
-        @JsonProperty("id") @JsonPropertyDescription("The unique identifier of the project workflow") Long id,
-        @JsonProperty("project_id") @JsonPropertyDescription("The ID of the project this workflow belongs to") long projectId,
-        @JsonProperty("project_version") @JsonPropertyDescription("The version of the project") int projectVersion,
-        @JsonProperty("workflow_id") @JsonPropertyDescription("The unique identifier of the workflow") String workflowId,
-        @JsonProperty("workflow_uuid") @JsonPropertyDescription("The uuid of the workflow") String workflowUuid,
-        @JsonProperty("created_date") @JsonPropertyDescription("When the workflow was created") Instant createdDate,
-        @JsonProperty("last_modified_date") @JsonPropertyDescription("When the workflow was last modified") Instant lastModifiedDate) {
-    }
-
-    /**
-     * Detailed task information record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record TaskInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the task") String name,
-        @JsonProperty("title") @JsonPropertyDescription("The title of the task") String title,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the task") String description,
-        @JsonProperty("type") @JsonPropertyDescription("The type of the task: action, trigger, or taskDispatcher") String type,
-        @JsonProperty("componentName") @JsonPropertyDescription("The name of the component (null for taskDispatchers)") String componentName,
-        @JsonProperty("properties") @JsonPropertyDescription("The properties of the task as JSON string") String properties,
-        @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the task as JSON string") String outputProperties) {
-
-    }
-
-    /**
-     * Minimal task information record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record TaskMinimalInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the task") String name,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the task") String description,
-        @JsonProperty("type") @JsonPropertyDescription("The type of the task: action, trigger, or taskDispatcher") String type,
-        @JsonProperty("componentName") @JsonPropertyDescription("The name of the component (null for taskDispatchers)") String componentName) {
-
-    }
-
-    /**
-     * Workflow information record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record WorkflowInfo(
-        @JsonProperty("id") @JsonPropertyDescription("The unique identifier of the workflow") String id,
-        @JsonProperty("project_workflow_id") @JsonPropertyDescription("The unique identifier of the project workflow") Long projectWorkflowId,
-        @JsonProperty("workflow_uuid") @JsonPropertyDescription("The uuid of the workflow") String workflowUuid,
-        @JsonProperty("name") @JsonPropertyDescription("The name of the workflow") String name,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the workflow") String description,
-        @JsonProperty("definition") @JsonPropertyDescription("The definition of the workflow") String definition,
-        @JsonProperty("version") @JsonPropertyDescription("The version of the workflow") int version,
-        @JsonProperty("created_date") @JsonPropertyDescription("When the workflow was created") Instant createdDate,
-        @JsonProperty("last_modified_date") @JsonPropertyDescription("When the workflow was last modified") Instant lastModifiedDate) {
-    }
-
-    /**
-     * Workflow validation result record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record WorkflowValidationResult(
-        @JsonProperty("valid") @JsonPropertyDescription("Whether the workflow is valid") boolean valid,
-        @JsonProperty("errors") @JsonPropertyDescription("Error details, which need to be fixed before the workflow can be valid") String errors,
-        @JsonProperty("warnings") @JsonPropertyDescription("Warning details that give additional information") String warnings) {
     }
 }

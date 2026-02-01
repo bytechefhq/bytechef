@@ -16,6 +16,9 @@
 
 package com.bytechef.ai.mcp.tool.automation.impl;
 
+import com.bytechef.ai.mcp.tool.automation.api.ProjectDetailInfo;
+import com.bytechef.ai.mcp.tool.automation.api.ProjectInfo;
+import com.bytechef.ai.mcp.tool.automation.api.ProjectStatusInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.api.ReadProjectTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -24,9 +27,12 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
 /**
+ * Read-only project tools implementation that delegates to ProjectTools.
+ *
  * @author Marko Kriskovic
  */
 public class ReadProjectToolsImpl implements ReadProjectTools {
+
     private final ProjectTools delegate;
 
     @SuppressFBWarnings("EI")
@@ -37,14 +43,14 @@ public class ReadProjectToolsImpl implements ReadProjectTools {
     @Override
     @Tool(
         description = "List all projects in ByteChef. Returns a list of projects with their basic information including id, name, description, and status.")
-    public List<ProjectToolsImpl.ProjectInfo> listProjects() {
+    public List<ProjectInfo> listProjects() {
         return delegate.listProjects();
     }
 
     @Override
     @Tool(
         description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, versions, and metadata.")
-    public ProjectToolsImpl.ProjectDetailInfo getProject(
+    public ProjectDetailInfo getProject(
         @ToolParam(description = "The ID of the project to retrieve") long projectId) {
         return delegate.getProject(projectId);
     }
@@ -52,7 +58,7 @@ public class ReadProjectToolsImpl implements ReadProjectTools {
     @Override
     @Tool(
         description = "Full-text search across all projects. Returns a list of projects matching the search query in name or description.")
-    public List<ProjectToolsImpl.ProjectInfo> searchProjects(
+    public List<ProjectInfo> searchProjects(
         @ToolParam(description = "The search query to match against project names and descriptions") String query) {
         return delegate.searchProjects(query);
     }
@@ -60,7 +66,7 @@ public class ReadProjectToolsImpl implements ReadProjectTools {
     @Override
     @Tool(
         description = "Get project deployment and execution status. Returns detailed status information including deployment environments and their states.")
-    public ProjectToolsImpl.ProjectStatusInfo getProjectStatus(
+    public ProjectStatusInfo getProjectStatus(
         @ToolParam(description = "The ID of the project to get status for") long projectId) {
         return delegate.getProjectStatus(projectId);
     }

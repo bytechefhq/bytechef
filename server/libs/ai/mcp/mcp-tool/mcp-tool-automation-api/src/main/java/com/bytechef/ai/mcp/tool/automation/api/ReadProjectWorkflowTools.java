@@ -16,16 +16,22 @@
 
 package com.bytechef.ai.mcp.tool.automation.api;
 
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
+import java.util.List;
 
 /**
+ * Interface for read-only project workflow tools operations.
+ *
  * @author Marko Kriskovic
  */
-public interface ProjectWorkflowTools extends ReadProjectWorkflowTools {
+public interface ReadProjectWorkflowTools {
 
-    ProjectWorkflowToolsImpl.ProjectWorkflowInfo createProjectWorkflow(long projectId, String definition);
+    WorkflowInfo getWorkflow(String workflowId);
 
-    String deleteWorkflow(String workflowId);
+    String getWorkflowBuildInstructions();
 
-    ProjectWorkflowToolsImpl.WorkflowInfo updateWorkflow(String workflowId, String definition);
+    List<WorkflowInfo> listWorkflows(long projectId);
+
+    List<WorkflowInfo> searchWorkflows(String query, Long projectId);
+
+    WorkflowValidationResult validateWorkflow(String workflowId);
 }
