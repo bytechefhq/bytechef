@@ -19,6 +19,7 @@ package com.bytechef.platform.component.context.jackson;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bytechef.component.definition.FileEntry;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,7 +85,7 @@ class FileEntryDeserializerTest {
     }
 
     @Test
-    void testDeserializeWithMissingNameReturnsNull() throws Exception {
+    void testDeserializeWithMissingNameThrowsException() {
         String json = """
             {
                 "url": "https://example.com/files/test.txt",
@@ -92,13 +93,11 @@ class FileEntryDeserializerTest {
             }
             """;
 
-        FileEntry fileEntry = objectMapper.readValue(json, FileEntry.class);
-
-        assertNull(fileEntry);
+        assertThrows(IllegalArgumentException.class, () -> objectMapper.readValue(json, FileEntry.class));
     }
 
     @Test
-    void testDeserializeWithMissingUrlReturnsNull() throws Exception {
+    void testDeserializeWithMissingUrlThrowsException() {
         String json = """
             {
                 "name": "test-file.csv",
@@ -106,18 +105,14 @@ class FileEntryDeserializerTest {
             }
             """;
 
-        FileEntry fileEntry = objectMapper.readValue(json, FileEntry.class);
-
-        assertNull(fileEntry);
+        assertThrows(IllegalArgumentException.class, () -> objectMapper.readValue(json, FileEntry.class));
     }
 
     @Test
-    void testDeserializeWithEmptyObjectReturnsNull() throws Exception {
+    void testDeserializeWithEmptyObjectThrowsException() {
         String json = "{}";
 
-        FileEntry fileEntry = objectMapper.readValue(json, FileEntry.class);
-
-        assertNull(fileEntry);
+        assertThrows(IllegalArgumentException.class, () -> objectMapper.readValue(json, FileEntry.class));
     }
 
     @Test
