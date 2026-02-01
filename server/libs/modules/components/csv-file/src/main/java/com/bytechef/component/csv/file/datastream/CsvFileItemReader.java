@@ -21,16 +21,19 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_PRO
 
 import com.bytechef.component.csv.file.util.CsvFileReadUtils;
 import com.bytechef.component.csv.file.util.ReadConfiguration;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.datastream.ExecutionContext;
+import com.bytechef.component.definition.datastream.FieldDefinition;
 import com.bytechef.component.definition.datastream.ItemReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -107,5 +110,63 @@ public class CsvFileItemReader implements ItemReader {
         }
 
         return null;
+    }
+
+    @Override
+    public List<FieldDefinition> getFields(
+        Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context) {
+
+        ReadConfiguration configuration = CsvFileReadUtils.getReadConfiguration(inputParameters);
+
+        if (!configuration.headerRow()) {
+            return List.of();
+        }
+
+        try (BufferedReader reader = new BufferedReader(
+            new InputStreamReader(
+                context.file(file -> file.getInputStream(inputParameters.getRequiredFileEntry(FILE_ENTRY))),
+                StandardCharsets.UTF_8))) {
+
+            String headerLine = reader.readLine();
+
+            if (headerLine == null) {
+                return List.of();
+            }
+
+            String delimiter = configuration.delimiter();
+            char quoteChar = CsvFileReadUtils.getEnclosingCharacter(configuration);
+
+            String[] headers = parseHeaders(headerLine, delimiter, quoteChar);
+
+            return Arrays.stream(headers)
+                .map(header -> new FieldDefinition(header, header, String.class))
+                .toList();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read CSV headers", e);
+        }
+    }
+
+    private String[] parseHeaders(String headerLine, String delimiter, char quoteChar) {
+        List<String> regexReservedCharacters = Arrays.asList(
+            ".", "+", "*", "?", "^", "$", "(", ")", "[", "]", "{", "}", "|", "\\");
+
+        String regexPrefix = "";
+
+        if (regexReservedCharacters.contains(delimiter)) {
+            regexPrefix = "\\";
+        }
+
+        String[] headers = headerLine.split(regexPrefix + delimiter, -1);
+
+        for (int i = 0; i < headers.length; i++) {
+            headers[i] = CsvFileReadUtils.strip(headers[i], quoteChar);
+
+            if (headers[i].isEmpty()) {
+                headers[i] = "column_" + (i + 1);
+            }
+        }
+
+        return headers;
     }
 }
