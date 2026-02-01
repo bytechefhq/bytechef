@@ -16,10 +16,18 @@
 
 package com.bytechef.platform.component.facade;
 
+import com.bytechef.component.definition.ClusterElementContext;
+import com.bytechef.component.definition.ClusterElementContext.ClusterElementFunction;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.domain.ClusterElement;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,13 +44,16 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ConnectionService connectionService;
+    private final ContextFactory contextFactory;
 
     @SuppressFBWarnings("EI")
     public ClusterElementDefinitionFacadeImpl(
-        ClusterElementDefinitionService clusterElementDefinitionService, ConnectionService connectionService) {
+        ClusterElementDefinitionService clusterElementDefinitionService, ConnectionService connectionService,
+        ContextFactory contextFactory) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.connectionService = connectionService;
+        this.contextFactory = contextFactory;
     }
 
     @Override
@@ -60,13 +71,25 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String clusterElementName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText, Long connectionId) {
+        Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,
+        String searchText, Long connectionId, Map<String, Long> clusterElementConnectionIds,
+        Map<String, Map<String, ?>> clusterElementInputParameters) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
+        Map<String, ComponentConnection> clusterElementConnections = clusterElementConnectionIds.entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() != null)
+            .collect(
+                java.util.stream.Collectors.toMap(
+                    Map.Entry::getKey, entry -> getComponentConnection(entry.getValue())));
+
+        ClusterElementResolverFunction clusterElementResolver = createClusterElementResolver(
+            extensions, clusterElementConnections, clusterElementInputParameters);
+
         return clusterElementDefinitionService.executeOptions(
-            componentName, componentVersion, clusterElementName, propertyName, inputParameters,
-            lookupDependsOnPaths, searchText, componentConnection);
+            componentName, componentVersion, clusterElementName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, componentConnection, clusterElementResolver);
     }
 
     @Override
@@ -75,6 +98,47 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
 
         return clusterElementDefinitionService.executeTool(
             componentName, clusterElementName, inputParameters, getComponentConnection(connectionId), false);
+    }
+
+    private ClusterElementResolverFunction createClusterElementResolver(
+        Map<String, ?> extensions, Map<String, ComponentConnection> clusterElementConnections,
+        Map<String, Map<String, ?>> clusterElementInputParameters) {
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        return new ClusterElementResolverFunction() {
+            @Override
+            public <T> T resolve(
+                ClusterElementType clusterElementType, ClusterElementFunction<T> clusterElementFunction) {
+
+                ClusterElement clusterElement = clusterElementMap.fetchClusterElement(clusterElementType)
+                    .orElse(null);
+
+                if (clusterElement == null) {
+                    return null;
+                }
+
+                Object clusterElementObject = clusterElementDefinitionService.getClusterElement(
+                    clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+                    clusterElement.getClusterElementName());
+
+                ComponentConnection clusterElementConnection = clusterElementConnections.get(
+                    clusterElement.getWorkflowNodeName());
+
+                ClusterElementContext context = contextFactory.createClusterElementContext(
+                    clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+                    clusterElement.getClusterElementName(), clusterElementConnection, true);
+
+                Map<String, ?> inputParameters = clusterElementInputParameters.getOrDefault(
+                    clusterElement.getWorkflowNodeName(), Map.of());
+
+                return clusterElementFunction.apply(
+                    clusterElementObject, ParametersFactory.create(inputParameters),
+                    ParametersFactory.create(
+                        clusterElementConnection == null ? Map.of() : clusterElementConnection.getParameters()),
+                    context);
+            }
+        };
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

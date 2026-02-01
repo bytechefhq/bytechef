@@ -33,8 +33,9 @@ public interface ClusterElementDefinitionFacade {
 
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable Long connectionId);
+        Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,
+        String searchText, @Nullable Long connectionId, Map<String, Long> clusterElementConnectionIds,
+        Map<String, Map<String, ?>> clusterElementInputParameters);
 
     Object executeTool(
         String componentName, String clusterElementName, Map<String, ?> inputParameters, @Nullable Long connectionId);
