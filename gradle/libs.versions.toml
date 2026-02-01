@@ -16,7 +16,7 @@ spring-ai = "2.0.0-M2"
 spring-boot = "4.0.2"
 spring-cloud-aws = "4.0.0"
 spring-cloud-dependencies = "2025.1.1"
-spring-shell = "4.0.0"
+spring-shell = "4.0.1"
 testcontainers = "1.21.3"
 
 [libraries]

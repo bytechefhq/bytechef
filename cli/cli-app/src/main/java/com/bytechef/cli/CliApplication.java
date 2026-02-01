@@ -41,7 +41,7 @@ public class CliApplication {
     @Bean
     ApplicationRunner shellRunner(CommandRegistry commandRegistry, ApplicationArguments applicationArguments) {
         return args -> {
-            DefaultCommandParser commandParser = new DefaultCommandParser();
+            DefaultCommandParser commandParser = new DefaultCommandParser(commandRegistry);
             NonInteractiveShellRunner runner = new NonInteractiveShellRunner(commandParser, commandRegistry);
 
             runner.run(applicationArguments.getSourceArgs());
