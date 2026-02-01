@@ -22,21 +22,30 @@ import static com.bytechef.component.github.constant.GithubConstants.PATH;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Encoder;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Ivona Pavela
  */
 class GithubGetRepositoryContentActionTest extends AbstractGithubActionTest {
 
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Encoder, byte[]>> encoderFunctionArgumentCaptor =
+        ArgumentCaptor.forClass(ContextFunction.class);
+    private final Encoder mockedEncoder = mock(Encoder.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(OWNER, "testOwner", REPOSITORY, "testRepo", PATH, "test"));
 
@@ -46,6 +55,12 @@ class GithubGetRepositoryContentActionTest extends AbstractGithubActionTest {
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of());
+        when(mockedActionContext.encoder(encoderFunctionArgumentCaptor.capture()))
+            .thenAnswer(invocation -> encoderFunctionArgumentCaptor.getValue()
+                .apply(mockedEncoder));
+        when(mockedEncoder.base64Decode(any(String.class)))
+            .thenAnswer(invocation -> Base64.getDecoder()
+                .decode(invocation.getArgument(0, String.class)));
     }
 
     @Test
