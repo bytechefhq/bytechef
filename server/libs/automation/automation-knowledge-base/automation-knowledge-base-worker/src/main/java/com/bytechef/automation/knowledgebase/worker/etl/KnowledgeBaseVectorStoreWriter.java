@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnProperty(prefix = "bytechef.knowledgebase", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseVectorStoreWriter {
 
     public static final String METADATA_KNOWLEDGE_BASE_ID = "knowledge_base_id";

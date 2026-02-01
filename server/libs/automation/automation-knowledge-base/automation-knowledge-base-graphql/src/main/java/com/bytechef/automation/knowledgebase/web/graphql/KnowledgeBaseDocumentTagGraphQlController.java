@@ -21,6 +21,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Controller;
  * @author Ivica Cardic
  */
 @Controller
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 @SuppressFBWarnings("EI")
 public class KnowledgeBaseDocumentTagGraphQlController {
 

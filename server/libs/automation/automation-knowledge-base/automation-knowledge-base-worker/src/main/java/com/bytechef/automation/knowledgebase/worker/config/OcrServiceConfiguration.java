@@ -21,6 +21,7 @@ import com.bytechef.automation.knowledgebase.worker.document.ocr.NoOpOcrService;
 import com.bytechef.automation.knowledgebase.worker.document.ocr.OcrService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.KnowledgeBase.Ocr;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 class OcrServiceConfiguration {
 
     @Bean

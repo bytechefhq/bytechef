@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-@ConditionalOnProperty(prefix = "bytechef.knowledgebase", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseFacade {
 
     private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;

@@ -19,11 +19,13 @@ package com.bytechef.automation.knowledgebase.service;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.automation.knowledgebase.repository.KnowledgeBaseRepository;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
 
     private final KnowledgeBaseRepository knowledgeBaseRepository;

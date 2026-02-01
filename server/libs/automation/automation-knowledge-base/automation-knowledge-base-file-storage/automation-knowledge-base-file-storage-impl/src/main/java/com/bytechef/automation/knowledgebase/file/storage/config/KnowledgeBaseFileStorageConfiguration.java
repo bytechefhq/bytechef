@@ -21,6 +21,7 @@ import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStora
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage.Provider;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,6 +29,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 class KnowledgeBaseFileStorageConfiguration {
 
     @Bean
