@@ -18,7 +18,6 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.OutputResponse;
@@ -51,26 +50,34 @@ public class ClusterElementDefinition {
     }
 
     public ClusterElementDefinition(
-        com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition,
-        String componentName, int componentVersion, String icon) {
+        com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition, String componentName,
+        int componentVersion, String icon) {
 
         this.componentName = componentName;
         this.componentVersion = componentVersion;
-        this.description = OptionalUtils.orElse(clusterElementDefinition.getDescription(), null);
-        this.help = OptionalUtils.mapOrElse(clusterElementDefinition.getHelp(), Help::new, null);
+        this.description = clusterElementDefinition.getDescription()
+            .orElse(null);
+        this.help = clusterElementDefinition.getHelp()
+            .map(Help::new)
+            .orElse(null);
         this.name = clusterElementDefinition.getName();
         this.icon = IconUtils.readIcon(icon);
-        this.outputDefined = OptionalUtils.mapOrElse(
-            clusterElementDefinition.getOutputDefinition(), outputDefinition -> true, false);
-        this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            clusterElementDefinition.getOutputDefinition(),
-            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
-        this.outputResponse = OptionalUtils.mapOrElse(
-            clusterElementDefinition.getOutputDefinition(), ClusterElementDefinition::toOutputResponse, null);
+        this.outputDefined = clusterElementDefinition.getOutputDefinition()
+            .isPresent();
+        this.outputFunctionDefined = clusterElementDefinition.getOutputDefinition()
+            .map(outputDefinition -> outputDefinition.getOutput()
+                .isPresent())
+            .orElse(false);
+        this.outputResponse = clusterElementDefinition.getOutputDefinition()
+            .map(ClusterElementDefinition::toOutputResponse)
+            .orElse(null);
         this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(clusterElementDefinition.getProperties(), List.of()), Property::toProperty);
-        this.title = OptionalUtils.orElse(clusterElementDefinition.getTitle(), null);
+            clusterElementDefinition.getProperties()
+                .orElse(List.of()),
+            Property::toProperty);
+        this.title = clusterElementDefinition.getTitle()
+            .orElse(null);
         this.type = clusterElementDefinition.getType();
     }
 
