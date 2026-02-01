@@ -40,6 +40,7 @@ const AutomationWorkflowExecutions = lazy(() =>
 const DataTables = lazy(() => import('@/pages/automation/datatables/DataTables'));
 const DataTable = lazy(() => import('@/pages/automation/datatable/DataTable'));
 const Home = lazy(() => import('@/pages/home/Home'));
+const KnowledgeBase = lazy(() => import('@/pages/automation/knowledge-base/KnowledgeBase'));
 const McpServer = lazy(() => import('@/pages/settings/platform/mcp-server/McpServer'));
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const Notifications = lazy(() => import('@/pages/settings/platform/notifications/Notifications'));
@@ -609,6 +610,16 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'datatables/:id',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <KnowledgeBase />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'knowledge-bases/:id',
                                 },
                                 {
                                     children: [
