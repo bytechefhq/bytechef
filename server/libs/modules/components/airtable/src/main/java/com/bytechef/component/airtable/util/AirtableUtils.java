@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableOption;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
@@ -36,6 +37,7 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.definition.datastream.FieldDefinition;
 import com.bytechef.component.exception.ProviderException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -126,6 +128,50 @@ public class AirtableUtils extends AbstractAirtableUtils {
         }
 
         return options;
+    }
+
+    public static List<FieldDefinition> getFieldDefinitions(
+        Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context) {
+
+        List<FieldDefinition> fieldDefinitions = new ArrayList<>();
+
+        String baseId = inputParameters.getRequiredString("baseId");
+        String tableId = inputParameters.getRequiredString("tableId");
+        String url = "/meta/bases/%s/tables".formatted(baseId);
+
+        Http.Response response = context.http(http -> http.get(url))
+            .configuration(Http.responseType(ResponseType.JSON))
+            .execute();
+
+        Map<?, ?> body = response.getBody(Map.class);
+
+        if (body.containsKey("error")) {
+            throw new ProviderException.BadRequestException(
+                (String) ((Map<?, ?>) body.get("error")).get("message"));
+        }
+
+        Map<String, List<AirtableTable>> tablesMap = response.getBody(new TypeReference<>() {});
+
+        List<AirtableTable> tables = tablesMap.get("tables");
+
+        AirtableTable table = tables
+            .stream()
+            .filter(curTable -> Objects.equals(curTable.id(), tableId))
+            .findFirst()
+            .orElseThrow(() -> new ProviderException.BadRequestException("Requested table does not exist"));
+
+        for (AirtableField field : table.fields()) {
+            if (SKIP_FIELDS.contains(field.type())) {
+                continue;
+            }
+
+            String name = field.name();
+            Class<?> type = getJavaType(field.type());
+
+            fieldDefinitions.add(new FieldDefinition(name, name, type));
+        }
+
+        return fieldDefinitions;
     }
 
     public static List<ModifiableValueProperty<?, ?>> getFieldsProperties(
@@ -253,6 +299,16 @@ public class AirtableUtils extends AbstractAirtableUtils {
         }
 
         return options;
+    }
+
+    private static Class<?> getJavaType(String airtableType) {
+        return switch (airtableType) {
+            case "autoNumber", "percent", "count" -> Integer.class;
+            case "checkbox" -> Boolean.class;
+            case "number" -> Number.class;
+            case "multipleSelects" -> List.class;
+            default -> String.class;
+        };
     }
 
     private static List<ModifiableOption<String>> getOptions(AirtableField field) {
