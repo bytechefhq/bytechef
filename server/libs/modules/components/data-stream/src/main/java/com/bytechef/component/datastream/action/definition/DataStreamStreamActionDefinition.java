@@ -112,13 +112,13 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                         add(new JobParameter<>(JOB_ID, actionContextAware.getJobId(), Long.class));
                     }
 
-                    clusterElement = clusterElementMap.getClusterElement(PROCESSOR);
+                    clusterElementMap.fetchClusterElement(PROCESSOR)
+                        .ifPresent(processorClusterElement -> {
+                            Map<String, Object> processorValue =
+                                getValue(processorClusterElement, connectionParameters);
 
-                    if (clusterElement != null) {
-                        value = getValue(clusterElement, connectionParameters);
-
-                        add(new JobParameter<>(PROCESSOR.name(), value, Map.class));
-                    }
+                            add(new JobParameter<>(PROCESSOR.name(), processorValue, Map.class));
+                        });
 
                     clusterElement = clusterElementMap.getClusterElement(SOURCE);
 

@@ -101,7 +101,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
 
     private ExecutionError extractExecutionError(Exception exception) {
         Throwable curException = exception;
-        String message = null;
+        String message = exception.getMessage();
 
         while (curException.getCause() != null) {
             curException = curException.getCause();

@@ -109,7 +109,7 @@ public class PolyglotEngine {
     private static Object copyFromPolyglotContext(Object object) {
         switch (object) {
             case null -> {
-                return Map.of();
+                return null;
             }
             case Map<?, ?> map -> {
                 Map<String, Object> hashMap = new HashMap<>();
