@@ -28,6 +28,7 @@ import {
     Table2Icon,
     UnplugIcon,
     UsersIcon,
+    VectorSquareIcon,
     Workflow,
     ZapIcon,
 } from 'lucide-react';
@@ -79,6 +80,11 @@ const automationNavigation: NavigationType[] = [
         href: '/automation/datatables',
         icon: Table2Icon,
         name: 'Data Tables',
+    },
+    {
+        href: '/automation/knowledge-bases',
+        icon: VectorSquareIcon,
+        name: 'Knowledge Base',
     },
     {href: '/automation/chat', icon: MessageCircleMoreIcon, name: 'Workflow Chat'},
 ];
@@ -163,6 +169,7 @@ function App() {
     const ff_2311 = useFeatureFlagsStore()('ff-2311');
     const ff_2894 = useFeatureFlagsStore()('ff-2894');
     const ff_3955 = useFeatureFlagsStore()('ff-3955');
+    const ff_4000 = useFeatureFlagsStore()('ff-4000');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (
@@ -187,6 +194,10 @@ function App() {
 
         if (navItem.href === '/automation/datatables') {
             return ff_3955;
+        }
+
+        if (navItem.href === '/automation/knowledge-bases') {
+            return ff_4000;
         }
 
         return true;
