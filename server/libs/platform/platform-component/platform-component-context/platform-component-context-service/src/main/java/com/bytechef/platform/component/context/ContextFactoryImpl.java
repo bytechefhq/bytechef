@@ -22,6 +22,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -41,7 +42,6 @@ public class ContextFactoryImpl implements ContextFactory {
     private final ApplicationContext applicationContext;
     private final CacheManager cacheManager;
     private final DataStorage dataStorage;
-    private final EditorTempFileStorage editorTempFileStorage;
     private final ApplicationEventPublisher eventPublisher;
     private final TempFileStorage tempFileStorage;
     private final String publicUrl;
@@ -54,7 +54,6 @@ public class ContextFactoryImpl implements ContextFactory {
         this.applicationContext = applicationContext;
         this.cacheManager = cacheManager;
         this.dataStorage = dataStorage;
-        this.editorTempFileStorage = new EditorTempFileStorage();
         this.eventPublisher = eventPublisher;
         this.tempFileStorage = tempFileStorage;
         this.publicUrl = applicationProperties.getPublicUrl();
@@ -67,18 +66,25 @@ public class ContextFactoryImpl implements ContextFactory {
         @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, @Nullable PlatformType type,
         boolean editorEnvironment) {
 
-        return new ActionContextImpl(
-            componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
-            componentConnection, publicUrl, cacheManager, this, dataStorage, eventPublisher,
-            getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment), environmentId, type,
-            editorEnvironment);
+        return ActionContextImpl
+            .builder(
+                componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage,
+                eventPublisher, getHttpClientExecutor(), tempFileStorage)
+            .componentConnection(componentConnection)
+            .environmentId(environmentId)
+            .jobId(jobId)
+            .jobPrincipalId(jobPrincipalId)
+            .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+            .publicUrl(publicUrl)
+            .type(type)
+            .workflowId(workflowId)
+            .build();
     }
 
     @Override
     public Context createContext(String componentName, @Nullable ComponentConnection componentConnection) {
         return new ContextImpl(
-            componentName, -1, null, componentConnection, false, getHttpClientExecutor(false),
-            getTempFileStorage(false));
+            componentName, -1, null, componentConnection, false, getHttpClientExecutor(), tempFileStorage);
     }
 
     @Override
@@ -86,9 +92,24 @@ public class ContextFactoryImpl implements ContextFactory {
         String componentName, int componentVersion, String clusterElementName,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
 
-        return new ClusterElementContextImpl(
-            componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment,
-            getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment));
+        return createClusterElementContext(
+            componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment, null);
+    }
+
+    @Override
+    public ClusterElementContext createClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
+        @Nullable ClusterElementResolverFunction clusterElementResolver) {
+
+        return ClusterElementContextImpl
+            .builder(
+                componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
+                eventPublisher, getHttpClientExecutor(), tempFileStorage)
+            .clusterElementResolver(clusterElementResolver)
+            .componentConnection(componentConnection)
+            .publicUrl(publicUrl)
+            .build();
     }
 
     @Override
@@ -97,21 +118,19 @@ public class ContextFactoryImpl implements ContextFactory {
         @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
         @Nullable PlatformType type, boolean editorEnvironment) {
 
-        return new TriggerContextImpl(
-            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
-            cacheManager, dataStorage, getTempFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment),
-            environmentId, type, editorEnvironment);
+        return TriggerContextImpl
+            .builder(
+                componentName, componentVersion, triggerName, editorEnvironment, cacheManager, dataStorage,
+                getHttpClientExecutor(), tempFileStorage)
+            .componentConnection(componentConnection)
+            .environmentId(environmentId)
+            .jobPrincipalId(jobPrincipalId)
+            .type(type)
+            .workflowUuid(workflowUuid)
+            .build();
     }
 
-    private TempFileStorage getTempFileStorage(boolean editorEnvironment) {
-        if (editorEnvironment) {
-            return editorTempFileStorage;
-        }
-
-        return tempFileStorage;
-    }
-
-    private HttpClientExecutor getHttpClientExecutor(boolean editorEnvironment) {
-        return new HttpClientExecutor(applicationContext, getTempFileStorage(editorEnvironment));
+    private HttpClientExecutor getHttpClientExecutor() {
+        return new HttpClientExecutor(applicationContext, tempFileStorage);
     }
 }

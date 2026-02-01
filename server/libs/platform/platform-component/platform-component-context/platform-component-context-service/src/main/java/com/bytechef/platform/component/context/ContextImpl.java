@@ -67,7 +67,7 @@ class ContextImpl implements Context {
     private final Xml xml;
 
     @SuppressFBWarnings("EI")
-    public ContextImpl(
+    ContextImpl(
         String componentName, int componentVersion, @Nullable String componentOperationName,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
         HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage) {
@@ -614,7 +614,7 @@ class ContextImpl implements Context {
         private final org.slf4j.Logger logger;
 
         public LogImpl(String componentName, @Nullable String componentOperationName) {
-            logger = LoggerFactory.getLogger(
+            this.logger = LoggerFactory.getLogger(
                 componentName + (componentOperationName == null ? "" : "." + componentOperationName));
         }
 

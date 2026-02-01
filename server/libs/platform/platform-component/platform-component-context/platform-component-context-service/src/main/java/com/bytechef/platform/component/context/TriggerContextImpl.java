@@ -43,24 +43,96 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     private final @Nullable String workflowUuid;
 
     @SuppressFBWarnings("EI")
-    public TriggerContextImpl(
-        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
-        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, CacheManager cacheManager,
-        DataStorage dataStorage, TempFileStorage tempFileStorage, HttpClientExecutor httpClientExecutor,
-        @Nullable Long environmentId, @Nullable PlatformType type, boolean editorEnvironment) {
-
+    private TriggerContextImpl(Builder builder) {
         super(
-            componentName, componentVersion, triggerName, componentConnection, editorEnvironment, httpClientExecutor,
-            tempFileStorage);
+            builder.componentName, builder.componentVersion, builder.triggerName, builder.componentConnection,
+            builder.editorEnvironment, builder.httpClientExecutor, builder.tempFileStorage);
 
         this.data = new DataImpl(
-            dataStorage, componentName, componentVersion, triggerName, workflowUuid, cacheManager, environmentId, type,
-            editorEnvironment);
-        this.environmentId = environmentId;
-        this.jobPrincipalId = jobPrincipalId;
-        this.triggerName = triggerName;
-        this.type = type;
-        this.workflowUuid = workflowUuid;
+            builder.dataStorage, builder.componentName, builder.componentVersion, builder.triggerName,
+            builder.workflowUuid, builder.cacheManager, builder.environmentId, builder.type,
+            builder.editorEnvironment);
+        this.environmentId = builder.environmentId;
+        this.jobPrincipalId = builder.jobPrincipalId;
+        this.triggerName = builder.triggerName;
+        this.type = builder.type;
+        this.workflowUuid = builder.workflowUuid;
+    }
+
+    static Builder builder(
+        String componentName, int componentVersion, String triggerName, boolean editorEnvironment,
+        CacheManager cacheManager, DataStorage dataStorage, HttpClientExecutor httpClientExecutor,
+        TempFileStorage tempFileStorage) {
+
+        return new Builder(
+            componentName, componentVersion, triggerName, editorEnvironment, cacheManager, dataStorage,
+            httpClientExecutor, tempFileStorage);
+    }
+
+    static final class Builder {
+
+        private final CacheManager cacheManager;
+        private @Nullable ComponentConnection componentConnection;
+        private final String componentName;
+        private final int componentVersion;
+        private final DataStorage dataStorage;
+        private final boolean editorEnvironment;
+        private @Nullable Long environmentId;
+        private final HttpClientExecutor httpClientExecutor;
+        private @Nullable Long jobPrincipalId;
+        private final TempFileStorage tempFileStorage;
+        private final String triggerName;
+        private @Nullable PlatformType type;
+        private @Nullable String workflowUuid;
+
+        private Builder(
+            String componentName, int componentVersion, String triggerName, boolean editorEnvironment,
+            CacheManager cacheManager, DataStorage dataStorage, HttpClientExecutor httpClientExecutor,
+            TempFileStorage tempFileStorage) {
+
+            this.componentName = componentName;
+            this.componentVersion = componentVersion;
+            this.triggerName = triggerName;
+            this.editorEnvironment = editorEnvironment;
+            this.cacheManager = cacheManager;
+            this.dataStorage = dataStorage;
+            this.httpClientExecutor = httpClientExecutor;
+            this.tempFileStorage = tempFileStorage;
+        }
+
+        Builder componentConnection(@Nullable ComponentConnection componentConnection) {
+            this.componentConnection = componentConnection;
+
+            return this;
+        }
+
+        Builder environmentId(@Nullable Long environmentId) {
+            this.environmentId = environmentId;
+
+            return this;
+        }
+
+        Builder jobPrincipalId(@Nullable Long jobPrincipalId) {
+            this.jobPrincipalId = jobPrincipalId;
+
+            return this;
+        }
+
+        Builder type(@Nullable PlatformType type) {
+            this.type = type;
+
+            return this;
+        }
+
+        Builder workflowUuid(@Nullable String workflowUuid) {
+            this.workflowUuid = workflowUuid;
+
+            return this;
+        }
+
+        TriggerContextImpl build() {
+            return new TriggerContextImpl(this);
+        }
     }
 
     @Override

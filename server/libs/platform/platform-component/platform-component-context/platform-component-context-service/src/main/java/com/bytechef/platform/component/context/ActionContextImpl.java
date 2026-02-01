@@ -44,46 +44,172 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     private final String actionName;
     private @Nullable Approval approval;
-    private final ContextFactory contextFactory;
+    private final CacheManager cacheManager;
     private final Data data;
+    private final DataStorage dataStorage;
+    private final boolean editorEnvironment;
     private final Event event;
+    private final ApplicationEventPublisher eventPublisher;
+    private final HttpClientExecutor httpClientExecutor;
     private final @Nullable Long jobPrincipalId;
     private final @Nullable Long jobPrincipalWorkflowId;
     private final @Nullable Long jobId;
     private final @Nullable PlatformType type;
+    private final @Nullable String publicUrl;
+    private final TempFileStorage tempFileStorage;
     private final @Nullable String workflowId;
     private final @Nullable Long environmentId;
 
     @SuppressFBWarnings("EI")
-    public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
-        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
-        @Nullable ComponentConnection componentConnection, @Nullable String publicUrl, CacheManager cacheManager,
-        ContextFactory contextFactory, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
-        HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage, @Nullable Long environmentId,
-        @Nullable PlatformType type, boolean editorEnvironment) {
-
+    private ActionContextImpl(Builder builder) {
         super(
-            componentName, componentVersion, actionName, componentConnection, editorEnvironment, httpClientExecutor,
-            tempFileStorage);
+            builder.componentName, builder.componentVersion, builder.actionName, builder.componentConnection,
+            builder.editorEnvironment, builder.httpClientExecutor, builder.tempFileStorage);
 
-        this.actionName = actionName;
-        this.contextFactory = contextFactory;
+        this.actionName = builder.actionName;
+        this.cacheManager = builder.cacheManager;
+        this.dataStorage = builder.dataStorage;
+        this.editorEnvironment = builder.editorEnvironment;
+        this.eventPublisher = builder.eventPublisher;
+        this.httpClientExecutor = builder.httpClientExecutor;
+        this.tempFileStorage = builder.tempFileStorage;
 
-        if (jobId != null && publicUrl != null) {
-            this.approval = new ApprovalImpl(jobId, publicUrl);
+        if (builder.jobId != null && builder.publicUrl != null) {
+            this.approval = new ApprovalImpl(builder.jobId, builder.publicUrl);
         }
 
         this.data = new DataImpl(
-            dataStorage, componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-            workflowId, cacheManager, environmentId, type, editorEnvironment);
-        this.environmentId = environmentId;
-        this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
-        this.jobPrincipalId = jobPrincipalId;
-        this.jobPrincipalWorkflowId = jobPrincipalWorkflowId;
-        this.jobId = jobId;
-        this.type = type;
-        this.workflowId = workflowId;
+            builder.dataStorage, builder.componentName, builder.componentVersion, builder.actionName,
+            builder.jobPrincipalId, builder.jobPrincipalWorkflowId, builder.jobId, builder.workflowId,
+            builder.cacheManager, builder.environmentId, builder.type, builder.editorEnvironment);
+        this.environmentId = builder.environmentId;
+        this.event = builder.jobId == null
+            ? progress -> {}
+            : new EventImpl(builder.eventPublisher, builder.jobId);
+        this.jobPrincipalId = builder.jobPrincipalId;
+        this.jobPrincipalWorkflowId = builder.jobPrincipalWorkflowId;
+        this.jobId = builder.jobId;
+        this.publicUrl = builder.publicUrl;
+        this.type = builder.type;
+        this.workflowId = builder.workflowId;
+    }
+
+    static Builder builder(
+        String componentName, int componentVersion, String actionName, boolean editorEnvironment,
+        CacheManager cacheManager, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
+        HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage) {
+
+        return new Builder(
+            componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage, eventPublisher,
+            httpClientExecutor, tempFileStorage);
+    }
+
+    @Override
+    public ActionContext toActionContext(
+        String componentName, int componentVersion, String actionName,
+        @Nullable ComponentConnection componentConnection) {
+
+        return builder(
+            componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage,
+            eventPublisher, httpClientExecutor, tempFileStorage)
+                .componentConnection(componentConnection)
+                .environmentId(environmentId)
+                .jobId(jobId)
+                .jobPrincipalId(jobPrincipalId)
+                .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+                .publicUrl(publicUrl)
+                .type(type)
+                .workflowId(workflowId)
+                .build();
+    }
+
+    static final class Builder {
+
+        private final String actionName;
+        private final CacheManager cacheManager;
+        private @Nullable ComponentConnection componentConnection;
+        private final String componentName;
+        private final int componentVersion;
+        private final DataStorage dataStorage;
+        private final boolean editorEnvironment;
+        private @Nullable Long environmentId;
+        private final ApplicationEventPublisher eventPublisher;
+        private final HttpClientExecutor httpClientExecutor;
+        private @Nullable Long jobId;
+        private @Nullable Long jobPrincipalId;
+        private @Nullable Long jobPrincipalWorkflowId;
+        private @Nullable String publicUrl;
+        private final TempFileStorage tempFileStorage;
+        private @Nullable PlatformType type;
+        private @Nullable String workflowId;
+
+        private Builder(
+            String componentName, int componentVersion, String actionName, boolean editorEnvironment,
+            CacheManager cacheManager, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
+            HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage) {
+
+            this.componentName = componentName;
+            this.componentVersion = componentVersion;
+            this.actionName = actionName;
+            this.editorEnvironment = editorEnvironment;
+            this.cacheManager = cacheManager;
+            this.dataStorage = dataStorage;
+            this.eventPublisher = eventPublisher;
+            this.httpClientExecutor = httpClientExecutor;
+            this.tempFileStorage = tempFileStorage;
+        }
+
+        Builder componentConnection(@Nullable ComponentConnection componentConnection) {
+            this.componentConnection = componentConnection;
+
+            return this;
+        }
+
+        Builder environmentId(@Nullable Long environmentId) {
+            this.environmentId = environmentId;
+
+            return this;
+        }
+
+        Builder jobId(@Nullable Long jobId) {
+            this.jobId = jobId;
+
+            return this;
+        }
+
+        Builder jobPrincipalId(@Nullable Long jobPrincipalId) {
+            this.jobPrincipalId = jobPrincipalId;
+
+            return this;
+        }
+
+        Builder jobPrincipalWorkflowId(@Nullable Long jobPrincipalWorkflowId) {
+            this.jobPrincipalWorkflowId = jobPrincipalWorkflowId;
+
+            return this;
+        }
+
+        Builder publicUrl(@Nullable String publicUrl) {
+            this.publicUrl = publicUrl;
+
+            return this;
+        }
+
+        Builder type(@Nullable PlatformType type) {
+            this.type = type;
+
+            return this;
+        }
+
+        Builder workflowId(@Nullable String workflowId) {
+            this.workflowId = workflowId;
+
+            return this;
+        }
+
+        ActionContextImpl build() {
+            return new ActionContextImpl(this);
+        }
     }
 
     @Override
@@ -107,15 +233,6 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Override
     public void event(Consumer<Event> eventConsumer) {
         eventConsumer.accept(event);
-    }
-
-    @Override
-    public ClusterElementContext createClusterElementContext(
-        String componentName, int componentVersion, String componentOperationName,
-        @Nullable ComponentConnection componentConnection) {
-
-        return contextFactory.createClusterElementContext(
-            componentName, componentVersion, componentOperationName, componentConnection, isEditorEnvironment());
     }
 
     @Override
@@ -157,6 +274,26 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Nullable
     public Long getEnvironmentId() {
         return environmentId;
+    }
+
+    @Override
+    public ClusterElementContext toClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection) {
+
+        return ClusterElementContextImpl
+            .builder(
+                componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
+                eventPublisher, httpClientExecutor, tempFileStorage)
+            .componentConnection(componentConnection)
+            .environmentId(environmentId)
+            .jobId(jobId)
+            .jobPrincipalId(jobPrincipalId)
+            .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+            .publicUrl(publicUrl)
+            .type(type)
+            .workflowId(workflowId)
+            .build();
     }
 
     private record ApprovalImpl(long jobId, String publicUrl) implements Approval {

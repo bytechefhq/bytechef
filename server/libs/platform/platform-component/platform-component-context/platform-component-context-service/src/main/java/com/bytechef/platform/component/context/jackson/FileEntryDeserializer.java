@@ -34,9 +34,14 @@ public class FileEntryDeserializer extends ValueDeserializer<FileEntry> {
     public FileEntry deserialize(JsonParser jp, DeserializationContext ctxt) {
         JsonNode jsonNode = ctxt.readTree(jp);
 
-        return new FileEntryImpl(
-            asText("name", jsonNode), asText("extension", jsonNode), asText("mimeType", jsonNode),
-            asText("url", jsonNode));
+        String name = asText("name", jsonNode);
+        String url = asText("url", jsonNode);
+
+        if (name == null || url == null) {
+            return null;
+        }
+
+        return new FileEntryImpl(name, asText("extension", jsonNode), asText("mimeType", jsonNode), url);
     }
 
     private String asText(String fieldName, JsonNode jsonNode) {
