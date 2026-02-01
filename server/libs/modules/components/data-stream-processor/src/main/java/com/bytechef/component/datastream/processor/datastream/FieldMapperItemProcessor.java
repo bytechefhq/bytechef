@@ -149,11 +149,7 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
             }
 
             if (destinationField.contains(".")) {
-                context.nested(nested -> {
-                    nested.setValue(result, destinationField, value);
-
-                    return null;
-                });
+                context.nested(nested -> nested.setValue(result, destinationField, value));
             } else {
                 result.put(destinationField, value);
             }

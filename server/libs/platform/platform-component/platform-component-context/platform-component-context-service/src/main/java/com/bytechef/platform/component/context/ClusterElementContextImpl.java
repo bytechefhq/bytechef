@@ -196,9 +196,9 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         }
 
         @Override
-        public void setValue(Map<String, Object> map, String path, @Nullable Object value) {
+        public Map<String, Object> setValue(Map<String, Object> map, String path, @Nullable Object value) {
             if (path.isEmpty()) {
-                return;
+                return map;
             }
 
             String[] parts = path.split("\\.");
@@ -227,6 +227,8 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
             } else {
                 current.put(parts[parts.length - 1], value);
             }
+
+            return map;
         }
 
         @Override
