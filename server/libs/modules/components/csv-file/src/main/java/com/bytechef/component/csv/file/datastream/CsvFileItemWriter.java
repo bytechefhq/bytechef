@@ -20,19 +20,24 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.CSV_MAPP
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.FILE_ENTRY;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.datastream.ExecutionContext;
+import com.bytechef.component.definition.datastream.FieldDefinition;
 import com.bytechef.component.definition.datastream.ItemWriter;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SequenceWriter;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -110,6 +115,38 @@ public class CsvFileItemWriter implements ItemWriter {
             }
 
             sequenceWriter.write(row.values());
+        }
+    }
+
+    @Override
+    public List<FieldDefinition> getFields(
+        Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context) {
+
+        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
+
+        if (context.file(file -> file.getContentLength(fileEntry)) == 0) {
+            return List.of();
+        }
+
+        try (BufferedReader reader = new BufferedReader(
+            new InputStreamReader(
+                context.file(file -> file.getInputStream(fileEntry)),
+                StandardCharsets.UTF_8))) {
+
+            String headerLine = reader.readLine();
+
+            if (headerLine == null || headerLine.isEmpty()) {
+                return List.of();
+            }
+
+            String[] headers = headerLine.split(",", -1);
+
+            return Arrays.stream(headers)
+                .map(header -> new FieldDefinition(header.strip(), header.strip(), String.class))
+                .toList();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read CSV headers", e);
         }
     }
 }
