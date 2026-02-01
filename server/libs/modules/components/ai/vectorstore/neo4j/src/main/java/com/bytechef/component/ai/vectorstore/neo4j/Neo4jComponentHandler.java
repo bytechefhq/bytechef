@@ -50,10 +50,10 @@ public class Neo4jComponentHandler implements ComponentHandler {
                 .connection(Neo4jConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
-                    new Neo4jLoadAction(clusterElementDefinitionService).actionDefinition,
-                    new Neo4jSearchAction(clusterElementDefinitionService).actionDefinition)
+                    Neo4jLoadAction.of(clusterElementDefinitionService),
+                    Neo4jSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(
-                    new Neo4jVectorStore(clusterElementDefinitionService).clusterElementDefinition));
+                    Neo4jVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override

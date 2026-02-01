@@ -20,17 +20,17 @@ import static com.bytechef.component.ai.vectorstore.typesense.constant.Typesense
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
 import com.bytechef.component.ai.vectorstore.typesense.constant.TypesenseConstants;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class TypesenseLoadAction extends AbstractLoadAction {
+public class TypesenseLoadAction {
 
-    public TypesenseLoadAction(
-        ClusterElementDefinitionService clusterElementDefinitionService) {
-
-        super(TYPESENSE, TypesenseConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractLoadAction.of(
+            TYPESENSE, TypesenseConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

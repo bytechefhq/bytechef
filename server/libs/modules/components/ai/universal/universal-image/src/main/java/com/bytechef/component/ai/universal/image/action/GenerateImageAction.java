@@ -57,10 +57,10 @@ import java.util.Map;
  */
 public class GenerateImageAction implements AiImageAction {
 
-    public final AiImageActionDefinition actionDefinition;
+    public static AiImageActionDefinition of(
+        ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
 
-    public GenerateImageAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
-        this.actionDefinition = new AiImageActionDefinition(
+        return new AiImageActionDefinition(
             action(AiImageConstants.GENERATE_IMAGE)
                 .title("Generate Image")
                 .description("AI generate an image that you prompt.")
@@ -108,9 +108,13 @@ public class GenerateImageAction implements AiImageAction {
                                     .description("URL of the generated image."),
                                 string("b64Json")
                                     .description("Base64 encoded JSON of the generated image.")))),
-            provider, this, propertyService);
+            provider, new GenerateImageAction(), propertyService);
     }
 
+    private GenerateImageAction() {
+    }
+
+    @Override
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 

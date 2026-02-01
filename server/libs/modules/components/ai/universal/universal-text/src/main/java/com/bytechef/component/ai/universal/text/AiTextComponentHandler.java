@@ -65,12 +65,12 @@ public class AiTextComponentHandler implements ComponentHandler {
                     .icon("path:assets/ai-text.svg")
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                     .actions(
-                        new ClassifyTextAction(provider, propertyService).actionDefinition,
-                        new SentimentAction(provider, propertyService).actionDefinition,
-                        new ScoreAction(provider, propertyService).actionDefinition,
-                        new SummarizeTextAction(provider, propertyService).actionDefinition,
-                        new SimilaritySearchAction(provider, propertyService).actionDefinition,
-                        new GenerateTextAction(provider, propertyService).actionDefinition));
+                        ClassifyTextAction.of(provider, propertyService),
+                        SentimentAction.of(provider, propertyService),
+                        ScoreAction.of(provider, propertyService),
+                        SummarizeTextAction.of(provider, propertyService),
+                        SimilaritySearchAction.of(provider, propertyService),
+                        GenerateTextAction.of(provider, propertyService)));
         }
     }
 }

@@ -57,8 +57,6 @@ import java.util.Map;
  */
 public class ScoreAction implements AiTextAction {
 
-    public final AiTextActionDefinition actionDefinition;
-
     private static final String RESPONSE_SCHEMA = """
         {
            "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -89,11 +87,7 @@ public class ScoreAction implements AiTextAction {
          }
         """;
 
-    public ScoreAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
-        this.actionDefinition = getActionDefinition(provider, propertyService);
-    }
-
-    private AiTextActionDefinition getActionDefinition(
+    public static AiTextActionDefinition of(
         ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
 
         return new AiTextActionDefinition(
@@ -138,9 +132,13 @@ public class ScoreAction implements AiTextAction {
                 .output(
                     (inputParameters, connectionParameters, context) -> OutputResponse.of(
                         context.outputSchema(outputSchema -> outputSchema.getOutputSchema(RESPONSE_SCHEMA)))),
-            provider, this, propertyService);
+            provider, new ScoreAction(), propertyService);
     }
 
+    private ScoreAction() {
+    }
+
+    @Override
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
@@ -192,5 +190,4 @@ public class ScoreAction implements AiTextAction {
 
         return ParametersFactory.createParameters(modelInputParametersMap);
     }
-
 }

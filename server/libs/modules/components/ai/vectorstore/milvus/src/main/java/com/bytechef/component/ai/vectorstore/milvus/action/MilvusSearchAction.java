@@ -20,15 +20,17 @@ import static com.bytechef.component.ai.vectorstore.milvus.constant.MilvusConsta
 import static com.bytechef.component.ai.vectorstore.milvus.constant.MilvusConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractSearchAction;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class MilvusSearchAction extends AbstractSearchAction {
+public class MilvusSearchAction {
 
-    public MilvusSearchAction(ClusterElementDefinitionService clusterElementDefinitionService) {
-        super(MILVUS, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractSearchAction.of(
+            MILVUS, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

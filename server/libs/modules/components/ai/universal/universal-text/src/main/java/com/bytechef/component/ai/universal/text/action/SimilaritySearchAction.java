@@ -51,8 +51,6 @@ import java.util.Map;
  */
 public class SimilaritySearchAction implements AiTextAction {
 
-    public final AiTextActionDefinition actionDefinition;
-
     private static final String RESPONSE_SCHEMA = """
         {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -83,10 +81,10 @@ public class SimilaritySearchAction implements AiTextAction {
         }
         """;
 
-    public SimilaritySearchAction(
+    public static AiTextActionDefinition of(
         ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
 
-        this.actionDefinition = new AiTextActionDefinition(
+        return new AiTextActionDefinition(
             action(AiTextConstants.SIMILARITY_SEARCH)
                 .title("Similarity Search")
                 .description(
@@ -120,8 +118,13 @@ public class SimilaritySearchAction implements AiTextAction {
                 .output(
                     (inputParameters, connectionParameters, context) -> BaseOutputDefinition.OutputResponse.of(
                         context.outputSchema(outputSchema -> outputSchema.getOutputSchema(RESPONSE_SCHEMA)))),
-            provider, this, propertyService);
+            provider, new SimilaritySearchAction(), propertyService);
     }
+
+    private SimilaritySearchAction() {
+    }
+
+    @Override
 
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();

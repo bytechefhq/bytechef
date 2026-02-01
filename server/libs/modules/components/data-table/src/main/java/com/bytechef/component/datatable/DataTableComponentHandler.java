@@ -72,19 +72,19 @@ public class DataTableComponentHandler implements ComponentHandler {
                 .icon("path:assets/data-table.svg")
                 .categories(ComponentCategory.HELPERS)
                 .actions(
-                    new DataTableCreateRecordsAction(dataTableService, dataTableRowService).actionDefinition,
-                    new DataTableDeleteRecordsAction(dataTableService, dataTableRowService).actionDefinition,
-                    new DataTableUpdateRecordAction(dataTableService, dataTableRowService).actionDefinition,
-                    new DataTableGetRecordAction(dataTableService, dataTableRowService).actionDefinition,
-                    new DataTableFindRecordsAction(dataTableService, dataTableRowService).actionDefinition,
-                    new DataTableClearTableAction(dataTableService, dataTableRowService).actionDefinition)
+                    DataTableCreateRecordsAction.of(dataTableService, dataTableRowService),
+                    DataTableDeleteRecordsAction.of(dataTableService, dataTableRowService),
+                    DataTableUpdateRecordAction.of(dataTableService, dataTableRowService),
+                    DataTableGetRecordAction.of(dataTableService, dataTableRowService),
+                    DataTableFindRecordsAction.of(dataTableService, dataTableRowService),
+                    DataTableClearTableAction.of(dataTableService, dataTableRowService))
                 .triggers(
-                    new DataTableRecordCreatedTrigger(
-                        dataTableRowService, dataTableService, dataTableWebhookService).triggerDefinition,
-                    new DataTableRecordUpdatedTrigger(
-                        dataTableRowService, dataTableService, dataTableWebhookService).triggerDefinition,
-                    new DataTableRecordDeletedTrigger(
-                        dataTableRowService, dataTableService, dataTableWebhookService).triggerDefinition));
+                    DataTableRecordCreatedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService),
+                    DataTableRecordUpdatedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService),
+                    DataTableRecordDeletedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService)));
         }
     }
 }

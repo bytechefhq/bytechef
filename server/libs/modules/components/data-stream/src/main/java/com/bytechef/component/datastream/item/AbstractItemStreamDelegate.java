@@ -82,10 +82,9 @@ public abstract class AbstractItemStreamDelegate {
         componentConnection = MapUtils.get(clusterElementMap, COMPONENT_CONNECTION, ComponentConnection.class);
 
         connectionParameters = componentConnection == null
-            ? null : ParametersFactory.createParameters(componentConnection.getParameters());
+            ? null : ParametersFactory.create(componentConnection.getParameters());
 
-        inputParameters = ParametersFactory.createParameters(
-            MapUtils.getRequiredMap(clusterElementMap, INPUT_PARAMETERS));
+        inputParameters = ParametersFactory.create(MapUtils.getRequiredMap(clusterElementMap, INPUT_PARAMETERS));
 
         jobParameter = Validate.notNull(jobParameters.getParameter(TENANT_ID), "tenantId is required");
 

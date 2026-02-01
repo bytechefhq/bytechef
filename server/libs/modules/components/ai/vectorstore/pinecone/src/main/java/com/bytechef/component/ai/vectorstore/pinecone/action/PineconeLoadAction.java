@@ -17,20 +17,19 @@
 package com.bytechef.component.ai.vectorstore.pinecone.action;
 
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.PINECONE;
+import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
-import com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class PineconeLoadAction extends AbstractLoadAction {
+public class PineconeLoadAction {
 
-    public PineconeLoadAction(
-        ClusterElementDefinitionService clusterElementDefinitionService) {
-
-        super(PINECONE, PineconeConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractLoadAction.of(PINECONE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

@@ -19,14 +19,19 @@ package com.bytechef.component.ai.vectorstore.redis.cluster;
 import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 
 /**
  * @author Monika Kušter
  */
-public class RedisVectorStore extends AbstractVectorStore {
+public class RedisVectorStore {
 
-    public RedisVectorStore(ClusterElementDefinitionService clusterElementDefinitionService) {
-        super("Redis", VECTOR_STORE, clusterElementDefinitionService);
+    public static ClusterElementDefinition<VectorStoreFunction> of(
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        return AbstractVectorStore.of(
+            "Redis", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

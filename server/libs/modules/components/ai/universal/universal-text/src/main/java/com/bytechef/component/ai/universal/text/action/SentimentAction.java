@@ -47,13 +47,7 @@ import java.util.Map;
  */
 public class SentimentAction implements AiTextAction {
 
-    public final AiTextActionDefinition actionDefinition;
-
-    public SentimentAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
-        this.actionDefinition = getActionDefinition(provider, propertyService);
-    }
-
-    private AiTextActionDefinition getActionDefinition(
+    public static AiTextActionDefinition of(
         ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
 
         return new AiTextActionDefinition(
@@ -76,9 +70,13 @@ public class SentimentAction implements AiTextAction {
                         string()
                             .description("The chosen category.")),
                     sampleOutput("sample category")),
-            provider, this, propertyService);
+            provider, new SentimentAction(), propertyService);
     }
 
+    private SentimentAction() {
+    }
+
+    @Override
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 

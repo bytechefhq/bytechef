@@ -52,13 +52,7 @@ import java.util.stream.Collectors;
  */
 public class ClassifyTextAction implements AiTextAction {
 
-    public final AiTextActionDefinition actionDefinition;
-
-    public ClassifyTextAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
-        this.actionDefinition = getActionDefinition(provider, propertyService);
-    }
-
-    private AiTextActionDefinition getActionDefinition(
+    public static AiTextActionDefinition of(
         ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
 
         return new AiTextActionDefinition(
@@ -91,9 +85,13 @@ public class ClassifyTextAction implements AiTextAction {
                         string()
                             .description("The chosen category.")),
                     sampleOutput("sample category")),
-            provider, this, propertyService);
+            provider, new ClassifyTextAction(), propertyService);
     }
 
+    private ClassifyTextAction() {
+    }
+
+    @Override
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 

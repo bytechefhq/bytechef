@@ -35,22 +35,27 @@ import org.springframework.ai.embedding.EmbeddingModel;
  */
 public abstract class AbstractVectorStore {
 
-    public final ClusterElementDefinition<VectorStoreFunction> clusterElementDefinition;
-
     private final VectorStore vectorStore;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
 
-    public AbstractVectorStore(
-        String title, VectorStore vectorStore, ClusterElementDefinitionService clusterElementDefinitionService) {
+    protected AbstractVectorStore(
+        VectorStore vectorStore, ClusterElementDefinitionService clusterElementDefinitionService) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.vectorStore = vectorStore;
+    }
 
-        this.clusterElementDefinition = ComponentDsl.<VectorStoreFunction>clusterElement(VECTOR_STORE)
+    public static ClusterElementDefinition<VectorStoreFunction> of(
+        String title, VectorStore vectorStore, ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        AbstractVectorStore abstractVectorStore = new AbstractVectorStore(
+            vectorStore, clusterElementDefinitionService) {};
+
+        return ComponentDsl.<VectorStoreFunction>clusterElement(VECTOR_STORE)
             .title("%s VectorStore".formatted(title))
             .description("%s VectorStore.".formatted(title))
             .type(VectorStoreFunction.VECTOR_STORE)
-            .object(() -> this::apply);
+            .object(() -> abstractVectorStore::apply);
     }
 
     protected org.springframework.ai.vectorstore.VectorStore apply(

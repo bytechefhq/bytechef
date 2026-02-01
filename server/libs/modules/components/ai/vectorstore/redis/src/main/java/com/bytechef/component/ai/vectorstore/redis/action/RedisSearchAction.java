@@ -20,15 +20,17 @@ import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstant
 import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractSearchAction;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class RedisSearchAction extends AbstractSearchAction {
+public class RedisSearchAction {
 
-    public RedisSearchAction(ClusterElementDefinitionService clusterElementDefinitionService) {
-        super(REDIS, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractSearchAction.of(
+            REDIS, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

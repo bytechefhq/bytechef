@@ -50,9 +50,9 @@ public class RedisComponentHandler implements ComponentHandler {
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
             .connection(RedisConnection.CONNECTION_DEFINITION)
             .actions(
-                new RedisSearchAction(clusterElementDefinitionService).actionDefinition,
-                new RedisLoadAction(clusterElementDefinitionService).actionDefinition)
-            .clusterElements(new RedisVectorStore(clusterElementDefinitionService).clusterElementDefinition));
+                RedisSearchAction.of(clusterElementDefinitionService),
+                RedisLoadAction.of(clusterElementDefinitionService))
+            .clusterElements(RedisVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override

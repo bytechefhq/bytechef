@@ -44,16 +44,19 @@ import java.util.Objects;
  */
 public class DataTableGetRecordAction {
 
-    public final ModifiableActionDefinition actionDefinition;
-
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
 
     @SuppressFBWarnings("EI")
-    public DataTableGetRecordAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    public static ModifiableActionDefinition of(
+        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+
+        return new DataTableGetRecordAction(dataTableService, dataTableRowService).build();
+    }
+
+    private DataTableGetRecordAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
-        this.actionDefinition = build();
     }
 
     private ModifiableActionDefinition build() {

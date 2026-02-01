@@ -51,10 +51,10 @@ public class QdrantComponentHandler implements ComponentHandler {
                 .connection(QdrantConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
-                    new QdrantLoadAction(clusterElementDefinitionService).actionDefinition,
-                    new QdrantSearchAction(clusterElementDefinitionService).actionDefinition)
+                    QdrantLoadAction.of(clusterElementDefinitionService),
+                    QdrantSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(
-                    new QdrantVectorStore(clusterElementDefinitionService).clusterElementDefinition));
+                    QdrantVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override

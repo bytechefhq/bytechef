@@ -20,15 +20,19 @@ import static com.bytechef.component.ai.vectorstore.neo4j.constant.Neo4jConstant
 import static com.bytechef.component.ai.vectorstore.neo4j.constant.Neo4jConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractSearchAction;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class Neo4jSearchAction extends AbstractSearchAction {
+public final class Neo4jSearchAction {
 
-    public Neo4jSearchAction(ClusterElementDefinitionService clusterElementDefinitionService) {
-        super(NEO4J, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    private Neo4jSearchAction() {
+    }
+
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractSearchAction.of(NEO4J, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

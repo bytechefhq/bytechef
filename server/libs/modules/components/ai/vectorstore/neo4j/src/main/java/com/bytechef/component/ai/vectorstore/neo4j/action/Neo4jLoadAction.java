@@ -17,20 +17,22 @@
 package com.bytechef.component.ai.vectorstore.neo4j.action;
 
 import static com.bytechef.component.ai.vectorstore.neo4j.constant.Neo4jConstants.NEO4J;
+import static com.bytechef.component.ai.vectorstore.neo4j.constant.Neo4jConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
-import com.bytechef.component.ai.vectorstore.neo4j.constant.Neo4jConstants;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class Neo4jLoadAction extends AbstractLoadAction {
+public final class Neo4jLoadAction {
 
-    public Neo4jLoadAction(
-        ClusterElementDefinitionService clusterElementDefinitionService) {
+    private Neo4jLoadAction() {
+    }
 
-        super(NEO4J, Neo4jConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractLoadAction.of(NEO4J, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

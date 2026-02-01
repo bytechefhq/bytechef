@@ -17,20 +17,19 @@
 package com.bytechef.component.ai.vectorstore.qdrant.action;
 
 import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.QDRANT;
+import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
-import com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class QdrantLoadAction extends AbstractLoadAction {
+public class QdrantLoadAction {
 
-    public QdrantLoadAction(
-        ClusterElementDefinitionService clusterElementDefinitionService) {
-
-        super(QDRANT, QdrantConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractLoadAction.of(QDRANT, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

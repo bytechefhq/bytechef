@@ -50,10 +50,10 @@ public class PineconeComponentHandler implements ComponentHandler {
                 .connection(PineconeConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
-                    new PineconeLoadAction(clusterElementDefinitionService).actionDefinition,
-                    new PineconeSearchAction(clusterElementDefinitionService).actionDefinition)
+                    PineconeLoadAction.of(clusterElementDefinitionService),
+                    PineconeSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(
-                    new PineconeVectorStore(clusterElementDefinitionService).clusterElementDefinition));
+                    PineconeVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override

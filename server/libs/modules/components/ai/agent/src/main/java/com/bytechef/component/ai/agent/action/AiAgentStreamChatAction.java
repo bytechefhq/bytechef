@@ -41,12 +41,16 @@ import reactor.core.publisher.Flux;
  */
 public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
-    public final ChatActionDefinitionWrapper actionDefinition;
+    public static ChatActionDefinitionWrapper of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return new AiAgentStreamChatAction(clusterElementDefinitionService).build();
+    }
 
-    public AiAgentStreamChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
+    private AiAgentStreamChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
         super(clusterElementDefinitionService);
+    }
 
-        actionDefinition = new ChatActionDefinitionWrapper(
+    private ChatActionDefinitionWrapper build() {
+        return new ChatActionDefinitionWrapper(
             action("streamChat")
                 .title("Chat (stream)")
                 .description("Chat with the AI agent and stream the response.")

@@ -20,15 +20,16 @@ import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeCo
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractSearchAction;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
 /**
  * @author Monika Kušter
  */
-public class PineconeSearchAction extends AbstractSearchAction {
+public class PineconeSearchAction {
 
-    public PineconeSearchAction(ClusterElementDefinitionService clusterElementDefinitionService) {
-        super(PINECONE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        return AbstractSearchAction.of(PINECONE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }
