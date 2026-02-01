@@ -21,6 +21,7 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.constant.PlatformType;
 import org.jspecify.annotations.Nullable;
 
@@ -40,6 +41,11 @@ public interface ContextFactory {
     ClusterElementContext createClusterElementContext(
         String componentName, int componentVersion, String clusterElementName,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment);
+
+    ClusterElementContext createClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
+        ClusterElementResolverFunction clusterElementResolverFunction);
 
     TriggerContext createTriggerContext(
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,

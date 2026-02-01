@@ -108,7 +108,7 @@ public abstract class AbstractLoadAction {
             ParametersFactory.create(clusterElement.getParameters()),
             ParametersFactory.create(
                 componentConnection == null ? Map.of() : componentConnection.getParameters()),
-            ((ActionContextAware) context).createClusterElementContext(
+            ((ActionContextAware) context).toClusterElementContext(
                 clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                 clusterElement.getClusterElementName(), componentConnection));
     }
