@@ -29,10 +29,13 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TYPE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.definition.datastream.ExecutionContext;
+import com.bytechef.component.definition.datastream.FieldDefinition;
 import com.bytechef.component.definition.datastream.ItemWriter;
 import com.bytechef.platform.component.jdbc.DataSourceFactory;
 import com.bytechef.platform.component.jdbc.operation.InsertJdbcOperation;
@@ -113,6 +116,32 @@ public class JdbcItemWriter implements ItemWriter {
 
         this.inputParameters = inputParameters;
         this.dataSource = DataSourceFactory.getDataSource(connectionParameters, urlTemplate, jdbcDriverClassName);
+    }
+
+    @Override
+    public List<FieldDefinition> getFields(
+        Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context) {
+
+        List<Map<String, Object>> columns = inputParameters.getList(COLUMNS, new TypeReference<>() {}, List.of());
+
+        return columns.stream()
+            .map(column -> {
+                String name = MapUtils.getRequiredString(column, NAME);
+                String type = MapUtils.getString(column, TYPE, "STRING");
+
+                Class<?> javaType = switch (type) {
+                    case "BIGINT", "INTEGER" -> Long.class;
+                    case "DECIMAL", "DOUBLE", "FLOAT", "REAL" -> Double.class;
+                    case "BOOLEAN" -> Boolean.class;
+                    case "DATE" -> java.time.LocalDate.class;
+                    case "TIME" -> java.time.LocalTime.class;
+                    case "TIMESTAMP" -> java.time.LocalDateTime.class;
+                    default -> String.class;
+                };
+
+                return new FieldDefinition(name, name, javaType);
+            })
+            .toList();
     }
 
     @Override
