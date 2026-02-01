@@ -26,6 +26,7 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.PRI
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
 import static com.bytechef.component.definition.datastream.ItemReader.SOURCE;
 import static com.bytechef.component.definition.datastream.ItemWriter.DESTINATION;
+import static com.bytechef.platform.component.definition.datastream.ItemProcessor.PROCESSOR;
 import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.COMPONENT_NAME;
 import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.COMPONENT_VERSION;
 
@@ -49,6 +50,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameter;
@@ -92,20 +94,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                 {
                     ClusterElement clusterElement = clusterElementMap.getClusterElement(DESTINATION);
 
-                    Map<String, Object> value = new HashMap<>();
-
-                    ComponentConnection componentConnection = connectionParameters.get(
-                        clusterElement.getWorkflowNodeName());
-
-                    if (componentConnection != null) {
-                        value.put(COMPONENT_CONNECTION, componentConnection);
-                    }
-
-                    value.put(COMPONENT_NAME, clusterElement.getComponentName());
-                    value.put(COMPONENT_VERSION, clusterElement.getComponentVersion());
-                    value.put(CLUSTER_ELEMENT_NAME, clusterElement.getClusterElementName());
-
-                    value.put(INPUT_PARAMETERS, clusterElement.getParameters());
+                    Map<String, Object> value = getValue(clusterElement, connectionParameters);
 
                     add(new JobParameter<>(DESTINATION.name(), value, Map.class));
 
@@ -119,23 +108,21 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                                 PRINCIPAL_WORKFLOW_ID, actionContextAware.getJobPrincipalWorkflowId(), Long.class));
                     }
 
-                    add(new JobParameter<>(JOB_ID, actionContextAware.getJobId(), Long.class));
+                    if (actionContextAware.getJobId() != null) {
+                        add(new JobParameter<>(JOB_ID, actionContextAware.getJobId(), Long.class));
+                    }
+
+                    clusterElement = clusterElementMap.getClusterElement(PROCESSOR);
+
+                    if (clusterElement != null) {
+                        value = getValue(clusterElement, connectionParameters);
+
+                        add(new JobParameter<>(PROCESSOR.name(), value, Map.class));
+                    }
 
                     clusterElement = clusterElementMap.getClusterElement(SOURCE);
 
-                    value = new HashMap<>();
-
-                    componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
-
-                    if (componentConnection != null) {
-                        value.put(COMPONENT_CONNECTION, componentConnection);
-                    }
-
-                    value.put(COMPONENT_NAME, clusterElement.getComponentName());
-                    value.put(COMPONENT_VERSION, clusterElement.getComponentVersion());
-                    value.put(CLUSTER_ELEMENT_NAME, clusterElement.getClusterElementName());
-
-                    value.put(INPUT_PARAMETERS, clusterElement.getParameters());
+                    value = getValue(clusterElement, connectionParameters);
 
                     add(new JobParameter<>(SOURCE.name(), value, Map.class));
 
@@ -175,5 +162,25 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
             "endTime", Objects.requireNonNull(jobExecution.getEndTime()),
             "status", jobExecution.getStatus(),
             "startTime", Objects.requireNonNull(jobExecution.getStartTime()));
+    }
+
+    private static @NonNull Map<String, Object> getValue(
+        ClusterElement clusterElement, Map<String, ? extends ComponentConnection> connectionParameters) {
+
+        Map<String, Object> value = new HashMap<>();
+
+        ComponentConnection componentConnection = connectionParameters.get(
+            clusterElement.getWorkflowNodeName());
+
+        if (componentConnection != null) {
+            value.put(COMPONENT_CONNECTION, componentConnection);
+        }
+
+        value.put(COMPONENT_NAME, clusterElement.getComponentName());
+        value.put(COMPONENT_VERSION, clusterElement.getComponentVersion());
+        value.put(CLUSTER_ELEMENT_NAME, clusterElement.getClusterElementName());
+
+        value.put(INPUT_PARAMETERS, clusterElement.getParameters());
+        return value;
     }
 }
