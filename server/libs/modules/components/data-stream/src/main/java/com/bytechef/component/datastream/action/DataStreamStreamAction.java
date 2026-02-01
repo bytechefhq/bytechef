@@ -18,8 +18,6 @@ package com.bytechef.component.datastream.action;
 
 import static com.bytechef.component.datastream.constant.DataStreamConstants.STREAM;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.datastream.action.definition.DataStreamStreamActionDefinition;
 import com.bytechef.component.datastream.batch.InMemoryBatchJobFactory;
@@ -31,21 +29,13 @@ import org.springframework.batch.core.launch.JobLauncher;
  */
 public class DataStreamStreamAction {
 
-    public final DataStreamStreamActionDefinition actionDefinition;
+    public static DataStreamStreamActionDefinition of(
+        Job job, JobLauncher jobLauncher, InMemoryBatchJobFactory inMemoryBatchJobFactory) {
 
-    public DataStreamStreamAction(Job job, JobLauncher jobLauncher, InMemoryBatchJobFactory inMemoryBatchJobFactory) {
-        actionDefinition = new DataStreamStreamActionDefinition(
+        return new DataStreamStreamActionDefinition(
             action(STREAM)
                 .title("Stream Data")
-                .description("Stream large volume of data between source and destination applications.")
-                .properties(
-                    integer("transformation")
-                        .description(
-                            "Choose between transformation: simple - define source and destination fields, script - define custom transformation script")
-                        .label("Transformation")
-                        .options(
-                            option("Simple", 1),
-                            option("Script", 2))),
+                .description("Stream large volume of data between source and destination applications."),
             job, jobLauncher, inMemoryBatchJobFactory);
     }
 

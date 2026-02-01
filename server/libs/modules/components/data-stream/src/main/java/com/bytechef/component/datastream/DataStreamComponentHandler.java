@@ -40,9 +40,7 @@ public class DataStreamComponentHandler implements ComponentHandler {
     private final DataStreamComponentDefinition componentDefinition;
 
     public DataStreamComponentHandler(
-        @Qualifier("dataStreamJob") Job job,
-        JobLauncher jobLauncher,
-        InMemoryBatchJobFactory inMemoryBatchJobFactory) {
+        @Qualifier("dataStreamJob") Job job, JobLauncher jobLauncher, InMemoryBatchJobFactory inMemoryBatchJobFactory) {
 
         this.componentDefinition = new DataStreamComponentDefinitionImpl(
             component(DATA_STREAM)
@@ -50,8 +48,7 @@ public class DataStreamComponentHandler implements ComponentHandler {
                 .description("With the Data Stream, you can transfer large amounts of data efficiently.")
                 .icon("path:assets/data-stream.svg")
                 .categories(ComponentCategory.HELPERS)
-                .actions(
-                    new DataStreamStreamAction(job, jobLauncher, inMemoryBatchJobFactory).actionDefinition));
+                .actions(DataStreamStreamAction.of(job, jobLauncher, inMemoryBatchJobFactory)));
     }
 
     @Override
