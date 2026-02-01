@@ -50,6 +50,7 @@ import org.springframework.test.context.ContextConfiguration;
     controllers = KnowledgeBaseDocumentGraphQlController.class,
     properties = {
         "bytechef.coordinator.enabled=true",
+        "bytechef.knowledge-base.enabled=true",
         "spring.graphql.schema.locations=classpath*:graphql/**/"
     })
 @AutomationKnowledgeBaseGraphQlConfigurationSharedMocks

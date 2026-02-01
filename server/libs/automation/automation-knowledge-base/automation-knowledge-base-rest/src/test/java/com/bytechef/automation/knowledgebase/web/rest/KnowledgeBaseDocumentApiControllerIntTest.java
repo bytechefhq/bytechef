@@ -44,7 +44,9 @@ import org.springframework.test.web.servlet.MockMvc;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = AutomationKnowledgeBaseRestTestConfiguration.class)
-@WebMvcTest(value = KnowledgeBaseDocumentApiController.class)
+@WebMvcTest(
+    value = KnowledgeBaseDocumentApiController.class,
+    properties = "bytechef.knowledge-base.enabled=true")
 class KnowledgeBaseDocumentApiControllerIntTest {
 
     @Autowired
