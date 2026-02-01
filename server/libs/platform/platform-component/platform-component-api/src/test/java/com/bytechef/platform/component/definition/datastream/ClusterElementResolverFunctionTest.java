@@ -21,9 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ClusterElementContext;
-import com.bytechef.component.definition.ClusterElementContext.ClusterElementFunction;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.definition.ClusterElementContextAware.ClusterElementFunction;
 import org.junit.jupiter.api.Test;
 
 /**

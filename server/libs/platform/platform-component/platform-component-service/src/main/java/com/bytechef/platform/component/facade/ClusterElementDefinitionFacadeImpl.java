@@ -17,10 +17,10 @@
 package com.bytechef.platform.component.facade;
 
 import com.bytechef.component.definition.ClusterElementContext;
-import com.bytechef.component.definition.ClusterElementContext.ClusterElementFunction;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.definition.ClusterElementContextAware.ClusterElementFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.Option;
