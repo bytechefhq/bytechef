@@ -38,6 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -90,7 +91,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
             .toList();
 
         Map<String, Long> clusterElementConnectionIds = connections.stream()
-            .collect(java.util.stream.Collectors.toMap(
+            .collect(Collectors.toMap(
                 WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
                 WorkflowTestConfigurationConnection::getConnectionId));
 

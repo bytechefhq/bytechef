@@ -142,7 +142,7 @@ public class JsonFileItemWriter implements ItemWriter {
         }
 
         for (Map<String, ?> item : items) {
-            String jsonItem = (String) context.json(json -> json.write(item));
+            String jsonItem = context.json(json -> json.write(item));
 
             if (fileType == FileType.JSONL) {
                 printWriter.println(jsonItem);
@@ -216,11 +216,12 @@ public class JsonFileItemWriter implements ItemWriter {
 
         return flattenedItem.entrySet()
             .stream()
-            .map(entry -> new FieldDefinition(
-                entry.getKey(),
-                entry.getKey(),
-                entry.getValue() != null ? entry.getValue()
-                    .getClass() : String.class))
+            .map(entry -> {
+                Object value = entry.getValue();
+
+                return new FieldDefinition(
+                    entry.getKey(), entry.getKey(), value != null ? value.getClass() : String.class);
+            })
             .toList();
     }
 

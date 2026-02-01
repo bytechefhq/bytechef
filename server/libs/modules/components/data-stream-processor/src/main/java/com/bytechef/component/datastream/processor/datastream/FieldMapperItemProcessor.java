@@ -121,29 +121,29 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
 
         Map<String, Object> result = new HashMap<>();
 
-        List<FieldMapping> mappings = inputParameters
+        List<FieldMapping> fieldMappings = inputParameters
             .getList(MAPPINGS, new TypeReference<Map<String, Object>>() {}, List.of())
             .stream()
             .map(map -> new FieldMapping(
                 (String) map.get(SOURCE_FIELD), (String) map.get(DESTINATION_FIELD), map.get(DEFAULT_VALUE)))
             .toList();
 
-        for (FieldMapping mapping : mappings) {
+        for (FieldMapping fieldMapping : fieldMappings) {
             Object value;
-            String sourceField = mapping.sourceField();
-            String destinationField = mapping.destinationField();
+            String sourceField = fieldMapping.sourceField();
+            String destinationField = fieldMapping.destinationField();
 
             if (sourceField.contains(".")) {
                 if (context.nested(nested -> nested.containsPath(item, sourceField))) {
                     value = context.nested(nested -> nested.getValue(item, sourceField));
                 } else {
-                    value = mapping.defaultValue();
+                    value = fieldMapping.defaultValue();
                 }
             } else {
                 if (item.containsKey(sourceField)) {
                     value = item.get(sourceField);
                 } else {
-                    value = mapping.defaultValue();
+                    value = fieldMapping.defaultValue();
                 }
             }
 

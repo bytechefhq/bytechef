@@ -137,12 +137,12 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
-        WorkflowNodeType parentWorkflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
 
         ClusterElementType clusterElementType = clusterElementDefinitionService.getClusterElementType(
-            parentWorkflowNodeType.name(), parentWorkflowNodeType.version(), clusterElementTypeName);
+            workflowNodeType.name(), workflowNodeType.version(), clusterElementTypeName);
 
         ClusterElement clusterElement = clusterElementMap.getClusterElement(
             clusterElementType, clusterElementWorkflowNodeName);
