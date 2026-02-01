@@ -196,11 +196,12 @@ public class JsonFileItemReader implements ItemReader {
 
         return flattenedItem.entrySet()
             .stream()
-            .map(entry -> new FieldDefinition(
-                entry.getKey(),
-                entry.getKey(),
-                entry.getValue() != null ? entry.getValue()
-                    .getClass() : String.class))
+            .map(entry -> {
+                Object value = entry.getValue();
+
+                return new FieldDefinition(
+                    entry.getKey(), entry.getKey(), value != null ? value.getClass() : String.class);
+            })
             .toList();
     }
 

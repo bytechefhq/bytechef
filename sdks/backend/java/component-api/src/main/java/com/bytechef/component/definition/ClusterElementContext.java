@@ -94,7 +94,7 @@ public interface ClusterElementContext extends Context {
         Map<String, Object> flatten(Map<String, Object> map);
 
         /**
-         * Gets a value from a nested map using dot notation path.
+         * Gets a value from a nested map using the dot notation path.
          *
          * @param map  the source map
          * @param path the dot-separated path (e.g., "item.name")
@@ -103,7 +103,7 @@ public interface ClusterElementContext extends Context {
         Object getValue(Map<String, Object> map, String path);
 
         /**
-         * Sets a value in a nested map using dot notation path. Creates intermediate maps as needed.
+         * Sets a value in a nested map using the dot notation path. Creates intermediate maps as needed.
          *
          * @param map   the target map
          * @param path  the dot-separated path (e.g., "item.name")
