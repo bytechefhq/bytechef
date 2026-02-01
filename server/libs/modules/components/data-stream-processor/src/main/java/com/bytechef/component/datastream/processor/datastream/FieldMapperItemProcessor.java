@@ -37,6 +37,7 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.definition.datastream.FieldDefinition;
 import com.bytechef.component.definition.datastream.FieldMapping;
 import com.bytechef.component.definition.datastream.FieldsProvider;
+import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.datastream.ItemProcessor;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +88,7 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ClusterElementContext context) {
 
-        List<FieldDefinition> columns = context.resolveClusterElement(
+        List<FieldDefinition> columns = ((ClusterElementContextAware) context).resolveClusterElement(
             SOURCE,
             (clusterElement, inputParameters1, connectionParameters1, context1) -> ((FieldsProvider) clusterElement)
                 .getFields(inputParameters1, connectionParameters1, context1));
@@ -104,7 +105,7 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ClusterElementContext context) {
 
-        List<FieldDefinition> columns = context.resolveClusterElement(
+        List<FieldDefinition> columns = ((ClusterElementContextAware) context).resolveClusterElement(
             DESTINATION,
             (clusterElement, inputParameters1, connectionParameters1, context1) -> ((FieldsProvider) clusterElement)
                 .getFields(inputParameters1, connectionParameters1, context1));

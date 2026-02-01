@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.component.definition.datastream;
 
-import com.bytechef.component.definition.ClusterElementContext.ClusterElementFunction;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.platform.component.definition.ClusterElementContextAware.ClusterElementFunction;
 
 /**
  * A functional interface designed to resolve cluster elements based on their type and a specified function. This
