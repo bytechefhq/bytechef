@@ -44,23 +44,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 /**
- * Filesystem-based file storage service implementation.
- *
- * <p>
- * <b>Security Note:</b> Path traversal is intentional for this component. This service manages file storage for
- * workflow artifacts and is designed to access files under a configured base directory. File paths are derived from
- * tenant context and internal directory parameters, not from untrusted user input. Access control is handled through
- * tenant isolation.
- *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class FilesystemFileStorageService implements FileStorageService {
 
     private static final String URL_PREFIX = "file:";
 
     private final Path baseDirPath;
 
+    /**
+     * <b>Security Note:</b> Path traversal is intentional for this component. The baseDir parameter is sourced from
+     * application configuration properties ({@code bytechef.file-storage.filesystem.base-path}), not from untrusted
+     * user input. This allows deployment-specific storage location configuration.
+     */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public FilesystemFileStorageService(String baseDir) {
         this.baseDirPath = Paths.get(baseDir);
     }
@@ -307,6 +304,13 @@ public class FilesystemFileStorageService implements FileStorageService {
         return url.replace(URL_PREFIX + "/" + directory + File.separator, "");
     }
 
+    /**
+     * <b>Security Note:</b> Path traversal is intentional for this component. This service manages file storage for
+     * workflow artifacts and is designed to access files under a configured base directory. File paths are derived from
+     * tenant context and internal directory parameters, not from untrusted user input. Access control is handled
+     * through tenant isolation.
+     */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private Path resolveDirectoryPath(String directory) {
         try {
             Path tenantDirectoryPath = baseDirPath.resolve(TenantContext.getCurrentTenantId());
