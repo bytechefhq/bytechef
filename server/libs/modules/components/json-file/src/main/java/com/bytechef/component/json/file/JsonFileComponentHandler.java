@@ -24,6 +24,8 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.json.file.action.JsonFileReadAction;
 import com.bytechef.component.json.file.action.JsonFileWriteAction;
+import com.bytechef.component.json.file.datastream.JsonFileItemReader;
+import com.bytechef.component.json.file.datastream.JsonFileItemWriter;
 import com.google.auto.service.AutoService;
 
 /**
@@ -42,7 +44,9 @@ public class JsonFileComponentHandler implements ComponentHandler {
             JsonFileWriteAction.ACTION_DEFINITION)
         .clusterElements(
             tool(JsonFileReadAction.ACTION_DEFINITION),
-            tool(JsonFileWriteAction.ACTION_DEFINITION));
+            tool(JsonFileWriteAction.ACTION_DEFINITION),
+            JsonFileItemReader.CLUSTER_ELEMENT_DEFINITION,
+            JsonFileItemWriter.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
