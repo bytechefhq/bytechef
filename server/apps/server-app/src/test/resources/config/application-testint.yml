@@ -1,4 +1,10 @@
 bytechef:
+  ai:
+    copilot:
+      enabled: false
+    mcp:
+      server:
+        enabled: false
   security:
     remember-me:
       key: test

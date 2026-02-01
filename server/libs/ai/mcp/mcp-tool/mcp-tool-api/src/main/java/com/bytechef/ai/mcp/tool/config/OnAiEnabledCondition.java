@@ -25,11 +25,14 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * Condition that matches when either MCP server or AI Copilot is enabled.
  *
  * <p>
- * This condition returns {@code true} if any of these conditions are met:
+ * Default values when properties are missing:
  * <ul>
- * <li>{@code bytechef.ai.mcp.server.enabled} is {@code true}</li>
- * <li>{@code bytechef.ai.copilot.enabled} is {@code true}</li>
+ * <li>{@code bytechef.ai.mcp.server.enabled} defaults to {@code true} (matchIfMissing)</li>
+ * <li>{@code bytechef.ai.copilot.enabled} defaults to {@code false}</li>
  * </ul>
+ *
+ * <p>
+ * This condition returns {@code true} if the resolved value of either property is {@code true}.
  *
  * @author Ivica Cardic
  */
@@ -42,9 +45,15 @@ public class OnAiEnabledCondition implements Condition {
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
         Environment environment = context.getEnvironment();
 
-        String mcpServerEnabled = environment.getProperty(MCP_SERVER_ENABLED_PROPERTY);
-        String copilotEnabled = environment.getProperty(COPILOT_ENABLED_PROPERTY);
+        String mcpServerEnabledValue = environment.getProperty(MCP_SERVER_ENABLED_PROPERTY);
+        String copilotEnabledValue = environment.getProperty(COPILOT_ENABLED_PROPERTY);
 
-        return "true".equalsIgnoreCase(mcpServerEnabled) || "true".equalsIgnoreCase(copilotEnabled);
+        // MCP server defaults to true when missing (matchIfMissing behavior)
+        boolean mcpServerEnabled = mcpServerEnabledValue == null || "true".equalsIgnoreCase(mcpServerEnabledValue);
+
+        // Copilot defaults to false when missing
+        boolean copilotEnabled = "true".equalsIgnoreCase(copilotEnabledValue);
+
+        return mcpServerEnabled || copilotEnabled;
     }
 }

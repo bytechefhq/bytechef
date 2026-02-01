@@ -20,6 +20,7 @@ import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.api.ReadProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowInfo;
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowValidationResult;
+import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Component;
  * @author Marko Kriskovic
  */
 @Component
+@ConditionalOnAiEnabled
 public class ReadProjectWorkflowToolsImpl implements ReadProjectWorkflowTools {
 
     private final ProjectWorkflowTools delegate;

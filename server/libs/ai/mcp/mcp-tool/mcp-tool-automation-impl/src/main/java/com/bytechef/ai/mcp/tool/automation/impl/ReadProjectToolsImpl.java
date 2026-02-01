@@ -21,16 +21,20 @@ import com.bytechef.ai.mcp.tool.automation.api.ProjectInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectStatusInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.api.ReadProjectTools;
+import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.stereotype.Component;
 
 /**
  * Read-only project tools implementation that delegates to ProjectTools.
  *
  * @author Marko Kriskovic
  */
+@Component
+@ConditionalOnAiEnabled
 public class ReadProjectToolsImpl implements ReadProjectTools {
 
     private final ProjectTools delegate;
