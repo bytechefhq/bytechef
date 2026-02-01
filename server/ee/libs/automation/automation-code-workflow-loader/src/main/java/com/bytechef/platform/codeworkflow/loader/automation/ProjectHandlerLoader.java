@@ -22,7 +22,6 @@ import org.springframework.cache.CacheManager;
  *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class ProjectHandlerLoader {
 
     public static ProjectHandler loadProjectHandler(
@@ -48,6 +47,11 @@ public class ProjectHandlerLoader {
         }
     }
 
+    /**
+     * <b>Security Note:</b> Path traversal is intentional. The URL is derived from internal code workflow container
+     * configuration, not from untrusted user input.
+     */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private static ProjectHandler loadPolyglotProjectHandler(URL url, Language language)
         throws URISyntaxException, IOException {
 
