@@ -20,6 +20,7 @@ import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.automation.knowledgebase.repository.KnowledgeBaseDocumentChunkRepository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseDocumentChunkServiceImpl implements KnowledgeBaseDocumentChunkService {
 
     private final KnowledgeBaseDocumentChunkRepository knowledgeBaseDocumentChunkRepository;

@@ -20,11 +20,13 @@ import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.automation.knowledgebase.dto.DocumentStatusUpdate;
 import com.bytechef.automation.knowledgebase.repository.KnowledgeBaseDocumentRepository;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 class KnowledgeBaseDocumentServiceImpl implements KnowledgeBaseDocumentService {
 
     private final KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository;

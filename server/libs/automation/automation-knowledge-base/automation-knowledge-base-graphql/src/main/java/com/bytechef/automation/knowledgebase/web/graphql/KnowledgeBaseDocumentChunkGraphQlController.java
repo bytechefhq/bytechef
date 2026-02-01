@@ -20,12 +20,14 @@ import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 @SuppressFBWarnings("EI")
 class KnowledgeBaseDocumentChunkGraphQlController {
 

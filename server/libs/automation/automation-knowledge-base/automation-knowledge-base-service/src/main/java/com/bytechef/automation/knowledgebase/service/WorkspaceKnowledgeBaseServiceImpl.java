@@ -19,6 +19,7 @@ package com.bytechef.automation.knowledgebase.service;
 import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBase;
 import com.bytechef.automation.knowledgebase.repository.WorkspaceKnowledgeBaseRepository;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 public class WorkspaceKnowledgeBaseServiceImpl implements WorkspaceKnowledgeBaseService {
 
     private final WorkspaceKnowledgeBaseRepository workspaceKnowledgeBaseRepository;

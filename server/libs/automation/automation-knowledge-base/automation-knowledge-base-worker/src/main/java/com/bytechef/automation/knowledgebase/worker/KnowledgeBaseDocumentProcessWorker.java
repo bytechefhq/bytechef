@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnProperty(prefix = "bytechef.knowledgebase", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseDocumentProcessWorker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KnowledgeBaseDocumentProcessWorker.class);

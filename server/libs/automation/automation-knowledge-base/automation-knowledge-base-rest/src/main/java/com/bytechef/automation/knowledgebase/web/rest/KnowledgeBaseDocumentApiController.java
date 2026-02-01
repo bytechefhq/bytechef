@@ -20,6 +20,7 @@ import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal/knowledge-bases")
 @SuppressFBWarnings("EI")
 class KnowledgeBaseDocumentApiController {
