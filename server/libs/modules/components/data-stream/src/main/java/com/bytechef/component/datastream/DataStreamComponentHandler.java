@@ -21,12 +21,14 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.datastream.action.DataStreamStreamAction;
+import com.bytechef.component.datastream.batch.InMemoryBatchJobFactory;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,14 +39,19 @@ public class DataStreamComponentHandler implements ComponentHandler {
 
     private final DataStreamComponentDefinition componentDefinition;
 
-    public DataStreamComponentHandler(Job job, JobLauncher jobLauncher) {
+    public DataStreamComponentHandler(
+        @Qualifier("dataStreamJob") Job job,
+        JobLauncher jobLauncher,
+        InMemoryBatchJobFactory inMemoryBatchJobFactory) {
+
         this.componentDefinition = new DataStreamComponentDefinitionImpl(
             component(DATA_STREAM)
                 .title("Data Stream")
                 .description("With the Data Stream, you can transfer large amounts of data efficiently.")
                 .icon("path:assets/data-stream.svg")
                 .categories(ComponentCategory.HELPERS)
-                .actions(new DataStreamStreamAction(job, jobLauncher).actionDefinition));
+                .actions(
+                    new DataStreamStreamAction(job, jobLauncher, inMemoryBatchJobFactory).actionDefinition));
     }
 
     @Override

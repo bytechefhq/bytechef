@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.datastream.action.definition.DataStreamStreamActionDefinition;
+import com.bytechef.component.datastream.batch.InMemoryBatchJobFactory;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.launch.JobLauncher;
 
@@ -32,7 +33,7 @@ public class DataStreamStreamAction {
 
     public final DataStreamStreamActionDefinition actionDefinition;
 
-    public DataStreamStreamAction(Job job, JobLauncher jobLauncher) {
+    public DataStreamStreamAction(Job job, JobLauncher jobLauncher, InMemoryBatchJobFactory inMemoryBatchJobFactory) {
         actionDefinition = new DataStreamStreamActionDefinition(
             action(STREAM)
                 .title("Stream Data")
@@ -45,7 +46,7 @@ public class DataStreamStreamAction {
                         .options(
                             option("Simple", 1),
                             option("Script", 2))),
-            job, jobLauncher);
+            job, jobLauncher, inMemoryBatchJobFactory);
     }
 
 }
