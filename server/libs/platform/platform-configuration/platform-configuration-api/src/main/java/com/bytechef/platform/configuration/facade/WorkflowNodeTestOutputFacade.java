@@ -28,6 +28,10 @@ public interface WorkflowNodeTestOutputFacade {
     WorkflowNodeTestOutput saveWorkflowNodeSampleOutput(
         String workflowId, String workflowNodeName, Object sampleOutput, long environmentId);
 
+    WorkflowNodeTestOutput saveClusterElementTestOutput(
+        String workflowId, String workflowNodeName, String clusterElementType,
+        String clusterElementWorkflowNodeName, long environmentId);
+
     WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName, long environmentId);
 
     void saveWorkflowNodeTestOutput(

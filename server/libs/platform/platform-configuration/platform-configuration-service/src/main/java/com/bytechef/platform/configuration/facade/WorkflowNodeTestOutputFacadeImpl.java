@@ -20,16 +20,20 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
+import com.bytechef.platform.configuration.domain.ClusterElement;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -55,6 +59,7 @@ import org.springframework.stereotype.Service;
 public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final Evaluator evaluator;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -66,13 +71,15 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator,
+        ActionDefinitionFacade actionDefinitionFacade,
+        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WebhookTriggerTestFacade webhookTriggerTestFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.evaluator = evaluator;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
@@ -112,6 +119,80 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         return workflowNodeTestOutputService.save(
             workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput),
             environmentId);
+    }
+
+    @Override
+    @WorkflowCacheEvict(cacheNames = {
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
+        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
+    },
+        environmentIdParam = "environmentId",
+        workflowIdParam = "workflowId")
+    @SuppressWarnings("unchecked")
+    public WorkflowNodeTestOutput saveClusterElementTestOutput(
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName, long environmentId) {
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+        WorkflowNodeType parentWorkflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+
+        ClusterElementType clusterElementType = clusterElementDefinitionService.getClusterElementType(
+            parentWorkflowNodeType.name(), parentWorkflowNodeType.version(), clusterElementTypeName);
+
+        ClusterElement clusterElement = clusterElementMap.getClusterElement(
+            clusterElementType, clusterElementWorkflowNodeName);
+
+        WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
+
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
+            workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+                workflowId, clusterElementWorkflowNodeName, environmentId);
+
+        Map<String, Long> connectionIds = MapUtils.toMap(
+            workflowTestConfigurationConnections,
+            WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+            WorkflowTestConfigurationConnection::getConnectionId);
+
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
+
+        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+            workflowId, workflowTask.getName(), environmentId);
+
+        Map<String, ?> inputParameters = workflowTask.evaluateParameters(
+            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
+
+        Map<String, ?> clusterElementInputParameters = evaluator.evaluate(clusterElement.getParameters(), outputs);
+
+        Map<String, ?> combinedInputParameters = MapUtils.concat(
+            (Map<String, Object>) inputParameters, (Map<String, Object>) clusterElementInputParameters);
+
+        Map<String, ?> extensions = evaluator.evaluate(clusterElement.getExtensions(), outputs);
+
+        Object value = actionDefinitionFacade.executePerform(
+            clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
+            clusterElementWorkflowNodeType.operation(), null, null, null, null,
+            combinedInputParameters, connectionIds, extensions, environmentId, null, true);
+
+        if (value == null) {
+            return null;
+        }
+
+        OutputResponse outputResponse = SchemaUtils.toOutput(
+            value, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+
+        if (outputResponse == null) {
+            return null;
+        }
+
+        return workflowNodeTestOutputService.save(
+            Validate.notNull(workflow.getId(), "id"), clusterElementWorkflowNodeName, clusterElementWorkflowNodeType,
+            outputResponse, environmentId);
     }
 
     @Override
