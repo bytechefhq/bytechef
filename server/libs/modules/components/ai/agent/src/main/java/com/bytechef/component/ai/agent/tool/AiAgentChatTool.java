@@ -26,8 +26,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
-import com.bytechef.component.ai.agent.action.AiAgentChatAction;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -37,13 +37,10 @@ import java.util.List;
 
 public class AiAgentChatTool {
 
-    public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
-        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition) {
-
-        MultipleConnectionsPerformFunction performFn =
-            (MultipleConnectionsPerformFunction) chatActionDefinition
-                .getPerform()
-                .orElseThrow();
+    public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(ActionDefinition actionDefinition) {
+        MultipleConnectionsPerformFunction performFn = (MultipleConnectionsPerformFunction) actionDefinition
+            .getPerform()
+            .orElseThrow();
 
         return ComponentDsl.<MultipleConnectionsToolFunction>clusterElement("aiAgent")
             .title("AI Agent")

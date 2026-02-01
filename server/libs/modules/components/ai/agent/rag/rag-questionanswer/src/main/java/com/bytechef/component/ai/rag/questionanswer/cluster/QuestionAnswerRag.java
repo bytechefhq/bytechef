@@ -102,9 +102,9 @@ public class QuestionAnswerRag {
         return QuestionAnswerAdvisor
             .builder(
                 vectorStoreFunction.apply(
-                    ParametersFactory.createParameters(clusterElement.getParameters()),
-                    ParametersFactory.createParameters(componentConnection.getParameters()),
-                    ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections))
+                    ParametersFactory.create(clusterElement.getParameters()),
+                    ParametersFactory.create(componentConnection.getParameters()),
+                    ParametersFactory.create(clusterElement.getExtensions()), componentConnections))
             .searchRequest(
                 SearchRequest.builder()
                     .filterExpression(inputParameters.getString(FILTER_EXPRESSION))

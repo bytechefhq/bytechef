@@ -102,7 +102,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         ProviderInputModel providerInputModel = providerModelMapper.desunify(unifiedInputModel, List.of());
 
         return providerModelAdapter.create(
-            providerInputModel, ParametersFactory.createParameters(componentConnection.getParameters()),
+            providerInputModel, ParametersFactory.create(componentConnection.getParameters()),
             contextFactory.createContext(componentName, componentConnection));
     }
 
@@ -121,7 +121,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
                 componentName, category, modelType);
 
         providerModelAdapter.delete(
-            id, ParametersFactory.createParameters(componentConnection.getParameters()),
+            id, ParametersFactory.create(componentConnection.getParameters()),
             contextFactory.createContext(componentName, componentConnection));
     }
 
@@ -143,7 +143,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
             unifiedApiDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
 
         ProviderOutputModel providerOutputModel = providerModelAdapter.get(
-            id, ParametersFactory.createParameters(componentConnection.getParameters()),
+            id, ParametersFactory.create(componentConnection.getParameters()),
             contextFactory.createContext(componentName, componentConnection));
 
         return providerModelMapper.unify(providerOutputModel, List.of());
@@ -202,8 +202,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         }
 
         Page<? extends ProviderOutputModel> page = providerModelAdapter.getPage(
-            ParametersFactory.createParameters(componentConnection.getParameters()),
-            ParametersFactory.createParameters(cursorParameters),
+            ParametersFactory.create(componentConnection.getParameters()),
+            ParametersFactory.create(cursorParameters),
             contextFactory.createContext(componentName, componentConnection));
 
         String continuationToken = null;
@@ -253,7 +253,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         ProviderInputModel providerInputModel = providerModelMapper.desunify(unifiedInputModel, List.of());
 
         providerModelAdapter.update(
-            id, providerInputModel, ParametersFactory.createParameters(componentConnection.getParameters()),
+            id, providerInputModel, ParametersFactory.create(componentConnection.getParameters()),
             contextFactory.createContext(componentName, componentConnection));
     }
 

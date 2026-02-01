@@ -48,7 +48,7 @@ public class VectorStoreUtils {
         ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
         return embeddingFunction.apply(
-            ParametersFactory.createParameters(clusterElement.getParameters()),
-            ParametersFactory.createParameters(componentConnection.getParameters()));
+            ParametersFactory.create(clusterElement.getParameters()),
+            ParametersFactory.create(componentConnection.getParameters()));
     }
 }

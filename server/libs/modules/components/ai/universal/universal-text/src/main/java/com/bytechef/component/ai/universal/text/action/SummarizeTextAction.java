@@ -128,6 +128,6 @@ public class SummarizeTextAction implements AiTextAction {
                 Map.of("content", inputParameters.getString(TEXT), ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
 
-        return ParametersFactory.createParameters(modelInputParametersMap);
+        return ParametersFactory.create(modelInputParametersMap);
     }
 }

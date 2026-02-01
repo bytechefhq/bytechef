@@ -91,6 +91,6 @@ public class SentimentAction implements AiTextAction {
                 Map.of("content", userBuilder, ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
 
-        return ParametersFactory.createParameters(modelInputParametersMap);
+        return ParametersFactory.create(modelInputParametersMap);
     }
 }

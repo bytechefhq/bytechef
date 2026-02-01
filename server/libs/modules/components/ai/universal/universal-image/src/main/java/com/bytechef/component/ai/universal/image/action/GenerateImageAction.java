@@ -130,6 +130,6 @@ public class GenerateImageAction implements AiImageAction {
         modelInputParametersMap.put(IMAGE_MESSAGES, List.of(Map.of(CONTENT, inputParameters.getString(PROMPT))));
         modelInputParametersMap.put(MODEL, inputParameters.getString(MODEL));
 
-        return ParametersFactory.createParameters(modelInputParametersMap);
+        return ParametersFactory.create(modelInputParametersMap);
     }
 }

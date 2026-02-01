@@ -104,9 +104,9 @@ public class VectorStoreDocumentRetriever {
         return org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever.builder()
             .vectorStore(
                 vectorStoreFunction.apply(
-                    ParametersFactory.createParameters(clusterElement.getParameters()),
-                    ParametersFactory.createParameters(componentConnection.getParameters()),
-                    ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections))
+                    ParametersFactory.create(clusterElement.getParameters()),
+                    ParametersFactory.create(componentConnection.getParameters()),
+                    ParametersFactory.create(clusterElement.getExtensions()), componentConnections))
             .filterExpression(
                 () -> filterExpression == null ? null : new FilterExpressionTextParser().parse(filterExpression))
             .similarityThreshold(
