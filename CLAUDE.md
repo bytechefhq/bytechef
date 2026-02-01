@@ -284,6 +284,21 @@ public class ExampleComponentHandler implements ComponentHandler {
   - Keep declarative chains (queries, reactive pipelines) as one logical block; prefer one operation per line
   - Avoid chaining when side effects are involved or intermediate values deserve names for clarity/debugging
 
+### Code Quality Tool Patterns
+
+**SpotBugs**:
+- Don't use rough approximations of known constants (e.g., use `Math.PI` instead of `3.14`)
+- Always check return values of methods like `CountDownLatch.await(long, TimeUnit)` - returns boolean
+- Use try-with-resources for `Connection` objects to avoid resource leaks
+- Catch specific exceptions (`SQLException`) instead of generic `Exception` when possible
+
+**PMD**:
+- Use `@SuppressWarnings("PMD.UnusedFormalParameter")` for interface-required but unused parameters
+- Don't qualify static method calls with the class name when already inside that class (e.g., `builder()` not `ClassName.builder()`)
+
+**Checkstyle**:
+- Test method names must be camelCase without underscores (e.g., `testExecuteSuccess` not `testExecute_Success`)
+
 ### Spring Boot Best Practices
 
 1. **Prefer Constructor Injection over Field/Setter Injection**
