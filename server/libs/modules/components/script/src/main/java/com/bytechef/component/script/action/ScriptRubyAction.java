@@ -40,10 +40,8 @@ import com.bytechef.component.script.engine.PolyglotEngine;
  */
 public class ScriptRubyAction {
 
-    public final ScriptActionDefinition actionDefinition;
-
-    public ScriptRubyAction(PolyglotEngine polyglotEngine) {
-        actionDefinition = new ScriptActionDefinition(
+    public static ScriptActionDefinition of(PolyglotEngine polyglotEngine) {
+        return new ScriptActionDefinition(
             action("ruby")
                 .title("Ruby")
                 .description("Executes custom Ruby code.")
@@ -64,5 +62,8 @@ public class ScriptRubyAction {
                         .required(true))
                 .output(),
             "ruby", polyglotEngine);
+    }
+
+    private ScriptRubyAction() {
     }
 }
