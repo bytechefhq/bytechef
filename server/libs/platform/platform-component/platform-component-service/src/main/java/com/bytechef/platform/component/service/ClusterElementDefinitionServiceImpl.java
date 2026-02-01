@@ -40,6 +40,7 @@ import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAdapater;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
@@ -96,10 +97,10 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     public List<Option> executeOptions(
         String componentName, int componentVersion, String clusterElementName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable ComponentConnection componentConnection) {
+        @Nullable ComponentConnection componentConnection, ClusterElementResolverFunction clusterElementResolver) {
 
         ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
-            componentName, componentVersion, clusterElementName, componentConnection, true);
+            componentName, componentVersion, clusterElementName, componentConnection, true, clusterElementResolver);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, clusterElementContext,
@@ -108,7 +109,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                 componentName, componentVersion, clusterElementName, propertyName, inputParameters,
                 lookupDependsOnPaths, searchText, componentConnection1, clusterElementContext1),
             componentConnection1 -> contextFactory.createClusterElementContext(
-                componentName, componentVersion, clusterElementName, componentConnection1, true));
+                componentName, componentVersion, clusterElementName, componentConnection1, true,
+                clusterElementResolver));
     }
 
     @Override

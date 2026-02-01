@@ -18,6 +18,7 @@ package com.bytechef.platform.component.service;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
@@ -38,7 +39,7 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable ComponentConnection componentConnection);
+        @Nullable ComponentConnection componentConnection, ClusterElementResolverFunction clusterElementResolver);
 
     Object executeTool(
         String componentName, String clusterElementName, Map<String, ?> inputParameters,
