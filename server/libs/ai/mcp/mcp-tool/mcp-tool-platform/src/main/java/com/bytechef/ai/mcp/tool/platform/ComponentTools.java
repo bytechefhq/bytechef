@@ -16,6 +16,7 @@
 
 package com.bytechef.ai.mcp.tool.platform;
 
+import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.platform.component.definition.PropertyFactory;
@@ -48,14 +49,13 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Marko Kriskovic
  */
 @Component
-@ConditionalOnProperty(name = "bytechef.ai.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnAiEnabled
 public class ComponentTools {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentTools.class);
