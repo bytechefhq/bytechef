@@ -1899,7 +1899,7 @@ public final class ComponentDsl {
 
         @Override
         public T getElement() {
-            return objectSupplier.get();
+            return objectSupplier != null ? objectSupplier.get() : null;
         }
 
         @Override

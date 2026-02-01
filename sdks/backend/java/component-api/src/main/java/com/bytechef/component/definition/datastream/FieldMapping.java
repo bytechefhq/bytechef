@@ -16,15 +16,19 @@
 
 package com.bytechef.component.definition.datastream;
 
-import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
-import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
+ * Configuration for mapping a source field to a destination field.
+ *
+ * @param sourceField      Name from source ColumnsProvider
+ * @param destinationField Name from destination ColumnsProvider
+ * @param defaultValue     Optional default when source field is missing (null uses null)
  * @author Ivica Cardic
  */
-public interface ItemReader extends ItemStream, FieldsProvider {
+public record FieldMapping(String sourceField, String destinationField, @Nullable Object defaultValue) {
 
-    ClusterElementType SOURCE = new ClusterElementType("SOURCE", "source", "Source");
-
-    Map<String, Object> read() throws Exception;
+    public FieldMapping(String sourceField, String destinationField) {
+        this(sourceField, destinationField, null);
+    }
 }
