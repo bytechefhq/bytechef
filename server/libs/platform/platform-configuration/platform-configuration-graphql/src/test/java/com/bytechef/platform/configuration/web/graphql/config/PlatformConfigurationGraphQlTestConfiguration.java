@@ -16,12 +16,9 @@
 
 package com.bytechef.platform.configuration.web.graphql.config;
 
-import com.bytechef.platform.configuration.facade.WorkflowNodeScriptFacade;
 import com.bytechef.test.config.graphql.GraphQLScalarTypes;
-import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 
 /**
@@ -38,11 +35,5 @@ public class PlatformConfigurationGraphQlTestConfiguration {
     @Bean
     RuntimeWiringConfigurer mapScalarWiringConfigurer() {
         return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.mapScalar());
-    }
-
-    @Bean
-    @Primary
-    public WorkflowNodeScriptFacade workflowNodeScriptFacade() {
-        return Mockito.mock(WorkflowNodeScriptFacade.class);
     }
 }

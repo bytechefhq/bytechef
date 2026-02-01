@@ -26,7 +26,8 @@ import org.jspecify.annotations.Nullable;
 public interface JobContextAware {
 
     ActionContext toActionContext(
-        String componentName, int componentVersion, String actionName, ComponentConnection componentConnection);
+        String componentName, int componentVersion, String actionName,
+        @Nullable ComponentConnection componentConnection);
 
     @Nullable
     Long getEnvironmentId();
