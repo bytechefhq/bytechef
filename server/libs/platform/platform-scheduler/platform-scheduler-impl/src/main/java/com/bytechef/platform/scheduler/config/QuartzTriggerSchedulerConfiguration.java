@@ -93,11 +93,11 @@ public class QuartzTriggerSchedulerConfiguration {
 
         @EventListener(ApplicationReadyEvent.class)
         public void startLater() throws SchedulerException {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Starting Quartz scheduler...");
-            }
-
             scheduler.start();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Quartz scheduler started");
+            }
         }
     }
 }
