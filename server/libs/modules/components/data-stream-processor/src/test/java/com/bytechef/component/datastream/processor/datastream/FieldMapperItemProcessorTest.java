@@ -79,7 +79,7 @@ class FieldMapperItemProcessorTest {
 
                 setNestedValue(map, path, value);
 
-                return null;
+                return map;
             }).when(mockNested)
                 .setValue(any(), any(), any());
 

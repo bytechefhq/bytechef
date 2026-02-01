@@ -70,8 +70,9 @@ public interface ClusterElementContext extends Context {
          * @param map   the target map
          * @param path  the dot-separated path (e.g., "item.name")
          * @param value the value to set
+         * @return the modified map for fluent chaining
          */
-        void setValue(Map<String, Object> map, String path, @Nullable Object value);
+        Map<String, Object> setValue(Map<String, Object> map, String path, @Nullable Object value);
 
         /**
          * Unflattens a map with dot-notation keys into a nested map structure.
