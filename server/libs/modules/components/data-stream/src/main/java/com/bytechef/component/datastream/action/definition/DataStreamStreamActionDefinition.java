@@ -29,6 +29,7 @@ import static com.bytechef.component.definition.datastream.ItemWriter.DESTINATIO
 import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.COMPONENT_NAME;
 import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.COMPONENT_VERSION;
 
+import com.bytechef.component.datastream.batch.InMemoryBatchJobFactory;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -56,12 +57,17 @@ import org.springframework.batch.core.launch.JobLauncher;
 
 public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWrapper {
 
+    private final InMemoryBatchJobFactory inMemoryBatchJobFactory;
     private final Job job;
     private final JobLauncher jobLauncher;
 
-    public DataStreamStreamActionDefinition(ActionDefinition actionDefinition, Job job, JobLauncher jobLauncher) {
+    public DataStreamStreamActionDefinition(
+        ActionDefinition actionDefinition, Job job, JobLauncher jobLauncher,
+        InMemoryBatchJobFactory inMemoryBatchJobFactory) {
+
         super(actionDefinition);
 
+        this.inMemoryBatchJobFactory = inMemoryBatchJobFactory;
         this.job = job;
         this.jobLauncher = jobLauncher;
     }
@@ -76,6 +82,8 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
         Parameters extensions, ActionContext actionContext) throws Exception {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
+
+        boolean editorEnvironment = actionContextAware.isEditorEnvironment();
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
@@ -134,8 +142,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                     add(new JobParameter<>(TENANT_ID, TenantContext.getCurrentTenantId(), String.class));
                     add(
                         new JobParameter<>(
-                            MetadataConstants.EDITOR_ENVIRONMENT, actionContextAware.isEditorEnvironment(),
-                            Boolean.class));
+                            MetadataConstants.EDITOR_ENVIRONMENT, editorEnvironment, Boolean.class));
 
                     if (actionContextAware.getPlatformType() != null) {
                         add(
@@ -145,8 +152,15 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                 }
             });
 
-        JobExecution jobExecution = TenantContext.callWithTenantId(
-            TenantContext.DEFAULT_TENANT_ID, () -> jobLauncher.run(job, jobParameters));
+        JobExecution jobExecution;
+
+        if (editorEnvironment) {
+            jobExecution = TenantContext.callWithTenantId(
+                TenantContext.DEFAULT_TENANT_ID, () -> inMemoryBatchJobFactory.runJob(jobParameters));
+        } else {
+            jobExecution = TenantContext.callWithTenantId(
+                TenantContext.DEFAULT_TENANT_ID, () -> jobLauncher.run(job, jobParameters));
+        }
 
         List<Throwable> failureExceptions = jobExecution.getAllFailureExceptions();
 
