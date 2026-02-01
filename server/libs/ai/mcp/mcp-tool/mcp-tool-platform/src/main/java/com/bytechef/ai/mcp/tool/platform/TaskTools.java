@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  * @author Marko Kriskovic
  */
 @Component
-@ConditionalOnProperty(name = "bytechef.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "bytechef.ai.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
 public class TaskTools {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskTools.class);

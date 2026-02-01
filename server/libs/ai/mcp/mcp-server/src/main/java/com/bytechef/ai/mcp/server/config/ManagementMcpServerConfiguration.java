@@ -51,7 +51,7 @@ import org.springframework.web.servlet.function.ServerResponse;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(name = "bytechef.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "bytechef.ai.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
 public class ManagementMcpServerConfiguration {
 
     private final ProjectToolsImpl projectTools;
