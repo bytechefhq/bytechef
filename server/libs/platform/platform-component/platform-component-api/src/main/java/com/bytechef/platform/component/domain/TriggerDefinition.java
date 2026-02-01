@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.OutputResponse;
@@ -60,31 +59,41 @@ public class TriggerDefinition {
         com.bytechef.component.definition.TriggerDefinition triggerDefinition, String componentName,
         int componentVersion) {
 
-        this.batch = OptionalUtils.orElse(triggerDefinition.getBatch(), false);
+        this.batch = triggerDefinition.getBatch()
+            .orElse(false);
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.description = Validate.notNull(getDescription(triggerDefinition), "description");
-        this.help = OptionalUtils.mapOrElse(triggerDefinition.getHelp(), Help::new, null);
+        this.help = triggerDefinition.getHelp()
+            .map(Help::new)
+            .orElse(null);
         this.name = Validate.notNull(triggerDefinition.getName(), "name");
-        this.outputDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputDefinition(), outputDefinition -> true, false);
-        this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputDefinition(),
-            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
-        this.outputResponse = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputDefinition(), TriggerDefinition::toOutputResponse, null);
+        this.outputDefined = triggerDefinition.getOutputDefinition()
+            .isPresent();
+        this.outputFunctionDefined = triggerDefinition.getOutputDefinition()
+            .map(outputDefinition -> outputDefinition.getOutput()
+                .isPresent())
+            .orElse(false);
+        this.outputResponse = triggerDefinition.getOutputDefinition()
+            .map(TriggerDefinition::toOutputResponse)
+            .orElse(null);
         this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
+            triggerDefinition.getProperties()
+                .orElse(List.of()),
+            Property::toProperty);
         this.title = Validate.notNull(getTitle(triggerDefinition), "title");
         this.type = Validate.notNull(triggerDefinition.getType(), "type");
-        this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);
-        this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getWorkflowNodeDescription(), nodeDescriptionFunction -> true, false);
-        this.workflowSyncExecution = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncExecution(), false);
-        this.workflowSyncValidation = OptionalUtils.mapOrElse(triggerDefinition.getWebhookValidate(), v -> true, false);
-        this.workflowSyncOnEnableValidation = OptionalUtils.mapOrElse(
-            triggerDefinition.getWebhookValidateOnEnable(), v -> true, false);
+        this.webhookRawBody = triggerDefinition.getWebhookRawBody()
+            .orElse(false);
+        this.workflowNodeDescriptionDefined = triggerDefinition.getWorkflowNodeDescription()
+            .isPresent();
+        this.workflowSyncExecution = triggerDefinition.getWorkflowSyncExecution()
+            .orElse(false);
+        this.workflowSyncValidation = triggerDefinition.getWebhookValidate()
+            .isPresent();
+        this.workflowSyncOnEnableValidation = triggerDefinition.getWebhookValidateOnEnable()
+            .isPresent();
     }
 
     @Override
@@ -214,11 +223,13 @@ public class TriggerDefinition {
     }
 
     private static String getDescription(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
-        return OptionalUtils.orElse(triggerDefinition.getDescription(), getTitle(triggerDefinition));
+        return triggerDefinition.getDescription()
+            .orElse(getTitle(triggerDefinition));
     }
 
     private static String getTitle(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
-        return OptionalUtils.orElse(triggerDefinition.getTitle(), triggerDefinition.getName());
+        return triggerDefinition.getTitle()
+            .orElse(triggerDefinition.getName());
     }
 
     private static OutputResponse toOutputResponse(

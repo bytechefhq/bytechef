@@ -18,7 +18,6 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.UnifiedApiDefinition;
@@ -72,7 +71,8 @@ public class ComponentDefinition {
     public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
 
-        this.clusterElement = !OptionalUtils.orElse(componentDefinition.getClusterElements(), List.of())
+        this.clusterElement = !componentDefinition.getClusterElements()
+            .orElse(List.of())
             .isEmpty();
         this.clusterElements = getClusterElements(componentDefinition);
 
@@ -86,24 +86,36 @@ public class ComponentDefinition {
         }
 
         this.clusterRoot = !clusterElementTypes.isEmpty();
-        this.componentCategories = OptionalUtils.orElse(componentDefinition.getComponentCategories(), List.of());
+        this.componentCategories = componentDefinition.getComponentCategories()
+            .orElse(List.of());
         this.connection = getConnection(componentDefinition);
         this.connectionRequired = componentDefinition.getConnection()
             .map(connectionDefinition -> CollectionUtils.anyMatch(
-                OptionalUtils.orElse(connectionDefinition.getProperties(), List.of()),
-                property -> OptionalUtils.orElse(property.getRequired(), false)) ||
-                OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true))
+                connectionDefinition.getProperties()
+                    .orElse(List.of()),
+                property -> property.getRequired()
+                    .orElse(false))
+                ||
+                connectionDefinition.getAuthorizationRequired()
+                    .orElse(true))
             .orElse(false);
-        this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
-        this.icon = OptionalUtils.mapOrElse(componentDefinition.getIcon(), IconUtils::readIcon, null);
+        this.description = componentDefinition.getDescription()
+            .orElse(null);
+        this.icon = componentDefinition.getIcon()
+            .map(IconUtils::readIcon)
+            .orElse(null);
         this.name = componentDefinition.getName();
-        this.resources = OptionalUtils.mapOrElse(componentDefinition.getResources(), Resources::new, null);
-        this.tags = OptionalUtils.orElse(componentDefinition.getTags(), Collections.emptyList());
+        this.resources = componentDefinition.getResources()
+            .map(Resources::new)
+            .orElse(null);
+        this.tags = componentDefinition.getTags()
+            .orElse(Collections.emptyList());
         this.triggers = getTriggers(componentDefinition);
-        this.title = getTitle(
-            componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null));
-        this.unifiedApiCategory = OptionalUtils.mapOrElse(
-            componentDefinition.getUnifiedApi(), UnifiedApiDefinition::getCategory, null);
+        this.title = getTitle(componentDefinition.getName(), componentDefinition.getTitle()
+            .orElse(null));
+        this.unifiedApiCategory = componentDefinition.getUnifiedApi()
+            .map(UnifiedApiDefinition::getCategory)
+            .orElse(null);
         this.version = componentDefinition.getVersion();
     }
 
@@ -264,24 +276,23 @@ public class ComponentDefinition {
     private static List<ActionDefinition> getActions(
         com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
-        return OptionalUtils.mapOrElse(
-            componentDefinition.getActions(),
-            actionDefinitions -> CollectionUtils.map(actionDefinitions, actionDefinition -> new ActionDefinition(
-                actionDefinition, componentDefinition.getName(), componentDefinition.getVersion())),
-            Collections.emptyList());
+        return componentDefinition.getActions()
+            .map(actionDefinitions -> CollectionUtils.map(actionDefinitions, actionDefinition -> new ActionDefinition(
+                actionDefinition, componentDefinition.getName(), componentDefinition.getVersion())))
+            .orElse(Collections.emptyList());
     }
 
     private static List<ClusterElementDefinition> getClusterElements(
         com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
-        return OptionalUtils.mapOrElse(
-            componentDefinition.getClusterElements(),
-            clusterElementDefinitions -> CollectionUtils.map(
+        return componentDefinition.getClusterElements()
+            .map(clusterElementDefinitions -> CollectionUtils.map(
                 clusterElementDefinitions,
                 clusterElementDefinition -> new ClusterElementDefinition(
                     clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
-                    OptionalUtils.orElse(componentDefinition.getIcon(), null))),
-            Collections.emptyList());
+                    componentDefinition.getIcon()
+                        .orElse(null))))
+            .orElse(Collections.emptyList());
     }
 
     private static ConnectionDefinition getConnection(
@@ -290,12 +301,11 @@ public class ComponentDefinition {
         Optional<String> descriptionOptional = componentDefinition.getDescription();
         Optional<String> titleOptional = componentDefinition.getTitle();
 
-        return OptionalUtils.mapOrElse(
-            componentDefinition.getConnection(),
-            connectionDefinition -> new ConnectionDefinition(
+        return componentDefinition.getConnection()
+            .map(connectionDefinition -> new ConnectionDefinition(
                 connectionDefinition, componentDefinition.getName(),
-                titleOptional.orElse(componentDefinition.getName()), descriptionOptional.orElse(null)),
-            null);
+                titleOptional.orElse(componentDefinition.getName()), descriptionOptional.orElse(null)))
+            .orElse(null);
     }
 
     private static String getTitle(String componentName, String componentTitle) {
@@ -305,11 +315,10 @@ public class ComponentDefinition {
     private static List<TriggerDefinition> getTriggers(
         com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
-        return OptionalUtils.mapOrElse(
-            componentDefinition.getTriggers(),
-            triggerDefinitions -> CollectionUtils.map(triggerDefinitions,
+        return componentDefinition.getTriggers()
+            .map(triggerDefinitions -> CollectionUtils.map(triggerDefinitions,
                 triggerDefinition -> new TriggerDefinition(
-                    triggerDefinition, componentDefinition.getName(), componentDefinition.getVersion())),
-            Collections.emptyList());
+                    triggerDefinition, componentDefinition.getName(), componentDefinition.getVersion())))
+            .orElse(Collections.emptyList());
     }
 }
