@@ -269,7 +269,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             return workflowNodeDescriptionFunction.apply(
-                ParametersFactory.createParameters(inputParameters), actionContext);
+                ParametersFactory.create(inputParameters), actionContext);
         } catch (Exception e) {
             throw new ConfigurationException(
                 e, inputParameters, ActionDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
@@ -308,8 +308,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @Nullable ComponentConnection componentConnection) {
 
         return new ConvertResult(
-            ParametersFactory.createParameters(inputParameters),
-            ParametersFactory.createParameters(
+            ParametersFactory.create(inputParameters),
+            ParametersFactory.create(
                 componentConnection == null ? Map.of() : componentConnection.parameters()),
             getLookupDependsOnPathsMap(lookupDependsOnPaths));
     }
@@ -349,8 +349,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
-                ParametersFactory.createParameters(inputParameters), connections,
-                ParametersFactory.createParameters(extensions), context);
+                ParametersFactory.create(inputParameters), connections,
+                ParametersFactory.create(extensions), context);
 
             return toOutputResponse(outputResponse);
         } catch (Exception e) {
@@ -365,8 +365,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             return performFunction.apply(
-                ParametersFactory.createParameters(inputParameters), componentConnections,
-                ParametersFactory.createParameters(extensions), context);
+                ParametersFactory.create(inputParameters), componentConnections,
+                ParametersFactory.create(extensions), context);
         } catch (Exception e) {
             throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
         }
@@ -378,8 +378,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             return performFunction.apply(
-                ParametersFactory.createParameters(inputParameters), componentConnections,
-                ParametersFactory.createParameters(extensions), context);
+                ParametersFactory.create(inputParameters), componentConnections,
+                ParametersFactory.create(extensions), context);
         } catch (Exception e) {
             throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
         }
@@ -391,8 +391,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             return performFunction.apply(
-                ParametersFactory.createParameters(inputParameters), componentConnections,
-                ParametersFactory.createParameters(extensions), context);
+                ParametersFactory.create(inputParameters), componentConnections,
+                ParametersFactory.create(extensions), context);
         } catch (Exception e) {
             throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
         }
@@ -432,8 +432,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
-                ParametersFactory.createParameters(inputParameters),
-                ParametersFactory.createParameters(
+                ParametersFactory.create(inputParameters),
+                ParametersFactory.create(
                     componentConnection == null ? Map.of() : componentConnection.getConnectionParameters()),
                 context);
 
@@ -453,9 +453,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             return performFunction.apply(
-                ParametersFactory.createParameters(inputParameters),
+                ParametersFactory.create(inputParameters),
                 componentConnection == null
-                    ? null : ParametersFactory.createParameters(componentConnection.getConnectionParameters()),
+                    ? null : ParametersFactory.create(componentConnection.getConnectionParameters()),
                 context);
         } catch (Exception e) {
             if (e instanceof ProviderException) {

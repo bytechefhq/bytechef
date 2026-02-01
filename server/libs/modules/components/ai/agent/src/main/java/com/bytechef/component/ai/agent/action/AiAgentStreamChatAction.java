@@ -41,7 +41,7 @@ import reactor.core.publisher.Flux;
  */
 public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
-    public static ChatActionDefinitionWrapper of(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
         return new AiAgentStreamChatAction(clusterElementDefinitionService).build();
     }
 

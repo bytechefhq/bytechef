@@ -77,9 +77,9 @@ public abstract class AbstractAiAgentChatAction {
         ComponentConnection componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
 
         ChatModel chatModel = (ChatModel) modelFunction.apply(
-            ParametersFactory.createParameters(
+            ParametersFactory.create(
                 MapUtils.concat(Map.copyOf(inputParameters.toMap()), Map.copyOf(clusterElement.getParameters()))),
-            ParametersFactory.createParameters(componentConnection.getParameters()), true);
+            ParametersFactory.create(componentConnection.getParameters()), true);
 
         ChatClient chatClient = ChatClient.builder(chatModel)
             .build();
@@ -127,9 +127,9 @@ public abstract class AbstractAiAgentChatAction {
 
         try {
             return chatMemoryFunction.apply(
-                ParametersFactory.createParameters(clusterElement.getParameters()),
+                ParametersFactory.create(clusterElement.getParameters()),
                 getConnectionParameters(componentConnections, clusterElement),
-                ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections);
+                ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -140,7 +140,7 @@ public abstract class AbstractAiAgentChatAction {
 
         ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
-        return ParametersFactory.createParameters(
+        return ParametersFactory.create(
             componentConnection == null ? Map.of() : componentConnection.getParameters());
     }
 
@@ -163,9 +163,9 @@ public abstract class AbstractAiAgentChatAction {
 
         try {
             return ragFunction.apply(
-                ParametersFactory.createParameters(clusterElement.getParameters()),
+                ParametersFactory.create(clusterElement.getParameters()),
                 getConnectionParameters(componentConnections, clusterElement),
-                ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections);
+                ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

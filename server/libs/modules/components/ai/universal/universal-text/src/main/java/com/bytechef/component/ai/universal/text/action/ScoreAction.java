@@ -188,6 +188,6 @@ public class ScoreAction implements AiTextAction {
                 "responseFormat", ChatModel.ResponseFormat.JSON,
                 "responseSchema", RESPONSE_SCHEMA));
 
-        return ParametersFactory.createParameters(modelInputParametersMap);
+        return ParametersFactory.create(modelInputParametersMap);
     }
 }

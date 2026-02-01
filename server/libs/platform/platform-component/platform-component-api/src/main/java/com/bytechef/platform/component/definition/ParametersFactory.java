@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class ParametersFactory {
 
-    public static Parameters createParameters(Map<String, ?> map) {
+    public static Parameters create(Map<String, ?> map) {
         try {
             return new ParametersImpl(map);
         } catch (Exception exception) {

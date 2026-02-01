@@ -112,7 +112,7 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         modelConnectionParametersMap.put(TOKEN, chatModelResult.token);
 
         return chatModelResult.chatModel.getResponse(
-            modelInputParameters, ParametersFactory.createParameters(modelConnectionParametersMap), context, false,
+            modelInputParameters, ParametersFactory.create(modelConnectionParametersMap), context, false,
             modelInputParameters.containsPath("response.responseFormat"));
     }
 

@@ -110,7 +110,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         try {
             return OptionalUtils.get(authorization.getAcquire())
-                .apply(ParametersFactory.createParameters(connectionParameters), context);
+                .apply(ParametersFactory.create(connectionParameters), context);
         } catch (Exception e) {
             throw new ConfigurationException(e, ConnectionDefinitionErrorType.ACQUIRE_FAILED);
         }
@@ -128,7 +128,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             authorization.getApply(), getDefaultApplyFunction(authorization.getType()));
 
         try {
-            return applyFunction.apply(ParametersFactory.createParameters(connectionParameters), context);
+            return applyFunction.apply(ParametersFactory.create(connectionParameters), context);
         } catch (Exception e) {
             throw new ConfigurationException(e, ConnectionDefinitionErrorType.AUTHORIZATION_APPLY_FAILED);
         }
@@ -174,7 +174,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             (connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
 
         return Optional.ofNullable(
-            baseUriFunction.apply(ParametersFactory.createParameters(componentConnection.parameters()), context));
+            baseUriFunction.apply(ParametersFactory.create(componentConnection.parameters()), context));
     }
 
     @Override
@@ -239,7 +239,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 logger.trace("Refreshing using {}", FormatUtils.toString(connectionParameters));
             }
 
-            return refreshFunction.apply(ParametersFactory.createParameters(connectionParameters), context);
+            return refreshFunction.apply(ParametersFactory.create(connectionParameters), context);
 
         } catch (Exception exception) {
             throw new ConfigurationException(
@@ -378,7 +378,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         try {
             return authorizationCallbackFunction.apply(
-                ParametersFactory.createParameters(connectionParameters),
+                ParametersFactory.create(connectionParameters),
                 MapUtils.getString(connectionParameters, CODE), redirectUri, verifier, context);
         } catch (Exception e) {
             throw new ConfigurationException(
@@ -663,7 +663,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 authorization.getOauth2AuthorizationExtraQueryParameters(),
                 (curConnectionParameters, context1) -> Map.of());
 
-        Parameters parameters = ParametersFactory.createParameters(connectionParameters);
+        Parameters parameters = ParametersFactory.create(connectionParameters);
 
         try {
             if (logger.isTraceEnabled()) {

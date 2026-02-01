@@ -87,6 +87,6 @@ public class GenerateTextAction implements AiTextAction {
             MESSAGES, List.of(Map.of(CONTENT, inputParameters.getString(PROMPT), ROLE, USER.name())));
         modelInputParametersMap.put(MODEL, inputParameters.getString(MODEL));
 
-        return ParametersFactory.createParameters(modelInputParametersMap);
+        return ParametersFactory.create(modelInputParametersMap);
     }
 }

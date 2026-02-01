@@ -83,7 +83,7 @@ public abstract class AbstractLoadAction {
 
         vectorStore.load(
             inputParameters,
-            ParametersFactory.createParameters(vectorStoreComponentConnection.getParameters()),
+            ParametersFactory.create(vectorStoreComponentConnection.getParameters()),
             VectorStoreUtils.getEmbeddingModel(extensions, componentConnections, clusterElementDefinitionService),
             getDocumentReader(extensions, componentConnections, context),
             getDocumentTransformers(extensions, componentConnections));
@@ -105,8 +105,8 @@ public abstract class AbstractLoadAction {
             clusterElement.getClusterElementName());
 
         return documentReaderFunction.apply(
-            ParametersFactory.createParameters(clusterElement.getParameters()),
-            ParametersFactory.createParameters(
+            ParametersFactory.create(clusterElement.getParameters()),
+            ParametersFactory.create(
                 componentConnection == null ? Map.of() : componentConnection.getParameters()),
             ((ActionContextAware) context).createClusterElementContext(
                 clusterElement.getComponentName(), clusterElement.getComponentVersion(),
@@ -129,15 +129,15 @@ public abstract class AbstractLoadAction {
 
                 if (documentTransformerFunction instanceof DocumentSplitterFunction documentSplitterFunction) {
                     return documentSplitterFunction.apply(
-                        ParametersFactory.createParameters(clusterElement.getParameters()),
-                        ParametersFactory.createParameters(
+                        ParametersFactory.create(clusterElement.getParameters()),
+                        ParametersFactory.create(
                             componentConnection == null ? Map.of() : componentConnection.getParameters()));
                 } else if (documentTransformerFunction instanceof DocumentEnricherFunction documentEnricherFunction) {
                     return documentEnricherFunction.apply(
-                        ParametersFactory.createParameters(clusterElement.getParameters()),
-                        ParametersFactory.createParameters(
+                        ParametersFactory.create(clusterElement.getParameters()),
+                        ParametersFactory.create(
                             componentConnection == null ? Map.of() : componentConnection.getParameters()),
-                        ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections);
+                        ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
                 } else {
                     throw new IllegalArgumentException(
                         "Unsupported transformer type: " + documentTransformerFunction.getClass());

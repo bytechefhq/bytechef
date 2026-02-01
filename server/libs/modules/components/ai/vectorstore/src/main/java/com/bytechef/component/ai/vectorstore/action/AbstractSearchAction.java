@@ -87,7 +87,7 @@ public abstract class AbstractSearchAction {
             extensions, componentConnections, clusterElementDefinitionService);
 
         return vectorStore.search(
-            inputParameters, ParametersFactory.createParameters(vectorStoreComponentConnection.getParameters()),
+            inputParameters, ParametersFactory.create(vectorStoreComponentConnection.getParameters()),
             embeddingModel);
     }
 }

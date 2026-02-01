@@ -86,7 +86,7 @@ public class AiImageActionDefinition extends AbstractActionDefinitionWrapper {
             .toList();
 
         Parameters modelInputParameters = aiImageAction.createParameters(inputParameters);
-        Parameters modelConnectionParameters = ParametersFactory.createParameters(modelConnectionParametersMap);
+        Parameters modelConnectionParameters = ParametersFactory.create(modelConnectionParametersMap);
 
         ImageModel imageModel = getImageModel(inputParameters, activeProviderKeys, modelConnectionParametersMap);
 
