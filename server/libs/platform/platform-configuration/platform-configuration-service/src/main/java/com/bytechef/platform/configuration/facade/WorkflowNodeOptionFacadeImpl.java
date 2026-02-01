@@ -82,44 +82,82 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         @Nullable String searchText, long environmentId) {
 
-        Long connectionId = workflowTestConfigurationService
+        List<WorkflowTestConfigurationConnection> connections = workflowTestConfigurationService
             .fetchWorkflowTestConfiguration(workflowId, environmentId)
             .stream()
             .flatMap(workflowTestConfiguration -> CollectionUtils.stream(
                 workflowTestConfiguration.getConnections()))
-            .filter(workflowTestConfigurationConnection -> Objects.equals(
-                workflowTestConfigurationConnection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
-            .findFirst()
-            .map(WorkflowTestConfigurationConnection::getConnectionId)
-            .orElse(null);
+            .toList();
+
+        Map<String, Long> clusterElementConnectionIds = connections.stream()
+            .collect(java.util.stream.Collectors.toMap(
+                WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+                WorkflowTestConfigurationConnection::getConnectionId));
+
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
             workflowId, workflowTask.getName(), environmentId);
 
-        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         ClusterElementType clusterElementType = clusterElementDefinitionService.getClusterElementType(
             workflowNodeType.name(), workflowNodeType.version(), clusterElementTypeName);
 
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+
         ClusterElement clusterElement = clusterElementMap.getClusterElement(
             clusterElementType, clusterElementWorkflowNodeName);
 
+        Map<String, Object> context = MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs);
+
+        Map<String, Map<String, ?>> clusterElementInputParameters = evaluateClusterElementInputParameters(
+            clusterElementMap, context);
+
         WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
+
+        Long connectionId = connections.stream()
+            .filter(workflowTestConfigurationConnection -> Objects.equals(
+                workflowTestConfigurationConnection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
+            .findFirst()
+            .map(WorkflowTestConfigurationConnection::getConnectionId)
+            .orElse(null);
 
         return clusterElementDefinitionFacade.executeOptions(
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation(), propertyName,
-            evaluator.evaluate(
-                clusterElement.getParameters(),
-                MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
-            lookupDependsOnPaths, searchText, connectionId);
+            evaluator.evaluate(clusterElement.getParameters(), context), workflowTask.getExtensions(),
+            lookupDependsOnPaths, searchText, connectionId, clusterElementConnectionIds,
+            clusterElementInputParameters);
+    }
+
+    private Map<String, Map<String, ?>> evaluateClusterElementInputParameters(
+        ClusterElementMap clusterElementMap, Map<String, Object> context) {
+
+        Map<String, Map<String, ?>> result = new java.util.HashMap<>();
+
+        for (Map.Entry<String, Object> entry : clusterElementMap.entrySet()) {
+            Object value = entry.getValue();
+
+            if (value instanceof ClusterElement clusterElement) {
+                result.put(
+                    clusterElement.getWorkflowNodeName(), evaluator.evaluate(clusterElement.getParameters(), context));
+            } else if (value instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof ClusterElement clusterElement) {
+                        result.put(
+                            clusterElement.getWorkflowNodeName(),
+                            evaluator.evaluate(clusterElement.getParameters(), context));
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override
