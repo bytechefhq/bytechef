@@ -42,6 +42,36 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     }
 
     @Override
+    public ScriptTestExecutionDTO testClusterElementScript(
+        String workflowId, String workflowNodeName, String clusterElementType,
+        String clusterElementWorkflowNodeName, long environmentId) {
+
+        ExecutionError executionError = null;
+        WorkflowNodeTestOutput workflowNodeTestOutput = null;
+
+        try {
+            workflowNodeTestOutput = workflowNodeTestOutputFacade.saveClusterElementTestOutput(
+                workflowId, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
+                environmentId);
+        } catch (Exception exception) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(exception.getMessage(), exception);
+            }
+
+            executionError = extractExecutionError(exception);
+        }
+
+        OutputResponse outputResponse = null;
+
+        if (workflowNodeTestOutput != null) {
+            outputResponse = workflowNodeTestOutput.getOutput(Property.class);
+        }
+
+        return new ScriptTestExecutionDTO(
+            executionError, outputResponse == null ? null : outputResponse.sampleOutput());
+    }
+
+    @Override
     public ScriptTestExecutionDTO testWorkflowNodeScript(
         String workflowId, String workflowNodeName, long environmentId) {
 
@@ -56,16 +86,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
                 logger.debug(exception.getMessage(), exception);
             }
 
-            Throwable curException = exception;
-            String message = null;
-
-            while (curException.getCause() != null) {
-                curException = curException.getCause();
-
-                message = curException.getMessage();
-            }
-
-            executionError = new ExecutionError(message, Arrays.asList(ExceptionUtils.getStackFrames(exception)));
+            executionError = extractExecutionError(exception);
         }
 
         OutputResponse outputResponse = null;
@@ -76,5 +97,18 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
 
         return new ScriptTestExecutionDTO(
             executionError, outputResponse == null ? null : outputResponse.sampleOutput());
+    }
+
+    private ExecutionError extractExecutionError(Exception exception) {
+        Throwable curException = exception;
+        String message = null;
+
+        while (curException.getCause() != null) {
+            curException = curException.getCause();
+
+            message = curException.getMessage();
+        }
+
+        return new ExecutionError(message, Arrays.asList(ExceptionUtils.getStackFrames(exception)));
     }
 }
