@@ -16,21 +16,29 @@
 
 package com.bytechef.server;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
+import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -39,14 +47,30 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Import({
     PostgreSQLContainerConfiguration.class, ServerApplicationIntTest.ServerApplicationIntTestConfiguration.class
 })
-@MockitoBean(types = {
-    KnowledgeBaseFacade.class, KnowledgeBaseDocumentChunkFacade.class, KnowledgeBaseDocumentFacade.class,
-    WorkspaceKnowledgeBaseFacade.class
-})
 class ServerApplicationIntTest {
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Test
     void testContextLoads() {
+    }
+
+    @Test
+    void testKnowledgeBaseBeansNotPresentWhenFeatureDisabled() {
+        // Verify that knowledge base services are not present when the feature is disabled
+        assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseService.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentService.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentChunkService.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseTagService.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentTagService.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(WorkspaceKnowledgeBaseService.class)).isEmpty();
+
+        // Verify that knowledge base facades are not present
+        assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseFacade.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentFacade.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentChunkFacade.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(WorkspaceKnowledgeBaseFacade.class)).isEmpty();
     }
 
     @TestConfiguration
