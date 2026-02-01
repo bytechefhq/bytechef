@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Context;
@@ -28,6 +29,7 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.definition.datastream.ExecutionContext;
+import com.bytechef.component.definition.datastream.FieldDefinition;
 import com.bytechef.component.definition.datastream.ItemReader;
 import com.bytechef.component.exception.ProviderException;
 import java.util.Collections;
@@ -100,6 +102,13 @@ public class AirtableItemReader implements ItemReader {
 
         // Fallback: wrap non-map record as value
         return Map.of("value", next);
+    }
+
+    @Override
+    public List<FieldDefinition> getFields(
+        Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context) {
+
+        return AirtableUtils.getFieldDefinitions(inputParameters, connectionParameters, context);
     }
 
     private void loadPage(String offset) {
