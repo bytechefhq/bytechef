@@ -93,9 +93,6 @@ public class ApplicationProperties {
     /** Email configuration */
     private Mail mail = new Mail();
 
-    /** Model Context Protocol configuration */
-    private Mcp mcp = new Mcp();
-
     /** Message broker configuration */
     private MessageBroker messageBroker = new MessageBroker();
 
@@ -195,10 +192,6 @@ public class ApplicationProperties {
 
     public Mail getMail() {
         return mail;
-    }
-
-    public Mcp getMcp() {
-        return mcp;
     }
 
     public MessageBroker getMessageBroker() {
@@ -311,10 +304,6 @@ public class ApplicationProperties {
 
     public void setMail(Mail mail) {
         this.mail = mail;
-    }
-
-    public void setMcp(Mcp mcp) {
-        this.mcp = mcp;
     }
 
     public void setMessageBroker(MessageBroker messageBroker) {
@@ -479,6 +468,7 @@ public class ApplicationProperties {
         private Anthropic anthropic = new Anthropic();
         private Copilot copilot = new Copilot();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
+        private Mcp mcp = new Mcp();
         private OpenAi openAi = new OpenAi();
         private Provider provider = new Provider();
         private Vectorstore vectorstore = new Vectorstore();
@@ -493,6 +483,10 @@ public class ApplicationProperties {
 
         public KnowledgeBase getKnowledgeBase() {
             return knowledgeBase;
+        }
+
+        public Mcp getMcp() {
+            return mcp;
         }
 
         public OpenAi getOpenAi() {
@@ -517,6 +511,10 @@ public class ApplicationProperties {
 
         public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
             this.knowledgeBase = knowledgeBase;
+        }
+
+        public void setMcp(Mcp mcp) {
+            this.mcp = mcp;
         }
 
         public void setOpenAi(OpenAi openAi) {
@@ -873,6 +871,39 @@ public class ApplicationProperties {
 
                 public void setProvider(Ai.Vectorstore.Provider provider) {
                     this.provider = provider;
+                }
+            }
+        }
+
+        /**
+         * MCP (Model Context Protocol) server configuration.
+         */
+        public static class Mcp {
+
+            private Server server = new Server();
+
+            public Server getServer() {
+                return server;
+            }
+
+            public void setServer(Server server) {
+                this.server = server;
+            }
+
+            /**
+             * MCP server settings.
+             */
+            public static class Server {
+
+                /** Whether the MCP server is enabled */
+                private boolean enabled;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
                 }
             }
         }
@@ -2558,39 +2589,6 @@ public class ApplicationProperties {
 
         public void setProvider(Provider provider) {
             this.provider = provider;
-        }
-    }
-
-    /**
-     * Represents the MCP configuration structure. Provides access to the server configuration settings.
-     */
-    public static class Mcp {
-
-        private Server server = new Server();
-
-        public Server getServer() {
-            return server;
-        }
-
-        public void setServer(Server server) {
-            this.server = server;
-        }
-
-        /**
-         * Represents the server configuration settings. This configuration determines whether the server is enabled or
-         * disabled.
-         */
-        public static class Server {
-
-            private boolean enabled;
-
-            public boolean isEnabled() {
-                return enabled;
-            }
-
-            public void setEnabled(boolean enabled) {
-                this.enabled = enabled;
-            }
         }
     }
 
