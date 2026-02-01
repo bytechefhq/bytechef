@@ -19,6 +19,11 @@ package com.bytechef.server;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
+import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
+import com.bytechef.ai.mcp.tool.platform.ComponentTools;
+import com.bytechef.ai.mcp.tool.platform.TaskDispatcherTools;
+import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseFacade;
@@ -29,6 +34,11 @@ import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagSer
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
+import com.bytechef.ee.ai.copilot.config.AgUiJacksonConfiguration;
+import com.bytechef.ee.ai.copilot.config.CopilotConfiguration;
+import com.bytechef.ee.ai.copilot.config.CopilotPgVectorConfiguration;
+import com.bytechef.ee.ai.copilot.service.CopilotVectorStoreService;
+import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +64,27 @@ class ServerApplicationIntTest {
 
     @Test
     void testContextLoads() {
+    }
+
+    @Test
+    void testAiToolsBeansNotPresentWhenFeatureDisabled() {
+        // Verify that AI/MCP tool beans are not present when both
+        // bytechef.ai.mcp.server.enabled and bytechef.ai.copilot.enabled are false
+        assertThat(applicationContext.getBeanNamesForType(ComponentTools.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(TaskTools.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(TaskDispatcherTools.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(ProjectToolsImpl.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(ProjectWorkflowToolsImpl.class)).isEmpty();
+    }
+
+    @Test
+    void testCopilotBeansNotPresentWhenFeatureDisabled() {
+        // Verify that Copilot beans are not present when bytechef.ai.copilot.enabled is false
+        assertThat(applicationContext.getBeanNamesForType(CopilotConfiguration.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(CopilotVectorStoreService.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(CopilotPgVectorConfiguration.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(AgUiJacksonConfiguration.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(CopilotApiController.class)).isEmpty();
     }
 
     @Test

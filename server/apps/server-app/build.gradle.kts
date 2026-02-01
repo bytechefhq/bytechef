@@ -220,6 +220,8 @@ dependencies {
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
 
+    testImplementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-automation-impl"))
+    testImplementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-platform"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
     testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
