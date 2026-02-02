@@ -43,15 +43,25 @@ const EditKnowledgeBaseDialog = ({
         open,
     } = useEditKnowledgeBaseDialog({knowledgeBase, onOpenChange, open: controlledOpen});
 
-    return (
-        <Dialog onOpenChange={handleOpenChange} open={open}>
-            {trigger !== undefined ? (
-                <DialogTrigger asChild>{trigger}</DialogTrigger>
-            ) : controlledOpen === undefined ? (
+    const renderTrigger = () => {
+        if (trigger !== undefined) {
+            return <DialogTrigger asChild>{trigger}</DialogTrigger>;
+        }
+
+        if (controlledOpen === undefined) {
+            return (
                 <DialogTrigger asChild>
                     <Button icon={<EditIcon />} size="icon" variant="ghost" />
                 </DialogTrigger>
-            ) : null}
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <Dialog onOpenChange={handleOpenChange} open={open}>
+            {renderTrigger()}
 
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader className="flex flex-row items-center justify-between space-y-0">
@@ -64,7 +74,7 @@ const EditKnowledgeBaseDialog = ({
                     <DialogCloseButton />
                 </DialogHeader>
 
-                <div className="space-y-4 py-4">
+                <fieldset className="space-y-4 border-0 py-4">
                     <div className="space-y-2">
                         <Label htmlFor="kb-name">Name</Label>
 
@@ -87,7 +97,7 @@ const EditKnowledgeBaseDialog = ({
                             value={description}
                         />
                     </div>
-                </div>
+                </fieldset>
 
                 <DialogFooter>
                     <Button onClick={handleCancel} variant="ghost">

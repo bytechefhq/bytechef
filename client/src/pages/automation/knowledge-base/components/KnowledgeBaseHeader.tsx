@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
 import Header from '@/shared/layout/Header';
-import {ArrowLeft} from 'lucide-react';
+import {ArrowLeftIcon} from 'lucide-react';
 
 interface KnowledgeBaseHeaderProps {
     knowledgeBaseName: string | undefined;
@@ -10,13 +10,13 @@ interface KnowledgeBaseHeaderProps {
 const KnowledgeBaseHeader = ({knowledgeBaseName, onBackClick}: KnowledgeBaseHeaderProps) => {
     return (
         <Header
-            centerTitle={true}
+            centerTitle
             position="main"
             title={
                 <div className="flex items-center space-x-2">
                     <Button
                         aria-label="Back"
-                        icon={<ArrowLeft className="size-5" />}
+                        icon={<ArrowLeftIcon className="size-5" />}
                         onClick={onBackClick}
                         size="icon"
                         variant="ghost"
