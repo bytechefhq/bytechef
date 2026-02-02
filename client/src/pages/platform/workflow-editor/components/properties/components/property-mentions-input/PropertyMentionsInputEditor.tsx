@@ -8,6 +8,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {
     encodeParameters,
     encodePath,
+    escapeHtmlForParagraph,
     transformValueForObjectAccess,
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
@@ -426,7 +427,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 if (!contentIsDecodedHtml && content.includes('\n')) {
                     const valueLines = content.split('\n');
 
-                    const paragraphedLines = valueLines.map((valueLine) => `<p>${valueLine}</p>`);
+                    const paragraphedLines =
+                        controlType === 'TEXT_AREA' || controlType === 'TEXT'
+                            ? valueLines.map((valueLine) => `<p>${escapeHtmlForParagraph(valueLine)}</p>`)
+                            : valueLines.map((valueLine) => `<p>${valueLine}</p>`);
 
                     content = paragraphedLines.join('');
                 }
