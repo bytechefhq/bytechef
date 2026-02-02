@@ -16,9 +16,7 @@ open class FindJsonFilesTask : DefaultTask() {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Properties {
-        companion object {
-            lateinit var resourcesPath: String
-        }
+        var resourcesPath: String? = null
 
         var controlType: String? = null
         var name: String? = null
@@ -341,6 +339,7 @@ The output for this action is dynamic and may vary depending on the input parame
         var title: String? = null
         var componentName: String? = null
         var componentVersion: Int? = null
+        var resourcesPath: String? = null
 
         private fun getOutputDefinitionString(): String {
             if (outputDefinition == null) {
@@ -378,7 +377,7 @@ $mdxContent
         }
 
         private fun getMdxContent(): String {
-            val mdxFile = File(Properties.resourcesPath, "$name.mdx")
+            val mdxFile = File(resourcesPath, "$name.mdx")
 
             return if (mdxFile.exists()) {
                 mdxFile.readText()
@@ -449,6 +448,7 @@ ${properties?.joinToString("\n")}
         var type: String? = null
         var componentName: String? = null
         var componentVersion: Int? = null
+        var resourcesPath: String? = null
 
         private fun getOutputResponseString(): String {
             if (outputDefinition == null) {
@@ -486,7 +486,7 @@ $mdxContent
         }
 
         private fun getMdxContent(): String {
-            val mdxFile = File(Properties.resourcesPath, "$name.mdx")
+            val mdxFile = File(resourcesPath, "$name.mdx")
 
             return if (mdxFile.exists()) {
                 mdxFile.readText()
@@ -558,6 +558,7 @@ ${properties?.joinToString("\n")}
     class Connection {
         var authorizations: Array<Authorizations>? = null
         var version: Int? = null
+        var resourcesPath: String? = null
 
         override fun toString(): String {
             val mdxContent = getMdxContent()
@@ -573,7 +574,7 @@ $mdxContent
         }
 
         private fun getMdxContent(): String {
-            val mdxFile = File(Properties.resourcesPath, "connection.mdx")
+            val mdxFile = File(resourcesPath, "connection.mdx")
 
             return if (mdxFile.exists()) {
                 mdxFile.readText()
@@ -607,6 +608,7 @@ $mdxContent
         var triggers: Array<Trigger>? = null
         var version: Int? = null
         var properties: Array<Properties>? = null
+        var resourcesPath: String? = null
 
         private fun getCategoriesString(): String {
             if (componentCategories == null) {
@@ -718,7 +720,7 @@ ${getCustomActionString()}
         val componentsPath = "$rootPath/docs/content/docs/reference/components"
         val taskDispatchersPath = "$rootPath/docs/content/docs/reference/flow-controls"
         val currentPath = project.projectDir.path
-        Properties.resourcesPath = "$currentPath/src/main/resources"
+        val resourcesPath = "$currentPath/src/main/resources"
 
         if (currentPath.contains(Regex("/modules/.+/"))) {
             val definitionDir = File("$currentPath/src/test/resources/definition")
@@ -743,8 +745,21 @@ ${getCustomActionString()}
                 }?.toList().orEmpty()
 
                 definitionJsonFiles.forEach { jsonFile ->
-                    val jsonObject = mapper.readValue(jsonFile.readText(), Component::class.java)
-                    val json = jsonObject.toString()
+                    val component = mapper.readValue(jsonFile.readText(), Component::class.java)
+
+                    component.resourcesPath = resourcesPath
+                    component.connection?.resourcesPath = resourcesPath
+                    component.actions?.forEach {
+                        it.resourcesPath = resourcesPath
+                        it.properties?.forEach { it2 -> setResourcesPath(it2, resourcesPath) }
+                    }
+                    component.triggers?.forEach {
+                        it.resourcesPath = resourcesPath
+                        it.properties?.forEach { it2 -> setResourcesPath(it2, resourcesPath) }
+                    }
+                    component.properties?.forEach { setResourcesPath(it, resourcesPath) }
+
+                    val json = component.toString()
 
                     val path = when (isComponentsDir) {
                         true -> componentsPath
@@ -794,6 +809,12 @@ ${getCustomActionString()}
                 }
             }
         }
+    }
+
+    private fun setResourcesPath(properties: Properties, resourcesPath: String) {
+        properties.resourcesPath = resourcesPath
+        properties.properties?.forEach { setResourcesPath(it, resourcesPath) }
+        properties.items?.forEach { setResourcesPath(it, resourcesPath) }
     }
 }
 
