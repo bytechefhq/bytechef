@@ -1,0 +1,3 @@
+mutation deleteCustomComponent($id: ID!) {
+    deleteCustomComponent(id: $id)
+}

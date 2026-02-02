@@ -1,0 +1,14 @@
+query customComponentDefinition($id: ID!) {
+    customComponentDefinition(id: $id) {
+        actions {
+            name
+            title
+            description
+        }
+        triggers {
+            name
+            title
+            description
+        }
+    }
+}
