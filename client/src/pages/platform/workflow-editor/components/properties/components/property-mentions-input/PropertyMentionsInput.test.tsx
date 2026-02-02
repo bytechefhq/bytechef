@@ -365,4 +365,86 @@ describe('PropertyMentionsInput', () => {
         // Clean up
         unmount();
     });
+
+    test('RICH_TEXT decodes entity-encoded HTML/XML and renders as formatted content', async () => {
+        useWorkflowDataStore.setState({
+            workflow: {
+                id: 'wf-rich-text-html',
+                nodeNames: ['trigger_1'],
+            },
+        } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
+
+        const dummyMutation = {} as unknown as UseMutationResult<unknown, Error, unknown, unknown>;
+        const updateWorkflowNodeParameterMutation = dummyMutation as unknown as UseMutationResult<
+            DeleteClusterElementParameter200Response,
+            Error,
+            UpdateWorkflowNodeParameterOperationRequest,
+            unknown
+        >;
+        const updateClusterElementParameterMutation = dummyMutation as unknown as UseMutationResult<
+            DeleteClusterElementParameter200Response,
+            Error,
+            UpdateClusterElementParameterOperationRequest,
+            unknown
+        >;
+
+        const entityEncodedHtml = '&lt;strong&gt;foo&lt;/strong&gt;';
+
+        render(
+            <WorkflowEditorProvider
+                value={{
+                    ConnectionKeys: {
+                        connection: () => [],
+                        connectionTags: [],
+                        connections: [],
+                        filteredConnections: () => [],
+                    },
+                    deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
+                        DeleteClusterElementParameter200Response,
+                        Error,
+                        DeleteClusterElementParameterOperationRequest,
+                        unknown
+                    >,
+                    deleteWorkflowNodeParameterMutation: dummyMutation as unknown as UseMutationResult<
+                        DeleteClusterElementParameter200Response,
+                        Error,
+                        DeleteWorkflowNodeParameterRequest,
+                        unknown
+                    >,
+                    invalidateWorkflowQueries: () => {},
+                    updateClusterElementParameterMutation,
+                    updateWorkflowMutation: {} as unknown as UpdateWorkflowMutationType,
+                    updateWorkflowNodeParameterMutation,
+                    useCreateConnectionMutation: () =>
+                        ({}) as unknown as UseMutationResult<number, Error, ConnectionI, unknown>,
+                    useGetComponentDefinitionsQuery: () =>
+                        ({}) as UseQueryResult<Array<ComponentDefinitionBasic>, Error>,
+                    useGetConnectionTagsQuery: () => ({}) as unknown as UseQueryResult<Tag[], Error>,
+                    useGetConnectionsQuery: () => ({}) as unknown as UseQueryResult<ConnectionI[], Error>,
+                    webhookTriggerTestApi: {
+                        startWebhookTriggerTest: async () => ({}),
+                        stopWebhookTriggerTest: async () => {},
+                    },
+                }}
+            >
+                <PropertyMentionsInput
+                    controlType="RICH_TEXT"
+                    label="RICH_TEXT HTML Label"
+                    leadingIcon="📄"
+                    path="parameters.body"
+                    placeholder=""
+                    type="STRING"
+                    value={entityEncodedHtml}
+                />
+            </WorkflowEditorProvider>
+        );
+
+        await microtaskTick(2);
+
+        const textbox = screen.getByRole('textbox', {name: 'RICH_TEXT HTML Label'});
+        const strong = textbox.querySelector('strong');
+
+        expect(strong).toBeInTheDocument();
+        expect(strong).toHaveTextContent('foo');
+    });
 });
