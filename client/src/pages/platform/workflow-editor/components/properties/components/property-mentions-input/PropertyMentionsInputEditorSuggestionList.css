@@ -7,7 +7,7 @@
     @apply flex-col;
     @apply overflow-auto;
     @apply p-1;
-    @apply: relative;
+    @apply relative;
     @apply text-sm;
 
     button {
