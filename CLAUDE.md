@@ -219,6 +219,20 @@ public class ExampleComponentHandler implements ComponentHandler {
   for (Order order : orders) { ... }
   ```
 
+### Lucide Icon Imports (Client)
+- Always import icons with the `Icon` suffix: `SearchIcon`, `DatabaseIcon`, `Loader2Icon`
+- Not: `Search`, `Database`, `Loader2`
+
+### CSS Class Merging (Client)
+- Use `twMerge` from `tailwind-merge` for conditional class merging
+- Do not use `cn()` utility
+
+### React Patterns (Client)
+- Use `fieldset` (with `border-0`) for semantic form grouping instead of `div`
+- Replace nested ternary operators with render functions (e.g., `renderTrigger()`)
+- Use `useMemo` for computed values instead of IIFEs in JSX
+- Prefer `||` over `??` for JSX fallbacks (e.g., `trigger || defaultTrigger`)
+
 ### Blank Line Before Control Statements (Java)
 - Insert exactly one empty line before control statements to improve visual separation of logic:
   - Applies to: `if`, `else if`, `else`, `for`, enhanced `for`, `while`, `do { ... } while (...)`, `switch`, `try`/`catch`/`finally`.
