@@ -315,12 +315,13 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
             if (!savingRef.current) {
                 const runSaveProperty = () => {
-                    const toSave = pendingValueRef.current;
+                    const valueToSave = pendingValueRef.current;
 
                     pendingValueRef.current = undefined;
 
-                    if (toSave === undefined) {
+                    if (valueToSave === undefined) {
                         savingRef.current = null;
+
                         return;
                     }
 
@@ -331,12 +332,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             type,
                             updateClusterElementParameterMutation,
                             updateWorkflowNodeParameterMutation,
-                            value: toSave,
+                            value: valueToSave,
                             workflowId,
                         })
                     )
                         .then(() => {
-                            lastSavedRef.current = toSave;
+                            lastSavedRef.current = valueToSave;
                         })
                         .catch(() => {})
                         .finally(() => {
