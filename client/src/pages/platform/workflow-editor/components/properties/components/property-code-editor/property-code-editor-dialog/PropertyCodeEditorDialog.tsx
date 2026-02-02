@@ -38,11 +38,8 @@ const PropertyCodeEditorDialog = (props: PropertyCodeEditorDialogProps) => {
                     <DialogDescription />
                 </DialogHeader>
 
-                <DialogContent
-                    className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 p-0"
-                    key={`dialog-content-${copilotPanelOpen}`}
-                >
-                    <div className="flex flex-1 flex-col gap-2">
+                <DialogContent className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden p-0">
+                    <div className="flex min-w-0 flex-1 flex-col gap-2">
                         <PropertyCodeEditorDialogToolbar
                             language={props.language}
                             onChange={props.onChange}
@@ -50,7 +47,7 @@ const PropertyCodeEditorDialog = (props: PropertyCodeEditorDialogProps) => {
                             workflowNodeName={props.workflowNodeName}
                         />
 
-                        <div className="flex flex-1">
+                        <div className="flex min-w-0 flex-1">
                             <ResizablePanelGroup className="flex-1" direction="vertical">
                                 <ResizablePanel defaultSize={75}>
                                     <PropertyCodeEditorDialogEditor language={props.language} />

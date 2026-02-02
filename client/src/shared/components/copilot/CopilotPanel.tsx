@@ -60,7 +60,7 @@ const CopilotPanel = ({className, onClose}: CopilotPanelProps) => {
                     <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>
                 </div>
 
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                     <ToggleGroup
                         onValueChange={(value) => {
                             if (value) {

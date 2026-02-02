@@ -1,14 +1,10 @@
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
 import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
-import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useCallback, useEffect, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface UsePropertyCodeEditorDialogProps {
-    language: string;
     onClose?: () => void;
     value?: string;
     workflow: Workflow;
@@ -16,7 +12,6 @@ interface UsePropertyCodeEditorDialogProps {
 }
 
 export const usePropertyCodeEditorDialog = ({
-    language,
     onClose,
     value,
     workflow,
@@ -55,25 +50,6 @@ export const usePropertyCodeEditorDialog = ({
         handleClose();
     }, [handleClose]);
 
-    const setContext = useCopilotStore((state) => state.setContext);
-    const ai = useApplicationInfoStore((state) => state.ai);
-    const ff_1570 = useFeatureFlagsStore()('ff-1570');
-
-    const copilotEnabled = ai.copilot.enabled && ff_1570;
-
-    const handleCopilotClick = useCallback(() => {
-        const currentContext = useCopilotStore.getState().context;
-
-        setContext({
-            ...currentContext,
-            mode: MODE.ASK,
-            parameters: {language},
-            source: Source.CODE_EDITOR,
-        });
-
-        setCopilotPanelOpen(true);
-    }, [language, setContext, setCopilotPanelOpen]);
-
     const handleCopilotClose = useCallback(() => {
         setCopilotPanelOpen(false);
     }, [setCopilotPanelOpen]);
@@ -108,10 +84,8 @@ export const usePropertyCodeEditorDialog = ({
     });
 
     return {
-        copilotEnabled,
         copilotPanelOpen,
         currentWorkflowTask,
-        handleCopilotClick,
         handleCopilotClose,
         handleOpenChange,
         handleUnsavedChangesAlertDialogCancel,
