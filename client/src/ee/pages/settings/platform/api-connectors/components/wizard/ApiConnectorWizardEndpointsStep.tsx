@@ -1,0 +1,135 @@
+import Badge from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
+import {HttpMethod} from '@/shared/middleware/graphql';
+import {PlusIcon, Trash2Icon} from 'lucide-react';
+import {useState} from 'react';
+import {twMerge} from 'tailwind-merge';
+
+import {useApiConnectorWizardStore} from '../../stores/useApiConnectorWizardStore';
+import {EndpointDefinitionI} from '../../types/api-connector-wizard.types';
+import {EndpointForm} from '../endpoint-editor';
+
+const ApiConnectorWizardEndpointsStep = () => {
+    const {addEndpoint, endpoints, removeEndpoint, updateEndpoint} = useApiConnectorWizardStore();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editingEndpoint, setEditingEndpoint] = useState<EndpointDefinitionI | undefined>(undefined);
+
+    const openAddDialog = () => {
+        setEditingEndpoint(undefined);
+        setIsDialogOpen(true);
+    };
+
+    const openEditDialog = (endpoint: EndpointDefinitionI) => {
+        setEditingEndpoint(endpoint);
+        setIsDialogOpen(true);
+    };
+
+    const handleSaveEndpoint = (endpoint: EndpointDefinitionI) => {
+        if (editingEndpoint) {
+            updateEndpoint(editingEndpoint.id, endpoint);
+        } else {
+            addEndpoint(endpoint);
+        }
+
+        setIsDialogOpen(false);
+        setEditingEndpoint(undefined);
+    };
+
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+        setEditingEndpoint(undefined);
+    };
+
+    const getMethodBadgeColor = (method: HttpMethod) => {
+        switch (method) {
+            case HttpMethod.Get:
+                return 'text-content-brand-primary';
+            case HttpMethod.Post:
+                return 'text-content-success-primary';
+            case HttpMethod.Put:
+                return 'text-content-warning-primary';
+            case HttpMethod.Patch:
+                return 'text-orange-700';
+            case HttpMethod.Delete:
+                return 'text-content-destructive-primary';
+            default:
+                return '';
+        }
+    };
+
+    return (
+        <div className="flex flex-col gap-4 pb-4">
+            <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium">Endpoints</h3>
+
+                <Button icon={<PlusIcon className="size-4" />} onClick={openAddDialog} size="sm" variant="secondary">
+                    Add Endpoint
+                </Button>
+            </div>
+
+            {endpoints.length === 0 ? (
+                <div className="rounded-md border border-dashed p-8 text-center">
+                    <p className="text-sm text-muted-foreground">No endpoints defined yet.</p>
+
+                    <p className="text-sm text-muted-foreground">Click "Add Endpoint" to create your first endpoint.</p>
+                </div>
+            ) : (
+                <ul className="divide-y rounded-md border">
+                    {endpoints.map((endpoint) => (
+                        <li
+                            className="flex cursor-pointer items-center justify-between p-3 hover:bg-gray-50"
+                            key={endpoint.id}
+                            onClick={() => openEditDialog(endpoint)}
+                        >
+                            <div className="flex items-center gap-3">
+                                <Badge
+                                    className={twMerge('w-20', getMethodBadgeColor(endpoint.httpMethod))}
+                                    label={endpoint.httpMethod}
+                                    styleType="outline-outline"
+                                    weight="semibold"
+                                />
+
+                                <div>
+                                    <p className="text-sm font-medium">{endpoint.operationId}</p>
+
+                                    <p className="text-xs text-gray-500">{endpoint.path}</p>
+
+                                    <div className="mt-1 flex gap-2 text-xs text-gray-400">
+                                        {endpoint.parameters.length > 0 && (
+                                            <span>{endpoint.parameters.length} param(s)</span>
+                                        )}
+
+                                        {endpoint.requestBody && <span>body</span>}
+
+                                        {endpoint.responses.length > 0 && (
+                                            <span>{endpoint.responses.length} response(s)</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Button
+                                icon={<Trash2Icon className="size-4" />}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    removeEndpoint(endpoint.id);
+                                }}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            <EndpointForm
+                endpoint={editingEndpoint}
+                onClose={handleCloseDialog}
+                onSave={handleSaveEndpoint}
+                open={isDialogOpen}
+            />
+        </div>
+    );
+};
+
+export default ApiConnectorWizardEndpointsStep;

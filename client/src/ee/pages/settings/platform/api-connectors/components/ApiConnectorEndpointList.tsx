@@ -1,30 +1,28 @@
-// TODO: Uncomment when api-connector middleware is implemented
-// import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
+import {ApiConnector} from '@/shared/middleware/graphql';
 
 import ApiConnectorEndpointListItem from './ApiConnectorEndpointListItem';
 
-// TODO: Remove when ApiConnectorEndpoint type is available from middleware
-export interface ApiConnectorEndpointI {
-    httpMethod: string;
-    id: string;
-    lastExecutionDate?: Date;
-    name: string;
-    path: string;
+interface ApiConnectorEndpointListProps {
+    apiConnector: ApiConnector;
 }
 
-const ApiConnectorEndpointList = ({apiConnectorEndpoints}: {apiConnectorEndpoints?: Array<ApiConnectorEndpointI>}) => {
+const ApiConnectorEndpointList = ({apiConnector}: ApiConnectorEndpointListProps) => {
     return (
         <div className="border-b border-b-border/50 py-3 pl-4">
             <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-400">Endpoints</h3>
 
             <ul>
-                {apiConnectorEndpoints?.map((apiConnectorEndpoint) => (
+                {apiConnector.endpoints?.map((apiConnectorEndpoint) => (
                     <li
                         className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
                         key={apiConnectorEndpoint.id}
                     >
                         {apiConnectorEndpoint && (
-                            <ApiConnectorEndpointListItem apiConnectorEndpoint={apiConnectorEndpoint} />
+                            <ApiConnectorEndpointListItem
+                                apiConnectorEndpoint={apiConnectorEndpoint}
+                                apiConnectorName={apiConnector.name}
+                                specification={apiConnector.specification ?? undefined}
+                            />
                         )}
                     </li>
                 ))}

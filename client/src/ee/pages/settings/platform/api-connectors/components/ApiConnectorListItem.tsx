@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {CollapsibleTrigger} from '@/components/ui/collapsible';
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,71 +10,67 @@ import {
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ApiConnectorDeleteAlertDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorDeleteAlertDialog';
-
-// TODO: Uncomment when mutations are implemented
-// import {
-//     useDeleteApiConnectorMutation,
-//     useEnableApiConnectorMutation,
-// } from '@/ee/shared/mutations/platform/apiConnector.mutations';
-// TODO: Uncomment when queries are implemented
-// import {ApiConnectorKeys} from '@/ee/shared/queries/platform/apiConnectors.queries';
-// import {useQueryClient} from '@tanstack/react-query';
+import ApiConnectorEditDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEditDialog';
+import {ApiConnector, useDeleteApiConnectorMutation, useEnableApiConnectorMutation} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
-// TODO: Uncomment when ApiConnectorImportDialog is implemented
-// import ApiConnectorImportDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorImportDialog';
-// TODO: Uncomment when api-connector middleware is implemented
-// import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
-import {type ApiConnectorI} from './ApiConnectorList';
-
 interface ApiConnectorItemProps {
-    apiConnector: ApiConnectorI;
+    apiConnector: ApiConnector;
 }
+
+const HTTP_METHOD_COLORS: Record<string, string> = {
+    DELETE: 'bg-red-100 text-red-700',
+    GET: 'bg-green-100 text-green-700',
+    PATCH: 'bg-orange-100 text-orange-700',
+    POST: 'bg-blue-100 text-blue-700',
+    PUT: 'bg-yellow-100 text-yellow-700',
+};
+
+const getHttpMethodBadgeColor = (method?: string | null): string => {
+    return (method && HTTP_METHOD_COLORS[method]) || 'bg-gray-100 text-gray-700';
+};
 
 const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    // TODO: Uncomment when mutations/queries are implemented
-    // const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-    // const deleteApiConnectorMutation = useDeleteApiConnectorMutation({
-    //     onSuccess: () => {
-    //         queryClient.invalidateQueries({
-    //             queryKey: ApiConnectorKeys.apiConnectors,
-    //         });
-    //     },
-    // });
+    const deleteApiConnectorMutation = useDeleteApiConnectorMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['apiConnectors'],
+            });
+        },
+    });
 
-    // const enableApiConnectorMutation = useEnableApiConnectorMutation({
-    //     onSuccess: () => {
-    //         queryClient.invalidateQueries({
-    //             queryKey: ApiConnectorKeys.apiConnectors,
-    //         });
-    //     },
-    // });
+    const enableApiConnectorMutation = useEnableApiConnectorMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['apiConnectors'],
+            });
+        },
+    });
 
     const handleAlertDeleteDialogClick = () => {
         if (apiConnector.id) {
-            // TODO: Uncomment when mutations are implemented
-            // deleteApiConnectorMutation.mutate(apiConnector.id);
+            deleteApiConnectorMutation.mutate({id: apiConnector.id});
 
             setShowDeleteDialog(false);
         }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handleOnCheckedChange = (_value: boolean) => {
-        // TODO: Uncomment when mutations are implemented
-        // enableApiConnectorMutation.mutate({
-        //     enable: value,
-        //     id: apiConnector.id!,
-        // });
+    const handleOnCheckedChange = (value: boolean) => {
+        enableApiConnectorMutation.mutate({
+            enable: value,
+            id: apiConnector.id,
+        });
     };
 
     return (
-        <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
+        <Collapsible className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
             <div className="flex items-center justify-between">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
@@ -122,13 +118,13 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                 <div className="flex items-center justify-end gap-x-6">
                     <div className="flex flex-col items-end gap-y-4">
-                        <Switch checked={apiConnector.enabled} onCheckedChange={handleOnCheckedChange} />
+                        <Switch checked={apiConnector.enabled ?? false} onCheckedChange={handleOnCheckedChange} />
 
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
                                 {apiConnector.lastModifiedDate ? (
                                     <span className="text-xs">
-                                        {`Modified at ${apiConnector.lastModifiedDate?.toLocaleDateString()} ${apiConnector.lastModifiedDate?.toLocaleTimeString()}`}
+                                        {`Modified at ${new Date(apiConnector.lastModifiedDate).toLocaleDateString()} ${new Date(apiConnector.lastModifiedDate).toLocaleTimeString()}`}
                                     </span>
                                 ) : (
                                     '-'
@@ -153,13 +149,52 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(false)}>
+                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
             </div>
+
+            <CollapsibleContent className="mt-4">
+                {apiConnector.endpoints && apiConnector.endpoints.length > 0 ? (
+                    <div className="space-y-2 border-t pt-4">
+                        {apiConnector.endpoints.map((endpoint) => (
+                            <div
+                                className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2"
+                                key={endpoint.id}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span
+                                        className={`rounded px-2 py-0.5 text-xs font-medium ${getHttpMethodBadgeColor(endpoint.httpMethod)}`}
+                                    >
+                                        {endpoint.httpMethod}
+                                    </span>
+
+                                    <span className="text-sm font-medium">{endpoint.name}</span>
+
+                                    <span className="text-sm text-gray-500">{endpoint.path}</span>
+                                </div>
+
+                                {endpoint.description && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <span className="max-w-xs truncate text-xs text-gray-400">
+                                                {endpoint.description}
+                                            </span>
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>{endpoint.description}</TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="border-t pt-4 text-center text-sm text-gray-500">No endpoints configured</div>
+                )}
+            </CollapsibleContent>
 
             {showDeleteDialog && (
                 <ApiConnectorDeleteAlertDialog
@@ -168,13 +203,10 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                 />
             )}
 
-            {/* TODO: Uncomment when ApiConnectorImportDialog is implemented */}
-
             {showEditDialog && (
-                // <ApiConnectorImportDialog apiConnector={apiConnector} onClose={() => setShowEditDialog(false)} />
-                <div onClick={() => setShowEditDialog(false)}>TODO: Edit Dialog</div>
+                <ApiConnectorEditDialog apiConnector={apiConnector} onClose={() => setShowEditDialog(false)} />
             )}
-        </div>
+        </Collapsible>
     );
 };
 
