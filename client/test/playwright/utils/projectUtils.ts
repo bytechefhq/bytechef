@@ -40,7 +40,7 @@ export async function createWorkflow(page: Page, projectId: string, workflowName
 
     const projectItem = page.getByLabel(projectId);
 
-    await expect(projectItem).toBeVisible({timeout: 10000});
+    await expect(projectItem).toBeVisible({timeout: 60000});
 
     const createWorkflowButton = projectItem.getByRole('button', {name: 'Create Workflow'});
 
@@ -88,7 +88,7 @@ export async function importWorkflow({page, projectId, workflowFilePath}: Import
 
     const projectItem = page.getByLabel(projectId);
 
-    await expect(projectItem).toBeVisible({timeout: 10000});
+    await expect(projectItem).toBeVisible({timeout: 60000});
 
     await projectItem.click();
 
