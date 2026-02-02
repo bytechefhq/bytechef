@@ -52,12 +52,20 @@ export class ProjectsPage {
 
         const projectItem = this.page.getByTestId('project-item').filter({hasText: projectName}).first();
 
-        const projectId = (await projectItem.getAttribute('aria-label')) ?? projectName;
+        const projectId = await projectItem.getAttribute('aria-label');
+
+        if (!projectId) {
+            throw new Error(`Project ID not found for project name: ${projectName}`);
+        }
 
         return projectId;
     }
 
     async deleteProject(projectId: string): Promise<void> {
+        await this.page.goto('/automation/projects');
+
+        await this.waitForPageLoad();
+
         await this.page.waitForLoadState('domcontentloaded');
 
         const projectItem = this.page.getByLabel(projectId);
