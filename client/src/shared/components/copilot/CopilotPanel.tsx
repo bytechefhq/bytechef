@@ -1,14 +1,20 @@
 import Button from '@/components/Button/Button';
 import {Thread} from '@/components/assistant-ui/thread';
-import {Select, SelectContent, SelectItem, SelectTrigger} from '@/components/ui/select';
+import {ToggleGroup, ToggleGroupItem} from '@/components/ui/toggle-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import {MODE, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {BotMessageSquareIcon, MessageSquareOffIcon, XIcon} from 'lucide-react';
 import {useEffect} from 'react';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-const CopilotPanel = () => {
+interface CopilotPanelProps {
+    className?: string;
+    onClose?: () => void;
+}
+
+const CopilotPanel = ({className, onClose}: CopilotPanelProps) => {
     const {context, generateConversationId, resetMessages, setContext, setCopilotPanelOpen} = useCopilotStore(
         useShallow((state) => ({
             context: state.context,
@@ -25,8 +31,12 @@ const CopilotPanel = () => {
     };
 
     const handleCloseClick = () => {
-        setContext(undefined);
-        setCopilotPanelOpen(false);
+        if (onClose) {
+            onClose();
+        } else {
+            setContext(undefined);
+            setCopilotPanelOpen(false);
+        }
     };
 
     useEffect(() => {
@@ -44,40 +54,33 @@ const CopilotPanel = () => {
     }, [context?.source]);
 
     return (
-        <div className="relative h-full min-h-[50vh] w-[450px] bg-surface-main">
+        <div className={twMerge('relative h-full min-h-[50vh] w-[450px] bg-surface-main', className)}>
             <div className="flex items-center justify-between p-3">
                 <div className="flex items-center space-x-1">
                     <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>
                 </div>
 
-                <div className="flex items-center space-x-3">
-                    <Select
-                        onValueChange={(value) =>
-                            setContext({
-                                ...context,
-                                mode: value as MODE,
-                            })
-                        }
+                <div className="flex items-center">
+                    <ToggleGroup
+                        onValueChange={(value) => {
+                            if (value) {
+                                setContext({
+                                    ...context,
+                                    mode: value as MODE,
+                                });
+                            }
+                        }}
+                        type="single"
                         value={context?.mode}
                     >
-                        <SelectTrigger className="min-w-24">
-                            {context?.mode.charAt(0) + context?.mode.slice(1).toLowerCase()}
-                        </SelectTrigger>
+                        <ToggleGroupItem value={MODE.ASK}>
+                            {MODE.ASK.charAt(0) + MODE.ASK.slice(1).toLowerCase()}
+                        </ToggleGroupItem>
 
-                        <SelectContent className="min-w-24">
-                            <SelectItem value={MODE.ASK}>
-                                <span className="text-muted-foreground">
-                                    {MODE.ASK.charAt(0) + MODE.ASK.slice(1).toLowerCase()}
-                                </span>
-                            </SelectItem>
-
-                            <SelectItem value={MODE.BUILD}>
-                                <span className="text-muted-foreground">
-                                    {MODE.BUILD.charAt(0) + MODE.BUILD.slice(1).toLowerCase()}
-                                </span>
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
+                        <ToggleGroupItem value={MODE.BUILD}>
+                            {MODE.BUILD.charAt(0) + MODE.BUILD.slice(1).toLowerCase()}
+                        </ToggleGroupItem>
+                    </ToggleGroup>
 
                     <Tooltip>
                         <TooltipTrigger asChild>
