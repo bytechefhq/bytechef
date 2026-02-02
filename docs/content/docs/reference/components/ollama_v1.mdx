@@ -31,6 +31,7 @@ Version: 1
 
 
 
+
 <hr />
 
 
@@ -46,7 +47,7 @@ Name: ask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> <span>codellama</span>, <span>dolphin-phi</span>, <span>gemma</span>, <span>gemma3</span>, <span>llama2</span>, <span>llama2-uncensored</span>, <span>llama3</span>, <span>llama3.1</span>, <span>llama3.2</span>, <span>llama3.2-vision</span>, <span>llama3.2-vision:90b</span>, <span>llama3.2:1b</span>, <span>llama3.2:3b</span>, <span>llava</span>, <span>mistral</span>, <span>mistral-nemo</span>, <span>moondream</span>, <span>mxbai-embed-large</span>, <span>neural-chat</span>, <span>nomic-embed-text</span>, <span>orca-mini</span>, <span>phi</span>, <span>phi3</span>, <span>qwen2.5</span>, <span>qwen2.5:3b</span>, <span>qwen2.5vl</span>, <span>qwen3:0.6b</span>, <span>qwen3:1.7b</span>, <span>qwen3:4b</span>, <span>qwen3:4b-thinking</span>, <span>qwen3:7b</span>, <span>qwq</span>, <span>starling-lm</span> </details> | ID of the model to use. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>codellama</span>, <span>dolphin-phi</span>, <span>gemma</span>, <span>gemma3</span>, <span>llama2</span>, <span>llama2-uncensored</span>, <span>llama3</span>, <span>llama3.1</span>, <span>llama3.2</span>, <span>llama3.2-vision</span>, <span>llama3.2-vision:90b</span>, <span>llama3.2:1b</span>, <span>llama3.2:3b</span>, <span>llava</span>, <span>mistral</span>, <span>mistral-nemo</span>, <span>moondream</span>, <span>mxbai-embed-large</span>, <span>neural-chat</span>, <span>nomic-embed-text</span>, <span>orca-mini</span>, <span>phi</span>, <span>phi3</span>, <span>qwen2.5</span>, <span>qwen2.5:3b</span>, <span>qwen2.5vl</span>, <span>qwen3-embedding:8b</span>, <span>qwen3:0.6b</span>, <span>qwen3:1.7b</span>, <span>qwen3:4b</span>, <span>qwen3:4b-thinking</span>, <span>qwen3:7b</span>, <span>qwq</span>, <span>starling-lm</span> </details> | ID of the model to use. | true |
 | format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
 | userPrompt | Prompt | STRING | User prompt to the model. | true |
 | systemPrompt | System Prompt | STRING | System prompt to the model. | false |
@@ -154,6 +155,8 @@ Name: ask
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

@@ -31,6 +31,7 @@ Version: 1
 
 
 
+
 <hr />
 
 
@@ -102,6 +103,79 @@ Name: ask
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Ask (stream)
+Name: streamAsk
+
+`Ask anything you want and stream the response.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model | Model | STRING <details> <summary> Options </summary> <span>claude-3-5-haiku-latest</span>, <span>claude-3-5-sonnet-latest</span>, <span>claude-3-7-sonnet-latest</span>, <span>claude-3-haiku-20240307</span>, <span>claude-3-opus-latest</span>, <span>claude-3-sonnet-20240229</span>, <span>claude-haiku-4-5</span>, <span>claude-opus-4-0</span>, <span>claude-opus-4-1</span>, <span>claude-opus-4-5</span>, <span>claude-sonnet-4-0</span>, <span>claude-sonnet-4-5</span> </details> | ID of the model to use. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
+| userPrompt | Prompt | STRING | User prompt to the model. | true |
+| systemPrompt | System Prompt | STRING | System prompt to the model. | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | Only text and image files are supported. Also, only certain models supports images. Please check the documentation. | false |
+| messages | Messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)&#125;] </details> | A list of messages comprising the conversation so far. | true |
+| maxTokens | Max Tokens | INTEGER | The maximum number of tokens to generate in the chat completion. | true |
+| response | Response | OBJECT <details> <summary> Properties </summary> &#123;STRING\(responseFormat), STRING\(responseSchema)&#125; </details> | The response from the API. | true |
+| temperature | Temperature | NUMBER | Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic. | false |
+| topP | Top P | NUMBER | An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. | false |
+| topK | Top K | INTEGER | Specify the number of token choices the generative uses to generate the next token. | false |
+| stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | Up to 4 sequences where the API will stop generating further tokens. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Ask (stream)",
+  "name" : "streamAsk",
+  "parameters" : {
+    "model" : "",
+    "format" : "",
+    "userPrompt" : "",
+    "systemPrompt" : "",
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ],
+    "messages" : [ {
+      "role" : "",
+      "content" : "",
+      "attachments" : [ {
+        "extension" : "",
+        "mimeType" : "",
+        "name" : "",
+        "url" : ""
+      } ]
+    } ],
+    "maxTokens" : 1,
+    "response" : {
+      "responseFormat" : "",
+      "responseSchema" : ""
+    },
+    "temperature" : 0.0,
+    "topP" : 0.0,
+    "topK" : 1,
+    "stop" : [ "" ]
+  },
+  "type" : "anthropic/v1/streamAsk"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 
