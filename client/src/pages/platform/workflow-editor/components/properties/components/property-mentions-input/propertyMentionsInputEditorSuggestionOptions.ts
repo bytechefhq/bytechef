@@ -31,7 +31,11 @@ const DOM_RECT_FALLBACK: DOMRect = {
 
 export function getSuggestionOptions(): MentionOptions['suggestion'] {
     return {
-        allow: ({editor, range}) => {
+        allow: ({editor, isActive, range}) => {
+            if (!editor.isFocused && !isActive) {
+                return false;
+            }
+
             const editorContent = editor.state.doc.textContent;
 
             if (range.from === 2) {
@@ -85,6 +89,10 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                 },
 
                 onStart: (props) => {
+                    if (!props.editor.isFocused) {
+                        return;
+                    }
+
                     component = new ReactRenderer(PropertyMentionsInputEditorSuggestionList, {
                         editor: props.editor,
                         props,
