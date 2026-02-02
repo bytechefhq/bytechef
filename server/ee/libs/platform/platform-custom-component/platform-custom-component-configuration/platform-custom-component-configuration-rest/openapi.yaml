@@ -1,232 +1,32 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Platform Custom Component Internal API"
+  title: "The Platform Custom Component Public API"
   version: "1"
 servers:
-  - url: "/api/platform/internal"
+  - url: "/api/platform/v1"
 tags:
   - name: "custom-component"
-    description: "The Platform Custom Component Internal API"
-#  - name: "custom-component-tag"
-#    description: "The Automation Custom Component Tag Internal API"
+    description: "The Platform Custom Component Public API"
 paths:
-  /custom-components:
-    get:
-      description: "Get Custom Components."
-      summary: "Get Custom Components"
+  /custom-components/deploy:
+    post:
+      description: "Deploy a new custom component."
+      summary: "Deploy a new custom component"
       tags:
         - "custom-component"
-      operationId: "getCustomComponents"
-      responses:
-        "200":
-          description: "A list of Custom Components."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/CustomComponent"
-#  /custom-component/tags:
-#    get:
-#      description: "Get custom component tags."
-#      summary: "Get custom component tags"
-#      tags:
-#        - "custom-component-tag"
-#      operationId: "getCustomComponentTags"
-#      responses:
-#        "200":
-#          description: "The list of custom component tags."
-#          content:
-#            application/json:
-#              schema:
-#                description: "The response object that contains the array of tags."
-#                type: "array"
-#                items:
-#                  $ref: "#/components/schemas/Tag"
-  /custom-components/{id}:
-    delete:
-      description: "Delete an custom component."
-      summary: "Delete an custom component"
-      tags:
-        - "custom-component"
-      operationId: "deleteCustomComponent"
-      parameters:
-        - name: "id"
-          description: "The id of an custom component."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
+      operationId: "deployCustomComponent"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                componentFile:
+                  description: "The file of a custom component."
+                  type: "string"
+                  format: "binary"
+        required: true
       responses:
         "204":
           description: "Successful operation."
-    get:
-      description: "Get an custom component by id."
-      summary: "Get an custom component by id"
-      tags:
-        - "custom-component"
-      operationId: "getCustomComponent"
-      parameters:
-        - name: "id"
-          description: "The id of an custom component."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "The custom component object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CustomComponent"
-  /custom-components/{id}/enable/{enable}:
-    patch:
-      description: "Enable/disable a custom component."
-      summary: "Enable/disable a custom component."
-      tags:
-        - "custom-component"
-      operationId: "enableCustomComponent"
-      parameters:
-        - name: "id"
-          description: "The id of the custom component."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "enable"
-          description: "Enable/disable the custom component."
-          in: "path"
-          required: true
-          schema:
-            type: "boolean"
-      responses:
-        "204":
-          description: "Successful operation."
-#  /custom-components/{id}/tags:
-#    put:
-#      description: "Updates tags of an existing Custom Components."
-#      summary: "Updates tags of an existing Custom Components"
-#      tags:
-#        - "custom-component-tag"
-#      operationId: "updateApiConnectionTags"
-#      parameters:
-#        - name: "id"
-#          description: "The id of an Custom Components."
-#          in: "path"
-#          required: true
-#          schema:
-#            type: "integer"
-#            format: "int64"
-#      requestBody:
-#        content:
-#          application/json:
-#            schema:
-#              $ref: "#/components/schemas/UpdateTagsRequest"
-#        required: true
-#      responses:
-#        "204":
-#          description: "Successful operation."
-components:
-  schemas:
-    CustomComponent:
-      description: "An custom component."
-      required:
-        - "name"
-        - "version"
-      properties:
-        componentVersion:
-          description: "The version of a custom component."
-          type: "integer"
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        description:
-          description: "The description of a custom component."
-          type: "string"
-        enabled:
-          description: "If a custom component is enabled or not."
-          type: "boolean"
-        icon:
-          description: "The icon of a custom component."
-          type: "string"
-        id:
-          description: "The id of an custom component."
-          type: "integer"
-          format: "int64"
-        language:
-          description: "The language in which the component is implemented"
-          type: "string"
-          enum:
-            - JAVA
-            - JAVASCRIPT
-            - PYTHON
-            - RUBY
-          readOnly: true
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        name:
-          description: "The name of a custom component."
-          type: "string"
-        title:
-          description: "The title of a custom component."
-          type: "string"
-        __version:
-          type: "integer"
-#    Tag:
-#      description: "A tag."
-#      required:
-#        - "name"
-#      properties:
-#        createdBy:
-#          description: "The created by."
-#          type: "string"
-#          readOnly: true
-#        createdDate:
-#          description: "The created date."
-#          type: "string"
-#          format: "date-time"
-#          readOnly: true
-#        id:
-#          description: "The id of the tag."
-#          type: "integer"
-#          format: "int64"
-#        lastModifiedBy:
-#          description: "The last modified by."
-#          type: "string"
-#          readOnly: true
-#        lastModifiedDate:
-#          description: "The last modified date."
-#          type: "string"
-#          format: "date-time"
-#          readOnly: true
-#        name:
-#          description: "The name of the tag."
-#          type: "string"
-#        __version:
-#          type: "integer"
-#    UpdateTagsRequest:
-#      description: "The request object that contains the array of tags."
-#      type: "object"
-#      properties:
-#        tags:
-#          type: "array"
-#          items:
-#            $ref: "#/components/schemas/Tag"

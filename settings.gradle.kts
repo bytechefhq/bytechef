@@ -557,7 +557,7 @@ include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-c
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api")
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-impl")
 include("server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-api")
-include("server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-public-rest")
+include("server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-graphql")
 include("server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-rest")
 include("server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-service")
 include("server:ee:libs:platform:platform-custom-component:platform-custom-component-file-storage:platform-custom-component-file-storage-api")
