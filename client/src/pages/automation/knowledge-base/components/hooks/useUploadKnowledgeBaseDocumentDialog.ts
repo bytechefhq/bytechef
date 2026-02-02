@@ -29,11 +29,11 @@ export default function useUploadKnowledgeBaseDocumentDialog({
     const uploadFile = useCallback(
         async (file: File, index: number) => {
             setSelectedFiles((prev) => {
-                const copy = [...prev];
+                const updatedFiles = [...prev];
 
-                copy[index] = {...copy[index], status: 'uploading'};
+                updatedFiles[index] = {...updatedFiles[index], status: 'uploading'};
 
-                return copy;
+                return updatedFiles;
             });
 
             try {
@@ -54,27 +54,27 @@ export default function useUploadKnowledgeBaseDocumentDialog({
                 }
 
                 setSelectedFiles((prev) => {
-                    const copy = [...prev];
+                    const updatedFiles = [...prev];
 
-                    copy[index] = {
-                        ...copy[index],
+                    updatedFiles[index] = {
+                        ...updatedFiles[index],
                         status: 'completed',
                         statusMessage: 'Uploaded successfully',
                     };
 
-                    return copy;
+                    return updatedFiles;
                 });
             } catch (error) {
                 setSelectedFiles((prev) => {
-                    const copy = [...prev];
+                    const updatedFiles = [...prev];
 
-                    copy[index] = {
-                        ...copy[index],
+                    updatedFiles[index] = {
+                        ...updatedFiles[index],
                         status: 'error',
                         statusMessage: error instanceof Error ? error.message : 'Upload failed',
                     };
 
-                    return copy;
+                    return updatedFiles;
                 });
             }
         },
@@ -124,11 +124,13 @@ export default function useUploadKnowledgeBaseDocumentDialog({
             return '0 Bytes';
         }
 
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        const bytesPerUnit = 1024;
+        const sizeUnits = ['Bytes', 'KB', 'MB', 'GB'];
+        const unitIndex = Math.floor(Math.log(bytes) / Math.log(bytesPerUnit));
+        const sizeInUnit = bytes / Math.pow(bytesPerUnit, unitIndex);
+        const formattedSize = parseFloat(sizeInUnit.toFixed(1));
 
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        return formattedSize + ' ' + sizeUnits[unitIndex];
     };
 
     const handleOpenChange = (newOpen: boolean) => {

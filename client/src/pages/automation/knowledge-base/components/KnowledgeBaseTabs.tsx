@@ -3,7 +3,7 @@ import KnowledgeBaseSearchInterface from '@/pages/automation/knowledge-base/comp
 import UploadKnowledgeBaseDocumentDialog from '@/pages/automation/knowledge-base/components/UploadKnowledgeBaseDocumentDialog';
 import KnowledgeBaseDocumentList from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentList';
 import {KnowledgeBaseDocument} from '@/shared/middleware/graphql';
-import {FileTextIcon, Search} from 'lucide-react';
+import {FileTextIcon, SearchIcon} from 'lucide-react';
 
 interface KnowledgeBaseTabsProps {
     documents: KnowledgeBaseDocument[];
@@ -21,7 +21,7 @@ const KnowledgeBaseTabs = ({documents, knowledgeBaseId}: KnowledgeBaseTabsProps)
                     </TabsTrigger>
 
                     <TabsTrigger value="search">
-                        <Search className="mr-2 size-4" />
+                        <SearchIcon className="mr-2 size-4" />
                         Search
                     </TabsTrigger>
                 </TabsList>
