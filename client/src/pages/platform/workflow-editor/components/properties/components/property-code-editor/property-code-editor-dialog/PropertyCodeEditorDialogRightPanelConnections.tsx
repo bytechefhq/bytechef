@@ -1,25 +1,14 @@
 import Button from '@/components/Button/Button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import PropertyCodeEditorSheetRightPanelConnectionsLabel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsLabel';
-import PropertyCodeEditorSheetRightPanelConnectionsPopover, {
-    connectionFormSchema,
-} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsPopover';
-import PropertyCodeEditorSheetRightPanelConnectionsSelect from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsSelect';
-import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
+import PropertyCodeEditorDialogRightPanelConnectionsLabel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsLabel';
+import PropertyCodeEditorDialogRightPanelConnectionsPopover from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsPopover';
+import PropertyCodeEditorDialogRightPanelConnectionsSelect from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsSelect';
+import {usePropertyCodeEditorDialogRightPanelConnections} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks/usePropertyCodeEditorDialogRightPanelConnections';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
-import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {LinkIcon, XIcon} from 'lucide-react';
-import {useState} from 'react';
-import {z} from 'zod';
-import {useShallow} from 'zustand/react/shallow';
 
-const SPACE = 4;
-
-const PropertyCodeEditorSheetRightPanelConnections = ({
+const PropertyCodeEditorDialogRightPanelConnections = ({
     componentConnections,
     workflow,
     workflowNodeName,
@@ -28,117 +17,23 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
     workflow: Workflow;
     workflowNodeName: string;
 }) => {
-    const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
-
-    const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore(
-        useShallow((state) => ({
-            setShowConnectionNote: state.setShowConnectionNote,
-            showConnectionNote: state.showConnectionNote,
-        }))
-    );
-    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-
     const {
         ConnectionKeys,
-        updateWorkflowMutation,
+        componentDefinitions,
+        handleCloseConnectionNote,
+        handleOnRemoveClick,
+        handleOnSubmit,
+        setShowNewConnectionDialog,
+        showConnectionNote,
+        showNewConnectionDialog,
         useCreateConnectionMutation,
-        useGetComponentDefinitionsQuery,
         useGetConnectionTagsQuery,
-    } = useWorkflowEditor();
-
-    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
-
-    const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
-        environmentId: currentEnvironmentId,
-        workflowId: workflow.id!,
+        workflowTestConfigurationConnections,
+    } = usePropertyCodeEditorDialogRightPanelConnections({
+        componentConnections,
+        workflow,
         workflowNodeName,
     });
-
-    const handleOnSubmit = (values: z.infer<typeof connectionFormSchema>) => {
-        if (!workflow?.definition) {
-            return;
-        }
-
-        let workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow?.definition);
-
-        const scriptWorkflowTask = workflowDefinition.tasks?.filter((task) => task.name === workflowNodeName)[0];
-
-        if (!scriptWorkflowTask) {
-            return;
-        }
-
-        workflowDefinition = {
-            ...workflowDefinition,
-            tasks: [
-                ...workflowDefinition.tasks!.map((task) => {
-                    if (task.name === workflowNodeName) {
-                        return {
-                            ...scriptWorkflowTask,
-                            connections: {
-                                ...(scriptWorkflowTask.connections ?? {}),
-                                [values.name]: {
-                                    componentName: values.componentName,
-                                    componentVersion: values.componentVersion,
-                                },
-                            },
-                        } as WorkflowTaskType;
-                    } else {
-                        return task;
-                    }
-                }),
-            ],
-        };
-
-        updateWorkflowMutation!.mutate({
-            id: workflow.id!,
-            workflow: {
-                definition: JSON.stringify(workflowDefinition, null, SPACE),
-                version: workflow.version,
-            },
-        });
-    };
-
-    const handleOnRemoveClick = (workflowConnectionKey: string) => {
-        if (!workflow?.definition) {
-            return;
-        }
-
-        let workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow?.definition);
-
-        const scriptWorkflowTask = workflowDefinition.tasks?.filter((task) => task.name === workflowNodeName)[0];
-
-        if (!scriptWorkflowTask) {
-            return;
-        }
-
-        delete scriptWorkflowTask.connections[workflowConnectionKey];
-
-        workflowDefinition = {
-            ...workflowDefinition,
-            tasks: [
-                ...workflowDefinition.tasks!.map((task) => {
-                    if (task.name === workflowNodeName) {
-                        return {
-                            ...scriptWorkflowTask,
-                            connections: {
-                                ...(scriptWorkflowTask.connections ?? {}),
-                            },
-                        };
-                    } else {
-                        return task;
-                    }
-                }),
-            ],
-        };
-
-        updateWorkflowMutation!.mutate({
-            id: workflow.id!,
-            workflow: {
-                definition: JSON.stringify(workflowDefinition, null, SPACE),
-                version: workflow.version,
-            },
-        });
-    };
 
     return (
         <Card className="border-none shadow-none">
@@ -163,12 +58,12 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
 
                             return (
                                 <fieldset className="space-y-2" key={workflowConnection.key}>
-                                    <PropertyCodeEditorSheetRightPanelConnectionsLabel
+                                    <PropertyCodeEditorDialogRightPanelConnectionsLabel
                                         componentConnection={workflowConnection}
                                         onRemoveClick={() => handleOnRemoveClick(workflowConnection.key)}
                                     />
 
-                                    <PropertyCodeEditorSheetRightPanelConnectionsSelect
+                                    <PropertyCodeEditorDialogRightPanelConnectionsSelect
                                         componentConnection={workflowConnection}
                                         workflowId={workflow.id!}
                                         workflowNodeName={workflowNodeName}
@@ -179,7 +74,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                         })}
 
                         <div className="mt-3 flex justify-end">
-                            <PropertyCodeEditorSheetRightPanelConnectionsPopover onSubmit={handleOnSubmit} />
+                            <PropertyCodeEditorDialogRightPanelConnectionsPopover onSubmit={handleOnSubmit} />
                         </div>
                     </>
                 ) : (
@@ -197,7 +92,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                                 </p>
 
                                 <div className="mt-6">
-                                    <PropertyCodeEditorSheetRightPanelConnectionsPopover
+                                    <PropertyCodeEditorDialogRightPanelConnectionsPopover
                                         onSubmit={handleOnSubmit}
                                         triggerNode={<Button label="Add Component" />}
                                     />
@@ -213,7 +108,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                                     <Button
                                         className="ml-auto hover:bg-transparent active:bg-transparent active:text-content-neutral-primary"
                                         icon={<XIcon aria-hidden="true" />}
-                                        onClick={() => setShowConnectionNote(false)}
+                                        onClick={handleCloseConnectionNote}
                                         size="iconXs"
                                         title="Close the note"
                                         variant="ghost"
@@ -243,4 +138,4 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
     );
 };
 
-export default PropertyCodeEditorSheetRightPanelConnections;
+export default PropertyCodeEditorDialogRightPanelConnections;

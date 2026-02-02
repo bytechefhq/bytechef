@@ -1,19 +1,19 @@
-import PropertyCodeEditorSheetRightPanelConnections from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnections';
-import PropertyCodeEditorSheetRightPanelInputs from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelInputs';
+import PropertyCodeEditorDialogRightPanelConnections from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnections';
+import PropertyCodeEditorDialogRightPanelInputs from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelInputs';
 import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 
-interface PropertyCodeEditorSheetConnectionsSheetRightPanelProps {
+interface PropertyCodeEditorDialogConnectionsSheetRightPanelProps {
     componentConnections: ComponentConnection[];
     workflow: Workflow;
     workflowNodeName: string;
 }
 
-const PropertyCodeEditorSheetRightPanel = ({
+const PropertyCodeEditorDialogRightPanel = ({
     componentConnections,
     workflow,
     workflowNodeName,
-}: PropertyCodeEditorSheetConnectionsSheetRightPanelProps) => {
+}: PropertyCodeEditorDialogConnectionsSheetRightPanelProps) => {
     const currentTask = getTask({
         tasks: workflow.tasks || [],
         workflowNodeName,
@@ -22,11 +22,11 @@ const PropertyCodeEditorSheetRightPanel = ({
     return (
         <div className="flex w-96 flex-col divide-y divide-solid divide-muted">
             <div className="flex-1">
-                <PropertyCodeEditorSheetRightPanelInputs input={currentTask?.parameters?.input ?? {}} />
+                <PropertyCodeEditorDialogRightPanelInputs input={currentTask?.parameters?.input ?? {}} />
             </div>
 
             <div className="flex-1">
-                <PropertyCodeEditorSheetRightPanelConnections
+                <PropertyCodeEditorDialogRightPanelConnections
                     componentConnections={componentConnections}
                     workflow={workflow}
                     workflowNodeName={workflowNodeName}
@@ -36,4 +36,4 @@ const PropertyCodeEditorSheetRightPanel = ({
     );
 };
 
-export default PropertyCodeEditorSheetRightPanel;
+export default PropertyCodeEditorDialogRightPanel;

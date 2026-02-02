@@ -1,6 +1,6 @@
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 
-const PropertyCodeEditorSheetRightPanelInputs = ({input}: {input: {[key: string]: object}}) => {
+const PropertyCodeEditorDialogRightPanelInputs = ({input}: {input: {[key: string]: object}}) => {
     const entries = Object.entries(input);
 
     return (
@@ -38,4 +38,4 @@ const PropertyCodeEditorSheetRightPanelInputs = ({input}: {input: {[key: string]
     );
 };
 
-export default PropertyCodeEditorSheetRightPanelInputs;
+export default PropertyCodeEditorDialogRightPanelInputs;

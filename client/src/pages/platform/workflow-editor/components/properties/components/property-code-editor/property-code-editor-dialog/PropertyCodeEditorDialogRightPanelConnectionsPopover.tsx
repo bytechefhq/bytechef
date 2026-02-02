@@ -3,14 +3,13 @@ import ComboBox from '@/components/ComboBox';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {zodResolver} from '@hookform/resolvers/zod';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {XIcon} from 'lucide-react';
-import {ReactNode, useState} from 'react';
-import {useForm} from 'react-hook-form';
+import {ReactNode} from 'react';
 import {z} from 'zod';
+
+import usePropertyCodeEditorDialogRightPanelConnectionsPopover from './hooks/usePropertyCodeEditorDialogRightPanelConnectionsPopover';
 
 export const connectionFormSchema = z.object({
     componentName: z.string(),
@@ -20,28 +19,16 @@ export const connectionFormSchema = z.object({
     }),
 });
 
-export interface PropertyCodeEditorSheetRightPanelConnectionsPopoverProps {
+export interface PropertyCodeEditorDialogRightPanelConnectionsPopoverProps {
     onSubmit: (values: z.infer<typeof connectionFormSchema>) => void;
     triggerNode?: ReactNode;
 }
 
-const PropertyCodeEditorSheetRightPanelConnectionsPopover = ({
+const PropertyCodeEditorDialogRightPanelConnectionsPopover = ({
     onSubmit,
     triggerNode,
-}: PropertyCodeEditorSheetRightPanelConnectionsPopoverProps) => {
-    const [open, setOpen] = useState(false);
-
-    const form = useForm<z.infer<typeof connectionFormSchema>>({
-        defaultValues: {
-            componentName: '',
-            name: '',
-        },
-        resolver: zodResolver(connectionFormSchema),
-    });
-
-    const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
-
-    const {data: componentDefinitions} = useGetComponentDefinitionsQuery!({connectionDefinitions: true});
+}: PropertyCodeEditorDialogRightPanelConnectionsPopoverProps) => {
+    const {componentDefinitions, form, open, setOpen} = usePropertyCodeEditorDialogRightPanelConnectionsPopover();
 
     return (
         <Popover onOpenChange={setOpen} open={open}>
@@ -136,4 +123,4 @@ const PropertyCodeEditorSheetRightPanelConnectionsPopover = ({
     );
 };
 
-export default PropertyCodeEditorSheetRightPanelConnectionsPopover;
+export default PropertyCodeEditorDialogRightPanelConnectionsPopover;
