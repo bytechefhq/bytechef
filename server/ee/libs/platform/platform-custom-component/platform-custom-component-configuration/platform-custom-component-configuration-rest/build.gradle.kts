@@ -3,7 +3,7 @@ plugins {
 }
 
 val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
-    apiPackage.set("com.bytechef.ee.platform.customcomponent.configuration.web.rest")
+    apiPackage.set("com.bytechef.ee.platform.customcomponent.configuration.public_.web.rest")
     configOptions.set(
         mapOf(
             "interfaceOnly" to "true",
@@ -14,7 +14,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     generatorName.set("spring")
     inputSpec.set( "$projectDir/openapi.yaml")
     modelNameSuffix.set("Model")
-    modelPackage.set("com.bytechef.ee.platform.customcomponent.configuration.web.rest.model")
+    modelPackage.set("com.bytechef.ee.platform.customcomponent.configuration.public_.web.rest.model")
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(
@@ -25,14 +25,15 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
 
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 
-val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
-    generatorName.set("typescript-fetch")
-    inputSpec.set("$projectDir/openapi.yaml")
-    outputDir.set("$rootDir/client/src/ee/shared/middleware/platform/custom-component")
-}
+//val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+//    generatorName.set("typescript-fetch")
+//    inputSpec.set("$projectDir/openapi.yaml")
+//    modelNameSuffix.set("Model")
+//    outputDir.set("$rootDir/client/src/shared/middleware/platform/custom-component")
+//}
 
 tasks.register("generateOpenAPI") {
-    dependsOn(generateOpenAPISpring, generateOpenAPITypeScriptFetch)
+    dependsOn(generateOpenAPISpring/*, generateOpenAPITypeScriptFetch*/)
 }
 
 dependencies {
@@ -53,7 +54,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:platform:platform-api"))
 
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-api"))
