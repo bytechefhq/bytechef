@@ -1,6 +1,4 @@
 import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
-import {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
-import {useRef} from 'react';
 
 interface EndpointYamlEditorProps {
     onChange: (value: string) => void;
@@ -8,8 +6,6 @@ interface EndpointYamlEditorProps {
 }
 
 const EndpointYamlEditor = ({onChange, value}: EndpointYamlEditorProps) => {
-    const editorRef = useRef<StandaloneCodeEditorType | null>(null);
-
     const editorOptions = {
         automaticLayout: true,
         folding: true,
@@ -26,9 +22,7 @@ const EndpointYamlEditor = ({onChange, value}: EndpointYamlEditorProps) => {
             <MonacoEditorWrapper
                 defaultLanguage="yaml"
                 onChange={(newValue) => onChange(newValue || '')}
-                onMount={(editor) => {
-                    editorRef.current = editor;
-                }}
+                onMount={() => {}}
                 options={editorOptions}
                 value={value}
             />

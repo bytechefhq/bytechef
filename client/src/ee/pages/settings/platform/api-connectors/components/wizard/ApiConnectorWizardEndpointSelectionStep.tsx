@@ -6,6 +6,7 @@ import {useMemo} from 'react';
 
 import {useApiConnectorWizardStore} from '../../stores/useApiConnectorWizardStore';
 import {DiscoveredEndpointI} from '../../types/api-connector-wizard.types';
+import {getHttpMethodPillColor} from '../../utils/httpMethodUtils';
 
 interface EndpointsByResourceI {
     [resource: string]: DiscoveredEndpointI[];
@@ -38,23 +39,6 @@ const ApiConnectorWizardEndpointSelectionStep = () => {
 
     const allSelected = selectedEndpointIds.length === discoveredEndpoints.length;
     const noneSelected = selectedEndpointIds.length === 0;
-
-    const getMethodBadgeColor = (method: string) => {
-        switch (method.toUpperCase()) {
-            case 'GET':
-                return 'bg-green-100 text-green-800';
-            case 'POST':
-                return 'bg-blue-100 text-blue-800';
-            case 'PUT':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'PATCH':
-                return 'bg-orange-100 text-orange-800';
-            case 'DELETE':
-                return 'bg-red-100 text-red-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
 
     return (
         <div className="flex flex-col gap-4">
@@ -107,7 +91,7 @@ const ApiConnectorWizardEndpointSelectionStep = () => {
                                             >
                                                 <div className="flex items-center gap-2">
                                                     <span
-                                                        className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${getMethodBadgeColor(endpoint.method)}`}
+                                                        className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${getHttpMethodPillColor(endpoint.method)}`}
                                                     >
                                                         {endpoint.method}
                                                     </span>

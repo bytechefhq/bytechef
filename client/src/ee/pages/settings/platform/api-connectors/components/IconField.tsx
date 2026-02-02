@@ -1,18 +1,40 @@
 import Button from '@/components/Button/Button';
 import {Avatar, AvatarImage} from '@/components/ui/avatar';
-import {ChangeEvent, useRef, useState} from 'react';
+import {ChangeEvent, useEffect, useRef, useState} from 'react';
 import {ControllerRenderProps, FieldPath, FieldValues} from 'react-hook-form';
 
-const IconField = <T extends FieldValues, K extends FieldPath<T>>({field}: {field: ControllerRenderProps<T, K>}) => {
+interface IconFieldProps<T extends FieldValues, K extends FieldPath<T>> {
+    field: ControllerRenderProps<T, K>;
+    onIconChange?: (value: string) => void;
+}
+
+const IconField = <T extends FieldValues, K extends FieldPath<T>>({field, onIconChange}: IconFieldProps<T, K>) => {
     const hiddenInputRef = useRef<HTMLInputElement>(null);
 
     const [preview, setPreview] = useState<string>();
+
+    // Clean up object URL on unmount or when preview changes to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            if (preview) {
+                URL.revokeObjectURL(preview);
+            }
+        };
+    }, [preview]);
 
     const handleUploadedFile = async (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.item(0);
 
         if (file) {
-            field.onChange(await file.text());
+            const iconText = await file.text();
+
+            field.onChange(iconText);
+            onIconChange?.(iconText);
+
+            // Revoke previous URL before creating a new one
+            if (preview) {
+                URL.revokeObjectURL(preview);
+            }
 
             const urlIcon = URL.createObjectURL(file);
 

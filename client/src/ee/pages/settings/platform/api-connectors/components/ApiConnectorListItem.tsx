@@ -11,6 +11,7 @@ import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ApiConnectorDeleteAlertDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorDeleteAlertDialog';
 import ApiConnectorEditDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEditDialog';
+import ApiConnectorEndpointListItem from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEndpointListItem';
 import {ApiConnector, useDeleteApiConnectorMutation, useEnableApiConnectorMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, EllipsisVerticalIcon} from 'lucide-react';
@@ -19,18 +20,6 @@ import {useState} from 'react';
 interface ApiConnectorItemProps {
     apiConnector: ApiConnector;
 }
-
-const HTTP_METHOD_COLORS: Record<string, string> = {
-    DELETE: 'bg-red-100 text-red-700',
-    GET: 'bg-green-100 text-green-700',
-    PATCH: 'bg-orange-100 text-orange-700',
-    POST: 'bg-blue-100 text-blue-700',
-    PUT: 'bg-yellow-100 text-yellow-700',
-};
-
-const getHttpMethodBadgeColor = (method?: string | null): string => {
-    return (method && HTTP_METHOD_COLORS[method]) || 'bg-gray-100 text-gray-700';
-};
 
 const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
@@ -63,6 +52,10 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
     };
 
     const handleOnCheckedChange = (value: boolean) => {
+        if (!apiConnector.id) {
+            return;
+        }
+
         enableApiConnectorMutation.mutate({
             enable: value,
             id: apiConnector.id,
@@ -131,7 +124,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                                 )}
                             </TooltipTrigger>
 
-                            <TooltipContent>Created Date</TooltipContent>
+                            <TooltipContent>Modified Date</TooltipContent>
                         </Tooltip>
                     </div>
 
@@ -159,38 +152,20 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
             <CollapsibleContent className="mt-4">
                 {apiConnector.endpoints && apiConnector.endpoints.length > 0 ? (
-                    <div className="space-y-2 border-t pt-4">
+                    <ul className="space-y-1 border-t pt-4">
                         {apiConnector.endpoints.map((endpoint) => (
-                            <div
-                                className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2"
+                            <li
+                                className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
                                 key={endpoint.id}
                             >
-                                <div className="flex items-center gap-3">
-                                    <span
-                                        className={`rounded px-2 py-0.5 text-xs font-medium ${getHttpMethodBadgeColor(endpoint.httpMethod)}`}
-                                    >
-                                        {endpoint.httpMethod}
-                                    </span>
-
-                                    <span className="text-sm font-medium">{endpoint.name}</span>
-
-                                    <span className="text-sm text-gray-500">{endpoint.path}</span>
-                                </div>
-
-                                {endpoint.description && (
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <span className="max-w-xs truncate text-xs text-gray-400">
-                                                {endpoint.description}
-                                            </span>
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>{endpoint.description}</TooltipContent>
-                                    </Tooltip>
-                                )}
-                            </div>
+                                <ApiConnectorEndpointListItem
+                                    apiConnectorEndpoint={endpoint}
+                                    apiConnectorName={apiConnector.name}
+                                    specification={apiConnector.specification ?? undefined}
+                                />
+                            </li>
                         ))}
-                    </div>
+                    </ul>
                 ) : (
                     <div className="border-t pt-4 text-center text-sm text-gray-500">No endpoints configured</div>
                 )}

@@ -1,13 +1,16 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import {toast} from '@/hooks/use-toast';
 import {HttpMethod} from '@/shared/middleware/graphql';
 import {Trash2Icon} from 'lucide-react';
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {parse as yamlParse, stringify as yamlStringify} from 'yaml';
 
 import {useApiConnectorWizardStore} from '../../stores/useApiConnectorWizardStore';
 import {EndpointDefinitionI, WizardModeType} from '../../types/api-connector-wizard.types';
+import {getHttpMethodBadgeColor} from '../../utils/httpMethodUtils';
+import {safeJsonParse} from '../../utils/jsonUtils';
 
 interface ApiConnectorWizardReviewStepProps {
     mode: WizardModeType;
@@ -15,6 +18,7 @@ interface ApiConnectorWizardReviewStepProps {
 
 const ApiConnectorWizardReviewStep = ({mode}: ApiConnectorWizardReviewStepProps) => {
     const {baseUrl, endpoints, name, removeEndpoint, setSpecification, specification} = useApiConnectorWizardStore();
+    const specParseErrorShownRef = useRef(false);
 
     const generateOpenApiSpec = useCallback(() => {
         const paths: Record<string, Record<string, unknown>> = {};
@@ -50,10 +54,15 @@ const ApiConnectorWizardReviewStep = ({mode}: ApiConnectorWizardReviewStepProps)
             }
 
             if (endpoint.requestBody) {
+                const {data: parsedSchema} = safeJsonParse(
+                    endpoint.requestBody.schema,
+                    `request body schema for ${endpoint.operationId}`
+                );
+
                 operation.requestBody = {
                     content: {
                         [endpoint.requestBody.contentType]: {
-                            schema: JSON.parse(endpoint.requestBody.schema || '{}'),
+                            schema: parsedSchema,
                         },
                     },
                     required: endpoint.requestBody.required,
@@ -66,9 +75,14 @@ const ApiConnectorWizardReviewStep = ({mode}: ApiConnectorWizardReviewStepProps)
                 };
 
                 if (response.contentType && response.schema) {
+                    const {data: parsedResponseSchema} = safeJsonParse(
+                        response.schema,
+                        `response schema for ${endpoint.operationId}`
+                    );
+
                     responseObj.content = {
                         [response.contentType]: {
-                            schema: JSON.parse(response.schema),
+                            schema: parsedResponseSchema,
                         },
                     };
                 }
@@ -100,22 +114,9 @@ const ApiConnectorWizardReviewStep = ({mode}: ApiConnectorWizardReviewStepProps)
         }
     }, [endpoints, generateOpenApiSpec, mode, setSpecification]);
 
-    const getMethodBadgeColor = (method: HttpMethod) => {
-        switch (method) {
-            case HttpMethod.Get:
-                return 'text-content-brand-primary';
-            case HttpMethod.Post:
-                return 'text-content-success-primary';
-            case HttpMethod.Put:
-                return 'text-content-warning-primary';
-            case HttpMethod.Patch:
-                return 'text-orange-700';
-            case HttpMethod.Delete:
-                return 'text-content-destructive-primary';
-            default:
-                return '';
-        }
-    };
+    useEffect(() => {
+        specParseErrorShownRef.current = false;
+    }, [specification]);
 
     const parseEndpointsFromSpec = (): EndpointDefinitionI[] => {
         if (!specification || mode === 'manual') {
@@ -151,7 +152,20 @@ const ApiConnectorWizardReviewStep = ({mode}: ApiConnectorWizardReviewStepProps)
             }
 
             return parsedEndpoints;
-        } catch {
+        } catch (error) {
+            console.error('Failed to parse API connector specification as YAML:', error);
+
+            if (!specParseErrorShownRef.current) {
+                specParseErrorShownRef.current = true;
+
+                toast({
+                    description:
+                        'The specification could not be parsed. Please check that it is valid YAML/OpenAPI format.',
+                    title: 'Failed to parse specification',
+                    variant: 'destructive',
+                });
+            }
+
             return [];
         }
     };
@@ -195,7 +209,7 @@ const ApiConnectorWizardReviewStep = ({mode}: ApiConnectorWizardReviewStepProps)
                             <li className="flex items-center justify-between p-3" key={endpoint.id}>
                                 <div className="flex items-center gap-3">
                                     <Badge
-                                        className={twMerge('w-20', getMethodBadgeColor(endpoint.httpMethod))}
+                                        className={twMerge('w-20', getHttpMethodBadgeColor(endpoint.httpMethod))}
                                         label={endpoint.httpMethod}
                                         styleType="outline-outline"
                                         weight="semibold"

@@ -135,6 +135,14 @@ const ParameterList = ({onChange, parameters}: ParameterListProps) => {
                             className="flex cursor-pointer items-center justify-between p-2 hover:bg-gray-50"
                             key={parameter.id}
                             onClick={() => openEditDialog(parameter)}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    openEditDialog(parameter);
+                                }
+                            }}
+                            role="button"
+                            tabIndex={0}
                         >
                             <div className="flex items-center gap-2">
                                 <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs">

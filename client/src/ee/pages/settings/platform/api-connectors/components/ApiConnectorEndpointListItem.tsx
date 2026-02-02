@@ -8,6 +8,7 @@ import {
     CloudDownloadIcon,
     EllipsisVerticalIcon,
     FolderSyncIcon,
+    InfoIcon,
     SendToBackIcon,
     Trash2Icon,
     UploadIcon,
@@ -64,8 +65,8 @@ const ApiConnectorEndpointListItem = ({
                 };
             default:
                 return {
-                    icon: undefined,
-                    textColor: '',
+                    icon: <InfoIcon className="size-3" />,
+                    textColor: 'text-gray-700',
                 };
         }
     }, [method]);

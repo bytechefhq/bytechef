@@ -1,4 +1,3 @@
-export {default as EndpointEditorToggle} from './EndpointEditorToggle';
 export {default as EndpointForm} from './EndpointForm';
 export {default as EndpointYamlEditor} from './EndpointYamlEditor';
 export {default as ParameterList} from './ParameterList';

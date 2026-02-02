@@ -1,34 +1,16 @@
 import Badge from '@/components/Badge/Badge';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {toast} from '@/hooks/use-toast';
 import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
-import {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
-import {HttpMethod} from '@/shared/middleware/graphql';
-import {useCallback, useMemo, useRef} from 'react';
+import {useCallback, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {parse as yamlParse, stringify as yamlStringify} from 'yaml';
 
 import {useEndpointDetailPanelStore} from '../stores/useEndpointDetailPanelStore';
+import {getHttpMethodBadgeColor} from '../utils/httpMethodUtils';
 
 const ApiConnectorEndpointDetailPanel = () => {
     const {apiConnectorName, closePanel, isOpen, selectedEndpoint, specification} = useEndpointDetailPanelStore();
-    const editorRef = useRef<StandaloneCodeEditorType | null>(null);
-
-    const getMethodBadgeColor = (method?: HttpMethod) => {
-        switch (method) {
-            case HttpMethod.Get:
-                return 'text-content-brand-primary';
-            case HttpMethod.Post:
-                return 'text-content-success-primary';
-            case HttpMethod.Put:
-                return 'text-content-warning-primary';
-            case HttpMethod.Patch:
-                return 'text-orange-700';
-            case HttpMethod.Delete:
-                return 'text-content-destructive-primary';
-            default:
-                return '';
-        }
-    };
 
     const extractEndpointSpec = useCallback(() => {
         if (!specification || !selectedEndpoint) {
@@ -61,7 +43,15 @@ const ApiConnectorEndpointDetailPanel = () => {
             };
 
             return yamlStringify(endpointSpec);
-        } catch {
+        } catch (error) {
+            console.error('Failed to parse YAML specification when extracting endpoint spec:', error);
+
+            toast({
+                description: 'Could not extract endpoint details. Showing full specification instead.',
+                title: 'Failed to parse specification',
+                variant: 'destructive',
+            });
+
             return specification;
         }
     }, [selectedEndpoint, specification]);
@@ -103,10 +93,7 @@ const ApiConnectorEndpointDetailPanel = () => {
                     <div className="flex flex-col gap-2">
                         <SheetTitle className="flex items-center gap-3">
                             <Badge
-                                className={twMerge(
-                                    'w-20',
-                                    getMethodBadgeColor(selectedEndpoint.httpMethod ?? undefined)
-                                )}
+                                className={twMerge('w-20', getHttpMethodBadgeColor(selectedEndpoint.httpMethod))}
                                 label={selectedEndpoint.httpMethod || 'GET'}
                                 styleType="outline-outline"
                                 weight="semibold"
@@ -148,9 +135,7 @@ const ApiConnectorEndpointDetailPanel = () => {
                                     <MonacoEditorWrapper
                                         defaultLanguage="yaml"
                                         onChange={() => {}}
-                                        onMount={(editor) => {
-                                            editorRef.current = editor;
-                                        }}
+                                        onMount={() => {}}
                                         options={editorOptions}
                                         value={endpointYaml}
                                     />
@@ -169,9 +154,7 @@ const ApiConnectorEndpointDetailPanel = () => {
                                     <MonacoEditorWrapper
                                         defaultLanguage="yaml"
                                         onChange={() => {}}
-                                        onMount={(editor) => {
-                                            editorRef.current = editor;
-                                        }}
+                                        onMount={() => {}}
                                         options={editorOptions}
                                         value={specification}
                                     />

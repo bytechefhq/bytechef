@@ -158,6 +158,14 @@ const ResponseEditor = ({onChange, responses}: ResponseEditorProps) => {
                             className="flex cursor-pointer items-center justify-between p-2 hover:bg-gray-50"
                             key={response.id}
                             onClick={() => openEditDialog(response)}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    openEditDialog(response);
+                                }
+                            }}
+                            role="button"
+                            tabIndex={0}
                         >
                             <div className="flex items-center gap-2">
                                 <span

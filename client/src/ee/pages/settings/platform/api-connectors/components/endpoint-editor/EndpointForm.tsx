@@ -13,6 +13,7 @@ import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Textarea} from '@/components/ui/textarea';
+import {toast} from '@/hooks/use-toast';
 import {HttpMethod} from '@/shared/middleware/graphql';
 import {CodeIcon, FormInputIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
@@ -28,6 +29,7 @@ import {
     RequestBodyDefinitionI,
     ResponseDefinitionI,
 } from '../../types/api-connector-wizard.types';
+import {safeJsonParse} from '../../utils/jsonUtils';
 import EndpointYamlEditor from './EndpointYamlEditor';
 import ParameterList from './ParameterList';
 import RequestBodyEditor from './RequestBodyEditor';
@@ -47,6 +49,11 @@ interface EndpointFormDataI {
     path: string;
     summary: string;
 }
+
+const DEFAULT_RESPONSE: ResponseDefinitionI = {
+    description: 'Successful response',
+    statusCode: '200',
+};
 
 const defaultEndpointValues: EndpointFormDataI = {
     description: '',
@@ -87,7 +94,7 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
                 reset(defaultEndpointValues);
                 setParameters([]);
                 setRequestBody(undefined);
-                setResponses([{description: 'Successful response', statusCode: '200'}]);
+                setResponses([DEFAULT_RESPONSE]);
             }
 
             setEditorMode('form');
@@ -123,10 +130,12 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
         }
 
         if (requestBody) {
+            const {data: parsedSchema} = safeJsonParse(requestBody.schema, 'request body schema');
+
             operation.requestBody = {
                 content: {
                     [requestBody.contentType]: {
-                        schema: JSON.parse(requestBody.schema || '{}'),
+                        schema: parsedSchema,
                     },
                 },
                 description: requestBody.description,
@@ -140,9 +149,14 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
             };
 
             if (response.contentType && response.schema) {
+                const {data: parsedResponseSchema} = safeJsonParse(
+                    response.schema,
+                    `response schema for status ${response.statusCode}`
+                );
+
                 responseObj.content = {
                     [response.contentType]: {
-                        schema: JSON.parse(response.schema),
+                        schema: parsedResponseSchema,
                     },
                 };
             }
@@ -167,12 +181,24 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
                 const parsed = yamlParse(yaml);
 
                 if (!parsed.paths) {
+                    toast({
+                        description: 'The YAML must contain a "paths" section with endpoint definitions.',
+                        title: 'Invalid OpenAPI structure',
+                        variant: 'destructive',
+                    });
+
                     return;
                 }
 
                 const pathEntries = Object.entries(parsed.paths);
 
                 if (pathEntries.length === 0) {
+                    toast({
+                        description: 'The "paths" section is empty. Add at least one endpoint path.',
+                        title: 'No endpoints found',
+                        variant: 'destructive',
+                    });
+
                     return;
                 }
 
@@ -180,6 +206,12 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
                 const methodEntries = Object.entries(methods as Record<string, Record<string, unknown>>);
 
                 if (methodEntries.length === 0) {
+                    toast({
+                        description: `The path "${path}" has no HTTP methods defined. Add at least one method (get, post, etc.).`,
+                        title: 'No methods found',
+                        variant: 'destructive',
+                    });
+
                     return;
                 }
 
@@ -192,17 +224,33 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
                 setValue('description', (operation.description as string) || '');
 
                 if (Array.isArray(operation.parameters)) {
+                    const validLocations: ParameterLocationType[] = ['path', 'query', 'header'];
+                    const validTypes: ParameterTypeType[] = ['string', 'number', 'integer', 'boolean', 'array'];
+
                     const parsedParams: ParameterDefinitionI[] = operation.parameters.map(
-                        (param: Record<string, unknown>) => ({
-                            description: (param.description as string) || '',
-                            example: (param.example as string) || '',
-                            id: uuidv4(),
-                            in: param.in as ParameterLocationType,
-                            name: (param.name as string) || '',
-                            required: !!param.required,
-                            type: (((param.schema as Record<string, unknown>)?.type as string) ||
-                                'string') as ParameterTypeType,
-                        })
+                        (param: Record<string, unknown>) => {
+                            const rawLocation = param.in as string;
+                            const location: ParameterLocationType = validLocations.includes(
+                                rawLocation as ParameterLocationType
+                            )
+                                ? (rawLocation as ParameterLocationType)
+                                : 'query';
+
+                            const rawType = ((param.schema as Record<string, unknown>)?.type as string) || 'string';
+                            const type: ParameterTypeType = validTypes.includes(rawType as ParameterTypeType)
+                                ? (rawType as ParameterTypeType)
+                                : 'string';
+
+                            return {
+                                description: (param.description as string) || '',
+                                example: (param.example as string) || '',
+                                id: uuidv4(),
+                                in: location,
+                                name: (param.name as string) || '',
+                                required: !!param.required,
+                                type,
+                            };
+                        }
                     );
 
                     setParameters(parsedParams);
@@ -244,8 +292,14 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
 
                     setResponses(parsedResponses);
                 }
-            } catch {
-                // Invalid YAML, ignore
+            } catch (error) {
+                console.error('Failed to parse YAML in EndpointForm.parseYamlToForm:', error);
+
+                toast({
+                    description: 'Unable to parse the YAML. Please check that your YAML syntax is valid.',
+                    title: 'Invalid YAML',
+                    variant: 'destructive',
+                });
             }
         },
         [setValue]
@@ -254,15 +308,54 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
     const handleModeChange = (mode: string) => {
         if (mode === 'yaml' && editorMode === 'form') {
             setYamlValue(generateYamlFromForm());
+            setEditorMode('yaml');
         } else if (mode === 'form' && editorMode === 'yaml') {
-            parseYamlToForm(yamlValue);
-        }
+            // Validate YAML before switching to prevent data loss
+            let parsed;
 
-        setEditorMode(mode as 'form' | 'yaml');
+            try {
+                parsed = yamlParse(yamlValue);
+            } catch {
+                toast({
+                    description:
+                        'Fix the YAML syntax errors before switching to form view, or your changes may be lost.',
+                    title: 'Invalid YAML',
+                    variant: 'destructive',
+                });
+
+                return;
+            }
+
+            // Validate OpenAPI structure before switching modes
+            if (!parsed.paths) {
+                toast({
+                    description: 'The YAML must contain a "paths" section to switch to form view.',
+                    title: 'Invalid OpenAPI structure',
+                    variant: 'destructive',
+                });
+
+                return;
+            }
+
+            parseYamlToForm(yamlValue);
+            setEditorMode('form');
+        }
     };
 
     const handleSaveEndpoint = (data: EndpointFormDataI) => {
         if (editorMode === 'yaml') {
+            try {
+                yamlParse(yamlValue);
+            } catch {
+                toast({
+                    description: 'Please fix the YAML syntax errors before saving.',
+                    title: 'Invalid YAML',
+                    variant: 'destructive',
+                });
+
+                return;
+            }
+
             parseYamlToForm(yamlValue);
         }
 

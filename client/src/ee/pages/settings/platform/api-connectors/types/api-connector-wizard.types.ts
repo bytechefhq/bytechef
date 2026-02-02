@@ -96,7 +96,7 @@ export interface DiscoveredEndpointI {
 }
 
 export const WIZARD_STEPS: Record<WizardModeType, string[]> = {
-    ai: ['Basic Info', 'Discover Endpoints', 'Select Endpoints', 'Review'],
+    ai: ['Basic Info', 'Select Endpoints', 'Review'],
     import: ['Import File', 'Review'],
     manual: ['Basic Info', 'Define Endpoints', 'Review'],
 };

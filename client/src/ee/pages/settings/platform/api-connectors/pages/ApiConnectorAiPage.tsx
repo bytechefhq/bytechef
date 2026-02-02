@@ -1,26 +1,31 @@
-import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
+import {toast} from '@/hooks/use-toast';
 import {
+    HttpMethod,
     useCancelGenerationJobMutation,
     useGenerationJobStatusQuery,
     useImportOpenApiSpecificationMutation,
     useStartGenerateFromDocumentationPreviewMutation,
 } from '@/shared/middleware/graphql';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {ArrowLeftIcon} from 'lucide-react';
-import {useEffect} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
+import {parse as yamlParse, stringify as yamlStringify} from 'yaml';
 
 import ApiConnectorWizardDocUrlStep from '../components/wizard/ApiConnectorWizardDocUrlStep';
+import ApiConnectorWizardEndpointSelectionStep from '../components/wizard/ApiConnectorWizardEndpointSelectionStep';
+import ApiConnectorWizardLayout from '../components/wizard/ApiConnectorWizardLayout';
 import ApiConnectorWizardReviewStep from '../components/wizard/ApiConnectorWizardReviewStep';
 import {useApiConnectorWizardStore} from '../stores/useApiConnectorWizardStore';
-import {WIZARD_STEPS} from '../types/api-connector-wizard.types';
+import {DiscoveredEndpointI, WIZARD_STEPS} from '../types/api-connector-wizard.types';
+
+// Maximum number of polling attempts before timing out (5 minutes at 1 second intervals)
+const MAX_POLLING_ATTEMPTS = 300;
 
 const ApiConnectorAiPage = () => {
     const {
         currentStep,
+        discoveredEndpoints,
         documentationUrl,
         icon,
         isProcessing,
@@ -29,7 +34,9 @@ const ApiConnectorAiPage = () => {
         nextStep,
         previousStep,
         reset,
-        setCurrentStep,
+        selectAllEndpoints,
+        selectedEndpointIds,
+        setDiscoveredEndpoints,
         setError,
         setIsProcessing,
         setJobId,
@@ -42,8 +49,8 @@ const ApiConnectorAiPage = () => {
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        setCurrentStep(0);
-    }, [setCurrentStep]);
+        reset();
+    }, [reset]);
 
     const onSuccess = () => {
         queryClient.invalidateQueries({
@@ -70,6 +77,8 @@ const ApiConnectorAiPage = () => {
 
     const cancelGenerationMutation = useCancelGenerationJobMutation();
 
+    const pollingStartTimeRef = useRef<number | null>(null);
+
     const {data: jobStatusData} = useGenerationJobStatusQuery(
         {jobId: jobId || ''},
         {
@@ -78,6 +87,22 @@ const ApiConnectorAiPage = () => {
                 const status = query.state.data?.generationJobStatus?.status;
 
                 if (status === 'COMPLETED' || status === 'FAILED' || status === 'CANCELLED') {
+                    pollingStartTimeRef.current = null;
+
+                    return false;
+                }
+
+                // Initialize start time on first poll
+                if (pollingStartTimeRef.current === null) {
+                    pollingStartTimeRef.current = Date.now();
+                }
+
+                // Check if we've exceeded the maximum polling duration (5 minutes)
+                const elapsedMs = Date.now() - pollingStartTimeRef.current;
+
+                if (elapsedMs >= MAX_POLLING_ATTEMPTS * 1000) {
+                    pollingStartTimeRef.current = null;
+
                     return false;
                 }
 
@@ -88,33 +113,137 @@ const ApiConnectorAiPage = () => {
 
     const jobStatus = jobStatusData?.generationJobStatus;
 
+    // Track if job completed to prevent timeout from firing after completion
+    const jobCompletedRef = useRef(false);
+
+    // Handle polling timeout by checking elapsed time
+    useEffect(() => {
+        if (!jobId || !isProcessing) {
+            jobCompletedRef.current = false;
+
+            return;
+        }
+
+        const timeoutId = setTimeout(() => {
+            // Don't show timeout error if job already completed
+            if (jobCompletedRef.current) {
+                return;
+            }
+
+            if (isProcessing && jobId) {
+                setError('Generation timed out after 5 minutes. Please try again.');
+                setIsProcessing(false);
+                setJobId(null);
+                pollingStartTimeRef.current = null;
+            }
+        }, MAX_POLLING_ATTEMPTS * 1000);
+
+        return () => clearTimeout(timeoutId);
+    }, [isProcessing, jobId, setError, setIsProcessing, setJobId]);
+
+    const parseEndpointsFromSpecification = useCallback((spec: string): DiscoveredEndpointI[] => {
+        try {
+            const parsed = yamlParse(spec);
+            const endpoints: DiscoveredEndpointI[] = [];
+
+            if (parsed.paths) {
+                Object.entries(parsed.paths).forEach(([path, methods]) => {
+                    Object.entries(methods as Record<string, Record<string, unknown>>).forEach(
+                        ([method, operation]) => {
+                            const httpMethod = method.toUpperCase();
+
+                            if (Object.values(HttpMethod).includes(httpMethod as HttpMethod)) {
+                                const tags = operation.tags as string[] | undefined;
+                                const resource = tags?.[0] || path.split('/')[1] || 'Other';
+
+                                endpoints.push({
+                                    id: `${path}-${method}`,
+                                    method: httpMethod,
+                                    path,
+                                    resource: resource.charAt(0).toUpperCase() + resource.slice(1),
+                                    summary: (operation.summary as string) || undefined,
+                                });
+                            }
+                        }
+                    );
+                });
+            }
+
+            return endpoints;
+        } catch (error) {
+            console.error('Failed to parse specification for endpoint discovery:', error);
+
+            toast({
+                description: 'The generated specification could not be parsed. Please try again.',
+                title: 'Failed to parse specification',
+                variant: 'destructive',
+            });
+
+            return [];
+        }
+    }, []);
+
     useEffect(() => {
         if (!jobStatus) {
             return;
         }
 
         if (jobStatus.status === 'COMPLETED' && jobStatus.specification) {
+            jobCompletedRef.current = true;
             setSpecification(jobStatus.specification);
+
+            const endpoints = parseEndpointsFromSpecification(jobStatus.specification);
+
+            setDiscoveredEndpoints(endpoints);
+            selectAllEndpoints();
             setIsProcessing(false);
             setJobId(null);
             nextStep();
         } else if (jobStatus.status === 'FAILED') {
+            jobCompletedRef.current = true;
             setError(jobStatus.errorMessage || 'Generation failed');
             setIsProcessing(false);
             setJobId(null);
         } else if (jobStatus.status === 'CANCELLED') {
+            jobCompletedRef.current = true;
             setIsProcessing(false);
             setJobId(null);
         }
-    }, [jobStatus, nextStep, setError, setIsProcessing, setJobId, setSpecification]);
+    }, [
+        jobStatus,
+        nextStep,
+        parseEndpointsFromSpecification,
+        selectAllEndpoints,
+        setDiscoveredEndpoints,
+        setError,
+        setIsProcessing,
+        setJobId,
+        setSpecification,
+    ]);
 
-    const stepCount = WIZARD_STEPS.ai.length;
-    const isLastStep = currentStep === stepCount - 1;
-    const isFirstStep = currentStep === 0;
+    const isValidUrl = useCallback((urlString: string): boolean => {
+        try {
+            const url = new URL(urlString);
+
+            return url.protocol === 'http:' || url.protocol === 'https:';
+        } catch {
+            return false;
+        }
+    }, []);
 
     const handleNext = () => {
         if (currentStep === 0) {
             if (!name || !documentationUrl) {
+                return;
+            }
+
+            if (!isValidUrl(documentationUrl)) {
+                toast({
+                    description: 'Please enter a valid URL starting with http:// or https://',
+                    title: 'Invalid URL',
+                    variant: 'destructive',
+                });
+
                 return;
             }
 
@@ -134,8 +263,73 @@ const ApiConnectorAiPage = () => {
         }
     };
 
+    const filterSpecificationBySelectedEndpoints = useCallback((): string | null => {
+        if (!specification) {
+            return null;
+        }
+
+        // Return full specification if all endpoints are selected
+        if (selectedEndpointIds.length === discoveredEndpoints.length) {
+            return specification;
+        }
+
+        try {
+            const parsed = yamlParse(specification);
+            const filteredPaths: Record<string, Record<string, unknown>> = {};
+
+            if (parsed.paths) {
+                Object.entries(parsed.paths).forEach(([path, methods]) => {
+                    Object.entries(methods as Record<string, unknown>).forEach(([method, operation]) => {
+                        const endpointId = `${path}-${method}`;
+
+                        if (selectedEndpointIds.includes(endpointId)) {
+                            if (!filteredPaths[path]) {
+                                filteredPaths[path] = {};
+                            }
+
+                            filteredPaths[path][method] = operation;
+                        }
+                    });
+                });
+            }
+
+            const filteredSpec = {
+                ...parsed,
+                paths: filteredPaths,
+            };
+
+            return yamlStringify(filteredSpec);
+        } catch (error) {
+            console.error('Failed to filter specification:', error);
+
+            return null;
+        }
+    }, [discoveredEndpoints.length, selectedEndpointIds, specification]);
+
     const handleSave = () => {
         if (!name || !specification) {
+            return;
+        }
+
+        if (selectedEndpointIds.length === 0) {
+            toast({
+                description: 'Please select at least one endpoint before saving.',
+                title: 'No endpoints selected',
+                variant: 'destructive',
+            });
+
+            return;
+        }
+
+        const filteredSpecification = filterSpecificationBySelectedEndpoints();
+
+        if (!filteredSpecification) {
+            toast({
+                description: 'Failed to filter endpoints. Please try again.',
+                title: 'Error',
+                variant: 'destructive',
+            });
+
             return;
         }
 
@@ -143,14 +337,24 @@ const ApiConnectorAiPage = () => {
             input: {
                 icon: icon || undefined,
                 name,
-                specification,
+                specification: filteredSpecification,
             },
         });
     };
 
-    const handleCancel = () => {
+    const handleCancel = async () => {
         if (jobId && isProcessing) {
-            cancelGenerationMutation.mutate({jobId});
+            try {
+                await cancelGenerationMutation.mutateAsync({jobId});
+            } catch (error) {
+                console.error('Failed to cancel generation job:', error);
+
+                toast({
+                    description: 'The generation job may still be running on the server. You can try again later.',
+                    title: 'Failed to cancel generation',
+                    variant: 'destructive',
+                });
+            }
         }
 
         reset();
@@ -174,6 +378,10 @@ const ApiConnectorAiPage = () => {
             return <ApiConnectorWizardDocUrlStep />;
         }
 
+        if (currentStep === 1) {
+            return <ApiConnectorWizardEndpointSelectionStep />;
+        }
+
         return <ApiConnectorWizardReviewStep mode="ai" />;
     };
 
@@ -182,91 +390,31 @@ const ApiConnectorAiPage = () => {
             return !!name && !!documentationUrl;
         }
 
+        if (currentStep === 1) {
+            return selectedEndpointIds.length > 0;
+        }
+
         return true;
-    };
-
-    const getPageTitle = () => {
-        const stepName = WIZARD_STEPS.ai[currentStep] || '';
-
-        return `Create from Documentation - ${stepName}`;
     };
 
     const isPending = importOpenApiSpecificationMutation.isPending || startGenerationMutation.isPending;
 
     return (
-        <div className="flex min-h-full items-center justify-center p-6">
-            <div className="w-full max-w-2xl">
-                <div className="rounded-lg border bg-white shadow-sm">
-                    <div className="flex flex-col gap-1 border-b p-6">
-                        <div className="flex items-center justify-between">
-                            <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
-
-                            <button
-                                className="inline-flex size-9 items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                onClick={handleCancel}
-                                type="button"
-                            >
-                                <Cross2Icon className="size-4" />
-
-                                <span className="sr-only">Close</span>
-                            </button>
-                        </div>
-
-                        <nav aria-label="Progress">
-                            <ol className="space-y-4 md:flex md:space-y-0" role="list">
-                                {WIZARD_STEPS.ai.map((stepLabel, index) => (
-                                    <li className="md:flex-1" key={stepLabel}>
-                                        <div
-                                            className={twMerge(
-                                                'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0',
-                                                index <= currentStep
-                                                    ? 'border-gray-900 hover:border-gray-800'
-                                                    : 'border-gray-200 hover:border-gray-300'
-                                            )}
-                                        />
-                                    </li>
-                                ))}
-                            </ol>
-                        </nav>
-                    </div>
-
-                    <div className="max-h-[60vh] overflow-y-auto p-6">{renderStepContent()}</div>
-
-                    <div className="flex justify-between border-t p-6">
-                        {isFirstStep ? (
-                            <Button disabled={isProcessing && !!jobId} onClick={handleCancel} variant="outline">
-                                <ArrowLeftIcon className="mr-2 size-4" />
-
-                                {isProcessing && jobId ? 'Cancel Generation' : 'Cancel'}
-                            </Button>
-                        ) : (
-                            <Button onClick={previousStep} variant="outline">
-                                <ArrowLeftIcon className="mr-2 size-4" />
-                                Previous
-                            </Button>
-                        )}
-
-                        {isLastStep ? (
-                            <Button
-                                disabled={isPending || !canProceed()}
-                                icon={isPending ? <LoadingIcon /> : undefined}
-                                onClick={handleSave}
-                            >
-                                Save
-                            </Button>
-                        ) : (
-                            <Button
-                                disabled={!canProceed() || isProcessing || isPending}
-                                icon={isPending || isProcessing ? <LoadingIcon /> : undefined}
-                                onClick={handleNext}
-                            >
-                                {currentStep === 0 ? 'Generate' : 'Next'}
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <ApiConnectorWizardLayout
+            canProceed={canProceed()}
+            currentStep={currentStep}
+            isPending={isPending}
+            isProcessing={isProcessing}
+            onCancel={handleCancel}
+            onNext={handleNext}
+            onPrevious={previousStep}
+            onSave={handleSave}
+            pageTitle="Create from Documentation"
+            primaryButtonLabel={currentStep === 0 ? 'Generate' : 'Next'}
+            steps={WIZARD_STEPS.ai}
+        >
+            {renderStepContent()}
+        </ApiConnectorWizardLayout>
     );
 };
 

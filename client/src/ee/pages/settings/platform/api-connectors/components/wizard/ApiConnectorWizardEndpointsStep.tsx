@@ -1,12 +1,12 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {HttpMethod} from '@/shared/middleware/graphql';
 import {PlusIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {useApiConnectorWizardStore} from '../../stores/useApiConnectorWizardStore';
 import {EndpointDefinitionI} from '../../types/api-connector-wizard.types';
+import {getHttpMethodBadgeColor} from '../../utils/httpMethodUtils';
 import {EndpointForm} from '../endpoint-editor';
 
 const ApiConnectorWizardEndpointsStep = () => {
@@ -40,23 +40,6 @@ const ApiConnectorWizardEndpointsStep = () => {
         setEditingEndpoint(undefined);
     };
 
-    const getMethodBadgeColor = (method: HttpMethod) => {
-        switch (method) {
-            case HttpMethod.Get:
-                return 'text-content-brand-primary';
-            case HttpMethod.Post:
-                return 'text-content-success-primary';
-            case HttpMethod.Put:
-                return 'text-content-warning-primary';
-            case HttpMethod.Patch:
-                return 'text-orange-700';
-            case HttpMethod.Delete:
-                return 'text-content-destructive-primary';
-            default:
-                return '';
-        }
-    };
-
     return (
         <div className="flex flex-col gap-4 pb-4">
             <div className="flex items-center justify-between">
@@ -77,13 +60,22 @@ const ApiConnectorWizardEndpointsStep = () => {
                 <ul className="divide-y rounded-md border">
                     {endpoints.map((endpoint) => (
                         <li
-                            className="flex cursor-pointer items-center justify-between p-3 hover:bg-gray-50"
+                            aria-label={`Edit ${endpoint.operationId} endpoint`}
+                            className="flex cursor-pointer items-center justify-between p-3 hover:bg-gray-50 focus-visible:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-400"
                             key={endpoint.id}
                             onClick={() => openEditDialog(endpoint)}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    openEditDialog(endpoint);
+                                }
+                            }}
+                            role="button"
+                            tabIndex={0}
                         >
                             <div className="flex items-center gap-3">
                                 <Badge
-                                    className={twMerge('w-20', getMethodBadgeColor(endpoint.httpMethod))}
+                                    className={twMerge('w-20', getHttpMethodBadgeColor(endpoint.httpMethod))}
                                     label={endpoint.httpMethod}
                                     styleType="outline-outline"
                                     weight="semibold"
