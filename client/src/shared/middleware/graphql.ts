@@ -355,6 +355,50 @@ export type CreateWorkspaceMcpServerInput = {
   workspaceId: Scalars['ID']['input'];
 };
 
+export type CustomComponent = {
+  __typename?: 'CustomComponent';
+  componentVersion?: Maybe<Scalars['Int']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  enabled?: Maybe<Scalars['Boolean']['output']>;
+  icon?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  language?: Maybe<CustomComponentLanguage>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type CustomComponentActionDefinition = {
+  __typename?: 'CustomComponentActionDefinition';
+  description?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type CustomComponentDefinition = {
+  __typename?: 'CustomComponentDefinition';
+  actions: Array<CustomComponentActionDefinition>;
+  triggers: Array<CustomComponentTriggerDefinition>;
+};
+
+export enum CustomComponentLanguage {
+  Java = 'JAVA',
+  Javascript = 'JAVASCRIPT',
+  Python = 'PYTHON',
+  Ruby = 'RUBY'
+}
+
+export type CustomComponentTriggerDefinition = {
+  __typename?: 'CustomComponentTriggerDefinition';
+  description?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+};
+
 export type DataTable = {
   __typename?: 'DataTable';
   baseName: Scalars['String']['output'];
@@ -484,6 +528,12 @@ export enum EnvironmentEnum {
   Staging = 'STAGING'
 }
 
+export type ExecutionError = {
+  __typename?: 'ExecutionError';
+  message?: Maybe<Scalars['String']['output']>;
+  stackTrace?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+};
+
 export type FileEntry = {
   __typename?: 'FileEntry';
   extension?: Maybe<Scalars['String']['output']>;
@@ -580,7 +630,7 @@ export type KnowledgeBaseDocument = {
 
 export type KnowledgeBaseDocumentChunk = {
   __typename?: 'KnowledgeBaseDocumentChunk';
-  content: Scalars['String']['output'];
+  content?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   knowledgeBaseDocumentId: Scalars['ID']['output'];
   metadata?: Maybe<Scalars['Map']['output']>;
@@ -757,10 +807,10 @@ export type Mutation = {
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpServer?: Maybe<McpServer>;
   createMcpTool?: Maybe<McpTool>;
-  createTask?: Maybe<Task>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteApiKey: Scalars['Boolean']['output'];
+  deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
   deleteKnowledgeBase?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
@@ -771,12 +821,13 @@ export type Mutation = {
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
-  deleteTask?: Maybe<Scalars['Boolean']['output']>;
   deleteUser: Scalars['Boolean']['output'];
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  disconnectConnection: Scalars['Boolean']['output'];
   dropDataTable: Scalars['Boolean']['output'];
   duplicateDataTable: Scalars['Boolean']['output'];
+  enableCustomComponent: Scalars['Boolean']['output'];
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
   importDataTableCsv: Scalars['Boolean']['output'];
@@ -787,6 +838,7 @@ export type Mutation = {
   removeDataTableColumn: Scalars['Boolean']['output'];
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
+  testClusterElementScript: ScriptTestExecution;
   updateApiKey: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
@@ -800,7 +852,6 @@ export type Mutation = {
   updateMcpServer?: Maybe<McpServer>;
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
-  updateTask?: Maybe<Task>;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
 };
@@ -859,11 +910,6 @@ export type MutationCreateMcpToolArgs = {
 };
 
 
-export type MutationCreateTaskArgs = {
-  task: TaskInput;
-};
-
-
 export type MutationCreateWorkspaceApiKeyArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -877,6 +923,11 @@ export type MutationCreateWorkspaceMcpServerArgs = {
 
 
 export type MutationDeleteApiKeyArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteCustomComponentArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -931,11 +982,6 @@ export type MutationDeleteSharedWorkflowArgs = {
 };
 
 
-export type MutationDeleteTaskArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
 export type MutationDeleteUserArgs = {
   login: Scalars['String']['input'];
 };
@@ -951,6 +997,11 @@ export type MutationDeleteWorkspaceMcpServerArgs = {
 };
 
 
+export type MutationDisconnectConnectionArgs = {
+  connectionId: Scalars['ID']['input'];
+};
+
+
 export type MutationDropDataTableArgs = {
   input: RemoveTableInput;
 };
@@ -958,6 +1009,12 @@ export type MutationDropDataTableArgs = {
 
 export type MutationDuplicateDataTableArgs = {
   input: DuplicateDataTableInput;
+};
+
+
+export type MutationEnableCustomComponentArgs = {
+  enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1016,6 +1073,15 @@ export type MutationRenameDataTableArgs = {
 
 export type MutationRenameDataTableColumnArgs = {
   input: RenameColumnInput;
+};
+
+
+export type MutationTestClusterElementScriptArgs = {
+  clusterElementType: Scalars['String']['input'];
+  clusterElementWorkflowNodeName: Scalars['String']['input'];
+  environmentId: Scalars['Long']['input'];
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
 };
 
 
@@ -1083,11 +1149,6 @@ export type MutationUpdateMcpServerTagsArgs = {
 
 export type MutationUpdateMcpServerUrlArgs = {
   id: Scalars['ID']['input'];
-};
-
-
-export type MutationUpdateTaskArgs = {
-  task: TaskInput;
 };
 
 
@@ -1321,6 +1382,9 @@ export type Query = {
   connectionComponentDefinition: ComponentDefinition;
   connectionDefinition: ConnectionDefinition;
   connectionDefinitions: Array<ConnectionDefinition>;
+  customComponent?: Maybe<CustomComponent>;
+  customComponentDefinition?: Maybe<CustomComponentDefinition>;
+  customComponents: Array<CustomComponent>;
   dataTableRows: Array<DataTableRow>;
   dataTableRowsPage: DataTableRowPage;
   dataTableTags: Array<Tag>;
@@ -1364,12 +1428,9 @@ export type Query = {
   searchKnowledgeBase?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
   sharedProject?: Maybe<SharedProject>;
   sharedWorkflow?: Maybe<SharedWorkflow>;
-  task?: Maybe<Task>;
   taskDispatcherDefinition: TaskDispatcherDefinition;
   taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
   taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
-  tasks?: Maybe<Array<Maybe<Task>>>;
-  tasksByIds?: Maybe<Array<Maybe<Task>>>;
   triggerDefinition: TriggerDefinition;
   triggerDefinitions: Array<TriggerDefinition>;
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
@@ -1485,6 +1546,16 @@ export type QueryConnectionDefinitionArgs = {
 export type QueryConnectionDefinitionsArgs = {
   componentName: Scalars['String']['input'];
   componentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryCustomComponentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryCustomComponentDefinitionArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1651,11 +1722,6 @@ export type QuerySharedWorkflowArgs = {
 };
 
 
-export type QueryTaskArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
 export type QueryTaskDispatcherDefinitionArgs = {
   name: Scalars['String']['input'];
   version: Scalars['Int']['input'];
@@ -1664,11 +1730,6 @@ export type QueryTaskDispatcherDefinitionArgs = {
 
 export type QueryTaskDispatcherDefinitionVersionsArgs = {
   name: Scalars['String']['input'];
-};
-
-
-export type QueryTasksByIdsArgs = {
-  ids: Array<Scalars['ID']['input']>;
 };
 
 
@@ -1754,6 +1815,12 @@ export type Resources = {
   documentationUrl?: Maybe<Scalars['String']['output']>;
 };
 
+export type ScriptTestExecution = {
+  __typename?: 'ScriptTestExecution';
+  error?: Maybe<ExecutionError>;
+  output?: Maybe<Scalars['Map']['output']>;
+};
+
 export type SharedProject = {
   __typename?: 'SharedProject';
   description?: Maybe<Scalars['String']['output']>;
@@ -1811,18 +1878,6 @@ export type TagInput = {
   name: Scalars['String']['input'];
 };
 
-export type Task = {
-  __typename?: 'Task';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  version: Scalars['Int']['output'];
-};
-
 export type TaskDispatcherDefinition = {
   __typename?: 'TaskDispatcherDefinition';
   description?: Maybe<Scalars['String']['output']>;
@@ -1837,13 +1892,6 @@ export type TaskDispatcherDefinition = {
   title?: Maybe<Scalars['String']['output']>;
   variablePropertiesDefined?: Maybe<Scalars['Boolean']['output']>;
   version: Scalars['Int']['output'];
-};
-
-export type TaskInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  name: Scalars['String']['input'];
-  version?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type TimeProperty = Property & {
@@ -2335,7 +2383,7 @@ export type KnowledgeBaseQueryVariables = Exact<{
 }>;
 
 
-export type KnowledgeBaseQuery = { __typename?: 'Query', knowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, documents?: Array<{ __typename?: 'KnowledgeBaseDocument', id: string, name: string, status: number, createdDate?: any | null, document?: { __typename?: 'FileEntry', name: string, extension?: string | null, mimeType?: string | null, url: string } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string }> | null, chunks?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content: string, metadata?: any | null } | null> | null } | null> | null } | null };
+export type KnowledgeBaseQuery = { __typename?: 'Query', knowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, documents?: Array<{ __typename?: 'KnowledgeBaseDocument', id: string, name: string, status: number, createdDate?: any | null, document?: { __typename?: 'FileEntry', name: string, extension?: string | null, mimeType?: string | null, url: string } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string }> | null, chunks?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null } | null> | null } | null> | null } | null };
 
 export type KnowledgeBaseDocumentStatusQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2378,7 +2426,7 @@ export type SearchKnowledgeBaseQueryVariables = Exact<{
 }>;
 
 
-export type SearchKnowledgeBaseQuery = { __typename?: 'Query', searchKnowledgeBase?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content: string, metadata?: any | null, score?: number | null } | null> | null };
+export type SearchKnowledgeBaseQuery = { __typename?: 'Query', searchKnowledgeBase?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null, score?: number | null } | null> | null };
 
 export type UpdateKnowledgeBaseMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2394,7 +2442,7 @@ export type UpdateKnowledgeBaseDocumentChunkMutationVariables = Exact<{
 }>;
 
 
-export type UpdateKnowledgeBaseDocumentChunkMutation = { __typename?: 'Mutation', updateKnowledgeBaseDocumentChunk?: { __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content: string, metadata?: any | null } | null };
+export type UpdateKnowledgeBaseDocumentChunkMutation = { __typename?: 'Mutation', updateKnowledgeBaseDocumentChunk?: { __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null } | null };
 
 export type UpdateKnowledgeBaseDocumentTagsMutationVariables = Exact<{
   input: UpdateKnowledgeBaseDocumentTagsInput;
@@ -2556,6 +2604,40 @@ export type UpdateMcpServerUrlMutationVariables = Exact<{
 
 
 export type UpdateMcpServerUrlMutation = { __typename?: 'Mutation', updateMcpServerUrl: string };
+
+export type CustomComponentQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type CustomComponentQuery = { __typename?: 'Query', customComponent?: { __typename?: 'CustomComponent', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, componentVersion?: number | null, enabled?: boolean | null, language?: CustomComponentLanguage | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
+
+export type CustomComponentDefinitionQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type CustomComponentDefinitionQuery = { __typename?: 'Query', customComponentDefinition?: { __typename?: 'CustomComponentDefinition', actions: Array<{ __typename?: 'CustomComponentActionDefinition', name: string, title?: string | null, description?: string | null }>, triggers: Array<{ __typename?: 'CustomComponentTriggerDefinition', name: string, title?: string | null, description?: string | null }> } | null };
+
+export type CustomComponentsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CustomComponentsQuery = { __typename?: 'Query', customComponents: Array<{ __typename?: 'CustomComponent', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, componentVersion?: number | null, enabled?: boolean | null, language?: CustomComponentLanguage | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null }> };
+
+export type DeleteCustomComponentMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteCustomComponentMutation = { __typename?: 'Mutation', deleteCustomComponent: boolean };
+
+export type EnableCustomComponentMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  enable: Scalars['Boolean']['input'];
+}>;
+
+
+export type EnableCustomComponentMutation = { __typename?: 'Mutation', enableCustomComponent: boolean };
 
 export type AuthoritiesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4770,6 +4852,149 @@ export const useUpdateMcpServerUrlMutation = <
       {
     mutationKey: ['updateMcpServerUrl'],
     mutationFn: (variables?: UpdateMcpServerUrlMutationVariables) => fetcher<UpdateMcpServerUrlMutation, UpdateMcpServerUrlMutationVariables>(UpdateMcpServerUrlDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CustomComponentDocument = `
+    query customComponent($id: ID!) {
+  customComponent(id: $id) {
+    id
+    name
+    title
+    description
+    icon
+    componentVersion
+    enabled
+    language
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `;
+
+export const useCustomComponentQuery = <
+      TData = CustomComponentQuery,
+      TError = unknown
+    >(
+      variables: CustomComponentQueryVariables,
+      options?: Omit<UseQueryOptions<CustomComponentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<CustomComponentQuery, TError, TData>(
+      {
+    queryKey: ['customComponent', variables],
+    queryFn: fetcher<CustomComponentQuery, CustomComponentQueryVariables>(CustomComponentDocument, variables),
+    ...options
+  }
+    )};
+
+export const CustomComponentDefinitionDocument = `
+    query customComponentDefinition($id: ID!) {
+  customComponentDefinition(id: $id) {
+    actions {
+      name
+      title
+      description
+    }
+    triggers {
+      name
+      title
+      description
+    }
+  }
+}
+    `;
+
+export const useCustomComponentDefinitionQuery = <
+      TData = CustomComponentDefinitionQuery,
+      TError = unknown
+    >(
+      variables: CustomComponentDefinitionQueryVariables,
+      options?: Omit<UseQueryOptions<CustomComponentDefinitionQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentDefinitionQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<CustomComponentDefinitionQuery, TError, TData>(
+      {
+    queryKey: ['customComponentDefinition', variables],
+    queryFn: fetcher<CustomComponentDefinitionQuery, CustomComponentDefinitionQueryVariables>(CustomComponentDefinitionDocument, variables),
+    ...options
+  }
+    )};
+
+export const CustomComponentsDocument = `
+    query customComponents {
+  customComponents {
+    id
+    name
+    title
+    description
+    icon
+    componentVersion
+    enabled
+    language
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `;
+
+export const useCustomComponentsQuery = <
+      TData = CustomComponentsQuery,
+      TError = unknown
+    >(
+      variables?: CustomComponentsQueryVariables,
+      options?: Omit<UseQueryOptions<CustomComponentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<CustomComponentsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['customComponents'] : ['customComponents', variables],
+    queryFn: fetcher<CustomComponentsQuery, CustomComponentsQueryVariables>(CustomComponentsDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteCustomComponentDocument = `
+    mutation deleteCustomComponent($id: ID!) {
+  deleteCustomComponent(id: $id)
+}
+    `;
+
+export const useDeleteCustomComponentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteCustomComponentMutation, TError, DeleteCustomComponentMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteCustomComponentMutation, TError, DeleteCustomComponentMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteCustomComponent'],
+    mutationFn: (variables?: DeleteCustomComponentMutationVariables) => fetcher<DeleteCustomComponentMutation, DeleteCustomComponentMutationVariables>(DeleteCustomComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableCustomComponentDocument = `
+    mutation enableCustomComponent($id: ID!, $enable: Boolean!) {
+  enableCustomComponent(id: $id, enable: $enable)
+}
+    `;
+
+export const useEnableCustomComponentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableCustomComponentMutation, TError, EnableCustomComponentMutationVariables, TContext>) => {
+    
+    return useMutation<EnableCustomComponentMutation, TError, EnableCustomComponentMutationVariables, TContext>(
+      {
+    mutationKey: ['enableCustomComponent'],
+    mutationFn: (variables?: EnableCustomComponentMutationVariables) => fetcher<EnableCustomComponentMutation, EnableCustomComponentMutationVariables>(EnableCustomComponentDocument, variables)(),
     ...options
   }
     )};
