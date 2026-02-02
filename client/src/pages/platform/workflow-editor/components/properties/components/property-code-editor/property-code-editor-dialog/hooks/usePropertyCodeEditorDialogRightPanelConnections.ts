@@ -108,7 +108,8 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
             return;
         }
 
-        delete scriptWorkflowTask.connections[workflowConnectionKey];
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {[workflowConnectionKey]: removed, ...remainingConnections} = scriptWorkflowTask.connections ?? {};
 
         workflowDefinition = {
             ...workflowDefinition,
@@ -117,10 +118,8 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
                     if (task.name === workflowNodeName) {
                         return {
                             ...scriptWorkflowTask,
-                            connections: {
-                                ...(scriptWorkflowTask.connections ?? {}),
-                            },
-                        };
+                            connections: remainingConnections,
+                        } as WorkflowTaskType;
                     } else {
                         return task;
                     }
