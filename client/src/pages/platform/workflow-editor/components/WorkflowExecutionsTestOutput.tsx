@@ -74,7 +74,7 @@ const WorkflowExecutionsTestOutput = ({
                 {job ? (
                     <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
                 ) : (
-                    <span className="text-sm uppercase">Test Output</span>
+                    <span className="flex w-full items-center gap-x-3 px-3 py-4 text-sm uppercase">Test Output</span>
                 )}
 
                 {onCloseClick && (
