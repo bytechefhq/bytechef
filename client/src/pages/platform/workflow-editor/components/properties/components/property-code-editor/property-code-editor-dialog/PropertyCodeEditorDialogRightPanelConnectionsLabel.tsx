@@ -3,20 +3,19 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentConnection} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 
-export interface PropertyCodeEditorSheetRightPanelConnectionsLabelProps {
-    onRemoveClick: () => void;
+import usePropertyCodeEditorDialogRightPanelConnectionsLabel from './hooks/usePropertyCodeEditorDialogRightPanelConnectionsLabel';
+
+export interface PropertyCodeEditorDialogRightPanelConnectionsLabelProps {
     componentConnection: ComponentConnection;
+    onRemoveClick: () => void;
 }
-const PropertyCodeEditorSheetRightPanelConnectionsLabel = ({
+
+const PropertyCodeEditorDialogRightPanelConnectionsLabel = ({
     componentConnection,
     onRemoveClick,
-}: PropertyCodeEditorSheetRightPanelConnectionsLabelProps) => {
-    const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: componentConnection.componentName,
-        componentVersion: componentConnection.componentVersion,
-    });
+}: PropertyCodeEditorDialogRightPanelConnectionsLabelProps) => {
+    const {componentDefinition} = usePropertyCodeEditorDialogRightPanelConnectionsLabel({componentConnection});
 
     return (
         <div className="flex items-center justify-between">
@@ -49,4 +48,4 @@ const PropertyCodeEditorSheetRightPanelConnectionsLabel = ({
     );
 };
 
-export default PropertyCodeEditorSheetRightPanelConnectionsLabel;
+export default PropertyCodeEditorDialogRightPanelConnectionsLabel;
