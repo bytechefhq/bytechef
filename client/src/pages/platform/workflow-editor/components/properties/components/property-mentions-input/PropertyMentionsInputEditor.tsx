@@ -399,40 +399,55 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             [editorValue, onChange, saveMentionInputValue]
         );
 
-        const getContent = useCallback((value?: string) => {
-            if (typeof value !== 'string') {
-                return;
-            }
-
-            if (!value) {
-                return '';
-            }
-
-            let content = value;
-
-            if (value.includes('\n')) {
-                const valueLines = value.split('\n');
-
-                const paragraphedLines = valueLines.map((valueLine) => `<p>${valueLine}</p>`);
-
-                content = paragraphedLines.join('');
-            }
-
-            const dataPillRegex = /\${([^}]+)}/g;
-
-            const matches = value.match(dataPillRegex)?.map((match) => match.slice(2, -1));
-
-            if (matches) {
-                for (const match of matches) {
-                    content = content.replace(
-                        `\${${match}}`,
-                        `<span data-type="mention" class="property-mention" data-id="${match}"></span>`
-                    );
+        const getContent = useCallback(
+            (value?: string) => {
+                if (typeof value !== 'string') {
+                    return;
                 }
-            }
 
-            return content;
-        }, []);
+                if (!value) {
+                    return '';
+                }
+
+                let content = value;
+                let contentIsDecodedHtml = false;
+
+                if (
+                    controlType === 'RICH_TEXT' &&
+                    (content.includes('&lt;') || content.includes('&gt;') || content.includes('&amp;'))
+                ) {
+                    content = decode(content);
+
+                    content = sanitizeHtml(content);
+
+                    contentIsDecodedHtml = true;
+                }
+
+                if (!contentIsDecodedHtml && content.includes('\n')) {
+                    const valueLines = content.split('\n');
+
+                    const paragraphedLines = valueLines.map((valueLine) => `<p>${valueLine}</p>`);
+
+                    content = paragraphedLines.join('');
+                }
+
+                const dataPillRegex = /\${([^}]+)}/g;
+
+                const matches = value.match(dataPillRegex)?.map((match) => match.slice(2, -1));
+
+                if (matches) {
+                    for (const match of matches) {
+                        content = content.replace(
+                            `\${${match}}`,
+                            `<span data-type="mention" class="property-mention" data-id="${match}"></span>`
+                        );
+                    }
+                }
+
+                return content;
+            },
+            [controlType]
+        );
 
         const moveCursorToEnd = useCallback((view: EditorView, pos: number) => {
             const valueSize = view.state.doc.content.size;
