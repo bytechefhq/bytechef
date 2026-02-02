@@ -310,3 +310,7 @@ export function transformValueForObjectAccess(value: string): string {
 
     return value;
 }
+
+export function escapeHtmlForParagraph(line: string): string {
+    return line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
