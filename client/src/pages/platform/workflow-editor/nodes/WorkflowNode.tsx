@@ -280,7 +280,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     <Button
                         aria-label={`${data.workflowNodeName} node`}
                         className={twMerge(
-                            'size-18 rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary shadow hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary [&_svg]:size-9',
+                            'size-18 rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary [&_svg]:size-9',
                             isSelected &&
                                 workflowNodeDetailsPanelOpen &&
                                 !isMainRootClusterElement &&
@@ -366,7 +366,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     {!isMainRootClusterElement && (
                         <Handle
                             className={twMerge(`left-${nodeWidth / 2}px`, styles.handle)}
-                            isConnectable={false}
+                            // isConnectable={false}
                             position={Position.Top}
                             type="target"
                         />
@@ -394,14 +394,18 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             ) : (
                 <>
                     <Handle
-                        className={twMerge('left-node-handle-placement', styles.handle)}
+                        className={twMerge(
+                            '-top-[1px] rounded-b-none rounded-t-xs',
+                            styles.handleVisible,
+                            data.trigger && 'hidden'
+                        )}
                         isConnectable={false}
                         position={Position.Top}
                         type="target"
                     />
 
                     <Handle
-                        className={twMerge('left-node-handle-placement', styles.handle)}
+                        className={twMerge('rounded-b-xs rounded-t-none', styles.handleVisible)}
                         isConnectable={false}
                         position={Position.Bottom}
                         type="source"
