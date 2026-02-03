@@ -18,7 +18,7 @@ All URIs are relative to */api/automation/internal*
 
 ## createProjectWorkflow
 
-> number createProjectWorkflow(id, workflow)
+> CreateProjectWorkflow200Response createProjectWorkflow(id, workflow)
 
 Create new workflow and adds it to an existing project.
 
@@ -66,7 +66,7 @@ example().catch(console.error);
 
 ### Return type
 
-**number**
+[**CreateProjectWorkflow200Response**](CreateProjectWorkflow200Response.md)
 
 ### Authorization
 

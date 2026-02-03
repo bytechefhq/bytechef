@@ -15,9 +15,15 @@
 
 import * as runtime from '../runtime';
 import type {
+  CreateProjectWorkflow200Response,
+  DuplicateWorkflow200Response,
   Workflow,
 } from '../models/index';
 import {
+    CreateProjectWorkflow200ResponseFromJSON,
+    CreateProjectWorkflow200ResponseToJSON,
+    DuplicateWorkflow200ResponseFromJSON,
+    DuplicateWorkflow200ResponseToJSON,
     WorkflowFromJSON,
     WorkflowToJSON,
 } from '../models/index';
@@ -68,7 +74,7 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Create new workflow and adds it to an existing project.
      * Create new workflow and adds it to an existing project.
      */
-    async createProjectWorkflowRaw(requestParameters: CreateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async createProjectWorkflowRaw(requestParameters: CreateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateProjectWorkflow200Response>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -101,18 +107,14 @@ export class WorkflowApi extends runtime.BaseAPI {
             body: WorkflowToJSON(requestParameters['workflow']),
         }, initOverrides);
 
-        if (this.isJsonMime(response.headers.get('content-type'))) {
-            return new runtime.JSONApiResponse<number>(response);
-        } else {
-            return new runtime.TextApiResponse(response) as any;
-        }
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateProjectWorkflow200ResponseFromJSON(jsonValue));
     }
 
     /**
      * Create new workflow and adds it to an existing project.
      * Create new workflow and adds it to an existing project.
      */
-    async createProjectWorkflow(requestParameters: CreateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
+    async createProjectWorkflow(requestParameters: CreateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateProjectWorkflow200Response> {
         const response = await this.createProjectWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -159,7 +161,7 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Duplicates existing workflow.
      * Duplicates existing workflow.
      */
-    async duplicateWorkflowRaw(requestParameters: DuplicateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async duplicateWorkflowRaw(requestParameters: DuplicateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DuplicateWorkflow200Response>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -190,18 +192,14 @@ export class WorkflowApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        if (this.isJsonMime(response.headers.get('content-type'))) {
-            return new runtime.JSONApiResponse<string>(response);
-        } else {
-            return new runtime.TextApiResponse(response) as any;
-        }
+        return new runtime.JSONApiResponse(response, (jsonValue) => DuplicateWorkflow200ResponseFromJSON(jsonValue));
     }
 
     /**
      * Duplicates existing workflow.
      * Duplicates existing workflow.
      */
-    async duplicateWorkflow(requestParameters: DuplicateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+    async duplicateWorkflow(requestParameters: DuplicateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DuplicateWorkflow200Response> {
         const response = await this.duplicateWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
