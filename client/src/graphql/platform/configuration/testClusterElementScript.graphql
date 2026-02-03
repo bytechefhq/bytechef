@@ -1,0 +1,21 @@
+mutation testClusterElementScript(
+    $workflowId: String!
+    $workflowNodeName: String!
+    $clusterElementType: String!
+    $clusterElementWorkflowNodeName: String!
+    $environmentId: Long!
+) {
+    testClusterElementScript(
+        workflowId: $workflowId
+        workflowNodeName: $workflowNodeName
+        clusterElementType: $clusterElementType
+        clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+        environmentId: $environmentId
+    ) {
+        error {
+            message
+            stackTrace
+        }
+        output
+    }
+}
