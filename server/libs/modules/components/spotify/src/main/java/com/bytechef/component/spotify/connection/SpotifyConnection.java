@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,8 +45,37 @@ public class SpotifyConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://accounts.spotify.com/authorize")
-            .scopes((connectionParameters, context) -> Map.of("playlist-modify-private", false,
-                "playlist-modify-public", false, "user-modify-playback-state", false))
+            .scopes((connectionParameters, context) -> {
+                Map<String, Boolean> scopeMap = new HashMap<>();
+
+                scopeMap.put("ugc-image-upload", false);
+                scopeMap.put("user-read-playback-state", false);
+                scopeMap.put("user-modify-playback-state", true);
+                scopeMap.put("user-read-currently-playing", false);
+                scopeMap.put("app-remote-control", false);
+                scopeMap.put("streaming", false);
+                scopeMap.put("playlist-read-private", true);
+                scopeMap.put("playlist-read-collaborative", false);
+                scopeMap.put("playlist-modify-private", true);
+                scopeMap.put("playlist-modify-public", true);
+                scopeMap.put("user-follow-modify", false);
+                scopeMap.put("user-follow-read", false);
+                scopeMap.put("user-read-playback-position", false);
+                scopeMap.put("user-top-read", false);
+                scopeMap.put("user-read-recently-played", false);
+                scopeMap.put("user-library-modify", false);
+                scopeMap.put("user-library-read", false);
+                scopeMap.put("user-read-email", false);
+                scopeMap.put("user-read-private", false);
+                scopeMap.put("user-personalized", false);
+                scopeMap.put("user-soa-link", false);
+                scopeMap.put("user-soa-unlink", false);
+                scopeMap.put("soa-manage-entitlements", false);
+                scopeMap.put("soa-manage-partner", false);
+                scopeMap.put("soa-create-partner", false);
+
+                return scopeMap;
+            })
             .tokenUrl((connectionParameters, context) -> "https://accounts.spotify.com/api/token")
             .refreshUrl((connectionParameters, context) -> "https://accounts.spotify.com/api/token"));
 
