@@ -85,6 +85,40 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+### R
+Name: r
+
+`Executes custom R code.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Initialize parameter values used in the custom code. | false |
+| script | R Code | STRING | Add your R custom logic here. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "R",
+  "name" : "r",
+  "parameters" : {
+    "input" : { },
+    "script" : ""
+  },
+  "type" : "script/v1/r"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
 ### Ruby
 Name: ruby
 
@@ -107,6 +141,40 @@ Name: ruby
     "script" : ""
   },
   "type" : "script/v1/ruby"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Java
+Name: java
+
+`Executes custom Java code.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Initialize parameter values used in the custom code. | false |
+| script | Java Code | STRING | Add your Java custom logic here. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Java",
+  "name" : "java",
+  "parameters" : {
+    "input" : { },
+    "script" : ""
+  },
+  "type" : "script/v1/java"
 }
 ```
 
