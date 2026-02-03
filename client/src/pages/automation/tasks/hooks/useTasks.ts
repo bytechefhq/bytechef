@@ -2,13 +2,9 @@ import {Task, useTasksQuery, useUpdateTaskMutation, useUsersQuery} from '@/share
 import {useCallback, useEffect, useMemo} from 'react';
 
 import {useTasksStore} from '../stores/useTasksStore';
+import {getAvailableAssignees, getCurrentTimestamp} from '../utils/task-utils';
 
 import type {TaskAttachmentI, TaskCommentI, TaskI} from '../types/types';
-
-// Utility functions
-const getCurrentTimestamp = (): string => {
-    return new Date().toISOString();
-};
 
 export interface UseTasksReturnI {
     // Task data
@@ -32,7 +28,6 @@ export interface UseTasksReturnI {
 }
 
 export function useTasks(): UseTasksReturnI {
-    // Store
     const tasks = useTasksStore((state) => state.tasks);
     const selectedTaskId = useTasksStore((state) => state.selectedTaskId);
     const setTasks = useTasksStore((state) => state.setTasks);
@@ -42,7 +37,6 @@ export function useTasks(): UseTasksReturnI {
     const storeAddAttachment = useTasksStore((state) => state.addAttachment);
     const storeRemoveAttachment = useTasksStore((state) => state.removeAttachment);
 
-    // GraphQL queries and mutations
     const {data: tasksData} = useTasksQuery();
     const {data: usersData} = useUsersQuery();
 
@@ -52,24 +46,8 @@ export function useTasks(): UseTasksReturnI {
         },
     });
 
-    // Map users to display names for assignee selection
-    const availableAssignees = useMemo(() => {
-        if (!usersData?.users?.content) {
-            return [];
-        }
+    const availableAssignees = useMemo(() => getAvailableAssignees(usersData?.users?.content), [usersData]);
 
-        return usersData.users.content
-            .filter((user) => user?.activated)
-            .map((user) => {
-                if (user?.firstName && user.lastName) {
-                    return `${user.firstName} ${user.lastName}`;
-                }
-
-                return user?.login || user?.email || '';
-            });
-    }, [usersData]);
-
-    // Map API tasks to UI tasks
     const mapApiTaskToUiTask = useCallback(
         (apiTask: Task): TaskI => ({
             assignee: apiTask.createdBy || 'Unassigned',
@@ -88,7 +66,6 @@ export function useTasks(): UseTasksReturnI {
         []
     );
 
-    // Update tasks when API data is loaded
     useEffect(() => {
         if (tasksData?.tasks) {
             const mappedTasks = tasksData.tasks.filter((task): task is Task => task !== null).map(mapApiTaskToUiTask);
@@ -97,10 +74,8 @@ export function useTasks(): UseTasksReturnI {
         }
     }, [tasksData, mapApiTaskToUiTask, setTasks]);
 
-    // Computed values
     const selectedTaskObject = tasks.find((task) => task.id === selectedTaskId) || null;
 
-    // Generate unique IDs
     const generateCommentId = useCallback(() => {
         const allComments = tasks.flatMap((task) => task.comments);
         const maxId = Math.max(...allComments.map((comment) => Number.parseInt(comment.id.replace('c', ''))), 0);
@@ -118,7 +93,6 @@ export function useTasks(): UseTasksReturnI {
         return `a${maxId + 1}`;
     }, [tasks]);
 
-    // Task mutations
     const updateTask = useCallback(
         (updatedTask: TaskI) => {
             storeUpdateTask(updatedTask);

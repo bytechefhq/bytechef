@@ -4,7 +4,9 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {useTasksStore} from '../../stores/useTasksStore';
 import {TaskI} from '../../types/types';
-import {formatDate, getPriorityColor, getStatusIcon} from '../../utils/task-utils';
+import {formatDate, getAvailableAssignees, getPriorityColor, getStatusIcon} from '../../utils/task-utils';
+
+import type React from 'react';
 
 export interface UseTaskDetailReturnI {
     // Task data
@@ -41,21 +43,7 @@ export function useTaskDetail(): UseTaskDetailReturnI {
     // Fetch users for assignee selection
     const {data: usersData} = useUsersQuery();
 
-    const availableAssignees = useMemo(() => {
-        if (!usersData?.users?.content) {
-            return [];
-        }
-
-        return usersData.users.content
-            .filter((user) => user?.activated)
-            .map((user) => {
-                if (user?.firstName && user.lastName) {
-                    return `${user.firstName} ${user.lastName}`;
-                }
-
-                return user?.login || user?.email || '';
-            });
-    }, [usersData]);
+    const availableAssignees = useMemo(() => getAvailableAssignees(usersData?.users?.content), [usersData]);
 
     const displayTask = isEditing ? editingTask : selectedTask;
 

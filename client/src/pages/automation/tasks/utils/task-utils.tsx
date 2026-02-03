@@ -1,5 +1,7 @@
 import {CheckCircle2, Circle, Clock} from 'lucide-react';
 
+import type React from 'react';
+
 import type {SortDirectionType, SortOptionType, TaskI} from '../types/types';
 
 const PRIORITY_ORDER: Record<string, number> = {high: 3, low: 1, medium: 2};
@@ -7,6 +9,31 @@ const STATUS_ORDER: Record<string, number> = {completed: 3, 'in-progress': 2, op
 
 export const getCurrentTimestamp = (): string => {
     return new Date().toISOString();
+};
+
+interface UserWithDisplayInfoI {
+    activated?: boolean | null;
+    email?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    login?: string | null;
+}
+
+export const getAvailableAssignees = (users: Array<UserWithDisplayInfoI | null> | undefined): string[] => {
+    if (!users) {
+        return [];
+    }
+
+    return users
+        .filter((user): user is UserWithDisplayInfoI => user !== null && user?.activated === true)
+        .map((user) => {
+            if (user.firstName && user.lastName) {
+                return `${user.firstName} ${user.lastName}`;
+            }
+
+            return user.login || user.email || '';
+        })
+        .filter((name) => name !== '');
 };
 
 export const formatDate = (dateString: string): string => {

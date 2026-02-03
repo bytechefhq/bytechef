@@ -2,6 +2,7 @@ import {useCreateTaskMutation, useUsersQuery} from '@/shared/middleware/graphql'
 import {useCallback, useMemo, useState} from 'react';
 
 import {useTasksStore} from '../../stores/useTasksStore';
+import {getAvailableAssignees} from '../../utils/task-utils';
 
 import type {NewTaskFormI, TaskI} from '../../types/types';
 
@@ -44,27 +45,12 @@ export function useTaskCreateDialog(): UseTaskCreateDialogReturnI {
     const [form, setForm] = useState<NewTaskFormI>(INITIAL_FORM_STATE);
     const [errors, setErrors] = useState<Partial<NewTaskFormI>>({});
 
-    const tasks = useTasksStore((state) => state.tasks);
     const addTask = useTasksStore((state) => state.addTask);
 
     // Fetch users for assignee selection
     const {data: usersData} = useUsersQuery();
 
-    const availableAssignees = useMemo(() => {
-        if (!usersData?.users?.content) {
-            return [];
-        }
-
-        return usersData.users.content
-            .filter((user) => user?.activated)
-            .map((user) => {
-                if (user?.firstName && user.lastName) {
-                    return `${user.firstName} ${user.lastName}`;
-                }
-
-                return user?.login || user?.email || '';
-            });
-    }, [usersData]);
+    const availableAssignees = useMemo(() => getAvailableAssignees(usersData?.users?.content), [usersData]);
 
     // API mutation
     const createTaskMutation = useCreateTaskMutation({
@@ -73,10 +59,15 @@ export function useTaskCreateDialog(): UseTaskCreateDialogReturnI {
         },
     });
 
-    // Generate unique task ID
+    // Generate unique task ID using crypto.randomUUID for UUID-safe IDs
     const generateTaskId = useCallback(() => {
-        return (Math.max(...tasks.map((task) => Number.parseInt(task.id)), 0) + 1).toString();
-    }, [tasks]);
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return crypto.randomUUID();
+        }
+
+        // Fallback for environments without crypto.randomUUID
+        return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    }, []);
 
     const handleOpenDialog = useCallback(() => {
         setIsOpen(true);
