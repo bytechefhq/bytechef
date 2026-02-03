@@ -17,11 +17,30 @@
 package com.bytechef.component.dhl;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Nikolina Špehar
  */
 @AutoService(OpenApiComponentHandler.class)
 public class DhlComponentHandler extends AbstractDhlComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .customAction(true)
+            .icon("path:assets/dhl.svg")
+            .categories(ComponentCategory.CUSTOMER_SUPPORT)
+            .customActionHelp("DHL Developer documentation", "https://developer.dhl.com/")
+            .version(1);
+    }
+
+    @Override
+    public ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
+        return modifiableActionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/dhl_v1#track-shipment");
+    }
 }
