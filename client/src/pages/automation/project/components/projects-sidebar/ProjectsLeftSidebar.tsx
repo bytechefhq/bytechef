@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
 import ProjectSelect from '@/pages/automation/project/components/projects-sidebar/components/ProjectSelect';
@@ -137,76 +138,84 @@ const ProjectsLeftSidebar = ({
     return (
         <aside className="flex h-full flex-col items-center gap-2 bg-surface-main pt-3">
             <div className="mx-4 flex w-80 flex-col gap-2">
-                {projects && (
+                {projectsLoading ? (
                     <div className="flex items-center gap-2">
-                        <ProjectSelect
-                            projectId={projectId}
-                            projects={projects}
-                            selectedProjectId={selectedProjectId}
-                            setSelectedProjectId={setSelectedProjectId}
-                        />
+                        <Skeleton className="h-9 flex-1 rounded-md" />
 
-                        {ff_2482 ? (
-                            <DropdownMenu>
-                                <Tooltip>
-                                    <DropdownMenuTrigger asChild>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                aria-label="New project"
-                                                className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
-                                                icon={<PlusIcon />}
-                                                size="icon"
-                                                variant="outline"
-                                            />
-                                        </TooltipTrigger>
-                                    </DropdownMenuTrigger>
+                        <Skeleton className="size-9 rounded-md" />
+                    </div>
+                ) : (
+                    projects && (
+                        <div className="flex items-center gap-2">
+                            <ProjectSelect
+                                projectId={projectId}
+                                projects={projects}
+                                selectedProjectId={selectedProjectId}
+                                setSelectedProjectId={setSelectedProjectId}
+                            />
 
-                                    <TooltipContent>New project</TooltipContent>
-                                </Tooltip>
+                            {ff_2482 ? (
+                                <DropdownMenu>
+                                    <Tooltip>
+                                        <DropdownMenuTrigger asChild>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    aria-label="New project"
+                                                    className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                                    icon={<PlusIcon />}
+                                                    size="icon"
+                                                    variant="outline"
+                                                />
+                                            </TooltipTrigger>
+                                        </DropdownMenuTrigger>
 
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
-                                        className="cursor-pointer"
-                                        onClick={() => setShowProjectDialog(true)}
-                                    >
-                                        <PlusIcon className="mr-2 size-4" />
-                                        From Scratch
-                                    </DropdownMenuItem>
+                                        <TooltipContent>New project</TooltipContent>
+                                    </Tooltip>
 
-                                    {ff_1041 && (
+                                    <DropdownMenuContent align="end">
                                         <DropdownMenuItem
                                             className="cursor-pointer"
-                                            onClick={() => navigate(`templates`)}
+                                            onClick={() => setShowProjectDialog(true)}
                                         >
-                                            <LayoutTemplateIcon className="mr-2 size-4" />
-                                            From Template
+                                            <PlusIcon className="mr-2 size-4" />
+                                            From Scratch
                                         </DropdownMenuItem>
-                                    )}
 
-                                    <DropdownMenuItem
-                                        className="cursor-pointer"
-                                        onClick={() => projectHiddenFileInputRef.current?.click()}
-                                    >
-                                        <UploadIcon className="mr-2 size-4" />
-                                        Import Project
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        ) : (
-                            <ProjectDialog
-                                project={undefined}
-                                triggerNode={
-                                    <Button
-                                        aria-label="New project"
-                                        className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
-                                        icon={<PlusIcon />}
-                                        size="icon"
-                                        variant="outline"
-                                    />
-                                }
-                            />
-                        )}
-                    </div>
+                                        {ff_1041 && (
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onClick={() => navigate(`templates`)}
+                                            >
+                                                <LayoutTemplateIcon className="mr-2 size-4" />
+                                                From Template
+                                            </DropdownMenuItem>
+                                        )}
+
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onClick={() => projectHiddenFileInputRef.current?.click()}
+                                        >
+                                            <UploadIcon className="mr-2 size-4" />
+                                            Import Project
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <ProjectDialog
+                                    project={undefined}
+                                    triggerNode={
+                                        <Button
+                                            aria-label="New project"
+                                            className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                            icon={<PlusIcon />}
+                                            size="icon"
+                                            variant="outline"
+                                        />
+                                    }
+                                />
+                            )}
+                        </div>
+                    )
                 )}
 
                 <WorkflowsListFilter
