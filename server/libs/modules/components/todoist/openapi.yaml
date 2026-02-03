@@ -13,6 +13,10 @@ paths:
       description: "Creates a new task."
       operationId: "createTask"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "task:add"
+            - "data:read"
       requestBody:
         content:
           application/json:
@@ -70,6 +74,9 @@ paths:
       description: "Mark a tas as being completed."
       operationId: "markTaskCompleted"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "data:read_write"
       parameters:
         - name: "taskId"
           description: "ID of the task to be closed."
@@ -88,6 +95,9 @@ paths:
       description: "Creates a new project."
       operationId: "createProject"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "data:read_write"
       requestBody:
         content:
           application/json:
@@ -138,4 +148,9 @@ components:
           authorizationUrl: "https://todoist.com/oauth/authorize"
           tokenUrl: "https://todoist.com/oauth/access_token"
           scopes:
-            data:read_write: " "
+            task:add: "Grants permission to add new tasks (the application cannot read or modify any existing data)."
+            data:read: "Grants read-only access to application data, including tasks, projects, labels, and filters."
+            data:read_write: "Grants read and write access to application data, including tasks, projects, labels, and filters. This scope includes task:add and data:read scopes."
+            data:delete: "Grants permission to delete application data, including tasks, labels, and filters."
+            project:delete: "Grants permission to delete projects."
+            backups:read: "Grants permission to list backups bypassing MFA requirements."

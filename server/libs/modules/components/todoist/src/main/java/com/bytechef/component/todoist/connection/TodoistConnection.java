@@ -44,7 +44,8 @@ public class TodoistConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://todoist.com/oauth/authorize")
-            .scopes((connectionParameters, context) -> Map.of("data:read_write", false))
+            .scopes((connectionParameters, context) -> Map.of("task:add", true, "data:read", true, "data:read_write",
+                true, "data:delete", false, "project:delete", false, "backups:read", false))
             .tokenUrl((connectionParameters, context) -> "https://todoist.com/oauth/access_token"));
 
     private TodoistConnection() {
