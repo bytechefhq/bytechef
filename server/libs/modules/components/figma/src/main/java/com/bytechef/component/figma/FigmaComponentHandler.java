@@ -34,6 +34,7 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.figma.trigger.FigmaNewCommentTrigger;
 import com.google.auto.service.AutoService;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -119,6 +120,32 @@ public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
                     }
 
                     return new AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
+                })
+                .scopes((connectionParameters, context) -> {
+                    Map<String, Boolean> scopeMap = new HashMap<>();
+
+                    scopeMap.put("current_user:read", false);
+                    scopeMap.put("file_comments:read", true);
+                    scopeMap.put("file_comments:write", true);
+                    scopeMap.put("file_content:read", false);
+                    scopeMap.put("file_dev_resources:read", false);
+                    scopeMap.put("file_dev_resources:write", false);
+                    scopeMap.put("file_metadata:read", false);
+                    scopeMap.put("file_variables:read", false);
+                    scopeMap.put("file_variables:write", false);
+                    scopeMap.put("file_versions:read", false);
+                    scopeMap.put("library_analytics:read", false);
+                    scopeMap.put("library_assets:read", false);
+                    scopeMap.put("library_content:read", false);
+                    scopeMap.put("org:activity_log_read", false);
+                    scopeMap.put("org:discovery_read", false);
+                    scopeMap.put("projects:read", false);
+                    scopeMap.put("selections:read", false);
+                    scopeMap.put("team_library_content:read", false);
+                    scopeMap.put("webhooks:read", false);
+                    scopeMap.put("webhooks:write", true);
+
+                    return scopeMap;
                 });
         }
 
