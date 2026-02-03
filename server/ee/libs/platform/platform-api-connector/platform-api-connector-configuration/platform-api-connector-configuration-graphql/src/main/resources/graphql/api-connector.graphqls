@@ -167,18 +167,18 @@ input ParameterDefinitionInput {
 }
 
 enum ParameterLocation {
-    query
-    path
-    header
+    QUERY
+    PATH
+    HEADER
 }
 
 enum ParameterType {
-    string
-    number
-    integer
-    boolean
-    array
-    object
+    STRING
+    NUMBER
+    INTEGER
+    BOOLEAN
+    ARRAY
+    OBJECT
 }
 
 input RequestBodyDefinitionInput {

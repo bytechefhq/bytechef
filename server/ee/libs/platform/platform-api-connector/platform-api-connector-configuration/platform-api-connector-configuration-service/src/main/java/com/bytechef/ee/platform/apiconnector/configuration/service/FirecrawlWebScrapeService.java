@@ -137,6 +137,14 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
         return "firecrawl";
     }
 
+    /**
+     * Polls the Firecrawl API for crawl status until completion or timeout.
+     *
+     * <p>
+     * <strong>Note:</strong> This method uses Thread.sleep() for polling intervals and may block for up to 2 minutes
+     * (MAX_POLL_ATTEMPTS * POLL_INTERVAL_MS). It should only be called from async/background threads, not from web
+     * request threads. The calling code in {@link ApiConnectorAiService} runs this in an async context.
+     */
     private CrawlResult pollCrawlStatus(String crawlId) throws IOException, InterruptedException {
         for (int attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
             HttpRequest request = HttpRequest.newBuilder()
