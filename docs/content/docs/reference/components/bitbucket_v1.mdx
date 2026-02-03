@@ -30,6 +30,39 @@ Version: 1
 
 
 
+## Connection Setup
+
+### Bitbucket API Token Creation
+
+1. Go to the [Bitbucket website](https://bitbucket.org).
+2. Click **Settings**.
+3. Click **Atlassian account settings**.
+4. Click **Security**.
+5. Click **Create and manage API tokens**.
+6. Click **Create API token with scopes**.
+7. Enter name of your API token.
+8. Choose expiry date of your API token.
+9. Click **Next**.
+10. Select **Bitbucket**.
+11. Click **Next**.
+12. Find and select these scopes:
+  -   admin:project:bitbucket
+  -   admin:repository:bitbucket
+  -   delete:webhook:bitbucket
+  -   read:project:bitbucket
+  -   read:repository:bitbucket
+  -   read:user:bitbucket
+  -   read:webhook:bitbucket
+  -   read:workspace:bitbucket
+  -   write:webhook:bitbucket
+13. After you have selected scopes click **Next**.
+14. Click **Create token**.
+15. Click on **Copy**. Make sure to save your newly created API token because after this step you won’t be able to view it again.
+16. Click **Close**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/007d698d-c90e-4083-b1c7-2e4fa0ec1415?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
 
 
 
@@ -508,40 +541,3 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
-<hr />
-
-# Additional Instructions
-
-## Connection Setup
-
-### Bitbucket API Token Creation
-
-1. Go to the [Bitbucket website](https://bitbucket.org).
-2. Click **Settings**.
-3. Click **Atlassian account settings**.
-4. Click **Security**.
-5. Click **Create and manage API tokens**.
-6. Click **Create API token with scopes**.
-7. Enter name of your API token.
-8. Choose expiry date of your API token.
-9. Click **Next**.
-10. Select **Bitbucket**.
-11. Click **Next**.
-12. Find and select these scopes:
-  -   admin:project:bitbucket
-  -   admin:repository:bitbucket
-  -   delete:webhook:bitbucket
-  -   read:project:bitbucket
-  -   read:repository:bitbucket
-  -   read:user:bitbucket
-  -   read:webhook:bitbucket
-  -   read:workspace:bitbucket
-  -   write:webhook:bitbucket
-13. After you have selected scopes click **Next**.
-14. Click **Create token**.
-15. Click on **Copy**. Make sure to save your newly created API token because after this step you won’t be able to view it again.
-16. Click **Close**.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/007d698d-c90e-4083-b1c7-2e4fa0ec1415?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
-</div>
