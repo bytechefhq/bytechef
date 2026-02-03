@@ -1,0 +1,17 @@
+mutation testWorkflowNodeScript(
+    $workflowId: String!
+    $workflowNodeName: String!
+    $environmentId: Long!
+) {
+    testWorkflowNodeScript(
+        workflowId: $workflowId
+        workflowNodeName: $workflowNodeName
+        environmentId: $environmentId
+    ) {
+        error {
+            message
+            stackTrace
+        }
+        output
+    }
+}
