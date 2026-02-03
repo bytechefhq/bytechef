@@ -84,10 +84,21 @@ export const usePropertyCodeEditorDialogToolbar = ({
                     workflowNodeName: rootClusterElementNodeData.workflowNodeName,
                 })
                 .then((result) => {
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('[usePropertyCodeEditorDialogToolbar] testClusterElementScript result:', result);
+                    }
+
                     setScriptTestExecution(result.testClusterElementScript);
                     setScriptIsRunning(false);
                 })
-                .catch(() => {
+                .catch((error) => {
+                    if (process.env.NODE_ENV === 'development') {
+                        console.error('[usePropertyCodeEditorDialogToolbar] testClusterElementScript error:', error);
+                    }
+
+                    setScriptTestExecution({
+                        error: {message: error.message || 'An error occurred while executing the script'},
+                    });
                     setScriptIsRunning(false);
                 });
         } else {
@@ -98,10 +109,21 @@ export const usePropertyCodeEditorDialogToolbar = ({
                     workflowNodeName,
                 })
                 .then((result) => {
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('[usePropertyCodeEditorDialogToolbar] testWorkflowNodeScript result:', result);
+                    }
+
                     setScriptTestExecution(result.testWorkflowNodeScript);
                     setScriptIsRunning(false);
                 })
-                .catch(() => {
+                .catch((error) => {
+                    if (process.env.NODE_ENV === 'development') {
+                        console.error('[usePropertyCodeEditorDialogToolbar] testWorkflowNodeScript error:', error);
+                    }
+
+                    setScriptTestExecution({
+                        error: {message: error.message || 'An error occurred while executing the script'},
+                    });
                     setScriptIsRunning(false);
                 });
         }
