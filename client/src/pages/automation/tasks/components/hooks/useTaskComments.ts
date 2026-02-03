@@ -1,4 +1,5 @@
 import {useCallback, useState} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 import {useTasksStore} from '../../stores/useTasksStore';
 import {getCurrentTimestamp} from '../../utils/task-utils';
@@ -13,11 +14,15 @@ export interface UseTaskCommentsReturnI {
 }
 
 export function useTaskComments(): UseTaskCommentsReturnI {
-    const tasks = useTasksStore((state) => state.tasks);
-    const selectedTaskId = useTasksStore((state) => state.selectedTaskId);
-    const storeAddComment = useTasksStore((state) => state.addComment);
-
     const [newComment, setNewComment] = useState('');
+
+    const {addComment, selectedTaskId, tasks} = useTasksStore(
+        useShallow((state) => ({
+            addComment: state.addComment,
+            selectedTaskId: state.selectedTaskId,
+            tasks: state.tasks,
+        }))
+    );
 
     const generateCommentId = useCallback(() => {
         const allComments = tasks.flatMap((task) => task.comments);
@@ -42,10 +47,10 @@ export function useTaskComments(): UseTaskCommentsReturnI {
             timestamp: getCurrentTimestamp(),
         };
 
-        storeAddComment(selectedTaskId, comment);
+        addComment(selectedTaskId, comment);
 
         setNewComment('');
-    }, [newComment, selectedTaskId, generateCommentId, storeAddComment]);
+    }, [newComment, selectedTaskId, generateCommentId, addComment]);
 
     return {
         canSubmit: newComment.trim().length > 0,

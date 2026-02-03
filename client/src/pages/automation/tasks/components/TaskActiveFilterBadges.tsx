@@ -1,5 +1,6 @@
 import Badge from '@/components/Badge/Badge';
-import {X} from 'lucide-react';
+import Button from '@/components/Button/Button';
+import {XIcon} from 'lucide-react';
 
 import {getPriorityLabel, getStatusLabel} from '../utils/task-utils';
 import {useTaskActiveFilterBadges} from './hooks/useTaskActiveFilterBadges';
@@ -24,14 +25,14 @@ export default function TaskActiveFilterBadges() {
                 <Badge className="text-xs" styleType="primary-outline">
                     <span>Status: {getStatusLabel(filters.status)}</span>
 
-                    <button
+                    <Button
                         aria-label="Clear status filter"
-                        className="ml-1 rounded-full p-0.5 hover:bg-muted"
+                        className="ml-1 size-4 p-0"
+                        icon={<XIcon className="size-3" />}
                         onClick={handleClearStatusFilter}
-                        type="button"
-                    >
-                        <X className="size-3" />
-                    </button>
+                        size="iconXxs"
+                        variant="ghost"
+                    />
                 </Badge>
             )}
 
@@ -39,14 +40,14 @@ export default function TaskActiveFilterBadges() {
                 <Badge className="text-xs" styleType="primary-outline">
                     <span>Priority: {getPriorityLabel(filters.priority)}</span>
 
-                    <button
+                    <Button
                         aria-label="Clear priority filter"
-                        className="ml-1 rounded-full p-0.5 hover:bg-muted"
+                        className="ml-1 size-4 p-0"
+                        icon={<XIcon className="size-3" />}
                         onClick={handleClearPriorityFilter}
-                        type="button"
-                    >
-                        <X className="size-3" />
-                    </button>
+                        size="iconXxs"
+                        variant="ghost"
+                    />
                 </Badge>
             )}
 
@@ -54,20 +55,18 @@ export default function TaskActiveFilterBadges() {
                 <Badge className="text-xs" styleType="primary-outline">
                     <span>Assignee: {filters.assignee}</span>
 
-                    <button
+                    <Button
                         aria-label="Clear assignee filter"
-                        className="ml-1 rounded-full p-0.5 hover:bg-muted"
+                        className="ml-1 size-4 p-0"
+                        icon={<XIcon className="size-3" />}
                         onClick={handleClearAssigneeFilter}
-                        type="button"
-                    >
-                        <X className="size-3" />
-                    </button>
+                        size="iconXxs"
+                        variant="ghost"
+                    />
                 </Badge>
             )}
 
-            <button className="text-xs text-primary hover:underline" onClick={handleResetFilters} type="button">
-                Clear all
-            </button>
+            <Button label="Clear all" onClick={handleResetFilters} size="xs" variant="link" />
         </div>
     );
 }

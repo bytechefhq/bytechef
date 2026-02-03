@@ -1,5 +1,6 @@
 import {Input} from '@/components/ui/input';
-import {Search} from 'lucide-react';
+import {SearchIcon} from 'lucide-react';
+import {twMerge} from 'tailwind-merge';
 
 import {useTaskSearch} from './hooks/useTaskSearch';
 
@@ -19,7 +20,7 @@ export default function TaskSearch() {
     return (
         <div className="relative">
             <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
+                <SearchIcon className="absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
 
                 <Input
                     className="px-10"
@@ -36,16 +37,17 @@ export default function TaskSearch() {
                 <div className="absolute inset-x-0 top-full z-50 mt-1 max-h-48 overflow-y-auto rounded-md border border-border bg-background shadow-lg">
                     {suggestions.map((suggestion, index) => (
                         <div
-                            className={`cursor-pointer px-3 py-2 text-sm transition-colors ${
+                            className={twMerge(
+                                'cursor-pointer px-3 py-2 text-sm transition-colors',
                                 index === selectedSuggestionIndex
                                     ? 'bg-muted text-foreground'
                                     : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-                            }`}
+                            )}
                             key={suggestion.text}
                             onClick={() => handleSuggestionClick(suggestion.text)}
                         >
                             <div className="flex items-center gap-2">
-                                <Search className="size-3 shrink-0" />
+                                <SearchIcon className="size-3 shrink-0" />
 
                                 <span className="truncate">{suggestion.highlighted}</span>
                             </div>

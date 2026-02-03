@@ -1,17 +1,18 @@
 import Badge from '@/components/Badge/Badge';
-import {AlertTriangle, Calendar, Link, MessageSquare, Paperclip} from 'lucide-react';
+import {AlertTriangleIcon, CalendarIcon, LinkIcon, MessageSquareIcon, PaperclipIcon} from 'lucide-react';
+import {twMerge} from 'tailwind-merge';
 
 import {useTasksStore} from '../stores/useTasksStore';
 import {isTaskOverdue} from '../utils/task-utils';
 
-import type React from 'react';
+import type {MouseEvent} from 'react';
 
 import type {TaskI} from '../types/types';
 
 interface TaskCardProps {
     isSelected: boolean;
     onSelect: () => void;
-    onStatusToggle: (event: React.MouseEvent) => void;
+    onStatusToggle: (event: MouseEvent) => void;
     task: TaskI;
 }
 
@@ -35,9 +36,10 @@ export default function TaskCard({isSelected, onSelect, onStatusToggle, task}: T
 
     return (
         <div
-            className={`cursor-pointer rounded-lg border p-3 transition-colors hover:bg-muted/50 ${
+            className={twMerge(
+                'cursor-pointer rounded-lg border p-3 transition-colors hover:bg-muted/50',
                 isSelected ? 'border-primary bg-muted' : 'border-border bg-background'
-            }`}
+            )}
             onClick={onSelect}
         >
             <div className="flex w-full items-start gap-3">
@@ -57,7 +59,7 @@ export default function TaskCard({isSelected, onSelect, onStatusToggle, task}: T
 
                         <div className="flex shrink-0 items-center gap-1">
                             <Badge
-                                className={`text-xs ${priorityColor}`}
+                                className={twMerge('text-xs', priorityColor)}
                                 label={task.priority}
                                 styleType="outline-outline"
                             />
@@ -65,7 +67,7 @@ export default function TaskCard({isSelected, onSelect, onStatusToggle, task}: T
                             {isOverdue && (
                                 <Badge
                                     className="text-xs"
-                                    icon={<AlertTriangle className="mr-1 size-3" />}
+                                    icon={<AlertTriangleIcon className="mr-1 size-3" />}
                                     label="Overdue"
                                     styleType="destructive-filled"
                                 />
@@ -83,7 +85,7 @@ export default function TaskCard({isSelected, onSelect, onStatusToggle, task}: T
                         <div className="flex shrink-0 items-center gap-2">
                             {formattedDueDate && (
                                 <div className="flex items-center gap-1">
-                                    <Calendar className="size-3" />
+                                    <CalendarIcon className="size-3" />
 
                                     <span>{formattedDueDate}</span>
                                 </div>
@@ -91,7 +93,7 @@ export default function TaskCard({isSelected, onSelect, onStatusToggle, task}: T
 
                             {task.comments.length > 0 && (
                                 <div className="flex items-center gap-1">
-                                    <MessageSquare className="size-3" />
+                                    <MessageSquareIcon className="size-3" />
 
                                     <span>{task.comments.length}</span>
                                 </div>
@@ -99,7 +101,7 @@ export default function TaskCard({isSelected, onSelect, onStatusToggle, task}: T
 
                             {task.attachments.length > 0 && (
                                 <div className="flex items-center gap-1">
-                                    <Paperclip className="size-3" />
+                                    <PaperclipIcon className="size-3" />
 
                                     <span>{task.attachments.length}</span>
                                 </div>
@@ -107,7 +109,7 @@ export default function TaskCard({isSelected, onSelect, onStatusToggle, task}: T
 
                             {task.dependencies.length > 0 && (
                                 <div className="flex items-center gap-1">
-                                    <Link className="size-3" />
+                                    <LinkIcon className="size-3" />
 
                                     <span>{task.dependencies.length}</span>
                                 </div>

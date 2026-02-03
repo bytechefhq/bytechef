@@ -14,20 +14,12 @@ const DEFAULT_FILTERS: FiltersI = {
 };
 
 interface TasksStateI {
-    // Task data
-    tasks: TaskI[];
-    selectedTaskId: string | null;
-
-    // Search state
-    searchQuery: string;
-    setSearchQuery: (query: string) => void;
-
-    // Filter state
+    addAttachment: (taskId: string, attachment: TaskAttachmentI) => void;
+    addComment: (taskId: string, comment: TaskCommentI) => void;
+    addTask: (task: TaskI) => void;
+    cycleTaskStatus: (taskId: string) => void;
+    deleteTask: (taskId: string) => void;
     filters: FiltersI;
-    setFilters: (filters: FiltersI | ((prev: FiltersI) => FiltersI)) => void;
-    resetFilters: () => void;
-
-    // Selectors
     getFormattedDueDate: (task: TaskI) => string | null;
     getHighlightedAssignee: (task: TaskI) => ReactNode;
     getHighlightedDescription: (task: TaskI) => ReactNode;
@@ -36,25 +28,16 @@ interface TasksStateI {
     getSelectedTask: () => TaskI | null;
     getStatusIcon: (task: TaskI) => ReactNode;
     hasActiveFilters: () => boolean;
-
-    // Setters
-    setTasks: (tasks: TaskI[]) => void;
-    setSelectedTaskId: (taskId: string | null) => void;
-
-    // Task mutations
-    addTask: (task: TaskI) => void;
-    updateTask: (task: TaskI) => void;
-    deleteTask: (taskId: string) => void;
-
-    // Comment mutations
-    addComment: (taskId: string, comment: TaskCommentI) => void;
-
-    // Attachment mutations
-    addAttachment: (taskId: string, attachment: TaskAttachmentI) => void;
     removeAttachment: (taskId: string, attachmentId: string) => void;
-
-    // Status mutations
-    cycleTaskStatus: (taskId: string) => void;
+    resetFilters: () => void;
+    searchQuery: string;
+    selectedTaskId: string | null;
+    setFilters: (filters: FiltersI | ((prev: FiltersI) => FiltersI)) => void;
+    setSearchQuery: (query: string) => void;
+    setSelectedTaskId: (taskId: string | null) => void;
+    setTasks: (tasks: TaskI[]) => void;
+    tasks: TaskI[];
+    updateTask: (task: TaskI) => void;
 }
 
 const cycleStatus = (currentStatus: string): 'open' | 'in-progress' | 'completed' => {

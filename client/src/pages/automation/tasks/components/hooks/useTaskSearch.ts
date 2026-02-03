@@ -1,35 +1,33 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useTasksStore} from '../../stores/useTasksStore';
 import {highlightText} from '../../utils/task-utils';
 
-import type React from 'react';
+import type {ReactNode, RefObject} from 'react';
 
 export interface SuggestionI {
-    highlighted: React.ReactNode;
+    highlighted: ReactNode;
     text: string;
 }
 
 export interface UseTaskSearchReturnI {
-    // State
-    searchInputRef: React.RefObject<HTMLInputElement>;
+    handleInputFocus: () => void;
+    handleKeyDown: (event: KeyboardEvent) => void;
+    handleSearchChange: (value: string) => void;
+    handleSuggestionClick: (suggestion: string) => void;
+    searchInputRef: RefObject<HTMLInputElement>;
     searchQuery: string;
     selectedSuggestionIndex: number;
     shortcutText: string;
     showSuggestions: boolean;
     suggestions: SuggestionI[];
-
-    // Handlers
-    handleInputFocus: () => void;
-    handleKeyDown: (event: React.KeyboardEvent) => void;
-    handleSearchChange: (value: string) => void;
-    handleSuggestionClick: (suggestion: string) => void;
 }
 
 export function useTaskSearch(): UseTaskSearchReturnI {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+
     const searchInputRef = useRef<HTMLInputElement>(null);
 
     const {filters, searchQuery, setSearchQuery, tasks} = useTasksStore(
@@ -44,7 +42,6 @@ export function useTaskSearch(): UseTaskSearchReturnI {
     const isMac = typeof navigator !== 'undefined' ? /Mac|iPod|iPhone|iPad/.test(navigator.platform) : false;
     const shortcutText = isMac ? '⌘K' : 'Ctrl+K';
 
-    // Compute suggestions based on search query and filters
     const suggestions = useMemo(() => {
         if (!searchQuery.trim()) {
             return [];
@@ -85,7 +82,7 @@ export function useTaskSearch(): UseTaskSearchReturnI {
 
     // Keyboard shortcut to focus search (Cmd+K on Mac, Ctrl+K on Windows/Linux)
     useEffect(() => {
-        const handleGlobalKeyDown = (event: KeyboardEvent) => {
+        const handleGlobalKeyDown = (event: globalThis.KeyboardEvent) => {
             if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
                 event.preventDefault();
                 searchInputRef.current?.focus();
@@ -99,7 +96,7 @@ export function useTaskSearch(): UseTaskSearchReturnI {
 
     // Close suggestions when clicking outside
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
+        const handleClickOutside = (event: globalThis.MouseEvent) => {
             if (searchInputRef.current && !searchInputRef.current.contains(event.target as Node)) {
                 setShowSuggestions(false);
                 setSelectedSuggestionIndex(-1);
@@ -131,7 +128,7 @@ export function useTaskSearch(): UseTaskSearchReturnI {
     );
 
     const handleKeyDown = useCallback(
-        (event: React.KeyboardEvent) => {
+        (event: KeyboardEvent) => {
             if (!showSuggestions || suggestions.length === 0) {
                 return;
             }

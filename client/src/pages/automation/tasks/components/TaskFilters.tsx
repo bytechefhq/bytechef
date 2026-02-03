@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {Check, CheckCircle2, Circle, Clock, SlidersHorizontal, User, X} from 'lucide-react';
+import {CheckCircle2Icon, CheckIcon, CircleIcon, ClockIcon, SlidersHorizontalIcon, UserIcon, XIcon} from 'lucide-react';
 
 import {useTaskFilters} from './hooks/useTaskFilters';
 
@@ -33,7 +33,7 @@ export default function TaskFilters() {
                 <Button
                     aria-label="Filter options"
                     className="size-6 shrink-0"
-                    icon={<SlidersHorizontal className="size-4" />}
+                    icon={<SlidersHorizontalIcon className="size-4" />}
                     size="icon"
                     variant={hasActiveFilters ? 'default' : 'ghost'}
                 />
@@ -44,8 +44,6 @@ export default function TaskFilters() {
 
                 <DropdownMenuSeparator />
 
-                {/* Status Section */}
-
                 <DropdownMenuGroup>
                     <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Status</DropdownMenuLabel>
 
@@ -55,7 +53,7 @@ export default function TaskFilters() {
                     >
                         <span>All</span>
 
-                        {filters.status === 'all' && <Check className="size-4" />}
+                        {filters.status === 'all' && <CheckIcon className="size-4" />}
 
                         <span className="ml-auto text-xs text-muted-foreground">({taskCounts.all})</span>
                     </DropdownMenuItem>
@@ -65,12 +63,12 @@ export default function TaskFilters() {
                         onClick={() => handleStatusChange('open')}
                     >
                         <div className="flex items-center">
-                            <Circle className="mr-2 size-3 text-gray-400" />
+                            <CircleIcon className="mr-2 size-3 text-gray-400" />
 
                             <span>Open</span>
                         </div>
 
-                        {filters.status === 'open' && <Check className="size-4" />}
+                        {filters.status === 'open' && <CheckIcon className="size-4" />}
 
                         <span className="ml-auto text-xs text-muted-foreground">({taskCounts.open})</span>
                     </DropdownMenuItem>
@@ -80,12 +78,12 @@ export default function TaskFilters() {
                         onClick={() => handleStatusChange('in-progress')}
                     >
                         <div className="flex items-center">
-                            <Clock className="mr-2 size-3 text-blue-600" />
+                            <ClockIcon className="mr-2 size-3 text-blue-600" />
 
                             <span>In Progress</span>
                         </div>
 
-                        {filters.status === 'in-progress' && <Check className="size-4" />}
+                        {filters.status === 'in-progress' && <CheckIcon className="size-4" />}
 
                         <span className="ml-auto text-xs text-muted-foreground">({taskCounts['in-progress']})</span>
                     </DropdownMenuItem>
@@ -95,20 +93,18 @@ export default function TaskFilters() {
                         onClick={() => handleStatusChange('completed')}
                     >
                         <div className="flex items-center">
-                            <CheckCircle2 className="mr-2 size-3 text-green-600" />
+                            <CheckCircle2Icon className="mr-2 size-3 text-green-600" />
 
                             <span>Completed</span>
                         </div>
 
-                        {filters.status === 'completed' && <Check className="size-4" />}
+                        {filters.status === 'completed' && <CheckIcon className="size-4" />}
 
                         <span className="ml-auto text-xs text-muted-foreground">({taskCounts.completed})</span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
-
-                {/* Priority Section */}
 
                 <DropdownMenuGroup>
                     <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
@@ -121,7 +117,7 @@ export default function TaskFilters() {
                     >
                         <span>All</span>
 
-                        {filters.priority === 'all' && <Check className="size-4" />}
+                        {filters.priority === 'all' && <CheckIcon className="size-4" />}
 
                         <span className="ml-auto text-xs text-muted-foreground">({priorityCounts.all})</span>
                     </DropdownMenuItem>
@@ -141,7 +137,7 @@ export default function TaskFilters() {
                             <span>High</span>
                         </div>
 
-                        {filters.priority === 'high' && <Check className="size-4" />}
+                        {filters.priority === 'high' && <CheckIcon className="size-4" />}
 
                         <span className="ml-auto text-xs text-muted-foreground">({priorityCounts.high})</span>
                     </DropdownMenuItem>
@@ -161,7 +157,7 @@ export default function TaskFilters() {
                             <span>Medium</span>
                         </div>
 
-                        {filters.priority === 'medium' && <Check className="size-4" />}
+                        {filters.priority === 'medium' && <CheckIcon className="size-4" />}
 
                         <span className="ml-auto text-xs text-muted-foreground">({priorityCounts.medium})</span>
                     </DropdownMenuItem>
@@ -181,15 +177,13 @@ export default function TaskFilters() {
                             <span>Low</span>
                         </div>
 
-                        {filters.priority === 'low' && <Check className="size-4" />}
+                        {filters.priority === 'low' && <CheckIcon className="size-4" />}
 
                         <span className="ml-auto text-xs text-muted-foreground">({priorityCounts.low})</span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
-
-                {/* Assignee Section */}
 
                 <DropdownMenuGroup>
                     <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
@@ -202,7 +196,7 @@ export default function TaskFilters() {
                     >
                         <span>All</span>
 
-                        {filters.assignee === 'all' && <Check className="size-4" />}
+                        {filters.assignee === 'all' && <CheckIcon className="size-4" />}
 
                         <span className="ml-auto text-xs text-muted-foreground">({assigneeCounts.all})</span>
                     </DropdownMenuItem>
@@ -214,12 +208,12 @@ export default function TaskFilters() {
                             onClick={() => handleAssigneeChange(assignee)}
                         >
                             <div className="flex items-center">
-                                <User className="mr-2 size-3 text-muted-foreground" />
+                                <UserIcon className="mr-2 size-3 text-muted-foreground" />
 
                                 <span className="truncate">{assignee}</span>
                             </div>
 
-                            {filters.assignee === assignee && <Check className="size-4" />}
+                            {filters.assignee === assignee && <CheckIcon className="size-4" />}
 
                             <span className="ml-auto text-xs text-muted-foreground">({assigneeCounts[assignee]})</span>
                         </DropdownMenuItem>
@@ -228,14 +222,12 @@ export default function TaskFilters() {
 
                 <DropdownMenuSeparator />
 
-                {/* Clear All Filters */}
-
                 <DropdownMenuItem
                     className="text-primary focus:text-primary"
                     disabled={!hasActiveFilters}
                     onClick={handleResetFilters}
                 >
-                    <X className="mr-2 size-4" />
+                    <XIcon className="mr-2 size-4" />
                     Clear all filters
                 </DropdownMenuItem>
             </DropdownMenuContent>

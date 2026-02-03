@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import {ListFilter, Plus} from 'lucide-react';
+import {ListFilterIcon, PlusIcon} from 'lucide-react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useTasksStore} from '../stores/useTasksStore';
@@ -50,7 +50,7 @@ export default function TaskList() {
                                 <Button
                                     aria-label="Create new task"
                                     className="size-6 shrink-0"
-                                    icon={<Plus className="size-4" />}
+                                    icon={<PlusIcon className="size-4" />}
                                     size="icon"
                                     variant="default"
                                 />
@@ -79,7 +79,7 @@ export default function TaskList() {
                     ) : (
                         <div className="flex flex-col items-center justify-center py-12 text-center">
                             <div className="mb-4 rounded-full bg-muted p-3">
-                                <ListFilter className="size-6 text-muted-foreground" />
+                                <ListFilterIcon className="size-6 text-muted-foreground" />
                             </div>
 
                             <h3 className="mb-1 font-medium text-foreground">No tasks found</h3>
@@ -99,12 +99,10 @@ export default function TaskList() {
                 </div>
             </ScrollArea>
 
-            <div className="shrink-0 border-t border-border bg-muted/30 px-4 py-2">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>
-                        {filteredTasks.length} of {totalTaskCount} tasks
-                    </span>
-                </div>
+            <div className="flex shrink-0 items-center justify-between border-t border-border bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
+                <span>
+                    {filteredTasks.length} of {totalTaskCount} tasks
+                </span>
             </div>
         </div>
     );

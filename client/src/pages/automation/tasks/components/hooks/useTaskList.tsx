@@ -7,21 +7,16 @@ import {getHeaderText, sortTasks} from '../../utils/task-utils';
 import type {SortDirectionType, SortOptionType, TaskI} from '../../types/types';
 
 export interface UseTaskListReturnI {
-    // Task data
     emptyStateMessage: string;
     filteredTasks: TaskI[];
-    headerText: string;
-    totalTaskCount: number;
-
-    // Sort
-    handleSortChange: (sortBy: SortOptionType, direction: SortDirectionType) => void;
-    sortBy: SortOptionType;
-    sortDirection: SortDirectionType;
-
-    // Task actions
     handleClearFilters: () => void;
     handleSelectTask: (taskId: string) => void;
+    handleSortChange: (sortBy: SortOptionType, direction: SortDirectionType) => void;
     handleStatusToggle: (taskId: string, event: MouseEvent) => void;
+    headerText: string;
+    sortBy: SortOptionType;
+    sortDirection: SortDirectionType;
+    totalTaskCount: number;
 }
 
 export function useTaskList(): UseTaskListReturnI {
@@ -50,7 +45,6 @@ export function useTaskList(): UseTaskListReturnI {
         }))
     );
 
-    // Computed values
     const filteredTasks = useMemo(() => {
         const filtered = tasks.filter((task) => {
             const matchesSearch =
@@ -82,13 +76,11 @@ export function useTaskList(): UseTaskListReturnI {
 
     const headerText = getHeaderText(filters);
 
-    // Clear filters handler
     const handleClearFilters = useCallback(() => {
         setSearchQuery('');
         resetFilters();
     }, [setSearchQuery, resetFilters]);
 
-    // Selection handler
     const handleSelectTask = useCallback(
         (taskId: string) => {
             setSelectedTaskId(taskId);
@@ -96,13 +88,11 @@ export function useTaskList(): UseTaskListReturnI {
         [setSelectedTaskId]
     );
 
-    // Sort handler
     const handleSortChange = useCallback((newSortBy: SortOptionType, direction: SortDirectionType) => {
         setSortBy(newSortBy);
         setSortDirection(direction);
     }, []);
 
-    // Status toggle handler
     const handleStatusToggle = useCallback(
         (taskId: string, event: MouseEvent) => {
             event.stopPropagation();
