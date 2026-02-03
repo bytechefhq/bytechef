@@ -189,7 +189,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))
-    implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-rest"))
+    implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-graphql"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-handler"))
