@@ -13,6 +13,11 @@ paths:
       description: "Updates an order's status to fulfilled."
       operationId: "fulfillOrder"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "ecommerce:write"
+            - "sites:read"
+            - "ecommerce:read"
       parameters:
         - name: "siteId"
           in: "path"
@@ -52,6 +57,10 @@ paths:
       description: "Get collection item in a collection."
       operationId: "getCollectionItem"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "cms:read"
+            - "sites:read"
       parameters:
         - name: "collectionId"
           in: "path"
@@ -104,7 +113,29 @@ components:
           tokenUrl: "https://api.webflow.com/oauth/access_token"
           refreshUrl: "https://api.webflow.com/oauth/access_token"
           scopes:
-            cms:read: " "
-            ecommerce:read: " "
-            ecommerce:write: " "
+            assets:read: ""
+            assets:write: ""
+            authorized_user:read: ""
+            cms:read: ""
+            cms:write: ""
+            comments:read: ""
+            comments:write: ""
+            components:read: ""
+            components:write: ""
+            custom_code:read: ""
+            custom_code:write: ""
+            ecommerce:read: ""
+            ecommerce:write: ""
+            forms:read: ""
+            forms:write: ""
+            pages:read: ""
+            pages:write: ""
             sites:read: ""
+            sites:write: ""
+            site_activity:read: ""
+            site_config:read: ""
+            site_config:write: ""
+            users:read: ""
+            users:write: ""
+            workspace:read: ""
+            workspace:write: ""
