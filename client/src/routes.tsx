@@ -50,6 +50,7 @@ const ProjectTemplate = lazy(() => import('@/pages/automation/template/project-t
 const ProjectTemplates = lazy(() => import('@/pages/automation/templates/project-templates/ProjectTemplates'));
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
+const Tasks = lazy(() => import('@/pages/automation/tasks/Tasks'));
 const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
 const WorkflowChatContainer = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChatContainer'));
 const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
@@ -647,6 +648,16 @@ export const getRouter = (queryClient: QueryClient) =>
                                     ],
                                     element: <WorkflowChatContainer />,
                                     path: 'chat',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <Tasks />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'tasks',
                                 },
                                 {
                                     children: [
