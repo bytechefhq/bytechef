@@ -10,56 +10,67 @@ import {
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ApiConnectorDeleteAlertDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorDeleteAlertDialog';
-import ApiConnectorImportDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorImportDialog';
-import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
-import {
-    useDeleteApiConnectorMutation,
-    useEnableApiConnectorMutation,
-} from '@/ee/shared/mutations/platform/apiConnector.mutations';
-import {ApiConnectorKeys} from '@/ee/shared/queries/platform/apiConnectors.queries';
-import {useQueryClient} from '@tanstack/react-query';
+
+// TODO: Uncomment when mutations are implemented
+// import {
+//     useDeleteApiConnectorMutation,
+//     useEnableApiConnectorMutation,
+// } from '@/ee/shared/mutations/platform/apiConnector.mutations';
+// TODO: Uncomment when queries are implemented
+// import {ApiConnectorKeys} from '@/ee/shared/queries/platform/apiConnectors.queries';
+// import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
+// TODO: Uncomment when ApiConnectorImportDialog is implemented
+// import ApiConnectorImportDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorImportDialog';
+// TODO: Uncomment when api-connector middleware is implemented
+// import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
+import {type ApiConnectorI} from './ApiConnectorList';
+
 interface ApiConnectorItemProps {
-    apiConnector: ApiConnector;
+    apiConnector: ApiConnectorI;
 }
 
 const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const queryClient = useQueryClient();
+    // TODO: Uncomment when mutations/queries are implemented
+    // const queryClient = useQueryClient();
 
-    const deleteApiConnectorMutation = useDeleteApiConnectorMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ApiConnectorKeys.apiConnectors,
-            });
-        },
-    });
+    // const deleteApiConnectorMutation = useDeleteApiConnectorMutation({
+    //     onSuccess: () => {
+    //         queryClient.invalidateQueries({
+    //             queryKey: ApiConnectorKeys.apiConnectors,
+    //         });
+    //     },
+    // });
 
-    const enableApiConnectorMutation = useEnableApiConnectorMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ApiConnectorKeys.apiConnectors,
-            });
-        },
-    });
+    // const enableApiConnectorMutation = useEnableApiConnectorMutation({
+    //     onSuccess: () => {
+    //         queryClient.invalidateQueries({
+    //             queryKey: ApiConnectorKeys.apiConnectors,
+    //         });
+    //     },
+    // });
 
     const handleAlertDeleteDialogClick = () => {
         if (apiConnector.id) {
-            deleteApiConnectorMutation.mutate(apiConnector.id);
+            // TODO: Uncomment when mutations are implemented
+            // deleteApiConnectorMutation.mutate(apiConnector.id);
 
             setShowDeleteDialog(false);
         }
     };
 
-    const handleOnCheckedChange = (value: boolean) => {
-        enableApiConnectorMutation.mutate({
-            enable: value,
-            id: apiConnector.id!,
-        });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleOnCheckedChange = (_value: boolean) => {
+        // TODO: Uncomment when mutations are implemented
+        // enableApiConnectorMutation.mutate({
+        //     enable: value,
+        //     id: apiConnector.id!,
+        // });
     };
 
     return (
@@ -142,7 +153,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
+                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(false)}>
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -157,8 +168,11 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                 />
             )}
 
+            {/* TODO: Uncomment when ApiConnectorImportDialog is implemented */}
+
             {showEditDialog && (
-                <ApiConnectorImportDialog apiConnector={apiConnector} onClose={() => setShowEditDialog(false)} />
+                // <ApiConnectorImportDialog apiConnector={apiConnector} onClose={() => setShowEditDialog(false)} />
+                <div onClick={() => setShowEditDialog(false)}>TODO: Edit Dialog</div>
             )}
         </div>
     );

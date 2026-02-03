@@ -2,7 +2,6 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
 import {
     CalendarIcon,
     CloudDownloadIcon,
@@ -16,7 +15,11 @@ import {useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
-const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpoint: ApiConnectorEndpoint}) => {
+// TODO: Uncomment when api-connector middleware is implemented
+// import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
+import {type ApiConnectorEndpointI} from './ApiConnectorEndpointList';
+
+const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpoint: ApiConnectorEndpointI}) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
     const projectDeploymentWorkflow = undefined;
 
@@ -51,7 +54,7 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
                 };
             default:
                 return {
-                    icon: undefined,
+                    icon: null,
                     textColor: '',
                 };
         }
@@ -63,15 +66,23 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
         <>
             <Link className="flex flex-1 items-center" to={`/automation/projects/${1}/workflows/${1}`}>
                 <div className="flex flex-1 items-center">
-                    {method && (
-                        <Badge
-                            className={twMerge('mr-4 w-20', textColor)}
-                            icon={icon}
-                            label={method}
-                            styleType="outline-outline"
-                            weight="semibold"
-                        />
-                    )}
+                    {method &&
+                        (icon ? (
+                            <Badge
+                                className={twMerge('mr-4 w-20', textColor)}
+                                icon={icon}
+                                label={method}
+                                styleType="outline-outline"
+                                weight="semibold"
+                            />
+                        ) : (
+                            <Badge
+                                className={twMerge('mr-4 w-20', textColor)}
+                                label={method}
+                                styleType="outline-outline"
+                                weight="semibold"
+                            />
+                        ))}
 
                     <div className="w-2/6 text-sm font-semibold">{apiConnectorEndpoint.name}</div>
 

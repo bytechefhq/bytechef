@@ -1,8 +1,18 @@
-import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
+// TODO: Uncomment when api-connector middleware is implemented
+// import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
 
 import ApiConnectorEndpointListItem from './ApiConnectorEndpointListItem';
 
-const ApiConnectorEndpointList = ({apiConnectorEndpoints}: {apiConnectorEndpoints?: Array<ApiConnectorEndpoint>}) => {
+// TODO: Remove when ApiConnectorEndpoint type is available from middleware
+export interface ApiConnectorEndpointI {
+    httpMethod: string;
+    id: string;
+    lastExecutionDate?: Date;
+    name: string;
+    path: string;
+}
+
+const ApiConnectorEndpointList = ({apiConnectorEndpoints}: {apiConnectorEndpoints?: Array<ApiConnectorEndpointI>}) => {
     return (
         <div className="border-b border-b-border/50 py-3 pl-4">
             <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-400">Endpoints</h3>
