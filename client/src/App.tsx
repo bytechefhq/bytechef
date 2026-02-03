@@ -16,6 +16,7 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
+    CircleIcon,
     FolderIcon,
     Layers3Icon,
     LayoutTemplateIcon,
@@ -87,6 +88,7 @@ const automationNavigation: NavigationType[] = [
         name: 'Knowledge Base',
     },
     {href: '/automation/chat', icon: MessageCircleMoreIcon, name: 'Workflow Chat'},
+    {href: '/automation/tasks', icon: CircleIcon, name: 'Tasks'},
 ];
 
 const embeddedNavigation: NavigationType[] = [
@@ -163,6 +165,7 @@ function App() {
 
     useFetchInterceptor();
 
+    const ff_732 = useFeatureFlagsStore()('ff-732');
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
@@ -198,6 +201,10 @@ function App() {
 
         if (navItem.href === '/automation/knowledge-bases') {
             return ff_4000;
+        }
+
+        if (navItem.href === '/automation/tasks') {
+            return ff_732;
         }
 
         return true;
@@ -275,7 +282,7 @@ function App() {
 
             <DesktopSidebar navigation={navigation} />
 
-            <div className="flex min-w-0 flex-1 flex-col">
+            <div className="flex h-full min-w-0 flex-1 flex-col">
                 <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
 
                 <div className="flex size-full">
