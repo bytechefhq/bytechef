@@ -1,0 +1,12 @@
+query tasks {
+    tasks {
+        createdBy
+        createdDate
+        description
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        version
+    }
+}
