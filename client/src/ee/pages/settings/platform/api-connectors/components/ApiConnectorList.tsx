@@ -1,10 +1,23 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
 
-import ApiConnectorEndpointList from './ApiConnectorEndpointList';
+// TODO: Uncomment when api-connector middleware is implemented
+// import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
+
+import ApiConnectorEndpointList, {type ApiConnectorEndpointI} from './ApiConnectorEndpointList';
 import ApiConnectorListItem from './ApiConnectorListItem';
 
-const ApiConnectorList = ({apiConnectors}: {apiConnectors: ApiConnector[]}) => {
+// TODO: Remove when ApiConnector type is available from middleware
+export interface ApiConnectorI {
+    description?: string;
+    enabled: boolean;
+    endpoints?: Array<ApiConnectorEndpointI>;
+    id: string;
+    lastModifiedDate?: Date;
+    name: string;
+    title: string;
+}
+
+const ApiConnectorList = ({apiConnectors}: {apiConnectors: ApiConnectorI[]}) => {
     return (
         <div className="w-full px-2 3xl:mx-auto 3xl:w-4/5">
             {apiConnectors.length > 0 && (
