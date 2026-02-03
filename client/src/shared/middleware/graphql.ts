@@ -86,6 +86,40 @@ export type AdminUserPage = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type ApiConnector = {
+  __typename?: 'ApiConnector';
+  connectorVersion: Scalars['Int']['output'];
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  definition?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  enabled?: Maybe<Scalars['Boolean']['output']>;
+  endpoints?: Maybe<Array<ApiConnectorEndpoint>>;
+  icon?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  specification?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ApiConnectorEndpoint = {
+  __typename?: 'ApiConnectorEndpoint';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  httpMethod?: Maybe<HttpMethod>;
+  id: Scalars['ID']['output'];
+  lastExecutionDate?: Maybe<Scalars['Long']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  path?: Maybe<Scalars['String']['output']>;
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
 export type ApiKey = {
   __typename?: 'ApiKey';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -332,6 +366,14 @@ export enum ControlType {
   Url = 'URL'
 }
 
+export type CreateApiConnectorInput = {
+  connectorVersion: Scalars['Int']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  icon?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CreateDataTableInput = {
   baseName: Scalars['String']['input'];
   columns: Array<ColumnInput>;
@@ -488,6 +530,21 @@ export type DeleteRowInput = {
   tableId: Scalars['ID']['input'];
 };
 
+export type DiscoverEndpointsInput = {
+  documentationUrl: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  userPrompt?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type DiscoveredEndpoint = {
+  __typename?: 'DiscoveredEndpoint';
+  id: Scalars['ID']['output'];
+  method: Scalars['String']['output'];
+  path: Scalars['String']['output'];
+  resource?: Maybe<Scalars['String']['output']>;
+  summary?: Maybe<Scalars['String']['output']>;
+};
+
 export type DocumentStatusUpdate = {
   __typename?: 'DocumentStatusUpdate';
   documentId: Scalars['ID']['output'];
@@ -514,6 +571,25 @@ export type DynamicPropertiesProperty = Property & {
   propertiesDataSource?: Maybe<PropertiesDataSource>;
   required?: Maybe<Scalars['Boolean']['output']>;
   type: PropertyType;
+};
+
+export type EndpointDefinitionInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  httpMethod: HttpMethod;
+  operationId: Scalars['String']['input'];
+  parameters?: InputMaybe<Array<ParameterDefinitionInput>>;
+  path: Scalars['String']['input'];
+  requestBody?: InputMaybe<RequestBodyDefinitionInput>;
+  responses?: InputMaybe<Array<ResponseDefinitionInput>>;
+  summary?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EndpointDiscoveryResult = {
+  __typename?: 'EndpointDiscoveryResult';
+  endpoints?: Maybe<Array<DiscoveredEndpoint>>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  jobId: Scalars['String']['output'];
+  status: GenerationJobStatusEnum;
 };
 
 export type Environment = {
@@ -559,16 +635,71 @@ export type FileEntryProperty = Property & {
   type: PropertyType;
 };
 
+export type GenerateForEndpointsInput = {
+  documentationUrl: Scalars['String']['input'];
+  icon?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  selectedEndpoints: Array<SelectedEndpointInput>;
+};
+
+export type GenerateFromDocumentationInput = {
+  documentationUrl: Scalars['String']['input'];
+  icon?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  userPrompt?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type GenerateSpecificationInput = {
+  baseUrl?: InputMaybe<Scalars['String']['input']>;
+  endpoints: Array<EndpointDefinitionInput>;
+  name: Scalars['String']['input'];
+};
+
+export type GenerateSpecificationResponse = {
+  __typename?: 'GenerateSpecificationResponse';
+  specification?: Maybe<Scalars['String']['output']>;
+};
+
+export type GenerationJobStatus = {
+  __typename?: 'GenerationJobStatus';
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  jobId: Scalars['String']['output'];
+  specification?: Maybe<Scalars['String']['output']>;
+  status: GenerationJobStatusEnum;
+};
+
+export enum GenerationJobStatusEnum {
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Processing = 'PROCESSING'
+}
+
 export type Help = {
   __typename?: 'Help';
   description?: Maybe<Scalars['String']['output']>;
   documentationUrl?: Maybe<Scalars['String']['output']>;
 };
 
+export enum HttpMethod {
+  Delete = 'DELETE',
+  Get = 'GET',
+  Patch = 'PATCH',
+  Post = 'POST',
+  Put = 'PUT'
+}
+
 export type ImportCsvInput = {
   csv: Scalars['String']['input'];
   environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
+};
+
+export type ImportOpenApiSpecificationInput = {
+  icon?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  specification: Scalars['String']['input'];
 };
 
 export type InsertRowInput = {
@@ -798,6 +929,8 @@ export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   addDataTableColumn: Scalars['Boolean']['output'];
+  cancelGenerationJob: Scalars['Boolean']['output'];
+  createApiConnector: ApiConnector;
   createApiKey: Scalars['String']['output'];
   createDataTable: Scalars['Boolean']['output'];
   createKnowledgeBase?: Maybe<KnowledgeBase>;
@@ -810,6 +943,7 @@ export type Mutation = {
   createTask?: Maybe<Task>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
+  deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
   deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
@@ -829,10 +963,14 @@ export type Mutation = {
   disconnectConnection: Scalars['Boolean']['output'];
   dropDataTable: Scalars['Boolean']['output'];
   duplicateDataTable: Scalars['Boolean']['output'];
+  enableApiConnector: Scalars['Boolean']['output'];
   enableCustomComponent: Scalars['Boolean']['output'];
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
+  generateFromDocumentation: ApiConnector;
+  generateSpecification: GenerateSpecificationResponse;
   importDataTableCsv: Scalars['Boolean']['output'];
+  importOpenApiSpecification: ApiConnector;
   importProjectTemplate: Scalars['ID']['output'];
   importWorkflowTemplate: Scalars['ID']['output'];
   insertDataTableRow: DataTableRow;
@@ -840,7 +978,11 @@ export type Mutation = {
   removeDataTableColumn: Scalars['Boolean']['output'];
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
+  startDiscoverEndpoints: EndpointDiscoveryResult;
+  startGenerateForEndpoints: GenerationJobStatus;
+  startGenerateFromDocumentationPreview: GenerationJobStatus;
   testClusterElementScript: ScriptTestExecution;
+  updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
@@ -862,6 +1004,16 @@ export type Mutation = {
 
 export type MutationAddDataTableColumnArgs = {
   input: AddColumnInput;
+};
+
+
+export type MutationCancelGenerationJobArgs = {
+  jobId: Scalars['String']['input'];
+};
+
+
+export type MutationCreateApiConnectorArgs = {
+  input: CreateApiConnectorInput;
 };
 
 
@@ -927,6 +1079,11 @@ export type MutationCreateWorkspaceApiKeyArgs = {
 
 export type MutationCreateWorkspaceMcpServerArgs = {
   input: CreateWorkspaceMcpServerInput;
+};
+
+
+export type MutationDeleteApiConnectorArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1025,6 +1182,12 @@ export type MutationDuplicateDataTableArgs = {
 };
 
 
+export type MutationEnableApiConnectorArgs = {
+  enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationEnableCustomComponentArgs = {
   enable: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
@@ -1043,8 +1206,23 @@ export type MutationExportSharedWorkflowArgs = {
 };
 
 
+export type MutationGenerateFromDocumentationArgs = {
+  input: GenerateFromDocumentationInput;
+};
+
+
+export type MutationGenerateSpecificationArgs = {
+  input: GenerateSpecificationInput;
+};
+
+
 export type MutationImportDataTableCsvArgs = {
   input: ImportCsvInput;
+};
+
+
+export type MutationImportOpenApiSpecificationArgs = {
+  input: ImportOpenApiSpecificationInput;
 };
 
 
@@ -1089,12 +1267,33 @@ export type MutationRenameDataTableColumnArgs = {
 };
 
 
+export type MutationStartDiscoverEndpointsArgs = {
+  input: DiscoverEndpointsInput;
+};
+
+
+export type MutationStartGenerateForEndpointsArgs = {
+  input: GenerateForEndpointsInput;
+};
+
+
+export type MutationStartGenerateFromDocumentationPreviewArgs = {
+  input: GenerateFromDocumentationInput;
+};
+
+
 export type MutationTestClusterElementScriptArgs = {
   clusterElementType: Scalars['String']['input'];
   clusterElementWorkflowNodeName: Scalars['String']['input'];
   environmentId: Scalars['Long']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateApiConnectorArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateApiConnectorInput;
 };
 
 
@@ -1251,6 +1450,30 @@ export type OptionsDataSource = {
   optionsLookupDependsOn?: Maybe<Array<Scalars['String']['output']>>;
 };
 
+export type ParameterDefinitionInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  example?: InputMaybe<Scalars['String']['input']>;
+  location: ParameterLocation;
+  name: Scalars['String']['input'];
+  required?: InputMaybe<Scalars['Boolean']['input']>;
+  type: ParameterType;
+};
+
+export enum ParameterLocation {
+  Header = 'header',
+  Path = 'path',
+  Query = 'query'
+}
+
+export enum ParameterType {
+  Array = 'array',
+  Boolean = 'boolean',
+  Integer = 'integer',
+  Number = 'number',
+  Object = 'object',
+  String = 'string'
+}
+
 export enum PlatformType {
   Automation = 'AUTOMATION',
   Embedded = 'EMBEDDED'
@@ -1385,6 +1608,8 @@ export type Query = {
   actionDefinition: ActionDefinition;
   actionDefinitions: Array<ActionDefinition>;
   adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
+  apiConnector?: Maybe<ApiConnector>;
+  apiConnectors: Array<ApiConnector>;
   apiKey?: Maybe<ApiKey>;
   apiKeys?: Maybe<Array<Maybe<ApiKey>>>;
   authorities: Array<Scalars['String']['output']>;
@@ -1409,8 +1634,10 @@ export type Query = {
   dataTableTagsByTable: Array<DataTableTagsEntry>;
   dataTableWebhooks: Array<DataTableWebhook>;
   dataTables: Array<DataTable>;
+  endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
   environments?: Maybe<Array<Maybe<Environment>>>;
   exportDataTableCsv: Scalars['String']['output'];
+  generationJobStatus?: Maybe<GenerationJobStatus>;
   integration?: Maybe<Integration>;
   knowledgeBase?: Maybe<KnowledgeBase>;
   knowledgeBaseDocument?: Maybe<KnowledgeBaseDocument>;
@@ -1479,6 +1706,11 @@ export type QueryActionDefinitionsArgs = {
 
 export type QueryAdminApiKeysArgs = {
   environmentId: Scalars['ID']['input'];
+};
+
+
+export type QueryApiConnectorArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1606,9 +1838,19 @@ export type QueryDataTablesArgs = {
 };
 
 
+export type QueryEndpointDiscoveryStatusArgs = {
+  jobId: Scalars['String']['input'];
+};
+
+
 export type QueryExportDataTableCsvArgs = {
   environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
+};
+
+
+export type QueryGenerationJobStatusArgs = {
+  jobId: Scalars['String']['input'];
 };
 
 
@@ -1841,15 +2083,34 @@ export type RenameDataTableInput = {
   tableId: Scalars['ID']['input'];
 };
 
+export type RequestBodyDefinitionInput = {
+  contentType: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  required?: InputMaybe<Scalars['Boolean']['input']>;
+  schema: Scalars['String']['input'];
+};
+
 export type Resources = {
   __typename?: 'Resources';
   documentationUrl?: Maybe<Scalars['String']['output']>;
+};
+
+export type ResponseDefinitionInput = {
+  contentType?: InputMaybe<Scalars['String']['input']>;
+  description: Scalars['String']['input'];
+  schema?: InputMaybe<Scalars['String']['input']>;
+  statusCode: Scalars['String']['input'];
 };
 
 export type ScriptTestExecution = {
   __typename?: 'ScriptTestExecution';
   error?: Maybe<ExecutionError>;
   output?: Maybe<Scalars['Map']['output']>;
+};
+
+export type SelectedEndpointInput = {
+  method: Scalars['String']['input'];
+  path: Scalars['String']['input'];
 };
 
 export type SharedProject = {
@@ -1995,6 +2256,14 @@ export enum UnifiedApiCategory {
   MarketingAutomation = 'MARKETING_AUTOMATION',
   Ticketing = 'TICKETING'
 }
+
+export type UpdateApiConnectorInput = {
+  connectorVersion?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  icon?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
 
 export type UpdateDataTableTagsInput = {
   tableId: Scalars['ID']['input'];
@@ -2555,6 +2824,83 @@ export type IntegrationByIdQueryVariables = Exact<{
 
 
 export type IntegrationByIdQuery = { __typename?: 'Query', integration?: { __typename?: 'Integration', id: string, name: string } | null };
+
+export type ApiConnectorQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ApiConnectorQuery = { __typename?: 'Query', apiConnector?: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } | null };
+
+export type ApiConnectorsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ApiConnectorsQuery = { __typename?: 'Query', apiConnectors: Array<{ __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null }> };
+
+export type CancelGenerationJobMutationVariables = Exact<{
+  jobId: Scalars['String']['input'];
+}>;
+
+
+export type CancelGenerationJobMutation = { __typename?: 'Mutation', cancelGenerationJob: boolean };
+
+export type CreateApiConnectorMutationVariables = Exact<{
+  input: CreateApiConnectorInput;
+}>;
+
+
+export type CreateApiConnectorMutation = { __typename?: 'Mutation', createApiConnector: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } };
+
+export type DeleteApiConnectorMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteApiConnectorMutation = { __typename?: 'Mutation', deleteApiConnector: boolean };
+
+export type EnableApiConnectorMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  enable: Scalars['Boolean']['input'];
+}>;
+
+
+export type EnableApiConnectorMutation = { __typename?: 'Mutation', enableApiConnector: boolean };
+
+export type GenerateSpecificationMutationVariables = Exact<{
+  input: GenerateSpecificationInput;
+}>;
+
+
+export type GenerateSpecificationMutation = { __typename?: 'Mutation', generateSpecification: { __typename?: 'GenerateSpecificationResponse', specification?: string | null } };
+
+export type GenerationJobStatusQueryVariables = Exact<{
+  jobId: Scalars['String']['input'];
+}>;
+
+
+export type GenerationJobStatusQuery = { __typename?: 'Query', generationJobStatus?: { __typename?: 'GenerationJobStatus', jobId: string, status: GenerationJobStatusEnum, specification?: string | null, errorMessage?: string | null } | null };
+
+export type ImportOpenApiSpecificationMutationVariables = Exact<{
+  input: ImportOpenApiSpecificationInput;
+}>;
+
+
+export type ImportOpenApiSpecificationMutation = { __typename?: 'Mutation', importOpenApiSpecification: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } };
+
+export type StartGenerateFromDocumentationPreviewMutationVariables = Exact<{
+  input: GenerateFromDocumentationInput;
+}>;
+
+
+export type StartGenerateFromDocumentationPreviewMutation = { __typename?: 'Mutation', startGenerateFromDocumentationPreview: { __typename?: 'GenerationJobStatus', jobId: string, status: GenerationJobStatusEnum, specification?: string | null, errorMessage?: string | null } };
+
+export type UpdateApiConnectorMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateApiConnectorInput;
+}>;
+
+
+export type UpdateApiConnectorMutation = { __typename?: 'Mutation', updateApiConnector: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } };
 
 export type AdminApiKeysQueryVariables = Exact<{
   environmentId: Scalars['ID']['input'];
@@ -4561,6 +4907,346 @@ export const useIntegrationByIdQuery = <
       {
     queryKey: ['integrationById', variables],
     queryFn: fetcher<IntegrationByIdQuery, IntegrationByIdQueryVariables>(IntegrationByIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const ApiConnectorDocument = `
+    query apiConnector($id: ID!) {
+  apiConnector(id: $id) {
+    id
+    name
+    title
+    description
+    icon
+    connectorVersion
+    enabled
+    specification
+    definition
+    endpoints {
+      id
+      name
+      description
+      path
+      httpMethod
+    }
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `;
+
+export const useApiConnectorQuery = <
+      TData = ApiConnectorQuery,
+      TError = unknown
+    >(
+      variables: ApiConnectorQueryVariables,
+      options?: Omit<UseQueryOptions<ApiConnectorQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiConnectorQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ApiConnectorQuery, TError, TData>(
+      {
+    queryKey: ['apiConnector', variables],
+    queryFn: fetcher<ApiConnectorQuery, ApiConnectorQueryVariables>(ApiConnectorDocument, variables),
+    ...options
+  }
+    )};
+
+export const ApiConnectorsDocument = `
+    query apiConnectors {
+  apiConnectors {
+    id
+    name
+    title
+    description
+    icon
+    connectorVersion
+    enabled
+    specification
+    definition
+    endpoints {
+      id
+      name
+      description
+      path
+      httpMethod
+    }
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `;
+
+export const useApiConnectorsQuery = <
+      TData = ApiConnectorsQuery,
+      TError = unknown
+    >(
+      variables?: ApiConnectorsQueryVariables,
+      options?: Omit<UseQueryOptions<ApiConnectorsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiConnectorsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ApiConnectorsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['apiConnectors'] : ['apiConnectors', variables],
+    queryFn: fetcher<ApiConnectorsQuery, ApiConnectorsQueryVariables>(ApiConnectorsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CancelGenerationJobDocument = `
+    mutation cancelGenerationJob($jobId: String!) {
+  cancelGenerationJob(jobId: $jobId)
+}
+    `;
+
+export const useCancelGenerationJobMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CancelGenerationJobMutation, TError, CancelGenerationJobMutationVariables, TContext>) => {
+    
+    return useMutation<CancelGenerationJobMutation, TError, CancelGenerationJobMutationVariables, TContext>(
+      {
+    mutationKey: ['cancelGenerationJob'],
+    mutationFn: (variables?: CancelGenerationJobMutationVariables) => fetcher<CancelGenerationJobMutation, CancelGenerationJobMutationVariables>(CancelGenerationJobDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateApiConnectorDocument = `
+    mutation createApiConnector($input: CreateApiConnectorInput!) {
+  createApiConnector(input: $input) {
+    id
+    name
+    title
+    description
+    icon
+    connectorVersion
+    enabled
+    specification
+    definition
+    endpoints {
+      id
+      name
+      description
+      path
+      httpMethod
+    }
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `;
+
+export const useCreateApiConnectorMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateApiConnectorMutation, TError, CreateApiConnectorMutationVariables, TContext>) => {
+    
+    return useMutation<CreateApiConnectorMutation, TError, CreateApiConnectorMutationVariables, TContext>(
+      {
+    mutationKey: ['createApiConnector'],
+    mutationFn: (variables?: CreateApiConnectorMutationVariables) => fetcher<CreateApiConnectorMutation, CreateApiConnectorMutationVariables>(CreateApiConnectorDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteApiConnectorDocument = `
+    mutation deleteApiConnector($id: ID!) {
+  deleteApiConnector(id: $id)
+}
+    `;
+
+export const useDeleteApiConnectorMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteApiConnectorMutation, TError, DeleteApiConnectorMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteApiConnectorMutation, TError, DeleteApiConnectorMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteApiConnector'],
+    mutationFn: (variables?: DeleteApiConnectorMutationVariables) => fetcher<DeleteApiConnectorMutation, DeleteApiConnectorMutationVariables>(DeleteApiConnectorDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableApiConnectorDocument = `
+    mutation enableApiConnector($id: ID!, $enable: Boolean!) {
+  enableApiConnector(id: $id, enable: $enable)
+}
+    `;
+
+export const useEnableApiConnectorMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableApiConnectorMutation, TError, EnableApiConnectorMutationVariables, TContext>) => {
+    
+    return useMutation<EnableApiConnectorMutation, TError, EnableApiConnectorMutationVariables, TContext>(
+      {
+    mutationKey: ['enableApiConnector'],
+    mutationFn: (variables?: EnableApiConnectorMutationVariables) => fetcher<EnableApiConnectorMutation, EnableApiConnectorMutationVariables>(EnableApiConnectorDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const GenerateSpecificationDocument = `
+    mutation generateSpecification($input: GenerateSpecificationInput!) {
+  generateSpecification(input: $input) {
+    specification
+  }
+}
+    `;
+
+export const useGenerateSpecificationMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GenerateSpecificationMutation, TError, GenerateSpecificationMutationVariables, TContext>) => {
+    
+    return useMutation<GenerateSpecificationMutation, TError, GenerateSpecificationMutationVariables, TContext>(
+      {
+    mutationKey: ['generateSpecification'],
+    mutationFn: (variables?: GenerateSpecificationMutationVariables) => fetcher<GenerateSpecificationMutation, GenerateSpecificationMutationVariables>(GenerateSpecificationDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const GenerationJobStatusDocument = `
+    query generationJobStatus($jobId: String!) {
+  generationJobStatus(jobId: $jobId) {
+    jobId
+    status
+    specification
+    errorMessage
+  }
+}
+    `;
+
+export const useGenerationJobStatusQuery = <
+      TData = GenerationJobStatusQuery,
+      TError = unknown
+    >(
+      variables: GenerationJobStatusQueryVariables,
+      options?: Omit<UseQueryOptions<GenerationJobStatusQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GenerationJobStatusQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GenerationJobStatusQuery, TError, TData>(
+      {
+    queryKey: ['generationJobStatus', variables],
+    queryFn: fetcher<GenerationJobStatusQuery, GenerationJobStatusQueryVariables>(GenerationJobStatusDocument, variables),
+    ...options
+  }
+    )};
+
+export const ImportOpenApiSpecificationDocument = `
+    mutation importOpenApiSpecification($input: ImportOpenApiSpecificationInput!) {
+  importOpenApiSpecification(input: $input) {
+    id
+    name
+    title
+    description
+    icon
+    connectorVersion
+    enabled
+    specification
+    definition
+    endpoints {
+      id
+      name
+      description
+      path
+      httpMethod
+    }
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `;
+
+export const useImportOpenApiSpecificationMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ImportOpenApiSpecificationMutation, TError, ImportOpenApiSpecificationMutationVariables, TContext>) => {
+    
+    return useMutation<ImportOpenApiSpecificationMutation, TError, ImportOpenApiSpecificationMutationVariables, TContext>(
+      {
+    mutationKey: ['importOpenApiSpecification'],
+    mutationFn: (variables?: ImportOpenApiSpecificationMutationVariables) => fetcher<ImportOpenApiSpecificationMutation, ImportOpenApiSpecificationMutationVariables>(ImportOpenApiSpecificationDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const StartGenerateFromDocumentationPreviewDocument = `
+    mutation startGenerateFromDocumentationPreview($input: GenerateFromDocumentationInput!) {
+  startGenerateFromDocumentationPreview(input: $input) {
+    jobId
+    status
+    specification
+    errorMessage
+  }
+}
+    `;
+
+export const useStartGenerateFromDocumentationPreviewMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<StartGenerateFromDocumentationPreviewMutation, TError, StartGenerateFromDocumentationPreviewMutationVariables, TContext>) => {
+    
+    return useMutation<StartGenerateFromDocumentationPreviewMutation, TError, StartGenerateFromDocumentationPreviewMutationVariables, TContext>(
+      {
+    mutationKey: ['startGenerateFromDocumentationPreview'],
+    mutationFn: (variables?: StartGenerateFromDocumentationPreviewMutationVariables) => fetcher<StartGenerateFromDocumentationPreviewMutation, StartGenerateFromDocumentationPreviewMutationVariables>(StartGenerateFromDocumentationPreviewDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateApiConnectorDocument = `
+    mutation updateApiConnector($id: ID!, $input: UpdateApiConnectorInput!) {
+  updateApiConnector(id: $id, input: $input) {
+    id
+    name
+    title
+    description
+    icon
+    connectorVersion
+    enabled
+    specification
+    definition
+    endpoints {
+      id
+      name
+      description
+      path
+      httpMethod
+    }
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `;
+
+export const useUpdateApiConnectorMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateApiConnectorMutation, TError, UpdateApiConnectorMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateApiConnectorMutation, TError, UpdateApiConnectorMutationVariables, TContext>(
+      {
+    mutationKey: ['updateApiConnector'],
+    mutationFn: (variables?: UpdateApiConnectorMutationVariables) => fetcher<UpdateApiConnectorMutation, UpdateApiConnectorMutationVariables>(UpdateApiConnectorDocument, variables)(),
     ...options
   }
     )};
