@@ -1,6 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import DatePicker from '@/components/DatePicker/DatePicker';
+import RequiredMark from '@/components/RequiredMark';
 import {
     Dialog,
     DialogCloseButton,
@@ -15,7 +16,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
-import {CheckCircle2, Circle, Clock, User} from 'lucide-react';
+import {CheckCircle2Icon, CircleIcon, ClockIcon, UserIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 
 import {useTaskCreateDialog} from './hooks/useTaskCreateDialog';
@@ -54,8 +55,11 @@ export default function TaskCreateDialog({trigger}: TaskCreateDialogProps) {
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="task-title">Title *</Label>
+                    <fieldset className="space-y-2 border-0">
+                        <Label htmlFor="task-title">
+                            Title
+                            <RequiredMark />
+                        </Label>
 
                         <Input
                             className={errors.title ? 'border-red-500' : ''}
@@ -66,10 +70,13 @@ export default function TaskCreateDialog({trigger}: TaskCreateDialogProps) {
                         />
 
                         {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
-                    </div>
+                    </fieldset>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="task-description">Description *</Label>
+                    <fieldset className="space-y-2 border-0">
+                        <Label htmlFor="task-description">
+                            Description
+                            <RequiredMark />
+                        </Label>
 
                         <Textarea
                             className={`min-h-[80px] ${errors.description ? 'border-red-500' : ''}`}
@@ -80,11 +87,11 @@ export default function TaskCreateDialog({trigger}: TaskCreateDialogProps) {
                         />
 
                         {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
-                    </div>
+                    </fieldset>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="task-status">Status</Label>
+                        <fieldset className="space-y-2 border-0">
+                            <Label>Status</Label>
 
                             <Select onValueChange={(value) => handleFormChange('status', value)} value={form.status}>
                                 <SelectTrigger>
@@ -93,31 +100,31 @@ export default function TaskCreateDialog({trigger}: TaskCreateDialogProps) {
 
                                 <SelectContent>
                                     <SelectItem value="open">
-                                        <div className="flex items-center gap-2">
-                                            <Circle className="size-3 text-gray-400" />
+                                        <span className="flex items-center gap-2">
+                                            <CircleIcon className="size-3 text-gray-400" />
                                             Open
-                                        </div>
+                                        </span>
                                     </SelectItem>
 
                                     <SelectItem value="in-progress">
-                                        <div className="flex items-center gap-2">
-                                            <Clock className="size-3 text-blue-600" />
+                                        <span className="flex items-center gap-2">
+                                            <ClockIcon className="size-3 text-blue-600" />
                                             In Progress
-                                        </div>
+                                        </span>
                                     </SelectItem>
 
                                     <SelectItem value="completed">
-                                        <div className="flex items-center gap-2">
-                                            <CheckCircle2 className="size-3 text-green-600" />
+                                        <span className="flex items-center gap-2">
+                                            <CheckCircle2Icon className="size-3 text-green-600" />
                                             Completed
-                                        </div>
+                                        </span>
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
+                        </fieldset>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="task-priority">Priority</Label>
+                        <fieldset className="space-y-2 border-0">
+                            <Label>Priority</Label>
 
                             <Select
                                 onValueChange={(value) => handleFormChange('priority', value)}
@@ -129,42 +136,39 @@ export default function TaskCreateDialog({trigger}: TaskCreateDialogProps) {
 
                                 <SelectContent>
                                     <SelectItem value="high">
-                                        <div className="flex items-center gap-2">
-                                            <Badge
-                                                className="border-red-200 bg-red-100 text-red-800"
-                                                label="High"
-                                                styleType="outline-outline"
-                                            />
-                                        </div>
+                                        <Badge
+                                            className="border-red-200 bg-red-100 text-red-800"
+                                            label="High"
+                                            styleType="outline-outline"
+                                        />
                                     </SelectItem>
 
                                     <SelectItem value="medium">
-                                        <div className="flex items-center gap-2">
-                                            <Badge
-                                                className="border-yellow-200 bg-yellow-100 text-yellow-800"
-                                                label="Medium"
-                                                styleType="outline-outline"
-                                            />
-                                        </div>
+                                        <Badge
+                                            className="border-yellow-200 bg-yellow-100 text-yellow-800"
+                                            label="Medium"
+                                            styleType="outline-outline"
+                                        />
                                     </SelectItem>
 
                                     <SelectItem value="low">
-                                        <div className="flex items-center gap-2">
-                                            <Badge
-                                                className="border-green-200 bg-green-100 text-green-800"
-                                                label="Low"
-                                                styleType="outline-outline"
-                                            />
-                                        </div>
+                                        <Badge
+                                            className="border-green-200 bg-green-100 text-green-800"
+                                            label="Low"
+                                            styleType="outline-outline"
+                                        />
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
+                        </fieldset>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="task-assignee">Assignee *</Label>
+                        <fieldset className="space-y-2 border-0">
+                            <Label>
+                                Assignee
+                                <RequiredMark />
+                            </Label>
 
                             <Select
                                 onValueChange={(value) => handleFormChange('assignee', value)}
@@ -177,21 +181,21 @@ export default function TaskCreateDialog({trigger}: TaskCreateDialogProps) {
                                 <SelectContent>
                                     {availableAssignees.map((assignee) => (
                                         <SelectItem key={assignee} value={assignee}>
-                                            <div className="flex items-center gap-2">
-                                                <User className="size-3 text-muted-foreground" />
+                                            <span className="flex items-center gap-2">
+                                                <UserIcon className="size-3 text-muted-foreground" />
 
                                                 {assignee}
-                                            </div>
+                                            </span>
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
 
                             {errors.assignee && <p className="text-sm text-red-500">{errors.assignee}</p>}
-                        </div>
+                        </fieldset>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="task-due-date">Due Date</Label>
+                        <fieldset className="space-y-2 border-0">
+                            <Label>Due Date</Label>
 
                             <DatePicker
                                 onChange={(date) =>
@@ -199,7 +203,7 @@ export default function TaskCreateDialog({trigger}: TaskCreateDialogProps) {
                                 }
                                 value={form.dueDate ? new Date(form.dueDate) : undefined}
                             />
-                        </div>
+                        </fieldset>
                     </div>
                 </div>
 

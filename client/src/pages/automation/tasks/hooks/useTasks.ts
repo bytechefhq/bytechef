@@ -7,24 +7,15 @@ import {getAvailableAssignees, getCurrentTimestamp} from '../utils/task-utils';
 import type {TaskAttachmentI, TaskCommentI, TaskI} from '../types/types';
 
 export interface UseTasksReturnI {
-    // Task data
-    tasks: TaskI[];
+    addAttachmentToTask: (taskId: string, attachment: Omit<TaskAttachmentI, 'id' | 'uploadedAt'>) => void;
+    addCommentToTask: (taskId: string, comment: Omit<TaskCommentI, 'id' | 'timestamp'>) => void;
+    availableAssignees: string[];
+    removeAttachmentFromTask: (taskId: string, attachmentId: string) => void;
     selectedTaskId: string | null;
     selectedTaskObject: TaskI | null;
-
-    // Selection
     setSelectedTaskId: (taskId: string | null) => void;
-
-    // Task mutations
+    tasks: TaskI[];
     updateTask: (task: TaskI) => void;
-
-    // Comment/Attachment mutations
-    addCommentToTask: (taskId: string, comment: Omit<TaskCommentI, 'id' | 'timestamp'>) => void;
-    addAttachmentToTask: (taskId: string, attachment: Omit<TaskAttachmentI, 'id' | 'uploadedAt'>) => void;
-    removeAttachmentFromTask: (taskId: string, attachmentId: string) => void;
-
-    // Constants
-    availableAssignees: string[];
 }
 
 export function useTasks(): UseTasksReturnI {

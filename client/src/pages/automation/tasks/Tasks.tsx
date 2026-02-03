@@ -5,7 +5,6 @@ import TaskList from './components/TaskList';
 import {useTasks} from './hooks/useTasks';
 
 export default function Tasks() {
-    // Initialize the store with API data
     useTasks();
 
     return (

@@ -1,6 +1,6 @@
-import {CheckCircle2, Circle, Clock} from 'lucide-react';
+import {CheckCircle2Icon, CircleIcon, ClockIcon} from 'lucide-react';
 
-import type React from 'react';
+import type {ReactNode} from 'react';
 
 import type {SortDirectionType, SortOptionType, TaskI} from '../types/types';
 
@@ -61,14 +61,14 @@ export const getInitials = (name: string): string => {
         .toUpperCase();
 };
 
-export const getStatusIcon = (status: string): React.ReactNode => {
+export const getStatusIcon = (status: string): ReactNode => {
     switch (status) {
         case 'completed':
-            return <CheckCircle2 className="size-4 text-green-500" />;
+            return <CheckCircle2Icon className="size-4 text-green-500" />;
         case 'in-progress':
-            return <Clock className="size-4 text-blue-500" />;
+            return <ClockIcon className="size-4 text-blue-500" />;
         default:
-            return <Circle className="size-4 text-gray-400" />;
+            return <CircleIcon className="size-4 text-gray-400" />;
     }
 };
 
@@ -110,7 +110,7 @@ export const getPriorityLabel = (priority: string): string => {
     return priority.charAt(0).toUpperCase() + priority.slice(1);
 };
 
-export const highlightText = (text: string, query: string): React.ReactNode => {
+export const highlightText = (text: string, query: string): ReactNode => {
     if (!query.trim()) {
         return text;
     }

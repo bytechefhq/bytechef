@@ -4,7 +4,16 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
-import {AlertTriangle, CheckCircle2, Circle, Clock, Edit, Save, User, XCircle} from 'lucide-react';
+import {
+    AlertTriangleIcon,
+    CheckCircle2Icon,
+    CircleIcon,
+    ClockIcon,
+    EditIcon,
+    SaveIcon,
+    UserIcon,
+    XCircleIcon,
+} from 'lucide-react';
 
 import {isTaskOverdue} from '../utils/task-utils';
 import TaskComments from './TaskComments';
@@ -27,14 +36,12 @@ export default function TaskDetail() {
 
     if (!task) {
         return (
-            <div className="flex h-full items-center justify-center">
-                <div className="text-center">
-                    <Circle className="mx-auto mb-4 size-12 text-muted-foreground" />
+            <div className="flex h-full items-center justify-center text-center">
+                <CircleIcon className="mx-auto mb-4 size-12 text-muted-foreground" />
 
-                    <h2 className="text-lg font-medium text-foreground">Select a task</h2>
+                <h2 className="text-lg font-medium text-foreground">Select a task</h2>
 
-                    <p className="text-sm text-muted-foreground">Choose a task from the sidebar to view details</p>
-                </div>
+                <p className="text-sm text-muted-foreground">Choose a task from the sidebar to view details</p>
             </div>
         );
     }
@@ -82,7 +89,7 @@ export default function TaskDetail() {
                         {!isEditing && isTaskOverdue(displayTask) && (
                             <Badge
                                 className="text-red-600"
-                                icon={<AlertTriangle className="size-3" />}
+                                icon={<AlertTriangleIcon className="size-3" />}
                                 label="Overdue"
                                 styleType="destructive-outline"
                             />
@@ -90,12 +97,12 @@ export default function TaskDetail() {
 
                         {isEditing ? (
                             <>
-                                <Button icon={<Save className="size-4" />} onClick={handleSave} size="sm">
+                                <Button icon={<SaveIcon className="size-4" />} onClick={handleSave} size="sm">
                                     Save
                                 </Button>
 
                                 <Button
-                                    icon={<XCircle className="size-4" />}
+                                    icon={<XCircleIcon className="size-4" />}
                                     onClick={handleCancel}
                                     size="sm"
                                     variant="outline"
@@ -104,7 +111,12 @@ export default function TaskDetail() {
                                 </Button>
                             </>
                         ) : (
-                            <Button icon={<Edit className="size-4" />} onClick={handleEdit} size="sm" variant="outline">
+                            <Button
+                                icon={<EditIcon className="size-4" />}
+                                onClick={handleEdit}
+                                size="sm"
+                                variant="outline"
+                            >
                                 Edit
                             </Button>
                         )}
@@ -112,8 +124,8 @@ export default function TaskDetail() {
                 </div>
             </div>
 
-            <div className="mb-6">
-                <Label className="mb-2 block text-sm font-medium text-foreground">Description</Label>
+            <fieldset className="mb-6 border-0">
+                <span className="mb-2 block text-sm font-medium text-foreground">Description</span>
 
                 {isEditing ? (
                     <Textarea
@@ -127,10 +139,10 @@ export default function TaskDetail() {
                         {displayTask.description || 'No description provided'}
                     </p>
                 )}
-            </div>
+            </fieldset>
 
             <div className="mb-6 grid w-8/12 grid-cols-2">
-                <div>
+                <fieldset className="border-0">
                     <Label className="mb-2 block text-sm font-medium text-foreground">Status</Label>
 
                     {isEditing ? (
@@ -145,21 +157,21 @@ export default function TaskDetail() {
                             <SelectContent>
                                 <SelectItem value="open">
                                     <div className="flex items-center gap-2">
-                                        <Circle className="size-4 text-gray-500" />
+                                        <CircleIcon className="size-4 text-gray-500" />
                                         Open
                                     </div>
                                 </SelectItem>
 
                                 <SelectItem value="in-progress">
                                     <div className="flex items-center gap-2">
-                                        <Clock className="size-4 text-blue-500" />
+                                        <ClockIcon className="size-4 text-blue-500" />
                                         In Progress
                                     </div>
                                 </SelectItem>
 
                                 <SelectItem value="completed">
                                     <div className="flex items-center gap-2">
-                                        <CheckCircle2 className="size-4 text-green-500" />
+                                        <CheckCircle2Icon className="size-4 text-green-500" />
                                         Completed
                                     </div>
                                 </SelectItem>
@@ -172,15 +184,15 @@ export default function TaskDetail() {
                             <span className="capitalize">{displayTask.status.replace('-', ' ')}</span>
                         </div>
                     )}
-                </div>
+                </fieldset>
 
                 <div>
-                    <Label className="mb-2 block text-sm font-medium text-foreground">Created</Label>
+                    <span className="mb-2 block text-sm font-medium text-foreground">Created</span>
 
                     <p className="text-sm text-muted-foreground">{createdAtFormatted}</p>
                 </div>
 
-                <div>
+                <fieldset className="border-0">
                     <Label className="mb-2 block text-sm font-medium text-foreground">Assignee</Label>
 
                     {isEditing ? (
@@ -196,7 +208,7 @@ export default function TaskDetail() {
                                 {availableAssignees.map((assignee) => (
                                     <SelectItem key={assignee} value={assignee}>
                                         <div className="flex items-center gap-2">
-                                            <User className="size-4" />
+                                            <UserIcon className="size-4" />
 
                                             {assignee}
                                         </div>
@@ -206,16 +218,16 @@ export default function TaskDetail() {
                         </Select>
                     ) : (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <User className="size-4" />
+                            <UserIcon className="size-4" />
 
                             {displayTask.assignee}
                         </div>
                     )}
-                </div>
+                </fieldset>
 
                 {!isEditing && (
                     <div>
-                        <Label className="mb-2 block text-sm font-medium text-foreground">Priority</Label>
+                        <span className="mb-2 block text-sm font-medium text-foreground">Priority</span>
 
                         <Badge className={priorityColor} label={displayTask.priority} styleType="outline-outline" />
                     </div>

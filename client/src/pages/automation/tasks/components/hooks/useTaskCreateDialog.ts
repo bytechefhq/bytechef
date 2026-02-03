@@ -21,23 +21,24 @@ const getCurrentDate = (): string => {
     return new Date().toISOString().split('T')[0];
 };
 
+const generateTaskId = (): string => {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+    }
+
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+};
+
 export interface UseTaskCreateDialogReturnI {
-    // Dialog state
-    isOpen: boolean;
+    availableAssignees: string[];
+    errors: Partial<NewTaskFormI>;
+    form: NewTaskFormI;
     handleCloseDialog: () => void;
+    handleFormChange: (field: keyof NewTaskFormI, value: string | string[]) => void;
     handleOpenChange: (open: boolean) => void;
     handleOpenDialog: () => void;
-
-    // Form state
-    form: NewTaskFormI;
-    errors: Partial<NewTaskFormI>;
-    handleFormChange: (field: keyof NewTaskFormI, value: string | string[]) => void;
-
-    // Actions
     handleSubmit: () => void;
-
-    // Data for the dialog
-    availableAssignees: string[];
+    isOpen: boolean;
 }
 
 export function useTaskCreateDialog(): UseTaskCreateDialogReturnI {
@@ -47,27 +48,15 @@ export function useTaskCreateDialog(): UseTaskCreateDialogReturnI {
 
     const addTask = useTasksStore((state) => state.addTask);
 
-    // Fetch users for assignee selection
     const {data: usersData} = useUsersQuery();
 
     const availableAssignees = useMemo(() => getAvailableAssignees(usersData?.users?.content), [usersData]);
 
-    // API mutation
     const createTaskMutation = useCreateTaskMutation({
         onError: (error) => {
             console.error('Error creating task:', error);
         },
     });
-
-    // Generate unique task ID using crypto.randomUUID for UUID-safe IDs
-    const generateTaskId = useCallback(() => {
-        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-            return crypto.randomUUID();
-        }
-
-        // Fallback for environments without crypto.randomUUID
-        return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-    }, []);
 
     const handleOpenDialog = useCallback(() => {
         setIsOpen(true);
@@ -105,7 +94,7 @@ export function useTaskCreateDialog(): UseTaskCreateDialogReturnI {
         });
     }, []);
 
-    const validateForm = useCallback((): boolean => {
+    const isFormValid = useCallback((): boolean => {
         const validationErrors: Partial<NewTaskFormI> = {};
 
         if (!form.title.trim()) {
@@ -126,7 +115,7 @@ export function useTaskCreateDialog(): UseTaskCreateDialogReturnI {
     }, [form]);
 
     const handleSubmit = useCallback(() => {
-        if (validateForm()) {
+        if (isFormValid()) {
             const newTask: TaskI = {
                 assignee: form.assignee,
                 attachments: [],
@@ -152,7 +141,7 @@ export function useTaskCreateDialog(): UseTaskCreateDialogReturnI {
 
             handleCloseDialog();
         }
-    }, [form, validateForm, generateTaskId, addTask, createTaskMutation, handleCloseDialog]);
+    }, [form, isFormValid, addTask, createTaskMutation, handleCloseDialog]);
 
     return {
         availableAssignees,
