@@ -20,6 +20,7 @@ src/main/java/com/bytechef/automation/configuration/web/rest/model/ComponentDefi
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ConnectionBaseModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ConnectionModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CreateProjectDeploymentWorkflowJob200ResponseModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/CreateProjectWorkflow200ResponseModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CredentialStatusModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/DuplicateWorkflow200ResponseModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectBasicModel.java

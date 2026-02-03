@@ -6,7 +6,7 @@
 
 Name | Type
 ------------ | -------------
-`id` | string
+`workflowId` | string
 
 ## Example
 
@@ -15,7 +15,7 @@ import type { DuplicateWorkflow200Response } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "id": null,
+  "workflowId": null,
 } satisfies DuplicateWorkflow200Response
 
 console.log(example)
