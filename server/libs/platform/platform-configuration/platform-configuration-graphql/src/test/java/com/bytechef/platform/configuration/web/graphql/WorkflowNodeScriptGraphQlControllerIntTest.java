@@ -162,4 +162,106 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
             .path("testClusterElementScript.output")
             .valueIsNull();
     }
+
+    @Test
+    void testTestWorkflowNodeScriptWithSuccessfulExecution() {
+        Map<String, Object> outputMap = Map.of("result", "script output", "value", 100);
+        ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(null, outputMap);
+
+        when(workflowNodeScriptFacade.testWorkflowNodeScript(
+            anyString(), anyString(), anyLong())).thenReturn(dto);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    testWorkflowNodeScript(
+                        workflowId: "workflow-456"
+                        workflowNodeName: "script_1"
+                        environmentId: 1
+                    ) {
+                        error {
+                            message
+                            stackTrace
+                        }
+                        output
+                    }
+                }
+                """)
+            .execute()
+            .path("testWorkflowNodeScript.error")
+            .valueIsNull()
+            .path("testWorkflowNodeScript.output")
+            .entity(Map.class)
+            .satisfies(output -> {
+                assert output.get("result")
+                    .equals("script output");
+                assert output.get("value")
+                    .equals(100);
+            });
+    }
+
+    @Test
+    void testTestWorkflowNodeScriptWithError() {
+        ExecutionError executionError = new ExecutionError(
+            "Workflow script failed", List.of("at script line 5", "at script line 10"));
+        ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(executionError, null);
+
+        when(workflowNodeScriptFacade.testWorkflowNodeScript(
+            anyString(), anyString(), anyLong())).thenReturn(dto);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    testWorkflowNodeScript(
+                        workflowId: "workflow-456"
+                        workflowNodeName: "script_1"
+                        environmentId: 1
+                    ) {
+                        error {
+                            message
+                            stackTrace
+                        }
+                        output
+                    }
+                }
+                """)
+            .execute()
+            .path("testWorkflowNodeScript.error.message")
+            .entity(String.class)
+            .isEqualTo("Workflow script failed")
+            .path("testWorkflowNodeScript.error.stackTrace")
+            .entityList(String.class)
+            .hasSize(2)
+            .path("testWorkflowNodeScript.output")
+            .valueIsNull();
+    }
+
+    @Test
+    void testTestWorkflowNodeScriptWithNullOutput() {
+        ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(null, null);
+
+        when(workflowNodeScriptFacade.testWorkflowNodeScript(
+            anyString(), anyString(), anyLong())).thenReturn(dto);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    testWorkflowNodeScript(
+                        workflowId: "workflow-456"
+                        workflowNodeName: "script_1"
+                        environmentId: 2
+                    ) {
+                        error {
+                            message
+                        }
+                        output
+                    }
+                }
+                """)
+            .execute()
+            .path("testWorkflowNodeScript.error")
+            .valueIsNull()
+            .path("testWorkflowNodeScript.output")
+            .valueIsNull();
+    }
 }
