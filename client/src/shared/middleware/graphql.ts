@@ -807,6 +807,7 @@ export type Mutation = {
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpServer?: Maybe<McpServer>;
   createMcpTool?: Maybe<McpTool>;
+  createTask?: Maybe<Task>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteApiKey: Scalars['Boolean']['output'];
@@ -821,6 +822,7 @@ export type Mutation = {
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
+  deleteTask?: Maybe<Scalars['Boolean']['output']>;
   deleteUser: Scalars['Boolean']['output'];
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -852,6 +854,7 @@ export type Mutation = {
   updateMcpServer?: Maybe<McpServer>;
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
+  updateTask?: Maybe<Task>;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
 };
@@ -907,6 +910,11 @@ export type MutationCreateMcpServerArgs = {
 
 export type MutationCreateMcpToolArgs = {
   input: McpToolInput;
+};
+
+
+export type MutationCreateTaskArgs = {
+  task: TaskInput;
 };
 
 
@@ -979,6 +987,11 @@ export type MutationDeleteSharedProjectArgs = {
 
 export type MutationDeleteSharedWorkflowArgs = {
   workflowId: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteTaskArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1149,6 +1162,11 @@ export type MutationUpdateMcpServerTagsArgs = {
 
 export type MutationUpdateMcpServerUrlArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateTaskArgs = {
+  task: TaskInput;
 };
 
 
@@ -1428,9 +1446,12 @@ export type Query = {
   searchKnowledgeBase?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
   sharedProject?: Maybe<SharedProject>;
   sharedWorkflow?: Maybe<SharedWorkflow>;
+  task?: Maybe<Task>;
   taskDispatcherDefinition: TaskDispatcherDefinition;
   taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
   taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
+  tasks?: Maybe<Array<Maybe<Task>>>;
+  tasksByIds?: Maybe<Array<Maybe<Task>>>;
   triggerDefinition: TriggerDefinition;
   triggerDefinitions: Array<TriggerDefinition>;
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
@@ -1722,6 +1743,11 @@ export type QuerySharedWorkflowArgs = {
 };
 
 
+export type QueryTaskArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type QueryTaskDispatcherDefinitionArgs = {
   name: Scalars['String']['input'];
   version: Scalars['Int']['input'];
@@ -1730,6 +1756,11 @@ export type QueryTaskDispatcherDefinitionArgs = {
 
 export type QueryTaskDispatcherDefinitionVersionsArgs = {
   name: Scalars['String']['input'];
+};
+
+
+export type QueryTasksByIdsArgs = {
+  ids: Array<Scalars['ID']['input']>;
 };
 
 
@@ -1878,6 +1909,18 @@ export type TagInput = {
   name: Scalars['String']['input'];
 };
 
+export type Task = {
+  __typename?: 'Task';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  version: Scalars['Int']['output'];
+};
+
 export type TaskDispatcherDefinition = {
   __typename?: 'TaskDispatcherDefinition';
   description?: Maybe<Scalars['String']['output']>;
@@ -1892,6 +1935,13 @@ export type TaskDispatcherDefinition = {
   title?: Maybe<Scalars['String']['output']>;
   variablePropertiesDefined?: Maybe<Scalars['Boolean']['output']>;
   version: Scalars['Int']['output'];
+};
+
+export type TaskInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name: Scalars['String']['input'];
+  version?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type TimeProperty = Property & {
@@ -2457,6 +2507,39 @@ export type UpdateKnowledgeBaseTagsMutationVariables = Exact<{
 
 
 export type UpdateKnowledgeBaseTagsMutation = { __typename?: 'Mutation', updateKnowledgeBaseTags: boolean };
+
+export type CreateTaskMutationVariables = Exact<{
+  task: TaskInput;
+}>;
+
+
+export type CreateTaskMutation = { __typename?: 'Mutation', createTask?: { __typename?: 'Task', description?: string | null, id: string, name: string } | null };
+
+export type DeleteTaskMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteTaskMutation = { __typename?: 'Mutation', deleteTask?: boolean | null };
+
+export type TaskQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type TaskQuery = { __typename?: 'Query', task?: { __typename?: 'Task', createdBy?: string | null, createdDate?: string | null, description?: string | null, id: string, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, version: number } | null };
+
+export type TasksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TasksQuery = { __typename?: 'Query', tasks?: Array<{ __typename?: 'Task', createdBy?: string | null, createdDate?: string | null, description?: string | null, id: string, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, version: number } | null> | null };
+
+export type UpdateTaskMutationVariables = Exact<{
+  task: TaskInput;
+}>;
+
+
+export type UpdateTaskMutation = { __typename?: 'Mutation', updateTask?: { __typename?: 'Task', description?: string | null, id: string, name: string, version: number } | null };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
@@ -4271,6 +4354,134 @@ export const useUpdateKnowledgeBaseTagsMutation = <
       {
     mutationKey: ['updateKnowledgeBaseTags'],
     mutationFn: (variables?: UpdateKnowledgeBaseTagsMutationVariables) => fetcher<UpdateKnowledgeBaseTagsMutation, UpdateKnowledgeBaseTagsMutationVariables>(UpdateKnowledgeBaseTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateTaskDocument = `
+    mutation createTask($task: TaskInput!) {
+  createTask(task: $task) {
+    description
+    id
+    name
+  }
+}
+    `;
+
+export const useCreateTaskMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateTaskMutation, TError, CreateTaskMutationVariables, TContext>) => {
+    
+    return useMutation<CreateTaskMutation, TError, CreateTaskMutationVariables, TContext>(
+      {
+    mutationKey: ['createTask'],
+    mutationFn: (variables?: CreateTaskMutationVariables) => fetcher<CreateTaskMutation, CreateTaskMutationVariables>(CreateTaskDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteTaskDocument = `
+    mutation deleteTask($id: ID!) {
+  deleteTask(id: $id)
+}
+    `;
+
+export const useDeleteTaskMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteTaskMutation, TError, DeleteTaskMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteTaskMutation, TError, DeleteTaskMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteTask'],
+    mutationFn: (variables?: DeleteTaskMutationVariables) => fetcher<DeleteTaskMutation, DeleteTaskMutationVariables>(DeleteTaskDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const TaskDocument = `
+    query task($id: ID!) {
+  task(id: $id) {
+    createdBy
+    createdDate
+    description
+    id
+    lastModifiedBy
+    lastModifiedDate
+    name
+    version
+  }
+}
+    `;
+
+export const useTaskQuery = <
+      TData = TaskQuery,
+      TError = unknown
+    >(
+      variables: TaskQueryVariables,
+      options?: Omit<UseQueryOptions<TaskQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TaskQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<TaskQuery, TError, TData>(
+      {
+    queryKey: ['task', variables],
+    queryFn: fetcher<TaskQuery, TaskQueryVariables>(TaskDocument, variables),
+    ...options
+  }
+    )};
+
+export const TasksDocument = `
+    query tasks {
+  tasks {
+    createdBy
+    createdDate
+    description
+    id
+    lastModifiedBy
+    lastModifiedDate
+    name
+    version
+  }
+}
+    `;
+
+export const useTasksQuery = <
+      TData = TasksQuery,
+      TError = unknown
+    >(
+      variables?: TasksQueryVariables,
+      options?: Omit<UseQueryOptions<TasksQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TasksQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<TasksQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['tasks'] : ['tasks', variables],
+    queryFn: fetcher<TasksQuery, TasksQueryVariables>(TasksDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateTaskDocument = `
+    mutation updateTask($task: TaskInput!) {
+  updateTask(task: $task) {
+    description
+    id
+    name
+    version
+  }
+}
+    `;
+
+export const useUpdateTaskMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateTaskMutation, TError, UpdateTaskMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateTaskMutation, TError, UpdateTaskMutationVariables, TContext>(
+      {
+    mutationKey: ['updateTask'],
+    mutationFn: (variables?: UpdateTaskMutationVariables) => fetcher<UpdateTaskMutation, UpdateTaskMutationVariables>(UpdateTaskDocument, variables)(),
     ...options
   }
     )};
