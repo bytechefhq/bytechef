@@ -18,7 +18,9 @@ import java.util.List;
  */
 public interface ApiConnectorFacade {
 
-    ApiConnector importOpenApiSpecification(String componentName, String specification);
+    ApiConnector generateFromDocumentation(String componentName, String documentationUrl);
 
     List<ApiConnectorDTO> getApiConnectors();
+
+    ApiConnector importOpenApiSpecification(String componentName, String specification);
 }

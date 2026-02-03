@@ -537,7 +537,7 @@ include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:e
 include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service")
 
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-api")
-include("server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-rest")
+include("server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-graphql")
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-service")
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-api")
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-impl")
