@@ -982,6 +982,7 @@ export type Mutation = {
   startGenerateForEndpoints: GenerationJobStatus;
   startGenerateFromDocumentationPreview: GenerationJobStatus;
   testClusterElementScript: ScriptTestExecution;
+  testWorkflowNodeScript: ScriptTestExecution;
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
@@ -1285,6 +1286,13 @@ export type MutationStartGenerateFromDocumentationPreviewArgs = {
 export type MutationTestClusterElementScriptArgs = {
   clusterElementType: Scalars['String']['input'];
   clusterElementWorkflowNodeName: Scalars['String']['input'];
+  environmentId: Scalars['Long']['input'];
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationTestWorkflowNodeScriptArgs = {
   environmentId: Scalars['Long']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
@@ -3005,6 +3013,26 @@ export type McpToolsByComponentIdQueryVariables = Exact<{
 
 
 export type McpToolsByComponentIdQuery = { __typename?: 'Query', mcpToolsByComponentId?: Array<{ __typename?: 'McpTool', id: string, name: string, mcpComponentId: string, parameters?: any | null } | null> | null };
+
+export type TestClusterElementScriptMutationVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+  clusterElementType: Scalars['String']['input'];
+  clusterElementWorkflowNodeName: Scalars['String']['input'];
+  environmentId: Scalars['Long']['input'];
+}>;
+
+
+export type TestClusterElementScriptMutation = { __typename?: 'Mutation', testClusterElementScript: { __typename?: 'ScriptTestExecution', output?: any | null, error?: { __typename?: 'ExecutionError', message?: string | null, stackTrace?: Array<string | null> | null } | null } };
+
+export type TestWorkflowNodeScriptMutationVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+  environmentId: Scalars['Long']['input'];
+}>;
+
+
+export type TestWorkflowNodeScriptMutation = { __typename?: 'Mutation', testWorkflowNodeScript: { __typename?: 'ScriptTestExecution', output?: any | null, error?: { __typename?: 'ExecutionError', message?: string | null, stackTrace?: Array<string | null> | null } | null } };
 
 export type UpdateApiKeyMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5662,6 +5690,66 @@ export const useMcpToolsByComponentIdQuery = <
       {
     queryKey: ['mcpToolsByComponentId', variables],
     queryFn: fetcher<McpToolsByComponentIdQuery, McpToolsByComponentIdQueryVariables>(McpToolsByComponentIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const TestClusterElementScriptDocument = `
+    mutation testClusterElementScript($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!) {
+  testClusterElementScript(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    clusterElementType: $clusterElementType
+    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+    environmentId: $environmentId
+  ) {
+    error {
+      message
+      stackTrace
+    }
+    output
+  }
+}
+    `;
+
+export const useTestClusterElementScriptMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<TestClusterElementScriptMutation, TError, TestClusterElementScriptMutationVariables, TContext>) => {
+    
+    return useMutation<TestClusterElementScriptMutation, TError, TestClusterElementScriptMutationVariables, TContext>(
+      {
+    mutationKey: ['testClusterElementScript'],
+    mutationFn: (variables?: TestClusterElementScriptMutationVariables) => fetcher<TestClusterElementScriptMutation, TestClusterElementScriptMutationVariables>(TestClusterElementScriptDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const TestWorkflowNodeScriptDocument = `
+    mutation testWorkflowNodeScript($workflowId: String!, $workflowNodeName: String!, $environmentId: Long!) {
+  testWorkflowNodeScript(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    environmentId: $environmentId
+  ) {
+    error {
+      message
+      stackTrace
+    }
+    output
+  }
+}
+    `;
+
+export const useTestWorkflowNodeScriptMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<TestWorkflowNodeScriptMutation, TError, TestWorkflowNodeScriptMutationVariables, TContext>) => {
+    
+    return useMutation<TestWorkflowNodeScriptMutation, TError, TestWorkflowNodeScriptMutationVariables, TContext>(
+      {
+    mutationKey: ['testWorkflowNodeScript'],
+    mutationFn: (variables?: TestWorkflowNodeScriptMutationVariables) => fetcher<TestWorkflowNodeScriptMutation, TestWorkflowNodeScriptMutationVariables>(TestWorkflowNodeScriptDocument, variables)(),
     ...options
   }
     )};
