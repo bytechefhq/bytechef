@@ -86,6 +86,14 @@ export type AdminUserPage = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type ApiCollectionSearchResult = SearchResult & {
+  __typename?: 'ApiCollectionSearchResult';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: SearchAssetType;
+};
+
 export type ApiConnector = {
   __typename?: 'ApiConnector';
   connectorVersion: Scalars['Int']['output'];
@@ -118,6 +126,16 @@ export type ApiConnectorEndpoint = {
   name: Scalars['String']['output'];
   path?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ApiEndpointSearchResult = SearchResult & {
+  __typename?: 'ApiEndpointSearchResult';
+  collectionId: Scalars['ID']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  path?: Maybe<Scalars['String']['output']>;
+  type: SearchAssetType;
 };
 
 export type ApiKey = {
@@ -352,6 +370,14 @@ export type ConnectionDefinition = {
   version: Scalars['Int']['output'];
 };
 
+export type ConnectionSearchResult = SearchResult & {
+  __typename?: 'ConnectionSearchResult';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: SearchAssetType;
+};
+
 export enum ControlType {
   ArrayBuilder = 'ARRAY_BUILDER',
   CodeEditor = 'CODE_EDITOR',
@@ -477,6 +503,14 @@ export type DataTableRowPage = {
   hasMore: Scalars['Boolean']['output'];
   items: Array<DataTableRow>;
   nextOffset?: Maybe<Scalars['Int']['output']>;
+};
+
+export type DataTableSearchResult = SearchResult & {
+  __typename?: 'DataTableSearchResult';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: SearchAssetType;
 };
 
 export type DataTableTagsEntry = {
@@ -781,6 +815,15 @@ export type KnowledgeBaseDocumentChunkInput = {
   content: Scalars['String']['input'];
 };
 
+export type KnowledgeBaseDocumentSearchResult = SearchResult & {
+  __typename?: 'KnowledgeBaseDocumentSearchResult';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  knowledgeBaseId: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: SearchAssetType;
+};
+
 export type KnowledgeBaseDocumentTagsEntry = {
   __typename?: 'KnowledgeBaseDocumentTagsEntry';
   knowledgeBaseDocumentId: Scalars['ID']['output'];
@@ -793,6 +836,14 @@ export type KnowledgeBaseInput = {
   minChunkSizeChars?: InputMaybe<Scalars['Int']['input']>;
   name: Scalars['String']['input'];
   overlap?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type KnowledgeBaseSearchResult = SearchResult & {
+  __typename?: 'KnowledgeBaseSearchResult';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: SearchAssetType;
 };
 
 export type KnowledgeBaseTagsEntry = {
@@ -1594,6 +1645,15 @@ export type ProjectDeployment = {
   version: Scalars['Int']['output'];
 };
 
+export type ProjectDeploymentSearchResult = SearchResult & {
+  __typename?: 'ProjectDeploymentSearchResult';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  projectName: Scalars['String']['output'];
+  type: SearchAssetType;
+};
+
 export type ProjectDeploymentWorkflow = {
   __typename?: 'ProjectDeploymentWorkflow';
   connections: Array<ProjectDeploymentWorkflowConnection>;
@@ -1623,6 +1683,14 @@ export type ProjectInfo = {
   __typename?: 'ProjectInfo';
   description?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+};
+
+export type ProjectSearchResult = SearchResult & {
+  __typename?: 'ProjectSearchResult';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: SearchAssetType;
 };
 
 export type ProjectTemplate = {
@@ -1701,6 +1769,7 @@ export type Query = {
   apiKey?: Maybe<ApiKey>;
   apiKeys?: Maybe<Array<Maybe<ApiKey>>>;
   authorities: Array<Scalars['String']['output']>;
+  automationSearch: Array<SearchResult>;
   clusterElementComponentConnections: Array<ComponentConnection>;
   clusterElementDefinition: ClusterElementDefinition;
   clusterElementDefinitions: Array<ClusterElementDefinition>;
@@ -1820,6 +1889,12 @@ export type QueryApiKeyArgs = {
 export type QueryApiKeysArgs = {
   environmentId: Scalars['ID']['input'];
   type: PlatformType;
+};
+
+
+export type QueryAutomationSearchArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  query: Scalars['String']['input'];
 };
 
 
@@ -2274,6 +2349,25 @@ export type ScriptTestExecution = {
   output?: Maybe<Scalars['Map']['output']>;
 };
 
+export enum SearchAssetType {
+  ApiCollection = 'API_COLLECTION',
+  ApiEndpoint = 'API_ENDPOINT',
+  Connection = 'CONNECTION',
+  DataTable = 'DATA_TABLE',
+  Deployment = 'DEPLOYMENT',
+  KnowledgeBase = 'KNOWLEDGE_BASE',
+  KnowledgeBaseDocument = 'KNOWLEDGE_BASE_DOCUMENT',
+  Project = 'PROJECT',
+  Workflow = 'WORKFLOW'
+}
+
+export type SearchResult = {
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: SearchAssetType;
+};
+
 export type SelectedEndpointInput = {
   method: Scalars['String']['input'];
   path: Scalars['String']['input'];
@@ -2471,6 +2565,16 @@ export type WorkflowInfo = {
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   label: Scalars['String']['output'];
+};
+
+export type WorkflowSearchResult = SearchResult & {
+  __typename?: 'WorkflowSearchResult';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  label: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  projectId: Scalars['ID']['output'];
+  type: SearchAssetType;
 };
 
 export type WorkflowTemplate = {
@@ -2949,6 +3053,24 @@ export type UpdateKnowledgeBaseTagsMutationVariables = Exact<{
 
 
 export type UpdateKnowledgeBaseTagsMutation = { __typename?: 'Mutation', updateKnowledgeBaseTags: boolean };
+
+export type AutomationSearchQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type AutomationSearchQuery = { __typename?: 'Query', automationSearch: Array<
+    | { __typename?: 'ApiCollectionSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
+    | { __typename?: 'ApiEndpointSearchResult', collectionId: string, path?: string | null, id: string, name: string, description?: string | null, type: SearchAssetType }
+    | { __typename?: 'ConnectionSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
+    | { __typename?: 'DataTableSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
+    | { __typename?: 'KnowledgeBaseDocumentSearchResult', knowledgeBaseId: string, id: string, name: string, description?: string | null, type: SearchAssetType }
+    | { __typename?: 'KnowledgeBaseSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
+    | { __typename?: 'ProjectDeploymentSearchResult', projectName: string, id: string, name: string, description?: string | null, type: SearchAssetType }
+    | { __typename?: 'ProjectSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
+    | { __typename?: 'WorkflowSearchResult', projectId: string, label: string, id: string, name: string, description?: string | null, type: SearchAssetType }
+  > };
 
 export type CreateTaskMutationVariables = Exact<{
   task: TaskInput;
@@ -5026,6 +5148,47 @@ export const useUpdateKnowledgeBaseTagsMutation = <
       {
     mutationKey: ['updateKnowledgeBaseTags'],
     mutationFn: (variables?: UpdateKnowledgeBaseTagsMutationVariables) => fetcher<UpdateKnowledgeBaseTagsMutation, UpdateKnowledgeBaseTagsMutationVariables>(UpdateKnowledgeBaseTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AutomationSearchDocument = `
+    query automationSearch($query: String!, $limit: Int) {
+  automationSearch(query: $query, limit: $limit) {
+    id
+    name
+    description
+    type
+    ... on WorkflowSearchResult {
+      projectId
+      label
+    }
+    ... on ProjectDeploymentSearchResult {
+      projectName
+    }
+    ... on ApiEndpointSearchResult {
+      collectionId
+      path
+    }
+    ... on KnowledgeBaseDocumentSearchResult {
+      knowledgeBaseId
+    }
+  }
+}
+    `;
+
+export const useAutomationSearchQuery = <
+      TData = AutomationSearchQuery,
+      TError = unknown
+    >(
+      variables: AutomationSearchQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationSearchQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationSearchQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationSearchQuery, TError, TData>(
+      {
+    queryKey: ['automationSearch', variables],
+    queryFn: fetcher<AutomationSearchQuery, AutomationSearchQueryVariables>(AutomationSearchDocument, variables),
     ...options
   }
     )};
