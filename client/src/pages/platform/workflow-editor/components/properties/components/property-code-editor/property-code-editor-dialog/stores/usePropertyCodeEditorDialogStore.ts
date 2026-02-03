@@ -1,4 +1,4 @@
-import {ScriptTestExecution} from '@/shared/middleware/platform/configuration';
+import {ScriptTestExecution} from '@/shared/middleware/graphql';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
