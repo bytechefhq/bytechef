@@ -14,9 +14,9 @@ const PropertyCodeEditorDialogExecutionOutput = () => {
         }))
     );
 
-    const renderContent = () => {
-        if (scriptIsRunning) {
-            return (
+    return (
+        <div className="relative size-full overflow-y-auto p-4 text-sm">
+            {scriptIsRunning ? (
                 <div className="flex items-center gap-x-1">
                     <span className="flex animate-spin text-gray-400">
                         <RefreshCwIcon className="size-4" />
@@ -24,45 +24,27 @@ const PropertyCodeEditorDialogExecutionOutput = () => {
 
                     <span className="text-muted-foreground">Script is running...</span>
                 </div>
-            );
-        }
-
-        if (!scriptTestExecution) {
-            return (
-                <div className="flex items-center gap-x-1 text-muted-foreground">
-                    <span>The script has not yet been executed.</span>
-                </div>
-            );
-        }
-
-        if (scriptTestExecution.output) {
-            if (typeof scriptTestExecution.output === 'object') {
-                return (
+            ) : !scriptTestExecution ? (
+                <span className="text-muted-foreground">The script has not yet been executed.</span>
+            ) : scriptTestExecution.output ? (
+                typeof scriptTestExecution.output === 'object' ? (
                     <Suspense fallback={<LoadingDots />}>
                         <ReactJson enableClipboard={false} sortKeys={true} src={scriptTestExecution.output as object} />
                     </Suspense>
-                );
-            }
+                ) : (
+                    <pre className="mt-2 text-xs">{scriptTestExecution.output}</pre>
+                )
+            ) : scriptTestExecution.error ? (
+                <div>
+                    <span className="font-semibold text-destructive">Error</span>
 
-            return <pre className="mt-2 text-xs">{scriptTestExecution.output}</pre>;
-        }
-
-        if (scriptTestExecution.error) {
-            return (
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <div className="font-semibold text-destructive">Error</div>
-
-                        <div>{scriptTestExecution.error.message}</div>
-                    </div>
+                    <p>{scriptTestExecution.error.message}</p>
                 </div>
-            );
-        }
-
-        return <span className="text-muted-foreground">No defined output.</span>;
-    };
-
-    return <div className="relative size-full overflow-y-auto p-4 text-sm">{renderContent()}</div>;
+            ) : (
+                <span className="text-muted-foreground">No defined output.</span>
+            )}
+        </div>
+    );
 };
 
 export default PropertyCodeEditorDialogExecutionOutput;

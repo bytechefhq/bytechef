@@ -89,7 +89,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
     }, [editorValue, onChange, setSaving]);
 
     const handleStopClick = useCallback(() => {
-        // TODO: implement stop functionality
+        console.warn('Stop functionality not yet implemented');
     }, []);
 
     return {
