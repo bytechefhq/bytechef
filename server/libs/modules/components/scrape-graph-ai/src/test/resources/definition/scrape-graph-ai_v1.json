@@ -1296,7 +1296,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": true,
-      "description": "When false, enables markdown conversion mode (NO AI/LLM processing, 2 credits per page). Default is true.",
+      "description": "When false, enables markdown conversion mode (2 credits per page). Default is true.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
