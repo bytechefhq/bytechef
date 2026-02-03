@@ -27,8 +27,11 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -222,11 +225,24 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
             specification, endpoints);
     }
 
-    @SuppressFBWarnings("RV_ABSOLUTE_VALUE_OF_HASHCODE")
     private static long generateEndpointId(String path, HttpMethod httpMethod) {
         String combined = path + ":" + httpMethod.name();
 
-        return Math.abs(combined.hashCode());
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(combined.getBytes(StandardCharsets.UTF_8));
+
+            // Use first 8 bytes of SHA-256 hash for a long value with very low collision probability
+            long result = 0;
+
+            for (int i = 0; i < 8; i++) {
+                result = (result << 8) | (hashBytes[i] & 0xFF);
+            }
+
+            return Math.abs(result);
+        } catch (NoSuchAlgorithmException exception) {
+            throw new RuntimeException("SHA-256 algorithm not available", exception);
+        }
     }
 
     private static String convertComponentName(String componentName) {

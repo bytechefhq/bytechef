@@ -78,7 +78,7 @@ public class JsoupWebScrapeService implements WebScrapeService {
             String baseHost = baseUri.getHost();
 
             List<Pattern> patterns = includePatterns.stream()
-                .map(pattern -> Pattern.compile(pattern.replace("*", ".*")))
+                .map(JsoupWebScrapeService::convertGlobToRegex)
                 .toList();
 
             Set<String> visited = new HashSet<>();
@@ -124,6 +124,47 @@ public class JsoupWebScrapeService implements WebScrapeService {
     @Override
     public String getProviderName() {
         return "jsoup";
+    }
+
+    private static Pattern convertGlobToRegex(String glob) {
+        StringBuilder regex = new StringBuilder();
+
+        for (int i = 0; i < glob.length(); i++) {
+            char c = glob.charAt(i);
+
+            switch (c) {
+                case '*':
+                    regex.append(".*");
+
+                    break;
+                case '?':
+                    regex.append(".");
+
+                    break;
+                case '.':
+                case '(':
+                case ')':
+                case '+':
+                case '|':
+                case '^':
+                case '$':
+                case '@':
+                case '%':
+                case '{':
+                case '}':
+                case '[':
+                case ']':
+                case '\\':
+                    regex.append("\\");
+                    regex.append(c);
+
+                    break;
+                default:
+                    regex.append(c);
+            }
+        }
+
+        return Pattern.compile(regex.toString());
     }
 
     private String fetchAndParse(String url) throws IOException, InterruptedException {

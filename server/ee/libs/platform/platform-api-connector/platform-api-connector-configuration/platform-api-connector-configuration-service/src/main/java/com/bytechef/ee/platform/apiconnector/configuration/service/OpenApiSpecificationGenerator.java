@@ -63,7 +63,7 @@ public class OpenApiSpecificationGenerator {
             spec.put("servers", List.of(server));
         }
 
-        Map<String, Object> paths = new LinkedHashMap<>();
+        Map<String, Map<String, Object>> paths = new LinkedHashMap<>();
 
         if (request.endpoints() != null) {
             for (EndpointDefinitionDTO endpoint : request.endpoints()) {
@@ -71,8 +71,7 @@ public class OpenApiSpecificationGenerator {
                 String method = endpoint.httpMethod()
                     .toLowerCase();
 
-                Map<String, Object> pathItem = (Map<String, Object>) paths.computeIfAbsent(
-                    path, k -> new LinkedHashMap<>());
+                Map<String, Object> pathItem = paths.computeIfAbsent(path, pathKey -> new LinkedHashMap<>());
 
                 Map<String, Object> operation = buildOperation(endpoint);
 
