@@ -1,3 +1,19 @@
+extend type Query {
+    clusterElementScriptInput(
+        workflowId: String!
+        workflowNodeName: String!
+        clusterElementType: String!
+        clusterElementWorkflowNodeName: String!
+        environmentId: Long!
+    ): Map
+
+    workflowNodeScriptInput(
+        workflowId: String!
+        workflowNodeName: String!
+        environmentId: Long!
+    ): Map
+}
+
 extend type Mutation {
     testClusterElementScript(
         workflowId: String!

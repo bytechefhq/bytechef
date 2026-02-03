@@ -17,11 +17,18 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public interface WorkflowNodeScriptFacade {
+
+    Map<String, Object> getClusterElementScriptInput(
+        String workflowId, String workflowNodeName, String clusterElementType,
+        String clusterElementWorkflowNodeName, long environmentId);
+
+    Map<String, Object> getWorkflowNodeScriptInput(String workflowId, String workflowNodeName, long environmentId);
 
     ScriptTestExecutionDTO testClusterElementScript(
         String workflowId, String workflowNodeName, String clusterElementType,

@@ -19,8 +19,10 @@ package com.bytechef.platform.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeScriptFacade;
+import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -38,6 +40,15 @@ public class WorkflowNodeScriptGraphQlController {
         this.workflowNodeScriptFacade = workflowNodeScriptFacade;
     }
 
+    @QueryMapping
+    Map<String, Object> clusterElementScriptInput(
+        @Argument String workflowId, @Argument String workflowNodeName, @Argument String clusterElementType,
+        @Argument String clusterElementWorkflowNodeName, @Argument Long environmentId) {
+
+        return workflowNodeScriptFacade.getClusterElementScriptInput(
+            workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId);
+    }
+
     @MutationMapping
     public ScriptTestExecutionDTO testClusterElementScript(
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String clusterElementType,
@@ -52,5 +63,12 @@ public class WorkflowNodeScriptGraphQlController {
         @Argument String workflowId, @Argument String workflowNodeName, @Argument Long environmentId) {
 
         return workflowNodeScriptFacade.testWorkflowNodeScript(workflowId, workflowNodeName, environmentId);
+    }
+
+    @QueryMapping
+    Map<String, Object> workflowNodeScriptInput(
+        @Argument String workflowId, @Argument String workflowNodeName, @Argument Long environmentId) {
+
+        return workflowNodeScriptFacade.getWorkflowNodeScriptInput(workflowId, workflowNodeName, environmentId);
     }
 }
