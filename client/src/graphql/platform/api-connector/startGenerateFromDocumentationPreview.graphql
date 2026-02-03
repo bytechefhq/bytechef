@@ -1,0 +1,8 @@
+mutation startGenerateFromDocumentationPreview($input: GenerateFromDocumentationInput!) {
+    startGenerateFromDocumentationPreview(input: $input) {
+        jobId
+        status
+        specification
+        errorMessage
+    }
+}

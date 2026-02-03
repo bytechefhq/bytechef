@@ -1,0 +1,25 @@
+mutation updateApiConnector($id: ID!, $input: UpdateApiConnectorInput!) {
+    updateApiConnector(id: $id, input: $input) {
+        id
+        name
+        title
+        description
+        icon
+        connectorVersion
+        enabled
+        specification
+        definition
+        endpoints {
+            id
+            name
+            description
+            path
+            httpMethod
+        }
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+        version
+    }
+}

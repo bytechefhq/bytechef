@@ -1,0 +1,8 @@
+query generationJobStatus($jobId: String!) {
+    generationJobStatus(jobId: $jobId) {
+        jobId
+        status
+        specification
+        errorMessage
+    }
+}
