@@ -792,6 +792,47 @@ export type KnowledgeBaseTagsEntry = {
   tags: Array<Tag>;
 };
 
+export type LogEntry = {
+  __typename?: 'LogEntry';
+  componentName: Scalars['String']['output'];
+  componentOperationName?: Maybe<Scalars['String']['output']>;
+  exceptionMessage?: Maybe<Scalars['String']['output']>;
+  exceptionType?: Maybe<Scalars['String']['output']>;
+  level: LogLevel;
+  message: Scalars['String']['output'];
+  stackTrace?: Maybe<Scalars['String']['output']>;
+  taskExecutionId: Scalars['ID']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type LogFilterInput = {
+  componentName?: InputMaybe<Scalars['String']['input']>;
+  fromTimestamp?: InputMaybe<Scalars['String']['input']>;
+  minLevel?: InputMaybe<LogLevel>;
+  searchText?: InputMaybe<Scalars['String']['input']>;
+  taskExecutionId?: InputMaybe<Scalars['ID']['input']>;
+  toTimestamp?: InputMaybe<Scalars['String']['input']>;
+};
+
+export enum LogLevel {
+  Debug = 'DEBUG',
+  Error = 'ERROR',
+  Info = 'INFO',
+  Trace = 'TRACE',
+  Warn = 'WARN'
+}
+
+export type LogPage = {
+  __typename?: 'LogPage';
+  content: Array<LogEntry>;
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  pageNumber: Scalars['Int']['output'];
+  pageSize: Scalars['Int']['output'];
+  totalElements: Scalars['Int']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type McpComponent = {
   __typename?: 'McpComponent';
   componentName: Scalars['String']['output'];
@@ -947,6 +988,7 @@ export type Mutation = {
   deleteApiKey: Scalars['Boolean']['output'];
   deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
+  deleteJobFileLogs: Scalars['Boolean']['output'];
   deleteKnowledgeBase?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocumentChunk?: Maybe<Scalars['Boolean']['output']>;
@@ -1100,6 +1142,11 @@ export type MutationDeleteCustomComponentArgs = {
 
 export type MutationDeleteDataTableRowArgs = {
   input: DeleteRowInput;
+};
+
+
+export type MutationDeleteJobFileLogsArgs = {
+  jobId: Scalars['ID']['input'];
 };
 
 
@@ -1468,18 +1515,18 @@ export type ParameterDefinitionInput = {
 };
 
 export enum ParameterLocation {
-  Header = 'header',
-  Path = 'path',
-  Query = 'query'
+  Header = 'HEADER',
+  Path = 'PATH',
+  Query = 'QUERY'
 }
 
 export enum ParameterType {
-  Array = 'array',
-  Boolean = 'boolean',
-  Integer = 'integer',
-  Number = 'number',
-  Object = 'object',
-  String = 'string'
+  Array = 'ARRAY',
+  Boolean = 'BOOLEAN',
+  Integer = 'INTEGER',
+  Number = 'NUMBER',
+  Object = 'OBJECT',
+  String = 'STRING'
 }
 
 export enum PlatformType {
@@ -1643,11 +1690,16 @@ export type Query = {
   dataTableTagsByTable: Array<DataTableTagsEntry>;
   dataTableWebhooks: Array<DataTableWebhook>;
   dataTables: Array<DataTable>;
+  editorJobFileLogs: LogPage;
+  editorJobFileLogsExist: Scalars['Boolean']['output'];
+  editorTaskExecutionFileLogs: Array<LogEntry>;
   endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
   environments?: Maybe<Array<Maybe<Environment>>>;
   exportDataTableCsv: Scalars['String']['output'];
   generationJobStatus?: Maybe<GenerationJobStatus>;
   integration?: Maybe<Integration>;
+  jobFileLogs: LogPage;
+  jobFileLogsExist: Scalars['Boolean']['output'];
   knowledgeBase?: Maybe<KnowledgeBase>;
   knowledgeBaseDocument?: Maybe<KnowledgeBaseDocument>;
   knowledgeBaseDocumentStatus?: Maybe<DocumentStatusUpdate>;
@@ -1686,6 +1738,7 @@ export type Query = {
   taskDispatcherDefinition: TaskDispatcherDefinition;
   taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
   taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
+  taskExecutionFileLogs: Array<LogEntry>;
   tasks?: Maybe<Array<Maybe<Task>>>;
   tasksByIds?: Maybe<Array<Maybe<Task>>>;
   triggerDefinition: TriggerDefinition;
@@ -1857,6 +1910,25 @@ export type QueryDataTablesArgs = {
 };
 
 
+export type QueryEditorJobFileLogsArgs = {
+  filter?: InputMaybe<LogFilterInput>;
+  jobId: Scalars['ID']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryEditorJobFileLogsExistArgs = {
+  jobId: Scalars['ID']['input'];
+};
+
+
+export type QueryEditorTaskExecutionFileLogsArgs = {
+  jobId: Scalars['ID']['input'];
+  taskExecutionId: Scalars['ID']['input'];
+};
+
+
 export type QueryEndpointDiscoveryStatusArgs = {
   jobId: Scalars['String']['input'];
 };
@@ -1875,6 +1947,19 @@ export type QueryGenerationJobStatusArgs = {
 
 export type QueryIntegrationArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryJobFileLogsArgs = {
+  filter?: InputMaybe<LogFilterInput>;
+  jobId: Scalars['ID']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryJobFileLogsExistArgs = {
+  jobId: Scalars['ID']['input'];
 };
 
 
@@ -2017,6 +2102,12 @@ export type QueryTaskDispatcherDefinitionArgs = {
 
 export type QueryTaskDispatcherDefinitionVersionsArgs = {
   name: Scalars['String']['input'];
+};
+
+
+export type QueryTaskExecutionFileLogsArgs = {
+  jobId: Scalars['ID']['input'];
+  taskExecutionId: Scalars['ID']['input'];
 };
 
 
@@ -2927,6 +3018,56 @@ export type UpdateApiConnectorMutationVariables = Exact<{
 
 
 export type UpdateApiConnectorMutation = { __typename?: 'Mutation', updateApiConnector: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } };
+
+export type EditorJobFileLogsQueryVariables = Exact<{
+  jobId: Scalars['ID']['input'];
+  filter?: InputMaybe<LogFilterInput>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type EditorJobFileLogsQuery = { __typename?: 'Query', editorJobFileLogs: { __typename?: 'LogPage', totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> } };
+
+export type EditorJobFileLogsExistQueryVariables = Exact<{
+  jobId: Scalars['ID']['input'];
+}>;
+
+
+export type EditorJobFileLogsExistQuery = { __typename?: 'Query', editorJobFileLogsExist: boolean };
+
+export type EditorTaskExecutionFileLogsQueryVariables = Exact<{
+  jobId: Scalars['ID']['input'];
+  taskExecutionId: Scalars['ID']['input'];
+}>;
+
+
+export type EditorTaskExecutionFileLogsQuery = { __typename?: 'Query', editorTaskExecutionFileLogs: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> };
+
+export type JobFileLogsQueryVariables = Exact<{
+  jobId: Scalars['ID']['input'];
+  filter?: InputMaybe<LogFilterInput>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type JobFileLogsQuery = { __typename?: 'Query', jobFileLogs: { __typename?: 'LogPage', totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> } };
+
+export type JobFileLogsExistQueryVariables = Exact<{
+  jobId: Scalars['ID']['input'];
+}>;
+
+
+export type JobFileLogsExistQuery = { __typename?: 'Query', jobFileLogsExist: boolean };
+
+export type TaskExecutionFileLogsQueryVariables = Exact<{
+  jobId: Scalars['ID']['input'];
+  taskExecutionId: Scalars['ID']['input'];
+}>;
+
+
+export type TaskExecutionFileLogsQuery = { __typename?: 'Query', taskExecutionFileLogs: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> };
 
 export type AdminApiKeysQueryVariables = Exact<{
   environmentId: Scalars['ID']['input'];
@@ -5313,6 +5454,194 @@ export const useUpdateApiConnectorMutation = <
       {
     mutationKey: ['updateApiConnector'],
     mutationFn: (variables?: UpdateApiConnectorMutationVariables) => fetcher<UpdateApiConnectorMutation, UpdateApiConnectorMutationVariables>(UpdateApiConnectorDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EditorJobFileLogsDocument = `
+    query editorJobFileLogs($jobId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) {
+  editorJobFileLogs(jobId: $jobId, filter: $filter, page: $page, size: $size) {
+    content {
+      timestamp
+      level
+      componentName
+      componentOperationName
+      taskExecutionId
+      message
+      exceptionType
+      exceptionMessage
+      stackTrace
+    }
+    totalElements
+    totalPages
+    pageNumber
+    pageSize
+    hasNext
+    hasPrevious
+  }
+}
+    `;
+
+export const useEditorJobFileLogsQuery = <
+      TData = EditorJobFileLogsQuery,
+      TError = unknown
+    >(
+      variables: EditorJobFileLogsQueryVariables,
+      options?: Omit<UseQueryOptions<EditorJobFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorJobFileLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EditorJobFileLogsQuery, TError, TData>(
+      {
+    queryKey: ['editorJobFileLogs', variables],
+    queryFn: fetcher<EditorJobFileLogsQuery, EditorJobFileLogsQueryVariables>(EditorJobFileLogsDocument, variables),
+    ...options
+  }
+    )};
+
+export const EditorJobFileLogsExistDocument = `
+    query editorJobFileLogsExist($jobId: ID!) {
+  editorJobFileLogsExist(jobId: $jobId)
+}
+    `;
+
+export const useEditorJobFileLogsExistQuery = <
+      TData = EditorJobFileLogsExistQuery,
+      TError = unknown
+    >(
+      variables: EditorJobFileLogsExistQueryVariables,
+      options?: Omit<UseQueryOptions<EditorJobFileLogsExistQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorJobFileLogsExistQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EditorJobFileLogsExistQuery, TError, TData>(
+      {
+    queryKey: ['editorJobFileLogsExist', variables],
+    queryFn: fetcher<EditorJobFileLogsExistQuery, EditorJobFileLogsExistQueryVariables>(EditorJobFileLogsExistDocument, variables),
+    ...options
+  }
+    )};
+
+export const EditorTaskExecutionFileLogsDocument = `
+    query editorTaskExecutionFileLogs($jobId: ID!, $taskExecutionId: ID!) {
+  editorTaskExecutionFileLogs(jobId: $jobId, taskExecutionId: $taskExecutionId) {
+    timestamp
+    level
+    componentName
+    componentOperationName
+    taskExecutionId
+    message
+    exceptionType
+    exceptionMessage
+    stackTrace
+  }
+}
+    `;
+
+export const useEditorTaskExecutionFileLogsQuery = <
+      TData = EditorTaskExecutionFileLogsQuery,
+      TError = unknown
+    >(
+      variables: EditorTaskExecutionFileLogsQueryVariables,
+      options?: Omit<UseQueryOptions<EditorTaskExecutionFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorTaskExecutionFileLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EditorTaskExecutionFileLogsQuery, TError, TData>(
+      {
+    queryKey: ['editorTaskExecutionFileLogs', variables],
+    queryFn: fetcher<EditorTaskExecutionFileLogsQuery, EditorTaskExecutionFileLogsQueryVariables>(EditorTaskExecutionFileLogsDocument, variables),
+    ...options
+  }
+    )};
+
+export const JobFileLogsDocument = `
+    query jobFileLogs($jobId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) {
+  jobFileLogs(jobId: $jobId, filter: $filter, page: $page, size: $size) {
+    content {
+      timestamp
+      level
+      componentName
+      componentOperationName
+      taskExecutionId
+      message
+      exceptionType
+      exceptionMessage
+      stackTrace
+    }
+    totalElements
+    totalPages
+    pageNumber
+    pageSize
+    hasNext
+    hasPrevious
+  }
+}
+    `;
+
+export const useJobFileLogsQuery = <
+      TData = JobFileLogsQuery,
+      TError = unknown
+    >(
+      variables: JobFileLogsQueryVariables,
+      options?: Omit<UseQueryOptions<JobFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<JobFileLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<JobFileLogsQuery, TError, TData>(
+      {
+    queryKey: ['jobFileLogs', variables],
+    queryFn: fetcher<JobFileLogsQuery, JobFileLogsQueryVariables>(JobFileLogsDocument, variables),
+    ...options
+  }
+    )};
+
+export const JobFileLogsExistDocument = `
+    query jobFileLogsExist($jobId: ID!) {
+  jobFileLogsExist(jobId: $jobId)
+}
+    `;
+
+export const useJobFileLogsExistQuery = <
+      TData = JobFileLogsExistQuery,
+      TError = unknown
+    >(
+      variables: JobFileLogsExistQueryVariables,
+      options?: Omit<UseQueryOptions<JobFileLogsExistQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<JobFileLogsExistQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<JobFileLogsExistQuery, TError, TData>(
+      {
+    queryKey: ['jobFileLogsExist', variables],
+    queryFn: fetcher<JobFileLogsExistQuery, JobFileLogsExistQueryVariables>(JobFileLogsExistDocument, variables),
+    ...options
+  }
+    )};
+
+export const TaskExecutionFileLogsDocument = `
+    query taskExecutionFileLogs($jobId: ID!, $taskExecutionId: ID!) {
+  taskExecutionFileLogs(jobId: $jobId, taskExecutionId: $taskExecutionId) {
+    timestamp
+    level
+    componentName
+    componentOperationName
+    taskExecutionId
+    message
+    exceptionType
+    exceptionMessage
+    stackTrace
+  }
+}
+    `;
+
+export const useTaskExecutionFileLogsQuery = <
+      TData = TaskExecutionFileLogsQuery,
+      TError = unknown
+    >(
+      variables: TaskExecutionFileLogsQueryVariables,
+      options?: Omit<UseQueryOptions<TaskExecutionFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TaskExecutionFileLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<TaskExecutionFileLogsQuery, TError, TData>(
+      {
+    queryKey: ['taskExecutionFileLogs', variables],
+    queryFn: fetcher<TaskExecutionFileLogsQuery, TaskExecutionFileLogsQueryVariables>(TaskExecutionFileLogsDocument, variables),
     ...options
   }
     )};
