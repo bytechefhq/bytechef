@@ -233,6 +233,14 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Use `useMemo` for computed values instead of IIFEs in JSX
 - Prefer `||` over `??` for JSX fallbacks (e.g., `trigger || defaultTrigger`)
 
+### GraphQL Conventions
+- Enum values must use SCREAMING_SNAKE_CASE (e.g., `DELETE`, `GET`, `QUERY`, `PATH`)
+- Consistent with HttpMethod and other enums in `*.graphqls` files
+
+### ID Generation
+- Avoid `hashCode()` for generating unique identifiers (collision risk)
+- Prefer SHA-256 with first 8 bytes for deterministic long IDs, or UUID for true uniqueness
+
 ### Blank Line Before Control Statements (Java)
 - Insert exactly one empty line before control statements to improve visual separation of logic:
   - Applies to: `if`, `else if`, `else`, `for`, enhanced `for`, `while`, `do { ... } while (...)`, `switch`, `try`/`catch`/`finally`.
@@ -483,6 +491,10 @@ ByteChef includes a CLI tool for scaffolding components:
 cd cli
 ./gradlew :cli-app:bootRun --args="component init openapi --name=my-component --openapi-path=/path/to/openapi.yaml"
 ```
+
+### Resolving PR Review Comments
+- Use `gh api graphql` with `resolveReviewThread` mutation to close threads programmatically
+- Get thread IDs via: `gh api graphql -f query='{ repository(owner: "X", name: "Y") { pullRequest(number: N) { reviewThreads(first: 20) { nodes { id isResolved path } } } }'`
 
 ## Build and Deployment
 
