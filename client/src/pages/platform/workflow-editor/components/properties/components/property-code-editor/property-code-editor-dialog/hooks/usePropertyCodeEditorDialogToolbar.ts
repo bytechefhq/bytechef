@@ -2,15 +2,12 @@ import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
-import {testClusterElementScript} from '@/shared/mutations/platform/clusterElementScript.mutations';
+import {useTestClusterElementScriptMutation, useTestWorkflowNodeScriptMutation} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
-
-const workflowNodeScriptApi = new WorkflowNodeScriptApi();
 
 interface UsePropertyCodeEditorDialogToolbarProps {
     language: string;
@@ -54,6 +51,9 @@ export const usePropertyCodeEditorDialogToolbar = ({
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const rootClusterElementNodeData = useWorkflowEditorStore(useShallow((state) => state.rootClusterElementNodeData));
 
+    const testClusterElementScriptMutation = useTestClusterElementScriptMutation();
+    const testWorkflowNodeScriptMutation = useTestWorkflowNodeScriptMutation();
+
     const copilotEnabled = ai.copilot.enabled && ff_1570;
 
     const handleCopilotClick = useCallback(() => {
@@ -75,29 +75,30 @@ export const usePropertyCodeEditorDialogToolbar = ({
         const isClusterElement = currentNode?.clusterElementType && rootClusterElementNodeData?.workflowNodeName;
 
         if (isClusterElement) {
-            testClusterElementScript({
-                clusterElementType: currentNode.clusterElementType!,
-                clusterElementWorkflowNodeName: currentNode.name,
-                environmentId: currentEnvironmentId!,
-                workflowId,
-                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-            })
-                .then((scriptTestExecution) => {
-                    setScriptTestExecution(scriptTestExecution);
+            testClusterElementScriptMutation
+                .mutateAsync({
+                    clusterElementType: currentNode.clusterElementType!,
+                    clusterElementWorkflowNodeName: currentNode.name,
+                    environmentId: currentEnvironmentId!,
+                    workflowId,
+                    workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                })
+                .then((result) => {
+                    setScriptTestExecution(result.testClusterElementScript);
                     setScriptIsRunning(false);
                 })
                 .catch(() => {
                     setScriptIsRunning(false);
                 });
         } else {
-            workflowNodeScriptApi
-                .testWorkflowNodeScript({
+            testWorkflowNodeScriptMutation
+                .mutateAsync({
                     environmentId: currentEnvironmentId!,
-                    id: workflowId,
+                    workflowId,
                     workflowNodeName,
                 })
-                .then((scriptTestExecution) => {
-                    setScriptTestExecution(scriptTestExecution);
+                .then((result) => {
+                    setScriptTestExecution(result.testWorkflowNodeScript);
                     setScriptIsRunning(false);
                 })
                 .catch(() => {
@@ -110,6 +111,8 @@ export const usePropertyCodeEditorDialogToolbar = ({
         rootClusterElementNodeData,
         setScriptIsRunning,
         setScriptTestExecution,
+        testClusterElementScriptMutation,
+        testWorkflowNodeScriptMutation,
         workflowId,
         workflowNodeName,
     ]);
