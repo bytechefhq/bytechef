@@ -87,7 +87,7 @@ class ShopifyUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Map<String, Object> result =
+        Object result =
             assertDoesNotThrow(() -> sendGraphQlQuery(mockedQuery, mockedContext, mockedVariables));
 
         assertEquals(Map.of(), result);
