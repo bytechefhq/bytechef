@@ -1,0 +1,3 @@
+mutation deleteApiConnector($id: ID!) {
+    deleteApiConnector(id: $id)
+}

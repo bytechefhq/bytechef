@@ -1,0 +1,3 @@
+mutation enableApiConnector($id: ID!, $enable: Boolean!) {
+    enableApiConnector(id: $id, enable: $enable)
+}
