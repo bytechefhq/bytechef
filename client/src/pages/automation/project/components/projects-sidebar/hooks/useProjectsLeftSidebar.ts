@@ -27,7 +27,7 @@ export const useProjectsLeftSidebar = ({
     const navigate = useNavigate();
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
-        onSuccess: (projectWorkflowId) => {
+        onSuccess: (response) => {
             captureProjectWorkflowCreated();
 
             queryClient.invalidateQueries({
@@ -50,7 +50,7 @@ export const useProjectsLeftSidebar = ({
                 bottomResizablePanelRef.current.resize(0);
             }
 
-            navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}`);
+            navigate(`/automation/projects/${projectId}/project-workflows/${response.projectWorkflowId}`);
         },
     });
 
