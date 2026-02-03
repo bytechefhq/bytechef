@@ -44,6 +44,6 @@ export const usePropertyCodeEditorDialogStore = create<PropertyCodeEditorStoreTy
             setScriptIsRunning: (running) => set({scriptIsRunning: running}),
             setScriptTestExecution: (execution) => set({scriptTestExecution: execution}),
         }),
-        {name: 'bytechef.property-code-editor-store'}
+        {name: 'bytechef.property-code-editor-dialog-store'}
     )
 );

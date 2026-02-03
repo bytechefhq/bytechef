@@ -22,6 +22,8 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
     workflow,
     workflowNodeName,
 }: UsePropertyCodeEditorDialogRightPanelConnectionsPropsI) => {
+    const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
+
     const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore(
         useShallow((state) => ({
             setShowConnectionNote: state.setShowConnectionNote,
@@ -40,8 +42,6 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
     } = useWorkflowEditor();
 
     const handleCloseConnectionNote = () => setShowConnectionNote(false);
-
-    const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 

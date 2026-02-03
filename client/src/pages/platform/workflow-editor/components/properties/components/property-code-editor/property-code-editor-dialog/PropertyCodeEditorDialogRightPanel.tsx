@@ -20,7 +20,7 @@ const PropertyCodeEditorDialogRightPanel = ({
     });
 
     return (
-        <div className="flex w-96 flex-col divide-y divide-solid divide-muted">
+        <div className="flex w-96 flex-col divide-y divide-solid divide-muted border-l border-l-border/50">
             <div className="flex-1">
                 <PropertyCodeEditorDialogRightPanelInputs input={currentTask?.parameters?.input ?? {}} />
             </div>

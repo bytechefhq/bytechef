@@ -18,7 +18,14 @@ interface PropertyCodeEditorDialogProps {
     workflowNodeName: string;
 }
 
-const PropertyCodeEditorDialog = (props: PropertyCodeEditorDialogProps) => {
+const PropertyCodeEditorDialog = ({
+    language,
+    onChange,
+    onClose,
+    value,
+    workflow,
+    workflowNodeName,
+}: PropertyCodeEditorDialogProps) => {
     const {
         copilotPanelOpen,
         currentWorkflowTask,
@@ -27,7 +34,7 @@ const PropertyCodeEditorDialog = (props: PropertyCodeEditorDialogProps) => {
         handleUnsavedChangesAlertDialogCancel,
         handleUnsavedChangesAlertDialogClose,
         unsavedChangesAlertDialogOpen,
-    } = usePropertyCodeEditorDialog(props);
+    } = usePropertyCodeEditorDialog({onClose, value, workflow, workflowNodeName});
 
     return (
         <>
@@ -41,16 +48,16 @@ const PropertyCodeEditorDialog = (props: PropertyCodeEditorDialogProps) => {
                 <DialogContent className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden p-0">
                     <div className="flex min-w-0 flex-1 flex-col gap-2">
                         <PropertyCodeEditorDialogToolbar
-                            language={props.language}
-                            onChange={props.onChange}
-                            workflowId={props.workflow.id!}
-                            workflowNodeName={props.workflowNodeName}
+                            language={language}
+                            onChange={onChange}
+                            workflowId={workflow.id!}
+                            workflowNodeName={workflowNodeName}
                         />
 
                         <div className="flex min-w-0 flex-1">
                             <ResizablePanelGroup className="flex-1" direction="vertical">
                                 <ResizablePanel defaultSize={75}>
-                                    <PropertyCodeEditorDialogEditor language={props.language} />
+                                    <PropertyCodeEditorDialogEditor language={language} />
                                 </ResizablePanel>
 
                                 <ResizableHandle className="bg-muted" />
@@ -60,20 +67,19 @@ const PropertyCodeEditorDialog = (props: PropertyCodeEditorDialogProps) => {
                                 </ResizablePanel>
                             </ResizablePanelGroup>
 
-                            <div className="flex border-l border-l-border/50">
-                                <PropertyCodeEditorDialogRightPanel
-                                    componentConnections={currentWorkflowTask?.connections || []}
-                                    workflow={props.workflow}
-                                    workflowNodeName={props.workflowNodeName}
-                                />
-                            </div>
+                            <PropertyCodeEditorDialogRightPanel
+                                componentConnections={currentWorkflowTask?.connections || []}
+                                workflow={workflow}
+                                workflowNodeName={workflowNodeName}
+                            />
                         </div>
                     </div>
 
                     {copilotPanelOpen && (
-                        <div className="flex h-full border-l border-l-border/50">
-                            <CopilotPanel className="rounded-r-md" onClose={handleCopilotClose} />
-                        </div>
+                        <CopilotPanel
+                            className="h-full rounded-r-md border-l border-l-border/50"
+                            onClose={handleCopilotClose}
+                        />
                     )}
                 </DialogContent>
             </Dialog>
