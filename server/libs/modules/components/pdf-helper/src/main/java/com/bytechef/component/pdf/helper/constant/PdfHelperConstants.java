@@ -25,6 +25,7 @@ public class PdfHelperConstants {
     public static final String FILE = "file";
     public static final String FILENAME = "filename";
     public static final String IMAGE = "image";
+    public static final String IMAGES = "images";
     public static final String TEXT = "text";
 
     private PdfHelperConstants() {

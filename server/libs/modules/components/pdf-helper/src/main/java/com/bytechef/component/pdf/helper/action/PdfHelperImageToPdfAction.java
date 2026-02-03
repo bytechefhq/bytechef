@@ -17,11 +17,13 @@
 package com.bytechef.component.pdf.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.pdf.helper.constant.PdfHelperConstants.FILENAME;
 import static com.bytechef.component.pdf.helper.constant.PdfHelperConstants.IMAGE;
+import static com.bytechef.component.pdf.helper.constant.PdfHelperConstants.IMAGES;
 import static com.bytechef.component.pdf.helper.util.PdfHelperUtils.storeIntoFileEntry;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -30,6 +32,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.List;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -45,10 +48,14 @@ public class PdfHelperImageToPdfAction {
         .title("Image to PDF")
         .description("Converts image to PDF.")
         .properties(
-            fileEntry(IMAGE)
-                .label("Image")
-                .description("The image which will be converted to PDF.")
-                .required(true),
+            array(IMAGES)
+                .description("List of images that will be converted to one PDF.")
+                .required(true)
+                .items(
+                    fileEntry(IMAGE)
+                        .label("Image")
+                        .description("The image which will be converted to PDF.")
+                        .required(true)),
             string(FILENAME)
                 .label("Filename")
                 .description("The name of the PDF file.")
@@ -65,27 +72,39 @@ public class PdfHelperImageToPdfAction {
     public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
         throws Exception {
 
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(IMAGE);
-        File image = context.file(file -> file.toTempFile(fileEntry));
+        List<FileEntry> fileEntries = inputParameters.getRequiredList(IMAGES, FileEntry.class);
 
         PDDocument pdDocument = new PDDocument();
 
         int pageWidth = (int) PDRectangle.A4.getWidth();
         int pageHeight = (int) PDRectangle.A4.getHeight();
 
-        PDPage pdPage = new PDPage(new PDRectangle(pageWidth, pageHeight));
-        pdDocument.addPage(pdPage);
+        for (FileEntry fileEntry : fileEntries) {
+            File image = context.file(file -> file.toTempFile(fileEntry));
 
-        PDPageContentStream pdPageContentStream = new PDPageContentStream(pdDocument, pdPage);
+            PDPage pdPage = new PDPage(new PDRectangle(pageWidth, pageHeight));
+            pdDocument.addPage(pdPage);
 
-        PDImageXObject pdImageXObject = PDImageXObject.createFromFileByContent(image, pdDocument);
+            PDPageContentStream pdPageContentStream = new PDPageContentStream(pdDocument, pdPage);
+            PDImageXObject pdImageXObject = PDImageXObject.createFromFileByContent(image, pdDocument);
 
-        pdPageContentStream.drawImage(pdImageXObject, 0, 0, pageWidth, pageHeight);
-        pdPageContentStream.close();
+            float imageWidth = pdImageXObject.getWidth();
+            float imageHeight = pdImageXObject.getHeight();
+
+            float scale = Math.min(pageWidth / imageWidth, pageHeight / imageHeight);
+            float scaledWidth = imageWidth * scale;
+            float scaledHeight = imageHeight * scale;
+
+            float x = (pageWidth - scaledWidth) / 2;
+            float y = (pageHeight - scaledHeight) / 2;
+
+            pdPageContentStream.drawImage(pdImageXObject, x, y, scaledWidth, scaledHeight);
+            pdPageContentStream.close();
+        }
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
         pdDocument.save(byteArrayOutputStream);
+        pdDocument.close();
 
         String filename = inputParameters.getRequiredString(FILENAME) + ".pdf";
 
