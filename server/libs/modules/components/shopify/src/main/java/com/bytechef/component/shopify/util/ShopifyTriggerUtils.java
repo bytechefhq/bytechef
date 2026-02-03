@@ -58,9 +58,10 @@ public class ShopifyTriggerUtils {
         Map<String, Object> variables = Map.of(
             "topic", topic, "webhookSubscription", Map.of("uri", webhookUrl));
 
-        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
+        Object body = sendGraphQlQuery(query, context, variables);
 
-        if (body.get("webhookSubscriptionCreate") instanceof Map<?, ?> webhookSubscriptionCreate &&
+        if (body instanceof Map<?, ?> bodyMap &&
+            bodyMap.get("webhookSubscriptionCreate") instanceof Map<?, ?> webhookSubscriptionCreate &&
             webhookSubscriptionCreate.get("webhookSubscription") instanceof Map<?, ?> webhookSubscription) {
 
             return (String) webhookSubscription.get(ID);

@@ -40,19 +40,23 @@ public class ShopifyUtils {
     public static Object executeGraphQlOperation(
         String query, Context context, Map<String, Object> variables, String dataKey) {
 
-        Map<String, Object> data = sendGraphQlQuery(query, context, variables);
+        Object data = sendGraphQlQuery(query, context, variables);
 
-        Object content = data.get(dataKey);
+        if (data instanceof Map<?, ?> dataMap) {
+            Object content = dataMap.get(dataKey);
 
-        checkForUserError(content);
+            checkForUserError(content);
 
-        return content;
+            return content;
+        }
+
+        throw new ProviderException("GraphQL query was not executed correctly.");
     }
 
-    public static Map<String, Object> sendGraphQlQuery(
+    public static Object sendGraphQlQuery(
         String query, Context context, Map<String, Object> variables) {
 
-        Map<String, Map<String, Object>> body = context
+        Map<String, Object> body = context
             .http(http -> http.post("/2025-10/graphql.json"))
             .configuration(Http.responseType(ResponseType.JSON))
             .body(Body.of(QUERY, query, VARIABLES, variables))

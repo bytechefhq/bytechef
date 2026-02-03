@@ -69,10 +69,12 @@ public class ShopifyOptionsUtils {
         Map<String, Object> variables = new HashMap<>();
         variables.put("first", 250);
 
-        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
+        Object body = sendGraphQlQuery(query, context, variables);
 
         Map<?, ?> orders = Map.of();
-        if (body.get("orders") instanceof Map<?, ?> ordersMap) {
+        if (body instanceof Map<?, ?> bodyMap &&
+            bodyMap.get("orders") instanceof Map<?, ?> ordersMap) {
+
             orders = ordersMap;
         }
 
@@ -85,7 +87,9 @@ public class ShopifyOptionsUtils {
 
             body = sendGraphQlQuery(query, context, variables);
 
-            if (body.get("orders") instanceof Map<?, ?> ordersMap) {
+            if (body instanceof Map<?, ?> bodyMap &&
+                bodyMap.get("orders") instanceof Map<?, ?> ordersMap) {
+
                 orders = ordersMap;
             }
 
@@ -122,9 +126,10 @@ public class ShopifyOptionsUtils {
             if (lineItem instanceof Map<?, ?> product) {
                 Map<String, Object> variables = Map.of(PRODUCT_ID, product.get(PRODUCT_ID));
 
-                Map<String, Object> body = sendGraphQlQuery(query, context, variables);
+                Object body = sendGraphQlQuery(query, context, variables);
 
-                if (body.get(PRODUCT) instanceof Map<?, ?> variant &&
+                if (body instanceof Map<?, ?> bodyMap &&
+                    bodyMap.get(PRODUCT) instanceof Map<?, ?> variant &&
                     variant.get("variants") instanceof Map<?, ?> variants &&
                     variants.get("edges") instanceof List<?> edges &&
                     edges.getFirst() instanceof Map<?, ?> edgeMap &&
@@ -177,9 +182,12 @@ public class ShopifyOptionsUtils {
 
         Map<String, Object> variables = Map.of("first", 250);
 
-        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
+        Object body = sendGraphQlQuery(query, context, variables);
 
-        if (body.get(PRODUCTS) instanceof Map<?, ?> productsMap && productsMap.get("nodes") instanceof List<?> nodes) {
+        if (body instanceof Map<?, ?> bodyMap &&
+            bodyMap.get(PRODUCTS) instanceof Map<?, ?> productsMap &&
+            productsMap.get("nodes") instanceof List<?> nodes) {
+
             for (Object node : nodes) {
                 if (node instanceof Map<?, ?> nodeMap) {
                     options.add(option((String) nodeMap.get("title"), (String) nodeMap.get(ID)));
