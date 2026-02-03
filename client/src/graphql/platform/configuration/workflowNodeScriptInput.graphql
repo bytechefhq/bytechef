@@ -1,0 +1,11 @@
+query workflowNodeScriptInput(
+    $workflowId: String!
+    $workflowNodeName: String!
+    $environmentId: Long!
+) {
+    workflowNodeScriptInput(
+        workflowId: $workflowId
+        workflowNodeName: $workflowNodeName
+        environmentId: $environmentId
+    )
+}

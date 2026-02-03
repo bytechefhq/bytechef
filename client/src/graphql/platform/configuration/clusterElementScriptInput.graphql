@@ -1,0 +1,15 @@
+query clusterElementScriptInput(
+    $workflowId: String!
+    $workflowNodeName: String!
+    $clusterElementType: String!
+    $clusterElementWorkflowNodeName: String!
+    $environmentId: Long!
+) {
+    clusterElementScriptInput(
+        workflowId: $workflowId
+        workflowNodeName: $workflowNodeName
+        clusterElementType: $clusterElementType
+        clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+        environmentId: $environmentId
+    )
+}
