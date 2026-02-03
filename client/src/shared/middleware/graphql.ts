@@ -1623,6 +1623,7 @@ export type Query = {
   authorities: Array<Scalars['String']['output']>;
   clusterElementDefinition: ClusterElementDefinition;
   clusterElementDefinitions: Array<ClusterElementDefinition>;
+  clusterElementScriptInput?: Maybe<Scalars['Map']['output']>;
   componentDefinition: ComponentDefinition;
   componentDefinitionSearch: Array<ComponentDefinition>;
   componentDefinitionVersions: Array<ComponentDefinition>;
@@ -1692,6 +1693,7 @@ export type Query = {
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
   user?: Maybe<AdminUser>;
   users?: Maybe<AdminUserPage>;
+  workflowNodeScriptInput?: Maybe<Scalars['Map']['output']>;
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
@@ -1744,6 +1746,15 @@ export type QueryClusterElementDefinitionsArgs = {
   clusterElementType: Scalars['String']['input'];
   rootComponentName: Scalars['String']['input'];
   rootComponentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryClusterElementScriptInputArgs = {
+  clusterElementType: Scalars['String']['input'];
+  clusterElementWorkflowNodeName: Scalars['String']['input'];
+  environmentId: Scalars['Long']['input'];
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
 };
 
 
@@ -2040,6 +2051,13 @@ export type QueryUserArgs = {
 export type QueryUsersArgs = {
   pageNumber?: InputMaybe<Scalars['Int']['input']>;
   pageSize?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryWorkflowNodeScriptInputArgs = {
+  environmentId: Scalars['Long']['input'];
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
 };
 
 
@@ -2925,6 +2943,17 @@ export type ApiKeysQueryVariables = Exact<{
 
 export type ApiKeysQuery = { __typename?: 'Query', apiKeys?: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null } | null> | null };
 
+export type ClusterElementScriptInputQueryVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+  clusterElementType: Scalars['String']['input'];
+  clusterElementWorkflowNodeName: Scalars['String']['input'];
+  environmentId: Scalars['Long']['input'];
+}>;
+
+
+export type ClusterElementScriptInputQuery = { __typename?: 'Query', clusterElementScriptInput?: any | null };
+
 export type ComponentDefinitionSearchQueryVariables = Exact<{
   query: Scalars['String']['input'];
 }>;
@@ -3061,6 +3090,15 @@ export type UpdateMcpServerUrlMutationVariables = Exact<{
 
 
 export type UpdateMcpServerUrlMutation = { __typename?: 'Mutation', updateMcpServerUrl: string };
+
+export type WorkflowNodeScriptInputQueryVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+  environmentId: Scalars['Long']['input'];
+}>;
+
+
+export type WorkflowNodeScriptInputQuery = { __typename?: 'Query', workflowNodeScriptInput?: any | null };
 
 export type CustomComponentQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5341,6 +5379,34 @@ export const useApiKeysQuery = <
   }
     )};
 
+export const ClusterElementScriptInputDocument = `
+    query clusterElementScriptInput($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!) {
+  clusterElementScriptInput(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    clusterElementType: $clusterElementType
+    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+    environmentId: $environmentId
+  )
+}
+    `;
+
+export const useClusterElementScriptInputQuery = <
+      TData = ClusterElementScriptInputQuery,
+      TError = unknown
+    >(
+      variables: ClusterElementScriptInputQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementScriptInputQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementScriptInputQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ClusterElementScriptInputQuery, TError, TData>(
+      {
+    queryKey: ['clusterElementScriptInput', variables],
+    queryFn: fetcher<ClusterElementScriptInputQuery, ClusterElementScriptInputQueryVariables>(ClusterElementScriptInputDocument, variables),
+    ...options
+  }
+    )};
+
 export const ComponentDefinitionSearchDocument = `
     query ComponentDefinitionSearch($query: String!) {
   componentDefinitionSearch(query: $query) {
@@ -5837,6 +5903,32 @@ export const useUpdateMcpServerUrlMutation = <
       {
     mutationKey: ['updateMcpServerUrl'],
     mutationFn: (variables?: UpdateMcpServerUrlMutationVariables) => fetcher<UpdateMcpServerUrlMutation, UpdateMcpServerUrlMutationVariables>(UpdateMcpServerUrlDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WorkflowNodeScriptInputDocument = `
+    query workflowNodeScriptInput($workflowId: String!, $workflowNodeName: String!, $environmentId: Long!) {
+  workflowNodeScriptInput(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    environmentId: $environmentId
+  )
+}
+    `;
+
+export const useWorkflowNodeScriptInputQuery = <
+      TData = WorkflowNodeScriptInputQuery,
+      TError = unknown
+    >(
+      variables: WorkflowNodeScriptInputQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowNodeScriptInputQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeScriptInputQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkflowNodeScriptInputQuery, TError, TData>(
+      {
+    queryKey: ['workflowNodeScriptInput', variables],
+    queryFn: fetcher<WorkflowNodeScriptInputQuery, WorkflowNodeScriptInputQueryVariables>(WorkflowNodeScriptInputDocument, variables),
     ...options
   }
     )};
