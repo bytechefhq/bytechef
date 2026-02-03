@@ -34,8 +34,6 @@ tags:
     description: "The Platform Workflow Node Output Internal API"
   - name: "workflow-node-parameter"
     description: "The Platform Workflow Node Parameter Internal API"
-  - name: "workflow-node-script"
-    description: "The Platform Workflow Node Script Internal API"
   - name: "workflow-node-test-output"
     description: "The Platform Workflow Node Test Output Internal API"
   - name: "workflow-test-configuration"
@@ -1599,40 +1597,6 @@ paths:
                     type: "array"
                     items:
                       type: "string"
-  /workflows/{id}/workflow-nodes/{workflowNodeName}/scripts:
-    post:
-      description: "Execute a script for testing purposes."
-      summary: "Execute a script for testing purposes"
-      tags:
-        - "workflow-node-script"
-      operationId: "testWorkflowNodeScript"
-      parameters:
-        - name: "id"
-          description: "The id of a workflow."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "workflowNodeName"
-          description: "The name of a workflow node which uses the script component."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "environmentId"
-          description: "The id of an environment."
-          required: true
-          in: "query"
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "The script test execution object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ScriptTestExecution"
   /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs:
     delete:
       description: "Delete existing workflow node test output."

@@ -46,4 +46,11 @@ public class WorkflowNodeScriptGraphQlController {
         return workflowNodeScriptFacade.testClusterElementScript(
             workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId);
     }
+
+    @MutationMapping
+    public ScriptTestExecutionDTO testWorkflowNodeScript(
+        @Argument String workflowId, @Argument String workflowNodeName, @Argument Long environmentId) {
+
+        return workflowNodeScriptFacade.testWorkflowNodeScript(workflowId, workflowNodeName, environmentId);
+    }
 }

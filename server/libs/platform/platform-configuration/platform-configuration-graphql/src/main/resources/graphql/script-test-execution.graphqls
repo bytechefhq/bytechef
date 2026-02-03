@@ -6,6 +6,12 @@ extend type Mutation {
         clusterElementWorkflowNodeName: String!
         environmentId: Long!
     ): ScriptTestExecution!
+
+    testWorkflowNodeScript(
+        workflowId: String!
+        workflowNodeName: String!
+        environmentId: Long!
+    ): ScriptTestExecution!
 }
 
 type ScriptTestExecution {
