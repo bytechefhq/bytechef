@@ -14,6 +14,11 @@ paths:
       summary: "Create Project"
       description: "Creates a new project in a workspace or team."
       operationId: "createProject"
+      security:
+        - oauth2:
+            - "projects:write"
+            - "workspaces:read"
+            - "teams:read"
       x-ai-agent-tool: true
       requestBody:
         content:
@@ -94,6 +99,13 @@ paths:
       description: "Creates a new task"
       operationId: "createTask"
       x-ai-agent-tool: true
+      security:
+        - oauth2:
+            - "tasks:write"
+            - "workspaces:read"
+            - "projects:read"
+            - "tags:read"
+            - "users:read"
       requestBody:
         content:
           application/json:
@@ -208,15 +220,38 @@ components:
           tokenUrl: "https://app.asana.com/-/oauth_token"
           refreshUrl: "https://app.asana.com/-/oauth_token"
           scopes:
-            default: >-
-              Provides access to all endpoints documented in our API reference.
-              If no scopes are requested, this scope is assumed by default.
-            openid: >-
-              Provides access to OpenID Connect ID tokens and the OpenID Connect
-              user info endpoint.
-            email: >-
-              Provides access to the user’s email through the OpenID Connect
-              user info endpoint.
-            profile: >-
-              Provides access to the user’s name and profile photo through the
-              OpenID Connect user info endpoint.
+            attachments:delete: ""
+            attachments:read: ""
+            attachments:write: ""
+            custom_fields:read: ""
+            custom_fields:write: ""
+            goals:read: ""
+            portfolios:read: ""
+            portfolios:write: ""
+            project_templates:read: ""
+            projects:delete: ""
+            projects:read: ""
+            projects:write: ""
+            stories:read: ""
+            stories:write: ""
+            tags:read: ""
+            tags:write: ""
+            task_templates:read: ""
+            tasks:delete: ""
+            tasks:read: ""
+            tasks:write: ""
+            team_memberships:read: ""
+            teams:read: ""
+            time_tracking_entries:read: ""
+            timesheet_approval_statuses:read: ""
+            timesheet_approval_statuses:write: ""
+            workspace.typehead:read: ""
+            users:read: ""
+            webhooks:delete: ""
+            webhooks:read: ""
+            webhooks:write: ""
+            workspaces:read: ""
+            default: "Provides access to all endpoints documented in our API reference. If no scopes are requested, this scope is assumed by default."
+            openid: "Provides access to OpenID Connect ID tokens and the OpenID Connect user info endpoint."
+            email: "Provides access to the user’s email through the OpenID Connect user info endpoint."
+            profile: "Provides access to the user’s name and profile photo through the OpenID Connect user info endpoint."
