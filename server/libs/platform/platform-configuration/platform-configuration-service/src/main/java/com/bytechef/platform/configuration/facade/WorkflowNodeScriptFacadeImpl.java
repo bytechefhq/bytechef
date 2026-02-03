@@ -208,8 +208,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             outputResponse = workflowNodeTestOutput.getOutput(Property.class);
         }
 
-        return new ScriptTestExecutionDTO(
-            executionError, outputResponse == null ? null : outputResponse.sampleOutput());
+        return new ScriptTestExecutionDTO(executionError, getOutputAsMap(outputResponse));
     }
 
     @Override
@@ -236,8 +235,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             outputResponse = workflowNodeTestOutput.getOutput(Property.class);
         }
 
-        return new ScriptTestExecutionDTO(
-            executionError, outputResponse == null ? null : outputResponse.sampleOutput());
+        return new ScriptTestExecutionDTO(executionError, getOutputAsMap(outputResponse));
     }
 
     private ExecutionError extractExecutionError(Exception exception) {
@@ -251,6 +249,25 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         }
 
         return new ExecutionError(message, Arrays.asList(ExceptionUtils.getStackFrames(exception)));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getOutputAsMap(OutputResponse outputResponse) {
+        if (outputResponse == null) {
+            return null;
+        }
+
+        Object sampleOutput = outputResponse.sampleOutput();
+
+        if (sampleOutput == null) {
+            return null;
+        }
+
+        if (sampleOutput instanceof Map) {
+            return (Map<String, Object>) sampleOutput;
+        }
+
+        return Map.of("value", sampleOutput);
     }
 
     private ComponentConnection getComponentConnection(
