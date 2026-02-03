@@ -24,6 +24,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.mail.action.GoogleMailAddLabelsAction;
+import com.bytechef.component.google.mail.action.GoogleMailArchiveEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailDeleteMailAction;
 import com.bytechef.component.google.mail.action.GoogleMailGetMailAction;
 import com.bytechef.component.google.mail.action.GoogleMailGetThreadAction;
@@ -53,6 +54,7 @@ public class GoogleMailComponentHandler implements ComponentHandler {
         .connection(CONNECTION_DEFINITION)
         .actions(
             GoogleMailAddLabelsAction.ACTION_DEFINITION,
+            GoogleMailArchiveEmailAction.ACTION_DEFINITION,
             GoogleMailDeleteMailAction.ACTION_DEFINITION,
             GoogleMailGetMailAction.ACTION_DEFINITION,
             GoogleMailGetThreadAction.ACTION_DEFINITION,
@@ -66,6 +68,7 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             GoogleMailNewEmailPollingTrigger.TRIGGER_DEFINITION)
         .clusterElements(
             tool(GoogleMailAddLabelsAction.ACTION_DEFINITION),
+            tool(GoogleMailArchiveEmailAction.ACTION_DEFINITION),
             tool(GoogleMailDeleteMailAction.ACTION_DEFINITION),
             tool(GoogleMailGetMailAction.ACTION_DEFINITION),
             tool(GoogleMailGetThreadAction.ACTION_DEFINITION),
