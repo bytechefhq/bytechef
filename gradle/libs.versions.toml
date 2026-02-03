@@ -20,7 +20,7 @@ spring-shell = "4.0.1"
 testcontainers = "1.21.3"
 
 [libraries]
-com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.7.0"
+com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.8.0"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.9.0"
 com-github-spotbugs-spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs" }
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
