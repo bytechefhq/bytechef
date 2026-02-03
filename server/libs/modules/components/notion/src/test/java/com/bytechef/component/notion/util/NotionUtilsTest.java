@@ -29,6 +29,7 @@ import static com.bytechef.component.notion.constant.NotionConstants.NAME;
 import static com.bytechef.component.notion.constant.NotionConstants.TEXT;
 import static com.bytechef.component.notion.constant.NotionConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -57,15 +59,15 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class NotionUtilsTest {
 
-    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(ConfigurationBuilder.class);
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, "xy"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testConvertPropertiesToNotionValues(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         Map<String, Object> propertiesSchema = Map.ofEntries(
             Map.entry("cb", Map.of("type", "checkbox")),
@@ -81,8 +83,6 @@ class NotionUtilsTest {
             Map.entry("url", Map.of("type", "url")));
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("properties", propertiesSchema));
@@ -100,8 +100,7 @@ class NotionUtilsTest {
             Map.entry("title", "My Title"),
             Map.entry("url", "https://example.com"));
 
-        Map<String, Object> result = NotionUtils.convertPropertiesToNotionValues(
-            mockedContext, inputFields, "db1");
+        Map<String, Object> result = NotionUtils.convertPropertiesToNotionValues(mockedContext, inputFields, "db1");
 
         Map<String, Object> expected = Map.ofEntries(
             Map.entry("cb", Map.of("checkbox", true)),
@@ -122,6 +121,10 @@ class NotionUtilsTest {
 
         assertEquals(expected, result);
 
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
         Http.Configuration configuration = configurationBuilder.build();
@@ -134,7 +137,9 @@ class NotionUtilsTest {
 
     @Test
     void testCreatePropertiesForDatabaseItem(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         Map<String, Object> propertiesSchema = Map.ofEntries(
             Map.entry("cb", Map.of("type", "checkbox")),
@@ -153,8 +158,6 @@ class NotionUtilsTest {
             Map.entry("url", Map.of("type", "url")));
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("properties", propertiesSchema));
@@ -205,6 +208,10 @@ class NotionUtilsTest {
         assertTrue(expectedProperties.containsAll(properties));
         assertTrue(properties.containsAll(expectedProperties));
 
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
         Http.Configuration configuration = configurationBuilder.build();
@@ -217,13 +224,13 @@ class NotionUtilsTest {
 
     @Test
     void testGetAllItems(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(
@@ -234,6 +241,10 @@ class NotionUtilsTest {
 
         assertEquals(List.of(Map.of(ID, "123"), Map.of(ID, "345")), result);
 
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
         Http.Configuration configuration = configurationBuilder.build();
@@ -242,7 +253,6 @@ class NotionUtilsTest {
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         assertEquals(List.of("url", "url"), stringArgumentCaptor.getAllValues());
-
         assertEquals(
             List.of(
                 Http.Body.of(Map.of("filter", "x", "page_size", 100), Http.BodyContentType.JSON),
@@ -254,7 +264,9 @@ class NotionUtilsTest {
 
     @Test
     void testGetDatabase(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -269,6 +281,10 @@ class NotionUtilsTest {
 
         assertEquals(Map.of(), result);
 
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
         Http.Configuration configuration = configurationBuilder.build();
@@ -281,13 +297,13 @@ class NotionUtilsTest {
 
     @Test
     void testGetDatabaseIdOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
 
         Map<String, Object> db1 = Map.of(
@@ -309,11 +325,17 @@ class NotionUtilsTest {
 
         assertEquals(List.of(option("DB One", "db1"), option("DB Two", "db2")), result);
 
-        Http.Configuration configuration = configurationBuilderArgumentCaptor.getValue()
-            .build();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-        assertEquals(Http.ResponseType.Type.JSON, configuration.getResponseType()
-            .getType());
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         assertEquals("/search", stringArgumentCaptor.getValue());
         assertEquals(
             Http.Body.of(
@@ -324,11 +346,11 @@ class NotionUtilsTest {
 
     @Test
     void testGetDatabasePropertyOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("properties", Map.of("p1", Map.of())));
@@ -338,23 +360,28 @@ class NotionUtilsTest {
 
         assertEquals(List.of(option("p1", "p1")), result);
 
-        Http.Configuration configuration = configurationBuilderArgumentCaptor.getValue()
-            .build();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-        assertEquals(Http.ResponseType.Type.JSON, configuration.getResponseType()
-            .getType());
+        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         assertEquals("/data_sources/xy", stringArgumentCaptor.getValue());
     }
 
     @Test
     void testGetPageIdOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
 
         Map<String, Object> page1 = Map.of(
@@ -381,11 +408,17 @@ class NotionUtilsTest {
 
         assertEquals(List.of(option("Page One", "p1"), option("Page Two", "p2")), result);
 
-        Http.Configuration configuration = configurationBuilderArgumentCaptor.getValue()
-            .build();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-        assertEquals(Http.ResponseType.Type.JSON, configuration.getResponseType()
-            .getType());
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         assertEquals("/search", stringArgumentCaptor.getValue());
         assertEquals(
             Http.Body.of(
