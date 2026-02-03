@@ -13,7 +13,7 @@ const PropertyCodeEditorDialogRightPanelInputs = ({input}: {input: {[key: string
                 {entries.length > 0 ? (
                     <div className="space-y-1 text-sm">
                         {entries.map(([key, value]) => {
-                            let string = value.toString();
+                            let string = String(value);
 
                             if (string.length > 23) {
                                 string = string.slice(0, 23) + '...';
