@@ -22,7 +22,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinit
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
 import com.google.auto.service.AutoService;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -36,7 +36,7 @@ public class GoogleSearchConsoleComponentHandler extends AbstractGoogleSearchCon
 
         return GoogleConnection.createConnection(
             "https://searchconsole.googleapis.com/webmasters/v3",
-            (connection, context) -> List.of("https://www.googleapis.com/auth/webmasters"));
+            (connection, context) -> Map.of("https://www.googleapis.com/auth/webmasters", true));
     }
 
     @Override
