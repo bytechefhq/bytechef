@@ -3,7 +3,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import PropertyCodeEditorDialogRightPanel from '../PropertyCodeEditorDialogRightPanel';
 
-vi.mock('../PropertyCodeEditorDialogRightPanelInputs', () => ({
+vi.mock('../PropertyCodeEditorDialogRightPanelInput', () => ({
     default: ({input}: {input: {[key: string]: object}}) => (
         <div data-testid="right-panel-inputs">
             <span data-testid="inputs-data">{JSON.stringify(input)}</span>
@@ -28,16 +28,24 @@ vi.mock('../PropertyCodeEditorDialogRightPanelConnections', () => ({
     ),
 }));
 
-vi.mock('@/pages/platform/workflow-editor/utils/getTask', () => ({
-    getTask: ({
-        tasks,
-        workflowNodeName,
-    }: {
-        tasks: Array<{name: string; parameters?: {input?: object}}>;
-        workflowNodeName: string;
-    }) => {
-        return tasks.find((task) => task.name === workflowNodeName);
-    },
+const mockUseClusterElementScriptInputQuery = vi.fn();
+const mockUseWorkflowNodeScriptInputQuery = vi.fn();
+
+vi.mock('@/shared/middleware/graphql', () => ({
+    useClusterElementScriptInputQuery: (...args: unknown[]) => mockUseClusterElementScriptInputQuery(...args),
+    useWorkflowNodeScriptInputQuery: (...args: unknown[]) => mockUseWorkflowNodeScriptInputQuery(...args),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => ({
+    default: () => undefined,
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore', () => ({
+    default: () => ({clusterElementType: undefined, name: 'testNode'}),
+}));
+
+vi.mock('@/shared/stores/useEnvironmentStore', () => ({
+    useEnvironmentStore: () => 1,
 }));
 
 describe('PropertyCodeEditorDialogRightPanel', () => {
@@ -71,6 +79,10 @@ describe('PropertyCodeEditorDialogRightPanel', () => {
 
     beforeEach(() => {
         windowResizeObserver();
+        mockUseClusterElementScriptInputQuery.mockReturnValue({data: undefined});
+        mockUseWorkflowNodeScriptInputQuery.mockReturnValue({
+            data: {workflowNodeScriptInput: {param1: 'value1', param2: 'value2'}},
+        });
     });
 
     afterEach(() => {
@@ -102,16 +114,12 @@ describe('PropertyCodeEditorDialogRightPanel', () => {
             expect(inputsData).toHaveTextContent('value1');
         });
 
-        it('should pass empty object when task has no parameters', () => {
-            const propsWithNoParams = {
-                ...defaultProps,
-                workflow: {
-                    ...defaultProps.workflow,
-                    tasks: [{name: 'testNode', type: 'script/script'}],
-                },
-            };
+        it('should pass empty object when query returns empty', () => {
+            mockUseWorkflowNodeScriptInputQuery.mockReturnValue({
+                data: {workflowNodeScriptInput: null},
+            });
 
-            render(<PropertyCodeEditorDialogRightPanel {...propsWithNoParams} />);
+            render(<PropertyCodeEditorDialogRightPanel {...defaultProps} />);
 
             const inputsData = screen.getByTestId('inputs-data');
 
