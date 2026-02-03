@@ -8,13 +8,16 @@ const hoisted = vi.hoisted(() => {
         mockSetSaving: vi.fn(),
         mockSetScriptIsRunning: vi.fn(),
         mockSetScriptTestExecution: vi.fn(),
+        mockTestClusterElementScript: vi.fn(),
         mockTestWorkflowNodeScript: vi.fn(),
         storeState: {
             ai: {copilot: {enabled: true}},
             currentEnvironmentId: 1,
+            currentNode: undefined as {clusterElementType?: string; name: string} | undefined,
             dirty: false,
             editorValue: 'const x = 1;',
             ff_1570: true,
+            rootClusterElementNodeData: undefined as {workflowNodeName: string} | undefined,
             saving: false,
             scriptIsRunning: false,
         },
@@ -75,6 +78,24 @@ vi.mock('@/shared/middleware/platform/configuration', () => ({
     },
 }));
 
+vi.mock('@/shared/mutations/platform/clusterElementScript.mutations', () => ({
+    testClusterElementScript: hoisted.mockTestClusterElementScript,
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore', () => ({
+    default: (selector: (state: unknown) => unknown) =>
+        selector({
+            currentNode: hoisted.storeState.currentNode,
+        }),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => ({
+    default: (selector: (state: unknown) => unknown) =>
+        selector({
+            rootClusterElementNodeData: hoisted.storeState.rootClusterElementNodeData,
+        }),
+}));
+
 describe('usePropertyCodeEditorDialogToolbar', () => {
     const defaultProps = {
         language: 'javascript',
@@ -91,7 +112,10 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
         hoisted.storeState.currentEnvironmentId = 1;
         hoisted.storeState.ai = {copilot: {enabled: true}};
         hoisted.storeState.ff_1570 = true;
+        hoisted.storeState.currentNode = undefined;
+        hoisted.storeState.rootClusterElementNodeData = undefined;
         hoisted.mockTestWorkflowNodeScript.mockResolvedValue({output: 'test result'});
+        hoisted.mockTestClusterElementScript.mockResolvedValue({output: 'cluster element result'});
         vi.clearAllMocks();
         vi.resetModules();
     });
@@ -231,6 +255,100 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
 
             await waitFor(() => {
                 expect(hoisted.mockSetScriptIsRunning).toHaveBeenLastCalledWith(false);
+            });
+        });
+
+        describe('cluster element script', () => {
+            it('should call testClusterElementScript when currentNode has clusterElementType', async () => {
+                hoisted.storeState.currentNode = {
+                    clusterElementType: 'TOOL',
+                    name: 'tool_1',
+                };
+                hoisted.storeState.rootClusterElementNodeData = {
+                    workflowNodeName: 'aiAgent_1',
+                };
+
+                const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
+                const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
+
+                act(() => {
+                    result.current.handleRunClick();
+                });
+
+                expect(hoisted.mockTestClusterElementScript).toHaveBeenCalledWith({
+                    clusterElementType: 'TOOL',
+                    clusterElementWorkflowNodeName: 'tool_1',
+                    environmentId: 1,
+                    workflowId: 'workflow-1',
+                    workflowNodeName: 'aiAgent_1',
+                });
+                expect(hoisted.mockTestWorkflowNodeScript).not.toHaveBeenCalled();
+            });
+
+            it('should set script test execution on cluster element script success', async () => {
+                hoisted.storeState.currentNode = {
+                    clusterElementType: 'SYSTEM_PROMPT',
+                    name: 'systemPrompt_1',
+                };
+                hoisted.storeState.rootClusterElementNodeData = {
+                    workflowNodeName: 'aiAgent_1',
+                };
+                hoisted.mockTestClusterElementScript.mockResolvedValue({output: 'cluster success'});
+
+                const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
+                const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
+
+                act(() => {
+                    result.current.handleRunClick();
+                });
+
+                await waitFor(() => {
+                    expect(hoisted.mockSetScriptTestExecution).toHaveBeenCalledWith({output: 'cluster success'});
+                });
+
+                await waitFor(() => {
+                    expect(hoisted.mockSetScriptIsRunning).toHaveBeenCalledWith(false);
+                });
+            });
+
+            it('should set scriptIsRunning to false on cluster element script error', async () => {
+                hoisted.storeState.currentNode = {
+                    clusterElementType: 'TOOL',
+                    name: 'tool_1',
+                };
+                hoisted.storeState.rootClusterElementNodeData = {
+                    workflowNodeName: 'aiAgent_1',
+                };
+                hoisted.mockTestClusterElementScript.mockRejectedValue(new Error('Cluster error'));
+
+                const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
+                const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
+
+                act(() => {
+                    result.current.handleRunClick();
+                });
+
+                await waitFor(() => {
+                    expect(hoisted.mockSetScriptIsRunning).toHaveBeenLastCalledWith(false);
+                });
+            });
+
+            it('should fall back to testWorkflowNodeScript when rootClusterElementNodeData is missing', async () => {
+                hoisted.storeState.currentNode = {
+                    clusterElementType: 'TOOL',
+                    name: 'tool_1',
+                };
+                hoisted.storeState.rootClusterElementNodeData = undefined;
+
+                const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
+                const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
+
+                act(() => {
+                    result.current.handleRunClick();
+                });
+
+                expect(hoisted.mockTestWorkflowNodeScript).toHaveBeenCalled();
+                expect(hoisted.mockTestClusterElementScript).not.toHaveBeenCalled();
             });
         });
     });
