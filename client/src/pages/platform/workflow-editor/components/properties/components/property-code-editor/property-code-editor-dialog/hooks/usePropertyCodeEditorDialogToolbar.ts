@@ -1,6 +1,9 @@
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
+import {testClusterElementScript} from '@/shared/mutations/platform/clusterElementScript.mutations';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -48,6 +51,8 @@ export const usePropertyCodeEditorDialogToolbar = ({
     const ai = useApplicationInfoStore((state) => state.ai);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const rootClusterElementNodeData = useWorkflowEditorStore(useShallow((state) => state.rootClusterElementNodeData));
 
     const copilotEnabled = ai.copilot.enabled && ff_1570;
 
@@ -67,20 +72,47 @@ export const usePropertyCodeEditorDialogToolbar = ({
     const handleRunClick = useCallback(() => {
         setScriptIsRunning(true);
 
-        workflowNodeScriptApi
-            .testWorkflowNodeScript({
+        const isClusterElement = currentNode?.clusterElementType && rootClusterElementNodeData?.workflowNodeName;
+
+        if (isClusterElement) {
+            testClusterElementScript({
+                clusterElementType: currentNode.clusterElementType!,
+                clusterElementWorkflowNodeName: currentNode.name,
                 environmentId: currentEnvironmentId!,
-                id: workflowId,
-                workflowNodeName,
+                workflowId,
+                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
             })
-            .then((scriptTestExecution) => {
-                setScriptTestExecution(scriptTestExecution);
-                setScriptIsRunning(false);
-            })
-            .catch(() => {
-                setScriptIsRunning(false);
-            });
-    }, [currentEnvironmentId, workflowId, workflowNodeName, setScriptIsRunning, setScriptTestExecution]);
+                .then((scriptTestExecution) => {
+                    setScriptTestExecution(scriptTestExecution);
+                    setScriptIsRunning(false);
+                })
+                .catch(() => {
+                    setScriptIsRunning(false);
+                });
+        } else {
+            workflowNodeScriptApi
+                .testWorkflowNodeScript({
+                    environmentId: currentEnvironmentId!,
+                    id: workflowId,
+                    workflowNodeName,
+                })
+                .then((scriptTestExecution) => {
+                    setScriptTestExecution(scriptTestExecution);
+                    setScriptIsRunning(false);
+                })
+                .catch(() => {
+                    setScriptIsRunning(false);
+                });
+        }
+    }, [
+        currentEnvironmentId,
+        currentNode,
+        rootClusterElementNodeData,
+        setScriptIsRunning,
+        setScriptTestExecution,
+        workflowId,
+        workflowNodeName,
+    ]);
 
     const handleSaveClick = useCallback(() => {
         setSaving(true);
