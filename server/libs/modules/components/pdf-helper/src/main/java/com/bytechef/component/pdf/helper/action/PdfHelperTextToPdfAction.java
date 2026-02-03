@@ -60,8 +60,7 @@ public class PdfHelperTextToPdfAction {
     private PdfHelperTextToPdfAction() {
     }
 
-    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws Exception {
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Document document = new Document();
 
