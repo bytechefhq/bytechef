@@ -1,0 +1,12 @@
+query task($id: ID!) {
+    task(id: $id) {
+        createdBy
+        createdDate
+        description
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        version
+    }
+}
