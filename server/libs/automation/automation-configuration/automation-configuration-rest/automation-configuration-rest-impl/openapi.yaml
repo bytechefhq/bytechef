@@ -762,8 +762,12 @@ paths:
           content:
             application/json:
               schema:
-                type: integer
-                format: int64
+                type: "object"
+                properties:
+                  projectWorkflowId:
+                    description: "The id of a created project workflow."
+                    type: "integer"
+                    format: "int64"
   /projects/{id}/workflows/{workflowId}/duplicate:
     post:
       description: "Duplicates existing workflow."
@@ -791,7 +795,11 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                type: "object"
+                properties:
+                  workflowId:
+                    description: "The id of a new duplicated workflow."
+                    type: "string"
   /users/{id}/workspaces:
     get:
       description: "Get all user workspaces."
