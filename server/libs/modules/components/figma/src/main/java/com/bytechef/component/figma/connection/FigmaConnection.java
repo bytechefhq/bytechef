@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,8 +45,32 @@ public class FigmaConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://www.figma.com/oauth")
-            .scopes((connectionParameters, context) -> Map.of("file_comments:read", false, "file_comments:write", false,
-                "webhooks:write", false))
+            .scopes((connectionParameters, context) -> {
+                Map<String, Boolean> scopeMap = new HashMap<>();
+
+                scopeMap.put("current_user:read", false);
+                scopeMap.put("file_comments:read", true);
+                scopeMap.put("file_comments:write", true);
+                scopeMap.put("file_content:read", false);
+                scopeMap.put("file_dev_resources:read", false);
+                scopeMap.put("file_dev_resources:write", false);
+                scopeMap.put("file_metadata:read", false);
+                scopeMap.put("file_variables:read", false);
+                scopeMap.put("file_variables:write", false);
+                scopeMap.put("file_versions:read", false);
+                scopeMap.put("library_analytics:read", false);
+                scopeMap.put("library_assets:read", false);
+                scopeMap.put("library_content:read", false);
+                scopeMap.put("org:activity_log_read", false);
+                scopeMap.put("org:discovery_read", false);
+                scopeMap.put("projects:read", false);
+                scopeMap.put("selections:read", false);
+                scopeMap.put("team_library_content:read", false);
+                scopeMap.put("webhooks:read", false);
+                scopeMap.put("webhooks:write", false);
+
+                return scopeMap;
+            })
             .tokenUrl((connectionParameters, context) -> "https://api.figma.com/v1/oauth/token")
             .refreshUrl((connectionParameters, context) -> "https://api.figma.com/v1/oauth/refresh"));
 
