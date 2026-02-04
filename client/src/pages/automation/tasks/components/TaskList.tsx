@@ -71,8 +71,8 @@ export default function TaskList() {
                             <TaskCard
                                 isSelected={selectedTaskId === task.id}
                                 key={task.id}
-                                onSelect={() => handleSelectTask(task.id)}
-                                onStatusToggle={(event) => handleStatusToggle(task.id, event)}
+                                onSelect={() => task.id && handleSelectTask(task.id)}
+                                onStatusToggle={(event) => task.id && handleStatusToggle(task.id, event)}
                                 task={task}
                             />
                         ))

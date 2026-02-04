@@ -21,14 +21,6 @@ const getCurrentDate = (): string => {
     return new Date().toISOString().split('T')[0];
 };
 
-const generateTaskId = (): string => {
-    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        return crypto.randomUUID();
-    }
-
-    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-};
-
 export interface UseTaskCreateDialogReturnI {
     availableAssignees: string[];
     errors: Partial<NewTaskFormI>;
@@ -124,7 +116,6 @@ export function useTaskCreateDialog(): UseTaskCreateDialogReturnI {
                 dependencies: form.dependencies,
                 description: form.description,
                 dueDate: form.dueDate || undefined,
-                id: generateTaskId(),
                 priority: form.priority,
                 status: form.status,
                 title: form.title,
