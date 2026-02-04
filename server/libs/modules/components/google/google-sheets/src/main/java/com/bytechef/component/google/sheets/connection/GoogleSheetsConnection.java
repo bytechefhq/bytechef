@@ -30,7 +30,9 @@ public class GoogleSheetsConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         null, (connection, context) -> Map.of(
-            "https://www.googleapis.com/auth/spreadsheets", true,
+            "https://www.googleapis.com/auth/drive", true,
+            "https://www.googleapis.com/auth/drive.file", false,
             "https://www.googleapis.com/auth/drive.readonly", true,
-            "https://www.googleapis.com/auth/drive", true));
+            "https://www.googleapis.com/auth/spreadsheets", true,
+            "https://www.googleapis.com/auth/spreadsheets.readonly", false));
 }

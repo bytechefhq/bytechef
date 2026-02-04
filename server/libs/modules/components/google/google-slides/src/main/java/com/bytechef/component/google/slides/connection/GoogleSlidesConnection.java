@@ -31,5 +31,10 @@ public class GoogleSlidesConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         "https://slides.googleapis.com/v1", (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/drive", true,
-            "https://www.googleapis.com/auth/presentations", true));
+            "https://www.googleapis.com/auth/drive.file", false,
+            "https://www.googleapis.com/auth/drive.readonly", false,
+            "https://www.googleapis.com/auth/presentations", true,
+            "https://www.googleapis.com/auth/presentations.readonly", true,
+            "https://www.googleapis.com/auth/spreadsheets", true,
+            "https://www.googleapis.com/auth/spreadsheets.readonly", true));
 }

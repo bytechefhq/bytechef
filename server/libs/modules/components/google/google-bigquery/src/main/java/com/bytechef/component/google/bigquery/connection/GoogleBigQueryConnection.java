@@ -29,8 +29,12 @@ public class GoogleBigQueryConnection {
         "https://bigquery.googleapis.com/bigquery/v2",
         (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/bigquery", true,
+            "https://www.googleapis.com/auth/bigquery.insertdata", false,
             "https://www.googleapis.com/auth/cloud-platform", true,
-            "https://www.googleapis.com/auth/cloud-platform.read-only", true));
+            "https://www.googleapis.com/auth/cloud-platform.read-only", true,
+            "https://www.googleapis.com/auth/devstorage.full_control", false,
+            "https://www.googleapis.com/auth/devstorage.read_only", false,
+            "https://www.googleapis.com/auth/devstorage.read_write", false));
 
     private GoogleBigQueryConnection() {
     }
