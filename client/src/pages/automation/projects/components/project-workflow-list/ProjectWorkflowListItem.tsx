@@ -23,6 +23,7 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/wor
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 
 import '@/shared/styles/dropdownMenu.css';
+import {useToast} from '@/hooks/use-toast';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -61,6 +62,8 @@ const ProjectWorkflowListItem = ({
 
     const queryClient = useQueryClient();
 
+    const {toast} = useToast();
+
     const deleteWorkflowMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
@@ -72,9 +75,18 @@ const ProjectWorkflowListItem = ({
     const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
         onError: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+
+            toast({
+                description: 'Workflow duplication failed.',
+                variant: 'destructive',
+            });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+
+            toast({
+                description: 'Workflow duplicated successfully.',
+            });
         },
     });
 
