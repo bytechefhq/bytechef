@@ -28,7 +28,7 @@ export interface TaskI {
     dependencies: string[];
     description: string;
     dueDate?: string;
-    id: string;
+    id?: string;
     priority: 'high' | 'medium' | 'low';
     status: 'open' | 'in-progress' | 'completed';
     title: string;
