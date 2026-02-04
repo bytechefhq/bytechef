@@ -51,7 +51,8 @@ public class MathHelperComponentHandler implements ComponentHandler {
             tool(MathHelperDivisionAction.ACTION_DEFINITION),
             tool(MathHelperModuloAction.ACTION_DEFINITION),
             tool(MathHelperMultiplicationAction.ACTION_DEFINITION),
-            tool(MathHelperSubtractionAction.ACTION_DEFINITION));
+            tool(MathHelperSubtractionAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -34,6 +34,7 @@ public class MathHelperDivisionAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("division")
         .title("Division")
         .description("Divide two numbers.")
+        .help("", "https://docs.bytechef.io/reference/components/math_helper_v1#division")
         .properties(
             number(FIRST_NUMBER)
                 .label("First Number")

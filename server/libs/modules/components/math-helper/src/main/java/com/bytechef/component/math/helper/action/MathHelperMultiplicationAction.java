@@ -34,6 +34,7 @@ public class MathHelperMultiplicationAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("multiplication")
         .title("Multiplication")
         .description("Multiply two numbers.")
+        .help("", "https://docs.bytechef.io/reference/components/math_helper_v1#multiplication")
         .properties(
             number(FIRST_NUMBER)
                 .label("First Number")

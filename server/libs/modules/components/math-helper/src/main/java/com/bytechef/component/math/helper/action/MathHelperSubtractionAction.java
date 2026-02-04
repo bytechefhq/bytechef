@@ -34,6 +34,7 @@ public class MathHelperSubtractionAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("subtraction")
         .title("Subtraction")
         .description("Subtract two numbers.")
+        .help("", "https://docs.bytechef.io/reference/components/math_helper_v1#subtraction")
         .properties(
             number(FIRST_NUMBER)
                 .label("First Number")
