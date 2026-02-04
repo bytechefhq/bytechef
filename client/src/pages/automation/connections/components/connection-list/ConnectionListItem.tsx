@@ -37,6 +37,7 @@ import {
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, EditIcon, EllipsisVerticalIcon, Link2OffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import TagList from '../../../../../shared/components/TagList';
 
@@ -201,17 +202,17 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
                                 <DropdownMenuContent
                                     align="end"
-                                    className="flex w-[193px] flex-col items-start rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-primary p-0 shadow-md"
+                                    className="flex w-[193px] flex-col items-start rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-primary p-2.5 shadow-md"
                                 >
                                     <DropdownMenuItem
-                                        className="flex cursor-pointer items-center gap-2 self-stretch overflow-hidden rounded-none px-1 py-2 text-sm font-normal leading-5 text-content-neutral-primary hover:bg-surface-neutral-primary-hover focus:bg-surface-neutral-primary-hover"
+                                        className="flex cursor-pointer items-center gap-2 self-stretch px-1 py-2.5 text-sm font-normal leading-5 text-content-neutral-primary hover:bg-surface-neutral-primary-hover focus:bg-surface-neutral-primary-hover"
                                         onClick={() => setShowEditDialog(true)}
                                     >
                                         <EditIcon className="size-4" /> Edit
                                     </DropdownMenuItem>
 
                                     <DropdownMenuItem
-                                        className="flex cursor-pointer items-center gap-2 self-stretch overflow-hidden rounded-none px-1 py-2 text-sm font-normal leading-5 text-content-neutral-primary hover:bg-surface-neutral-primary-hover focus:bg-surface-neutral-primary-hover"
+                                        className="flex cursor-pointer items-center gap-2 self-stretch px-1 py-2.5 text-sm font-normal leading-5 text-content-neutral-primary hover:bg-surface-neutral-primary-hover focus:bg-surface-neutral-primary-hover"
                                         onClick={() => setShowDisconnectDialog(true)}
                                     >
                                         <Link2OffIcon className="size-4" /> Disconnect from all
@@ -220,8 +221,18 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                     <DropdownMenuSeparator className="m-0" />
 
                                     <DropdownMenuItem
-                                        className="flex cursor-pointer items-center gap-2 self-stretch overflow-hidden rounded-none px-1 py-2 text-sm font-normal leading-5 text-content-destructive-primary hover:bg-surface-destructive-secondary hover:text-content-destructive-primary focus:bg-surface-destructive-secondary focus:text-content-destructive-primary"
-                                        onClick={() => setShowDeleteDialog(true)}
+                                        className={twMerge(
+                                            'flex cursor-pointer items-center gap-2 self-stretch px-1 py-2.5 text-sm font-normal leading-5 text-content-destructive-primary hover:bg-surface-destructive-secondary hover:text-content-destructive-primary focus:bg-surface-destructive-secondary focus:text-content-destructive-primary',
+                                            connection.active &&
+                                                'cursor-not-allowed opacity-50 hover:bg-transparent hover:text-content-destructive-primary focus:bg-transparent focus:text-content-destructive-primary'
+                                        )}
+                                        disabled={connection.active === true}
+                                        onClick={() => connection.active !== true && setShowDeleteDialog(true)}
+                                        title={
+                                            connection.active === true
+                                                ? 'Disconnect from all workflows first to enable deletion'
+                                                : undefined
+                                        }
                                     >
                                         <Trash2Icon className="size-4" /> Delete
                                     </DropdownMenuItem>
