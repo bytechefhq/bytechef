@@ -145,6 +145,7 @@ const WorkflowNodeDetailsPanel = ({
         setActiveTab,
         setCurrentComponent,
         setCurrentNode,
+        setOperationChangeInProgress,
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
@@ -154,6 +155,7 @@ const WorkflowNodeDetailsPanel = ({
             setActiveTab: state.setActiveTab,
             setCurrentComponent: state.setCurrentComponent,
             setCurrentNode: state.setCurrentNode,
+            setOperationChangeInProgress: state.setOperationChangeInProgress,
             workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
         }))
     );
@@ -800,6 +802,8 @@ const WorkflowNodeDetailsPanel = ({
 
             setCurrentOperationName(newOperationName);
 
+            setOperationChangeInProgress(true);
+
             let newOperationDefinition: ActionDefinition | TriggerDefinition | ClusterElementDefinition | undefined;
 
             if (!currentComponentDefinition || !currentComponent) {
@@ -872,7 +876,6 @@ const WorkflowNodeDetailsPanel = ({
                         value: newOperationName,
                     },
                     invalidateWorkflowQueries,
-                    queryClient,
                     updateWorkflowMutation,
                 });
 
@@ -922,6 +925,8 @@ const WorkflowNodeDetailsPanel = ({
                         type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
                         workflowNodeName,
                     });
+
+                    setOperationChangeInProgress(false);
                 },
                 updateWorkflowMutation,
             });
@@ -945,6 +950,7 @@ const WorkflowNodeDetailsPanel = ({
             currentNodeIndex,
             setCurrentComponent,
             setCurrentNode,
+            setOperationChangeInProgress,
         ]
     );
 

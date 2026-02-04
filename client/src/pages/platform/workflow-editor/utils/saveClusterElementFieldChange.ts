@@ -161,6 +161,8 @@ export default function saveClusterElementFieldChange({
                     });
                 }
             }
+
+            useWorkflowNodeDetailsPanelStore.getState().setOperationChangeInProgress(false);
         },
         updateWorkflowMutation,
     });
