@@ -65,7 +65,6 @@ class GithubGetRepositoryContentActionTest extends AbstractGithubActionTest {
 
     @Test
     void testPerformWhenItReturnsFile() throws Exception {
-
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("content", "dGVzdA=="));
 
@@ -77,7 +76,6 @@ class GithubGetRepositoryContentActionTest extends AbstractGithubActionTest {
 
     @Test
     void testPerformWhenItReturnsDirectory() throws Exception {
-
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(
                 Map.of(NAME, "test1"),
@@ -91,7 +89,6 @@ class GithubGetRepositoryContentActionTest extends AbstractGithubActionTest {
 
     @Test
     void testPerform() throws Exception {
-
         String result = (String) executePerformFunction(
             GithubGetRepositoryContentAction.ACTION_DEFINITION, mockedParameters);
 

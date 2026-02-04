@@ -44,9 +44,9 @@ public class GithubGetRepositoryContentAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getRepositoryContent")
         .title("Get Repository Content")
-        .description("Gets the contents of a file or directory in a repository." +
-            " If the content is a directory, the response will be each item in the directory" +
-            " and if the content is a file, the response will be file as a string.")
+        .description(
+            "Gets the contents of a file or directory in a repository. If the content is a directory, the response " +
+                "will be each item in the directory and if the content is a file, the response will be file as a string.")
         .properties(
             OWNER_PROPERTY,
             string(REPOSITORY)
@@ -57,13 +57,10 @@ public class GithubGetRepositoryContentAction {
                 .label("Path")
                 .description("Path to the file or the directory.")
                 .required(true))
-        .output(
-            outputSchema(
-                string()))
+        .output(outputSchema(string()))
         .perform(GithubGetRepositoryContentAction::perform);
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         Object response = context
             .http(http -> http.get("/repos/" +
                 inputParameters.getRequiredString(OWNER) + "/" +
