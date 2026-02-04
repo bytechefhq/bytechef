@@ -12,7 +12,6 @@ apis/WorkflowNodeDynamicPropertiesApi.ts
 apis/WorkflowNodeOptionApi.ts
 apis/WorkflowNodeOutputApi.ts
 apis/WorkflowNodeParameterApi.ts
-apis/WorkflowNodeScriptApi.ts
 apis/WorkflowNodeTestOutputApi.ts
 apis/WorkflowTestConfigurationApi.ts
 apis/index.ts
@@ -98,7 +97,6 @@ docs/WorkflowNodeOptionApi.md
 docs/WorkflowNodeOutput.md
 docs/WorkflowNodeOutputApi.md
 docs/WorkflowNodeParameterApi.md
-docs/WorkflowNodeScriptApi.md
 docs/WorkflowNodeTestOutput.md
 docs/WorkflowNodeTestOutputApi.md
 docs/WorkflowOutput.md
