@@ -123,6 +123,9 @@ Type: OBJECT
 }
 ```
 
+#### Find File Key
+
+To find a Figma file key, copy the alphanumeric string located between `/file/` (or `/design/`, `/proto/`, etc.) and the file name in the browser URL. For example, in `https://www.figma.com/file/ABC123456/File-Name`, the file key is `ABC123456`. You can also right-click a file in the desktop app and select **Copy link** to extract it.
 
 
 
@@ -180,6 +183,9 @@ Type: OBJECT
 }
 ```
 
+#### Find File Key
+
+To find a Figma file key, copy the alphanumeric string located between `/file/` (or `/design/`, `/proto/`, etc.) and the file name in the browser URL. For example, in `https://www.figma.com/file/ABC123456/File-Name`, the file key is `ABC123456`. You can also right-click a file in the desktop app and select **Copy link** to extract it.
 
 
 
@@ -203,7 +209,33 @@ Type: DYNAMIC_WEBHOOK
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| file_name | STRING | The name of the file that was updated. |
+| created_at | STRING | The UTC ISO 8601 time at which the comment was left. |
+| comment_id | STRING | ID of the comment. |
+| triggered_by | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(handle), STRING\(email), STRING\(img_url)&#125; </details> | The user that made the comment and triggered this event. |
+| file_key | STRING | The key of the file that was updated. |
+| retries | INTEGER | Number of times the event has been retried. |
+| event_type | STRING | Type of the event. |
+| webhook_id | STRING | The id of the webhook that caused the callback. |
+| parent_id | STRING | If present, the id of the comment to which this is the reply. |
+| resolved_at | STRING | If set, the UTC ISO 8601 time the comment was resolved. |
+| mentions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(handle), STRING\(email), STRING\(img_url)&#125;] </details> | Users that were mentioned in the comment. |
+| comment | ARRAY <details> <summary> Items </summary> [&#123;STRING\(text), STRING\(mention)&#125;] </details> | Contents of the comment itself. |
+| order_id | STRING | Only set for top level comments. The number displayed with the comment in the UI. |
+| passcode | STRING | The passcode specified when the webhook was created, should match what was initially provided. |
+| timestamp | STRING | UTC ISO 8601 timestamp of when the event was triggered. |
+
+
+
 
 #### JSON Example
 ```json
@@ -216,6 +248,9 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "figma/v1/newComment"
 }
 ```
+#### Find Team ID
+
+To find your Figma Team ID, open the Figma web browser app, click on your team name in the left-hand sidebar, and copy the long numerical string located after `/team/` in the URL bar (e.g., `figma.com/team/123456789/team-name`).
 
 
 
