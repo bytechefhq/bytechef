@@ -16,6 +16,14 @@
 
 package com.bytechef.component.google.mail.action;
 
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NAME;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -24,39 +32,29 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.Gmail.Users;
 import com.google.api.services.gmail.Gmail.Users.Labels;
 import com.google.api.services.gmail.model.Label;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Ivona Pavela
  */
 class GoogleMailCreateLabelActionTest {
 
-    private final Gmail mockedGmail = mock(Gmail.class);
-    private final Users mockedUsers = mock(Users.class);
-    private final Labels mockedLabels = mock(Labels.class);
-    private final Label mockedLabel = mock(Label.class);
+    private final ArgumentCaptor<Label> labelArgumentCaptor = forClass(Label.class);
     private final Labels.Create mockedCreate = mock(Labels.Create.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Label> labelArgumentCaptor = ArgumentCaptor.forClass(Label.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-
+    private final Gmail mockedGmail = mock(Gmail.class);
+    private final Label mockedLabel = mock(Label.class);
+    private final Labels mockedLabels = mock(Labels.class);
+    private final Users mockedUsers = mock(Users.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
-
         Parameters parameters = MockParametersFactory.create(Map.of(NAME, "test"));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
@@ -68,23 +66,21 @@ class GoogleMailCreateLabelActionTest {
                 .thenReturn(mockedLabels);
             when(mockedLabels.create(
                 stringArgumentCaptor.capture(), labelArgumentCaptor.capture()))
-                .thenReturn(mockedCreate);
+                    .thenReturn(mockedCreate);
             when(mockedCreate.execute())
                 .thenReturn(mockedLabel);
-
 
             Label result = GoogleMailCreateLabelAction.perform(parameters, parameters, mock(ActionContext.class));
 
             assertEquals(mockedLabel, result);
             assertEquals(parameters, parametersArgumentCaptor.getValue());
-
             assertEquals(List.of(ME), stringArgumentCaptor.getAllValues());
 
-            Label sentLabel = labelArgumentCaptor.getValue();
+            Label label = new Label().setName("test")
+                .setLabelListVisibility("labelShow")
+                .setMessageListVisibility("show");
 
-            assertEquals("test", sentLabel.getName());
-            assertEquals("labelShow", sentLabel.getLabelListVisibility());
-            assertEquals("show", sentLabel.getMessageListVisibility());
+            assertEquals(label, labelArgumentCaptor.getValue());
         }
     }
 }
