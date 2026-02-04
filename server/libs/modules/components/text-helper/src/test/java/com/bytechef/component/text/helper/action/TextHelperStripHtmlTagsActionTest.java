@@ -22,64 +22,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * @author Nikolina Spehar
  */
 class TextHelperStripHtmlTagsActionTest {
 
-    private static String run(String input) {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input));
+    @ParameterizedTest
+    @CsvSource(value = {
+        "'<p>Hello <b>World</b></p>', 'Hello World'",
+        "'Visit <a href=''https://example.com''>Example</a>!', 'Visit Example!'",
+        "'', ''",
+        "'<div><span></span></div>', ''",
+        "'<div>Hello <span>World <b>Bold</b></span></div>', 'Hello World Bold'",
+        "'<p>Hello <b>World</p>', 'Hello World'"
+    })
+    void testPerform(String input, String expectedResult) {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input == null ? "" : input));
 
-        return TextHelperStripHtmlTagsAction.perform(mockedParameters, null, null);
-    }
-
-    @Test
-    void testSimpleHtml() {
-        String html = "<p>Hello <b>World</b></p>";
-        String expected = "Hello World";
-
-        assertEquals(expected, run(html));
-    }
-
-    @Test
-    void testHtmlWithLinks() {
-        String html = "Visit <a href='https://example.com'>Example</a>!";
-        String expected = "Visit Example!";
-
-        assertEquals(expected, run(html));
-    }
-
-    @Test
-    void testEmptyString() {
-        String html = "";
-        String expected = "";
-
-        assertEquals(expected, run(html));
-    }
-
-    @Test
-    void testOnlyTags() {
-        String html = "<div><span></span></div>";
-        String expected = "";
-
-        assertEquals(expected, run(html));
-    }
-
-    @Test
-    void testNestedTags() {
-        String html = "<div>Hello <span>World <b>Bold</b></span></div>";
-        String expected = "Hello World Bold";
-
-        assertEquals(expected, run(html));
-    }
-
-    @Test
-    void testMalformedHtml() {
-        String html = "<p>Hello <b>World</p>";
-        String expected = "Hello World";
-
-        assertEquals(expected, run(html));
+        assertEquals(expectedResult, TextHelperStripHtmlTagsAction.perform(mockedParameters, null, null));
     }
 }

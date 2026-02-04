@@ -22,48 +22,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * @author Nikolina Spehar
  */
 class TextHelperRemoveSpecialCharactersActionTest {
 
-    private static String run(String input) {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input));
+    @ParameterizedTest
+    @CsvSource(value = {
+        "'Hello, World! 123', HelloWorld123",
+        "AbcXYZ123, AbcXYZ123",
+        "'!@#$%^&*() ', ''",
+        "'', ''"
+    })
+    void testPerform(String input, String expectedResult) {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input == null ? "" : input));
 
-        return TextHelperRemoveSpecialCharactersAction.perform(mockedParameters, null, null);
-    }
-
-    @Test
-    void removesSpacesAndSpecialCharacters() {
-        String input = "Hello, World! 123";
-        String result = run(input);
-
-        assertEquals("HelloWorld123", result);
-    }
-
-    @Test
-    void returnsSameStringWhenAlreadyAlphanumeric() {
-        String input = "AbcXYZ123";
-        String result = run(input);
-
-        assertEquals("AbcXYZ123", result);
-    }
-
-    @Test
-    void returnsEmptyStringWhenOnlySpecialCharacters() {
-        String input = "!@#$%^&*() ";
-        String result = run(input);
-
-        assertEquals("", result);
-    }
-
-    @Test
-    void handlesEmptyString() {
-        String input = "";
-        String result = run(input);
-
-        assertEquals("", result);
+        assertEquals(expectedResult, TextHelperRemoveSpecialCharactersAction.perform(mockedParameters, null, null));
     }
 }

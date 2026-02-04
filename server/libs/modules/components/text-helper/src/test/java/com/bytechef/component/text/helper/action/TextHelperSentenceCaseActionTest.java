@@ -22,72 +22,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * @author Nikolina Spehar
  */
 class TextHelperSentenceCaseActionTest {
 
-    private static String run(String input) {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input));
+    @ParameterizedTest
+    @CsvSource(value = {
+        "'hELLO world!', 'Hello world!'",
+        "'hELLO world! this is JAVA. how are YOU?', 'Hello world! This is java. How are you?'",
+        "'', ''",
+        "'hELLO', 'Hello'",
+        "'how are you? i am fine! good.', 'How are you? I am fine! Good.'",
+        "'This is already properly cased.', 'This is already properly cased.'",
+        "'  tHIS is a TeST. another SENTENCE? yes!  ', 'This is a test. Another sentence? Yes!'"
+    })
+    void testPerform(String input, String expectedResult) {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input == null ? "" : input));
 
-        return TextHelperSentenceCaseAction.perform(mockedParameters, null, null);
-    }
-
-    @Test
-    void testSingleSentence() {
-        String input = "hELLO world!";
-        String expected = "Hello world!";
-
-        assertEquals(expected, run(input));
-    }
-
-    @Test
-    void testMultipleSentences() {
-        String input = "hELLO world! this is JAVA. how are YOU?";
-        String expected = "Hello world! This is java. How are you?";
-
-        assertEquals(expected, run(input));
-    }
-
-    @Test
-    void testEmptyString() {
-        String input = "";
-        String expected = "";
-
-        assertEquals(expected, run(input));
-    }
-
-    @Test
-    void testSingleWord() {
-        String input = "hELLO";
-        String expected = "Hello";
-
-        assertEquals(expected, run(input));
-    }
-
-    @Test
-    void testSentenceEndingWithDifferentPunctuations() {
-        String input = "how are you? i am fine! good.";
-        String expected = "How are you? I am fine! Good.";
-
-        assertEquals(expected, run(input));
-    }
-
-    @Test
-    void testAlreadyProperlyCased() {
-        String input = "This is already properly cased.";
-        String expected = "This is already properly cased.";
-
-        assertEquals(expected, run(input));
-    }
-
-    @Test
-    void testMixedCasingAndSpaces() {
-        String input = "  tHIS is a TeST. another SENTENCE? yes!  ";
-        String expected = "This is a test. Another sentence? Yes!";
-
-        assertEquals(expected, run(input));
+        assertEquals(expectedResult, TextHelperSentenceCaseAction.perform(mockedParameters, null, null));
     }
 }

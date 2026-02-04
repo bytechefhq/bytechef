@@ -21,85 +21,41 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.AL
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.ALLOW_LOCAL_URLS;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.NO_FRAGMENT;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * @author Nikolina Spehar
  */
 class TextHelperIsUrlActionTest {
 
-    private static boolean run(
-        String url, boolean allow2slashes, boolean noFragment, boolean allowAllSchemes, boolean allowLocalUrls) {
+    @ParameterizedTest
+    @CsvSource({
+        "http://example.com, false, false, false, false, true",
+        "https://example.com/path, true, true, true, true, true",
+        "htp:/bad-url, false, false, false, false, false",
+        "http://localhost/test, false, false, false, true, true",
+        "http://localhost/test, false, false, false, false, false",
+        "http://example.com//path, true, false, false, false, true",
+        "http://example.com//path, false, false, false, false, false"
+    })
+    void testPerform(
+        String url, boolean allow2slashes, boolean noFragment, boolean allowAllSchemes, boolean allowLocalUrls,
+        boolean expectedResult) {
 
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(
-            TEXT, url,
-            ALLOW_2_SLASHES, allow2slashes,
-            NO_FRAGMENT, noFragment,
-            ALLOW_ALL_SCHEMES, allowAllSchemes,
-            ALLOW_LOCAL_URLS, allowLocalUrls));
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(
+                TEXT, url,
+                ALLOW_2_SLASHES, allow2slashes,
+                NO_FRAGMENT, noFragment,
+                ALLOW_ALL_SCHEMES, allowAllSchemes,
+                ALLOW_LOCAL_URLS, allowLocalUrls));
 
-        return TextHelperIsUrlAction.perform(mockedParameters, null, null);
-    }
-
-    @Test
-    void shouldReturnTrueForValidHttpUrl() {
-        boolean result = run(
-            "http://example.com", false, false, false, false);
-
-        assertTrue(result);
-    }
-
-    @Test
-    void shouldReturnTrueForValidHttpsUrlWithFlags() {
-        boolean result = run(
-            "https://example.com/path", true, true, true, true);
-
-        assertTrue(result);
-    }
-
-    @Test
-    void shouldReturnFalseForInvalidUrl() {
-        boolean result = run(
-            "htp:/bad-url", false, false, false, false);
-
-        assertFalse(result);
-    }
-
-    @Test
-    void shouldHandleLocalUrlsWhenFlagEnabled() {
-        boolean result = run(
-            "http://localhost/test", false, false, false, true);
-
-        assertTrue(result);
-    }
-
-    @Test
-    void shouldRejectLocalUrlsWhenFlagDisabled() {
-        boolean result = run(
-            "http://localhost/test", false, false, false, false);
-
-        assertFalse(result);
-    }
-
-    @Test
-    void shouldAllowUrlWithTwoSlashesWhenFlagEnabled() {
-        boolean result = run(
-            "http://example.com//path", true, false, false, false);
-
-        assertTrue(result);
-    }
-
-    @Test
-    void shouldRejectUrlWithTwoSlashesWhenFlagDisabled() {
-        boolean result = run(
-            "http://example.com//path", false, false, false, false);
-
-        assertFalse(result);
+        assertEquals(expectedResult, TextHelperIsUrlAction.perform(mockedParameters, null, null));
     }
 }
