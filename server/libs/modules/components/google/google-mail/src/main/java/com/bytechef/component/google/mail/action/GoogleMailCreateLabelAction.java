@@ -16,21 +16,22 @@
 
 package com.bytechef.component.google.mail.action;
 
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NAME;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
+
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Label;
-
 import java.io.IOException;
-
-import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NAME;
-import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 /**
  * @author Ivona Pavela
@@ -49,7 +50,17 @@ public class GoogleMailCreateLabelAction {
                 .required(true))
         .output(
             outputSchema(
-                string()))
+                object()
+                    .properties(
+                        string(ID)
+                            .description("ID of the newly created label."),
+                        string("labelListVisibility")
+                            .description("The visibility of the label in the label list in the Gmail web interface."),
+                        string("messageListVisibility")
+                            .description(
+                                "The visibility of messages with this label in the message list in the Gmail web interface."),
+                        string(NAME)
+                            .description("The display name of the label."))))
         .perform(GoogleMailCreateLabelAction::perform);
 
     public static Label perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
