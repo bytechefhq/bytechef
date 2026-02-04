@@ -23,12 +23,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.EMAIL;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.EMAILS;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.PARSED_EMAIL_OBJECT;
-import static com.bytechef.component.text.helper.util.TextHelperUtils.parseEmail;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import java.util.ArrayList;
+import com.bytechef.component.text.helper.util.TextHelperUtils;
 import java.util.List;
 import java.util.Map;
 
@@ -69,13 +68,8 @@ public class TextHelperParseEmailListAction {
 
         List<String> emailList = inputParameters.getRequiredList(EMAILS, String.class);
 
-        List<Map<String, String>> parsedEmails = new ArrayList<>();
-
-        for (String email : emailList) {
-            Map<String, String> parsedEmail = parseEmail(email);
-            parsedEmails.add(parsedEmail);
-        }
-
-        return parsedEmails;
+        return emailList.stream()
+            .map(TextHelperUtils::parseEmail)
+            .toList();
     }
 }

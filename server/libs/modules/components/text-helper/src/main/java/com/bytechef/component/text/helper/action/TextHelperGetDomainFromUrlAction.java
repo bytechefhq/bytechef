@@ -55,7 +55,7 @@ public class TextHelperGetDomainFromUrlAction {
 
         String domain = "";
 
-        while (matcher.find()) {
+        if (matcher.find()) {
             domain = matcher.group(1);
         }
 

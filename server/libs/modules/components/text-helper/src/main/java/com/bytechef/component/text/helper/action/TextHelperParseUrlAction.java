@@ -46,39 +46,40 @@ public class TextHelperParseUrlAction {
                 .label("URL")
                 .description("The URL that will be turned into structured data.")
                 .required(true))
-        .output(outputSchema(
-            object()
-                .description("The parsed URL data.")
-                .properties(
-                    string("protocol")
-                        .description("The protocol of the URL."),
-                    string("slashes")
-                        .description("Indicates if the URL has a slash after the protocol."),
-                    string("auth")
-                        .description("The authentication information of the URL."),
-                    string("host")
-                        .description("The host part of the URL."),
-                    string("port")
-                        .description("The port part of the URL."),
-                    string("hostname")
-                        .description("The hostname part of the URL."),
-                    string("hash")
-                        .description("The hash part of the URL."),
-                    string("search")
-                        .description("The search part of the URL."),
-                    string("pathname")
-                        .description("The pathname part of the URL."),
-                    string("path")
-                        .description("The path part of the URL including the query if present."),
-                    string("href")
-                        .description("The full URL as a string."),
-                    object("query")
-                        .description("The query parameters of the URL.")
-                        .properties(
-                            string("key")
-                                .description("The key of the query parameter."),
-                            string("value")
-                                .description("The value of the query parameter.")))))
+        .output(
+            outputSchema(
+                object()
+                    .description("The parsed URL data.")
+                    .properties(
+                        string("protocol")
+                            .description("The protocol of the URL."),
+                        string("slashes")
+                            .description("Indicates if the URL has a slash after the protocol."),
+                        string("auth")
+                            .description("The authentication information of the URL."),
+                        string("host")
+                            .description("The host part of the URL."),
+                        string("port")
+                            .description("The port part of the URL."),
+                        string("hostname")
+                            .description("The hostname part of the URL."),
+                        string("hash")
+                            .description("The hash part of the URL."),
+                        string("search")
+                            .description("The search part of the URL."),
+                        string("pathname")
+                            .description("The pathname part of the URL."),
+                        string("path")
+                            .description("The path part of the URL including the query if present."),
+                        string("href")
+                            .description("The full URL as a string."),
+                        object("query")
+                            .description("The query parameters of the URL.")
+                            .properties(
+                                string("key")
+                                    .description("The key of the query parameter."),
+                                string("value")
+                                    .description("The value of the query parameter.")))))
         .perform(TextHelperParseUrlAction::perform);
 
     private TextHelperParseUrlAction() {

@@ -28,6 +28,8 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.text.helper.constant.OperationType;
 import java.nio.charset.StandardCharsets;
+import java.util.HexFormat;
+import java.util.Objects;
 
 /**
  * @author Nikolina Špehar
@@ -57,35 +59,12 @@ public class TextHelperHexEncodeDecodeAction {
         }
 
         String operation = inputParameters.getRequiredString(OPERATION);
+        HexFormat hexFormat = HexFormat.of();
 
-        if (operation.equals(OperationType.ENCODE.name())) {
-            return hexEncodeString(text);
+        if (Objects.equals(operation, OperationType.ENCODE.name())) {
+            return hexFormat.formatHex(text.getBytes(StandardCharsets.UTF_8));
         } else {
-            return hexDecodeString(text);
+            return new String(hexFormat.parseHex(text), StandardCharsets.UTF_8);
         }
-    }
-
-    private static String hexDecodeString(String encoded) {
-        if (encoded.length() % 2 != 0) {
-            throw new IllegalArgumentException("Invalid hex string");
-        }
-
-        byte[] decodedBytes = new byte[encoded.length() / 2];
-        for (int i = 0; i < encoded.length(); i += 2) {
-            decodedBytes[i / 2] = (byte) Integer.parseInt(encoded.substring(i, i + 2), 16);
-        }
-
-        return new String(decodedBytes, StandardCharsets.UTF_8);
-    }
-
-    private static String hexEncodeString(String string) {
-        byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
-        StringBuilder hexEncodedStringBuilder = new StringBuilder(bytes.length * 2);
-
-        for (byte b : bytes) {
-            hexEncodedStringBuilder.append(String.format("%02x", b));
-        }
-
-        return hexEncodedStringBuilder.toString();
     }
 }

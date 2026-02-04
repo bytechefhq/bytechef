@@ -47,7 +47,6 @@ public class TextHelperUnderscoreAction {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         String text = inputParameters.getRequiredString(TEXT);
 
         return text.toLowerCase()

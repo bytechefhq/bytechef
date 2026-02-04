@@ -47,7 +47,6 @@ public class TextHelperIsNumericAction {
     }
 
     public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         String text = inputParameters.getRequiredString(TEXT);
 
         return NumberUtils.isCreatable(text);

@@ -59,7 +59,8 @@ public class TextHelperIsUrlAction {
             bool(ALLOW_ALL_SCHEMES)
                 .label("Allow All Schemes")
                 .description(
-                    "Allows all validly formatted schemes to pass validation instead of supplying a set of valid schemes.")
+                    "Allows all validly formatted schemes to pass validation instead of supplying a set of valid " +
+                        "schemes.")
                 .required(false)
                 .defaultValue(false),
             bool(ALLOW_LOCAL_URLS)
@@ -81,8 +82,7 @@ public class TextHelperIsUrlAction {
         long allowAllSchemes = inputParameters.getBoolean(ALLOW_ALL_SCHEMES) ? UrlValidator.ALLOW_ALL_SCHEMES : 0L;
         long allowLocalUrls = inputParameters.getBoolean(ALLOW_LOCAL_URLS) ? UrlValidator.ALLOW_LOCAL_URLS : 0L;
 
-        UrlValidator urlValidator = new UrlValidator(
-            allow2slashes + noFragment + allowAllSchemes + allowLocalUrls);
+        UrlValidator urlValidator = new UrlValidator(allow2slashes + noFragment + allowAllSchemes + allowLocalUrls);
 
         return urlValidator.isValid(url);
     }

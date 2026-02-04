@@ -25,7 +25,6 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.TE
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import java.util.regex.Pattern;
 
 /**
  * @author Nikolina Špehar
@@ -55,7 +54,6 @@ public class TextHelperRemoveCharactersAction {
         String text = inputParameters.getRequiredString(TEXT);
         String character = inputParameters.getRequiredString(CHARACTER);
 
-        String regex = Pattern.quote(String.valueOf(character));
-        return text.replaceAll(regex, "");
+        return text.replace(character, "");
     }
 }

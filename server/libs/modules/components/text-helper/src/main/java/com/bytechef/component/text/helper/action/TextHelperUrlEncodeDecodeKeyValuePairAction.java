@@ -34,8 +34,8 @@ import com.bytechef.component.text.helper.constant.OperationType;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Nikolina Špehar
@@ -65,6 +65,9 @@ public class TextHelperUrlEncodeDecodeKeyValuePairAction {
         .output(outputSchema(string().description("URL encoded/decoded content.")))
         .perform(TextHelperUrlEncodeDecodeKeyValuePairAction::perform);
 
+    private TextHelperUrlEncodeDecodeKeyValuePairAction() {
+    }
+
     public static Map<String, String> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
@@ -81,28 +84,18 @@ public class TextHelperUrlEncodeDecodeKeyValuePairAction {
     }
 
     private static Map<String, String> encodeKeyValuePairs(Map<String, String> pairs) {
-        Map<String, String> encodedPairs = new HashMap<>();
-
-        for (Map.Entry<String, String> entry : pairs.entrySet()) {
-            String encodedKey = URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8);
-            String encodedValue = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8);
-
-            encodedPairs.put(encodedKey, encodedValue);
-        }
-
-        return encodedPairs;
+        return pairs.entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8),
+                entry -> URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8)));
     }
 
     private static Map<String, String> decodeKeyValuePairs(Map<String, String> pairs) {
-        Map<String, String> decodedPairs = new HashMap<>();
-
-        for (Map.Entry<String, String> entry : pairs.entrySet()) {
-            String encodedKey = URLDecoder.decode(entry.getKey(), StandardCharsets.UTF_8);
-            String encodedValue = URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8);
-
-            decodedPairs.put(encodedKey, encodedValue);
-        }
-
-        return decodedPairs;
+        return pairs.entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                entry -> URLDecoder.decode(entry.getKey(), StandardCharsets.UTF_8),
+                entry -> URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8)));
     }
 }

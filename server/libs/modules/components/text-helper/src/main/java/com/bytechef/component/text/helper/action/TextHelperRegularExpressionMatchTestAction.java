@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 /**
  * @author Nikolina Špehar
  */
-public class TextHelperRegularExpressionMatchTestAction {
+public final class TextHelperRegularExpressionMatchTestAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("regExMatchTest")
         .title("Regular Expression Match Test")
@@ -80,12 +80,17 @@ public class TextHelperRegularExpressionMatchTestAction {
 
         int flags = 0;
 
-        if (ignoreCase)
+        if (ignoreCase) {
             flags |= Pattern.CASE_INSENSITIVE;
-        if (multiline)
+        }
+
+        if (multiline) {
             flags |= Pattern.MULTILINE;
-        if (unicode)
+        }
+
+        if (unicode) {
             flags |= Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS;
+        }
 
         Pattern pattern = Pattern.compile(regularExpression, flags);
         Matcher matcher = pattern.matcher(text);
