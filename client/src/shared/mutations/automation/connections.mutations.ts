@@ -1,5 +1,6 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Connection, ConnectionApi} from '@/shared/middleware/automation/configuration';
+import {useDisconnectConnectionMutation as useDisconnectConnectionGraphQL} from '@/shared/middleware/graphql';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateConnectionMutationProps {
@@ -39,6 +40,27 @@ export const useDeleteConnectionMutation = (mutationProps?: DeleteConnectionMuta
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
     });
+
+interface DisconnectConnectionMutationProps {
+    onSuccess?: () => void;
+    onError?: (error: Error) => void;
+}
+
+export const useDisconnectConnectionMutation = (mutationProps?: DisconnectConnectionMutationProps) => {
+    const graphqlMutation = useDisconnectConnectionGraphQL();
+
+    return useMutation<boolean, Error, number>({
+        mutationFn: async (connectionId: number) => {
+            const result = await graphqlMutation.mutateAsync({
+                connectionId: connectionId.toString(),
+            });
+
+            return result.disconnectConnection;
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+};
 
 interface UpdateConnectionMutationProps {
     onSuccess?: (result: void, variables: Connection) => void;

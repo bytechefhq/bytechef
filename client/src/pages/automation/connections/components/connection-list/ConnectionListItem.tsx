@@ -26,6 +26,7 @@ import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configurati
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
 import {
     useDeleteConnectionMutation,
+    useDisconnectConnectionMutation,
     useUpdateConnectionMutation,
 } from '@/shared/mutations/automation/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
@@ -34,7 +35,7 @@ import {
     useGetConnectionComponentDefinitionQuery,
 } from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {ComponentIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
+import {ComponentIcon, EditIcon, EllipsisVerticalIcon, Link2OffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useState} from 'react';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -48,6 +49,7 @@ interface ConnectionListItemProps {
 const ConnectionListItem = memo(({componentDefinitions, connection, remainingTags}: ConnectionListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
 
     const {data: componentDefinition} = useGetConnectionComponentDefinitionQuery({
         componentName: connection.componentName,
@@ -70,6 +72,27 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         },
     });
 
+    const disconnectConnectionMutation = useDisconnectConnectionMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ComponentDefinitionKeys.componentDefinitions,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connections,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connectionTags,
+            });
+
+            setShowDisconnectDialog(false);
+        },
+        // eslint-disable-next-line sort-keys
+        onError: (error) => {
+            console.error('Failed to disconnect connection:', error);
+            setShowDisconnectDialog(false);
+        },
+    });
+
     const updateConnectionTagsMutation = useUpdateConnectionTagsMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -86,6 +109,12 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
             deleteConnectionMutation.mutate(connection.id);
 
             setShowDeleteDialog(false);
+        }
+    };
+
+    const handleDisconnectFromAllClick = () => {
+        if (connection.id) {
+            disconnectConnectionMutation.mutate(connection.id);
         }
     };
 
@@ -170,21 +199,31 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                     <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                                 </DropdownMenuTrigger>
 
-                                <DropdownMenuContent align="end" className="p-0">
+                                <DropdownMenuContent
+                                    align="end"
+                                    className="flex w-[193px] flex-col items-start rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-primary p-0 shadow-md"
+                                >
                                     <DropdownMenuItem
-                                        className="dropdown-menu-item"
+                                        className="flex cursor-pointer items-center gap-2 self-stretch overflow-hidden rounded-none px-1 py-2 text-sm font-normal leading-5 text-content-neutral-primary hover:bg-surface-neutral-primary-hover focus:bg-surface-neutral-primary-hover"
                                         onClick={() => setShowEditDialog(true)}
                                     >
-                                        <EditIcon /> Edit
+                                        <EditIcon className="size-4" /> Edit
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem
+                                        className="flex cursor-pointer items-center gap-2 self-stretch overflow-hidden rounded-none px-1 py-2 text-sm font-normal leading-5 text-content-neutral-primary hover:bg-surface-neutral-primary-hover focus:bg-surface-neutral-primary-hover"
+                                        onClick={() => setShowDisconnectDialog(true)}
+                                    >
+                                        <Link2OffIcon className="size-4" /> Disconnect from all
                                     </DropdownMenuItem>
 
                                     <DropdownMenuSeparator className="m-0" />
 
                                     <DropdownMenuItem
-                                        className="dropdown-menu-item-destructive"
+                                        className="flex cursor-pointer items-center gap-2 self-stretch overflow-hidden rounded-none px-1 py-2 text-sm font-normal leading-5 text-content-destructive-primary hover:bg-surface-destructive-secondary hover:text-content-destructive-primary focus:bg-surface-destructive-secondary focus:text-content-destructive-primary"
                                         onClick={() => setShowDeleteDialog(true)}
                                     >
-                                        <Trash2Icon /> Delete
+                                        <Trash2Icon className="size-4" /> Delete
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -210,6 +249,37 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                 onClick={handleAlertDeleteDialogClick}
                             >
                                 Delete
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+
+                <AlertDialog open={showDisconnectDialog}>
+                    <AlertDialogContent className="flex w-full max-w-lg flex-col items-end gap-4 rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-primary p-6 shadow-lg">
+                        <AlertDialogHeader className="w-full">
+                            <AlertDialogTitle className="self-stretch text-lg font-normal leading-7 text-content-neutral-primary">
+                                Disconnect <strong>{connection.name}</strong> from all workflows?
+                            </AlertDialogTitle>
+
+                            <AlertDialogDescription className="self-stretch text-sm font-normal leading-5 text-content-neutral-secondary">
+                                This action cannot be undone.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter className="gap-2">
+                            <AlertDialogCancel
+                                className="flex h-9 items-center justify-center gap-2 rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary px-4 py-2"
+                                onClick={() => setShowDisconnectDialog(false)}
+                            >
+                                Cancel
+                            </AlertDialogCancel>
+
+                            <AlertDialogAction
+                                className="flex h-9 items-center justify-center gap-2 rounded-md bg-surface-destructive-primary px-4 py-2 text-content-onsurface-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
+                                onClick={handleDisconnectFromAllClick}
+                            >
+                                <Link2OffIcon className="size-4" />
+                                Disconnect from all
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
