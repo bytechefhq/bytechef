@@ -57,6 +57,9 @@ public class JiraAssignIssueAction {
                 .required(true))
         .perform(JiraAssignIssueAction::perform);
 
+    private JiraAssignIssueAction() {
+    }
+
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         context.http(http -> http.put("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/assignee"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

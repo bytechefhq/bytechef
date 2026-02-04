@@ -28,13 +28,12 @@ import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
 import static com.bytechef.component.jira.constant.JiraConstants.UPDATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -50,6 +49,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+/**
+ * @author Ivona Pavela
+ */
 class JiraEditIssueActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
@@ -63,13 +65,9 @@ class JiraEditIssueActionTest {
     private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            PROJECT, "1",
-            ISSUE_ID, "1",
-            SUMMARY, "summary",
-            DESCRIPTION, "description",
-            ADD_LABELS, List.of("test_add_labels"),
-            REMOVE_LABELS, List.of("test_remove_labels")));
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+            PROJECT, "1", ISSUE_ID, "1", SUMMARY, "summary", DESCRIPTION, "description",
+            ADD_LABELS, List.of("test_add_labels"), REMOVE_LABELS, List.of("test_remove_labels")));
+    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -77,7 +75,6 @@ class JiraEditIssueActionTest {
         when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> httpFunctionArgumentCaptor.getValue()
                 .apply(mockedHttp));
-
         when(mockedHttp.put(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
@@ -87,9 +84,9 @@ class JiraEditIssueActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        Boolean result = JiraEditIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = JiraEditIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        assertTrue(result);
+        assertNull(result);
 
         ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
@@ -109,14 +106,10 @@ class JiraEditIssueActionTest {
         expectedFields.put(SUMMARY, "summary");
         JiraUtils.addDescriptionField(expectedFields, "description");
 
-        List<Map<String, Object>> expectedLabels = List.of(
-            Map.of(ADD, "test_add_labels"),
-            Map.of(REMOVE, "test_remove_labels"));
-
         Map<String, Object> expectedBody = Map.of(
             FIELDS, expectedFields,
-            UPDATE, Map.of("labels", expectedLabels));
+            UPDATE, Map.of("labels", List.of(Map.of(ADD, "test_add_labels"), Map.of(REMOVE, "test_remove_labels"))));
 
-        assertEquals(Http.Body.of(expectedBody), bodyArgumentCaptor.getValue());
+        assertEquals(Http.Body.of(expectedBody, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }

@@ -129,6 +129,9 @@ public class JiraListIssueCommentsAction {
                                                 "The date and time at which the comment was updated last."))))))
         .perform(JiraListIssueCommentsAction::perform);
 
+    private JiraListIssueCommentsAction() {
+    }
+
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.get("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/comment"))
