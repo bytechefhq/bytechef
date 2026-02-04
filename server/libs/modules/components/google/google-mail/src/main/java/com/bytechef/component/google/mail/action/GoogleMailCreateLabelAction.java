@@ -53,7 +53,6 @@ public class GoogleMailCreateLabelAction {
         .perform(GoogleMailCreateLabelAction::perform);
 
     public static Label perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         Label label = new Label()
