@@ -56,6 +56,7 @@ public class PdfHelperTextToPdfAction {
             outputSchema(
                 fileEntry()
                     .description("PDF file")))
+        .help("", "https://docs.bytechef.io/reference/components/pdf-helper#text-to-pdf")
         .perform(PdfHelperTextToPdfAction::perform);
 
     private PdfHelperTextToPdfAction() {
