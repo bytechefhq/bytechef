@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,10 +50,39 @@ public class LinkedInConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://www.linkedin.com/oauth/v2/authorization")
-                .scopes((connection, context) -> Map.of(
-                    "w_member_social", true,
-                    "openid", true, "email", true, "profile", true, "w_organization_social", true,
-                    "r_organization_social", true))
+                .scopes((connection, context) -> {
+                    Map<String, Boolean> map = new HashMap<>();
+
+                    map.put("email", true);
+                    map.put("openid", true);
+                    map.put("profile", true);
+                    map.put("r_1st_connections_size", false);
+                    map.put("r_ads", false);
+                    map.put("r_ads_reporting", false);
+                    map.put("r_basicprofile", false);
+                    map.put("r_compliance", false);
+                    map.put("r_events", false);
+                    map.put("r_liteprofile", false);
+                    map.put("r_organization_admin", false);
+                    map.put("r_organization_followers", false);
+                    map.put("r_organization_social", true);
+                    map.put("r_organization_social_feed", false);
+                    map.put("r_sales_nav_analytics", false);
+                    map.put("r_sales_nav_display", false);
+                    map.put("r_sales_nav_profiles", false);
+                    map.put("r_sales_nav_validation", false);
+                    map.put("rw_ads", false);
+                    map.put("rw_dmp_segments", false);
+                    map.put("rw_events", false);
+                    map.put("rw_organization_admin", false);
+                    map.put("w_compliance", false);
+                    map.put("w_member_social", true);
+                    map.put("w_member_social_feed", false);
+                    map.put("w_organization_social", true);
+                    map.put("w_organization_social_feed", false);
+
+                    return map;
+                })
                 .tokenUrl((connection, context) -> "https://www.linkedin.com/oauth/v2/accessToken")
                 .refreshUrl((connectionParameters, context) -> "https://www.linkedin.com/oauth/v2/accessToken")
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(

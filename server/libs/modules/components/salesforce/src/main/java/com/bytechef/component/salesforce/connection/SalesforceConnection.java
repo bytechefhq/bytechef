@@ -26,6 +26,7 @@ import static com.bytechef.component.salesforce.constant.SalesforceConstants.SUB
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -53,8 +54,40 @@ public class SalesforceConnection {
                 .authorizationUrl(
                     (connectionParameters, context) -> getUrl(connectionParameters, "oauth2/authorize"))
                 .refreshUrl((connectionParameters, context) -> getUrl(connectionParameters, "oauth2/token"))
-                .scopes((connectionParameters, context) -> Map.of(
-                    "full", true, "refresh_token", true, "offline_access", true))
+                .scopes((connectionParameters, context) -> {
+                    Map<String, Boolean> map = new HashMap<>();
+
+                    map.put("cdp_query_api", false);
+                    map.put("pardot_api", false);
+                    map.put("cdp_profile_api", false);
+                    map.put("chatter_api", false);
+                    map.put("cdp_ingest_api", false);
+                    map.put("eclair_api", false);
+                    map.put("wave_api", false);
+                    map.put("api", false);
+                    map.put("custom_permissions", false);
+                    map.put("id", false);
+                    map.put("profile", false);
+                    map.put("email", false);
+                    map.put("address", false);
+                    map.put("phone", false);
+                    map.put("lightning", false);
+                    map.put("content", false);
+                    map.put("openid", false);
+                    map.put("full", true);
+                    map.put("refresh_token", true);
+                    map.put("offline_access", true);
+                    map.put("visualforce", false);
+                    map.put("web", false);
+                    map.put("chatbot_api", false);
+                    map.put("user_registration_api", false);
+                    map.put("forgot_password", false);
+                    map.put("cdp_api", false);
+                    map.put("sfap_api", false);
+                    map.put("interaction_api", false);
+
+                    return map;
+                })
                 .tokenUrl((connectionParameters, context) -> getUrl(connectionParameters, "oauth2/token")));
 
     private SalesforceConnection() {

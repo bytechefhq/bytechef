@@ -33,6 +33,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,9 +56,77 @@ public class XeroConnection {
                         .required(true))
                 .apply(XeroConnection::getApplyResponse)
                 .authorizationUrl((connection, context) -> "https://login.xero.com/identity/connect/authorize")
-                .scopes((connection, context) -> Map.of(
-                    "accounting.contacts", true, "accounting.transactions", true, "accounting.settings.read", true,
-                    "offline_access", true))
+                .scopes((connection, context) -> {
+                    Map<String, Boolean> map = new HashMap<>();
+
+                    map.put("offline_access", true);
+                    map.put("openid", false);
+                    map.put("profile", false);
+                    map.put("email", false);
+                    map.put("accounting.transactions", true);
+                    map.put("accounting.transactions.read", false);
+                    map.put("accounting.invoices", false);
+                    map.put("accounting.invoices.read", false);
+                    map.put("accounting.payments", false);
+                    map.put("accounting.payments.read", false);
+                    map.put("accounting.banktransactions", false);
+                    map.put("accounting.banktransactions.read", false);
+                    map.put("accounting.manualjournals", false);
+                    map.put("accounting.manualjournals.read", false);
+                    map.put("accounting.reports.read", false);
+                    map.put("accounting.reports.aged.read", false);
+                    map.put("accounting.reports.balancesheets.read", false);
+                    map.put("accounting.reports.banksummary.read", false);
+                    map.put("accounting.reports.budgetsummary.read", false);
+                    map.put("accounting.reports.executivesummary.read", false);
+                    map.put("accounting.reports.profitandloss.read", false);
+                    map.put("accounting.reports.trialbalance.read", false);
+                    map.put("accounting.reports.taxreports.read", false);
+                    map.put("accounting.reports.tenninetynine.read", false);
+                    map.put("accounting.journals.read", false);
+                    map.put("accounting.settings", false);
+                    map.put("accounting.settings.read", true);
+                    map.put("accounting.contacts", true);
+                    map.put("accounting.contacts.read", false);
+                    map.put("accounting.attachments", false);
+                    map.put("accounting.attachments.read", false);
+                    map.put("accounting.budgets.read", false);
+                    map.put("payroll.employees", false);
+                    map.put("payroll.employees.read", false);
+                    map.put("payroll.payruns", false);
+                    map.put("payroll.payruns.read", false);
+                    map.put("payroll.payslip", false);
+                    map.put("payroll.payslip.read", false);
+                    map.put("payroll.timesheets", false);
+                    map.put("payroll.timesheets.read", false);
+                    map.put("payroll.settings", false);
+                    map.put("payroll.settings.read", false);
+                    map.put("files", false);
+                    map.put("files.read", false);
+                    map.put("assets", false);
+                    map.put("assets.read", false);
+                    map.put("projects", false);
+                    map.put("projects.read", false);
+                    map.put("paymentservices", false);
+                    map.put("bankfeeds", false);
+                    map.put("finance.accountingactivity.read", false);
+                    map.put("finance.cashvalidation.read", false);
+                    map.put("finance.statements.read", false);
+                    map.put("finance.bankstatementsplus.read", false);
+                    map.put("practicemanager.job", false);
+                    map.put("practicemanager.job.read", false);
+                    map.put("practicemanager.client", false);
+                    map.put("practicemanager.client.read", false);
+                    map.put("practicemanager.staff", false);
+                    map.put("practicemanager.staff.read", false);
+                    map.put("practicemanager.time", false);
+                    map.put("practicemanager.time.read", false);
+                    map.put("einvoicing", false);
+                    map.put("app.connections", false);
+                    map.put("marketplace.billing", false);
+
+                    return map;
+                })
                 .tokenUrl((connection, context) -> "https://identity.xero.com/connect/token")
                 .refreshUrl((connection, context) -> "https://identity.xero.com/connect/token"));
 
