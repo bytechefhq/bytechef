@@ -30,10 +30,12 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.pdf.helper.util.PdfHelperUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -57,15 +59,12 @@ class PdfHelperConvertToImageActionTest {
     private final Context mockedContext = mock(Context.class);
     private final File mockedFile = mock(File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FILE, mockedFileEntry, FILENAME, "TestFile"));
     private final PDDocument mockedPDDocument = mock(PDDocument.class);
 
     @Test
     void perform() throws Exception {
-        when(mockedParameters.getRequiredFileEntry(FILE))
-            .thenReturn(mockedFileEntry);
-        when(mockedParameters.getRequiredString(FILENAME))
-            .thenReturn("TestFile");
         when(mockedContext.file(any()))
             .thenReturn(mockedFile);
 

@@ -38,6 +38,7 @@ import java.io.ByteArrayOutputStream;
  * @author Nikolina Spehar
  */
 public class PdfHelperTextToPdfAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("textToPdf")
         .title("Text to PDF")
         .description("Converts text to PDF.")
@@ -61,7 +62,6 @@ public class PdfHelperTextToPdfAction {
     }
 
     public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         Document document = new Document();
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

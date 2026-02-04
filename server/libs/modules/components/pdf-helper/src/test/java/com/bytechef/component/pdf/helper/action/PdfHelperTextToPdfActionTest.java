@@ -56,7 +56,7 @@ class PdfHelperTextToPdfActionTest {
     private final PdfWriter mockPdfWriter = mock(PdfWriter.class);
 
     @Test
-    void perform() throws Exception {
+    void perform() {
         try (MockedStatic<PdfWriter> mockedPdfWriter = mockStatic(PdfWriter.class);
             MockedConstruction<Document> mockedDocumentConstruction = mockConstruction(Document.class);
             MockedStatic<PdfHelperUtils> mockedPdfHelperUtils = mockStatic(PdfHelperUtils.class)) {

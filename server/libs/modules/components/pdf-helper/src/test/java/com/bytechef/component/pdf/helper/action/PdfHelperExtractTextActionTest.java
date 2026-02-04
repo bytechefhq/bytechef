@@ -28,9 +28,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -46,13 +48,11 @@ class PdfHelperExtractTextActionTest {
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final File mockedFile = mock(File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILE, mockedFileEntry));
     private final PDDocument mockedPDDocument = mock(PDDocument.class);
 
     @Test
     void testPerform() throws IOException {
-        when(mockedParameters.getRequiredFileEntry(FILE))
-            .thenReturn(mockedFileEntry);
         when(mockedActionContext.file(any()))
             .thenReturn(mockedFile);
 
@@ -71,7 +71,6 @@ class PdfHelperExtractTextActionTest {
                 List<PDFTextStripper> constructed = pdfTextStripperMockedConstruction.constructed();
                 assertEquals(1, constructed.size());
 
-                verify(mockedParameters).getRequiredFileEntry(FILE);
                 verify(mockedActionContext).file(any());
             }
         }
