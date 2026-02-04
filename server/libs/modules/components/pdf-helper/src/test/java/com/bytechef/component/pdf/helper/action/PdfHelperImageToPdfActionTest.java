@@ -51,8 +51,8 @@ class PdfHelperImageToPdfActionTest {
     private final Context mockedContext = mock(Context.class);
     private final File mockedFile = mock(File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
-        IMAGES, List.of(mockedFileEntry), FILENAME, "testFileName"));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(IMAGES, List.of(mockedFileEntry), FILENAME, "testFileName"));
     private final PDImageXObject mockPDImageXObject = mock(PDImageXObject.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
