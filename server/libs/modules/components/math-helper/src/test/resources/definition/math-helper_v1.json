@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add two numbers.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/math_helper_v1#addition"
+    },
     "metadata": null,
     "name": "addition",
     "outputDefinition": {
@@ -121,7 +124,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Divide two numbers.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/math_helper_v1#division"
+    },
     "metadata": null,
     "name": "division",
     "outputDefinition": {
@@ -236,7 +242,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the remainder of the division of two numbers.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/math_helper_v1#modulo"
+    },
     "metadata": null,
     "name": "modulo",
     "outputDefinition": {
@@ -351,7 +360,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Multiply two numbers.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/math_helper_v1#multiplication"
+    },
     "metadata": null,
     "name": "multiplication",
     "outputDefinition": {
@@ -466,7 +478,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Subtract two numbers.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/math_helper_v1#subtraction"
+    },
     "metadata": null,
     "name": "subtraction",
     "outputDefinition": {
