@@ -11,7 +11,6 @@ import {
     TriggerDefinition,
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
@@ -42,8 +41,6 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
         }))
     );
 
-    const queryClient = useQueryClient();
-
     const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (!currentNode) {
             return;
@@ -65,7 +62,6 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
                     value: event.target.value,
                 },
                 invalidateWorkflowQueries,
-                queryClient,
                 updateWorkflowMutation,
             });
 
@@ -133,7 +129,6 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
                     value: event.target.value,
                 },
                 invalidateWorkflowQueries,
-                queryClient,
                 updateWorkflowMutation,
             });
 

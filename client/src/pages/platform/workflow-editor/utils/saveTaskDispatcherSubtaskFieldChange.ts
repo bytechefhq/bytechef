@@ -1,7 +1,7 @@
 import {TASK_DISPATCHER_DATA_KEY_MAP} from '@/shared/constants';
 import {ComponentDefinition, Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType, PropertyAllType, TaskDispatcherContextType} from '@/shared/types';
-import {QueryClient, UseMutationResult} from '@tanstack/react-query';
+import {UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -21,7 +21,6 @@ interface SaveTaskDispatcherSubtaskFieldChangeProps {
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
     invalidateWorkflowQueries: () => void;
-    queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, Error, {id: string; workflow: Workflow}, unknown>;
 }
 
@@ -240,6 +239,8 @@ export default function saveTaskDispatcherSubtaskFieldChange({
                 ...commonUpdates,
                 name: workflowNodeName || '',
             });
+
+            useWorkflowNodeDetailsPanelStore.getState().setOperationChangeInProgress(false);
         },
         taskDispatcherContext,
         updateWorkflowMutation,

@@ -89,7 +89,14 @@ const PropertyComboBox = ({
     const [value, setValue] = useState(initialValue !== undefined ? initialValue.toString() : defaultValue);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+
+    const {currentNode, operationChangeInProgress} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentNode: state.currentNode,
+            operationChangeInProgress: state.operationChangeInProgress,
+        }))
+    );
+
     const {rootClusterElementNodeData} = useWorkflowEditorStore(
         useShallow((state) => ({
             rootClusterElementNodeData: state.rootClusterElementNodeData,
@@ -173,8 +180,16 @@ const PropertyComboBox = ({
                 ? lookupDependsOnValues?.every((loadDependencyValue) => !!loadDependencyValue)
                 : true) &&
             !!connectionRequirementMet &&
+            optionsDataSource &&
+            !operationChangeInProgress,
+        [
+            connectionRequirementMet,
+            currentNode,
+            lookupDependsOnPaths?.length,
+            lookupDependsOnValues,
+            operationChangeInProgress,
             optionsDataSource,
-        [connectionRequirementMet, currentNode, lookupDependsOnPaths?.length, lookupDependsOnValues, optionsDataSource]
+        ]
     );
 
     const {
