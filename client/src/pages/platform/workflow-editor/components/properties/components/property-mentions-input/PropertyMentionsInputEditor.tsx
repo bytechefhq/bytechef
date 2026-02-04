@@ -211,7 +211,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             mergeAttributes(options.HTMLAttributes, {
                                 class: twMerge(
                                     'relative inline-flex items-center gap-0.5 not-prose bg-muted hover:bg-foreground/15 px-2 rounded-full',
-                                    controlType !== 'RICH_TEXT' && controlType !== 'TEXT_AREA' && 'text-sm'
+                                    controlType !== 'RICH_TEXT' &&
+                                controlType !== 'TEXT_AREA' &&
+                                controlType !== 'FORMULA_MODE' &&
+                                'text-sm'
                                 ),
                             }),
                             [
@@ -240,7 +243,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 }),
             ];
 
-            if (controlType !== 'TEXT_AREA' && controlType !== 'RICH_TEXT') {
+            if (
+                controlType !== 'TEXT_AREA' &&
+                controlType !== 'RICH_TEXT' &&
+                controlType !== 'FORMULA_MODE'
+            ) {
                 extensions.push(
                     Extension.create({
                         addKeyboardShortcuts(this) {
@@ -428,7 +435,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     const valueLines = content.split('\n');
 
                     const paragraphedLines =
-                        controlType === 'TEXT_AREA' || controlType === 'TEXT'
+                        controlType === 'TEXT_AREA' ||
+                        controlType === 'TEXT' ||
+                        controlType === 'FORMULA_MODE'
                             ? valueLines.map((valueLine) => `<p>${escapeHtmlForParagraph(valueLine)}</p>`)
                             : valueLines.map((valueLine) => `<p>${valueLine}</p>`);
 

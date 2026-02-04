@@ -53,7 +53,15 @@ const INPUT_PROPERTY_CONTROL_TYPES = [
     'URL',
 ];
 
-const MENTION_INPUT_PROPERTY_CONTROL_TYPES = ['EMAIL', 'PHONE', 'RICH_TEXT', 'TEXT', 'TEXT_AREA', 'URL'];
+const MENTION_INPUT_PROPERTY_CONTROL_TYPES = [
+    'EMAIL',
+    'FORMULA_MODE',
+    'PHONE',
+    'RICH_TEXT',
+    'TEXT',
+    'TEXT_AREA',
+    'URL',
+];
 
 type UsePropertyReturnType = {
     controlType?: ControlType;

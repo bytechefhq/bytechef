@@ -205,7 +205,9 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         )}
 
                         <div className="flex items-center gap-1">
-                            {(controlType === 'RICH_TEXT' || controlType === 'TEXT_AREA') && (
+                            {(controlType === 'RICH_TEXT' ||
+                                controlType === 'TEXT_AREA' ||
+                                controlType === 'FORMULA_MODE') && (
                                 <Suspense fallback={<Skeleton className="size-6" />}>
                                     <PropertyMentionsInputEditorSheet
                                         componentDefinitions={componentDefinitions}
