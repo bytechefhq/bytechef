@@ -126,7 +126,7 @@ Name: imageToPdf
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| image | Image | FILE_ENTRY | The image which will be converted to PDF. | true |
+| images | null | ARRAY <details> <summary> Items </summary> [FILE_ENTRY\($image)] </details> | List of images that will be converted to one PDF. | true |
 | filename | Filename | STRING | The name of the PDF file. | true |
 
 #### Example JSON Structure
@@ -135,12 +135,12 @@ Name: imageToPdf
   "label" : "Image to PDF",
   "name" : "imageToPdf",
   "parameters" : {
-    "image" : {
+    "images" : [ {
       "extension" : "",
       "mimeType" : "",
       "name" : "",
       "url" : ""
-    },
+    } ],
     "filename" : ""
   },
   "type" : "pdfHelper/v1/imageToPdf"
