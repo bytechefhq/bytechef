@@ -56,6 +56,9 @@ public class TextHelperExtractKeyRegExAction {
                     .items(
                         string()
                             .description("Key that matches the regular expression."))))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/text-helper_v1#extract-key-by-regular-expression")
         .perform(TextHelperExtractKeyRegExAction::perform);
 
     private TextHelperExtractKeyRegExAction() {

@@ -43,6 +43,9 @@ public class TextHelperSelectLastNCharactersAction {
                 .description("The number of characters to select.")
                 .required(true))
         .output(outputSchema(string().description("Lower case string.")))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/text-helper_v1#select-last-n-characters")
         .perform(TextHelperSelectLastNCharactersAction::perform);
 
     private TextHelperSelectLastNCharactersAction() {

@@ -81,6 +81,9 @@ public class TextHelperExtractContentFromHtmlAction {
                 .description(
                     "If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string."))
         .output()
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/text-helper_v1#extract-content-from-html")
         .perform(TextHelperExtractContentFromHtmlAction::perform);
 
     public static Object perform(

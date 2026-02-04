@@ -80,6 +80,7 @@ public class TextHelperParseUrlAction {
                                     .description("The key of the query parameter."),
                                 string("value")
                                     .description("The value of the query parameter.")))))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#parse-url")
         .perform(TextHelperParseUrlAction::perform);
 
     private TextHelperParseUrlAction() {

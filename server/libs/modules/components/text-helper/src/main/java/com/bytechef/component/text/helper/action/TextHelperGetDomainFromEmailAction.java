@@ -40,6 +40,7 @@ public class TextHelperGetDomainFromEmailAction {
                 .label("Email")
                 .required(true))
         .output(outputSchema(string().description("Extracted domain")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#get-domain-from-email")
         .perform(TextHelperGetDomainFromEmailAction::perform);
 
     private TextHelperGetDomainFromEmailAction() {

@@ -41,6 +41,7 @@ public class TextHelperChangeTypeAction {
                 .label("Text")
                 .required(true))
         .output(outputSchema(number().description("Number input text")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#change-type")
         .perform(TextHelperChangeTypeAction::perform);
 
     private TextHelperChangeTypeAction() {

@@ -47,6 +47,7 @@ public class TextHelperExtractUrlsAction {
             outputSchema(
                 array().description("Extracted URLs.")
                     .items(string())))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#extract-urls")
         .perform(TextHelperExtractUrlsAction::perform);
 
     private TextHelperExtractUrlsAction() {

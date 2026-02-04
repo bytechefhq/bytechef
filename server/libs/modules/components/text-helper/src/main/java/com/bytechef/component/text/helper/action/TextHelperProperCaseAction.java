@@ -40,6 +40,7 @@ public class TextHelperProperCaseAction {
                 .description("The text that will be turned into proper case.")
                 .required(true))
         .output(outputSchema(string().description("The text in proper case.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#proper-case")
         .perform(TextHelperProperCaseAction::perform);
 
     private TextHelperProperCaseAction() {

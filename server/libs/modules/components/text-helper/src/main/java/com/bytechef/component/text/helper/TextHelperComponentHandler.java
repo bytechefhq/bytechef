@@ -174,7 +174,8 @@ public class TextHelperComponentHandler implements ComponentHandler {
             tool(TextHelperUnderscoreAction.ACTION_DEFINITION),
             tool(TextHelperUpperCaseAction.ACTION_DEFINITION),
             tool(TextHelperUrlEncodeDecodeAction.ACTION_DEFINITION),
-            tool(TextHelperUrlEncodeDecodeKeyValuePairAction.ACTION_DEFINITION));
+            tool(TextHelperUrlEncodeDecodeKeyValuePairAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -45,6 +45,9 @@ public class TextHelperExtractRegExAction {
                 .description("Regular expression that will be used for extracting strings.")
                 .required(true))
         .output(outputSchema(string().description("String that matches the regular expression.")))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/text-helper_v1#extract-by-regular-expression")
         .perform(TextHelperExtractRegExAction::perform);
 
     private TextHelperExtractRegExAction() {

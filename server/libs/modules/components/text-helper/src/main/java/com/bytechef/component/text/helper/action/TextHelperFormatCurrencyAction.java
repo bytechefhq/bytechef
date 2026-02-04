@@ -64,6 +64,7 @@ public class TextHelperFormatCurrencyAction {
                 .description("The character you would like to use as a thousands separator.")
                 .required(true))
         .output(outputSchema(string().description("Formatted currency.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#format-currency")
         .perform(TextHelperFormatCurrencyAction::perform);
 
     private TextHelperFormatCurrencyAction() {

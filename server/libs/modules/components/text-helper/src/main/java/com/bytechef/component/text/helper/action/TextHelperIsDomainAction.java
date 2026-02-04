@@ -41,6 +41,7 @@ public class TextHelperIsDomainAction {
                 .description("The text to be checked as a valid domain name.")
                 .required(true))
         .output(outputSchema(bool().description("Whether the text is a valid domain.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#is-domain")
         .perform(TextHelperIsDomainAction::perform);
 
     private TextHelperIsDomainAction() {

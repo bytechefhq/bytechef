@@ -45,6 +45,7 @@ public class TextHelperShortenAction {
                 .description("Maximum allowed length of the string.")
                 .required(true))
         .output(outputSchema(string().description("Shortened string.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#shorten")
         .perform(TextHelperShortenAction::perform);
 
     private TextHelperShortenAction() {

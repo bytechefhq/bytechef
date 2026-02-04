@@ -41,6 +41,7 @@ public class TextHelperIsEmailAction {
                 .description("The text to be checked as a valid email address.")
                 .required(true))
         .output(outputSchema(bool().description("Whether the text is a valid email address.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#is-email")
         .perform(TextHelperIsEmailAction::perform);
 
     private TextHelperIsEmailAction() {

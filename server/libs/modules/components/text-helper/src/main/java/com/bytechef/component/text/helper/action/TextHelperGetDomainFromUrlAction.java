@@ -42,6 +42,7 @@ public class TextHelperGetDomainFromUrlAction {
                 .label("URL")
                 .required(true))
         .output(outputSchema(string().description("Extracted domain")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#get-domain-from-url")
         .perform(TextHelperGetDomainFromUrlAction::perform);
 
     private TextHelperGetDomainFromUrlAction() {

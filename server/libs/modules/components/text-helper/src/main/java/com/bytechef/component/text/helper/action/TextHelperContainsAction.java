@@ -43,6 +43,7 @@ public class TextHelperContainsAction {
                 .description("Text to search for.")
                 .required(true))
         .output(outputSchema(bool().description("True if the text contains the expression, false otherwise.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#contains")
         .perform(TextHelperContainsAction::perform);
 
     private TextHelperContainsAction() {

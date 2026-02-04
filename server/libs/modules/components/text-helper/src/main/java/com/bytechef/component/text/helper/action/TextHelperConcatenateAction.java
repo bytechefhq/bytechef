@@ -48,6 +48,7 @@ public class TextHelperConcatenateAction {
                 .description("The text that separates the texts you want to concatenate.")
                 .required(false))
         .output(outputSchema(string().description("The concatenated text.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#concatenate")
         .perform(TextHelperConcatenateAction::perform);
 
     private TextHelperConcatenateAction() {

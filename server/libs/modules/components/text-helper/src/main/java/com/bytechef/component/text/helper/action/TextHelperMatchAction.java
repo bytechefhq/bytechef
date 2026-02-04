@@ -52,6 +52,7 @@ public class TextHelperMatchAction {
                 .items(
                     string()
                         .description("Result of matching a string against a regular expression."))))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#match")
         .perform(TextHelperMatchAction::perform);
 
     private TextHelperMatchAction() {
