@@ -24,6 +24,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -50,9 +51,25 @@ public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
     }
 
     @Override
+    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
+        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
+            if (actionDefinition.getName()
+                .equals("getComments")) {
+                actionDefinition.help("", "https://docs.bytechef.io/reference/components/figma_v1#get-comments");
+            } else if (actionDefinition.getName()
+                .equals("createComment")) {
+                actionDefinition.help("", "https://docs.bytechef.io/reference/components/figma_v1#post-comment");
+            }
+        }
+
+        return super.modifyActions(actionDefinitions);
+    }
+
+    @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp("", "https://developers.figma.com/docs/rest-api/")
             .icon("path:assets/figma.svg")
             .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
     }
@@ -60,6 +77,9 @@ public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
     @Override
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        modifiableConnectionDefinition.help("",
+            "https://docs.bytechef.io/reference/components/figma_v1#connection-setup");
 
         Optional<List<? extends Authorization>> optionalAuthorizations =
             modifiableConnectionDefinition.getAuthorizations();
