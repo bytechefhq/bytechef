@@ -30,5 +30,15 @@ public class GoogleDriveConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        null, (connection, context) -> Map.of("https://www.googleapis.com/auth/drive", true));
+        null, (connection, context) -> Map.of(
+            "https://www.googleapis.com/auth/drive", true,
+            "https://www.googleapis.com/auth/drive.appdata", false,
+            "https://www.googleapis.com/auth/drive.apps.readonly", false,
+            "https://www.googleapis.com/auth/drive.file", false,
+            "https://www.googleapis.com/auth/drive.meet.readonly", false,
+            "https://www.googleapis.com/auth/drive.metadata", false,
+            "https://www.googleapis.com/auth/drive.metadata.readonly", false,
+            "https://www.googleapis.com/auth/drive.photos.readonly", false,
+            "https://www.googleapis.com/auth/drive.readonly", false,
+            "https://www.googleapis.com/auth/drive.scripts", false));
 }

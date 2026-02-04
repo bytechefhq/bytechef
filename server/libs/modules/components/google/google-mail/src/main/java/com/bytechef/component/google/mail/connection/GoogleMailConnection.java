@@ -18,6 +18,7 @@ package com.bytechef.component.google.mail.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,11 +30,26 @@ public class GoogleMailConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        null, (connection, context) -> Map.of(
-            "https://www.googleapis.com/auth/gmail.send", true,
-            "https://www.googleapis.com/auth/gmail.readonly", true,
-            "https://www.googleapis.com/auth/gmail.compose", true,
-            "email", true,
-            "https://mail.google.com/", true,
-            "https://www.googleapis.com/auth/calendar.settings.readonly", true));
+        null, (connection, context) -> {
+            Map<String, Boolean> map = new HashMap<>();
+
+            map.put("https://mail.google.com/", true);
+            map.put("https://www.googleapis.com/auth/gmail.addons.current.action.compose", false);
+            map.put("https://www.googleapis.com/auth/gmail.addons.current.message.action", false);
+            map.put("https://www.googleapis.com/auth/gmail.addons.current.message.metadata", false);
+            map.put("https://www.googleapis.com/auth/gmail.addons.current.message.readonly", false);
+            map.put("https://www.googleapis.com/auth/gmail.compose", true);
+            map.put("https://www.googleapis.com/auth/gmail.insert", false);
+            map.put("https://www.googleapis.com/auth/gmail.labels", false);
+            map.put("https://www.googleapis.com/auth/gmail.metadata", false);
+            map.put("https://www.googleapis.com/auth/gmail.modify", false);
+            map.put("https://www.googleapis.com/auth/gmail.readonly", true);
+            map.put("https://www.googleapis.com/auth/gmail.send", true);
+            map.put("https://www.googleapis.com/auth/gmail.settings.basic", false);
+            map.put("https://www.googleapis.com/auth/gmail.settings.sharing", false);
+            map.put("email", true);
+            map.put("https://www.googleapis.com/auth/calendar.settings.readonly", true);
+
+            return map;
+        });
 }

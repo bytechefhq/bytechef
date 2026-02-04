@@ -27,7 +27,10 @@ public class GoogleMeetConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         "https://meet.googleapis.com/v2",
-        (connection, context) -> Map.of("https://www.googleapis.com/auth/meetings.space.created", true));
+        (connection, context) -> Map.of(
+            "https://www.googleapis.com/auth/meetings.space.created", true,
+            "https://www.googleapis.com/auth/meetings.space.readonly", false,
+            "https://www.googleapis.com/auth/meetings.space.settings", false));
 
     private GoogleMeetConnection() {
     }

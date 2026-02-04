@@ -18,6 +18,7 @@ package com.bytechef.component.google.calendar.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +30,27 @@ public class GoogleCalendarConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        null, (connection, context) -> Map.of(
-            "https://www.googleapis.com/auth/calendar.events", true,
-            "https://www.googleapis.com/auth/calendar.readonly", true));
+        null, (connection, context) -> {
+            Map<String, Boolean> map = new HashMap<>();
+
+            map.put("https://www.googleapis.com/auth/calendar", false);
+            map.put("https://www.googleapis.com/auth/calendar.acls", false);
+            map.put("https://www.googleapis.com/auth/calendar.acls.readonly", false);
+            map.put("https://www.googleapis.com/auth/calendar.app.created", false);
+            map.put("https://www.googleapis.com/auth/calendar.calendarlist", false);
+            map.put("https://www.googleapis.com/auth/calendar.calendarlist.readonly", false);
+            map.put("https://www.googleapis.com/auth/calendar.calendars", false);
+            map.put("https://www.googleapis.com/auth/calendar.calendars.readonly", false);
+            map.put("https://www.googleapis.com/auth/calendar.events", true);
+            map.put("https://www.googleapis.com/auth/calendar.events.freebusy", false);
+            map.put("https://www.googleapis.com/auth/calendar.events.owned", false);
+            map.put("https://www.googleapis.com/auth/calendar.events.owned.readonly", false);
+            map.put("https://www.googleapis.com/auth/calendar.events.public.readonly", false);
+            map.put("https://www.googleapis.com/auth/calendar.events.readonly", false);
+            map.put("https://www.googleapis.com/auth/calendar.freebusy", false);
+            map.put("https://www.googleapis.com/auth/calendar.readonly", true);
+            map.put("https://www.googleapis.com/auth/calendar.settings.readonly", false);
+
+            return map;
+        });
 }

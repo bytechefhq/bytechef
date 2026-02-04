@@ -27,9 +27,12 @@ public class GooglePhotosConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         "https://photoslibrary.googleapis.com/v1", (connection, context) -> Map.of(
-            "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata", true,
+            "https://www.googleapis.com/auth/photoslibrary", false,
             "https://www.googleapis.com/auth/photoslibrary.appendonly", true,
-            "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata", true));
+            "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata", true,
+            "https://www.googleapis.com/auth/photoslibrary.readonly", false,
+            "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata", true,
+            "https://www.googleapis.com/auth/photoslibrary.sharing", false));
 
     private GooglePhotosConnection() {
     }
