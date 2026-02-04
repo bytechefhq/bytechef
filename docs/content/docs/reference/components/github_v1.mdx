@@ -646,6 +646,48 @@ Type: OBJECT
 
 
 
+### Get Repository Content
+Name: getRepositoryContent
+
+`Gets the contents of a file or directory in a repository. If the content is a directory, the response will be each item in the directory and if the content is a file, the response will be file as a string.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | Repository where the content is located. | true |
+| path | Path | STRING | Path to the file or the directory. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Repository Content",
+  "name" : "getRepositoryContent",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "path" : ""
+  },
+  "type" : "github/v1/getRepositoryContent"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+
 ### List Issues
 Name: listIssues
 
