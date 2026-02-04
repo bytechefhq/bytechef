@@ -22,48 +22,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * @author Nikolina Spehar
  */
 class TextHelperUnderscoreActionTest {
 
-    private static String run(String input) {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input));
+    @ParameterizedTest
+    @CsvSource(value = {
+        "'Hello, World!', hello_world",
+        "'Java@#$ Is *** Awesome!!!', java_is_awesome",
+        "'  Too   many   spaces  ', too_many_spaces",
+        "'Version 2 Release 10', version_2_release_10"
+    })
+    void testPerform(String input, String expectedResult) {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input == null ? "" : input));
 
-        return TextHelperUnderscoreAction.perform(mockedParameters, null, null);
-    }
-
-    @Test
-    void convertsBasicSentence() {
-        String input = "Hello, World!";
-        String expected = "hello_world";
-
-        assertEquals(expected, run(input));
-    }
-
-    @Test
-    void removesSpecialCharacters() {
-        String input = "Java@#$ Is *** Awesome!!!";
-        String expected = "java_is_awesome";
-
-        assertEquals(expected, run(input));
-    }
-
-    @Test
-    void handlesMultipleSpaces() {
-        String input = "  Too   many   spaces  ";
-        String expected = "too_many_spaces";
-
-        assertEquals(expected, run(input));
-    }
-
-    @Test
-    void keepsNumbers() {
-        String input = "Version 2 Release 10";
-        String expected = "version_2_release_10";
-
-        assertEquals(expected, run(input));
+        assertEquals(expectedResult, TextHelperUnderscoreAction.perform(mockedParameters, null, null));
     }
 }
