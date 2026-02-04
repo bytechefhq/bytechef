@@ -44,7 +44,13 @@ public class LinearConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://linear.app/oauth/authorize")
-                .scopes((connection, context) -> Map.of("read", true, "write", true, "admin", true))
+                .scopes((connection, context) -> Map.of(
+                    "read", true,
+                    "write", true,
+                    "issues:create", false,
+                    "comments:create", false,
+                    "timeSchedule:write", false,
+                    "admin", true))
                 .tokenUrl((connectionParameters, context) -> "https://api.linear.app/oauth/token")
                 .refreshUrl((connectionParameters, context) -> "https://api.linear.app/oauth/token"));
 
