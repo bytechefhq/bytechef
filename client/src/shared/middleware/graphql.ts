@@ -1468,18 +1468,18 @@ export type ParameterDefinitionInput = {
 };
 
 export enum ParameterLocation {
-  Header = 'header',
-  Path = 'path',
-  Query = 'query'
+  Header = 'HEADER',
+  Path = 'PATH',
+  Query = 'QUERY'
 }
 
 export enum ParameterType {
-  Array = 'array',
-  Boolean = 'boolean',
-  Integer = 'integer',
-  Number = 'number',
-  Object = 'object',
-  String = 'string'
+  Array = 'ARRAY',
+  Boolean = 'BOOLEAN',
+  Integer = 'INTEGER',
+  Number = 'NUMBER',
+  Object = 'OBJECT',
+  String = 'STRING'
 }
 
 export enum PlatformType {
@@ -2416,6 +2416,13 @@ export type DeleteWorkspaceMcpServerMutationVariables = Exact<{
 
 export type DeleteWorkspaceMcpServerMutation = { __typename?: 'Mutation', deleteWorkspaceMcpServer?: boolean | null };
 
+export type DisconnectConnectionMutationVariables = Exact<{
+  connectionId: Scalars['ID']['input'];
+}>;
+
+
+export type DisconnectConnectionMutation = { __typename?: 'Mutation', disconnectConnection: boolean };
+
 export type ExportSharedProjectMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
@@ -3336,6 +3343,25 @@ export const useDeleteWorkspaceMcpServerMutation = <
       {
     mutationKey: ['deleteWorkspaceMcpServer'],
     mutationFn: (variables?: DeleteWorkspaceMcpServerMutationVariables) => fetcher<DeleteWorkspaceMcpServerMutation, DeleteWorkspaceMcpServerMutationVariables>(DeleteWorkspaceMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DisconnectConnectionDocument = `
+    mutation DisconnectConnection($connectionId: ID!) {
+  disconnectConnection(connectionId: $connectionId)
+}
+    `;
+
+export const useDisconnectConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DisconnectConnectionMutation, TError, DisconnectConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<DisconnectConnectionMutation, TError, DisconnectConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['DisconnectConnection'],
+    mutationFn: (variables?: DisconnectConnectionMutationVariables) => fetcher<DisconnectConnectionMutation, DisconnectConnectionMutationVariables>(DisconnectConnectionDocument, variables)(),
     ...options
   }
     )};
