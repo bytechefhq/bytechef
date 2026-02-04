@@ -31,5 +31,8 @@ public class GoogleDocsConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         null, (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/documents", true,
-            "https://www.googleapis.com/auth/drive", true));
+            "https://www.googleapis.com/auth/documents.readonly", false,
+            "https://www.googleapis.com/auth/drive", true,
+            "https://www.googleapis.com/auth/drive.file", false,
+            "https://www.googleapis.com/auth/drive.readonly", false));
 }

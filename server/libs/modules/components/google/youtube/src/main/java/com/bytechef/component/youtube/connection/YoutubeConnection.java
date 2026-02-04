@@ -27,7 +27,13 @@ public class YoutubeConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         "https://www.googleapis.com/youtube/v3", (connection, context) -> Map.of(
-            "https://www.googleapis.com/auth/youtube", true, "https://www.googleapis.com/auth/youtube.upload", true));
+            "https://www.googleapis.com/auth/youtube", true,
+            "https://www.googleapis.com/auth/youtube.channel-memberships.creator", false,
+            "https://www.googleapis.com/auth/youtube.force-ssl", false,
+            "https://www.googleapis.com/auth/youtube.readonly", false,
+            "https://www.googleapis.com/auth/youtube.upload", true,
+            "https://www.googleapis.com/auth/youtubepartner", false,
+            "https://www.googleapis.com/auth/youtubepartner-channel-audit", false));
 
     private YoutubeConnection() {
     }
