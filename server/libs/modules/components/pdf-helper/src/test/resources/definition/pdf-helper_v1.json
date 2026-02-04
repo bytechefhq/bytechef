@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts pdf to image.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper#convert-to-image"
+    },
     "metadata": null,
     "name": "convertToImage",
     "outputDefinition": {
@@ -409,7 +412,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts text from a PDF file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper#extract-text"
+    },
     "metadata": null,
     "name": "extractText",
     "outputDefinition": {
@@ -584,7 +590,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts image to PDF.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper#image-to-pdf"
+    },
     "metadata": null,
     "name": "imageToPdf",
     "outputDefinition": {
@@ -966,7 +975,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts text to PDF.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper#text-to-pdf"
+    },
     "metadata": null,
     "name": "textToPdf",
     "outputDefinition": {
