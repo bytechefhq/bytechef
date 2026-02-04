@@ -57,7 +57,9 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
         environmentId: currentEnvironmentId,
         workflowId: workflow.id!,
-        workflowNodeName,
+        workflowNodeName: isClusterElement
+            ? (rootClusterElementNodeData?.workflowNodeName as string)
+            : workflowNodeName,
     });
 
     const handleOnSubmit = (values: z.infer<typeof connectionFormSchema>) => {

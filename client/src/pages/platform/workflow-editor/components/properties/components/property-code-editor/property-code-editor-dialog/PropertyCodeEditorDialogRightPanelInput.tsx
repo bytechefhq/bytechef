@@ -1,81 +1,63 @@
+import Button from '@/components/Button/Button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {usePropertyCodeEditorDialogRightPanelInput} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks/usePropertyCodeEditorDialogRightPanelInput';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import {RotateCcwIcon} from 'lucide-react';
+import {Suspense, lazy} from 'react';
 
-type InputValueType = string | number | boolean | null | undefined | InputValueType[] | {[key: string]: InputValueType};
+const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
-interface InputEntriesProps {
-    entries: [string, InputValueType][];
-    indent?: number;
+type InputValueType = Record<string, unknown>;
+
+interface PropertyCodeEditorDialogRightPanelInputProps {
+    input: InputValueType;
 }
 
-const formatValue = (value: InputValueType): string => {
-    if (value === null) {
-        return 'null';
-    }
+const PropertyCodeEditorDialogRightPanelInput = ({input}: PropertyCodeEditorDialogRightPanelInputProps) => {
+    const {handleEditorChange, handleReset, hasChanges, jsonValue, parseError} =
+        usePropertyCodeEditorDialogRightPanelInput({input});
 
-    if (value === undefined) {
-        return 'undefined';
-    }
-
-    if (typeof value === 'string') {
-        let result = value;
-
-        if (result.length > 23) {
-            result = result.slice(0, 23) + '...';
-        }
-
-        return result;
-    }
-
-    if (typeof value === 'number' || typeof value === 'boolean') {
-        return String(value);
-    }
-
-    if (Array.isArray(value)) {
-        return `[${value.length} items]`;
-    }
-
-    return '';
-};
-
-const isNestedObject = (value: InputValueType): value is {[key: string]: InputValueType} => {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
-};
-
-const InputEntries = ({entries, indent = 0}: InputEntriesProps) => {
     return (
-        <div className="space-y-1">
-            {entries.map(([key, value]) => {
-                const hasNestedObject = isNestedObject(value);
+        <Card className="flex h-full flex-col border-none shadow-none">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-4">
+                <div className="flex h-5 w-full items-center justify-between">
+                    <CardTitle>Input</CardTitle>
 
-                return (
-                    <div key={key}>
-                        <div className="flex" style={{paddingLeft: `${indent * 12}px`}}>
-                            <div className={hasNestedObject ? 'font-medium' : 'w-1/2'}>{key}</div>
+                    {hasChanges && (
+                        <Button
+                            icon={<RotateCcwIcon />}
+                            onClick={handleReset}
+                            size="icon"
+                            title="Reset to original"
+                            variant="ghost"
+                        />
+                    )}
+                </div>
+            </CardHeader>
 
-                            {!hasNestedObject && <div className="w-1/2 text-foreground/60">{formatValue(value)}</div>}
+            <CardContent className="-ml-2 flex min-h-0 flex-1 flex-col pb-4 pl-0 pr-4">
+                {Object.keys(input).length > 0 ? (
+                    <div className="flex min-h-0 flex-1 flex-col">
+                        <div className="min-h-0 flex-1 overflow-hidden">
+                            <Suspense fallback={<MonacoEditorLoader />}>
+                                <MonacoEditor
+                                    className="size-full"
+                                    defaultLanguage="json"
+                                    onChange={handleEditorChange}
+                                    onMount={(editor) => {
+                                        editor.updateOptions({
+                                            folding: true,
+                                            lineNumbers: 'off',
+                                            minimap: {enabled: false},
+                                            scrollBeyondLastLine: false,
+                                        });
+                                    }}
+                                    value={jsonValue}
+                                />
+                            </Suspense>
                         </div>
 
-                        {hasNestedObject && <InputEntries entries={Object.entries(value)} indent={indent + 1} />}
-                    </div>
-                );
-            })}
-        </div>
-    );
-};
-
-const PropertyCodeEditorDialogRightPanelInput = ({input}: {input: {[key: string]: InputValueType}}) => {
-    const entries = Object.entries(input) as [string, InputValueType][];
-
-    return (
-        <Card className="border-none shadow-none">
-            <CardContent className="px-4">
-                <CardHeader className="px-0 py-4">
-                    <CardTitle>Input</CardTitle>
-                </CardHeader>
-
-                {entries.length > 0 ? (
-                    <div className="text-sm">
-                        <InputEntries entries={entries} />
+                        {parseError && <div className="mt-2 text-sm text-destructive">{parseError}</div>}
                     </div>
                 ) : (
                     <div>

@@ -6,6 +6,7 @@ interface PropertyCodeEditorStateI {
     copilotPanelOpen: boolean;
     dirty: boolean;
     editorValue: string | undefined;
+    inputParameters: Record<string, unknown> | undefined;
     saving: boolean;
     scriptIsRunning: boolean;
     scriptTestExecution: ScriptTestExecution | undefined;
@@ -16,6 +17,7 @@ interface PropertyCodeEditorActionsI {
     setCopilotPanelOpen: (open: boolean) => void;
     setDirty: (dirty: boolean) => void;
     setEditorValue: (value: string | undefined) => void;
+    setInputParameters: (inputParameters: Record<string, unknown> | undefined) => void;
     setSaving: (saving: boolean) => void;
     setScriptIsRunning: (running: boolean) => void;
     setScriptTestExecution: (execution: ScriptTestExecution | undefined) => void;
@@ -27,6 +29,7 @@ const initialState: PropertyCodeEditorStateI = {
     copilotPanelOpen: false,
     dirty: false,
     editorValue: undefined,
+    inputParameters: undefined,
     saving: false,
     scriptIsRunning: false,
     scriptTestExecution: undefined,
@@ -40,6 +43,7 @@ export const usePropertyCodeEditorDialogStore = create<PropertyCodeEditorStoreTy
             setCopilotPanelOpen: (open) => set({copilotPanelOpen: open}),
             setDirty: (dirty) => set({dirty}),
             setEditorValue: (value) => set({editorValue: value}),
+            setInputParameters: (inputParameters) => set({inputParameters}),
             setSaving: (saving) => set({saving}),
             setScriptIsRunning: (running) => set({scriptIsRunning: running}),
             setScriptTestExecution: (execution) => set({scriptTestExecution: execution}),

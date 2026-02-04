@@ -25,6 +25,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
     const {
         dirty,
         editorValue,
+        inputParameters,
         saving,
         scriptIsRunning,
         setCopilotPanelOpen,
@@ -35,6 +36,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
         useShallow((state) => ({
             dirty: state.dirty,
             editorValue: state.editorValue,
+            inputParameters: state.inputParameters,
             saving: state.saving,
             scriptIsRunning: state.scriptIsRunning,
             setCopilotPanelOpen: state.setCopilotPanelOpen,
@@ -80,6 +82,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
                     clusterElementType: currentNode.clusterElementType!,
                     clusterElementWorkflowNodeName: currentNode.name,
                     environmentId: currentEnvironmentId!,
+                    inputParameters,
                     workflowId,
                     workflowNodeName: rootClusterElementNodeData.workflowNodeName,
                 })
@@ -105,6 +108,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
             testWorkflowNodeScriptMutation
                 .mutateAsync({
                     environmentId: currentEnvironmentId!,
+                    inputParameters,
                     workflowId,
                     workflowNodeName,
                 })
@@ -130,6 +134,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
     }, [
         currentEnvironmentId,
         currentNode,
+        inputParameters,
         rootClusterElementNodeData,
         setScriptIsRunning,
         setScriptTestExecution,
