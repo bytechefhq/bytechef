@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add value to the object by key if it exists. Otherwise, update the value",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/object-helper#add-key-value-pairs"
+    },
     "metadata": null,
     "name": "addValueByKey",
     "outputDefinition": {
@@ -327,7 +330,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add values from list to object. The source object can either be empty or populated with properties. The items in the list will be treated as Key-value pairs.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/object-helper#add-value-to-the-object-by-key"
+    },
     "metadata": null,
     "name": "addKeyValuePairs",
     "outputDefinition": {
@@ -883,7 +889,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Checks if the given key exists in the given object.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/object-helper#contains"
+    },
     "metadata": null,
     "name": "contains",
     "outputDefinition": {
@@ -956,10 +965,10 @@
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Input",
+      "label": "Source",
       "metadata": { },
       "multipleValues": null,
-      "name": "input",
+      "name": "source",
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
@@ -1000,7 +1009,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a key-value pair in the given object by the specified key. Returns the modified object.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/object-helper#delete-key-value-pair"
+    },
     "metadata": null,
     "name": "deleteKeyValuePair",
     "outputDefinition": {
@@ -1021,10 +1033,10 @@
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Input",
+      "label": "Source",
       "metadata": { },
       "multipleValues": null,
-      "name": "input",
+      "name": "source",
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
@@ -1065,7 +1077,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Compares two objects and returns true if they are equal.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/object-helper#equals"
+    },
     "metadata": null,
     "name": "equals",
     "outputDefinition": {
@@ -1180,7 +1195,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Merge two objects into one. If there is any property with the same name, the source value will be used.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/object-helper#merge-two-objects"
+    },
     "metadata": null,
     "name": "mergeTwoObjects",
     "outputDefinition": {
