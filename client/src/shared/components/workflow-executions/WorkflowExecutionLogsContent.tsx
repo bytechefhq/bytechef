@@ -1,7 +1,9 @@
+import Badge from '@/components/Badge/Badge';
 import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import {LogEntry, LogLevel, useEditorJobFileLogsQuery, useJobFileLogsQuery} from '@/shared/middleware/graphql';
 import {AlertCircleIcon, AlertTriangleIcon, BugIcon, InfoIcon, MessageSquareIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 interface WorkflowExecutionLogsContentProps {
     isEditorEnvironment?: boolean;
@@ -35,13 +37,7 @@ const LOG_LEVEL_BADGE_CONFIG = {
 const LogLevelBadge = ({level}: {level: LogLevel}) => {
     const {className, icon} = LOG_LEVEL_BADGE_CONFIG[level] || LOG_LEVEL_BADGE_CONFIG[LogLevel.Info];
 
-    return (
-        <span className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium ${className}`}>
-            {icon}
-
-            {level}
-        </span>
-    );
+    return <Badge className={twMerge('border-0', className)} icon={icon} label={level} styleType="secondary-filled" />;
 };
 
 const LogEntryRow = ({entry}: {entry: LogEntry}) => {
@@ -50,7 +46,10 @@ const LogEntryRow = ({entry}: {entry: LogEntry}) => {
 
     return (
         <div
-            className={`border-b border-stroke-neutral-secondary p-2 ${hasError ? 'cursor-pointer hover:bg-surface-neutral-secondary' : ''}`}
+            className={twMerge(
+                'border-b border-stroke-neutral-secondary p-2',
+                hasError && 'cursor-pointer hover:bg-surface-neutral-secondary'
+            )}
             onClick={() => hasError && setIsExpanded(!isExpanded)}
         >
             <div className="flex items-start gap-2">

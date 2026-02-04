@@ -1,5 +1,6 @@
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
+import {TabValueType} from '@/shared/types';
 
 export interface TaskTreeItemProps {
     children: TaskTreeItemProps[];
@@ -112,7 +113,7 @@ export const getInitialSelectedItem = (
 interface GetDisplayValueProps {
     job: Job;
     selectedItem: TaskExecution | TriggerExecution | undefined;
-    tab: 'input' | 'output' | 'error' | 'logs';
+    tab: TabValueType;
     triggerExecution?: TriggerExecution;
 }
 

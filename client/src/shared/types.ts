@@ -103,6 +103,8 @@ export type ClickedOperationType = {
 
 export type TabNameType = 'description' | 'clusterElements' | 'connection' | 'properties' | 'output';
 
+export type TabValueType = 'input' | 'output' | 'error' | 'logs';
+
 type ConditionDataType = {
     conditionCase: 'caseTrue' | 'caseFalse';
     conditionId: string;

@@ -13,6 +13,7 @@ import {
 } from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import {TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
+import {TabValueType} from '@/shared/types';
 import {ChevronDownIcon, RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
@@ -27,7 +28,7 @@ const WorkflowExecutionsTestOutput = ({
     workflowTestExecution?: WorkflowTestExecution;
     onCloseClick?: () => void;
 }) => {
-    const [activeTab, setActiveTab] = useState<'input' | 'output' | 'error' | 'logs'>('input');
+    const [activeTab, setActiveTab] = useState<TabValueType>('input');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
         getInitialSelectedItem(workflowTestExecution)

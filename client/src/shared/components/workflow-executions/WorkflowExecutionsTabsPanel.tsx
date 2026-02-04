@@ -15,10 +15,9 @@ import WorkflowExecutionContentClipboardButton from '@/shared/components/workflo
 import WorkflowExecutionLogsContent from '@/shared/components/workflow-executions/WorkflowExecutionLogsContent';
 import {getDisplayValue, hasDialogContentValue} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {TabValueType} from '@/shared/types';
 import {AlertCircleIcon, ExpandIcon, ScrollTextIcon} from 'lucide-react';
 import {useMemo} from 'react';
-
-type TabValueType = 'input' | 'output' | 'error' | 'logs';
 
 const WorkflowExecutionsTabsPanel = ({
     activeTab,
