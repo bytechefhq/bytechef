@@ -89,6 +89,9 @@ public class JiraCreateIssueCommentAction {
                                 string("value")))))
         .perform(JiraCreateIssueCommentAction::perform);
 
+    private JiraCreateIssueCommentAction() {
+    }
+
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.post("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/comment"))
