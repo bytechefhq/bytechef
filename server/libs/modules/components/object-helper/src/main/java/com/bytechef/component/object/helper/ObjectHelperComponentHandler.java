@@ -46,7 +46,8 @@ public class ObjectHelperComponentHandler implements ComponentHandler {
             ObjectHelperContainsAction.ACTION_DEFINITION,
             ObjectHelperDeleteKeyValuePairAction.ACTION_DEFINITION,
             ObjectHelperEqualsAction.ACTION_DEFINITION,
-            ObjectHelperMergeTwoObjectsAction.ACTION_DEFINITION);
+            ObjectHelperMergeTwoObjectsAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

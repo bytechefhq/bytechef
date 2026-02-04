@@ -45,6 +45,7 @@ public class ObjectHelperMergeTwoObjectsAction {
                 .description("The target object to merge into.")
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/object-helper#merge-two-objects")
         .perform(ObjectHelperMergeTwoObjectsAction::perform);
 
     private ObjectHelperMergeTwoObjectsAction() {
