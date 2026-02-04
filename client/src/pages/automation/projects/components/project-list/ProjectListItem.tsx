@@ -101,10 +101,10 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const queryClient = useQueryClient();
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
-        onSuccess: (projectWorkflowId) => {
+        onSuccess: (response) => {
             captureProjectWorkflowCreated();
 
-            navigate(`/automation/projects/${project.id}/project-workflows/${projectWorkflowId}`);
+            navigate(`/automation/projects/${project.id}/project-workflows/${response.projectWorkflowId}`);
         },
     });
 
@@ -124,8 +124,18 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     });
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
+        onError: () => {
+            toast({
+                description: 'Project duplication failed.',
+                variant: 'destructive',
+            });
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+
+            toast({
+                description: 'Project duplicated successfully.',
+            });
         },
     });
 
