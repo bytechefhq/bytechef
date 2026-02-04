@@ -15,7 +15,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDynamicPr
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOptionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOutputApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeParameterApi.java
-src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeScriptApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeTestOutputApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowTestConfigurationApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ActionDefinitionBasicModel.java

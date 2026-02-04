@@ -5,10 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -26,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2AuthorizationParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.494207+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-02-04T11:39:22.654842121+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
 public class OAuth2AuthorizationParametersModel {
 
   private @Nullable String authorizationUrl;
@@ -37,7 +34,7 @@ public class OAuth2AuthorizationParametersModel {
   private @Nullable String clientId;
 
   @Valid
-  private List<String> scopes = new ArrayList<>();
+  private Map<String, Boolean> scopes = new HashMap<>();
 
   public OAuth2AuthorizationParametersModel authorizationUrl(@Nullable String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
@@ -107,16 +104,16 @@ public class OAuth2AuthorizationParametersModel {
     this.clientId = clientId;
   }
 
-  public OAuth2AuthorizationParametersModel scopes(List<String> scopes) {
+  public OAuth2AuthorizationParametersModel scopes(Map<String, Boolean> scopes) {
     this.scopes = scopes;
     return this;
   }
 
-  public OAuth2AuthorizationParametersModel addScopesItem(String scopesItem) {
+  public OAuth2AuthorizationParametersModel putScopesItem(String key, Boolean scopesItem) {
     if (this.scopes == null) {
-      this.scopes = new ArrayList<>();
+      this.scopes = new HashMap<>();
     }
-    this.scopes.add(scopesItem);
+    this.scopes.put(key, scopesItem);
     return this;
   }
 
@@ -127,11 +124,11 @@ public class OAuth2AuthorizationParametersModel {
   
   @Schema(name = "scopes", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("scopes")
-  public List<String> getScopes() {
+  public Map<String, Boolean> getScopes() {
     return scopes;
   }
 
-  public void setScopes(List<String> scopes) {
+  public void setScopes(Map<String, Boolean> scopes) {
     this.scopes = scopes;
   }
 
@@ -171,7 +168,7 @@ public class OAuth2AuthorizationParametersModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
+  private String toIndentedString(@Nullable Object o) {
     if (o == null) {
       return "null";
     }
