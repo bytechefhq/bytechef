@@ -47,7 +47,8 @@ public class PdfHelperComponentHandler implements ComponentHandler {
             tool(PdfHelperConvertToImageAction.ACTION_DEFINITION),
             tool(PdfHelperExtractTextAction.ACTION_DEFINITION),
             tool(PdfHelperImageToPdfAction.ACTION_DEFINITION),
-            tool(PdfHelperTextToPdfAction.ACTION_DEFINITION));
+            tool(PdfHelperTextToPdfAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
