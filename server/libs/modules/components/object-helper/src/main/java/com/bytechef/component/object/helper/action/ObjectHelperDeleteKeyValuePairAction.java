@@ -20,8 +20,8 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDef
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.INPUT;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.KEY;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -38,8 +38,8 @@ public class ObjectHelperDeleteKeyValuePairAction {
         .description(
             "Deletes a key-value pair in the given object by the specified key. Returns the modified object.")
         .properties(
-            object(INPUT)
-                .label("Input")
+            object(SOURCE)
+                .label("Source")
                 .description("The object from which to delete the key-value pair.")
                 .required(true),
             string(KEY)
@@ -47,12 +47,13 @@ public class ObjectHelperDeleteKeyValuePairAction {
                 .description("The key of the key-value pair to delete.")
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/object-helper#delete-key-value-pair")
         .perform(ObjectHelperDeleteKeyValuePairAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        Map<String, Object> input = inputParameters.getRequiredMap(INPUT, Object.class);
+        Map<String, Object> input = inputParameters.getRequiredMap(SOURCE, Object.class);
         String keyToDelete = inputParameters.getRequiredString(KEY);
 
         Map<String, Object> mutableMap = new HashMap<>(input);

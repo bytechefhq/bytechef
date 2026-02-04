@@ -113,6 +113,7 @@ public class ObjectHelperAddValueByKeyAction {
                 .displayCondition("type == '%s'".formatted(ValueType.TIME))
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/object-helper#add-key-value-pairs")
         .perform(ObjectHelperAddValueByKeyAction::perform);
 
     private ObjectHelperAddValueByKeyAction() {

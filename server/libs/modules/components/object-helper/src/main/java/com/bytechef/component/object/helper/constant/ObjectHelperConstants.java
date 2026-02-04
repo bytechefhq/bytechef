@@ -29,7 +29,6 @@ public class ObjectHelperConstants {
     private ObjectHelperConstants() {
     }
 
-    public static final String INPUT = "input";
     public static final String KEY = "key";
     public static final String LIST = "list";
     public static final String SOURCE = "source";

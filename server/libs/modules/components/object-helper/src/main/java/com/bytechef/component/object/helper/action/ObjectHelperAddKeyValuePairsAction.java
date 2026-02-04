@@ -127,6 +127,9 @@ public class ObjectHelperAddKeyValuePairsAction {
                                 .required(true)))
                 .required(true))
         .output(ObjectHelperAddKeyValuePairsAction::output)
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/object-helper#add-value-to-the-object-by-key")
         .perform(ObjectHelperAddKeyValuePairsAction::perform);
 
     private ObjectHelperAddKeyValuePairsAction() {

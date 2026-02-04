@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.INPUT;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.KEY;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -38,8 +38,8 @@ public class ObjectHelperContainsAction {
         .title("Contains")
         .description("Checks if the given key exists in the given object.")
         .properties(
-            object(INPUT)
-                .label("Input")
+            object(SOURCE)
+                .label("Source")
                 .description("Object that you'd like to check.")
                 .required(true),
             string(KEY)
@@ -47,6 +47,7 @@ public class ObjectHelperContainsAction {
                 .description("Key to check for existence.")
                 .required(true))
         .output(outputSchema(bool().description("Indicator of whether the key exists in the object.")))
+        .help("", "https://docs.bytechef.io/reference/components/object-helper#contains")
         .perform(ObjectHelperContainsAction::perform);
 
     private ObjectHelperContainsAction() {
@@ -55,7 +56,7 @@ public class ObjectHelperContainsAction {
     protected static Boolean perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        Map<String, Object> modifiedObject = inputParameters.getRequiredMap(INPUT, Object.class);
+        Map<String, Object> modifiedObject = inputParameters.getRequiredMap(SOURCE, Object.class);
 
         return modifiedObject.containsKey(inputParameters.getRequiredString(KEY));
     }
