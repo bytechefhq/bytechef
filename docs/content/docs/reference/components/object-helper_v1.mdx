@@ -111,7 +111,7 @@ Name: contains
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Object that you'd like to check. | true |
+| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Object that you'd like to check. | true |
 | key | Key | STRING | Key to check for existence. | true |
 
 #### Example JSON Structure
@@ -120,7 +120,7 @@ Name: contains
   "label" : "Contains",
   "name" : "contains",
   "parameters" : {
-    "input" : { },
+    "source" : { },
     "key" : ""
   },
   "type" : "objectHelper/v1/contains"
@@ -151,7 +151,7 @@ Name: deleteKeyValuePair
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The object from which to delete the key-value pair. | true |
+| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The object from which to delete the key-value pair. | true |
 | key | Key | STRING | The key of the key-value pair to delete. | true |
 
 #### Example JSON Structure
@@ -160,7 +160,7 @@ Name: deleteKeyValuePair
   "label" : "Delete Key-Value Pair",
   "name" : "deleteKeyValuePair",
   "parameters" : {
-    "input" : { },
+    "source" : { },
     "key" : ""
   },
   "type" : "objectHelper/v1/deleteKeyValuePair"
