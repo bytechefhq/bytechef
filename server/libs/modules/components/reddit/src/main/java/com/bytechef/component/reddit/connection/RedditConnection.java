@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.TypeReference;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.naming.ConfigurationException;
@@ -53,7 +54,31 @@ public class RedditConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://www.reddit.com/api/v1/authorize")
-                .scopes((connection, context) -> Map.of("identity", true, "submit", true, "read", true))
+                .scopes((connection, context) -> {
+                    Map<String, Boolean> map = new HashMap<>();
+
+                    map.put("identity", true);
+                    map.put("edit", false);
+                    map.put("flair", false);
+                    map.put("history", false);
+                    map.put("modconfig", false);
+                    map.put("modflair", false);
+                    map.put("modlog", false);
+                    map.put("modposts", false);
+                    map.put("modwiki", false);
+                    map.put("mysubreddits", false);
+                    map.put("privatemessages", false);
+                    map.put("read", true);
+                    map.put("report", false);
+                    map.put("save", false);
+                    map.put("submit", true);
+                    map.put("subscribe", false);
+                    map.put("vote", false);
+                    map.put("wikiedit", false);
+                    map.put("wikiread", false);
+
+                    return map;
+                })
                 .tokenUrl((connectionParameters, context) -> "https://www.reddit.com/api/v1/access_token")
                 .refreshUrl((connectionParameters, context) -> "https://www.reddit.com/api/v1/access_token")
                 .authorizationCallback((connectionParameters, code, redirectUri, codeVerifier, context) -> {

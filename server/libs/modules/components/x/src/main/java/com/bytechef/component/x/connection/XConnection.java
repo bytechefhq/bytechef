@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -46,9 +47,32 @@ public class XConnection {
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://x.com/i/oauth2/authorize")
                 .refreshUrl((connection, context) -> "https://api.x.com/2/oauth2/token")
-                .scopes((connection, context) -> Map.of(
-                    "tweet.read", true, "tweet.write", true, "users.read", true, "media.write", true,
-                    "like.write", true, "offline.access", true))
+                .scopes((connection, context) -> {
+                    Map<String, Boolean> map = new HashMap<>();
+
+                    map.put("tweet.read", true);
+                    map.put("tweet.write", true);
+                    map.put("tweet.moderate.write", false);
+                    map.put("users.email", false);
+                    map.put("users.read", true);
+                    map.put("follows.read", false);
+                    map.put("follows.write", false);
+                    map.put("offline.access", true);
+                    map.put("space.read", false);
+                    map.put("mute.read", false);
+                    map.put("mute.write", false);
+                    map.put("like.read", false);
+                    map.put("like.write", true);
+                    map.put("list.read", false);
+                    map.put("list.write", false);
+                    map.put("block.read", false);
+                    map.put("block.write", false);
+                    map.put("bookmark.read", false);
+                    map.put("bookmark.write", false);
+                    map.put("media.write", true);
+
+                    return map;
+                })
                 .tokenUrl((connection, context) -> "https://api.x.com/2/oauth2/token")
                 .pkce((verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(
                     "challenge", null, "plain"))

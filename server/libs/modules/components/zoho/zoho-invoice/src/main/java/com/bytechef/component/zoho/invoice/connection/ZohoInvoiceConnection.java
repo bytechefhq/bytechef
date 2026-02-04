@@ -18,6 +18,7 @@ package com.bytechef.component.zoho.invoice.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.zoho.commons.ZohoConnection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,11 +27,44 @@ import java.util.Map;
 public class ZohoInvoiceConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = ZohoConnection.createConnection(
-        "/invoice/v3",
-        Map.of(
-            "ZohoInvoice.contacts.CREATE", true, "ZohoInvoice.contacts.READ", true, "ZohoInvoice.invoices.CREATE", true,
-            "ZohoInvoice.settings.CREATE", true, "ZohoInvoice.settings.READ", true),
-        true);
+        "/invoice/v3", createScopesMap(), true);
+
+    private static Map<String, Boolean> createScopesMap() {
+        Map<String, Boolean> map = new HashMap<>();
+
+        map.put("ZohoInvoice.contacts.Create", true);
+        map.put("ZohoInvoice.contacts.UPDATE", false);
+        map.put("ZohoInvoice.contacts.READ", true);
+        map.put("ZohoInvoice.contacts.DELETE", false);
+        map.put("ZohoInvoice.settings.Create", true);
+        map.put("ZohoInvoice.settings.UPDATE", false);
+        map.put("ZohoInvoice.settings.READ", true);
+        map.put("ZohoInvoice.settings.DELETE", false);
+        map.put("ZohoInvoice.estimates.UPDATE", false);
+        map.put("ZohoInvoice.estimates.READ", false);
+        map.put("ZohoInvoice.estimates.DELETE", false);
+        map.put("ZohoInvoice.invoices.Create", true);
+        map.put("ZohoInvoice.invoices.UPDATE", false);
+        map.put("ZohoInvoice.invoices.READ", false);
+        map.put("ZohoInvoice.invoices.DELETE", false);
+        map.put("ZohoInvoice.customerpayments.UPDATE", false);
+        map.put("ZohoInvoice.customerpayments.READ", false);
+        map.put("ZohoInvoice.customerpayments.DELETE", false);
+        map.put("ZohoInvoice.creditnotes.Create", false);
+        map.put("ZohoInvoice.creditnotes.UPDATE", false);
+        map.put("ZohoInvoice.creditnotes.READ", false);
+        map.put("ZohoInvoice.creditnotes.DELETE", false);
+        map.put("ZohoInvoice.projects.Create", false);
+        map.put("ZohoInvoice.projects.UPDATE", false);
+        map.put("ZohoInvoice.projects.READ", false);
+        map.put("ZohoInvoice.projects.DELETE", false);
+        map.put("ZohoInvoice.expenses.Create", false);
+        map.put("ZohoInvoice.expenses.UPDATE", false);
+        map.put("ZohoInvoice.expenses.READ", false);
+        map.put("ZohoInvoice.expenses.DELETE", false);
+
+        return map;
+    }
 
     private ZohoInvoiceConnection() {
     }

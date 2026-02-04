@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,9 +43,31 @@ public class MondayConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/authorize")
-            .scopes(
-                (connection, context) -> Map.of(
-                    "boards:read", true, "boards:write", true, "workspaces:read", true, "webhooks:write", true))
+            .scopes((connection, context) -> {
+                Map<String, Boolean> map = new HashMap<>();
+
+                map.put("account:read", false);
+                map.put("assets:read", false);
+                map.put("boards:read", true);
+                map.put("boards:write", true);
+                map.put("docs:read", false);
+                map.put("docs:write", false);
+                map.put("me:read", false);
+                map.put("notifications:write", false);
+                map.put("tags:read", false);
+                map.put("teams:read", false);
+                map.put("teams:write", false);
+                map.put("updates:read", false);
+                map.put("updates:write", false);
+                map.put("users:read", false);
+                map.put("users:write", false);
+                map.put("webhooks:read", false);
+                map.put("webhooks:write", true);
+                map.put("workspaces:read", true);
+                map.put("workspaces:write", false);
+
+                return map;
+            })
             .tokenUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token")
             .refreshUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token"))
         .baseUri((connectionParameters, context) -> "https://api.monday.com/v2");
