@@ -50,6 +50,7 @@ public class TextHelperGetTextBetweenAction {
                 .description("End pattern to where substring will be extracted.")
                 .required(true))
         .output(outputSchema(string().description("Extracted substring.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#get-text-between")
         .perform(TextHelperGetTextBetweenAction::perform);
 
     private TextHelperGetTextBetweenAction() {

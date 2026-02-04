@@ -58,6 +58,7 @@ public class TextHelperParseEmailListAction {
                         "List of parsed email objects. Each object contains the display name, local part, and " +
                             "domain of the email.")
                     .items(PARSED_EMAIL_OBJECT)))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#parse-email-list")
         .perform(TextHelperParseEmailListAction::perform);
 
     private TextHelperParseEmailListAction() {

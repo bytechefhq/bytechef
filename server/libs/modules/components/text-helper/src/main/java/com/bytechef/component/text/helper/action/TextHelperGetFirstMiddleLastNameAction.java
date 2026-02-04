@@ -59,6 +59,9 @@ public class TextHelperGetFirstMiddleLastNameAction {
                             .description("Middle name"),
                         string(LAST_NAME)
                             .description("Last name"))))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/text-helper_v1#get-first-middle-and-last-name")
         .perform(TextHelperGetFirstMiddleLastNameAction::perform);
 
     private TextHelperGetFirstMiddleLastNameAction() {

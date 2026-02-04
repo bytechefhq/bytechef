@@ -47,6 +47,7 @@ public class TextHelperMarkdownToHtmlAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
         .output(outputSchema(string().description("HTML content.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#markdown-to-html")
         .perform(TextHelperMarkdownToHtmlAction::perform);
 
     private TextHelperMarkdownToHtmlAction() {

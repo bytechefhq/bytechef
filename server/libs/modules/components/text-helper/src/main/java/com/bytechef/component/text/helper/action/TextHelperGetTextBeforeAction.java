@@ -53,6 +53,7 @@ public class TextHelperGetTextBeforeAction {
                 .description("Specifies which match to use for extracting the substring when multiple matches exist.")
                 .required(true))
         .output(outputSchema(string().description("Extracted substring.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#get-text-before")
         .perform(TextHelperGetTextBeforeAction::perform);
 
     private TextHelperGetTextBeforeAction() {

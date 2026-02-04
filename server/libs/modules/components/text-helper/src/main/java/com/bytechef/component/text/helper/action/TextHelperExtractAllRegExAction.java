@@ -53,6 +53,10 @@ public class TextHelperExtractAllRegExAction {
                     .items(
                         string()
                             .description("String that matches the regular expression."))))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/text-helper_v1#extract-all-by-regular-expression")
+
         .perform(TextHelperExtractAllRegExAction::perform);
 
     private TextHelperExtractAllRegExAction() {

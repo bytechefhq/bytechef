@@ -46,6 +46,7 @@ public class TextHelperHexEncodeDecodeAction {
                 .required(true),
             OPERATION_PROPERTY)
         .output(outputSchema(string().description("Hex encoded/decoded content.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#hex-encodedecode")
         .perform(TextHelperHexEncodeDecodeAction::perform);
 
     private TextHelperHexEncodeDecodeAction() {

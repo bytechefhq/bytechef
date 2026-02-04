@@ -36,6 +36,7 @@ public class TextHelperLowerCaseAction {
         .description("Convert a string to lower case.")
         .properties(TEXT_PROPERTY)
         .output(outputSchema(string().description("Lower case string.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#lower-case")
         .perform(TextHelperLowerCaseAction::perform);
 
     private TextHelperLowerCaseAction() {

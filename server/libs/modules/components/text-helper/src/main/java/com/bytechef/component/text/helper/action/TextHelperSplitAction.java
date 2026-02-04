@@ -47,6 +47,7 @@ public class TextHelperSplitAction {
                 array()
                     .description("List of elements.")
                     .items(string())))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#split")
         .perform(TextHelperSplitAction::perform);
 
     private TextHelperSplitAction() {

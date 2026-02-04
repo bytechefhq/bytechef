@@ -41,6 +41,7 @@ public class TextHelperUnderscoreAction {
                 .label("Text")
                 .required(true))
         .output(outputSchema(string().description("Text in snake case.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#underscore")
         .perform(TextHelperUnderscoreAction::perform);
 
     private TextHelperUnderscoreAction() {

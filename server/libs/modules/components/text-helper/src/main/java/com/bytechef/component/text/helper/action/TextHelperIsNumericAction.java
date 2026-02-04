@@ -41,6 +41,7 @@ public class TextHelperIsNumericAction {
                 .label("Text")
                 .required(true))
         .output(outputSchema(bool().description("Whether the input text is number.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#is-numeric")
         .perform(TextHelperIsNumericAction::perform);
 
     private TextHelperIsNumericAction() {

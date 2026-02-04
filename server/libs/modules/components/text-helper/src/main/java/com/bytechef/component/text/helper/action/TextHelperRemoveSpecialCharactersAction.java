@@ -40,6 +40,9 @@ public class TextHelperRemoveSpecialCharactersAction {
                 .required(true))
         .output(outputSchema(string()
             .description("Result of removing special characters from a string.")))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/text-helper_v1#remove-special-characters")
         .perform(TextHelperRemoveSpecialCharactersAction::perform);
 
     private TextHelperRemoveSpecialCharactersAction() {

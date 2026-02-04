@@ -36,6 +36,7 @@ public class TextHelperTrimWhitespaceAction {
         .description("Trim whitespace from the beginning and end of a string.")
         .properties(TEXT_PROPERTY)
         .output(outputSchema(string().description("Trimmed string.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#trim-whitespace")
         .perform(TextHelperTrimWhitespaceAction::perform);
 
     private TextHelperTrimWhitespaceAction() {

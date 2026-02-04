@@ -53,6 +53,7 @@ public class TextHelperEscapeCharactersAction {
                         .maxLength(2)
                         .required(true)))
         .output(outputSchema(string().description("Text without escaped character.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#escape-characters")
         .perform(TextHelperEscapeCharactersAction::perform);
 
     private TextHelperEscapeCharactersAction() {

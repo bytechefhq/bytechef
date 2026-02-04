@@ -65,6 +65,9 @@ public final class TextHelperRegularExpressionMatchTestAction {
                 .required(false)
                 .defaultValue(false))
         .output(outputSchema(bool().description("Result of testing if a string matches a regular expression.")))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/text-helper_v1#regular-expression-match-test")
         .perform(TextHelperRegularExpressionMatchTestAction::perform);
 
     private TextHelperRegularExpressionMatchTestAction() {

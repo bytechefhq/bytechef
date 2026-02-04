@@ -36,6 +36,7 @@ public class TextHelperUpperCaseAction {
         .description("Convert a string to upper case.")
         .properties(TEXT_PROPERTY)
         .output(outputSchema(string().description("Upper case string.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#upper-case")
         .perform(TextHelperUpperCaseAction::perform);
 
     private TextHelperUpperCaseAction() {

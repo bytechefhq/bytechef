@@ -69,6 +69,7 @@ public class TextHelperIsUrlAction {
                 .required(false)
                 .defaultValue(false))
         .output(outputSchema(bool().description("Whether the text is valid URL.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#is-url")
         .perform(TextHelperIsUrlAction::perform);
 
     private TextHelperIsUrlAction() {

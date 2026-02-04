@@ -44,6 +44,7 @@ public class TextHelperParseEmailAction {
                 .description("The email that will be turned into structured data.")
                 .required(true))
         .output(outputSchema(PARSED_EMAIL_OBJECT))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#parse-email")
         .perform(TextHelperParseEmailAction::perform);
 
     private TextHelperParseEmailAction() {

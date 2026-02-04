@@ -39,6 +39,7 @@ public class TextHelperSentenceCaseAction {
                 .label("Text")
                 .required(true))
         .output(outputSchema(string().description("Sentence case text")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#sentence-case")
         .perform(TextHelperSentenceCaseAction::perform);
 
     private TextHelperSentenceCaseAction() {

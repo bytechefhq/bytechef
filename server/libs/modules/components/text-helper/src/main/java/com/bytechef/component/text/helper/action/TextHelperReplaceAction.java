@@ -54,6 +54,7 @@ public class TextHelperReplaceAction {
                 .defaultValue(false)
                 .required(true))
         .output(outputSchema(string().description("The text with replaced values.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#replace")
         .perform(TextHelperReplaceAction::perform);
 
     private TextHelperReplaceAction() {

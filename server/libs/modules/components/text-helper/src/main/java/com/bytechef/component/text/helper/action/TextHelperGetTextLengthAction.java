@@ -40,6 +40,7 @@ public class TextHelperGetTextLengthAction {
                 .description("The text of which the length will be returned of.")
                 .required(true))
         .output(outputSchema(integer().description("Length of the text.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#get-text-length")
         .perform(TextHelperGetTextLengthAction::perform);
 
     private TextHelperGetTextLengthAction() {

@@ -40,6 +40,7 @@ public class TextHelperStripHtmlTagsAction {
                 .label("Text")
                 .required(true))
         .output(outputSchema(string().description("Text without HTML tags.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#strip-html-tags")
         .perform(TextHelperStripHtmlTagsAction::perform);
 
     private TextHelperStripHtmlTagsAction() {

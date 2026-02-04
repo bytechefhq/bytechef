@@ -48,6 +48,7 @@ public class TextHelperUrlEncodeDecodeAction {
                 .required(true),
             OPERATION_PROPERTY)
         .output(outputSchema(string().description("URL encoded/decoded content.")))
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#url-encodedecode")
         .perform(TextHelperUrlEncodeDecodeAction::perform);
 
     private TextHelperUrlEncodeDecodeAction() {
