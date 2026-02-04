@@ -72,6 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -609,21 +610,20 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static List<String> getDefaultScopes(Parameters connectionParameters) {
+    private static Map<String, Boolean> getDefaultScopes(Parameters connectionParameters) {
         Object scopes = MapUtils.get(connectionParameters, Authorization.SCOPES);
 
-        if (scopes == null) {
-            return Collections.emptyList();
-        } else if (scopes instanceof List<?>) {
-            return (List<String>) scopes;
-        } else {
-            return Arrays.stream(((String) scopes).split(","))
+        return switch (scopes) {
+            case null -> Collections.emptyMap();
+            case Map<?, ?> map -> (Map<String, Boolean>) scopes;
+            case List<?> objects -> ((List<String>) scopes).stream()
+                .collect(Collectors.toMap(scope -> scope, scope -> true));
+            default -> Arrays.stream(((String) scopes).split(","))
                 .filter(Objects::nonNull)
                 .filter(scope -> !scope.isBlank())
                 .map(String::trim)
-                .toList();
-        }
+                .collect(Collectors.toMap(scope -> scope, scope -> true));
+        };
     }
 
     private static String getDefaultTokenUrl(Parameters connectionParameters) {
