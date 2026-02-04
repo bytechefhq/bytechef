@@ -7,10 +7,11 @@ import WorkflowExecutionsTaskAccordionItem from '@/shared/components/workflow-ex
 import WorkflowExecutionsTriggerAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsTriggerAccordionItem';
 import {getTasksTree} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {TabValueType} from '@/shared/types';
 import {useCallback, useMemo, useState} from 'react';
 
 const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
-    const [activeTab, setActiveTab] = useState<'input' | 'output' | 'error' | 'logs'>('input');
+    const [activeTab, setActiveTab] = useState<TabValueType>('input');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
         triggerExecution || job.taskExecutions?.[0] || undefined
