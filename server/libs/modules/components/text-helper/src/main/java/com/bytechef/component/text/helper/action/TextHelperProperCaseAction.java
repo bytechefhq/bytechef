@@ -32,7 +32,7 @@ import org.apache.commons.text.WordUtils;
 public class TextHelperProperCaseAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("properCase")
-        .title("Match")
+        .title("Proper Case")
         .description("Capitalize the first letter of every word.")
         .properties(
             string(TEXT)

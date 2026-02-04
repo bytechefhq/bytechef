@@ -50,6 +50,9 @@ public class TextHelperBase64EncodeDecodeAction {
         .output(outputSchema(string().description("Base64 encoded/decoded content.")))
         .perform(TextHelperBase64EncodeDecodeAction::perform);
 
+    private TextHelperBase64EncodeDecodeAction() {
+    }
+
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String text = inputParameters.getRequiredString(TEXT);
 

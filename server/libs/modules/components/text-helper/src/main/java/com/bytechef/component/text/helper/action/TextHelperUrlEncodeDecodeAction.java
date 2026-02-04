@@ -50,6 +50,9 @@ public class TextHelperUrlEncodeDecodeAction {
         .output(outputSchema(string().description("URL encoded/decoded content.")))
         .perform(TextHelperUrlEncodeDecodeAction::perform);
 
+    private TextHelperUrlEncodeDecodeAction() {
+    }
+
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String text = inputParameters.getRequiredString(TEXT);
 

@@ -81,12 +81,10 @@ public class TextHelperUtils {
     }
 
     public static Map<String, String> parseEmail(String emailInput) {
-
         Pattern pattern = Pattern.compile("\\s*(?:(.*?)\\s*<)?([\\w.+-]+)@([\\w.-]+)>?\\s*");
         Matcher matcher = pattern.matcher(emailInput);
 
         if (matcher.matches()) {
-
             String displayName = matcher.group(1) != null ? matcher.group(1) : "";
             String localPart = matcher.group(2);
             String domain = matcher.group(3);
@@ -94,7 +92,6 @@ public class TextHelperUtils {
             String email = localPart + "@" + domain;
 
             return Map.of(DISPLAY_NAME, displayName, LOCAL_PART, localPart, DOMAIN, domain, EMAIL, email);
-
         } else {
             throw new ProviderException("Invalid email format: " + emailInput);
         }
