@@ -16,8 +16,8 @@
 
 package com.bytechef.component.object.helper.action;
 
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.INPUT;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.KEY;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -39,7 +39,7 @@ class ObjectHelperContainsActionTest {
     @Test
     void testPerformForExistingKey() {
         mockedParameters = MockParametersFactory.create(
-            Map.of(INPUT, Map.of("key1", "value1", "key2", "value2"), KEY, "key1"));
+            Map.of(SOURCE, Map.of("key1", "value1", "key2", "value2"), KEY, "key1"));
 
         assertTrue(ObjectHelperContainsAction.perform(mockedParameters, mockedParameters, actionContext));
     }
@@ -47,7 +47,7 @@ class ObjectHelperContainsActionTest {
     @Test
     void testPerformForNonExistingKey() {
         mockedParameters = MockParametersFactory.create(
-            Map.of(INPUT, Map.of("key1", "value1"), KEY, "nonExistentKey"));
+            Map.of(SOURCE, Map.of("key1", "value1"), KEY, "nonExistentKey"));
 
         assertFalse(ObjectHelperContainsAction.perform(mockedParameters, mockedParameters, actionContext));
     }

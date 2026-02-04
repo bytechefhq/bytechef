@@ -16,8 +16,8 @@
 
 package com.bytechef.component.object.helper.action;
 
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.INPUT;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.KEY;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.ActionContext;
@@ -38,7 +38,7 @@ class ObjectHelperDeleteKeyValuePairActionTest {
     @Test
     void testPerformDeleteKeyValuePair() {
         mockedParameters = MockParametersFactory.create(
-            Map.of(INPUT, Map.of("key1", "value1", "key2", "value2"), KEY, "key1"));
+            Map.of(SOURCE, Map.of("key1", "value1", "key2", "value2"), KEY, "key1"));
 
         Object result = ObjectHelperDeleteKeyValuePairAction.perform(mockedParameters, mockedParameters, actionContext);
 
@@ -48,7 +48,7 @@ class ObjectHelperDeleteKeyValuePairActionTest {
     @Test
     void testPerformDeleteNonExistentKey() {
         mockedParameters = MockParametersFactory.create(
-            Map.of(INPUT, Map.of("key1", "value1"), KEY, "nonExistentKey"));
+            Map.of(SOURCE, Map.of("key1", "value1"), KEY, "nonExistentKey"));
 
         Object result = ObjectHelperDeleteKeyValuePairAction.perform(mockedParameters, mockedParameters, actionContext);
 
