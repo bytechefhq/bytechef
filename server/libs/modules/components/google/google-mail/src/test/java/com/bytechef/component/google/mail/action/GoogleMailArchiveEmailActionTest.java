@@ -19,6 +19,7 @@ package com.bytechef.component.google.mail.action;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -47,15 +48,13 @@ class GoogleMailArchiveEmailActionTest {
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
     private final Message mockedMessage = mock(Message.class);
     private final Gmail.Users.Messages.Modify mockedModify = mock(Gmail.Users.Messages.Modify.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<ModifyMessageRequest> requestArgumentCaptor =
-        ArgumentCaptor.forClass(ModifyMessageRequest.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<ModifyMessageRequest> requestArgumentCaptor = forClass(ModifyMessageRequest.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
-        Parameters parameters =
-            MockParametersFactory.create(Map.of(ID, "1"));
+        Parameters parameters = MockParametersFactory.create(Map.of(ID, "1"));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic.when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
@@ -74,7 +73,6 @@ class GoogleMailArchiveEmailActionTest {
 
             assertEquals(mockedMessage, result);
             assertEquals(parameters, parametersArgumentCaptor.getValue());
-
             assertEquals(List.of(ME, "1"), stringArgumentCaptor.getAllValues());
 
             ModifyMessageRequest expectedModifyMessageRequest = new ModifyMessageRequest()
@@ -83,5 +81,4 @@ class GoogleMailArchiveEmailActionTest {
             assertEquals(expectedModifyMessageRequest, requestArgumentCaptor.getValue());
         }
     }
-
 }

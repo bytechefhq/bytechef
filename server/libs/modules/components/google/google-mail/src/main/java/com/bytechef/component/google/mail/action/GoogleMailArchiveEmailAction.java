@@ -64,13 +64,13 @@ public class GoogleMailArchiveEmailAction {
         .perform(GoogleMailArchiveEmailAction::perform);
 
     public static Message perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         try {
             return gmail.users()
                 .messages()
-                .modify(ME,
+                .modify(
+                    ME,
                     inputParameters.getRequiredString(ID),
                     new ModifyMessageRequest().setRemoveLabelIds(List.of("INBOX")))
                 .execute();
