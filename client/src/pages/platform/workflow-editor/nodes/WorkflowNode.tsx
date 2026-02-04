@@ -365,8 +365,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 <>
                     {!isMainRootClusterElement && (
                         <Handle
-                            className={twMerge(`left-${nodeWidth / 2}px`, styles.handle)}
-                            // isConnectable={false}
+                            className={twMerge(`left-${nodeWidth / 2}px`, styles.handleVisible)}
+                            isConnectable={false}
                             position={Position.Top}
                             type="target"
                         />
@@ -374,7 +374,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
                     {filteredClusterElementTypes.map((clusterElementType, index) => (
                         <Handle
-                            className={twMerge(styles.handle)}
+                            className={styles.handle}
                             id={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
                             isConnectable={false}
                             key={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
@@ -405,7 +405,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     />
 
                     <Handle
-                        className={twMerge('rounded-b-xs rounded-t-none', styles.handleVisible)}
+                        className={twMerge(styles.handleVisible, 'rounded-b-xs rounded-t-none')}
                         isConnectable={false}
                         position={Position.Bottom}
                         type="source"
