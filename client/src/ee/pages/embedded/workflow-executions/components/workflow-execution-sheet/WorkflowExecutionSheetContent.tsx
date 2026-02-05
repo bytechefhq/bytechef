@@ -10,7 +10,7 @@ import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automati
 import {useCallback, useMemo, useState} from 'react';
 
 const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
-    const [activeTab, setActiveTab] = useState<'input' | 'output' | 'error'>('input');
+    const [activeTab, setActiveTab] = useState<'input' | 'output' | 'error' | 'logs'>('input');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
         triggerExecution || job.taskExecutions?.[0] || undefined

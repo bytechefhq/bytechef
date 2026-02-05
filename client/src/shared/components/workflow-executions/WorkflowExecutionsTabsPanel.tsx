@@ -12,26 +12,31 @@ import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import WorkflowExecutionContent from '@/shared/components/workflow-executions/WorkflowExecutionContent';
 import WorkflowExecutionContentClipboardButton from '@/shared/components/workflow-executions/WorkflowExecutionContentClipboardButton';
+import WorkflowExecutionLogsContent from '@/shared/components/workflow-executions/WorkflowExecutionLogsContent';
 import {getDisplayValue, hasDialogContentValue} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
-import {AlertCircleIcon, ExpandIcon} from 'lucide-react';
+import {AlertCircleIcon, ExpandIcon, ScrollTextIcon} from 'lucide-react';
 import {useMemo} from 'react';
+
+type TabValueType = 'input' | 'output' | 'error' | 'logs';
 
 const WorkflowExecutionsTabsPanel = ({
     activeTab,
     dialogOpen,
+    isEditorEnvironment = false,
     job,
     selectedItem,
     setActiveTab,
     setDialogOpen,
     triggerExecution,
 }: {
-    activeTab: 'input' | 'output' | 'error';
-    setActiveTab: (value: 'input' | 'output' | 'error') => void;
+    activeTab: TabValueType;
+    setActiveTab: (value: TabValueType) => void;
     dialogOpen: boolean;
     setDialogOpen: (open: boolean) => void;
     selectedItem: TriggerExecution | TaskExecution | undefined;
     job: Job;
+    isEditorEnvironment?: boolean;
     triggerExecution?: TriggerExecution;
 }) => {
     const displayValue = useMemo(
@@ -74,7 +79,7 @@ const WorkflowExecutionsTabsPanel = ({
         <Tabs
             className="flex h-full flex-col"
             defaultValue={activeTab}
-            onValueChange={(value) => setActiveTab(value as 'input' | 'output' | 'error')}
+            onValueChange={(value) => setActiveTab(value as TabValueType)}
             value={activeTab}
         >
             <div className="flex items-center justify-between p-3">
@@ -114,6 +119,12 @@ const WorkflowExecutionsTabsPanel = ({
                             <span className="text-content-destructive-primary">Error</span>
                         </TabsTrigger>
                     )}
+
+                    <TabsTrigger className="flex items-center gap-x-1" value="logs">
+                        <ScrollTextIcon className="size-4" />
+
+                        <span>Logs</span>
+                    </TabsTrigger>
                 </TabsList>
 
                 {hasDialogContent && (
@@ -189,6 +200,20 @@ const WorkflowExecutionsTabsPanel = ({
 
                     <TabsContent className="p-3" value="error">
                         <WorkflowExecutionContent error={selectedItem?.error} />
+                    </TabsContent>
+
+                    <TabsContent className="h-full p-3" value="logs">
+                        {job.id && (
+                            <WorkflowExecutionLogsContent
+                                isEditorEnvironment={isEditorEnvironment}
+                                jobId={job.id}
+                                taskExecutionId={
+                                    selectedItem && 'workflowTask' in selectedItem
+                                        ? (selectedItem as TaskExecution).id
+                                        : undefined
+                                }
+                            />
+                        )}
                     </TabsContent>
                 </div>
 
