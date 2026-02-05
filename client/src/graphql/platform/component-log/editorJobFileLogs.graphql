@@ -1,0 +1,21 @@
+query editorJobFileLogs($jobId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) {
+    editorJobFileLogs(jobId: $jobId, filter: $filter, page: $page, size: $size) {
+        content {
+            timestamp
+            level
+            componentName
+            componentOperationName
+            taskExecutionId
+            message
+            exceptionType
+            exceptionMessage
+            stackTrace
+        }
+        totalElements
+        totalPages
+        pageNumber
+        pageSize
+        hasNext
+        hasPrevious
+    }
+}

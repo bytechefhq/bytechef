@@ -1,0 +1,13 @@
+query taskExecutionFileLogs($jobId: ID!, $taskExecutionId: ID!) {
+    taskExecutionFileLogs(jobId: $jobId, taskExecutionId: $taskExecutionId) {
+        timestamp
+        level
+        componentName
+        componentOperationName
+        taskExecutionId
+        message
+        exceptionType
+        exceptionMessage
+        stackTrace
+    }
+}
