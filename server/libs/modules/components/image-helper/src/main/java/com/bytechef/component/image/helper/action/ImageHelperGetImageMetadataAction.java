@@ -43,6 +43,7 @@ public class ImageHelperGetImageMetadataAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getImageMetadata")
         .title("Get Image Metadata")
         .description("Get metadata of the image.")
+        .help("", "https://docs.bytechef.io/reference/components/image-helper_v1#get-image-metadata")
         .properties(
             IMAGE_PROPERTY,
             RESULT_FILE_NAME_PROPERTY)

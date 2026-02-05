@@ -54,7 +54,8 @@ public class ImageHelperComponentHandler implements ComponentHandler {
             tool(ImageHelperGetImageMetadataAction.ACTION_DEFINITION),
             tool(ImageHelperImageToBase64Action.ACTION_DEFINITION),
             tool(ImageHelperResizeImageAction.ACTION_DEFINITION),
-            tool(ImageHelperRotateImageAction.ACTION_DEFINITION));
+            tool(ImageHelperRotateImageAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -46,6 +46,7 @@ public class ImageHelperRotateImageAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("rotateImage")
         .title("Rotate Image")
         .description("Rotates an image by a specified degree.")
+        .help("", "https://docs.bytechef.io/reference/components/image-helper_v1#rotate-image")
         .properties(
             IMAGE_PROPERTY,
             integer(DEGREE)

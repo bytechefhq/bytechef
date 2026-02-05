@@ -46,15 +46,16 @@ public class ImageHelperResizeImageAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("resizeImage")
         .title("Resize Image")
         .description("Resizes an image to the specified width and height.")
+        .help("", "https://docs.bytechef.io/reference/components/image-helper_v1#resize-image")
         .properties(
             IMAGE_PROPERTY,
             integer(WIDTH)
                 .label("Width")
-                .description("Width in pixels")
+                .description("The target width of the image in pixels.")
                 .required(true),
             integer(HEIGHT)
                 .label("Height")
-                .description("Height in pixels")
+                .description("The target height of the image in pixels.")
                 .required(true),
             RESULT_FILE_NAME_PROPERTY)
         .output(outputSchema(fileEntry().description("Resized image.")))

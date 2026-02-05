@@ -51,6 +51,7 @@ public class ImageHelperCompressImageAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("compressImage")
         .title("Compress Image")
         .description("Compress image with specified quality.")
+        .help("", "https://docs.bytechef.io/reference/components/image-helper_v1#compress-image")
         .properties(
             IMAGE_PROPERTY,
             number(QUALITY)

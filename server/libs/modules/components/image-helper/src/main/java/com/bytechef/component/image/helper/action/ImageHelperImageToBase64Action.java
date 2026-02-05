@@ -34,6 +34,7 @@ public class ImageHelperImageToBase64Action {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("imageToBase64")
         .title("Image to Base64")
         .description("Converts image to Base64 string.")
+        .help("", "https://docs.bytechef.io/reference/components/image-helper_v1#image-to-base64")
         .properties(IMAGE_PROPERTY)
         .output(outputSchema(string().description("Base64 encoded image.")))
         .perform(ImageHelperImageToBase64Action::perform);
