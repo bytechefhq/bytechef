@@ -50,6 +50,7 @@ public class DateHelperDateDifferenceAction {
                 .required(true),
             UNIT_PROPERTY)
         .output(outputSchema(number().description("Difference between two dates.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#date-difference")
         .perform(DateHelperDateDifferenceAction::perform);
 
     private DateHelperDateDifferenceAction() {

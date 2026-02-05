@@ -65,6 +65,7 @@ public class DateHelperIsBetweenTimesAction {
                 .description("Whether the seconds will be compared.")
                 .defaultValue(true))
         .output(outputSchema(bool().description("Whether the date falls within given date range.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#is-between-times")
         .perform(DateHelperIsBetweenTimesAction::perform);
 
     private DateHelperIsBetweenTimesAction() {

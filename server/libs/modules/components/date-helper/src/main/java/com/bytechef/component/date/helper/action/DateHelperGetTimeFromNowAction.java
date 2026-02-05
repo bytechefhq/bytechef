@@ -44,6 +44,7 @@ public class DateHelperGetTimeFromNowAction {
                 .description("Date to which time will be calculated.")
                 .required(true))
         .output(outputSchema(string().description("Human readable time to inputted date.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#get-time-from-now")
         .perform(DateHelperGetTimeFromNowAction::perform);
 
     private DateHelperGetTimeFromNowAction() {

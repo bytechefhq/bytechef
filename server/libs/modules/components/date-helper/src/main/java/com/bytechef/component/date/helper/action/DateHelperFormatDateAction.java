@@ -44,6 +44,7 @@ public class DateHelperFormatDateAction {
                 .required(true),
             DATE_FORMAT_PROPERTY)
         .output(outputSchema(object().description("Date in desired format.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#format-date")
         .perform(DateHelperFormatDateAction::perform);
 
     private DateHelperFormatDateAction() {

@@ -61,6 +61,7 @@ public class DateHelperConvertAction {
                 .required(true)
                 .defaultValue(ISO8601_DATE_TIME_FORMAT))
         .output(outputSchema(string().description("ISO8601 Date")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#convert-date-timestamp")
         .perform(DateHelperConvertAction::perform);
 
     private DateHelperConvertAction() {

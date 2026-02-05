@@ -61,6 +61,7 @@ public class DateHelperIsBetweenDatesAction {
                 .description("Whether the boundary is inclusive or not.")
                 .defaultValue(false))
         .output(outputSchema(bool().description("Whether the date falls within given date range.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#is-between-dates")
         .perform(DateHelperIsBetweenDatesAction::perform);
 
     private DateHelperIsBetweenDatesAction() {

@@ -75,6 +75,7 @@ public class DateHelperGetTimeBetweenAction {
                             .description("Number of minutes in between dates."),
                         integer(SECOND)
                             .description("Number of seconds in between dates."))))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#get-time-between")
         .perform(DateHelperGetTimeBetweenAction::perform);
 
     private DateHelperGetTimeBetweenAction() {

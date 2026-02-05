@@ -74,6 +74,7 @@ public class DateHelperSubtractTimeAction {
                 .description("Seconds to subtract.")
                 .required(false))
         .output(outputSchema(dateTime().description("Date with subtracted time.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#subtract-time")
         .perform(DateHelperSubtractTimeAction::perform);
 
     private DateHelperSubtractTimeAction() {

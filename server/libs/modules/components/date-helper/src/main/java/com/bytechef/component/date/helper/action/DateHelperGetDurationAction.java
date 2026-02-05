@@ -52,6 +52,7 @@ public class DateHelperGetDurationAction {
                 .required(true),
             UNIT_PROPERTY)
         .output(outputSchema(string().description("Human readable duration text.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#get-duration")
         .perform(DateHelperGetDurationAction::perform);
 
     private DateHelperGetDurationAction() {

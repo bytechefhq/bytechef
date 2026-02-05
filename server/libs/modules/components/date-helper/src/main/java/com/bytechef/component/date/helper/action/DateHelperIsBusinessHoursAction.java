@@ -78,6 +78,7 @@ public class DateHelperIsBusinessHoursAction {
                 .options((OptionsFunction<String>) DateHelperUtils::getZoneOptions)
                 .required(true))
         .output(outputSchema(bool().description("True if the date is a weekend, false otherwise.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#is-business-hours")
         .perform(DateHelperIsBusinessHoursAction::perform);
 
     private DateHelperIsBusinessHoursAction() {

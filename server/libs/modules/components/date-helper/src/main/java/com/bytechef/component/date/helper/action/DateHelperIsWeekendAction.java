@@ -53,6 +53,7 @@ public class DateHelperIsWeekendAction {
                 .options((OptionsFunction<String>) DateHelperUtils::getZoneOptions)
                 .required(true))
         .output(outputSchema(bool().description("True if the date is a weekend, false otherwise.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#is-weekend")
         .perform(DateHelperIsWeekendAction::perform);
 
     private DateHelperIsWeekendAction() {

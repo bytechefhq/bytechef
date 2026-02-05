@@ -64,6 +64,7 @@ public class DateHelperDateIsInLastAction {
                 .required(true),
             UNIT_PROPERTY)
         .output(outputSchema(bool().description("Whether the date is in the last X number of selected time units.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#date-is-in-the-last")
         .perform(DateHelperDateIsInLastAction::perform);
 
     private DateHelperDateIsInLastAction() {
