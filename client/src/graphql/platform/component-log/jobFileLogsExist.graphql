@@ -1,0 +1,3 @@
+query jobFileLogsExist($jobId: ID!) {
+    jobFileLogsExist(jobId: $jobId)
+}
