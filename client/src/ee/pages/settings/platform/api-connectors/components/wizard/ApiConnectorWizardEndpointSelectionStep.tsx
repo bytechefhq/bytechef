@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Label} from '@/components/ui/label';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {twMerge} from 'tailwind-merge';
 
 import {getHttpMethodPillColor} from '../../utils/httpMethod-utils';
 import useApiConnectorWizardEndpointSelectionStep from './hooks/useApiConnectorWizardEndpointSelectionStep';
@@ -70,7 +71,10 @@ const ApiConnectorWizardEndpointSelectionStep = () => {
                                             >
                                                 <div className="flex items-center gap-2">
                                                     <span
-                                                        className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${getHttpMethodPillColor(endpoint.method)}`}
+                                                        className={twMerge(
+                                                            'inline-flex items-center rounded px-2 py-0.5 text-xs font-medium',
+                                                            getHttpMethodPillColor(endpoint.method)
+                                                        )}
                                                     >
                                                         {endpoint.method}
                                                     </span>
