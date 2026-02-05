@@ -84,6 +84,7 @@ export default function deleteProperty(
 
                 setCurrentComponent({
                     ...currentComponent,
+                    displayConditions: response.displayConditions,
                     metadata: response.metadata,
                     parameters: response.parameters,
                 });
@@ -91,6 +92,7 @@ export default function deleteProperty(
                 if (currentNode) {
                     setCurrentNode({
                         ...currentNode,
+                        displayConditions: response.displayConditions,
                         metadata: response.metadata,
                         parameters: response.parameters,
                     });
