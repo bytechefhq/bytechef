@@ -254,6 +254,48 @@ Type: OBJECT
 
 
 
+### Edit Issue
+Name: editIssue
+
+`Edits an issue.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | ID of the project where the issue is located. | false |
+| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue. | true |
+| summary | Summary | STRING | The summary that will be edited. | false |
+| description | Description | STRING | The description that will be edited. | false |
+| addLabels | Add Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of labels that will be added to the issue. | false |
+| removeLabels | Remove Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of labels that will be removed from the issue. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Edit Issue",
+  "name" : "editIssue",
+  "parameters" : {
+    "project" : "",
+    "issueId" : "",
+    "summary" : "",
+    "description" : "",
+    "addLabels" : [ "" ],
+    "removeLabels" : [ "" ]
+  },
+  "type" : "jira/v1/editIssue"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
 ### Get Issue
 Name: getIssue
 
@@ -459,6 +501,42 @@ Items Type: OBJECT
   "id" : ""
 } ]
 ```
+
+
+
+
+### Transition Issue
+Name: transitionIssue
+
+`Move an issue to another status.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | ID of the project where the issue is located. | false |
+| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue to be assigned. | true |
+| statusId | Status ID | STRING <details> <summary> Depends On </summary> issueId </details> | ID of the status you want to put the issue in. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Transition Issue",
+  "name" : "transitionIssue",
+  "parameters" : {
+    "project" : "",
+    "issueId" : "",
+    "statusId" : ""
+  },
+  "type" : "jira/v1/transitionIssue"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 
