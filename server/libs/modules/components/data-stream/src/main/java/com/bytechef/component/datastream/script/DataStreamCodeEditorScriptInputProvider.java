@@ -56,7 +56,7 @@ public class DataStreamCodeEditorScriptInputProvider implements CodeEditorScript
     }
 
     @Override
-    public Map<String, Object> getScriptInput(
+    public Map<String, Object> getScriptInputParameters(
         int rootComponentVersion, String sourceComponentName, int sourceComponentVersion,
         String sourceClusterElementName, Map<String, ?> sourceInputParameters,
         @Nullable ComponentConnection sourceComponentConnection) {
