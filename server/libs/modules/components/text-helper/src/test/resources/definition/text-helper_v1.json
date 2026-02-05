@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Encode/decode a specified string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper#base64-encodedecode"
+    },
     "metadata": null,
     "name": "base64EncodeDecode",
     "outputDefinition": {
@@ -129,7 +132,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Change the type of the input text to number.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#change-type"
+    },
     "metadata": null,
     "name": "changeType",
     "outputDefinition": {
@@ -222,7 +228,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Concatenate a list of texts.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#concatenate"
+    },
     "metadata": null,
     "name": "concatenate",
     "outputDefinition": {
@@ -358,7 +367,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Check if text contains the specified sequence of characters.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#contains"
+    },
     "metadata": null,
     "name": "contains",
     "outputDefinition": {
@@ -477,7 +489,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Escape characters in a string, specified in the input.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#escape-characters"
+    },
     "metadata": null,
     "name": "escapeCharacters",
     "outputDefinition": {
@@ -613,7 +628,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extract all strings that match a given pattern.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#extract-all-by-regular-expression"
+    },
     "metadata": null,
     "name": "extractAllRegEx",
     "outputDefinition": {
@@ -770,7 +788,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extract content from the HTML content.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#extract-content-from-html"
+    },
     "metadata": null,
     "name": "extractContentFromHtml",
     "outputDefinition": {
@@ -785,7 +806,7 @@
       "advancedOption": null,
       "controlType": "TEXT_AREA",
       "defaultValue": null,
-      "description": "HTML content to extract content from.",
+      "description": "The full HTML document or fragment to extract data from.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -807,7 +828,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The CSS selector to search for.",
+      "description": "A CSS selector used to locate the element(s) you want to extract (for example: div.article, a[href], #title).",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -829,7 +850,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": "html",
-      "description": "The data to return.",
+      "description": "Specifies what content should be extracted from the matched element(s).",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -863,7 +884,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The name of the attribute to return the value of",
+      "description": "The name of the HTML attribute to extract from the matched element(s) (for example: href, src, or class).",
       "displayCondition": "returnValue == 'ATTRIBUTE'",
       "exampleValue": null,
       "expressionEnabled": null,
@@ -917,7 +938,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extract first string that match a given pattern.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#extract-key-by-regular-expression"
+    },
     "metadata": null,
     "name": "extractKeyRegEx",
     "outputDefinition": {
@@ -1072,7 +1096,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extract first string that match a given pattern.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#extract-by-regular-expression"
+    },
     "metadata": null,
     "name": "extractRegEx",
     "outputDefinition": {
@@ -1187,7 +1214,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extract all of the URLs from a given piece of text, returning them as a list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#extract-urls"
+    },
     "metadata": null,
     "name": "extractUrls",
     "outputDefinition": {
@@ -1322,7 +1352,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Format currency to the specified denomination.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#format-currency"
+    },
     "metadata": null,
     "name": "formatCurrency",
     "outputDefinition": {
@@ -2361,7 +2394,7 @@
       "advancedOption": null,
       "controlType": "INTEGER",
       "defaultValue": null,
-      "description": "Digits you would like after your decimal.",
+      "description": "Number of digits that will be visible after the decimal seperator.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2432,7 +2465,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts domain from the given email address.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#get-domain-from-email"
+    },
     "metadata": null,
     "name": "getDomainFromEmail",
     "outputDefinition": {
@@ -2525,7 +2561,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts domain from the given URL.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#get-domain-from-url"
+    },
     "metadata": null,
     "name": "getDomainFromUrl",
     "outputDefinition": {
@@ -2618,7 +2657,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "From full name extract first, middle and last name.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#get-first-middle-and-last-name"
+    },
     "metadata": null,
     "name": "getFirstMiddleLastName",
     "outputDefinition": {
@@ -2863,7 +2905,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Given a string and a pattern, this operation will return the substring between where the pattern was found depending on the match number and ending of the string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#get-text-after"
+    },
     "metadata": null,
     "name": "getTextAfter",
     "outputDefinition": {
@@ -2997,7 +3042,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Given a string and a pattern, this operation will return the substring between where the pattern was found depending on the match number and beginning of the string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#get-text-before"
+    },
     "metadata": null,
     "name": "getTextBefore",
     "outputDefinition": {
@@ -3131,7 +3179,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extract text between two patterns.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#get-text-between"
+    },
     "metadata": null,
     "name": "getTextBetween",
     "outputDefinition": {
@@ -3268,7 +3319,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns length of the given text.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#get-text-length"
+    },
     "metadata": null,
     "name": "getTextLength",
     "outputDefinition": {
@@ -3355,7 +3409,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Hex encode/decode a specified string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#hex-encodedecode"
+    },
     "metadata": null,
     "name": "hexEncodeDecode",
     "outputDefinition": {
@@ -3478,7 +3535,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts HTML to markdown.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#html-to-markdown"
+    },
     "metadata": null,
     "name": "HtmlToMarkdown",
     "outputDefinition": {
@@ -3571,7 +3631,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Check if a string is a valid domain.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#is-domain"
+    },
     "metadata": null,
     "name": "isDomain",
     "outputDefinition": {
@@ -3668,7 +3731,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Check if a string is a valid email address.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#is-email"
+    },
     "metadata": null,
     "name": "isEmail",
     "outputDefinition": {
@@ -3765,7 +3831,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Check if a text string is a number.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#is-numeric"
+    },
     "metadata": null,
     "name": "isNumeric",
     "outputDefinition": {
@@ -3862,7 +3931,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Check if a string is a valid URL.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#is-url"
+    },
     "metadata": null,
     "name": "isUrl",
     "outputDefinition": {
@@ -4055,7 +4127,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Convert a string to lower case.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#lower-case"
+    },
     "metadata": null,
     "name": "lowerCase",
     "outputDefinition": {
@@ -4148,7 +4223,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts markdown to HTML.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#markdown-to-html"
+    },
     "metadata": null,
     "name": "markdownToHtml",
     "outputDefinition": {
@@ -4241,7 +4319,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve the result of matching a string against a regular expression.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#match"
+    },
     "metadata": null,
     "name": "match",
     "outputDefinition": {
@@ -4398,7 +4479,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Parse email into structured object. For example: \"Name <name@domain.com>\" into {displayName: 'Name', localPart: 'name', domain: 'domain.com'}.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#parse-email"
+    },
     "metadata": null,
     "name": "parseEmail",
     "outputDefinition": {
@@ -4663,7 +4747,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Parse emails into structured objects. For example: \"Name <name@domain.com>\" into {displayName: 'Name', localPart: 'name', domain: 'domain.com'}.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#parse-email-list"
+    },
     "metadata": null,
     "name": "parseEmailList",
     "outputDefinition": {
@@ -4991,7 +5078,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Parses URL into structured data.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#parse-url"
+    },
     "metadata": null,
     "name": "parseUrl",
     "outputDefinition": {
@@ -5692,7 +5782,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Capitalize the first letter of every word.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#proper-case"
+    },
     "metadata": null,
     "name": "properCase",
     "outputDefinition": {
@@ -5785,7 +5878,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Test if a string matches a regex.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#regular-expression-match-test"
+    },
     "metadata": null,
     "name": "regExMatchTest",
     "outputDefinition": {
@@ -5976,7 +6072,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Remove specified characters from a string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#remove-characters"
+    },
     "metadata": null,
     "name": "removeCharacters",
     "outputDefinition": {
@@ -6091,7 +6190,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Remove special characters from a string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#remove-special-characters"
+    },
     "metadata": null,
     "name": "removeSpecialCharacters",
     "outputDefinition": {
@@ -6184,7 +6286,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Replace all instances of any word, character, or phrase in text with another.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#replace"
+    },
     "metadata": null,
     "name": "replace",
     "outputDefinition": {
@@ -6345,7 +6450,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Select the first N characters from a string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#select-first-n-characters"
+    },
     "metadata": null,
     "name": "selectFirstNCharacters",
     "outputDefinition": {
@@ -6457,7 +6565,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Select the last N characters from a string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#select-last-n-characters"
+    },
     "metadata": null,
     "name": "selectLastNCharacters",
     "outputDefinition": {
@@ -6569,7 +6680,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts string into sentence case.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#sentence-case"
+    },
     "metadata": null,
     "name": "sentenceCase",
     "outputDefinition": {
@@ -6662,7 +6776,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Shorten string to a max allowed length.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#shorten"
+    },
     "metadata": null,
     "name": "shorten",
     "outputDefinition": {
@@ -6774,7 +6891,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Split the text by delimiter.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#split"
+    },
     "metadata": null,
     "name": "split",
     "outputDefinition": {
@@ -6931,7 +7051,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Remove HTML tags from a string leaving only the tag's text content.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#strip-html-tags"
+    },
     "metadata": null,
     "name": "stripHtmlTags",
     "outputDefinition": {
@@ -7024,7 +7147,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Trim whitespace from the beginning and end of a string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#trim-whitespace"
+    },
     "metadata": null,
     "name": "trimWhitespace",
     "outputDefinition": {
@@ -7117,7 +7243,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Convert text to snake case, lowercasing all text, removing special characters, and replacing spaces with underscores.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#underscore"
+    },
     "metadata": null,
     "name": "underscore",
     "outputDefinition": {
@@ -7210,7 +7339,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Convert a string to upper case.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#upper-case"
+    },
     "metadata": null,
     "name": "upperCase",
     "outputDefinition": {
@@ -7303,7 +7435,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "URL encode/decode a specified string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#url-encodedecode"
+    },
     "metadata": null,
     "name": "urlEncodeDecode",
     "outputDefinition": {
@@ -7426,7 +7561,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "URL encode/decode a specified set of key/value pairs.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#url-encodedecode-keyvalue-pair"
+    },
     "metadata": null,
     "name": "urlEncodeDecodeKeyValuePair",
     "outputDefinition": {
@@ -8380,7 +8518,7 @@
       "advancedOption": null,
       "controlType": "TEXT_AREA",
       "defaultValue": null,
-      "description": "HTML content to extract content from.",
+      "description": "The full HTML document or fragment to extract data from.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -8402,7 +8540,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The CSS selector to search for.",
+      "description": "A CSS selector used to locate the element(s) you want to extract (for example: div.article, a[href], #title).",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -8424,7 +8562,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": "html",
-      "description": "The data to return.",
+      "description": "Specifies what content should be extracted from the matched element(s).",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -8458,7 +8596,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The name of the attribute to return the value of",
+      "description": "The name of the HTML attribute to extract from the matched element(s) (for example: href, src, or class).",
       "displayCondition": "returnValue == 'ATTRIBUTE'",
       "exampleValue": null,
       "expressionEnabled": null,
@@ -9952,7 +10090,7 @@
       "advancedOption": null,
       "controlType": "INTEGER",
       "defaultValue": null,
-      "description": "Digits you would like after your decimal.",
+      "description": "Number of digits that will be visible after the decimal seperator.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
