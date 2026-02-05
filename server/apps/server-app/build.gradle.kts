@@ -61,6 +61,8 @@ dependencies {
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-worker"))
     implementation(project(":server:libs:automation:automation-mcp:automation-mcp-graphql"))
     implementation(project(":server:libs:automation:automation-mcp:automation-mcp-service"))
+    implementation(project(":server:libs:automation:automation-search:automation-search-graphql"))
+    implementation(project(":server:libs:automation:automation-search:automation-search-service"))
     implementation(project(":server:libs:automation:automation-swagger"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-rest"))

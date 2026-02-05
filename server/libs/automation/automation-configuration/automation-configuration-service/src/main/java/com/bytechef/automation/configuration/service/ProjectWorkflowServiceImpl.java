@@ -75,6 +75,11 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public List<ProjectWorkflow> getLatestProjectWorkflows() {
+        return projectWorkflowRepository.findAllLatestPerUuid();
+    }
+
+    @Override
     public List<Long> getProjectProjectWorkflowIds(long projectId, int projectVersion) {
         return projectWorkflowRepository.findAllByProjectIdAndProjectVersion(projectId, projectVersion)
             .stream()
