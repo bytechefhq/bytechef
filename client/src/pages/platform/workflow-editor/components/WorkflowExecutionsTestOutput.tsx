@@ -27,7 +27,7 @@ const WorkflowExecutionsTestOutput = ({
     workflowTestExecution?: WorkflowTestExecution;
     onCloseClick?: () => void;
 }) => {
-    const [activeTab, setActiveTab] = useState<'input' | 'output' | 'error'>('input');
+    const [activeTab, setActiveTab] = useState<'input' | 'output' | 'error' | 'logs'>('input');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
         getInitialSelectedItem(workflowTestExecution)
@@ -139,6 +139,7 @@ const WorkflowExecutionsTestOutput = ({
                                             <WorkflowExecutionsTabsPanel
                                                 activeTab={activeTab}
                                                 dialogOpen={dialogOpen}
+                                                isEditorEnvironment={true}
                                                 job={job}
                                                 selectedItem={selectedItem}
                                                 setActiveTab={setActiveTab}
