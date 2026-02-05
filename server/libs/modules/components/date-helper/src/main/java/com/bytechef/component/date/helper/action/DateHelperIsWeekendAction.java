@@ -45,7 +45,9 @@ public class DateHelperIsWeekendAction {
         .properties(
             dateTime(INPUT_DATE)
                 .label("Date")
-                .description("Date to check to see if it is a weekend.")
+                .description(
+                    "Date to check to see if it is a weekend. We only accept yyyy-MM-ddTHH:mm:ss, use our Format " +
+                        "Date action to transform the date format")
                 .required(true),
             string(TIME_ZONE)
                 .label("Time Zone")

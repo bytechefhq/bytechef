@@ -51,7 +51,9 @@ public class DateHelperDateIsInLastAction {
         .properties(
             dateTime(DATE)
                 .label("Date")
-                .description("Date for which you want to check is it in the last X number of selected time units.")
+                .description(
+                    "Date for which you want to check is it in the last X number of selected time units. We only " +
+                        "accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format")
                 .required(true),
             string(TIME_ZONE)
                 .label("Time Zone")

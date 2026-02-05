@@ -52,7 +52,9 @@ public class DateHelperIsBusinessHoursAction {
         .properties(
             dateTime(INPUT_DATE)
                 .label("Date")
-                .description("Date to check to see if it is business hours.")
+                .description(
+                    "Date to check to see if it is business hours. We only accept yyyy-MM-ddTHH:mm:ss, use our " +
+                        "Format Date action to transform the date format")
                 .required(true),
             integer(BUSINESS_WEEK_START)
                 .label("Business Week Start")

@@ -48,6 +48,9 @@ public class DateHelperAddTimeAction {
         .properties(
             dateTime(INPUT_DATE)
                 .label("Date")
+                .description(
+                    "Date to which time will be added. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date " +
+                        "action to transform the date format")
                 .required(true),
             DATE_FORMAT_PROPERTY,
             integer(YEAR)

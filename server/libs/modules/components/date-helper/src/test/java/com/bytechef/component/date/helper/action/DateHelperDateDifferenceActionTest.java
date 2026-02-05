@@ -16,13 +16,13 @@
 
 package com.bytechef.component.date.helper.action;
 
-import static com.bytechef.component.date.helper.action.DateHelperDateDifferenceAction.END_DATE;
-import static com.bytechef.component.date.helper.action.DateHelperDateDifferenceAction.START_DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.END_DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MINUTE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.START_DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.UNIT;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.YEAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;

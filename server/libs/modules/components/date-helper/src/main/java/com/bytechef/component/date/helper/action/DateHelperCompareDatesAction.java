@@ -46,11 +46,15 @@ public class DateHelperCompareDatesAction {
         .properties(
             dateTime(DATE_A)
                 .label("Date A")
-                .description("First date that will be compared.")
+                .description(
+                    "First date that will be compared. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action" +
+                        " to transform the date format")
                 .required(true),
             dateTime(DATE_B)
                 .label("Date B")
-                .description("Second date that will be compared.")
+                .description(
+                    "Second date that will be compared. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date " +
+                        "action to transform the date format")
                 .required(true),
             RESOLUTION_PROPERTY,
             string(COMPARISON)

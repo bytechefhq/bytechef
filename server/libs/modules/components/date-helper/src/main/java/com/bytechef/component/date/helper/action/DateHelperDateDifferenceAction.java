@@ -16,6 +16,8 @@
 
 package com.bytechef.component.date.helper.action;
 
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.END_DATE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.START_DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.UNIT;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.UNIT_PROPERTY;
 import static com.bytechef.component.date.helper.util.DateHelperUtils.getChronoUnit;
@@ -35,18 +37,21 @@ import java.time.temporal.ChronoUnit;
  */
 public class DateHelperDateDifferenceAction {
 
-    protected static final String START_DATE = "startDate";
-    protected static final String END_DATE = "endDate";
-
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("dateDifference")
         .title("Date Difference")
         .description("Get the difference between two dates.")
         .properties(
             dateTime(START_DATE)
                 .label("Start Date")
+                .description(
+                    "Start date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to " +
+                        "transform the date format")
                 .required(true),
             dateTime(END_DATE)
                 .label("End Date")
+                .description(
+                    "End date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to " +
+                        "transform the date format")
                 .required(true),
             UNIT_PROPERTY)
         .output(outputSchema(number().description("Difference between two dates.")))
@@ -56,9 +61,7 @@ public class DateHelperDateDifferenceAction {
     private DateHelperDateDifferenceAction() {
     }
 
-    protected static Long perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    protected static Long perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String unitDifference = inputParameters.getRequiredString(UNIT);
 
         ChronoUnit chronoUnit = getChronoUnit(unitDifference);

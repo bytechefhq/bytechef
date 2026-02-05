@@ -46,7 +46,9 @@ public class DateHelperIsBetweenTimesAction {
         .properties(
             dateTime(DATE)
                 .label("Date")
-                .description("Date to check if it is in the range.")
+                .description(
+                    "Date to check if it is in the range. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date " +
+                        "action to transform the date format")
                 .required(true),
             time(TIME_A)
                 .label("Start Time")

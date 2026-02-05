@@ -55,7 +55,9 @@ public class DateHelperExtractDateUnitsAction {
         .properties(
             dateTime(INPUT_DATE)
                 .label("Date")
-                .description("The date from which to extract the specified unit.")
+                .description(
+                    "The date from which to extract the specified unit. We only accept yyyy-MM-ddTHH:mm:ss, use our " +
+                        "Format Date action to transform the date format")
                 .required(true),
             string(UNIT)
                 .label("Unit to Extract")
