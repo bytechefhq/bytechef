@@ -24,6 +24,10 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
  */
 public interface WorkflowTestConfigurationFacade {
 
+    void deleteWorkflowTestConfigurationConnection(
+        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
+        long environmentId);
+
     void removeUnusedWorkflowTestConfigurationConnections(Workflow workflow);
 
     WorkflowTestConfiguration saveWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
@@ -33,8 +37,4 @@ public interface WorkflowTestConfigurationFacade {
         long environmentId);
 
     void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value, long environmentId);
-
-    void deleteWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
-        long environmentId);
 }

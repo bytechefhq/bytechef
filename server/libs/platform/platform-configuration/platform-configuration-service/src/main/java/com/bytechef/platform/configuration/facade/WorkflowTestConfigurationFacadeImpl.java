@@ -60,6 +60,15 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
+    public void deleteWorkflowTestConfigurationConnection(
+        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
+        long environmentId) {
+
+        workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(
+            workflowId, workflowNodeName, workflowConnectionKey, environmentId);
+    }
+
+    @Override
     public void removeUnusedWorkflowTestConfigurationConnections(Workflow workflow) {
         List<WorkflowTestConfiguration> workflowTestConfigurations = workflowTestConfigurationService
             .getWorkflowTestConfigurations(Validate.notNull(workflow.getId(), "id"));
@@ -113,16 +122,6 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         Validate.notEmpty(key, "Missing required param: " + key);
 
         workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(workflowId, key, value, environmentId);
-    }
-
-    @Override
-    public void deleteWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
-        long environmentId) {
-
-        // No validation is required for deletion; if it exists, remove it. Otherwise it's a no-op.
-        workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(
-            workflowId, workflowNodeName, workflowConnectionKey, environmentId);
     }
 
     private static Map<String, String> getInputs(
