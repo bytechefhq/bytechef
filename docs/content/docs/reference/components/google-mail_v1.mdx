@@ -112,6 +112,114 @@ Type: OBJECT
 
 
 
+### Archive Email
+Name: archiveEmail
+
+`Archive an Email message.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Message ID | STRING | ID of the message to be archived. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Archive Email",
+  "name" : "archiveEmail",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "googleMail/v1/archiveEmail"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the message. |
+| threadId | STRING | The ID of the thread the message belongs to. |
+| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of IDs of labels applied to this message. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "threadId" : "",
+  "labelIds" : [ "" ]
+}
+```
+
+
+
+
+### Create Label
+Name: createLabel
+
+`Creates a new label.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The display name of the newly created label. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Label",
+  "name" : "createLabel",
+  "parameters" : {
+    "name" : ""
+  },
+  "type" : "googleMail/v1/createLabel"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the newly created label. |
+| labelListVisibility | STRING | The visibility of the label in the label list in the Gmail web interface. |
+| messageListVisibility | STRING | The visibility of messages with this label in the message list in the Gmail web interface. |
+| name | STRING | The display name of the label. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "labelListVisibility" : "",
+  "messageListVisibility" : "",
+  "name" : ""
+}
+```
+
+
+
+
 ### Delete Mail
 Name: deleteMail
 
