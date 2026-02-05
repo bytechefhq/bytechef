@@ -91,6 +91,7 @@ const ParameterList = ({onChange, parameters}: ParameterListProps) => {
                                 </div>
 
                                 <Button
+                                    aria-label="Remove parameter"
                                     icon={<Trash2Icon className="size-3" />}
                                     onClick={(event) => {
                                         event.stopPropagation();
