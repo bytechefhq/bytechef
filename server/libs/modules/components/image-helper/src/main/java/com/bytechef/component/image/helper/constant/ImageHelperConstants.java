@@ -38,6 +38,7 @@ public class ImageHelperConstants {
 
     public static final ModifiableFileEntryProperty IMAGE_PROPERTY = fileEntry(IMAGE)
         .label("Image")
+        .description("The image file to process.")
         .required(true);
 
     public static final ModifiableStringProperty RESULT_FILE_NAME_PROPERTY = string(RESULT_FILE_NAME)
