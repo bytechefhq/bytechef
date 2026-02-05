@@ -52,6 +52,7 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
                 ) : (
                     <div className="flex gap-1">
                         <Button
+                            aria-label="Edit request body"
                             icon={<EditIcon className="size-3" />}
                             onClick={handleOpenDialog}
                             size="icon"
@@ -60,6 +61,7 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
                         />
 
                         <Button
+                            aria-label="Remove request body"
                             icon={<Trash2Icon className="size-3" />}
                             onClick={handleRemoveRequestBody}
                             size="icon"
@@ -174,7 +176,22 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
                                     <FormMessage />
                                 </FormItem>
                             )}
-                            rules={{required: 'Schema is required'}}
+                            rules={{
+                                required: 'Schema is required',
+                                validate: (value: string) => {
+                                    if (!value || value.trim().length === 0) {
+                                        return 'Schema is required';
+                                    }
+
+                                    try {
+                                        JSON.parse(value);
+
+                                        return true;
+                                    } catch {
+                                        return 'Schema must be valid JSON';
+                                    }
+                                },
+                            }}
                         />
 
                         <FormField

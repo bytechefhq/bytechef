@@ -86,6 +86,7 @@ const ResponseEditor = ({onChange, responses}: ResponseEditorProps) => {
                             </div>
 
                             <Button
+                                aria-label="Remove response"
                                 icon={<Trash2Icon className="size-3" />}
                                 onClick={(event) => {
                                     event.stopPropagation();
