@@ -41,6 +41,16 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
 
     List<ProjectWorkflow> findAllByProjectIdIn(List<Long> projectIds);
 
+    @Query("""
+        SELECT pw.* FROM project_workflow pw
+        INNER JOIN (
+            SELECT uuid, MAX(project_version) AS max_version
+            FROM project_workflow
+            GROUP BY uuid
+        ) latest ON pw.uuid = latest.uuid AND pw.project_version = latest.max_version
+        """)
+    List<ProjectWorkflow> findAllLatestPerUuid();
+
     Optional<ProjectWorkflow> findByProjectIdAndProjectVersionAndWorkflowId(
         long projectId, int projectVersion, String workflowId);
 

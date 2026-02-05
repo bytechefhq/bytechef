@@ -43,7 +43,9 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import tools.jackson.databind.ObjectMapper;
@@ -57,7 +59,10 @@ import tools.jackson.databind.ObjectMapper;
         "com.bytechef.automation.mcp", "com.bytechef.commons.util", "com.bytechef.jackson.config",
         "com.bytechef.platform.category", "com.bytechef.platform.connection", "com.bytechef.platform.mcp",
         "com.bytechef.platform.tag"
-    })
+    },
+    excludeFilters = @Filter(
+        type = FilterType.REGEX,
+        pattern = "com\\.bytechef\\.automation\\.configuration\\.facade\\.AutomationSearchFacadeImpl"))
 @EnableAutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)

@@ -1,0 +1,91 @@
+extend type Query {
+    automationSearch(query: String!, limit: Int): [SearchResult!]!
+}
+
+interface SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+}
+
+enum SearchAssetType {
+    API_COLLECTION
+    API_ENDPOINT
+    CONNECTION
+    DATA_TABLE
+    DEPLOYMENT
+    KNOWLEDGE_BASE
+    KNOWLEDGE_BASE_DOCUMENT
+    PROJECT
+    WORKFLOW
+}
+
+type ProjectSearchResult implements SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+}
+
+type WorkflowSearchResult implements SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+    projectId: ID!
+    label: String!
+}
+
+type ProjectDeploymentSearchResult implements SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+    projectName: String!
+}
+
+type ApiCollectionSearchResult implements SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+}
+
+type ApiEndpointSearchResult implements SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+    collectionId: ID!
+    path: String
+}
+
+type DataTableSearchResult implements SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+}
+
+type KnowledgeBaseSearchResult implements SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+}
+
+type KnowledgeBaseDocumentSearchResult implements SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+    knowledgeBaseId: ID!
+}
+
+type ConnectionSearchResult implements SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+}
