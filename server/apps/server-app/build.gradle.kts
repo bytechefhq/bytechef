@@ -95,6 +95,8 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-single-service"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-service"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-graphql"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-service"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-graphql"))

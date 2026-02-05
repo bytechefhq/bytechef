@@ -21,6 +21,7 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
+import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -47,6 +48,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
     private final @Nullable Long jobId;
     private final @Nullable Long jobPrincipalId;
     private final @Nullable Long jobPrincipalWorkflowId;
+    private final @Nullable LogFileStorageWriter logFileStorageWriter;
     private final Nested nested;
     private final @Nullable String publicUrl;
     private final TempFileStorage tempFileStorage;
@@ -69,6 +71,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         this.jobId = builder.jobId;
         this.jobPrincipalId = builder.jobPrincipalId;
         this.jobPrincipalWorkflowId = builder.jobPrincipalWorkflowId;
+        this.logFileStorageWriter = builder.logFileStorageWriter;
         this.nested = new NestedImpl();
         this.publicUrl = builder.publicUrl;
         this.tempFileStorage = builder.tempFileStorage;
@@ -108,6 +111,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
             .jobId(jobId)
             .jobPrincipalId(jobPrincipalId)
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+            .logFileStorageWriter(logFileStorageWriter)
             .publicUrl(publicUrl)
             .type(type)
             .workflowId(workflowId)
@@ -275,6 +279,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         private @Nullable Long jobId;
         private @Nullable Long jobPrincipalId;
         private @Nullable Long jobPrincipalWorkflowId;
+        private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
         private final TempFileStorage tempFileStorage;
         private @Nullable PlatformType type;
@@ -328,6 +333,12 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
 
         Builder jobPrincipalWorkflowId(@Nullable Long jobPrincipalWorkflowId) {
             this.jobPrincipalWorkflowId = jobPrincipalWorkflowId;
+
+            return this;
+        }
+
+        Builder logFileStorageWriter(@Nullable LogFileStorageWriter logFileStorage) {
+            this.logFileStorageWriter = logFileStorage;
 
             return this;
         }

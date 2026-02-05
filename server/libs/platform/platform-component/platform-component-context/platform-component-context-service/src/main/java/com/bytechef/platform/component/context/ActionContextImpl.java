@@ -22,6 +22,7 @@ import com.bytechef.component.definition.ActionContext.Approval.Links;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -54,6 +55,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable Long jobPrincipalId;
     private final @Nullable Long jobPrincipalWorkflowId;
     private final @Nullable Long jobId;
+    private final @Nullable LogFileStorageWriter logFileStorageWriter;
     private final @Nullable PlatformType type;
     private final @Nullable String publicUrl;
     private final TempFileStorage tempFileStorage;
@@ -64,7 +66,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private ActionContextImpl(Builder builder) {
         super(
             builder.componentName, builder.componentVersion, builder.actionName, builder.componentConnection,
-            builder.editorEnvironment, builder.httpClientExecutor, builder.tempFileStorage);
+            builder.editorEnvironment, builder.httpClientExecutor, builder.tempFileStorage,
+            builder.logFileStorageWriter, builder.jobId, builder.jobId != null ? builder.jobId : 0);
 
         this.actionName = builder.actionName;
         this.cacheManager = builder.cacheManager;
@@ -72,6 +75,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.editorEnvironment = builder.editorEnvironment;
         this.eventPublisher = builder.eventPublisher;
         this.httpClientExecutor = builder.httpClientExecutor;
+        this.logFileStorageWriter = builder.logFileStorageWriter;
         this.tempFileStorage = builder.tempFileStorage;
 
         if (builder.jobId != null && builder.publicUrl != null) {
@@ -117,6 +121,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
                 .jobId(jobId)
                 .jobPrincipalId(jobPrincipalId)
                 .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+                .logFileStorageWriter(logFileStorageWriter)
                 .publicUrl(publicUrl)
                 .type(type)
                 .workflowId(workflowId)
@@ -138,6 +143,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         private @Nullable Long jobId;
         private @Nullable Long jobPrincipalId;
         private @Nullable Long jobPrincipalWorkflowId;
+        private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
         private final TempFileStorage tempFileStorage;
         private @Nullable PlatformType type;
@@ -185,6 +191,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
         Builder jobPrincipalWorkflowId(@Nullable Long jobPrincipalWorkflowId) {
             this.jobPrincipalWorkflowId = jobPrincipalWorkflowId;
+
+            return this;
+        }
+
+        Builder logFileStorageWriter(@Nullable LogFileStorageWriter logFileStorageWriter) {
+            this.logFileStorageWriter = logFileStorageWriter;
 
             return this;
         }
@@ -290,6 +302,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             .jobId(jobId)
             .jobPrincipalId(jobPrincipalId)
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+            .logFileStorageWriter(logFileStorageWriter)
             .publicUrl(publicUrl)
             .type(type)
             .workflowId(workflowId)

@@ -29,6 +29,8 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.context.util.JsonSchemaUtils;
 import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.log.LogFileStorageWriter;
+import com.bytechef.platform.component.log.domain.LogEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,6 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,8 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.FormattingTuple;
+import org.slf4j.helpers.MessageFormatter;
 
 /**
  * @author Ivica Cardic
@@ -72,6 +77,18 @@ class ContextImpl implements Context {
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
         HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage) {
 
+        this(
+            componentName, componentVersion, componentOperationName, componentConnection, editorEnvironment,
+            httpClientExecutor, tempFileStorage, null, null, 0);
+    }
+
+    @SuppressFBWarnings("EI")
+    ContextImpl(
+        String componentName, int componentVersion, @Nullable String componentOperationName,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
+        HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
+        @Nullable LogFileStorageWriter logFileStorageWriter, @Nullable Long jobId, long taskExecutionId) {
+
         this.convert = new ConvertImpl();
         this.editorEnvironment = editorEnvironment;
         this.encoder = new EncoderImpl();
@@ -79,7 +96,7 @@ class ContextImpl implements Context {
         this.http = new HttpImpl(
             componentName, componentVersion, componentOperationName, componentConnection, this, httpClientExecutor);
         this.json = new JsonImpl();
-        this.log = new LogImpl(componentName, componentOperationName);
+        this.log = new LogImpl(componentName, componentOperationName, logFileStorageWriter, jobId, taskExecutionId);
         this.mimeType = new MimeTypeImpl();
         this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
@@ -611,17 +628,32 @@ class ContextImpl implements Context {
 
     private static class LogImpl implements Log {
 
+        private final String componentName;
+        private final @Nullable String componentOperationName;
+        private final @Nullable Long jobId;
+        private final @Nullable LogFileStorageWriter logFileStorageWriter;
         private final org.slf4j.Logger logger;
+        private final long taskExecutionId;
 
-        public LogImpl(String componentName, @Nullable String componentOperationName) {
+        public LogImpl(
+            String componentName, @Nullable String componentOperationName,
+            @Nullable LogFileStorageWriter logFileStorageWriter, @Nullable Long jobId, long taskExecutionId) {
+
+            this.componentName = componentName;
+            this.componentOperationName = componentOperationName;
+            this.jobId = jobId;
+            this.logFileStorageWriter = logFileStorageWriter;
             this.logger = LoggerFactory.getLogger(
                 componentName + (componentOperationName == null ? "" : "." + componentOperationName));
+            this.taskExecutionId = taskExecutionId;
         }
 
         @Override
         public void debug(String message) {
             if (logger.isDebugEnabled()) {
                 logger.debug(message);
+
+                storeLogEntry(LogEntry.Level.DEBUG, message, null);
             }
         }
 
@@ -629,6 +661,8 @@ class ContextImpl implements Context {
         public void debug(String format, Object... args) {
             if (logger.isDebugEnabled()) {
                 logger.debug(format, args);
+
+                storeLogEntry(LogEntry.Level.DEBUG, formatMessage(format, args), null);
             }
         }
 
@@ -636,6 +670,8 @@ class ContextImpl implements Context {
         public void debug(String message, Exception exception) {
             if (logger.isDebugEnabled()) {
                 logger.debug(message, exception);
+
+                storeLogEntry(LogEntry.Level.DEBUG, message, exception);
             }
         }
 
@@ -643,6 +679,8 @@ class ContextImpl implements Context {
         public void error(String message) {
             if (logger.isErrorEnabled()) {
                 logger.error(message);
+
+                storeLogEntry(LogEntry.Level.ERROR, message, null);
             }
         }
 
@@ -650,6 +688,8 @@ class ContextImpl implements Context {
         public void error(String format, Object... args) {
             if (logger.isErrorEnabled()) {
                 logger.error(format, args);
+
+                storeLogEntry(LogEntry.Level.ERROR, formatMessage(format, args), null);
             }
         }
 
@@ -657,6 +697,8 @@ class ContextImpl implements Context {
         public void error(String message, Exception exception) {
             if (logger.isErrorEnabled()) {
                 logger.error(message, exception);
+
+                storeLogEntry(LogEntry.Level.ERROR, message, exception);
             }
         }
 
@@ -664,6 +706,8 @@ class ContextImpl implements Context {
         public void info(String message) {
             if (logger.isInfoEnabled()) {
                 logger.info(message);
+
+                storeLogEntry(LogEntry.Level.INFO, message, null);
             }
         }
 
@@ -671,6 +715,8 @@ class ContextImpl implements Context {
         public void info(String format, Object... args) {
             if (logger.isInfoEnabled()) {
                 logger.info(format, args);
+
+                storeLogEntry(LogEntry.Level.INFO, formatMessage(format, args), null);
             }
         }
 
@@ -678,6 +724,8 @@ class ContextImpl implements Context {
         public void info(String message, Exception exception) {
             if (logger.isInfoEnabled()) {
                 logger.info(message, exception);
+
+                storeLogEntry(LogEntry.Level.INFO, message, exception);
             }
         }
 
@@ -685,6 +733,8 @@ class ContextImpl implements Context {
         public void warn(String message) {
             if (logger.isWarnEnabled()) {
                 logger.warn(message);
+
+                storeLogEntry(LogEntry.Level.WARN, message, null);
             }
         }
 
@@ -692,6 +742,8 @@ class ContextImpl implements Context {
         public void warn(String format, Object... args) {
             if (logger.isWarnEnabled()) {
                 logger.warn(format, args);
+
+                storeLogEntry(LogEntry.Level.WARN, formatMessage(format, args), null);
             }
         }
 
@@ -699,6 +751,8 @@ class ContextImpl implements Context {
         public void warn(String message, Exception exception) {
             if (logger.isWarnEnabled()) {
                 logger.warn(message, exception);
+
+                storeLogEntry(LogEntry.Level.WARN, message, exception);
             }
         }
 
@@ -706,6 +760,8 @@ class ContextImpl implements Context {
         public void trace(String message) {
             if (logger.isTraceEnabled()) {
                 logger.trace(message);
+
+                storeLogEntry(LogEntry.Level.TRACE, message, null);
             }
         }
 
@@ -713,6 +769,8 @@ class ContextImpl implements Context {
         public void trace(String format, Object... args) {
             if (logger.isTraceEnabled()) {
                 logger.trace(format, args);
+
+                storeLogEntry(LogEntry.Level.TRACE, formatMessage(format, args), null);
             }
         }
 
@@ -720,7 +778,35 @@ class ContextImpl implements Context {
         public void trace(String message, Exception exception) {
             if (logger.isTraceEnabled()) {
                 logger.trace(message, exception);
+
+                storeLogEntry(LogEntry.Level.TRACE, message, exception);
             }
+        }
+
+        private String formatMessage(String format, Object... args) {
+            FormattingTuple formattingTuple = MessageFormatter.arrayFormat(format, args);
+
+            return formattingTuple.getMessage();
+        }
+
+        private void storeLogEntry(LogEntry.Level level, String message, @Nullable Exception exception) {
+            if (jobId == null || logFileStorageWriter == null) {
+                return;
+            }
+
+            LogEntry.Builder builder = LogEntry.builder()
+                .timestamp(Instant.now())
+                .level(level)
+                .componentName(componentName)
+                .componentOperationName(componentOperationName)
+                .taskExecutionId(taskExecutionId)
+                .message(message);
+
+            if (exception != null) {
+                builder.exception(exception);
+            }
+
+            logFileStorageWriter.storeLogEntry(jobId, taskExecutionId, builder.build());
         }
     }
 
