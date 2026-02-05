@@ -16,7 +16,7 @@
 
 package com.bytechef.component.date.helper.action;
 
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.INPUT_DATE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.TIME_ZONE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -43,7 +43,7 @@ public class DateHelperIsWeekendAction {
         .title("Is Weekend?")
         .description("Check if the current date is a weekend.")
         .properties(
-            dateTime(INPUT_DATE)
+            dateTime(DATE)
                 .label("Date")
                 .description(
                     "Date to check to see if it is a weekend. We only accept yyyy-MM-ddTHH:mm:ss, use our Format " +
@@ -62,7 +62,7 @@ public class DateHelperIsWeekendAction {
     }
 
     public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        LocalDateTime localDateTime = inputParameters.getRequiredLocalDateTime(INPUT_DATE);
+        LocalDateTime localDateTime = inputParameters.getRequiredLocalDateTime(DATE);
         String timeZone = inputParameters.getRequiredString(TIME_ZONE);
 
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of(timeZone));

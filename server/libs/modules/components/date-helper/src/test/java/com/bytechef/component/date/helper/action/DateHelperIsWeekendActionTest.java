@@ -16,7 +16,7 @@
 
 package com.bytechef.component.date.helper.action;
 
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.INPUT_DATE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.TIME_ZONE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
@@ -35,7 +35,7 @@ class DateHelperIsWeekendActionTest {
 
     private final Context mockedContext = mock(Context.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(INPUT_DATE, LocalDateTime.of(2025, 1, 1, 13, 1, 1), TIME_ZONE, "UTC"));
+        Map.of(DATE, LocalDateTime.of(2025, 1, 1, 13, 1, 1), TIME_ZONE, "UTC"));
 
     @Test
     void testPerform() {

@@ -45,7 +45,6 @@ public class DateHelperConstants {
     public static final String HOUR = "hour";
     public static final String INCLUSIVE = "inclusive";
     public static final String INCLUSIVE_SECONDS = "inclusiveSeconds";
-    public static final String INPUT_DATE = "inputDate";
     public static final String IN_LAST = "inLast";
     public static final String MINUTE = "minute";
     public static final String MONTH = "month";

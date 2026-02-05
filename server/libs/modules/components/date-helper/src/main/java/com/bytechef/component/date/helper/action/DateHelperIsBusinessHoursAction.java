@@ -20,7 +20,7 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.B
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.BUSINESS_HOURS_START;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.BUSINESS_WEEK_END;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.BUSINESS_WEEK_START;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.INPUT_DATE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.TIME_ZONE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -50,7 +50,7 @@ public class DateHelperIsBusinessHoursAction {
         .title("Is Business Hours?")
         .description("Check to see if it's business hours or not.")
         .properties(
-            dateTime(INPUT_DATE)
+            dateTime(DATE)
                 .label("Date")
                 .description(
                     "Date to check to see if it is business hours. We only accept yyyy-MM-ddTHH:mm:ss, use our " +
@@ -87,7 +87,7 @@ public class DateHelperIsBusinessHoursAction {
     }
 
     public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        LocalDateTime localDateTime = inputParameters.getRequiredLocalDateTime(INPUT_DATE);
+        LocalDateTime localDateTime = inputParameters.getRequiredLocalDateTime(DATE);
         String timeZone = inputParameters.getRequiredString(TIME_ZONE);
 
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of(timeZone));

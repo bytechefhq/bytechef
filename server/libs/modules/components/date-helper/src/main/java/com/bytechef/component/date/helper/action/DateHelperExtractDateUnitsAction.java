@@ -20,7 +20,6 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.D
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY_OF_WEEK;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.INPUT_DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MINUTE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH_NAME;
@@ -53,7 +52,7 @@ public class DateHelperExtractDateUnitsAction {
             "Extracts specific units (year, month, day, hour, minute, second, day of week, month name, date, or " +
                 "time) from a given date.")
         .properties(
-            dateTime(INPUT_DATE)
+            dateTime(DATE)
                 .label("Date")
                 .description(
                     "The date from which to extract the specified unit. We only accept yyyy-MM-ddTHH:mm:ss, use our " +
@@ -84,7 +83,7 @@ public class DateHelperExtractDateUnitsAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        LocalDateTime inputDate = inputParameters.getRequiredLocalDateTime(INPUT_DATE);
+        LocalDateTime inputDate = inputParameters.getRequiredLocalDateTime(DATE);
 
         String unitToExtract = inputParameters.getRequiredString(UNIT);
 

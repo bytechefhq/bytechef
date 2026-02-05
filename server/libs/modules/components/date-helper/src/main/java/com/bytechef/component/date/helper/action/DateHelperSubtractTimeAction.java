@@ -16,11 +16,11 @@
 
 package com.bytechef.component.date.helper.action;
 
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_PROPERTY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.INPUT_DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MINUTE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
@@ -45,7 +45,7 @@ public class DateHelperSubtractTimeAction {
         .title("Subtract Time")
         .description("Subtract time from date")
         .properties(
-            dateTime(INPUT_DATE)
+            dateTime(DATE)
                 .label("Date")
                 .description(
                     "Date from which time will be subtracted. We only accept yyyy-MM-ddTHH:mm:ss, use our Format " +
@@ -84,7 +84,7 @@ public class DateHelperSubtractTimeAction {
     }
 
     protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        LocalDateTime inputDate = inputParameters.getRequiredLocalDateTime(INPUT_DATE);
+        LocalDateTime inputDate = inputParameters.getRequiredLocalDateTime(DATE);
 
         inputDate = inputDate
             .minusYears(inputParameters.getInteger(YEAR, 0))
