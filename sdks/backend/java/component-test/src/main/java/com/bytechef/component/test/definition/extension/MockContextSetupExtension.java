@@ -28,6 +28,7 @@ import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -79,7 +80,7 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
         throws ParameterResolutionException {
 
         Parameter parameter = parameterContext.getParameter();
-        java.lang.reflect.Type type = parameter.getParameterizedType();
+        Type type = parameter.getParameterizedType();
 
         return parameter.getType() == Context.class ||
             parameter.getType() == Http.Response.class ||
@@ -99,7 +100,7 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
         Store extensionContextStore = extensionContext.getStore(Namespace.create(MockContextSetupExtension.class));
 
         Parameter parameter = parameterContext.getParameter();
-        java.lang.reflect.Type type = parameter.getParameterizedType();
+        Type type = parameter.getParameterizedType();
 
         if (parameter.getType() == Context.class) {
             return extensionContextStore.get(Context.class);
@@ -118,15 +119,18 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
         }
 
         if (parameter.getType() == ArgumentCaptor.class && type instanceof ParameterizedType pt) {
-            if (pt.getActualTypeArguments()[0].equals(ConfigurationBuilder.class)) {
+            Type actualTypeArgument = pt.getActualTypeArguments()[0];
+
+            if (actualTypeArgument.equals(ConfigurationBuilder.class)) {
                 return extensionContextStore.get("configurationBuilderArgumentCaptor");
             }
 
-            if (pt.getActualTypeArguments()[0] instanceof ParameterizedType nestedPt &&
-                nestedPt.getRawType()
-                    .equals(ContextFunction.class)) {
+            if (actualTypeArgument instanceof ParameterizedType nestedPt) {
+                Type rawType = nestedPt.getRawType();
 
-                return extensionContextStore.get("httpFunctionArgumentCaptor");
+                if (rawType.equals(ContextFunction.class)) {
+                    return extensionContextStore.get("httpFunctionArgumentCaptor");
+                }
             }
         }
 
