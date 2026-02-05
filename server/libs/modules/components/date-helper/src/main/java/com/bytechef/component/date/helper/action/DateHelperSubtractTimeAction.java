@@ -47,6 +47,9 @@ public class DateHelperSubtractTimeAction {
         .properties(
             dateTime(INPUT_DATE)
                 .label("Date")
+                .description(
+                    "Date from which time will be subtracted. We only accept yyyy-MM-ddTHH:mm:ss, use our Format " +
+                        "Date action to transform the date format")
                 .required(true),
             DATE_FORMAT_PROPERTY,
             integer(YEAR)

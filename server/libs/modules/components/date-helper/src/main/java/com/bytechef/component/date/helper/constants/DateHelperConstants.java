@@ -41,6 +41,7 @@ public class DateHelperConstants {
     public static final String DAY = "day";
     public static final String DAY_OF_WEEK = "dayOfWeek";
     public static final String DURATION = "duration";
+    public static final String END_DATE = "endDate";
     public static final String HOUR = "hour";
     public static final String INCLUSIVE = "inclusive";
     public static final String INCLUSIVE_SECONDS = "inclusiveSeconds";
@@ -51,6 +52,7 @@ public class DateHelperConstants {
     public static final String MONTH_NAME = "monthName";
     public static final String RESOLUTION = "resolution";
     public static final String SECOND = "second";
+    public static final String START_DATE = "startDate";
     public static final String TIME = "time";
     public static final String TIME_A = "timeA";
     public static final String TIME_B = "timeB";
@@ -94,7 +96,9 @@ public class DateHelperConstants {
 
     public static final ModifiableStringProperty RESOLUTION_PROPERTY = string(RESOLUTION)
         .label("Resolution")
-        .description("The resolution at which the dates will be compared.")
+        .description(
+            "The resolution at which the dates will be compared. Chosen resolution will be the smallest time unit " +
+                "that will be compared.")
         .options(
             option("Year", YEAR),
             option("Month", MONTH),

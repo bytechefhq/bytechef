@@ -52,11 +52,15 @@ public class DateHelperGetTimeBetweenAction {
         .properties(
             dateTime(DATE_A)
                 .label("Start Date")
-                .description("Start date of the interval.")
+                .description(
+                    "Start date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to " +
+                        "transform the date format")
                 .required(true),
             dateTime(DATE_B)
                 .label("End Date")
-                .description("End date of the interval.")
+                .description(
+                    "End date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to " +
+                        "transform the date format")
                 .required(true))
         .output(
             outputSchema(

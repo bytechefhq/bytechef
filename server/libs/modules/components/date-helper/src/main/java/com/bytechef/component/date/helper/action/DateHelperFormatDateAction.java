@@ -40,7 +40,9 @@ public class DateHelperFormatDateAction {
         .properties(
             dateTime(DATE)
                 .label("Date")
-                .description("Date which you want to format")
+                .description(
+                    "Date which you want to format. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action " +
+                        "to transform the date format")
                 .required(true),
             DATE_FORMAT_PROPERTY)
         .output(outputSchema(object().description("Date in desired format.")))
