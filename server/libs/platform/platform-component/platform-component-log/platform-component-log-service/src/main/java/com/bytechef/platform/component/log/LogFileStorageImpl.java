@@ -93,21 +93,21 @@ public class LogFileStorageImpl implements LogFileStorage {
 
     private synchronized void appendLogEntry(long jobId, LogEntry logEntry) {
         String filename = jobId + ".jsonl";
-        String logLine = JsonUtils.write(logEntry) + "\n";
+        byte[] logLineBytes = (JsonUtils.write(logEntry) + "\n").getBytes(StandardCharsets.UTF_8);
 
         if (fileStorageService.fileExists(LOG_FILES_DIR, filename)) {
             FileEntry existingFile = fileStorageService.getFileEntry(LOG_FILES_DIR, filename);
+
             byte[] existingContent = fileStorageService.readFileToBytes(LOG_FILES_DIR, existingFile);
-            byte[] newContent = new byte[existingContent.length + logLine.getBytes(StandardCharsets.UTF_8).length];
+
+            byte[] newContent = new byte[existingContent.length + logLineBytes.length];
 
             System.arraycopy(existingContent, 0, newContent, 0, existingContent.length);
-            System.arraycopy(
-                logLine.getBytes(StandardCharsets.UTF_8), 0, newContent, existingContent.length,
-                logLine.getBytes(StandardCharsets.UTF_8).length);
+            System.arraycopy(logLineBytes, 0, newContent, existingContent.length, logLineBytes.length);
 
             fileStorageService.storeFileContent(LOG_FILES_DIR, filename, newContent);
         } else {
-            fileStorageService.storeFileContent(LOG_FILES_DIR, filename, logLine.getBytes(StandardCharsets.UTF_8));
+            fileStorageService.storeFileContent(LOG_FILES_DIR, filename, logLineBytes);
         }
     }
 

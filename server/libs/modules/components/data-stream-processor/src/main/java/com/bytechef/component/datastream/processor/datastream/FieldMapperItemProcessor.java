@@ -49,6 +49,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Mapping processor that transforms data between source and destination schemas. Only mapped fields pass through;
@@ -57,6 +59,8 @@ import org.jspecify.annotations.NonNull;
  * @author Ivica Cardic
  */
 public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
+
+    private static final Logger logger = LoggerFactory.getLogger(FieldMapperItemProcessor.class);
 
     public static final String DESTINATION_SCHEMA = "destinationSchema";
     public static final String SCHEMAS = "schemas";
@@ -275,6 +279,8 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
 
             return fields;
         } catch (Exception exception) {
+            logger.warn("Failed to parse JSON schema: {}", exception.getMessage());
+
             return List.of();
         }
     }
