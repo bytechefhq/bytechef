@@ -53,8 +53,8 @@ public class BaserowPropertiesUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext context) {
 
-        List<Map<String, ?>> tableFields =
-            BaserowUtils.getTableFields(context, inputParameters.getRequiredString(TABLE_ID));
+        List<Map<String, ?>> tableFields = BaserowUtils.getTableFields(
+            context, inputParameters.getRequiredString(TABLE_ID));
 
         return new ArrayList<>(tableFields.stream()
             .map(BaserowPropertiesUtils::createProperty)
