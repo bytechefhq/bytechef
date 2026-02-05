@@ -79,9 +79,21 @@ public class WorkflowCacheEvictAspect {
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
 
+            Class<?> type = parameter.getType();
+
             if (parameter.isAnnotationPresent(WorkflowCacheEvict.EnvironmentIdParam.class)) {
+                if (!(args[i] instanceof Long)) {
+                    throw new IllegalArgumentException(
+                        "@EnvironmentIdParam must be applied to a Long parameter, but found: " + type.getName());
+                }
+
                 environmentId = (Long) args[i];
             } else if (parameter.isAnnotationPresent(WorkflowCacheEvict.WorkflowIdParam.class)) {
+                if (!(args[i] instanceof String)) {
+                    throw new IllegalArgumentException(
+                        "@WorkflowIdParam must be applied to a String parameter, but found: " + type.getName());
+                }
+
                 workflowId = (String) args[i];
             }
         }

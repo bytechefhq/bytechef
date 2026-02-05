@@ -21,7 +21,6 @@ import com.bytechef.automation.search.SearchResult;
 import com.bytechef.tenant.TenantContext;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +41,6 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
     @Override
     @SuppressWarnings("unchecked")
     public List<SearchResult<?>> search(String query, int limit) {
-        String queryLower = query.toLowerCase(Locale.ROOT);
-
         List<CompletableFuture<List<SearchResult<?>>>> futures = new ArrayList<>();
 
         String currentTenantId = TenantContext.getCurrentTenantId();
@@ -51,7 +48,7 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
         for (SearchAssetProvider provider : providers) {
             CompletableFuture<List<SearchResult<?>>> future = CompletableFuture.supplyAsync(
                 () -> (List<SearchResult<?>>) TenantContext.callWithTenantId(currentTenantId,
-                    () -> provider.search(queryLower, limit)));
+                    () -> provider.search(query, limit)));
 
             futures.add(future);
         }
