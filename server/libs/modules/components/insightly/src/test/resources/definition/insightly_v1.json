@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/insightly_v1/createContact"
+    },
     "metadata": {
       "path": "/Contacts",
       "mimeType": "application/json",
@@ -466,7 +469,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new organization.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/insightly_v1/createOrganization"
+    },
     "metadata": {
       "path": "/Organisations",
       "mimeType": "application/json",
@@ -790,7 +796,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new task.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/insightly_v1/createTask"
+    },
     "metadata": {
       "path": "/Tasks",
       "mimeType": "application/json",
@@ -1083,17 +1092,17 @@
         "advancedOption": null,
         "controlType": "TEXT",
         "defaultValue": null,
-        "description": "Your instances pod can be found under your API URL, e.g. https://api.{pod}.insightly.com/v3.1",
+        "description": null,
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": null,
         "hidden": null,
-        "label": "Pod",
+        "label": "API URL",
         "languageId": null,
         "maxLength": null,
         "metadata": { },
         "minLength": null,
-        "name": "pod",
+        "name": "url",
         "options": null,
         "optionsDataSource": null,
         "optionsLoadedDynamically": null,
@@ -1134,14 +1143,20 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/insightly_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://api.na1.insightly.com/v3.1/#!/Overview/Introduction"
+  },
   "description": "Insightly is a customer relationship management (CRM) software that helps businesses manage contacts, sales, projects, and tasks in one platform.",
   "icon": "path:assets/insightly.svg",
   "metadata": null,
