@@ -53,11 +53,11 @@ public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
     @Override
     public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
-            if (actionDefinition.getName()
-                .equals("getComments")) {
+            String name = actionDefinition.getName();
+
+            if (name.equals("getComments")) {
                 actionDefinition.help("", "https://docs.bytechef.io/reference/components/figma_v1#get-comments");
-            } else if (actionDefinition.getName()
-                .equals("createComment")) {
+            } else if (name.equals("createComment")) {
                 actionDefinition.help("", "https://docs.bytechef.io/reference/components/figma_v1#post-comment");
             }
         }
