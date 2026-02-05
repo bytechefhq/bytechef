@@ -822,7 +822,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource> getOptionsDataSource() {
+        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -2057,7 +2057,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource> getOptionsDataSource() {
+        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -2167,7 +2167,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource> getOptionsDataSource() {
+        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -2461,7 +2461,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource> getOptionsDataSource() {
+        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -2697,7 +2697,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource> getOptionsDataSource() {
+        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -2871,7 +2871,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource> getOptionsDataSource() {
+        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -3301,7 +3301,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource> getOptionsDataSource() {
+        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -3418,7 +3418,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource> getOptionsDataSource() {
+        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
