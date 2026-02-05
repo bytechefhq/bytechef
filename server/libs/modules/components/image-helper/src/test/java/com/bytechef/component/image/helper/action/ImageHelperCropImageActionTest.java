@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.image.helper.util.ImageHelperUtils;
@@ -39,13 +39,12 @@ import org.mockito.MockedStatic;
  */
 class ImageHelperCropImageActionTest {
 
-    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
-        ArgumentCaptor.forClass(ActionContext.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final ArgumentCaptor<BufferedImage> bufferedImageArgumentCaptor =
         ArgumentCaptor.forClass(BufferedImage.class);
     private final ArgumentCaptor<String> extensionArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> fileNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final File mockedFile = mock(File.class);
     private final Parameters mockedParameters = mock(Parameters.class);
@@ -61,13 +60,13 @@ class ImageHelperCropImageActionTest {
         when(mockedParameters.getRequiredFileEntry("image")).thenReturn(mockedFileEntry);
         when(mockedParameters.getRequiredString("resultFileName")).thenReturn("croppedImage");
         when(mockedFileEntry.getExtension()).thenReturn("png");
-        when(mockedActionContext.file(any())).thenReturn(mockedFile);
+        when(mockedContext.file(any())).thenReturn(mockedFile);
 
         try (MockedStatic<ImageHelperUtils> imageHelperUtilsMockedStatic = mockStatic(ImageHelperUtils.class);
             MockedStatic<ImageIO> imageIOMockedStatic = mockStatic(ImageIO.class)) {
 
             imageHelperUtilsMockedStatic.when(() -> ImageHelperUtils.storeBufferedImage(
-                actionContextArgumentCaptor.capture(),
+                contextArgumentCaptor.capture(),
                 bufferedImageArgumentCaptor.capture(),
                 extensionArgumentCaptor.capture(),
                 fileNameArgumentCaptor.capture()))
@@ -77,10 +76,10 @@ class ImageHelperCropImageActionTest {
                 .thenReturn(originalImage);
 
             FileEntry result = ImageHelperCropImageAction.perform(
-                mockedParameters, mockedParameters, mockedActionContext);
+                mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedFileEntry, result);
-            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
 
             BufferedImage croppedImage = bufferedImageArgumentCaptor.getValue();
 

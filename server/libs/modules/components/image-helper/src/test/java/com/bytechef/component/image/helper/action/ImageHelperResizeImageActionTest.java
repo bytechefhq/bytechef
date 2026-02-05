@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.image.helper.util.ImageHelperUtils;
@@ -47,9 +47,8 @@ class ImageHelperResizeImageActionTest {
     private final ArgumentCaptor<String> fileNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<BufferedImage> bufferedImageArgumentCaptor =
         ArgumentCaptor.forClass(BufferedImage.class);
-    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
-        ArgumentCaptor.forClass(ActionContext.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final Context mockedContext = mock(Context.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final File mockedFile = mock(File.class);
     private final Parameters mockedParameters = mock(Parameters.class);
@@ -68,13 +67,13 @@ class ImageHelperResizeImageActionTest {
             .thenReturn("rotatedImage");
         when(mockedFileEntry.getExtension())
             .thenReturn("png");
-        when(mockedActionContext.file(any()))
+        when(mockedContext.file(any()))
             .thenReturn(mockedFile);
 
         try (MockedStatic<ImageHelperUtils> imageHelperUtilsMockedStatic = mockStatic(ImageHelperUtils.class);
             MockedStatic<ImageIO> imageIOMockedStatic = mockStatic(ImageIO.class)) {
             imageHelperUtilsMockedStatic.when(() -> ImageHelperUtils.storeBufferedImage(
-                actionContextArgumentCaptor.capture(), bufferedImageArgumentCaptor.capture(),
+                contextArgumentCaptor.capture(), bufferedImageArgumentCaptor.capture(),
                 extenstionArgumentCaptor.capture(), fileNameArgumentCaptor.capture()))
                 .thenReturn(mockedFileEntry);
 
@@ -82,10 +81,10 @@ class ImageHelperResizeImageActionTest {
                 .thenReturn(bufferedImage);
 
             FileEntry result =
-                ImageHelperResizeImageAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+                ImageHelperResizeImageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedFileEntry, result);
-            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
 
             BufferedImage bufferedImageArgumentCaptorValue = bufferedImageArgumentCaptor.getValue();
 

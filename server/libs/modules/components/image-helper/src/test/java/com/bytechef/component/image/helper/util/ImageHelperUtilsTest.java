@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -33,21 +33,21 @@ import org.junit.jupiter.api.Test;
  */
 class ImageHelperUtilsTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
 
     @Test
     void testStoreBufferedImage() throws IOException {
-        when(mockedActionContext.file(any()))
+        when(mockedContext.file(any()))
             .thenReturn(mockedFileEntry);
 
         BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
         String extension = "png";
         String resultFileName = "testImage";
 
-        FileEntry result = ImageHelperUtils.storeBufferedImage(mockedActionContext, image, extension, resultFileName);
+        FileEntry result = ImageHelperUtils.storeBufferedImage(mockedContext, image, extension, resultFileName);
 
-        verify(mockedActionContext).file(any());
+        verify(mockedContext).file(any());
 
         assertEquals(mockedFileEntry, result);
     }
