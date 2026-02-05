@@ -92,7 +92,8 @@ public class DateHelperComponentHandler implements ComponentHandler {
             tool(DateHelperIsBetweenTimesAction.ACTION_DEFINITION),
             tool(DateHelperIsBusinessHoursAction.ACTION_DEFINITION),
             tool(DateHelperIsWeekendAction.ACTION_DEFINITION),
-            tool(DateHelperSubtractTimeAction.ACTION_DEFINITION));
+            tool(DateHelperSubtractTimeAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

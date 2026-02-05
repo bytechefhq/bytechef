@@ -75,6 +75,7 @@ public class DateHelperAddTimeAction {
                 .description("Seconds to add.")
                 .required(false))
         .output(outputSchema(string().description("Date with added time.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#add-time")
         .perform(DateHelperAddTimeAction::perform);
 
     private DateHelperAddTimeAction() {

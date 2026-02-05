@@ -73,6 +73,7 @@ public class DateHelperExtractDateUnitsAction {
                     option("Time", TIME))
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#extract-date-units")
         .perform(DateHelperExtractDateUnitsAction::perform);
 
     private DateHelperExtractDateUnitsAction() {

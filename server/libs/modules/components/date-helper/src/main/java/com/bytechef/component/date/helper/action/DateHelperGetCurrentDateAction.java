@@ -50,6 +50,7 @@ public class DateHelperGetCurrentDateAction {
                 .required(true),
             DATE_FORMAT_PROPERTY)
         .output(outputSchema(string().description("Current date in the specified time zone and format.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#get-current-date")
         .perform(DateHelperGetCurrentDateAction::perform);
 
     private DateHelperGetCurrentDateAction() {

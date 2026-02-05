@@ -59,6 +59,7 @@ public class DateHelperCompareDatesAction {
                 .options(DateHelperUtils.getComparisonOptions())
                 .required(true))
         .output(outputSchema(bool().description("Result of comparison.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#compare-dates")
         .perform(DateHelperCompareDatesAction::perform);
 
     private DateHelperCompareDatesAction() {

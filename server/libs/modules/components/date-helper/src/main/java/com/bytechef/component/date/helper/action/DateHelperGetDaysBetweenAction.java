@@ -54,6 +54,7 @@ public class DateHelperGetDaysBetweenAction {
                     .description(
                         "Number of days between start and end date. If the end date was before start date number " +
                             "will be negative.")))
+        .help("", "https://docs.bytechef.io/reference/components/date-helper_v1#get-days-between")
         .perform(DateHelperGetDaysBetweenAction::perform);
 
     private DateHelperGetDaysBetweenAction() {
