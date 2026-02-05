@@ -9,6 +9,45 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Enable to manually define field schemas using JSON Schema format.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": false,
+      "hidden": null,
+      "label": "Use JSON Schema",
+      "metadata": { },
+      "name": "useJsonSchema",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    }, {
+      "name": "schemas",
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "dynamicPropertiesDataSource": {
+        "properties": { },
+        "propertiesLookupDependsOn": [ "useJsonSchema" ]
+      },
+      "expressionEnabled": null,
+      "header": "Field Schemas",
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "type": "DYNAMIC_PROPERTIES"
+    }, {
+      "advancedOption": null,
       "controlType": "ARRAY_BUILDER",
       "defaultValue": null,
       "description": "List of field mappings from source to destination.",

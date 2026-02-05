@@ -2222,6 +2222,14 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableDynamicPropertiesProperty properties(
+            ClusterElementDefinition.PropertiesFunction propertiesFunction) {
+
+            this.propertiesFunction = propertiesFunction;
+
+            return this;
+        }
+
         @Override
         public Optional<String> getHeader() {
             return Optional.ofNullable(header);
@@ -3974,17 +3982,14 @@ public final class ComponentDsl {
         private final BasePropertiesFunction propertiesFunction;
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-        private PropertiesDataSourceImpl(List<String> loadPropertiesDependOn,
-            BasePropertiesFunction propertiesFunction) {
-            if (loadPropertiesDependOn == null || loadPropertiesDependOn.isEmpty()) {
-                throw new IllegalArgumentException("propertiesLookupDependsOn is not defined.");
-            }
+        private PropertiesDataSourceImpl(
+            List<String> loadPropertiesDependOn, BasePropertiesFunction propertiesFunction) {
 
             if (propertiesFunction == null) {
                 throw new IllegalArgumentException("propertiesFunction is not defined.");
             }
 
-            this.propertiesLookupDependsOn = loadPropertiesDependOn;
+            this.propertiesLookupDependsOn = loadPropertiesDependOn == null ? List.of() : loadPropertiesDependOn;
             this.propertiesFunction = propertiesFunction;
         }
 
