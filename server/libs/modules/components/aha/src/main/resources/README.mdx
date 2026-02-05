@@ -1,0 +1,22 @@
+### How to find the Release ID
+
+The Release ID (also known as the Reference Number) can be found in the Aha! UI or via the API.
+
+#### In the Aha! UI
+- **Release Detail View**: Open a specific release. The Reference Number (e.g., `APP-R-1`) is displayed in the header or in the URL.
+- **Gantt Views**: **Releases** → **Gantt**. The Reference Number is shown in its own column.
+- **Search**: Use the search bar (or press `/`) and type the release name. The Reference Number (e.g., `APP-R-1`) will appear in the results.
+
+#### Via API
+- Use the `GET /products/{product_id}/releases` endpoint.
+- List releases within a product to retrieve their IDs.
+
+### How to find the Product ID
+
+The Product ID is a unique numeric value that can be found in the URL or via the API.
+
+#### Via API
+- Use the `GET /products` endpoint to retrieve a list of all products and their numeric IDs.
+
+#### Via Search
+- Press `/` to open the search modal. Recently viewed products will be listed with their IDs.
