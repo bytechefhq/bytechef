@@ -75,10 +75,10 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     @WorkflowCacheEvict(cacheNames = {
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE,
-    },
-        environmentIdParam = "environmentId",
-        workflowIdParam = "workflowId")
-    public void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName, long environmentId) {
+    })
+    public void deleteWorkflowNodeTestOutput(
+        @WorkflowCacheEvict.WorkflowIdParam String workflowId, String workflowNodeName,
+        @WorkflowCacheEvict.EnvironmentIdParam long environmentId) {
         workflowNodeTestOutputRepository
             .findByWorkflowIdAndWorkflowNodeNameAndEnvironmentId(workflowId, workflowNodeName, environmentId)
             .ifPresent(workflowNodeTestOutputRepository::delete);
@@ -146,12 +146,11 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     @WorkflowCacheEvict(cacheNames = {
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE,
-    },
-        environmentIdParam = "environmentId",
-        workflowIdParam = "workflowId")
+    })
     public WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, OutputResponse outputResponse,
-        long environmentId) {
+        @WorkflowCacheEvict.WorkflowIdParam String workflowId, String workflowNodeName,
+        WorkflowNodeType workflowNodeType, OutputResponse outputResponse,
+        @WorkflowCacheEvict.EnvironmentIdParam long environmentId) {
 
         try {
             return save(

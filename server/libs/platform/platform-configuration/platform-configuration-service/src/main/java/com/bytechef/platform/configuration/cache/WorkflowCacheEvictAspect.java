@@ -52,7 +52,7 @@ public class WorkflowCacheEvictAspect {
      */
     @AfterReturning(pointcut = "@annotation(workflowCacheEvict)", returning = "result")
     public void clearCache(JoinPoint joinPoint, Object result, WorkflowCacheEvict workflowCacheEvict) {
-        Arguments arguments = extractArguments(joinPoint, workflowCacheEvict);
+        Arguments arguments = extractArguments(joinPoint);
 
         for (String cacheName : workflowCacheEvict.cacheNames()) {
             workflowCacheManager.clearCacheForWorkflow(arguments.workflowId, cacheName, arguments.environmentId);
@@ -60,13 +60,12 @@ public class WorkflowCacheEvictAspect {
     }
 
     /**
-     * Extracts the workflow ID from the method parameters based on the annotation configuration.
+     * Extracts the workflow ID and environment ID from the method parameters based on parameter annotations.
      *
-     * @param joinPoint          the join point
-     * @param workflowCacheEvict the annotation
-     * @return the workflow ID or null if not found
+     * @param joinPoint the join point
+     * @return the Arguments containing workflow ID and environment ID
      */
-    private Arguments extractArguments(JoinPoint joinPoint, WorkflowCacheEvict workflowCacheEvict) {
+    private Arguments extractArguments(JoinPoint joinPoint) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Object[] args = joinPoint.getArgs();
 
@@ -74,21 +73,20 @@ public class WorkflowCacheEvictAspect {
 
         Parameter[] parameters = method.getParameters();
 
-        return new Arguments(
-            (Long) Objects.requireNonNull(extractArgument(workflowCacheEvict.environmentIdParam(), args, parameters)),
-            (String) extractArgument(workflowCacheEvict.workflowIdParam(), args, parameters));
-    }
+        Long environmentId = null;
+        String workflowId = null;
 
-    private Object extractArgument(String paramName, Object[] args, Parameter[] parameters) {
         for (int i = 0; i < parameters.length; i++) {
-            String name = parameters[i].getName();
+            Parameter parameter = parameters[i];
 
-            if (name.equals(paramName)) {
-                return args[i];
+            if (parameter.isAnnotationPresent(WorkflowCacheEvict.EnvironmentIdParam.class)) {
+                environmentId = (Long) args[i];
+            } else if (parameter.isAnnotationPresent(WorkflowCacheEvict.WorkflowIdParam.class)) {
+                workflowId = (String) args[i];
             }
         }
 
-        return null;
+        return new Arguments(Objects.requireNonNull(environmentId, "environmentId"), workflowId);
     }
 
     private record Arguments(long environmentId, String workflowId) {
