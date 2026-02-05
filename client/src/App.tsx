@@ -1,3 +1,4 @@
+import GlobalSearchDialog from '@/components/GlobalSearch/GlobalSearchDialog';
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
@@ -131,6 +132,7 @@ const platformNavigation = [
 
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
 
     const {ai, edition} = useApplicationInfoStore(
         useShallow((state) => ({
@@ -170,6 +172,7 @@ function App() {
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
     const ff_2311 = useFeatureFlagsStore()('ff-2311');
+    const ff_2396 = useFeatureFlagsStore()('ff-2396');
     const ff_2894 = useFeatureFlagsStore()('ff-2894');
     const ff_3955 = useFeatureFlagsStore()('ff-3955');
     const ff_4000 = useFeatureFlagsStore()('ff-4000');
@@ -271,6 +274,25 @@ function App() {
         }
     }, [currentType, location, setCurrentType]);
 
+    useEffect(() => {
+        if (!ff_2396) {
+            return;
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+                event.preventDefault();
+                setSearchOpen(true);
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [ff_2396]);
+
     return authenticated ? (
         <div className="flex h-full">
             <MobileSidebar
@@ -297,6 +319,8 @@ function App() {
             </div>
 
             <Toaster />
+
+            {ff_2396 && <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />}
         </div>
     ) : (
         <Outlet />
