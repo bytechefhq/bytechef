@@ -1,0 +1,21 @@
+extend type Query {
+    clusterElementComponentConnections(
+        workflowId: String!
+        workflowNodeName: String!
+        clusterElementType: String!
+        clusterElementWorkflowNodeName: String!
+    ): [ComponentConnection!]!
+
+    workflowNodeComponentConnections(
+        workflowId: String!
+        workflowNodeName: String!
+    ): [ComponentConnection!]!
+}
+
+type ComponentConnection {
+    componentName: String!
+    componentVersion: Int!
+    key: String!
+    required: Boolean!
+    workflowNodeName: String!
+}

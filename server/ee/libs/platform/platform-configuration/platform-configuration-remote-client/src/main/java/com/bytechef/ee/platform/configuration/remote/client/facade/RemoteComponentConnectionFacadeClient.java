@@ -36,6 +36,13 @@ public class RemoteComponentConnectionFacadeClient implements ComponentConnectio
     }
 
     @Override
+    public List<ComponentConnection> getClusterElementComponentConnections(
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ComponentConnection getComponentConnection(String workflowId, String workflowNodeName, String key) {
         throw new UnsupportedOperationException();
     }
@@ -60,5 +67,10 @@ public class RemoteComponentConnectionFacadeClient implements ComponentConnectio
                 .build(),
             workflowTrigger,
             new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public List<ComponentConnection> getWorkflowNodeComponentConnections(String workflowId, String workflowNodeName) {
+        throw new UnsupportedOperationException();
     }
 }
