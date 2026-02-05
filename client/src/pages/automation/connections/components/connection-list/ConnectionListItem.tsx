@@ -74,6 +74,10 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     });
 
     const disconnectConnectionMutation = useDisconnectConnectionMutation({
+        onError: (error) => {
+            console.error('Failed to disconnect connection:', error);
+            setShowDisconnectDialog(false);
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
@@ -85,11 +89,6 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                 queryKey: ConnectionKeys.connectionTags,
             });
 
-            setShowDisconnectDialog(false);
-        },
-        // eslint-disable-next-line sort-keys
-        onError: (error) => {
-            console.error('Failed to disconnect connection:', error);
             setShowDisconnectDialog(false);
         },
     });
@@ -200,29 +199,28 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                     <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                                 </DropdownMenuTrigger>
 
-                                <DropdownMenuContent
-                                    align="end"
-                                    className="flex w-[193px] flex-col items-start rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-primary p-2.5 shadow-md"
-                                >
+                                <DropdownMenuContent align="end" className="p-0">
                                     <DropdownMenuItem
-                                        className="flex cursor-pointer items-center gap-2 self-stretch px-1 py-2.5 text-sm font-normal leading-5 text-content-neutral-primary hover:bg-surface-neutral-primary-hover focus:bg-surface-neutral-primary-hover"
+                                        className="dropdown-menu-item"
                                         onClick={() => setShowEditDialog(true)}
                                     >
-                                        <EditIcon className="size-4" /> Edit
-                                    </DropdownMenuItem>
-
-                                    <DropdownMenuItem
-                                        className="flex cursor-pointer items-center gap-2 self-stretch px-1 py-2.5 text-sm font-normal leading-5 text-content-neutral-primary hover:bg-surface-neutral-primary-hover focus:bg-surface-neutral-primary-hover"
-                                        onClick={() => setShowDisconnectDialog(true)}
-                                    >
-                                        <Link2OffIcon className="size-4" /> Disconnect from all
+                                        <EditIcon /> Edit
                                     </DropdownMenuItem>
 
                                     <DropdownMenuSeparator className="m-0" />
 
+                                    {connection.active && (
+                                        <DropdownMenuItem
+                                            className="dropdown-menu-item"
+                                            onClick={() => setShowDisconnectDialog(true)}
+                                        >
+                                            <Link2OffIcon /> Disconnect from all
+                                        </DropdownMenuItem>
+                                    )}
+
                                     <DropdownMenuItem
                                         className={twMerge(
-                                            'flex cursor-pointer items-center gap-2 self-stretch px-1 py-2.5 text-sm font-normal leading-5 text-content-destructive-primary hover:bg-surface-destructive-secondary hover:text-content-destructive-primary focus:bg-surface-destructive-secondary focus:text-content-destructive-primary',
+                                            'dropdown-menu-item-destructive',
                                             connection.active &&
                                                 'cursor-not-allowed opacity-50 hover:bg-transparent hover:text-content-destructive-primary focus:bg-transparent focus:text-content-destructive-primary'
                                         )}
@@ -234,7 +232,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                                 : undefined
                                         }
                                     >
-                                        <Trash2Icon className="size-4" /> Delete
+                                        <Trash2Icon /> Delete
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
