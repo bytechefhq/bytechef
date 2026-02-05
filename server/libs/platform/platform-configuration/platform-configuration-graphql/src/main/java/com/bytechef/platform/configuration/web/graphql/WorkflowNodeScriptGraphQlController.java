@@ -52,7 +52,14 @@ public class WorkflowNodeScriptGraphQlController {
     @MutationMapping
     public ScriptTestExecutionDTO testClusterElementScript(
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String clusterElementType,
-        @Argument String clusterElementWorkflowNodeName, @Argument Long environmentId) {
+        @Argument String clusterElementWorkflowNodeName, @Argument Long environmentId,
+        @Argument Map<String, Object> inputParameters) {
+
+        if (inputParameters != null) {
+            return workflowNodeScriptFacade.testClusterElementScript(
+                workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId,
+                inputParameters);
+        }
 
         return workflowNodeScriptFacade.testClusterElementScript(
             workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId);
@@ -60,7 +67,13 @@ public class WorkflowNodeScriptGraphQlController {
 
     @MutationMapping
     public ScriptTestExecutionDTO testWorkflowNodeScript(
-        @Argument String workflowId, @Argument String workflowNodeName, @Argument Long environmentId) {
+        @Argument String workflowId, @Argument String workflowNodeName, @Argument Long environmentId,
+        @Argument Map<String, Object> inputParameters) {
+
+        if (inputParameters != null) {
+            return workflowNodeScriptFacade.testWorkflowNodeScript(
+                workflowId, workflowNodeName, environmentId, inputParameters);
+        }
 
         return workflowNodeScriptFacade.testWorkflowNodeScript(workflowId, workflowNodeName, environmentId);
     }
