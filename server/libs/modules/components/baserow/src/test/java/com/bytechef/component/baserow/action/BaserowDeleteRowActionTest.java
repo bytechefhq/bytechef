@@ -18,37 +18,47 @@ package com.bytechef.component.baserow.action;
 
 import static com.bytechef.component.baserow.constant.BaserowConstants.ROW_ID;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TABLE_ID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
+/**
+ * @author Monika Kušter
+ */
+@ExtendWith(MockContextSetupExtension.class)
 class BaserowDeleteRowActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(TABLE_ID, 1, ROW_ID, 1));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(null);
+    void testPerform(
+        Context mockedContext, Http.Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor) {
 
-        Object result = BaserowDeleteRowAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+
+        Object result = BaserowDeleteRowAction.perform(mockedParameters, null, mockedContext);
 
         assertNull(result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+        assertEquals("/database/rows/table/1/1/", stringArgumentCaptor.getValue());
     }
 }
