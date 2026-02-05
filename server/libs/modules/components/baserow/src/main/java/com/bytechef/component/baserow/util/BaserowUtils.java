@@ -16,7 +16,7 @@
 
 package com.bytechef.component.baserow.util;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
@@ -30,8 +30,8 @@ public class BaserowUtils {
     private BaserowUtils() {
     }
 
-    public static List<Map<String, ?>> getTableFields(ActionContext actionContext, String tableId) {
-        return actionContext
+    public static List<Map<String, ?>> getTableFields(Context context, String tableId) {
+        return context
             .http(http -> http.get("/database/fields/table/" + tableId + "/"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
