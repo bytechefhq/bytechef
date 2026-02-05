@@ -60,6 +60,19 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
     }
 
     @Override
+    public ComponentConnection getClusterElementComponentConnection(
+        String workflowId, String workflowNodeName, String clusterElementType,
+        String clusterElementWorkflowNodeName, String key) {
+
+        return getClusterElementComponentConnections(
+            workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName)
+                .stream()
+                .filter(componentConnection -> Objects.equals(componentConnection.key(), key))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    @Override
     public List<ComponentConnection> getClusterElementComponentConnections(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName) {

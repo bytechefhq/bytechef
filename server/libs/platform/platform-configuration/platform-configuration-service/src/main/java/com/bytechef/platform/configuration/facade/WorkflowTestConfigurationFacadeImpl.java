@@ -102,6 +102,27 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
+    public void saveClusterElementTestConfigurationConnection(
+        String workflowId, String workflowNodeName, String clusterElementType,
+        String clusterElementWorkflowNodeName, String workflowConnectionKey, long connectionId,
+        long environmentId) {
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        ComponentConnection componentConnection = componentConnectionFacade.getClusterElementComponentConnection(
+            workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, workflowConnectionKey);
+
+        if (!Objects.equals(connection.getComponentName(), componentConnection.componentName())) {
+            throw new ConfigurationException(
+                "Connection component name does not match workflow test configuration connection component name",
+                ConnectionErrorType.INVALID_CONNECTION_COMPONENT_NAME);
+        }
+
+        workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
+            workflowId, workflowNodeName, workflowConnectionKey, connectionId, false, environmentId);
+    }
+
+    @Override
     public void saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
         long environmentId) {

@@ -238,6 +238,62 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         return new ScriptTestExecutionDTO(executionError, getOutputAsMap(outputResponse));
     }
 
+    @Override
+    public ScriptTestExecutionDTO testClusterElementScript(
+        String workflowId, String workflowNodeName, String clusterElementType,
+        String clusterElementWorkflowNodeName, long environmentId, Map<String, Object> inputParameters) {
+
+        ExecutionError executionError = null;
+        WorkflowNodeTestOutput workflowNodeTestOutput = null;
+
+        try {
+            workflowNodeTestOutput = workflowNodeTestOutputFacade.saveClusterElementTestOutput(
+                workflowId, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
+                environmentId, inputParameters);
+        } catch (Exception exception) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(exception.getMessage(), exception);
+            }
+
+            executionError = extractExecutionError(exception);
+        }
+
+        OutputResponse outputResponse = null;
+
+        if (workflowNodeTestOutput != null) {
+            outputResponse = workflowNodeTestOutput.getOutput(Property.class);
+        }
+
+        return new ScriptTestExecutionDTO(executionError, getOutputAsMap(outputResponse));
+    }
+
+    @Override
+    public ScriptTestExecutionDTO testWorkflowNodeScript(
+        String workflowId, String workflowNodeName, long environmentId, Map<String, Object> inputParameters) {
+
+        ExecutionError executionError = null;
+        WorkflowNodeTestOutput workflowNodeTestOutput = null;
+
+        try {
+            workflowNodeTestOutput = workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
+                workflowId, workflowNodeName, environmentId, inputParameters);
+        } catch (Exception exception) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(exception.getMessage(), exception);
+            }
+
+            executionError = extractExecutionError(exception);
+        }
+
+        OutputResponse outputResponse = null;
+
+        if (workflowNodeTestOutput != null) {
+            outputResponse = workflowNodeTestOutput.getOutput(Property.class);
+        }
+
+        return new ScriptTestExecutionDTO(executionError, getOutputAsMap(outputResponse));
+    }
+
     private ExecutionError extractExecutionError(Exception exception) {
         Throwable curException = exception;
         String message = exception.getMessage();

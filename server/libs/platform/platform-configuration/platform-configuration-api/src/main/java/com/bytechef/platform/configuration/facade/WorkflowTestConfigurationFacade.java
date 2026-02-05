@@ -30,6 +30,10 @@ public interface WorkflowTestConfigurationFacade {
 
     void removeUnusedWorkflowTestConfigurationConnections(Workflow workflow);
 
+    void saveClusterElementTestConfigurationConnection(
+        String workflowId, String workflowNodeName, String clusterElementType,
+        String clusterElementWorkflowNodeName, String workflowConnectionKey, long connectionId, long environmentId);
+
     WorkflowTestConfiguration saveWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
 
     void saveWorkflowTestConfigurationConnection(

@@ -34,5 +34,12 @@ public interface WorkflowNodeScriptFacade {
         String workflowId, String workflowNodeName, String clusterElementType,
         String clusterElementWorkflowNodeName, long environmentId);
 
+    ScriptTestExecutionDTO testClusterElementScript(
+        String workflowId, String workflowNodeName, String clusterElementType,
+        String clusterElementWorkflowNodeName, long environmentId, Map<String, Object> inputParameters);
+
     ScriptTestExecutionDTO testWorkflowNodeScript(String workflowId, String workflowNodeName, long environmentId);
+
+    ScriptTestExecutionDTO testWorkflowNodeScript(
+        String workflowId, String workflowNodeName, long environmentId, Map<String, Object> inputParameters);
 }

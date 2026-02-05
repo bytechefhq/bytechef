@@ -36,6 +36,13 @@ public class RemoteComponentConnectionFacadeClient implements ComponentConnectio
     }
 
     @Override
+    public ComponentConnection getClusterElementComponentConnection(
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
+        String key) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ComponentConnection> getClusterElementComponentConnections(
         String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName) {
 
