@@ -17,8 +17,6 @@
 package com.bytechef.component.jira.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
@@ -26,7 +24,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.STATUS_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.TRANSITION;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -46,31 +44,28 @@ public class JiraTransitionIssueAction {
             string(PROJECT)
                 .label("Project ID")
                 .description("ID of the project where the issue is located.")
-                .options((ActionDefinition.OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
-                .required(true),
+                .options((OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
+                .required(false),
             string(ISSUE_ID)
                 .label("Issue ID")
                 .description("ID of the issue to be assigned.")
-                .options((ActionDefinition.OptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
             string(STATUS_ID)
                 .label("Status ID")
                 .description("ID of the status you want to put the issue in.")
-                .options((ActionDefinition.OptionsFunction<String>) JiraOptionsUtils::getStatusIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getStatusIdOptions)
                 .optionsLookupDependsOn(ISSUE_ID)
                 .required(true))
-        .output(outputSchema(bool().description("Returns true if the issue transition was successful.")))
         .perform(JiraTransitionIssueAction::perform);
 
-    public static Boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        context.http(
-            http -> http.post("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/transitions"))
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        context.http(http -> http.post("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/transitions"))
             .body(Http.Body.of(Map.of(TRANSITION, Map.of(ID, inputParameters.getRequiredString(STATUS_ID)))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
-        return true;
+        return null;
     }
 }
