@@ -3797,64 +3797,7 @@
     "help": null,
     "metadata": null,
     "name": "transitionIssue",
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": {
-        "outputSchema": {
-          "advancedOption": null,
-          "controlType": "SELECT",
-          "defaultValue": null,
-          "description": null,
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "metadata": { },
-          "name": null,
-          "options": [ {
-            "description": null,
-            "label": "True",
-            "value": true
-          }, {
-            "description": null,
-            "label": "False",
-            "value": false
-          } ],
-          "placeholder": null,
-          "required": null,
-          "type": "BOOLEAN"
-        },
-        "placeholder": null,
-        "sampleOutput": null
-      },
-      "outputSchema": {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "name": null,
-        "options": [ {
-          "description": null,
-          "label": "True",
-          "value": true
-        }, {
-          "description": null,
-          "label": "False",
-          "value": false
-        } ],
-        "placeholder": null,
-        "required": null,
-        "type": "BOOLEAN"
-      },
-      "sampleOutput": null
-    },
+    "outputDefinition": null,
     "perform": { },
     "processErrorResponse": null,
     "properties": [ {
@@ -3880,7 +3823,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -7724,64 +7667,7 @@
     "description": "Move an issue to another status.",
     "element": { },
     "help": null,
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": {
-        "outputSchema": {
-          "advancedOption": null,
-          "controlType": "SELECT",
-          "defaultValue": null,
-          "description": null,
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "metadata": { },
-          "name": null,
-          "options": [ {
-            "description": null,
-            "label": "True",
-            "value": true
-          }, {
-            "description": null,
-            "label": "False",
-            "value": false
-          } ],
-          "placeholder": null,
-          "required": null,
-          "type": "BOOLEAN"
-        },
-        "placeholder": null,
-        "sampleOutput": null
-      },
-      "outputSchema": {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "name": null,
-        "options": [ {
-          "description": null,
-          "label": "True",
-          "value": true
-        }, {
-          "description": null,
-          "label": "False",
-          "value": false
-        } ],
-        "placeholder": null,
-        "required": null,
-        "type": "BOOLEAN"
-      },
-      "sampleOutput": null
-    },
+    "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
@@ -7806,7 +7692,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
