@@ -106,11 +106,10 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @WorkflowCacheEvict(cacheNames = {
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
-    },
-        environmentIdParam = "environmentId",
-        workflowIdParam = "workflowId")
+    })
     public WorkflowNodeTestOutput saveWorkflowNodeSampleOutput(
-        String workflowId, String workflowNodeName, Object sampleOutput, long environmentId) {
+        @WorkflowCacheEvict.WorkflowIdParam String workflowId, String workflowNodeName, Object sampleOutput,
+        @WorkflowCacheEvict.EnvironmentIdParam long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -137,13 +136,11 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @WorkflowCacheEvict(cacheNames = {
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
-    },
-        environmentIdParam = "environmentId",
-        workflowIdParam = "workflowId")
+    })
     @SuppressWarnings("unchecked")
     public WorkflowNodeTestOutput saveClusterElementTestOutput(
-        String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName, long environmentId) {
+        @WorkflowCacheEvict.WorkflowIdParam String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName, @WorkflowCacheEvict.EnvironmentIdParam long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -199,11 +196,10 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @WorkflowCacheEvict(cacheNames = {
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
-    },
-        environmentIdParam = "environmentId",
-        workflowIdParam = "workflowId")
+    })
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, long environmentId) {
+        @WorkflowCacheEvict.WorkflowIdParam String workflowId, String workflowNodeName,
+        @WorkflowCacheEvict.EnvironmentIdParam long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 

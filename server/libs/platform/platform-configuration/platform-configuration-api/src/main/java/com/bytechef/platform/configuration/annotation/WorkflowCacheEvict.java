@@ -25,6 +25,11 @@ import java.lang.annotation.Target;
  * Annotation to mark methods that should trigger cache cleaning for a workflow. The aspect will intercept these methods
  * and call the CacheCleanManager to clear the specified caches.
  *
+ * <p>
+ * Use {@link EnvironmentIdParam} and {@link WorkflowIdParam} annotations on method parameters to identify the
+ * environment ID and workflow ID for the cache eviction operation.
+ * </p>
+ *
  * @author Ivica Cardic
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -39,16 +44,26 @@ public @interface WorkflowCacheEvict {
     String[] cacheNames();
 
     /**
-     * The name of the parameter that contains the environment ID.
+     * Marks a method parameter as the environment ID for cache eviction operations. Used in conjunction with
+     * {@link WorkflowCacheEvict} to identify which parameter contains the environment ID without relying on parameter
+     * name reflection.
      *
-     * @return the name of the parameter that contains the workflow ID
+     * @author Ivica Cardic
      */
-    String environmentIdParam();
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.PARAMETER)
+    @interface EnvironmentIdParam {
+    }
 
     /**
-     * The name of the parameter that contains the workflow ID.
+     * Marks a method parameter as the workflow ID for cache eviction operations. Used in conjunction with
+     * {@link WorkflowCacheEvict} to identify which parameter contains the workflow ID without relying on parameter name
+     * reflection.
      *
-     * @return the name of the parameter that contains the workflow ID
+     * @author Ivica Cardic
      */
-    String workflowIdParam();
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.PARAMETER)
+    @interface WorkflowIdParam {
+    }
 }
