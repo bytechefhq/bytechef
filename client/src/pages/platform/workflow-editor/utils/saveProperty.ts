@@ -55,6 +55,30 @@ export default function saveProperty({
 
     const decodedPath = decodePath(path);
 
+    function handleSuccess(response: DeleteClusterElementParameter200Response & {workflowNodeName?: string}) {
+        if (successCallback) {
+            successCallback();
+        }
+
+        if (currentComponent) {
+            useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
+                ...currentComponent,
+                displayConditions: response.displayConditions,
+                metadata: response.metadata,
+                parameters: response.parameters,
+            });
+        }
+
+        if (currentNode) {
+            useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({
+                ...currentNode,
+                displayConditions: response.displayConditions,
+                metadata: response.metadata,
+                parameters: response.parameters,
+            });
+        }
+    }
+
     if (currentNode && currentNode.clusterElementType) {
         updateClusterElementParameterMutation?.mutate(
             {
@@ -72,25 +96,7 @@ export default function saveProperty({
                 workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
             },
             {
-                onSuccess: (response) => {
-                    if (successCallback) {
-                        successCallback();
-                    }
-
-                    useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
-                        ...currentComponent,
-                        displayConditions: response.displayConditions,
-                        metadata: response.metadata,
-                        parameters: response.parameters,
-                    });
-
-                    useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({
-                        ...currentNode,
-                        displayConditions: response.displayConditions,
-                        metadata: response.metadata,
-                        parameters: response.parameters,
-                    });
-                },
+                onSuccess: (response) => handleSuccess(response),
             }
         );
 
@@ -110,27 +116,7 @@ export default function saveProperty({
             workflowNodeName: currentComponent.workflowNodeName,
         },
         {
-            onSuccess: (response) => {
-                if (successCallback) {
-                    successCallback();
-                }
-
-                useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
-                    ...currentComponent,
-                    displayConditions: response.displayConditions,
-                    metadata: response.metadata,
-                    parameters: response.parameters,
-                });
-
-                if (currentNode) {
-                    useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({
-                        ...currentNode,
-                        displayConditions: response.displayConditions,
-                        metadata: response.metadata,
-                        parameters: response.parameters,
-                    });
-                }
-            },
+            onSuccess: (response) => handleSuccess(response),
         }
     );
 }
