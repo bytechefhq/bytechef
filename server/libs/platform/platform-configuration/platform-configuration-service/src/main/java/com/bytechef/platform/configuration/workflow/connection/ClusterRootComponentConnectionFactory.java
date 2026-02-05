@@ -71,6 +71,23 @@ class ClusterRootComponentConnectionFactory
         return Optional.ofNullable(componentDefinition.isClusterRoot() ? this : null);
     }
 
+    private ComponentConnection getComponentConnection(
+        String workflowNodeName, String workflowConnectionKey, String componentName, int componentVersion) {
+
+        ComponentConnection componentConnection = null;
+
+        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+            componentName, componentVersion);
+
+        if (componentDefinition.getConnection() != null) {
+            componentConnection = ComponentConnection.of(
+                workflowNodeName, workflowConnectionKey, componentDefinition.getName(),
+                componentDefinition.getVersion(), componentDefinition.isConnectionRequired());
+        }
+
+        return componentConnection;
+    }
+
     private List<ComponentConnection> getComponentConnections(
         ClusterElementMap clusterElementMap, String workflowNodeName) {
 
@@ -107,27 +124,20 @@ class ClusterRootComponentConnectionFactory
                 }
 
                 componentConnections.addAll(
+                    ComponentConnection.of(
+                        clusterElement.getExtensions(), workflowNodeName,
+                        (name, version) -> {
+                            ComponentDefinition curComponentDefinition =
+                                componentDefinitionService.getComponentDefinition(name, version);
+
+                            return curComponentDefinition.isConnectionRequired();
+                        }));
+
+                componentConnections.addAll(
                     getComponentConnections(ClusterElementMap.of(clusterElement.getExtensions()), workflowNodeName));
             }
         }
 
         return new ArrayList<>(componentConnections);
-    }
-
-    private ComponentConnection getComponentConnection(
-        String workflowNodeName, String workflowConnectionKey, String componentName, int componentVersion) {
-
-        ComponentConnection componentConnection = null;
-
-        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-            componentName, componentVersion);
-
-        if (componentDefinition.getConnection() != null) {
-            componentConnection = ComponentConnection.of(
-                workflowNodeName, workflowConnectionKey, componentDefinition.getName(),
-                componentDefinition.getVersion(), componentDefinition.isConnectionRequired());
-        }
-
-        return componentConnection;
     }
 }

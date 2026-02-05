@@ -26,9 +26,14 @@ import java.util.List;
  */
 public interface ComponentConnectionFacade {
 
+    List<ComponentConnection> getClusterElementComponentConnections(
+        String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName);
+
     ComponentConnection getComponentConnection(String workflowId, String workflowNodeName, String key);
 
     List<ComponentConnection> getComponentConnections(WorkflowTask workflowTask);
 
     List<ComponentConnection> getComponentConnections(WorkflowTrigger workflowTrigger);
+
+    List<ComponentConnection> getWorkflowNodeComponentConnections(String workflowId, String workflowNodeName);
 }
