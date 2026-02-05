@@ -160,13 +160,8 @@ public class JiraOptionsUtils {
 
         if (body.get("transitions") instanceof List<?> list) {
             for (Object object : list) {
-                if (object instanceof Map<?, ?> map &&
-                    map.get("to") instanceof Map<?, ?> to) {
-
-                    String name = (String) to.get("name");
-                    String id = (String) map.get("id");
-
-                    options.add(option(name, id));
+                if (object instanceof Map<?, ?> map && map.get("to") instanceof Map<?, ?> to) {
+                    options.add(option((String) to.get("name"), (String) map.get("id")));
                 }
             }
         }

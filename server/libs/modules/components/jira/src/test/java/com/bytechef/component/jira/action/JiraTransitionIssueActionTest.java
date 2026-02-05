@@ -22,7 +22,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.STATUS_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.TRANSITION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -74,9 +74,9 @@ class JiraTransitionIssueActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        Boolean result = JiraTransitionIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = JiraTransitionIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        assertTrue(result);
+        assertNull(result);
 
         assertEquals("/issue/testIssue/transitions", stringArgumentCaptor.getValue());
 
