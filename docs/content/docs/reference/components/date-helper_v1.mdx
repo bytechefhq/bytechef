@@ -26,7 +26,7 @@ Name: addTime
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputDate | Date | DATE_TIME |  | true |
+| date | Date | DATE_TIME | Date to which time will be added. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 | dateFormat | Date Format | STRING <details> <summary> Options </summary> <span title="Sun Sep 17 2023 11:23:58">EEE MMM dd yyyy HH:mm:ss</span>, <span title="Sun Sep 17 11:23:58 2023">EEE MMM dd HH:mm:ss yyyy</span>, <span title="September 17 2023 11:23:58">MMMM dd yyyy HH:mm:ss</span>, <span title="September 17 2023">MMMM dd yyyy</span>, <span title="Sep 17 2023">MMM dd yyyy</span>, <span title="2023-09-17T11:23:58">yyyy-MM-dd'T'HH:mm:ss</span>, <span title="2023-09-17 11:23:58">yyyy-MM-dd HH:mm:ss</span>, <span title="2023-09-17">yyyy-MM-dd</span>, <span title="09-17-2023">MM-dd-yyyy</span>, <span title="09/17/2023">MM/dd/yyyy</span>, <span title="09/17/23">MM/dd/yy</span>, <span title="17-09-2023">dd-MM-yyyy</span>, <span title="17/09/2023">dd/MM/yyyy</span>, <span title="17.09.2023">dd.MM.yyyy</span>, <span title="17/09/23">dd/MM/yy</span>, <span title="17.09.23">dd.MM.yy</span>, <span title="1694949838">UnixTimestamp</span> </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
 | year | Year | INTEGER | Years to add. | false |
 | month | Month | INTEGER | Months to add. | false |
@@ -41,7 +41,7 @@ Name: addTime
   "label" : "Add Time",
   "name" : "addTime",
   "parameters" : {
-    "inputDate" : "2021-01-01T00:00:00",
+    "date" : "2021-01-01T00:00:00",
     "dateFormat" : "",
     "year" : 1,
     "month" : 1,
@@ -78,9 +78,9 @@ Name: compareDates
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| dateA | Date A | DATE_TIME | First date that will be compared. | true |
-| dateB | Date B | DATE_TIME | Second date that will be compared. | true |
-| resolution | Resolution | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span> </details> | The resolution at which the dates will be compared. | true |
+| dateA | Date A | DATE_TIME | First date that will be compared. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
+| dateB | Date B | DATE_TIME | Second date that will be compared. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
+| resolution | Resolution | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span> </details> | The resolution at which the dates will be compared. Chosen resolution will be the smallest time unit that will be compared. | true |
 | comparison | Comparison | STRING <details> <summary> Options </summary> <span>IS_AFTER</span>, <span>IS_AFTER_OR_EQUAL</span>, <span>IS_BEFORE</span>, <span>IS_BEFORE_OR_EQUAL</span>, <span>IS_EQUAL</span> </details> | The type of comparison to be performed. | true |
 
 #### Example JSON Structure
@@ -122,8 +122,8 @@ Name: compareTimes
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| dateA | Date A | DATE_TIME | First date that will be compared. | true |
-| dateB | Date B | DATE_TIME | Second date that will be compared. | true |
+| dateA | Date A | DATE_TIME | First date that will be compared. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
+| dateB | Date B | DATE_TIME | Second date that will be compared. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 | comparison | Comparison | STRING <details> <summary> Options </summary> <span>IS_AFTER</span>, <span>IS_AFTER_OR_EQUAL</span>, <span>IS_BEFORE</span>, <span>IS_BEFORE_OR_EQUAL</span>, <span>IS_EQUAL</span> </details> | The type of comparison to be performed. | true |
 
 #### Example JSON Structure
@@ -204,8 +204,8 @@ Name: dateDifference
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| startDate | Start Date | DATE_TIME |  | true |
-| endDate | End Date | DATE_TIME |  | true |
+| startDate | Start Date | DATE_TIME | Start date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
+| endDate | End Date | DATE_TIME | End date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 | unit | Unit | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span> </details> | The unit of difference between the two dates. | true |
 
 #### Example JSON Structure
@@ -246,7 +246,7 @@ Name: dateIsInLast
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| date | Date | DATE_TIME | Date for which you want to check is it in the last X number of selected time units. | true |
+| date | Date | DATE_TIME | Date for which you want to check is it in the last X number of selected time units. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 | timeZone | Time Zone | STRING | Time zone to use when checking the date. | true |
 | inLast | In Last | INTEGER | Number of how many time units. | true |
 | unit | Unit | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span> </details> | The unit of difference between the two dates. | true |
@@ -290,7 +290,7 @@ Name: extractDateUnits
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputDate | Date | DATE_TIME | The date from which to extract the specified unit. | true |
+| date | Date | DATE_TIME | The date from which to extract the specified unit. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 | unit | Unit to Extract | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span>, <span>dayOfWeek</span>, <span>monthName</span>, <span>date</span>, <span>time</span> </details> | Unit to extract from the input date. | true |
 
 #### Example JSON Structure
@@ -299,7 +299,7 @@ Name: extractDateUnits
   "label" : "Extract Date Units",
   "name" : "extractDateUnits",
   "parameters" : {
-    "inputDate" : "2021-01-01T00:00:00",
+    "date" : "2021-01-01T00:00:00",
     "unit" : ""
   },
   "type" : "dateHelper/v1/extractDateUnits"
@@ -324,7 +324,7 @@ Name: formatDate
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| date | Date | DATE_TIME | Date which you want to format | true |
+| date | Date | DATE_TIME | Date which you want to format. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 | dateFormat | Date Format | STRING <details> <summary> Options </summary> <span title="Sun Sep 17 2023 11:23:58">EEE MMM dd yyyy HH:mm:ss</span>, <span title="Sun Sep 17 11:23:58 2023">EEE MMM dd HH:mm:ss yyyy</span>, <span title="September 17 2023 11:23:58">MMMM dd yyyy HH:mm:ss</span>, <span title="September 17 2023">MMMM dd yyyy</span>, <span title="Sep 17 2023">MMM dd yyyy</span>, <span title="2023-09-17T11:23:58">yyyy-MM-dd'T'HH:mm:ss</span>, <span title="2023-09-17 11:23:58">yyyy-MM-dd HH:mm:ss</span>, <span title="2023-09-17">yyyy-MM-dd</span>, <span title="09-17-2023">MM-dd-yyyy</span>, <span title="09/17/2023">MM/dd/yyyy</span>, <span title="09/17/23">MM/dd/yy</span>, <span title="17-09-2023">dd-MM-yyyy</span>, <span title="17/09/2023">dd/MM/yyyy</span>, <span title="17.09.2023">dd.MM.yyyy</span>, <span title="17/09/23">dd/MM/yy</span>, <span title="17.09.23">dd.MM.yy</span>, <span title="1694949838">UnixTimestamp</span> </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
 
 #### Example JSON Structure
@@ -404,8 +404,8 @@ Name: getDaysBetween
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| dateA | Start Date | DATE_TIME | Start date of the interval. | true |
-| dateB | End Date | DATE_TIME | End date of the interval. | true |
+| dateA | Start Date | DATE_TIME | Start date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
+| dateB | End Date | DATE_TIME | End date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 
 #### Example JSON Structure
 ```json
@@ -484,8 +484,8 @@ Name: getTimeBetween
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| dateA | Start Date | DATE_TIME | Start date of the interval. | true |
-| dateB | End Date | DATE_TIME | End date of the interval. | true |
+| dateA | Start Date | DATE_TIME | Start date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
+| dateB | End Date | DATE_TIME | End date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 
 #### Example JSON Structure
 ```json
@@ -545,7 +545,7 @@ Name: getTimeFromNow
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| date | Date | DATE_TIME | Date to which time will be calculated. | true |
+| date | Date | DATE_TIME | Date to which time will be calculated. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 
 #### Example JSON Structure
 ```json
@@ -583,10 +583,10 @@ Name: IsBetweenDates
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| date | Date | DATE_TIME | Date to check if it is in the range. | true |
-| dateA | Start Date | DATE_TIME | Start date of the interval. | true |
-| dateB | End Date | DATE_TIME | End date of the interval. | true |
-| resolution | Resolution | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span> </details> | The resolution at which the dates will be compared. | true |
+| date | Date | DATE_TIME | Date to check if it is in the range. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format. | true |
+| dateA | Start Date | DATE_TIME | Start date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
+| dateB | End Date | DATE_TIME | End date of the interval. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
+| resolution | Resolution | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span> </details> | The resolution at which the dates will be compared. Chosen resolution will be the smallest time unit that will be compared. | true |
 | inclusive | Inclusive | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the boundary is inclusive or not. | false |
 
 #### Example JSON Structure
@@ -629,7 +629,7 @@ Name: IsBetweenTimes
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| date | Date | DATE_TIME | Date to check if it is in the range. | true |
+| date | Date | DATE_TIME | Date to check if it is in the range. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 | timeA | Start Time | TIME | Start time of the interval. | true |
 | timeB | End Time | TIME | End time of the interval. | true |
 | inclusive | Inclusive | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the boundary is inclusive or not. | false |
@@ -675,7 +675,7 @@ Name: isBusinessHours
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputDate | Date | DATE_TIME | Date to check to see if it is business hours. | true |
+| date | Date | DATE_TIME | Date to check to see if it is business hours. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 | businessWeekStart | Business Week Start | INTEGER <details> <summary> Options </summary> <span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, <span>5</span>, <span>6</span>, <span>7</span> </details> | First day of the business week. | true |
 | businessWeekEnd | Business Week End | INTEGER <details> <summary> Options </summary> <span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, <span>5</span>, <span>6</span>, <span>7</span> </details> | Last day of the business week. | true |
 | businessHoursStart | Business Hours Start | TIME | Time of the day that business hours start. | true |
@@ -688,7 +688,7 @@ Name: isBusinessHours
   "label" : "Is Business Hours?",
   "name" : "isBusinessHours",
   "parameters" : {
-    "inputDate" : "2021-01-01T00:00:00",
+    "date" : "2021-01-01T00:00:00",
     "businessWeekStart" : 1,
     "businessWeekEnd" : 1,
     "businessHoursStart" : "00:00:00",
@@ -723,7 +723,7 @@ Name: isWeekend
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputDate | Date | DATE_TIME | Date to check to see if it is a weekend. | true |
+| date | Date | DATE_TIME | Date to check to see if it is a weekend. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 | timeZone | Time Zone | STRING | Time zone you are in. | true |
 
 #### Example JSON Structure
@@ -732,7 +732,7 @@ Name: isWeekend
   "label" : "Is Weekend?",
   "name" : "isWeekend",
   "parameters" : {
-    "inputDate" : "2021-01-01T00:00:00",
+    "date" : "2021-01-01T00:00:00",
     "timeZone" : ""
   },
   "type" : "dateHelper/v1/isWeekend"
@@ -763,7 +763,7 @@ Name: subtractTime
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputDate | Date | DATE_TIME |  | true |
+| date | Date | DATE_TIME | Date from which time will be subtracted. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date action to transform the date format | true |
 | dateFormat | Date Format | STRING <details> <summary> Options </summary> <span title="Sun Sep 17 2023 11:23:58">EEE MMM dd yyyy HH:mm:ss</span>, <span title="Sun Sep 17 11:23:58 2023">EEE MMM dd HH:mm:ss yyyy</span>, <span title="September 17 2023 11:23:58">MMMM dd yyyy HH:mm:ss</span>, <span title="September 17 2023">MMMM dd yyyy</span>, <span title="Sep 17 2023">MMM dd yyyy</span>, <span title="2023-09-17T11:23:58">yyyy-MM-dd'T'HH:mm:ss</span>, <span title="2023-09-17 11:23:58">yyyy-MM-dd HH:mm:ss</span>, <span title="2023-09-17">yyyy-MM-dd</span>, <span title="09-17-2023">MM-dd-yyyy</span>, <span title="09/17/2023">MM/dd/yyyy</span>, <span title="09/17/23">MM/dd/yy</span>, <span title="17-09-2023">dd-MM-yyyy</span>, <span title="17/09/2023">dd/MM/yyyy</span>, <span title="17.09.2023">dd.MM.yyyy</span>, <span title="17/09/23">dd/MM/yy</span>, <span title="17.09.23">dd.MM.yy</span>, <span title="1694949838">UnixTimestamp</span> </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
 | year | Year | INTEGER | Years to subtract. | false |
 | month | Month | INTEGER | Months to subtract. | false |
@@ -778,7 +778,7 @@ Name: subtractTime
   "label" : "Subtract Time",
   "name" : "subtractTime",
   "parameters" : {
-    "inputDate" : "2021-01-01T00:00:00",
+    "date" : "2021-01-01T00:00:00",
     "dateFormat" : "",
     "year" : 1,
     "month" : 1,
