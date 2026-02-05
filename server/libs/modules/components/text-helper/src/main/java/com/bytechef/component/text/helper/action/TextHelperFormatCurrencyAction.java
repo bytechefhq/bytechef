@@ -53,7 +53,7 @@ public class TextHelperFormatCurrencyAction {
                 .required(true),
             integer(DECIMAL_DIGITS)
                 .label("Decimal Digits")
-                .description("Digits you would like after your decimal.")
+                .description("Number of digits that will be visible after the decimal seperator.")
                 .required(true),
             string(DECIMAL_SEPARATOR)
                 .label("Decimal Separator")

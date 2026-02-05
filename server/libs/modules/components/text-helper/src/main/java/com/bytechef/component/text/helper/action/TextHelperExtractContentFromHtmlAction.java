@@ -53,16 +53,18 @@ public class TextHelperExtractContentFromHtmlAction {
         .properties(
             string(CONTENT)
                 .label("HTML Content")
-                .description("HTML content to extract content from.")
+                .description("The full HTML document or fragment to extract data from.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             string(QUERY_SELECTOR)
                 .label("CSS Selector")
-                .description("The CSS selector to search for.")
+                .description(
+                    "A CSS selector used to locate the element(s) you want to extract (for example: div.article, " +
+                        "a[href], #title).")
                 .required(true),
             string(RETURN_VALUE)
                 .label("Return Value")
-                .description("The data to return.")
+                .description("Specifies what content should be extracted from the matched element(s).")
                 .options(
                     option(
                         "Attribute", ReturnValue.ATTRIBUTE.name(),
@@ -73,13 +75,16 @@ public class TextHelperExtractContentFromHtmlAction {
                 .defaultValue("html"),
             string(TextHelperConstants.ATTRIBUTE)
                 .label("Attribute")
-                .description("The name of the attribute to return the value of")
+                .description(
+                    "The name of the HTML attribute to extract from the matched element(s) (for example: href, src, " +
+                        "or class).")
                 .required(true)
                 .displayCondition("%s == '%s'".formatted(RETURN_VALUE, ReturnValue.ATTRIBUTE.name())),
             bool(RETURN_ARRAY)
                 .label("Return Array")
                 .description(
-                    "If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string."))
+                    "If selected, then extracted individual items are returned as an array. If you don't set this, " +
+                        "all values are returned as a single string."))
         .output()
         .help(
             "",
