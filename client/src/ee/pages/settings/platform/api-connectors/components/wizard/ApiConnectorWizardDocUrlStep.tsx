@@ -3,10 +3,10 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import IconField from '@/ee/pages/settings/platform/api-connectors/components/IconField';
 
-import useApiConnectorWizardDocUrlStep from './hooks/useApiConnectorWizardDocUrlStep';
+import useApiConnectorWizard from './hooks/useApiConnectorWizard';
 
 const ApiConnectorWizardDocUrlStep = () => {
-    const {control, form} = useApiConnectorWizardDocUrlStep();
+    const {control, form} = useApiConnectorWizard('docUrl');
 
     return (
         <Form {...form}>

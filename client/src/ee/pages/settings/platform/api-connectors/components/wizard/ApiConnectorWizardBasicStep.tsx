@@ -2,10 +2,10 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import IconField from '@/ee/pages/settings/platform/api-connectors/components/IconField';
 
-import useApiConnectorWizardBasicStep from './hooks/useApiConnectorWizardBasicStep';
+import useApiConnectorWizard from './hooks/useApiConnectorWizard';
 
 const ApiConnectorWizardBasicStep = () => {
-    const {control, form} = useApiConnectorWizardBasicStep();
+    const {control, form} = useApiConnectorWizard('basic');
 
     return (
         <Form {...form}>

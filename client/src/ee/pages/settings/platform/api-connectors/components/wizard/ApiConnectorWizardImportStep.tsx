@@ -3,10 +3,10 @@ import {Input} from '@/components/ui/input';
 import IconField from '@/ee/pages/settings/platform/api-connectors/components/IconField';
 import OpenApiSpecificationField from '@/ee/pages/settings/platform/api-connectors/components/OpenApiSpecificationField';
 
-import useApiConnectorWizardImportStep from './hooks/useApiConnectorWizardImportStep';
+import useApiConnectorWizard from './hooks/useApiConnectorWizard';
 
 const ApiConnectorWizardImportStep = () => {
-    const {control, form} = useApiConnectorWizardImportStep();
+    const {control, form} = useApiConnectorWizard('import');
 
     return (
         <Form {...form}>

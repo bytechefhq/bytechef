@@ -52,37 +52,35 @@ const ApiConnectorWizardLayout = ({
                         <div className="flex items-center justify-between">
                             <h1 className="text-lg font-semibold">{pageTitleWithStep}</h1>
 
-                            <button
+                            <Button
                                 aria-label="Close"
-                                className="inline-flex size-9 items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                icon={<Cross2Icon className="size-4" />}
                                 onClick={onCancel}
-                                type="button"
-                            >
-                                <Cross2Icon className="size-4" />
-                            </button>
+                                size="icon"
+                                variant="ghost"
+                            />
                         </div>
 
                         <nav aria-label="Progress">
                             <ol className="space-y-4 md:flex md:space-y-0" role="list">
-                                {steps.map((stepLabel, index) => (
-                                    <li className="md:flex-1" key={stepLabel}>
-                                        <div
+                                {steps.map((step, index) => (
+                                    <li
+                                        className={twMerge(
+                                            'group flex flex-col border-l-4 py-2 pl-4 md:flex-1 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-2',
+                                            index <= currentStep
+                                                ? 'border-gray-900 hover:border-gray-800'
+                                                : 'border-gray-200 hover:border-gray-300'
+                                        )}
+                                        key={step}
+                                    >
+                                        <span
                                             className={twMerge(
-                                                'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-2',
-                                                index <= currentStep
-                                                    ? 'border-gray-900 hover:border-gray-800'
-                                                    : 'border-gray-200 hover:border-gray-300'
+                                                'text-xs font-medium',
+                                                index <= currentStep ? 'text-gray-900' : 'text-gray-500'
                                             )}
                                         >
-                                            <span
-                                                className={twMerge(
-                                                    'text-xs font-medium',
-                                                    index <= currentStep ? 'text-gray-900' : 'text-gray-500'
-                                                )}
-                                            >
-                                                {stepLabel}
-                                            </span>
-                                        </div>
+                                            {step}
+                                        </span>
                                     </li>
                                 ))}
                             </ol>
