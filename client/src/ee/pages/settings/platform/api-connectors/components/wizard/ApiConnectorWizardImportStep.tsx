@@ -49,7 +49,7 @@ const ApiConnectorWizardImportStep = () => {
                     name="specification"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Open API Specification</FormLabel>
+                            <FormLabel>OpenAPI Specification</FormLabel>
 
                             <FormControl>
                                 <OpenApiSpecificationField field={field} />

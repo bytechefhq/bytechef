@@ -59,19 +59,21 @@ export default function useApiConnectorWizardReviewStep({
             }
 
             if (endpoint.requestBody) {
-                const {data: parsedSchema} = safeJsonParse(
+                const {data: parsedSchema, success: schemaParseSuccess} = safeJsonParse(
                     endpoint.requestBody.schema,
                     `request body schema for ${endpoint.operationId}`
                 );
 
-                operation.requestBody = {
-                    content: {
-                        [endpoint.requestBody.contentType]: {
-                            schema: parsedSchema,
+                if (schemaParseSuccess) {
+                    operation.requestBody = {
+                        content: {
+                            [endpoint.requestBody.contentType]: {
+                                schema: parsedSchema,
+                            },
                         },
-                    },
-                    required: endpoint.requestBody.required,
-                };
+                        required: endpoint.requestBody.required,
+                    };
+                }
             }
 
             endpoint.responses.forEach((response) => {
@@ -80,16 +82,18 @@ export default function useApiConnectorWizardReviewStep({
                 };
 
                 if (response.contentType && response.schema) {
-                    const {data: parsedResponseSchema} = safeJsonParse(
+                    const {data: parsedResponseSchema, success: responseSchemaParseSuccess} = safeJsonParse(
                         response.schema,
                         `response schema for ${endpoint.operationId}`
                     );
 
-                    responseObj.content = {
-                        [response.contentType]: {
-                            schema: parsedResponseSchema,
-                        },
-                    };
+                    if (responseSchemaParseSuccess) {
+                        responseObj.content = {
+                            [response.contentType]: {
+                                schema: parsedResponseSchema,
+                            },
+                        };
+                    }
                 }
 
                 (operation.responses as Record<string, unknown>)[response.statusCode] = responseObj;

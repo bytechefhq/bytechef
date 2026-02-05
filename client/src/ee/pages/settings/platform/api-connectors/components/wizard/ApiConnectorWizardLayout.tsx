@@ -111,7 +111,7 @@ const ApiConnectorWizardLayout = ({
                                 icon={isPending ? <LoadingIcon /> : undefined}
                                 onClick={onSave}
                             >
-                                Save
+                                {primaryLabel}
                             </Button>
                         ) : (
                             <Button
