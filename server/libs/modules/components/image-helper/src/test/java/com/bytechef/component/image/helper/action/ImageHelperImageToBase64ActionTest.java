@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  */
 class ImageHelperImageToBase64ActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
 
     @Test
@@ -44,12 +44,12 @@ class ImageHelperImageToBase64ActionTest {
 
         String encodeToString = EncodingUtils.base64EncodeToString(fileContent);
 
-        when(mockedActionContext.file(any()))
+        when(mockedContext.file(any()))
             .thenReturn(fileContent);
-        when(mockedActionContext.encoder(any()))
+        when(mockedContext.encoder(any()))
             .thenReturn(encodeToString);
 
-        String result = ImageHelperImageToBase64Action.perform(mockedParameters, mockedParameters, mockedActionContext);
+        String result = ImageHelperImageToBase64Action.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(encodeToString, result);
     }
