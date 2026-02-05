@@ -31,6 +31,7 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -100,6 +101,11 @@ public class ComponentTestIntConfiguration {
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
+
+    @Bean
+    LogFileStorage logFileStorage() {
+        return Mockito.mock(LogFileStorage.class);
     }
 
     @Bean

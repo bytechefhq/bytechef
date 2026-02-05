@@ -23,6 +23,8 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
+import com.bytechef.platform.component.log.LogFileStorage;
+import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -39,22 +41,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContextFactoryImpl implements ContextFactory {
 
+    private static final EditorLogFileStorageWriter EDITOR_LOG_FILE_STORAGE_WRITER = new EditorLogFileStorageWriter();
+
     private final ApplicationContext applicationContext;
     private final CacheManager cacheManager;
     private final DataStorage dataStorage;
     private final ApplicationEventPublisher eventPublisher;
+    private final LogFileStorage logFileStorage;
     private final TempFileStorage tempFileStorage;
     private final String publicUrl;
 
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
-        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, TempFileStorage tempFileStorage) {
+        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, LogFileStorage logFileStorage,
+        TempFileStorage tempFileStorage) {
 
         this.applicationContext = applicationContext;
         this.cacheManager = cacheManager;
         this.dataStorage = dataStorage;
         this.eventPublisher = eventPublisher;
+        this.logFileStorage = logFileStorage;
         this.tempFileStorage = tempFileStorage;
         this.publicUrl = applicationProperties.getPublicUrl();
     }
@@ -75,6 +82,7 @@ public class ContextFactoryImpl implements ContextFactory {
             .jobId(jobId)
             .jobPrincipalId(jobPrincipalId)
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+            .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
             .publicUrl(publicUrl)
             .type(type)
             .workflowId(workflowId)
@@ -108,6 +116,7 @@ public class ContextFactoryImpl implements ContextFactory {
                 eventPublisher, getHttpClientExecutor(), tempFileStorage)
             .clusterElementResolver(clusterElementResolver)
             .componentConnection(componentConnection)
+            .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
             .publicUrl(publicUrl)
             .build();
     }
@@ -132,5 +141,13 @@ public class ContextFactoryImpl implements ContextFactory {
 
     private HttpClientExecutor getHttpClientExecutor() {
         return new HttpClientExecutor(applicationContext, tempFileStorage);
+    }
+
+    private LogFileStorageWriter getLogFileStorageWriter(boolean editorEnvironment) {
+        if (editorEnvironment) {
+            return EDITOR_LOG_FILE_STORAGE_WRITER;
+        }
+
+        return logFileStorage;
     }
 }

@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
+import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -61,6 +62,7 @@ class ClusterElementContextImplTest {
 
     @Test
     void testBuilderWithAllFields() {
+        LogFileStorage logFileStorage = mock(LogFileStorage.class);
         ComponentConnection componentConnection = mock(ComponentConnection.class);
         ClusterElementResolverFunction clusterElementResolver = mock(ClusterElementResolverFunction.class);
 
@@ -73,6 +75,7 @@ class ClusterElementContextImplTest {
             .jobId(200L)
             .jobPrincipalId(300L)
             .jobPrincipalWorkflowId(400L)
+            .logFileStorageWriter(logFileStorage)
             .publicUrl("https://example.com")
             .type(PlatformType.AUTOMATION)
             .workflowId("workflow-123")
