@@ -47,7 +47,7 @@ public interface CodeEditorScriptInputProvider {
      * @param sourceComponentConnection the connection for the SOURCE component, if available
      * @return a map of input field names to sample values
      */
-    Map<String, Object> getScriptInput(
+    Map<String, Object> getScriptInputParameters(
         int rootComponentVersion, String sourceComponentName, int sourceComponentVersion,
         String sourceClusterElementName, Map<String, ?> sourceInputParameters,
         @Nullable ComponentConnection sourceComponentConnection);

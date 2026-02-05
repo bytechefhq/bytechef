@@ -41,6 +41,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -109,8 +110,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             workflowId, sourceClusterElement.getWorkflowNodeName(), environmentId);
 
         CodeEditorScriptInputProvider provider = codeEditorScriptInputProviders.stream()
-            .filter(inputProvider -> inputProvider.getRootComponentName()
-                .equals(workflowNodeType.name()))
+            .filter(inputProvider -> Objects.equals(inputProvider.getRootComponentName(), workflowNodeType.name()))
             .findFirst()
             .orElse(null);
 
@@ -119,7 +119,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         }
 
         try {
-            return provider.getScriptInput(
+            return provider.getScriptInputParameters(
                 workflowNodeType.version(), sourceClusterElement.getComponentName(),
                 sourceClusterElement.getComponentVersion(), sourceClusterElement.getClusterElementName(),
                 sourceInputParameters, sourceComponentConnection);
