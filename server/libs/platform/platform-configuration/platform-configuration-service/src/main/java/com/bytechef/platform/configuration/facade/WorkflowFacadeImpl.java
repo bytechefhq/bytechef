@@ -108,8 +108,7 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
         for (WorkflowTask workflowTask : allTasks) {
             List<ComponentConnection> componentConnections = componentConnectionFacade.getComponentConnections(
                 CollectionUtils.getFirst(
-                    allTasks,
-                    curWorkflowTask -> Objects.equals(curWorkflowTask.getName(), workflowTask.getName())));
+                    allTasks, curWorkflowTask -> Objects.equals(curWorkflowTask.getName(), workflowTask.getName())));
 
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 

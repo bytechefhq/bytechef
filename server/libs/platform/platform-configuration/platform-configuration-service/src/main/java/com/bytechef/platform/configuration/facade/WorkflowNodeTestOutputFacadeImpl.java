@@ -17,6 +17,8 @@
 package com.bytechef.platform.configuration.facade;
 
 import static com.bytechef.component.definition.datastream.ItemReader.SOURCE;
+import static com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE;
+import static com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -36,6 +38,8 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
+import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict.EnvironmentIdParam;
+import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict.WorkflowIdParam;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
@@ -104,43 +108,12 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @Override
     @WorkflowCacheEvict(cacheNames = {
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
-    })
-    public WorkflowNodeTestOutput saveWorkflowNodeSampleOutput(
-        @WorkflowCacheEvict.WorkflowIdParam String workflowId, String workflowNodeName, Object sampleOutput,
-        @WorkflowCacheEvict.EnvironmentIdParam long environmentId) {
-
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        String type = WorkflowTrigger.fetch(workflow, workflowNodeName)
-            .map(WorkflowTrigger::getType)
-            .orElseGet(() -> {
-                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
-
-                return workflowTask.getType();
-            });
-
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
-
-        Property outputSchema = Property.toProperty(
-            (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
-                sampleOutput, PropertyFactory.PROPERTY_FACTORY));
-
-        return workflowNodeTestOutputService.save(
-            workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput),
-            environmentId);
-    }
-
-    @Override
-    @WorkflowCacheEvict(cacheNames = {
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
+        PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
     @SuppressWarnings("unchecked")
     public WorkflowNodeTestOutput saveClusterElementTestOutput(
-        @WorkflowCacheEvict.WorkflowIdParam String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName, @WorkflowCacheEvict.EnvironmentIdParam long environmentId) {
+        @WorkflowIdParam String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName, @EnvironmentIdParam long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -194,12 +167,39 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @Override
     @WorkflowCacheEvict(cacheNames = {
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
-        WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
+        PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
+    })
+    public WorkflowNodeTestOutput saveWorkflowNodeSampleOutput(
+        @WorkflowIdParam String workflowId, String workflowNodeName, Object sampleOutput,
+        @EnvironmentIdParam long environmentId) {
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        String type = WorkflowTrigger.fetch(workflow, workflowNodeName)
+            .map(WorkflowTrigger::getType)
+            .orElseGet(() -> {
+                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+                return workflowTask.getType();
+            });
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+        Property outputSchema = Property.toProperty(
+            (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
+                sampleOutput, PropertyFactory.PROPERTY_FACTORY));
+
+        return workflowNodeTestOutputService.save(
+            workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput),
+            environmentId);
+    }
+
+    @Override
+    @WorkflowCacheEvict(cacheNames = {
+        PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
-        @WorkflowCacheEvict.WorkflowIdParam String workflowId, String workflowNodeName,
-        @WorkflowCacheEvict.EnvironmentIdParam long environmentId) {
+        @WorkflowIdParam String workflowId, String workflowNodeName, @EnvironmentIdParam long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
