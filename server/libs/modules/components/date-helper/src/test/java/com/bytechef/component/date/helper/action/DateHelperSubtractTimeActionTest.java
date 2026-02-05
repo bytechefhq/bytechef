@@ -16,10 +16,10 @@
 
 package com.bytechef.component.date.helper.action;
 
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.INPUT_DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MINUTE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
@@ -47,7 +47,7 @@ class DateHelperSubtractTimeActionTest {
     private final ArgumentCaptor<LocalDateTime> localDateTimeArgumentCaptor = forClass(LocalDateTime.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(INPUT_DATE, LocalDateTime.of(2000, 1, 1, 1, 1, 1), YEAR, 1, MONTH, 1, DAY, 1, HOUR, 1, MINUTE, 1,
+        Map.of(DATE, LocalDateTime.of(2000, 1, 1, 1, 1, 1), YEAR, 1, MONTH, 1, DAY, 1, HOUR, 1, MINUTE, 1,
             SECOND, 1, DATE_FORMAT, "dd/MM/yy"));
 
     @Test

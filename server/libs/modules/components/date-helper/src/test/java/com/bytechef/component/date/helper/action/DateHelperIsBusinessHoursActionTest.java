@@ -20,7 +20,7 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.B
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.BUSINESS_HOURS_START;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.BUSINESS_WEEK_END;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.BUSINESS_WEEK_START;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.INPUT_DATE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.TIME_ZONE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -41,7 +41,7 @@ class DateHelperIsBusinessHoursActionTest {
     private final Context mockedContext = mock(Context.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            INPUT_DATE, LocalDateTime.of(2025, 1, 1, 13, 1, 1),
+            DATE, LocalDateTime.of(2025, 1, 1, 13, 1, 1),
             BUSINESS_WEEK_START, 1, BUSINESS_WEEK_END, 5, BUSINESS_HOURS_START, LocalTime.of(8, 0, 0),
             BUSINESS_HOURS_END, LocalTime.of(16, 0, 0), TIME_ZONE, "UTC"));
 

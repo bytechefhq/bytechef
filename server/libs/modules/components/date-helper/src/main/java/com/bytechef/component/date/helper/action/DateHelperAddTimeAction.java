@@ -16,11 +16,11 @@
 
 package com.bytechef.component.date.helper.action;
 
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_PROPERTY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.INPUT_DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MINUTE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
@@ -46,7 +46,7 @@ public class DateHelperAddTimeAction {
         .title("Add Time")
         .description("Add time to the date.")
         .properties(
-            dateTime(INPUT_DATE)
+            dateTime(DATE)
                 .label("Date")
                 .description(
                     "Date to which time will be added. We only accept yyyy-MM-ddTHH:mm:ss, use our Format Date " +
@@ -87,7 +87,7 @@ public class DateHelperAddTimeAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        LocalDateTime inputDate = inputParameters.getRequiredLocalDateTime(INPUT_DATE);
+        LocalDateTime inputDate = inputParameters.getRequiredLocalDateTime(DATE);
 
         inputDate = inputDate.plusYears(inputParameters.getInteger(YEAR, 0))
             .plusMonths(inputParameters.getInteger(MONTH, 0))
