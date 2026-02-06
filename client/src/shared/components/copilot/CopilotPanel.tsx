@@ -3,9 +3,11 @@ import {Thread} from '@/components/assistant-ui/thread';
 import {ToggleGroup, ToggleGroupItem} from '@/components/ui/toggle-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {BotMessageSquareIcon, MessageSquareOffIcon, XIcon} from 'lucide-react';
 import {useEffect} from 'react';
+import {useLocation} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -15,15 +17,17 @@ interface CopilotPanelProps {
 }
 
 const CopilotPanel = ({className, onClose}: CopilotPanelProps) => {
-    const {context, generateConversationId, resetMessages, setContext, setCopilotPanelOpen} = useCopilotStore(
+    const {context, generateConversationId, resetMessages, setContext} = useCopilotStore(
         useShallow((state) => ({
             context: state.context,
             generateConversationId: state.generateConversationId,
             resetMessages: state.resetMessages,
             setContext: state.setContext,
-            setCopilotPanelOpen: state.setCopilotPanelOpen,
         }))
     );
+    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
+
+    const location = useLocation();
 
     const handleCleanMessages = () => {
         resetMessages();
@@ -44,14 +48,7 @@ const CopilotPanel = ({className, onClose}: CopilotPanelProps) => {
         resetMessages();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-        generateConversationId();
-        resetMessages();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [context?.source]);
+    }, [context?.source, location.pathname]);
 
     return (
         <div className={twMerge('relative h-full min-h-[50vh] w-[450px] bg-surface-main', className)}>

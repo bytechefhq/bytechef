@@ -45,9 +45,6 @@ interface CopilotStateI {
             | undefined
     ) => void;
 
-    copilotPanelOpen: boolean;
-    setCopilotPanelOpen: (showCopilot: boolean) => void;
-
     messages: ThreadMessageLike[];
     addMessage: (message: ThreadMessageLike) => void;
     appendToLastAssistantMessage: (text: string) => void;
@@ -90,15 +87,6 @@ export const useCopilotStore = create<CopilotStateI>()(
                         ...state.context,
                         workflowExecutionError: error,
                     },
-                };
-            }),
-
-        copilotPanelOpen: false,
-        setCopilotPanelOpen: (copilotPanelOpen) =>
-            set((state) => {
-                return {
-                    ...state,
-                    copilotPanelOpen,
                 };
             }),
 

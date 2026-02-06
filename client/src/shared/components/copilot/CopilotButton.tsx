@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -14,10 +15,10 @@ export interface CopilotButtonProps {
 
 const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
     const ai = useApplicationInfoStore((state) => state.ai);
-    const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore(
+    const setContext = useCopilotStore((state) => state.setContext);
+    const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotPanelStore(
         useShallow((state) => ({
             copilotPanelOpen: state.copilotPanelOpen,
-            setContext: state.setContext,
             setCopilotPanelOpen: state.setCopilotPanelOpen,
         }))
     );
