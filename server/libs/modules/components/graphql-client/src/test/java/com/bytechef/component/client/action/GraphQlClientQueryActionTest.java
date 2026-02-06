@@ -22,6 +22,7 @@ import static com.bytechef.component.graphql.client.constant.GraphQlConstants.QU
 import static com.bytechef.component.graphql.client.constant.GraphQlConstants.VARIABLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +47,6 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Monika Kušter
  **/
-
 @ExtendWith(MockContextSetupExtension.class)
 class GraphQlClientQueryActionTest {
 
@@ -57,10 +57,11 @@ class GraphQlClientQueryActionTest {
           }
         }""";
 
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Map<String, List<String>>> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<Map<String, List<String>>> mapArgumentCaptor = forClass(Map.class);
     private final Object mockedObject = mock(Object.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
@@ -100,13 +101,10 @@ class GraphQlClientQueryActionTest {
 
         assertEquals(ResponseType.Type.JSON, responseType.getType());
         assertEquals("/graphql", stringArgumentCaptor.getValue());
-
-        Map<String, List<String>> headers = mapArgumentCaptor.getValue();
-
-        assertEquals(headers, Map.of("Content-Type", List.of("application/json")));
-
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of(VARIABLES, Map.of("characterId", 1), QUERY, EXAMPLE_QUERY), body.getContent());
+        assertEquals(Map.of("Content-Type", List.of("application/json")), mapArgumentCaptor.getValue());
+        assertEquals(
+            Http.Body.of(
+                Map.of(VARIABLES, Map.of("characterId", 1), QUERY, EXAMPLE_QUERY), Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }
