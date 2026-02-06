@@ -12,7 +12,7 @@ import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkf
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {Suspense, lazy, useEffect, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
@@ -41,7 +41,7 @@ interface WorkflowEditorLayoutProps {
 }
 
 const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInputs}: WorkflowEditorLayoutProps) => {
-    const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
+    const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);

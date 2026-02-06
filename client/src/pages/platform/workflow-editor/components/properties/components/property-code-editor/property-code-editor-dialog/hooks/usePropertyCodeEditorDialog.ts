@@ -1,5 +1,6 @@
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
 import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
+import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useCallback, useEffect, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -34,6 +35,7 @@ export const usePropertyCodeEditorDialog = ({
         );
 
     const handleClose = useCallback(() => {
+        useCopilotStore.getState().restoreConversationState();
         reset();
 
         if (onClose) {
@@ -51,6 +53,7 @@ export const usePropertyCodeEditorDialog = ({
     }, [handleClose]);
 
     const handleCopilotClose = useCallback(() => {
+        useCopilotStore.getState().restoreConversationState();
         setCopilotPanelOpen(false);
     }, [setCopilotPanelOpen]);
 

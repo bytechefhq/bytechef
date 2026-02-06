@@ -36,13 +36,15 @@ export function CopilotRuntimeProvider({
 
     const {projectId, projectWorkflowId} = useParams();
 
+    const sourceKey = context?.source ?? Source.WORKFLOW_EDITOR;
+
     const agent = new HttpAgent({
-        agentId: Source[context.source],
+        agentId: Source[sourceKey],
         headers: {
             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
         },
         threadId: conversationId!,
-        url: `/api/platform/internal/ai/chat/${Source[context.source].toLowerCase()}`,
+        url: `/api/platform/internal/ai/chat/${Source[sourceKey].toLowerCase()}`,
     });
 
     const queryClient = useQueryClient();
@@ -63,7 +65,7 @@ export function CopilotRuntimeProvider({
             role: 'user',
         });
 
-        const {workflowExecutionError, ...contextWithoutError} = context as typeof context & {
+        const {workflowExecutionError, ...contextWithoutError} = (context ?? {}) as typeof context & {
             workflowExecutionError?: {
                 errorMessage?: string;
                 stackTrace?: string[];

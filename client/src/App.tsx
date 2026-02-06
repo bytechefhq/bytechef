@@ -3,7 +3,7 @@ import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
-import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
@@ -151,7 +151,7 @@ function App() {
             reset: state.reset,
         }))
     );
-    const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
+    const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {currentType, setCurrentType} = usePlatformTypeStore(
         useShallow((state) => ({
@@ -312,11 +312,13 @@ function App() {
                 <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
 
                 <div className="flex size-full">
-                    <Outlet />
+                    <div className="flex h-full min-w-0 flex-1">
+                        <Outlet />
+                    </div>
 
-                    {ai.copilot.enabled && copilotPanelOpen && (
-                        <aside>
-                            <CopilotPanel />
+                    {ai.copilot.enabled && (
+                        <aside className="h-full shrink-0">
+                            <CopilotPanel open={copilotPanelOpen} />
                         </aside>
                     )}
                 </div>
