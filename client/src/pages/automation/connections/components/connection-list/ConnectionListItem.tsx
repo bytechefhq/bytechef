@@ -37,7 +37,6 @@ import {
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, EditIcon, EllipsisVerticalIcon, Link2OffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useState} from 'react';
-import {twMerge} from 'tailwind-merge';
 
 import TagList from '../../../../../shared/components/TagList';
 
@@ -218,22 +217,25 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                         </DropdownMenuItem>
                                     )}
 
-                                    <DropdownMenuItem
-                                        className={twMerge(
-                                            'dropdown-menu-item-destructive',
-                                            connection.active &&
-                                                'cursor-not-allowed opacity-50 hover:bg-transparent hover:text-content-destructive-primary focus:bg-transparent focus:text-content-destructive-primary'
-                                        )}
-                                        disabled={connection.active === true}
-                                        onClick={() => connection.active !== true && setShowDeleteDialog(true)}
+                                    <div
                                         title={
                                             connection.active === true
                                                 ? 'Disconnect from all workflows first to enable deletion'
-                                                : undefined
+                                                : 'Delete the connection'
                                         }
                                     >
-                                        <Trash2Icon /> Delete
-                                    </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            className={
+                                                connection.active
+                                                    ? 'dropdown-menu-item-destructive-disabled'
+                                                    : 'dropdown-menu-item-destructive'
+                                            }
+                                            disabled={connection.active === true}
+                                            onClick={() => connection.active !== true && setShowDeleteDialog(true)}
+                                        >
+                                            <Trash2Icon /> Delete
+                                        </DropdownMenuItem>
+                                    </div>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
