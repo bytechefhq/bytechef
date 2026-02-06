@@ -60,6 +60,13 @@ const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers
 const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
 const ApiCollections = lazy(() => import('@/ee/pages/automation/api-platform/api-collections/ApiCollections'));
 const ApiConnectors = lazy(() => import('@/ee/pages/settings/platform/api-connectors/ApiConnectors'));
+const ApiConnectorManualPage = lazy(
+    () => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorManualPage')
+);
+const ApiConnectorImportPage = lazy(
+    () => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorImportPage')
+);
+const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorAiPage'));
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
@@ -233,15 +240,56 @@ const platformSettingsRoutes = {
             path: 'custom-components',
         },
         {
-            element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                    <EEVersion>
-                        <LazyLoadWrapper>
-                            <ApiConnectors />
-                        </LazyLoadWrapper>
-                    </EEVersion>
-                </PrivateRoute>
-            ),
+            children: [
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <EEVersion>
+                                <LazyLoadWrapper>
+                                    <ApiConnectors />
+                                </LazyLoadWrapper>
+                            </EEVersion>
+                        </PrivateRoute>
+                    ),
+                    index: true,
+                },
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <EEVersion>
+                                <LazyLoadWrapper>
+                                    <ApiConnectorManualPage />
+                                </LazyLoadWrapper>
+                            </EEVersion>
+                        </PrivateRoute>
+                    ),
+                    path: 'new/manual',
+                },
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <EEVersion>
+                                <LazyLoadWrapper>
+                                    <ApiConnectorImportPage />
+                                </LazyLoadWrapper>
+                            </EEVersion>
+                        </PrivateRoute>
+                    ),
+                    path: 'new/import',
+                },
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <EEVersion>
+                                <LazyLoadWrapper>
+                                    <ApiConnectorAiPage />
+                                </LazyLoadWrapper>
+                            </EEVersion>
+                        </PrivateRoute>
+                    ),
+                    path: 'new/ai',
+                },
+            ],
             path: 'api-connectors',
         },
         {
