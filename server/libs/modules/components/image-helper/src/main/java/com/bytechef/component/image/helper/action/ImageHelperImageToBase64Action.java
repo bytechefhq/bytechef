@@ -42,11 +42,9 @@ public class ImageHelperImageToBase64Action {
     private ImageHelperImageToBase64Action() {
     }
 
-    protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context actionContext) {
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        byte[] fileContent = context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(IMAGE)));
 
-        byte[] fileContent = actionContext.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(IMAGE)));
-
-        return actionContext.encoder(encoder -> encoder.base64EncodeToString(fileContent));
+        return context.encoder(encoder -> encoder.base64EncodeToString(fileContent));
     }
 }

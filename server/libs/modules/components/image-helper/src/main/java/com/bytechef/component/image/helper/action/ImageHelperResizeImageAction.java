@@ -64,17 +64,18 @@ public class ImageHelperResizeImageAction {
     private ImageHelperResizeImageAction() {
     }
 
-    protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, Context actionContext) throws IOException {
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
+
         FileEntry image = inputParameters.getRequiredFileEntry(IMAGE);
 
-        BufferedImage bufferedImage = ImageIO.read((File) actionContext.file(file -> file.toTempFile(image)));
+        BufferedImage bufferedImage = ImageIO.read((File) context.file(file -> file.toTempFile(image)));
 
         BufferedImage resizedImage = getResizedImage(
             inputParameters.getRequiredInteger(WIDTH), inputParameters.getRequiredInteger(HEIGHT), bufferedImage);
 
         return storeBufferedImage(
-            actionContext, resizedImage, image.getExtension(), inputParameters.getRequiredString(RESULT_FILE_NAME));
+            context, resizedImage, image.getExtension(), inputParameters.getRequiredString(RESULT_FILE_NAME));
     }
 
     private static BufferedImage getResizedImage(int width, int height, BufferedImage bufferedImage) {

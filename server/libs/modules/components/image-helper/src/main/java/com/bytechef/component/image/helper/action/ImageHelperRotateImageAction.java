@@ -64,19 +64,17 @@ public class ImageHelperRotateImageAction {
     private ImageHelperRotateImageAction() {
     }
 
-    protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, Context actionContext) throws IOException {
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         FileEntry imageFileEntry = inputParameters.getRequiredFileEntry(IMAGE);
 
-        BufferedImage bufferedImage = ImageIO.read((File) actionContext.file(file -> file.toTempFile(imageFileEntry)));
+        BufferedImage bufferedImage = ImageIO.read((File) context.file(file -> file.toTempFile(imageFileEntry)));
 
-        BufferedImage rotatedImage =
-            rotateImage(inputParameters.getRequiredInteger(DEGREE), bufferedImage);
+        BufferedImage rotatedImage = rotateImage(inputParameters.getRequiredInteger(DEGREE), bufferedImage);
 
         return storeBufferedImage(
-            actionContext, rotatedImage, imageFileEntry.getExtension(),
-            inputParameters.getRequiredString(RESULT_FILE_NAME));
+            context, rotatedImage, imageFileEntry.getExtension(), inputParameters.getRequiredString(RESULT_FILE_NAME));
     }
 
     private static BufferedImage rotateImage(int degree, BufferedImage bufferedImage) {
