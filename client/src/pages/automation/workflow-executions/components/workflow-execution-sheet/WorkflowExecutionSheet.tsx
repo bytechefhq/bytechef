@@ -65,7 +65,10 @@ const WorkflowExecutionSheet = () => {
     );
 
     const handleCopilotClick = useCallback(() => {
-        const currentContext = useCopilotStore.getState().context;
+        const {context: currentContext, generateConversationId, resetMessages} = useCopilotStore.getState();
+
+        resetMessages();
+        generateConversationId();
 
         setContext({
             ...currentContext,

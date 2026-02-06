@@ -57,7 +57,10 @@ export const usePropertyCodeEditorDialogToolbar = ({
     const copilotEnabled = ai.copilot.enabled && ff_1570;
 
     const handleCopilotClick = useCallback(() => {
-        const currentContext = useCopilotStore.getState().context;
+        const {context: currentContext, generateConversationId, resetMessages} = useCopilotStore.getState();
+
+        resetMessages();
+        generateConversationId();
 
         setContext({
             ...currentContext,

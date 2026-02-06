@@ -6,7 +6,7 @@ import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-provid
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {BotMessageSquareIcon, MessageSquareOffIcon, XIcon} from 'lucide-react';
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import {useLocation} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -43,12 +43,16 @@ const CopilotPanel = ({className, onClose}: CopilotPanelProps) => {
         }
     };
 
-    useEffect(() => {
-        generateConversationId();
-        resetMessages();
+    const previousPathnameRef = useRef(location.pathname);
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [context?.source, location.pathname]);
+    useEffect(() => {
+        if (previousPathnameRef.current !== location.pathname) {
+            previousPathnameRef.current = location.pathname;
+
+            generateConversationId();
+            resetMessages();
+        }
+    }, [generateConversationId, location.pathname, resetMessages]);
 
     return (
         <div className={twMerge('relative h-full min-h-[50vh] w-[450px] bg-surface-main', className)}>

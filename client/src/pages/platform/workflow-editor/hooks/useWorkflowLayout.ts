@@ -163,7 +163,10 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     };
 
     const handleCopilotClick = () => {
-        const currentContext = useCopilotStore.getState().context;
+        const {context: currentContext, generateConversationId, resetMessages} = useCopilotStore.getState();
+
+        resetMessages();
+        generateConversationId();
 
         setContext({
             ...currentContext,
