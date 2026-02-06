@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Run a raw query to a GraphQL endpoint.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/graphql-client_v1#raw-query"
+    },
     "metadata": null,
     "name": "rawQuery",
     "outputDefinition": {
@@ -289,7 +292,7 @@
   "connection": null,
   "customAction": null,
   "customActionHelp": null,
-  "description": "The GraphQL client connector offers a comprehensive overview of your API's data, empowering users to request precisely what they need and nothing beyond that.",
+  "description": "Execute GraphQL queries against a GraphQL API, allowing you to fetch exactly the data you need using queries and variables.",
   "icon": "path:assets/graphql-client.svg",
   "metadata": null,
   "name": "graphQl",
