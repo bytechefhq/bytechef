@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {CollapsibleTrigger} from '@/components/ui/collapsible';
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,71 +10,29 @@ import {
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ApiConnectorDeleteAlertDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorDeleteAlertDialog';
-
-// TODO: Uncomment when mutations are implemented
-// import {
-//     useDeleteApiConnectorMutation,
-//     useEnableApiConnectorMutation,
-// } from '@/ee/shared/mutations/platform/apiConnector.mutations';
-// TODO: Uncomment when queries are implemented
-// import {ApiConnectorKeys} from '@/ee/shared/queries/platform/apiConnectors.queries';
-// import {useQueryClient} from '@tanstack/react-query';
+import ApiConnectorEditDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEditDialog';
+import ApiConnectorEndpointListItem from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEndpointListItem';
+import {ApiConnector} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, EllipsisVerticalIcon} from 'lucide-react';
-import {useState} from 'react';
 
-// TODO: Uncomment when ApiConnectorImportDialog is implemented
-// import ApiConnectorImportDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorImportDialog';
-// TODO: Uncomment when api-connector middleware is implemented
-// import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
-import {type ApiConnectorI} from './ApiConnectorList';
+import useApiConnectorListItem from './hooks/useApiConnectorListItem';
 
 interface ApiConnectorItemProps {
-    apiConnector: ApiConnectorI;
+    apiConnector: ApiConnector;
 }
 
 const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
-    const [showEditDialog, setShowEditDialog] = useState(false);
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-    // TODO: Uncomment when mutations/queries are implemented
-    // const queryClient = useQueryClient();
-
-    // const deleteApiConnectorMutation = useDeleteApiConnectorMutation({
-    //     onSuccess: () => {
-    //         queryClient.invalidateQueries({
-    //             queryKey: ApiConnectorKeys.apiConnectors,
-    //         });
-    //     },
-    // });
-
-    // const enableApiConnectorMutation = useEnableApiConnectorMutation({
-    //     onSuccess: () => {
-    //         queryClient.invalidateQueries({
-    //             queryKey: ApiConnectorKeys.apiConnectors,
-    //         });
-    //     },
-    // });
-
-    const handleAlertDeleteDialogClick = () => {
-        if (apiConnector.id) {
-            // TODO: Uncomment when mutations are implemented
-            // deleteApiConnectorMutation.mutate(apiConnector.id);
-
-            setShowDeleteDialog(false);
-        }
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handleOnCheckedChange = (_value: boolean) => {
-        // TODO: Uncomment when mutations are implemented
-        // enableApiConnectorMutation.mutate({
-        //     enable: value,
-        //     id: apiConnector.id!,
-        // });
-    };
+    const {
+        handleAlertDeleteDialogClick,
+        handleOnCheckedChange,
+        setShowDeleteDialog,
+        setShowEditDialog,
+        showDeleteDialog,
+        showEditDialog,
+    } = useApiConnectorListItem({apiConnector});
 
     return (
-        <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
+        <Collapsible className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
             <div className="flex items-center justify-between">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
@@ -122,20 +80,20 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                 <div className="flex items-center justify-end gap-x-6">
                     <div className="flex flex-col items-end gap-y-4">
-                        <Switch checked={apiConnector.enabled} onCheckedChange={handleOnCheckedChange} />
+                        <Switch checked={apiConnector.enabled ?? false} onCheckedChange={handleOnCheckedChange} />
 
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
                                 {apiConnector.lastModifiedDate ? (
                                     <span className="text-xs">
-                                        {`Modified at ${apiConnector.lastModifiedDate?.toLocaleDateString()} ${apiConnector.lastModifiedDate?.toLocaleTimeString()}`}
+                                        {`Modified at ${new Date(apiConnector.lastModifiedDate).toLocaleDateString()} ${new Date(apiConnector.lastModifiedDate).toLocaleTimeString()}`}
                                     </span>
                                 ) : (
                                     '-'
                                 )}
                             </TooltipTrigger>
 
-                            <TooltipContent>Created Date</TooltipContent>
+                            <TooltipContent>Modified Date</TooltipContent>
                         </Tooltip>
                     </div>
 
@@ -153,13 +111,34 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(false)}>
+                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
             </div>
+
+            <CollapsibleContent className="mt-4">
+                {apiConnector.endpoints && apiConnector.endpoints.length > 0 ? (
+                    <ul className="space-y-1 border-t pt-4">
+                        {apiConnector.endpoints.map((endpoint) => (
+                            <li
+                                className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
+                                key={endpoint.id}
+                            >
+                                <ApiConnectorEndpointListItem
+                                    apiConnectorEndpoint={endpoint}
+                                    apiConnectorName={apiConnector.name}
+                                    specification={apiConnector.specification ?? undefined}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <div className="border-t pt-4 text-center text-sm text-gray-500">No endpoints configured</div>
+                )}
+            </CollapsibleContent>
 
             {showDeleteDialog && (
                 <ApiConnectorDeleteAlertDialog
@@ -168,13 +147,10 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                 />
             )}
 
-            {/* TODO: Uncomment when ApiConnectorImportDialog is implemented */}
-
             {showEditDialog && (
-                // <ApiConnectorImportDialog apiConnector={apiConnector} onClose={() => setShowEditDialog(false)} />
-                <div onClick={() => setShowEditDialog(false)}>TODO: Edit Dialog</div>
+                <ApiConnectorEditDialog apiConnector={apiConnector} onClose={() => setShowEditDialog(false)} />
             )}
-        </div>
+        </Collapsible>
     );
 };
 
