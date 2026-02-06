@@ -16,7 +16,11 @@
 
 package com.bytechef.component.image.helper.action;
 
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.IMAGE;
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.QUALITY;
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.RESULT_FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -26,19 +30,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -46,57 +53,64 @@ import org.mockito.MockedStatic;
  */
 class ImageHelperCompressImageActionTest {
 
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Context.File, ?>> contextFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Context mockedContext = mock(Context.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final ImageWriteParam mockedParams = mock(ImageWriteParam.class);
-    private final ImageOutputStream mockedImageOutputStream = mock(ImageOutputStream.class);
-    private final ImageWriter mockedWriter = mock(ImageWriter.class);
     private final Context.File mockedContextFile = mock(Context.File.class);
+    private final ImageOutputStream mockedImageOutputStream = mock(ImageOutputStream.class);
+    private final ImageWriter mockedImageWriter = mock(ImageWriter.class);
+    private final ImageWriteParam mockedImageWriteParam = mock(ImageWriteParam.class);
     private final FileEntry mockedInputFileEntry = mock(FileEntry.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(IMAGE, mockedInputFileEntry, QUALITY, 1, RESULT_FILE_NAME, "compressedImage"));
     private final FileEntry mockedResultFileEntry = mock(FileEntry.class);
 
     @Test
-    void testPerform() throws IOException {
+    void testPerform() throws Exception {
         BufferedImage originalImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
 
         File tempFile = File.createTempFile("image", ".png");
         tempFile.deleteOnExit();
 
-        when(mockedParameters.getRequiredFileEntry("image")).thenReturn(mockedInputFileEntry);
-        when(mockedParameters.getRequiredInteger("quality")).thenReturn(1);
-        when(mockedParameters.getRequiredString("resultFileName")).thenReturn("compressedImage");
-        when(mockedInputFileEntry.getExtension()).thenReturn("png");
-        when(mockedContext.file(any())).thenAnswer(invocation -> {
-            Context.ContextFunction<Context.File, ?> function =
-                invocation.getArgument(0);
+        when(mockedInputFileEntry.getExtension())
+            .thenReturn("png");
+        when(mockedContext.file(contextFunctionArgumentCaptor.capture()))
+            .thenAnswer(invocation -> {
+                ContextFunction<Context.File, ?> function = invocation.getArgument(0);
 
-            return function.apply(mockedContextFile);
-        });
-
-        when(mockedContextFile.toTempFile(mockedInputFileEntry)).thenReturn(tempFile);
-        when(mockedContextFile.storeContent(anyString(), any(InputStream.class))).thenReturn(mockedResultFileEntry);
-        when(mockedWriter.getDefaultWriteParam()).thenReturn(mockedParams);
+                return function.apply(mockedContextFile);
+            });
+        when(mockedContextFile.toTempFile(mockedInputFileEntry))
+            .thenReturn(tempFile);
+        when(mockedContextFile.storeContent(anyString(), any(InputStream.class)))
+            .thenReturn(mockedResultFileEntry);
+        when(mockedImageWriter.getDefaultWriteParam())
+            .thenReturn(mockedImageWriteParam);
 
         try (MockedStatic<ImageIO> imageIOMock = mockStatic(ImageIO.class)) {
-
             imageIOMock.when(() -> ImageIO.read(tempFile))
                 .thenReturn(originalImage);
 
             imageIOMock.when(() -> ImageIO.getImageWritersByFormatName("png"))
-                .thenReturn(Collections.singletonList(mockedWriter)
+                .thenReturn(Collections.singletonList(mockedImageWriter)
                     .iterator());
 
             imageIOMock.when(() -> ImageIO.createImageOutputStream(any(ByteArrayOutputStream.class)))
                 .thenReturn(mockedImageOutputStream);
 
-            FileEntry result = ImageHelperCompressImageAction.perform(
-                mockedParameters, mockedParameters, mockedContext);
+            FileEntry result =
+                ImageHelperCompressImageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedResultFileEntry, result);
 
             verify(mockedContextFile).toTempFile(mockedInputFileEntry);
             verify(mockedContextFile).storeContent(eq("compressedImage.png"), any(InputStream.class));
-            verify(mockedWriter).write(any(), any(), eq(mockedParams));
+            verify(mockedImageWriter).write(any(), any(), eq(mockedImageWriteParam));
+
+            ContextFunction<Context.File, ?> contextFunction = contextFunctionArgumentCaptor.getValue();
+
+            assertEquals(mockedResultFileEntry, contextFunction.apply(mockedContextFile));
         }
     }
 }
