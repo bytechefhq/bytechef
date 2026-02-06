@@ -3,20 +3,10 @@ import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ApiConnectorEndpoint} from '@/shared/middleware/graphql';
-import {
-    CalendarIcon,
-    CloudDownloadIcon,
-    EllipsisVerticalIcon,
-    FolderSyncIcon,
-    InfoIcon,
-    SendToBackIcon,
-    Trash2Icon,
-    UploadIcon,
-} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {CalendarIcon, EllipsisVerticalIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
-import {useEndpointDetailPanelStore} from '../stores/useEndpointDetailPanelStore';
+import useApiConnectorEndpointListItem from '../hooks/useApiConnectorEndpointListItem';
 
 interface ApiConnectorEndpointListItemProps {
     apiConnectorEndpoint: ApiConnectorEndpoint;
@@ -29,53 +19,8 @@ const ApiConnectorEndpointListItem = ({
     apiConnectorName,
     specification,
 }: ApiConnectorEndpointListItemProps) => {
-    const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
-    const projectDeploymentWorkflow = undefined;
-
-    const {openPanel} = useEndpointDetailPanelStore();
-
-    const method = apiConnectorEndpoint.httpMethod;
-
-    const httpMethodStyles = useMemo(() => {
-        switch (method) {
-            case 'GET':
-                return {
-                    icon: <CloudDownloadIcon className="size-3" />,
-                    textColor: 'text-content-brand-primary',
-                };
-            case 'POST':
-                return {
-                    icon: <UploadIcon className="size-3" />,
-                    textColor: 'text-content-success-primary',
-                };
-            case 'PUT':
-                return {
-                    icon: <SendToBackIcon className="size-3" />,
-                    textColor: 'text-content-warning-primary',
-                };
-            case 'PATCH':
-                return {
-                    icon: <FolderSyncIcon className="size-3" />,
-                    textColor: 'text-orange-700',
-                };
-            case 'DELETE':
-                return {
-                    icon: <Trash2Icon className="size-3" />,
-                    textColor: 'text-content-destructive-primary',
-                };
-            default:
-                return {
-                    icon: <InfoIcon className="size-3" />,
-                    textColor: 'text-gray-700',
-                };
-        }
-    }, [method]);
-
-    const {icon, textColor} = httpMethodStyles;
-
-    const handleClick = () => {
-        openPanel(apiConnectorEndpoint, apiConnectorName, specification);
-    };
+    const {handleClick, icon, lastExecutionDate, method, setShowEditWorkflowDialog, showEditWorkflowDialog, textColor} =
+        useApiConnectorEndpointListItem({apiConnectorEndpoint, apiConnectorName, specification});
 
     return (
         <>
@@ -98,13 +43,13 @@ const ApiConnectorEndpointListItem = ({
             </button>
 
             <div className="flex items-center justify-end gap-x-6">
-                {apiConnectorEndpoint?.lastExecutionDate ? (
+                {lastExecutionDate ? (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-gray-500">
                             <CalendarIcon aria-hidden="true" className="mr-0.5 size-3.5 shrink-0 text-gray-400" />
 
                             <span className="text-xs">
-                                {`Executed at ${new Date(apiConnectorEndpoint.lastExecutionDate).toLocaleDateString()} ${new Date(apiConnectorEndpoint.lastExecutionDate).toLocaleTimeString()}`}
+                                {`Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`}
                             </span>
                         </TooltipTrigger>
 
@@ -124,19 +69,26 @@ const ApiConnectorEndpointListItem = ({
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setShowEditWorkflowDialog(true)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem
+                            disabled
+                            onClick={() => setShowEditWorkflowDialog(true)}
+                            title="Edit workflow (coming soon)"
+                        >
+                            Edit
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
 
-            {showEditWorkflowDialog && projectDeploymentWorkflow && (
+            {showEditWorkflowDialog && (
+                // TODO: Implement edit workflow dialog
                 // <ProjectDeploymentEditWorkflowDialog
                 //     onClose={() => setShowEditWorkflowDialog(false)}
                 //     projectDeploymentEnabled={projectDeploymentEnabled}
                 //     projectDeploymentWorkflow={projectDeploymentWorkflow}
                 //     workflow={workflow}
                 // />
-                <>TODO</>
+                <></>
             )}
         </>
     );

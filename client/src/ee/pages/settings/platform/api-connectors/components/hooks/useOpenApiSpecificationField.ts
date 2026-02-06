@@ -10,7 +10,6 @@ interface UseOpenApiSpecificationFieldI {
     hiddenInputRef: React.RefObject<HTMLInputElement>;
     name: string | undefined;
     onUpload: () => void;
-    preview: string | undefined;
     uploadButtonLabel: string;
 }
 
@@ -19,7 +18,6 @@ export default function useOpenApiSpecificationField<T extends FieldValues, K ex
 }: UseOpenApiSpecificationFieldProps<T, K>): UseOpenApiSpecificationFieldI {
     const hiddenInputRef = useRef<HTMLInputElement>(null);
     const [name, setName] = useState<string>();
-    const [preview, setPreview] = useState<string>();
 
     const handleUploadedFile = useCallback(
         async (event: ChangeEvent<HTMLInputElement>) => {
@@ -29,10 +27,6 @@ export default function useOpenApiSpecificationField<T extends FieldValues, K ex
                 setName(file.name);
 
                 field.onChange(await file.text());
-
-                const urlIcon = URL.createObjectURL(file);
-
-                setPreview(urlIcon);
             }
         },
         [field]
@@ -42,14 +36,13 @@ export default function useOpenApiSpecificationField<T extends FieldValues, K ex
         hiddenInputRef.current?.click();
     }, []);
 
-    const uploadButtonLabel = preview ? 'Change spec' : 'Upload spec';
+    const uploadButtonLabel = name ? 'Change spec' : 'Upload spec';
 
     return {
         handleUploadedFile,
         hiddenInputRef,
         name,
         onUpload,
-        preview,
         uploadButtonLabel,
     };
 }

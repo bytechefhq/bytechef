@@ -1,6 +1,6 @@
 import {ApiConnector, useDeleteApiConnectorMutation, useEnableApiConnectorMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useCallback, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
 interface UseApiConnectorListItemProps {
     apiConnector: ApiConnector;
@@ -9,6 +9,7 @@ interface UseApiConnectorListItemProps {
 interface UseApiConnectorListItemI {
     handleAlertDeleteDialogClick: () => void;
     handleOnCheckedChange: (value: boolean) => void;
+    lastModifiedDate: Date | undefined;
     setShowDeleteDialog: (show: boolean) => void;
     setShowEditDialog: (show: boolean) => void;
     showDeleteDialog: boolean;
@@ -22,6 +23,11 @@ export default function useApiConnectorListItem({
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const queryClient = useQueryClient();
+
+    const lastModifiedDate = useMemo(
+        () => (apiConnector.lastModifiedDate ? new Date(apiConnector.lastModifiedDate) : undefined),
+        [apiConnector.lastModifiedDate]
+    );
 
     const deleteApiConnectorMutation = useDeleteApiConnectorMutation({
         onSuccess: () => {
@@ -64,6 +70,7 @@ export default function useApiConnectorListItem({
     return {
         handleAlertDeleteDialogClick,
         handleOnCheckedChange,
+        lastModifiedDate,
         setShowDeleteDialog,
         setShowEditDialog,
         showDeleteDialog,
