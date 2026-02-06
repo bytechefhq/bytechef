@@ -35,6 +35,7 @@ public class RandomHelperRandomIntAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("randomInt")
         .title("Random Integer")
         .description("Generates a random integer value.")
+        .help("", "https://docs.bytechef.io/reference/components/random-helper_v1#random-integer")
         .properties(
             integer(START_INCLUSIVE)
                 .label("Start Inclusive")
@@ -46,13 +47,16 @@ public class RandomHelperRandomIntAction {
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))
-        .output(outputSchema(integer().description("Generated random integer value.")))
+        .output(
+            outputSchema(
+                integer()
+                    .description("Generated random integer value.")))
         .perform(RandomHelperRandomIntAction::perform);
 
-    /**
-     * Generates a random integer.
-     */
-    protected static Integer perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    private RandomHelperRandomIntAction() {
+    }
+
+    public static Integer perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         int startInclusive = inputParameters.getInteger(START_INCLUSIVE, 0);
         int endInclusive = inputParameters.getInteger(END_INCLUSIVE, 100);
 

@@ -36,6 +36,7 @@ public class RandomHelperRandomFloatAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("randomFloat")
         .title("Random Float")
         .description("Generates a random float value.")
+        .help("", "https://docs.bytechef.io/reference/components/random-helper_v1#random-float")
         .properties(
             integer(START_INCLUSIVE)
                 .label("Start Inclusive")
@@ -47,13 +48,16 @@ public class RandomHelperRandomFloatAction {
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))
-        .output(outputSchema(number().description("Generated random float value.")))
+        .output(
+            outputSchema(
+                number()
+                    .description("Generated random float value.")))
         .perform(RandomHelperRandomFloatAction::perform);
 
-    /**
-     * Generates a random float.
-     */
-    protected static Float perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    private RandomHelperRandomFloatAction() {
+    }
+
+    public static Float perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         int startInclusive = inputParameters.getInteger(START_INCLUSIVE, 0);
         int endInclusive = inputParameters.getInteger(END_INCLUSIVE, 100);
 

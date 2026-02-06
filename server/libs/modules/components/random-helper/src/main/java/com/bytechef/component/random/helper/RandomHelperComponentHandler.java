@@ -51,7 +51,8 @@ public class RandomHelperComponentHandler implements ComponentHandler {
             tool(RandomHelperRandomHexAction.ACTION_DEFINITION),
             tool(RandomHelperRandomIntAction.ACTION_DEFINITION),
             tool(RandomHelperRandomStringAction.ACTION_DEFINITION),
-            tool(RandomHelperRandomUuidAction.ACTION_DEFINITION));
+            tool(RandomHelperRandomUuidAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

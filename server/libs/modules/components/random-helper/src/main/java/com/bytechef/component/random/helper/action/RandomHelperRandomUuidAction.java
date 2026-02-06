@@ -33,6 +33,7 @@ public class RandomHelperRandomUuidAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("randomUuid")
         .title("Random UUID")
         .description("Generates a random UUID.")
+        .help("", "https://docs.bytechef.io/reference/components/random-helper_v1#random-uuid")
         .output(
             outputSchema(
                 string()
