@@ -50,6 +50,7 @@ public class GitlabNewIssueTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newIssue")
         .title("New Issue")
         .description("Triggers when a new issue is created.")
+        .help("", "https://docs.bytechef.io/reference/components/gitlab_v1#new-issue")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(PROJECT_ID)
