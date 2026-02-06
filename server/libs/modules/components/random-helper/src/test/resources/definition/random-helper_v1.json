@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generates a random float value.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/random-helper_v1#random-float"
+    },
     "metadata": null,
     "name": "randomFloat",
     "outputDefinition": {
@@ -115,7 +118,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generates a random Hex.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/random-helper_v1#random-hex"
+    },
     "metadata": null,
     "name": "randomHex",
     "outputDefinition": {
@@ -205,7 +211,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generates a random integer value.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/random-helper_v1#random-integer"
+    },
     "metadata": null,
     "name": "randomInt",
     "outputDefinition": {
@@ -307,8 +316,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Generates a random string value.",
-    "help": null,
+    "description": "Generates a random string of the specified length using the provided character set.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/random-helper_v1#random-string"
+    },
     "metadata": null,
     "name": "randomString",
     "outputDefinition": {
@@ -428,7 +440,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generates a random UUID.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/random-helper_v1#random-uuid"
+    },
     "metadata": null,
     "name": "randomUuid",
     "outputDefinition": {
@@ -794,7 +809,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "randomString",
-    "description": "Generates a random string value.",
+    "description": "Generates a random string of the specified length using the provided character set.",
     "element": { },
     "help": null,
     "outputDefinition": {
