@@ -30,9 +30,15 @@ vi.mock('../PropertyCodeEditorDialogRightPanelConnections', () => ({
 
 const mockUseClusterElementScriptInputQuery = vi.fn();
 const mockUseWorkflowNodeScriptInputQuery = vi.fn();
+const mockUseClusterElementComponentConnectionsQuery = vi.fn();
+const mockUseWorkflowNodeComponentConnectionsQuery = vi.fn();
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useClusterElementComponentConnectionsQuery: (...args: unknown[]) =>
+        mockUseClusterElementComponentConnectionsQuery(...args),
     useClusterElementScriptInputQuery: (...args: unknown[]) => mockUseClusterElementScriptInputQuery(...args),
+    useWorkflowNodeComponentConnectionsQuery: (...args: unknown[]) =>
+        mockUseWorkflowNodeComponentConnectionsQuery(...args),
     useWorkflowNodeScriptInputQuery: (...args: unknown[]) => mockUseWorkflowNodeScriptInputQuery(...args),
 }));
 
@@ -50,16 +56,6 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 
 describe('PropertyCodeEditorDialogRightPanel', () => {
     const defaultProps = {
-        componentConnections: [
-            {componentName: 'slack', componentVersion: 1, key: 'slack_1', required: true, workflowNodeName: 'testNode'},
-            {
-                componentName: 'github',
-                componentVersion: 1,
-                key: 'github_1',
-                required: false,
-                workflowNodeName: 'testNode',
-            },
-        ],
         workflow: {
             definition: '{}',
             id: 'workflow-1',
@@ -77,11 +73,20 @@ describe('PropertyCodeEditorDialogRightPanel', () => {
         workflowNodeName: 'testNode',
     };
 
+    const mockComponentConnections = [
+        {componentName: 'slack', componentVersion: 1, key: 'slack_1', required: true, workflowNodeName: 'testNode'},
+        {componentName: 'github', componentVersion: 1, key: 'github_1', required: false, workflowNodeName: 'testNode'},
+    ];
+
     beforeEach(() => {
         windowResizeObserver();
         mockUseClusterElementScriptInputQuery.mockReturnValue({data: undefined});
         mockUseWorkflowNodeScriptInputQuery.mockReturnValue({
             data: {workflowNodeScriptInput: {param1: 'value1', param2: 'value2'}},
+        });
+        mockUseClusterElementComponentConnectionsQuery.mockReturnValue({data: undefined});
+        mockUseWorkflowNodeComponentConnectionsQuery.mockReturnValue({
+            data: {workflowNodeComponentConnections: mockComponentConnections},
         });
     });
 
@@ -128,7 +133,7 @@ describe('PropertyCodeEditorDialogRightPanel', () => {
     });
 
     describe('connections panel', () => {
-        it('should pass component connections to connections panel', () => {
+        it('should pass component connections from GraphQL query to connections panel', () => {
             render(<PropertyCodeEditorDialogRightPanel {...defaultProps} />);
 
             expect(screen.getByTestId('connections-count')).toHaveTextContent('2');
@@ -138,6 +143,16 @@ describe('PropertyCodeEditorDialogRightPanel', () => {
             render(<PropertyCodeEditorDialogRightPanel {...defaultProps} />);
 
             expect(screen.getByTestId('connections-node-name')).toHaveTextContent('testNode');
+        });
+
+        it('should pass empty array when query returns no connections', () => {
+            mockUseWorkflowNodeComponentConnectionsQuery.mockReturnValue({
+                data: {workflowNodeComponentConnections: null},
+            });
+
+            render(<PropertyCodeEditorDialogRightPanel {...defaultProps} />);
+
+            expect(screen.getByTestId('connections-count')).toHaveTextContent('0');
         });
     });
 });

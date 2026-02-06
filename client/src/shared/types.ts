@@ -159,6 +159,7 @@ export type NestedClusterRootComponentDefinitionType = {
 export type ClusterElementItemType = {
     clusterElements?: ClusterElementsType;
     clusterElementTypesCount?: number;
+    connections?: {[key: string]: ComponentConnectionType};
     label?: string;
     isNestedClusterRoot?: boolean;
     metadata?: {

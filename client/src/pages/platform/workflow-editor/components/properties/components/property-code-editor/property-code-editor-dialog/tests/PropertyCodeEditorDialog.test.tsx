@@ -12,11 +12,6 @@ const hoisted = vi.hoisted(() => {
         mockHandleUnsavedChangesAlertDialogClose: vi.fn(),
         storeState: {
             copilotPanelOpen: false,
-            currentWorkflowTask: {
-                connections: [],
-                name: 'testNode',
-                parameters: {input: {}},
-            },
             unsavedChangesAlertDialogOpen: false,
         },
     };
@@ -25,7 +20,6 @@ const hoisted = vi.hoisted(() => {
 vi.mock('../hooks', () => ({
     usePropertyCodeEditorDialog: () => ({
         copilotPanelOpen: hoisted.storeState.copilotPanelOpen,
-        currentWorkflowTask: hoisted.storeState.currentWorkflowTask,
         handleCopilotClose: hoisted.mockHandleCopilotClose,
         handleOpenChange: hoisted.mockHandleOpenChange,
         handleUnsavedChangesAlertDialogCancel: hoisted.mockHandleUnsavedChangesAlertDialogCancel,
