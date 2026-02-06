@@ -3,11 +3,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => {
     return {
+        mockInvalidateQueries: vi.fn(),
         mockMutate: vi.fn(),
         mockSetShowConnectionNote: vi.fn(),
         storeState: {
             componentDefinitions: [{name: 'slack', title: 'Slack', version: 1}],
             currentEnvironmentId: 1,
+            currentNode: {clusterElementType: undefined as string | undefined, name: 'testNode'},
+            rootClusterElementNodeData: undefined as {workflowNodeName: string} | undefined,
             showConnectionNote: true,
             workflowTestConfigurationConnections: [{connectionId: 1, workflowConnectionKey: 'slack_1'}],
         },
@@ -27,6 +30,20 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
         selector({
             currentEnvironmentId: hoisted.storeState.currentEnvironmentId,
         }),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore', () => ({
+    default: (selector: (state: unknown) => unknown) => selector({currentNode: hoisted.storeState.currentNode}),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => ({
+    default: () => hoisted.storeState.rootClusterElementNodeData,
+}));
+
+vi.mock('@tanstack/react-query', () => ({
+    useQueryClient: () => ({
+        invalidateQueries: hoisted.mockInvalidateQueries,
+    }),
 }));
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
@@ -77,6 +94,8 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         hoisted.storeState.currentEnvironmentId = 1;
         hoisted.storeState.componentDefinitions = [{name: 'slack', title: 'Slack', version: 1}];
         hoisted.storeState.workflowTestConfigurationConnections = [{connectionId: 1, workflowConnectionKey: 'slack_1'}];
+        hoisted.storeState.currentNode = {clusterElementType: undefined, name: 'testNode'};
+        hoisted.storeState.rootClusterElementNodeData = undefined;
         vi.clearAllMocks();
         vi.resetModules();
     });
@@ -235,6 +254,215 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
             });
 
             expect(hoisted.mockMutate).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('cluster element connections', () => {
+        const clusterElementProps = {
+            componentConnections: [
+                {
+                    componentName: 'amazonS3',
+                    componentVersion: 1,
+                    key: 's3_connection',
+                    required: true,
+                    workflowNodeName: 'source_1',
+                },
+            ],
+            workflow: {
+                definition: JSON.stringify({
+                    tasks: [
+                        {
+                            clusterElements: {
+                                source: {
+                                    connections: {s3_connection: {componentName: 'amazonS3', componentVersion: 1}},
+                                    name: 'source_1',
+                                    type: 'amazonS3/v1/amazonS3Read',
+                                },
+                            },
+                            name: 'dataStream_1',
+                            type: 'dataStream/v1/sync',
+                        },
+                    ],
+                }),
+                id: 'workflow-1',
+                version: 1,
+            },
+            workflowNodeName: 'source_1',
+        };
+
+        beforeEach(async () => {
+            hoisted.storeState.currentNode = {clusterElementType: 'source', name: 'source_1'};
+            hoisted.storeState.rootClusterElementNodeData = {workflowNodeName: 'dataStream_1'};
+            vi.clearAllMocks();
+            vi.resetModules();
+        });
+
+        describe('handleOnSubmit for cluster elements', () => {
+            it('should add connection to cluster element', async () => {
+                const {usePropertyCodeEditorDialogRightPanelConnections} =
+                    await import('../usePropertyCodeEditorDialogRightPanelConnections');
+                const {result} = renderHook(() =>
+                    usePropertyCodeEditorDialogRightPanelConnections(clusterElementProps)
+                );
+
+                act(() => {
+                    result.current.handleOnSubmit({
+                        componentName: 'googleDrive',
+                        componentVersion: 1,
+                        name: 'gdrive_connection',
+                    });
+                });
+
+                expect(hoisted.mockMutate).toHaveBeenCalled();
+
+                const callArg = hoisted.mockMutate.mock.calls[0][0];
+                const definition = JSON.parse(callArg.workflow.definition);
+
+                expect(definition.tasks[0].clusterElements.source.connections.gdrive_connection).toEqual({
+                    componentName: 'googleDrive',
+                    componentVersion: 1,
+                });
+            });
+
+            it('should not overwrite existing cluster element connections', async () => {
+                const {usePropertyCodeEditorDialogRightPanelConnections} =
+                    await import('../usePropertyCodeEditorDialogRightPanelConnections');
+                const {result} = renderHook(() =>
+                    usePropertyCodeEditorDialogRightPanelConnections(clusterElementProps)
+                );
+
+                act(() => {
+                    result.current.handleOnSubmit({
+                        componentName: 'googleDrive',
+                        componentVersion: 1,
+                        name: 'gdrive_connection',
+                    });
+                });
+
+                const callArg = hoisted.mockMutate.mock.calls[0][0];
+                const definition = JSON.parse(callArg.workflow.definition);
+
+                expect(definition.tasks[0].clusterElements.source.connections.s3_connection).toBeDefined();
+            });
+        });
+
+        describe('handleOnRemoveClick for cluster elements', () => {
+            it('should remove connection from cluster element', async () => {
+                const {usePropertyCodeEditorDialogRightPanelConnections} =
+                    await import('../usePropertyCodeEditorDialogRightPanelConnections');
+                const {result} = renderHook(() =>
+                    usePropertyCodeEditorDialogRightPanelConnections(clusterElementProps)
+                );
+
+                act(() => {
+                    result.current.handleOnRemoveClick('s3_connection');
+                });
+
+                expect(hoisted.mockMutate).toHaveBeenCalled();
+
+                const callArg = hoisted.mockMutate.mock.calls[0][0];
+                const definition = JSON.parse(callArg.workflow.definition);
+
+                expect(definition.tasks[0].clusterElements.source.connections.s3_connection).toBeUndefined();
+            });
+        });
+    });
+
+    describe('query invalidation', () => {
+        it('should invalidate workflowNodeComponentConnections on submit success for regular nodes', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+
+            act(() => {
+                result.current.handleOnSubmit({
+                    componentName: 'github',
+                    componentVersion: 2,
+                    name: 'github_connection',
+                });
+            });
+
+            const mutateOptions = hoisted.mockMutate.mock.calls[0][1];
+
+            act(() => {
+                mutateOptions.onSuccess();
+            });
+
+            expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({
+                queryKey: ['workflowNodeComponentConnections'],
+            });
+        });
+
+        it('should invalidate clusterElementComponentConnections on submit success for cluster elements', async () => {
+            hoisted.storeState.currentNode = {clusterElementType: 'source', name: 'source_1'};
+            hoisted.storeState.rootClusterElementNodeData = {workflowNodeName: 'dataStream_1'};
+            vi.resetModules();
+
+            const clusterElementProps = {
+                componentConnections: [],
+                workflow: {
+                    definition: JSON.stringify({
+                        tasks: [
+                            {
+                                clusterElements: {
+                                    source: {
+                                        connections: {},
+                                        name: 'source_1',
+                                        type: 'amazonS3/v1/amazonS3Read',
+                                    },
+                                },
+                                name: 'dataStream_1',
+                                type: 'dataStream/v1/sync',
+                            },
+                        ],
+                    }),
+                    id: 'workflow-1',
+                    version: 1,
+                },
+                workflowNodeName: 'source_1',
+            };
+
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(clusterElementProps));
+
+            act(() => {
+                result.current.handleOnSubmit({
+                    componentName: 'amazonS3',
+                    componentVersion: 1,
+                    name: 's3_connection',
+                });
+            });
+
+            const mutateOptions = hoisted.mockMutate.mock.calls[0][1];
+
+            act(() => {
+                mutateOptions.onSuccess();
+            });
+
+            expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({
+                queryKey: ['clusterElementComponentConnections'],
+            });
+        });
+
+        it('should invalidate workflowNodeComponentConnections on remove success for regular nodes', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+
+            act(() => {
+                result.current.handleOnRemoveClick('slack_1');
+            });
+
+            const mutateOptions = hoisted.mockMutate.mock.calls[0][1];
+
+            act(() => {
+                mutateOptions.onSuccess();
+            });
+
+            expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({
+                queryKey: ['workflowNodeComponentConnections'],
+            });
         });
     });
 });
