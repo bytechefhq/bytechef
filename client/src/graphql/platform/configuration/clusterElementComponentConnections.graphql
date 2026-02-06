@@ -1,0 +1,19 @@
+query clusterElementComponentConnections(
+    $workflowId: String!
+    $workflowNodeName: String!
+    $clusterElementType: String!
+    $clusterElementWorkflowNodeName: String!
+) {
+    clusterElementComponentConnections(
+        workflowId: $workflowId
+        workflowNodeName: $workflowNodeName
+        clusterElementType: $clusterElementType
+        clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+    ) {
+        componentName
+        componentVersion
+        key
+        required
+        workflowNodeName
+    }
+}

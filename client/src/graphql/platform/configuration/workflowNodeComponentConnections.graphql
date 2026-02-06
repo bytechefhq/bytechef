@@ -1,0 +1,9 @@
+query workflowNodeComponentConnections($workflowId: String!, $workflowNodeName: String!) {
+    workflowNodeComponentConnections(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
+        componentName
+        componentVersion
+        key
+        required
+        workflowNodeName
+    }
+}
