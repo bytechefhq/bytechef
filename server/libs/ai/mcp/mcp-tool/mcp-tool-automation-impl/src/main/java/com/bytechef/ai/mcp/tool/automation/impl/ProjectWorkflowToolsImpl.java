@@ -309,7 +309,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
             return new WorkflowInfo(
                 projectWorkflowDTO.getId(), projectWorkflowDTO.getProjectWorkflowId(),
                 projectWorkflowDTO.getWorkflowUuid(), projectWorkflowDTO.getLabel(),
-                projectWorkflowDTO.getDescription(), projectWorkflowDTO.getDefinition(),
+                projectWorkflowDTO.getDescription(), definition,
                 projectWorkflowDTO.getVersion(),
                 projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
                 projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
