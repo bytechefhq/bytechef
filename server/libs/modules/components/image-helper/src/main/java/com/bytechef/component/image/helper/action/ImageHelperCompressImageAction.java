@@ -67,12 +67,12 @@ public class ImageHelperCompressImageAction {
     private ImageHelperCompressImageAction() {
     }
 
-    protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, Context actionContext) throws IOException {
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         FileEntry imageFileEntry = inputParameters.getRequiredFileEntry(IMAGE);
 
-        BufferedImage inputImage = ImageIO.read((File) actionContext.file(file -> file.toTempFile(imageFileEntry)));
+        BufferedImage inputImage = ImageIO.read((File) context.file(file -> file.toTempFile(imageFileEntry)));
         String fileExtension = imageFileEntry.getExtension();
         Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(fileExtension);
         ImageWriter writer = writers.next();
@@ -92,7 +92,7 @@ public class ImageHelperCompressImageAction {
 
         InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 
-        return actionContext
+        return context
             .file(file -> file.storeContent(
                 inputParameters.getRequiredString(RESULT_FILE_NAME) + "." + fileExtension, inputStream));
     }

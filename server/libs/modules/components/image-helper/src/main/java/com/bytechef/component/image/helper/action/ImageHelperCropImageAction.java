@@ -75,8 +75,8 @@ public class ImageHelperCropImageAction {
     private ImageHelperCropImageAction() {
     }
 
-    protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         FileEntry imageFileEntry = inputParameters.getRequiredFileEntry(IMAGE);
 
@@ -92,8 +92,7 @@ public class ImageHelperCropImageAction {
         BufferedImage croppedImage = bufferedImage.getSubimage(x, y, width, height);
 
         return storeBufferedImage(
-            context, croppedImage, imageFileEntry.getExtension(),
-            inputParameters.getRequiredString(RESULT_FILE_NAME));
+            context, croppedImage, imageFileEntry.getExtension(), inputParameters.getRequiredString(RESULT_FILE_NAME));
     }
 
     private static void validate(int x, int y, int width, int height, int imageWidth, int imageHeight)

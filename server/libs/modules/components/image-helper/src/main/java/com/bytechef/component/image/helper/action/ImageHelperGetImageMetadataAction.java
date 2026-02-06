@@ -53,12 +53,12 @@ public class ImageHelperGetImageMetadataAction {
     private ImageHelperGetImageMetadataAction() {
     }
 
-    protected static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context actionContext) throws IOException {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
 
         FileEntry imageFileEntry = inputParameters.getRequiredFileEntry(IMAGE);
 
-        File imageFile = actionContext.file(file -> file.toTempFile(imageFileEntry));
+        File imageFile = context.file(file -> file.toTempFile(imageFileEntry));
         ImageInputStream iis = ImageIO.createImageInputStream(imageFile);
         Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
 
