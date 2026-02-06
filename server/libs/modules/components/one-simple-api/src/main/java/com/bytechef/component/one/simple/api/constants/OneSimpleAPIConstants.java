@@ -34,6 +34,11 @@ public class OneSimpleAPIConstants {
     public static final String TITLE = "title";
     public static final String TO_CURRENCY = "to_currency";
     public static final String URL = "url";
+    public static final String SOURCE = "source";
+    public static final String HTML = "html";
+    public static final String CUSTOM_CSS = "custom_css";
+    public static final String WAIT = "wait";
+    public static final String FULL_PAGE = "fullpage";
 
     public static final List<Option<String>> CURRENCY_OPTIONS = List.of(
         option("UAE Dirham", "AED"),
