@@ -60,7 +60,16 @@ export const usePropertyCodeEditorDialogToolbar = ({
     const testWorkflowNodeScriptMutation = useTestWorkflowNodeScriptMutation();
 
     const handleCopilotClick = useCallback(() => {
-        const currentContext = useCopilotStore.getState().context;
+        const {
+            context: currentContext,
+            generateConversationId,
+            resetMessages,
+            saveConversationState,
+        } = useCopilotStore.getState();
+
+        saveConversationState();
+        resetMessages();
+        generateConversationId();
 
         setContext({
             ...currentContext,

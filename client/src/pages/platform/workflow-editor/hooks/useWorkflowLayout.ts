@@ -5,6 +5,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
@@ -15,13 +16,13 @@ import {useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 export const useWorkflowLayout = (includeComponents?: string[]) => {
-    const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore(
+    const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotPanelStore(
         useShallow((state) => ({
             copilotPanelOpen: state.copilotPanelOpen,
-            setContext: state.setContext,
             setCopilotPanelOpen: state.setCopilotPanelOpen,
         }))
     );
+    const setContext = useCopilotStore((state) => state.setContext);
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore(
@@ -162,7 +163,10 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     };
 
     const handleCopilotClick = () => {
-        const currentContext = useCopilotStore.getState().context;
+        const {context: currentContext, generateConversationId, resetMessages} = useCopilotStore.getState();
+
+        resetMessages();
+        generateConversationId();
 
         setContext({
             ...currentContext,

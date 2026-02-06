@@ -3,8 +3,11 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => {
     return {
+        mockGenerateConversationId: vi.fn(),
         mockMutateAsyncClusterElement: vi.fn(),
         mockMutateAsyncWorkflowNode: vi.fn(),
+        mockResetMessages: vi.fn(),
+        mockSaveConversationState: vi.fn(),
         mockSetContext: vi.fn(),
         mockSetCopilotPanelOpen: vi.fn(),
         mockSetSaving: vi.fn(),
@@ -49,6 +52,9 @@ vi.mock('@/shared/components/copilot/stores/useCopilotStore', () => ({
         {
             getState: () => ({
                 context: {existingProp: 'value'},
+                generateConversationId: hoisted.mockGenerateConversationId,
+                resetMessages: hoisted.mockResetMessages,
+                saveConversationState: hoisted.mockSaveConversationState,
             }),
         }
     ),

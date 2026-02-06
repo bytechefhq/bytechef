@@ -77,6 +77,7 @@ const PropertyCodeEditorDialog = ({
                         <CopilotPanel
                             className="h-full rounded-r-md border-l border-l-border/50"
                             onClose={handleCopilotClose}
+                            open={copilotPanelOpen}
                         />
                     )}
                 </DialogContent>

@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -14,10 +15,10 @@ export interface CopilotButtonProps {
 
 const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
     const ai = useApplicationInfoStore((state) => state.ai);
-    const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore(
+    const setContext = useCopilotStore((state) => state.setContext);
+    const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotPanelStore(
         useShallow((state) => ({
             copilotPanelOpen: state.copilotPanelOpen,
-            setContext: state.setContext,
             setCopilotPanelOpen: state.setCopilotPanelOpen,
         }))
     );
@@ -25,7 +26,10 @@ const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
     const handleClick = () => {
-        const currentContext = useCopilotStore.getState().context;
+        const {context: currentContext, generateConversationId, resetMessages} = useCopilotStore.getState();
+
+        resetMessages();
+        generateConversationId();
 
         setContext({
             ...currentContext,
@@ -35,7 +39,7 @@ const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
         });
 
         if (!copilotPanelOpen) {
-            setCopilotPanelOpen(!copilotPanelOpen);
+            setCopilotPanelOpen(true);
         }
     };
 

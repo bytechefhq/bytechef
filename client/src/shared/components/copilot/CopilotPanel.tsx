@@ -2,28 +2,33 @@ import Button from '@/components/Button/Button';
 import {Thread} from '@/components/assistant-ui/thread';
 import {ToggleGroup, ToggleGroupItem} from '@/components/ui/toggle-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import CopilotPanelBoundary from '@/shared/components/copilot/CopilotPanelBoundary';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
-import {MODE, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {BotMessageSquareIcon, MessageSquareOffIcon, XIcon} from 'lucide-react';
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
+import {useLocation} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 interface CopilotPanelProps {
     className?: string;
     onClose?: () => void;
+    open: boolean;
 }
 
-const CopilotPanel = ({className, onClose}: CopilotPanelProps) => {
-    const {context, generateConversationId, resetMessages, setContext, setCopilotPanelOpen} = useCopilotStore(
+const CopilotPanelContent = ({className, onClose}: Omit<CopilotPanelProps, 'open'>) => {
+    const {context, generateConversationId, resetMessages, setContext} = useCopilotStore(
         useShallow((state) => ({
             context: state.context,
             generateConversationId: state.generateConversationId,
             resetMessages: state.resetMessages,
             setContext: state.setContext,
-            setCopilotPanelOpen: state.setCopilotPanelOpen,
         }))
     );
+    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
+    const location = useLocation();
 
     const handleCleanMessages = () => {
         resetMessages();
@@ -34,24 +39,25 @@ const CopilotPanel = ({className, onClose}: CopilotPanelProps) => {
         if (onClose) {
             onClose();
         } else {
-            setContext(undefined);
+            setContext({
+                mode: MODE.ASK,
+                parameters: {},
+                source: Source.WORKFLOW_EDITOR,
+            });
             setCopilotPanelOpen(false);
         }
     };
 
-    useEffect(() => {
-        generateConversationId();
-        resetMessages();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    const previousPathnameRef = useRef(location.pathname);
 
     useEffect(() => {
-        generateConversationId();
-        resetMessages();
+        if (previousPathnameRef.current !== location.pathname) {
+            previousPathnameRef.current = location.pathname;
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [context?.source]);
+            generateConversationId();
+            resetMessages();
+        }
+    }, [generateConversationId, location.pathname, resetMessages]);
 
     return (
         <div className={twMerge('relative h-full min-h-[50vh] w-[450px] bg-surface-main', className)}>
@@ -107,5 +113,11 @@ const CopilotPanel = ({className, onClose}: CopilotPanelProps) => {
         </div>
     );
 };
+
+const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => (
+    <CopilotPanelBoundary>
+        {open && <CopilotPanelContent className={className} onClose={onClose} />}
+    </CopilotPanelBoundary>
+);
 
 export default CopilotPanel;
