@@ -35,6 +35,7 @@ public class RandomHelperRandomHexAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("randomHex")
         .title("Random Hex")
         .description("Generates a random Hex.")
+        .help("", "https://docs.bytechef.io/reference/components/random-helper_v1#random-hex")
         .properties(
             integer(LENGTH)
                 .label("Hex Byte Length")

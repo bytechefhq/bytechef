@@ -32,15 +32,14 @@ import com.bytechef.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * Action for generating random strings in workflow automation.
- *
  * @author Nikolina Spehar
  */
 public class RandomHelperRandomStringAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("randomString")
         .title("Random String")
-        .description("Generates a random string value.")
+        .description("Generates a random string of the specified length using the provided character set.")
+        .help("", "https://docs.bytechef.io/reference/components/random-helper_v1#random-string")
         .properties(
             integer(LENGTH)
                 .label("Length")
@@ -64,8 +63,6 @@ public class RandomHelperRandomStringAction {
     }
 
     /**
-     * Generates a random string of the specified length using the provided character set.
-     *
      * <p>
      * <b>Security Note:</b> The use of {@link Math#random()} is intentional for this action. The Random String action
      * is designed to generate random strings for workflow automation purposes, such as generating test data, creating
