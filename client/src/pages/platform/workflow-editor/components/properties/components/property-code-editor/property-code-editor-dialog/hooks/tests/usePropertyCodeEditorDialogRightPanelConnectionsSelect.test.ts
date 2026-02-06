@@ -3,6 +3,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => {
     return {
+        currentNode: undefined as {clusterElementType?: string; name: string} | undefined,
         mockComponentDefinition: {
             connection: {version: 1},
             name: 'testComponent',
@@ -17,7 +18,9 @@ const hoisted = vi.hoisted(() => {
             {id: 1, name: 'Connection 1'},
             {id: 2, name: 'Connection 2'},
         ],
-        mockMutate: vi.fn(),
+        mockMutateClusterElement: vi.fn(),
+        mockMutateWorkflowNode: vi.fn(),
+        rootClusterElementNodeData: undefined as {workflowNodeName: string} | undefined,
     };
 });
 
@@ -35,15 +38,28 @@ vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () 
     }),
 }));
 
-vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
-    useGetComponentDefinitionQuery: () => ({
-        data: hoisted.mockComponentDefinition,
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => ({
+    default: (selector: (state: {rootClusterElementNodeData: typeof hoisted.rootClusterElementNodeData}) => unknown) =>
+        selector({rootClusterElementNodeData: hoisted.rootClusterElementNodeData}),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore', () => ({
+    default: (selector: (state: {currentNode: typeof hoisted.currentNode}) => unknown) =>
+        selector({currentNode: hoisted.currentNode}),
+}));
+
+vi.mock('@/shared/middleware/graphql', () => ({
+    useSaveClusterElementTestConfigurationConnectionMutation: () => ({
+        mutate: hoisted.mockMutateClusterElement,
+    }),
+    useSaveWorkflowTestConfigurationConnectionMutation: () => ({
+        mutate: hoisted.mockMutateWorkflowNode,
     }),
 }));
 
-vi.mock('@/shared/mutations/platform/workflowTestConfigurations.mutations', () => ({
-    useSaveWorkflowTestConfigurationConnectionMutation: () => ({
-        mutate: hoisted.mockMutate,
+vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
+    useGetComponentDefinitionQuery: () => ({
+        data: hoisted.mockComponentDefinition,
     }),
 }));
 
@@ -61,6 +77,10 @@ vi.mock('@tanstack/react-query', () => ({
     useQueryClient: () => ({
         invalidateQueries: vi.fn(),
     }),
+}));
+
+vi.mock('zustand/react/shallow', () => ({
+    useShallow: (selector: unknown) => selector,
 }));
 
 import usePropertyCodeEditorDialogRightPanelConnectionsSelect from '../usePropertyCodeEditorDialogRightPanelConnectionsSelect';
@@ -81,6 +101,9 @@ describe('usePropertyCodeEditorDialogRightPanelConnectionsSelect', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+
+        hoisted.currentNode = undefined;
+        hoisted.rootClusterElementNodeData = undefined;
     });
 
     afterEach(() => {
@@ -163,22 +186,49 @@ describe('usePropertyCodeEditorDialogRightPanelConnectionsSelect', () => {
     });
 
     describe('handleValueChange', () => {
-        it('should call mutation with correct parameters', () => {
+        it('should call workflow node mutation with correct parameters', () => {
             const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnectionsSelect(defaultProps));
 
             act(() => {
                 result.current.handleValueChange(456, 'connection-key');
             });
 
-            expect(hoisted.mockMutate).toHaveBeenCalledWith({
-                environmentId: 1,
-                saveWorkflowTestConfigurationConnectionRequest: {
+            expect(hoisted.mockMutateWorkflowNode).toHaveBeenCalledWith(
+                {
                     connectionId: 456,
+                    environmentId: 1,
+                    workflowConnectionKey: 'connection-key',
+                    workflowId: 'workflow-1',
+                    workflowNodeName: 'testNode',
                 },
-                workflowConnectionKey: 'connection-key',
-                workflowId: 'workflow-1',
-                workflowNodeName: 'testNode',
+                expect.objectContaining({onSuccess: expect.any(Function)})
+            );
+        });
+
+        it('should call cluster element mutation when in cluster element context', () => {
+            hoisted.currentNode = {clusterElementType: 'model', name: 'script_1'};
+            hoisted.rootClusterElementNodeData = {workflowNodeName: 'ai_agent_1'};
+
+            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnectionsSelect(defaultProps));
+
+            act(() => {
+                result.current.handleValueChange(789, 'connection-key');
             });
+
+            expect(hoisted.mockMutateClusterElement).toHaveBeenCalledWith(
+                {
+                    clusterElementType: 'model',
+                    clusterElementWorkflowNodeName: 'script_1',
+                    connectionId: 789,
+                    environmentId: 1,
+                    workflowConnectionKey: 'connection-key',
+                    workflowId: 'workflow-1',
+                    workflowNodeName: 'ai_agent_1',
+                },
+                expect.objectContaining({onSuccess: expect.any(Function)})
+            );
+
+            expect(hoisted.mockMutateWorkflowNode).not.toHaveBeenCalled();
         });
     });
 

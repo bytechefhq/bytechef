@@ -1,11 +1,17 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {
+    useSaveClusterElementTestConfigurationConnectionMutation,
+    useSaveWorkflowTestConfigurationConnectionMutation,
+} from '@/shared/middleware/graphql';
 import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
-import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 interface UsePropertyCodeEditorDialogRightPanelConnectionsSelectProps {
     componentConnection: ComponentConnection;
@@ -23,6 +29,10 @@ const usePropertyCodeEditorDialogRightPanelConnectionsSelect = ({
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const rootClusterElementNodeData = useWorkflowEditorStore(useShallow((state) => state.rootClusterElementNodeData));
+
+    const isClusterElement = currentNode?.clusterElementType && rootClusterElementNodeData?.workflowNodeName;
 
     const {
         ConnectionKeys,
@@ -58,24 +68,47 @@ const usePropertyCodeEditorDialogRightPanelConnectionsSelect = ({
 
     const queryClient = useQueryClient();
 
-    const saveWorkflowTestConfigurationConnectionMutation = useSaveWorkflowTestConfigurationConnectionMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
-            });
-        },
-    });
+    const saveClusterElementConnectionMutation = useSaveClusterElementTestConfigurationConnectionMutation();
+    const saveWorkflowNodeConnectionMutation = useSaveWorkflowTestConfigurationConnectionMutation();
 
     const handleValueChange = (connectionId: number, workflowConnectionKey: string) => {
-        saveWorkflowTestConfigurationConnectionMutation.mutate({
-            environmentId: currentEnvironmentId,
-            saveWorkflowTestConfigurationConnectionRequest: {
-                connectionId,
-            },
-            workflowConnectionKey,
-            workflowId,
-            workflowNodeName,
-        });
+        if (isClusterElement) {
+            saveClusterElementConnectionMutation.mutate(
+                {
+                    clusterElementType: currentNode.clusterElementType!,
+                    clusterElementWorkflowNodeName: currentNode.name,
+                    connectionId,
+                    environmentId: currentEnvironmentId!,
+                    workflowConnectionKey,
+                    workflowId,
+                    workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                },
+                {
+                    onSuccess: () => {
+                        queryClient.invalidateQueries({
+                            queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
+                        });
+                    },
+                }
+            );
+        } else {
+            saveWorkflowNodeConnectionMutation.mutate(
+                {
+                    connectionId,
+                    environmentId: currentEnvironmentId!,
+                    workflowConnectionKey,
+                    workflowId,
+                    workflowNodeName,
+                },
+                {
+                    onSuccess: () => {
+                        queryClient.invalidateQueries({
+                            queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
+                        });
+                    },
+                }
+            );
+        }
     };
 
     return {
