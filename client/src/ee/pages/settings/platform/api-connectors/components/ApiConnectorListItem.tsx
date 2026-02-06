@@ -25,6 +25,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
     const {
         handleAlertDeleteDialogClick,
         handleOnCheckedChange,
+        lastModifiedDate,
         setShowDeleteDialog,
         setShowEditDialog,
         showDeleteDialog,
@@ -84,9 +85,9 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                                {apiConnector.lastModifiedDate ? (
+                                {lastModifiedDate ? (
                                     <span className="text-xs">
-                                        {`Modified at ${new Date(apiConnector.lastModifiedDate).toLocaleDateString()} ${new Date(apiConnector.lastModifiedDate).toLocaleTimeString()}`}
+                                        {`Modified at ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}
                                     </span>
                                 ) : (
                                     '-'
