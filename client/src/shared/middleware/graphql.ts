@@ -3140,6 +3140,16 @@ export type ApiKeysQueryVariables = Exact<{
 
 export type ApiKeysQuery = { __typename?: 'Query', apiKeys?: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null } | null> | null };
 
+export type ClusterElementComponentConnectionsQueryVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+  clusterElementType: Scalars['String']['input'];
+  clusterElementWorkflowNodeName: Scalars['String']['input'];
+}>;
+
+
+export type ClusterElementComponentConnectionsQuery = { __typename?: 'Query', clusterElementComponentConnections: Array<{ __typename?: 'ComponentConnection', componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
+
 export type ClusterElementScriptInputQueryVariables = Exact<{
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
@@ -3270,6 +3280,7 @@ export type TestClusterElementScriptMutationVariables = Exact<{
   clusterElementType: Scalars['String']['input'];
   clusterElementWorkflowNodeName: Scalars['String']['input'];
   environmentId: Scalars['Long']['input'];
+  inputParameters?: InputMaybe<Scalars['Map']['input']>;
 }>;
 
 
@@ -3279,6 +3290,7 @@ export type TestWorkflowNodeScriptMutationVariables = Exact<{
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
   environmentId: Scalars['Long']['input'];
+  inputParameters?: InputMaybe<Scalars['Map']['input']>;
 }>;
 
 
@@ -3311,6 +3323,14 @@ export type UpdateMcpServerUrlMutationVariables = Exact<{
 
 
 export type UpdateMcpServerUrlMutation = { __typename?: 'Mutation', updateMcpServerUrl: string };
+
+export type WorkflowNodeComponentConnectionsQueryVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+}>;
+
+
+export type WorkflowNodeComponentConnectionsQuery = { __typename?: 'Query', workflowNodeComponentConnections: Array<{ __typename?: 'ComponentConnection', componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
 
 export type WorkflowNodeScriptInputQueryVariables = Exact<{
   workflowId: Scalars['String']['input'];
@@ -5807,6 +5827,39 @@ export const useApiKeysQuery = <
   }
     )};
 
+export const ClusterElementComponentConnectionsDocument = `
+    query clusterElementComponentConnections($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!) {
+  clusterElementComponentConnections(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    clusterElementType: $clusterElementType
+    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+  ) {
+    componentName
+    componentVersion
+    key
+    required
+    workflowNodeName
+  }
+}
+    `;
+
+export const useClusterElementComponentConnectionsQuery = <
+      TData = ClusterElementComponentConnectionsQuery,
+      TError = unknown
+    >(
+      variables: ClusterElementComponentConnectionsQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementComponentConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementComponentConnectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ClusterElementComponentConnectionsQuery, TError, TData>(
+      {
+    queryKey: ['clusterElementComponentConnections', variables],
+    queryFn: fetcher<ClusterElementComponentConnectionsQuery, ClusterElementComponentConnectionsQueryVariables>(ClusterElementComponentConnectionsDocument, variables),
+    ...options
+  }
+    )};
+
 export const ClusterElementScriptInputDocument = `
     query clusterElementScriptInput($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!) {
   clusterElementScriptInput(
@@ -6241,13 +6294,14 @@ export const useSaveWorkflowTestConfigurationConnectionMutation = <
     )};
 
 export const TestClusterElementScriptDocument = `
-    mutation testClusterElementScript($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!) {
+    mutation testClusterElementScript($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!, $inputParameters: Map) {
   testClusterElementScript(
     workflowId: $workflowId
     workflowNodeName: $workflowNodeName
     clusterElementType: $clusterElementType
     clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
     environmentId: $environmentId
+    inputParameters: $inputParameters
   ) {
     error {
       message
@@ -6272,11 +6326,12 @@ export const useTestClusterElementScriptMutation = <
     )};
 
 export const TestWorkflowNodeScriptDocument = `
-    mutation testWorkflowNodeScript($workflowId: String!, $workflowNodeName: String!, $environmentId: Long!) {
+    mutation testWorkflowNodeScript($workflowId: String!, $workflowNodeName: String!, $environmentId: Long!, $inputParameters: Map) {
   testWorkflowNodeScript(
     workflowId: $workflowId
     workflowNodeName: $workflowNodeName
     environmentId: $environmentId
+    inputParameters: $inputParameters
   ) {
     error {
       message
@@ -6383,6 +6438,37 @@ export const useUpdateMcpServerUrlMutation = <
       {
     mutationKey: ['updateMcpServerUrl'],
     mutationFn: (variables?: UpdateMcpServerUrlMutationVariables) => fetcher<UpdateMcpServerUrlMutation, UpdateMcpServerUrlMutationVariables>(UpdateMcpServerUrlDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WorkflowNodeComponentConnectionsDocument = `
+    query workflowNodeComponentConnections($workflowId: String!, $workflowNodeName: String!) {
+  workflowNodeComponentConnections(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+  ) {
+    componentName
+    componentVersion
+    key
+    required
+    workflowNodeName
+  }
+}
+    `;
+
+export const useWorkflowNodeComponentConnectionsQuery = <
+      TData = WorkflowNodeComponentConnectionsQuery,
+      TError = unknown
+    >(
+      variables: WorkflowNodeComponentConnectionsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowNodeComponentConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeComponentConnectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkflowNodeComponentConnectionsQuery, TError, TData>(
+      {
+    queryKey: ['workflowNodeComponentConnections', variables],
+    queryFn: fetcher<WorkflowNodeComponentConnectionsQuery, WorkflowNodeComponentConnectionsQueryVariables>(WorkflowNodeComponentConnectionsDocument, variables),
     ...options
   }
     )};
