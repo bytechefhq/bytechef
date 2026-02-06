@@ -90,6 +90,7 @@ updateWorkflow(workflowId, workflow)
 - Every task must have a unique name in format: componentName_{number}
 - Required fields must be filled, the other fields are optional
 - If an array in taskDefinition contains multiple objects, you can use any of the objects for that array
+- You can reference the output property in a format similar to: ${taskName.outputProperty}, ${taskName.outputProperty.nestedProperty}, ${taskName.arrayProperty[1]}
 - ALWAYS validate before building
 - ALWAYS validate after building
 - FIX all errors before proceeding
