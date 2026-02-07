@@ -17,27 +17,27 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * SaveWorkflowTestConfigurationConnectionRequestModel
+ * DeleteWorkflowTestConfigurationConnectionRequestModel
  */
 
-@JsonTypeName("saveWorkflowTestConfigurationConnection_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.494207+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
-public class SaveWorkflowTestConfigurationConnectionRequestModel {
+@JsonTypeName("deleteWorkflowTestConfigurationConnection_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-02-07T09:52:01.007100+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
+public class DeleteWorkflowTestConfigurationConnectionRequestModel {
 
   private Long connectionId;
 
-  public SaveWorkflowTestConfigurationConnectionRequestModel() {
+  public DeleteWorkflowTestConfigurationConnectionRequestModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public SaveWorkflowTestConfigurationConnectionRequestModel(Long connectionId) {
+  public DeleteWorkflowTestConfigurationConnectionRequestModel(Long connectionId) {
     this.connectionId = connectionId;
   }
 
-  public SaveWorkflowTestConfigurationConnectionRequestModel connectionId(Long connectionId) {
+  public DeleteWorkflowTestConfigurationConnectionRequestModel connectionId(Long connectionId) {
     this.connectionId = connectionId;
     return this;
   }
@@ -65,8 +65,8 @@ public class SaveWorkflowTestConfigurationConnectionRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequest = (SaveWorkflowTestConfigurationConnectionRequestModel) o;
-    return Objects.equals(this.connectionId, saveWorkflowTestConfigurationConnectionRequest.connectionId);
+    DeleteWorkflowTestConfigurationConnectionRequestModel deleteWorkflowTestConfigurationConnectionRequest = (DeleteWorkflowTestConfigurationConnectionRequestModel) o;
+    return Objects.equals(this.connectionId, deleteWorkflowTestConfigurationConnectionRequest.connectionId);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class SaveWorkflowTestConfigurationConnectionRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class SaveWorkflowTestConfigurationConnectionRequestModel {\n");
+    sb.append("class DeleteWorkflowTestConfigurationConnectionRequestModel {\n");
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -87,7 +87,7 @@ public class SaveWorkflowTestConfigurationConnectionRequestModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
+  private String toIndentedString(@Nullable Object o) {
     if (o == null) {
       return "null";
     }
