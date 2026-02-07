@@ -1,6 +1,5 @@
 import {
-    DeleteWorkflowTestConfigurationConnectionRequest,
-    SaveWorkflowTestConfigurationConnectionOperationRequest,
+    DeleteWorkflowTestConfigurationConnectionOperationRequest,
     SaveWorkflowTestConfigurationInputsOperationRequest,
     SaveWorkflowTestConfigurationRequest,
     WorkflowTestConfiguration,
@@ -9,15 +8,15 @@ import {
 import {useMutation} from '@tanstack/react-query';
 
 interface DeleteWorkflowTestConfigurationConnectionRequestProps {
-    onSuccess?: (result: void, variables: DeleteWorkflowTestConfigurationConnectionRequest) => void;
-    onError?: (error: Error, variables: DeleteWorkflowTestConfigurationConnectionRequest) => void;
+    onSuccess?: (result: void, variables: DeleteWorkflowTestConfigurationConnectionOperationRequest) => void;
+    onError?: (error: Error, variables: DeleteWorkflowTestConfigurationConnectionOperationRequest) => void;
 }
 
 export const useDeleteWorkflowTestConfigurationConnectionMutation = (
     mutationProps?: DeleteWorkflowTestConfigurationConnectionRequestProps
 ) =>
     useMutation({
-        mutationFn: (request: DeleteWorkflowTestConfigurationConnectionRequest) => {
+        mutationFn: (request: DeleteWorkflowTestConfigurationConnectionOperationRequest) => {
             return new WorkflowTestConfigurationApi().deleteWorkflowTestConfigurationConnection(request);
         },
         onError: mutationProps?.onError,
@@ -33,22 +32,6 @@ export const useSaveWorkflowTestConfigurationMutation = (mutationProps?: SaveWor
     useMutation({
         mutationFn: (request: SaveWorkflowTestConfigurationRequest) => {
             return new WorkflowTestConfigurationApi().saveWorkflowTestConfiguration(request);
-        },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
-    });
-
-interface SaveWorkflowTestConfigurationConnectionRequestProps {
-    onSuccess?: (result: void, variables: SaveWorkflowTestConfigurationConnectionOperationRequest) => void;
-    onError?: (error: Error, variables: SaveWorkflowTestConfigurationConnectionOperationRequest) => void;
-}
-
-export const useSaveWorkflowTestConfigurationConnectionMutation = (
-    mutationProps?: SaveWorkflowTestConfigurationConnectionRequestProps
-) =>
-    useMutation({
-        mutationFn: (request: SaveWorkflowTestConfigurationConnectionOperationRequest) => {
-            return new WorkflowTestConfigurationApi().saveWorkflowTestConfigurationConnection(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
