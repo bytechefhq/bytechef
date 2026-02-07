@@ -28,6 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.HashMap;
 import java.util.Map;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -89,6 +90,13 @@ public class TokenRefreshAspect {
 
         String componentName =
             findAnnotatedArgument(parameters, args, WithTokenRefresh.ComponentNameParam.class, String.class);
+
+        if (componentName == null) {
+            throw new IllegalStateException(
+                "Method annotated with @WithTokenRefresh must declare a parameter annotated with " +
+                    "@WithTokenRefresh.ComponentNameParam of type String: " + method.toGenericString());
+        }
+
         ComponentConnection componentConnection = findConnectionArgument(parameters, args);
 
         if (componentConnection == null || componentConnection.authorizationType() == null) {
@@ -215,7 +223,11 @@ public class TokenRefreshAspect {
                     .iterator()
                     .next();
 
-                connectionMap.put(firstKey, refreshedConnection);
+                Map<String, ComponentConnection> updatedMap = new HashMap<>(connectionMap);
+
+                updatedMap.put(firstKey, refreshedConnection);
+
+                updatedArgs[index] = updatedMap;
             }
         }
 

@@ -99,8 +99,8 @@ public class TokenRefreshTestService {
     @WithTokenRefresh(
         errorTypeClass = ActionDefinitionErrorType.class,
         errorTypeField = "EXECUTE_PERFORM")
-    public Object
-        executeWithoutConnection(@WithTokenRefresh.ComponentNameParam String componentName, int componentVersion) {
+    public Object executeWithoutConnection(
+        @WithTokenRefresh.ComponentNameParam String componentName, int componentVersion) {
         callCount.incrementAndGet();
 
         return behavior.get();
