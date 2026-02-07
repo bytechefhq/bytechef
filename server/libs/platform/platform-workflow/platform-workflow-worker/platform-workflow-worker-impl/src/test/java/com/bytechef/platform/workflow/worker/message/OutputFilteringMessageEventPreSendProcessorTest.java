@@ -456,22 +456,32 @@ class OutputFilteringMessageEventPreSendProcessorTest {
             .thenAnswer(invocation -> {
                 Map<String, Object> filteredOutput = (Map<String, Object>) invocation.getArgument(2);
 
-                assertThat(filteredOutput).containsKey("items[0]");
-                assertThat(filteredOutput.get("items[0]")).isInstanceOf(Map.class);
+                assertThat(filteredOutput).containsKey("items");
+                assertThat(filteredOutput.get("items")).isInstanceOf(List.class);
 
-                Map<String, Object> firstItem = (Map<String, Object>) filteredOutput.get("items[0]");
+                List<Object> itemsList = (List<Object>) filteredOutput.get("items");
+
+                assertThat(itemsList).hasSize(2);
+
+                Map<String, Object> firstItem = (Map<String, Object>) itemsList.get(0);
 
                 assertThat(firstItem).containsEntry("name", "First");
                 assertThat(firstItem).doesNotContainKey("value");
+
+                assertThat(itemsList.get(1)).isNull();
 
                 assertThat(filteredOutput).containsKey("response");
 
                 Map<String, Object> responseMap = (Map<String, Object>) filteredOutput.get("response");
 
-                assertThat(responseMap).containsKey("elements[0]");
-                assertThat(responseMap.get("elements[0]")).isInstanceOf(Map.class);
+                assertThat(responseMap).containsKey("elements");
+                assertThat(responseMap.get("elements")).isInstanceOf(List.class);
 
-                Map<String, Object> firstElement = (Map<String, Object>) responseMap.get("elements[0]");
+                List<Object> elementsList = (List<Object>) responseMap.get("elements");
+
+                assertThat(elementsList).hasSize(1);
+
+                Map<String, Object> firstElement = (Map<String, Object>) elementsList.get(0);
 
                 assertThat(firstElement).containsEntry("propBool", true);
 
@@ -524,5 +534,109 @@ class OutputFilteringMessageEventPreSendProcessorTest {
         assertThat(taskExecution.getOutput()).isSameAs(outputFileEntry);
 
         verify(taskFileStorage, never()).storeTaskExecutionOutput(anyLong(), anyLong(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testProcessFiltersWithOverlappingParentAndChildPaths() {
+        Map<String, Object> fullOutput = Map.of(
+            "response", Map.of("lastname", "Doe", "firstname", "John", "age", 30),
+            "unused", "data");
+
+        FileEntry originalOutputFileEntry = mock(FileEntry.class);
+        FileEntry filteredOutputFileEntry = mock(FileEntry.class);
+
+        when(taskFileStorage.readTaskExecutionOutput(originalOutputFileEntry)).thenReturn(fullOutput);
+        when(taskFileStorage.storeTaskExecutionOutput(anyLong(), anyLong(), any()))
+            .thenAnswer(invocation -> {
+                Map<String, Object> filteredOutput = (Map<String, Object>) invocation.getArgument(2);
+
+                assertThat(filteredOutput).containsKey("response");
+
+                Map<String, Object> responseMap = (Map<String, Object>) filteredOutput.get("response");
+
+                assertThat(responseMap).containsEntry("lastname", "Doe");
+                assertThat(responseMap).containsEntry("firstname", "John");
+                assertThat(responseMap).containsEntry("age", 30);
+                assertThat(filteredOutput).doesNotContainKey("unused");
+
+                return filteredOutputFileEntry;
+            });
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(1L)
+            .jobId(100L)
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(WorkflowConstants.NAME, "accelo_1", WorkflowConstants.TYPE, "accelo/v1/createContact",
+                        WorkflowConstants.PARAMETERS, Map.of())))
+            .build();
+
+        taskExecution.setOutput(originalOutputFileEntry);
+        taskExecution.putMetadata(MetadataConstants.OUTPUT_REFERENCE_PATHS,
+            Set.of("response", "response.lastname"));
+
+        TaskExecutionCompleteEvent event = new TaskExecutionCompleteEvent(taskExecution);
+
+        processor.process(event);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testProcessFiltersWithMultiBracketIndexedPaths() {
+        Map<String, Object> fullOutput = Map.of(
+            "conditions", List.of(
+                List.of(
+                    Map.of("value", "first", "type", "text"),
+                    Map.of("value", "second", "type", "number")),
+                List.of(
+                    Map.of("value", "third", "type", "bool"))));
+
+        FileEntry originalOutputFileEntry = mock(FileEntry.class);
+        FileEntry filteredOutputFileEntry = mock(FileEntry.class);
+
+        when(taskFileStorage.readTaskExecutionOutput(originalOutputFileEntry)).thenReturn(fullOutput);
+        when(taskFileStorage.storeTaskExecutionOutput(anyLong(), anyLong(), any()))
+            .thenAnswer(invocation -> {
+                Map<String, Object> filteredOutput = (Map<String, Object>) invocation.getArgument(2);
+
+                assertThat(filteredOutput).containsKey("conditions");
+                assertThat(filteredOutput.get("conditions")).isInstanceOf(List.class);
+
+                List<Object> conditionsList = (List<Object>) filteredOutput.get("conditions");
+
+                assertThat(conditionsList).hasSize(2);
+
+                Object firstRow = conditionsList.get(0);
+
+                assertThat(firstRow).isInstanceOf(List.class);
+
+                List<Object> firstRowList = (List<Object>) firstRow;
+
+                assertThat(firstRowList).hasSize(2);
+
+                Map<String, Object> secondElement = (Map<String, Object>) firstRowList.get(1);
+
+                assertThat(secondElement).containsEntry("value", "second");
+
+                return filteredOutputFileEntry;
+            });
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(1L)
+            .jobId(100L)
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(WorkflowConstants.NAME, "accelo_1", WorkflowConstants.TYPE, "accelo/v1/createContact",
+                        WorkflowConstants.PARAMETERS, Map.of())))
+            .build();
+
+        taskExecution.setOutput(originalOutputFileEntry);
+        taskExecution.putMetadata(MetadataConstants.OUTPUT_REFERENCE_PATHS,
+            Set.of("conditions[0][1].value"));
+
+        TaskExecutionCompleteEvent event = new TaskExecutionCompleteEvent(taskExecution);
+
+        processor.process(event);
     }
 }
