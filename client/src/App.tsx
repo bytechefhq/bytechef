@@ -280,6 +280,10 @@ function App() {
         }
 
         const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.defaultPrevented) {
+                return;
+            }
+
             if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
                 event.preventDefault();
                 setSearchOpen(true);
