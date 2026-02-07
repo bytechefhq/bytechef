@@ -81,11 +81,15 @@ export default function saveProperty({
     }
 
     if (currentNode && currentNode.clusterElementType) {
+        if (!updateClusterElementParameterMutation) {
+            return;
+        }
+
         const clusterElementType = currentNode.clusterElementType;
         const clusterElementWorkflowNodeName = currentNode.workflowNodeName;
 
         enqueueWorkflowMutation(() =>
-            updateClusterElementParameterMutation!.mutateAsync(
+            updateClusterElementParameterMutation.mutateAsync(
                 {
                     clusterElementType,
                     clusterElementWorkflowNodeName,

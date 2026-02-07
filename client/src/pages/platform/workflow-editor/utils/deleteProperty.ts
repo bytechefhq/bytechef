@@ -37,11 +37,15 @@ export default function deleteProperty(
     }
 
     if (currentNode?.clusterElementType) {
+        if (!deleteClusterElementParameterMutation) {
+            return;
+        }
+
         const clusterElementType = currentNode.clusterElementType;
         const clusterElementWorkflowNodeName = currentNode.workflowNodeName;
 
         enqueueWorkflowMutation(() =>
-            deleteClusterElementParameterMutation!.mutateAsync(
+            deleteClusterElementParameterMutation.mutateAsync(
                 {
                     clusterElementType,
                     clusterElementWorkflowNodeName,
@@ -58,12 +62,14 @@ export default function deleteProperty(
 
                         setCurrentComponent({
                             ...currentComponent,
+                            displayConditions: response.displayConditions,
                             metadata: response.metadata,
                             parameters: response.parameters,
                         });
 
                         setCurrentNode({
                             ...currentNode,
+                            displayConditions: response.displayConditions,
                             metadata: response.metadata,
                             parameters: response.parameters,
                         });
