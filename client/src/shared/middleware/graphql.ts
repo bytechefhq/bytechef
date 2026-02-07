@@ -245,6 +245,15 @@ export type ComponentCategory = {
   name: Scalars['String']['output'];
 };
 
+export type ComponentConnection = {
+  __typename?: 'ComponentConnection';
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  key: Scalars['String']['output'];
+  required: Scalars['Boolean']['output'];
+  workflowNodeName: Scalars['String']['output'];
+};
+
 export type ComponentDefinition = {
   __typename?: 'ComponentDefinition';
   actionClusterElementTypes?: Maybe<Scalars['Map']['output']>;
@@ -1020,6 +1029,8 @@ export type Mutation = {
   removeDataTableColumn: Scalars['Boolean']['output'];
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
+  saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
   startGenerateFromDocumentationPreview: GenerationJobStatus;
@@ -1315,6 +1326,26 @@ export type MutationRenameDataTableColumnArgs = {
 };
 
 
+export type MutationSaveClusterElementTestConfigurationConnectionArgs = {
+  clusterElementType: Scalars['String']['input'];
+  clusterElementWorkflowNodeName: Scalars['String']['input'];
+  connectionId: Scalars['Long']['input'];
+  environmentId: Scalars['Long']['input'];
+  workflowConnectionKey: Scalars['String']['input'];
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
+  connectionId: Scalars['Long']['input'];
+  environmentId: Scalars['Long']['input'];
+  workflowConnectionKey: Scalars['String']['input'];
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+};
+
+
 export type MutationStartDiscoverEndpointsArgs = {
   input: DiscoverEndpointsInput;
 };
@@ -1334,6 +1365,7 @@ export type MutationTestClusterElementScriptArgs = {
   clusterElementType: Scalars['String']['input'];
   clusterElementWorkflowNodeName: Scalars['String']['input'];
   environmentId: Scalars['Long']['input'];
+  inputParameters?: InputMaybe<Scalars['Map']['input']>;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
 };
@@ -1341,6 +1373,7 @@ export type MutationTestClusterElementScriptArgs = {
 
 export type MutationTestWorkflowNodeScriptArgs = {
   environmentId: Scalars['Long']['input'];
+  inputParameters?: InputMaybe<Scalars['Map']['input']>;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
 };
@@ -1668,6 +1701,7 @@ export type Query = {
   apiKey?: Maybe<ApiKey>;
   apiKeys?: Maybe<Array<Maybe<ApiKey>>>;
   authorities: Array<Scalars['String']['output']>;
+  clusterElementComponentConnections: Array<ComponentConnection>;
   clusterElementDefinition: ClusterElementDefinition;
   clusterElementDefinitions: Array<ClusterElementDefinition>;
   clusterElementScriptInput?: Maybe<Scalars['Map']['output']>;
@@ -1746,6 +1780,7 @@ export type Query = {
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
   user?: Maybe<AdminUser>;
   users?: Maybe<AdminUserPage>;
+  workflowNodeComponentConnections: Array<ComponentConnection>;
   workflowNodeScriptInput?: Maybe<Scalars['Map']['output']>;
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
@@ -1785,6 +1820,14 @@ export type QueryApiKeyArgs = {
 export type QueryApiKeysArgs = {
   environmentId: Scalars['ID']['input'];
   type: PlatformType;
+};
+
+
+export type QueryClusterElementComponentConnectionsArgs = {
+  clusterElementType: Scalars['String']['input'];
+  clusterElementWorkflowNodeName: Scalars['String']['input'];
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
 };
 
 
@@ -2142,6 +2185,12 @@ export type QueryUserArgs = {
 export type QueryUsersArgs = {
   pageNumber?: InputMaybe<Scalars['Int']['input']>;
   pageSize?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryWorkflowNodeComponentConnectionsArgs = {
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
 };
 
 
@@ -3183,6 +3232,30 @@ export type McpToolsByComponentIdQueryVariables = Exact<{
 
 
 export type McpToolsByComponentIdQuery = { __typename?: 'Query', mcpToolsByComponentId?: Array<{ __typename?: 'McpTool', id: string, name: string, mcpComponentId: string, parameters?: any | null } | null> | null };
+
+export type SaveClusterElementTestConfigurationConnectionMutationVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+  clusterElementType: Scalars['String']['input'];
+  clusterElementWorkflowNodeName: Scalars['String']['input'];
+  workflowConnectionKey: Scalars['String']['input'];
+  connectionId: Scalars['Long']['input'];
+  environmentId: Scalars['Long']['input'];
+}>;
+
+
+export type SaveClusterElementTestConfigurationConnectionMutation = { __typename?: 'Mutation', saveClusterElementTestConfigurationConnection?: boolean | null };
+
+export type SaveWorkflowTestConfigurationConnectionMutationVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+  workflowConnectionKey: Scalars['String']['input'];
+  connectionId: Scalars['Long']['input'];
+  environmentId: Scalars['Long']['input'];
+}>;
+
+
+export type SaveWorkflowTestConfigurationConnectionMutation = { __typename?: 'Mutation', saveWorkflowTestConfigurationConnection?: boolean | null };
 
 export type TestClusterElementScriptMutationVariables = Exact<{
   workflowId: Scalars['String']['input'];
@@ -6085,6 +6158,58 @@ export const useMcpToolsByComponentIdQuery = <
       {
     queryKey: ['mcpToolsByComponentId', variables],
     queryFn: fetcher<McpToolsByComponentIdQuery, McpToolsByComponentIdQueryVariables>(McpToolsByComponentIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const SaveClusterElementTestConfigurationConnectionDocument = `
+    mutation saveClusterElementTestConfigurationConnection($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $workflowConnectionKey: String!, $connectionId: Long!, $environmentId: Long!) {
+  saveClusterElementTestConfigurationConnection(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    clusterElementType: $clusterElementType
+    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+    workflowConnectionKey: $workflowConnectionKey
+    connectionId: $connectionId
+    environmentId: $environmentId
+  )
+}
+    `;
+
+export const useSaveClusterElementTestConfigurationConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SaveClusterElementTestConfigurationConnectionMutation, TError, SaveClusterElementTestConfigurationConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<SaveClusterElementTestConfigurationConnectionMutation, TError, SaveClusterElementTestConfigurationConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['saveClusterElementTestConfigurationConnection'],
+    mutationFn: (variables?: SaveClusterElementTestConfigurationConnectionMutationVariables) => fetcher<SaveClusterElementTestConfigurationConnectionMutation, SaveClusterElementTestConfigurationConnectionMutationVariables>(SaveClusterElementTestConfigurationConnectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SaveWorkflowTestConfigurationConnectionDocument = `
+    mutation saveWorkflowTestConfigurationConnection($workflowId: String!, $workflowNodeName: String!, $workflowConnectionKey: String!, $connectionId: Long!, $environmentId: Long!) {
+  saveWorkflowTestConfigurationConnection(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    workflowConnectionKey: $workflowConnectionKey
+    connectionId: $connectionId
+    environmentId: $environmentId
+  )
+}
+    `;
+
+export const useSaveWorkflowTestConfigurationConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SaveWorkflowTestConfigurationConnectionMutation, TError, SaveWorkflowTestConfigurationConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<SaveWorkflowTestConfigurationConnectionMutation, TError, SaveWorkflowTestConfigurationConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['saveWorkflowTestConfigurationConnection'],
+    mutationFn: (variables?: SaveWorkflowTestConfigurationConnectionMutationVariables) => fetcher<SaveWorkflowTestConfigurationConnectionMutation, SaveWorkflowTestConfigurationConnectionMutationVariables>(SaveWorkflowTestConfigurationConnectionDocument, variables)(),
     ...options
   }
     )};
