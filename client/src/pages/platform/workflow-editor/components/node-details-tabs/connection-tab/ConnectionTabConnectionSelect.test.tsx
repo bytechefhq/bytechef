@@ -30,13 +30,16 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 const mockSaveWorkflowTestConfigurationConnectionMutation = vi.fn();
 const mockDeleteWorkflowTestConfigurationConnectionMutation = vi.fn();
 
+vi.mock('@/shared/middleware/graphql', () => ({
+    useSaveWorkflowTestConfigurationConnectionMutation: ({onSuccess}: {onSuccess?: () => void}) => ({
+        mutate: mockSaveWorkflowTestConfigurationConnectionMutation,
+        onSuccess,
+    }),
+}));
+
 vi.mock('@/shared/mutations/platform/workflowTestConfigurations.mutations', () => ({
     useDeleteWorkflowTestConfigurationConnectionMutation: ({onSuccess}: {onSuccess?: () => void}) => ({
         mutate: mockDeleteWorkflowTestConfigurationConnectionMutation,
-        onSuccess,
-    }),
-    useSaveWorkflowTestConfigurationConnectionMutation: ({onSuccess}: {onSuccess?: () => void}) => ({
-        mutate: mockSaveWorkflowTestConfigurationConnectionMutation,
         onSuccess,
     }),
 }));
@@ -297,10 +300,8 @@ describe('ConnectionTabConnectionSelect', () => {
                     queryKey: ['connections'],
                 });
                 expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith({
+                    connectionId: 123,
                     environmentId: 1,
-                    saveWorkflowTestConfigurationConnectionRequest: {
-                        connectionId: 123,
-                    },
                     workflowConnectionKey: 'connection_1',
                     workflowId: 'workflow-1',
                     workflowNodeName: 'node-1',
@@ -390,10 +391,8 @@ describe('ConnectionTabConnectionSelect', () => {
 
             await waitFor(() => {
                 expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith({
+                    connectionId: 123,
                     environmentId: 1,
-                    saveWorkflowTestConfigurationConnectionRequest: {
-                        connectionId: 123,
-                    },
                     workflowConnectionKey: 'connection_1',
                     workflowId: 'workflow-1',
                     workflowNodeName: 'node-1',
@@ -469,10 +468,8 @@ describe('ConnectionTabConnectionSelect', () => {
 
         await waitFor(() => {
             expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith({
+                connectionId: 1,
                 environmentId: 1,
-                saveWorkflowTestConfigurationConnectionRequest: {
-                    connectionId: 1,
-                },
                 workflowConnectionKey: 'connection_1',
                 workflowId: 'workflow-1',
                 workflowNodeName: 'node-1',
