@@ -152,8 +152,8 @@ spring:
     name: server-app
   autoconfigure:
     exclude:
-      org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration,
-      org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,
+      org.springframework.boot.neo4j.autoconfigure.Neo4jAutoConfiguration
   cache:
     type: ${bytechef.cache.provider}
   cloud:

@@ -40,7 +40,7 @@ public class KafkaMessageBrokerEnvironmentPostProcessor implements EnvironmentPo
                 "spring.autoconfigure.exclude",
                 StringUtils.join(
                     environment.getProperty("spring.autoconfigure.exclude"),
-                    ",org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration"));
+                    ", org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration"));
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Kafka Message Broker Config", source);

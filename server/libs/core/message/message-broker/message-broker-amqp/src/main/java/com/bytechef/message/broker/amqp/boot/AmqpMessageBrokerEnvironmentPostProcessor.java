@@ -44,7 +44,7 @@ public class AmqpMessageBrokerEnvironmentPostProcessor implements EnvironmentPos
                 "spring.autoconfigure.exclude",
                 StringUtils.join(
                     environment.getProperty("spring.autoconfigure.exclude"),
-                    ",org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration"));
+                    ", org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration"));
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Rabbit Message Broker Config", source);

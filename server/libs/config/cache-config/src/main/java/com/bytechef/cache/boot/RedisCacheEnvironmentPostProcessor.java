@@ -40,7 +40,7 @@ public class RedisCacheEnvironmentPostProcessor implements EnvironmentPostProces
             source.computeIfPresent(
                 "spring.autoconfigure.exclude",
                 (k, v) -> ((String) v).replace(
-                    ", org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration", ""));
+                    "org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,", ""));
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Redis Cache Config", source);
