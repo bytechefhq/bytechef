@@ -1,0 +1,22 @@
+query automationSearch($query: String!, $limit: Int) {
+    automationSearch(query: $query, limit: $limit) {
+        id
+        name
+        description
+        type
+        ... on WorkflowSearchResult {
+            projectId
+            label
+        }
+        ... on ProjectDeploymentSearchResult {
+            projectName
+        }
+        ... on ApiEndpointSearchResult {
+            collectionId
+            path
+        }
+        ... on KnowledgeBaseDocumentSearchResult {
+            knowledgeBaseId
+        }
+    }
+}

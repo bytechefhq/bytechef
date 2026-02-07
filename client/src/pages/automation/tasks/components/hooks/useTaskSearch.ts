@@ -19,7 +19,6 @@ export interface UseTaskSearchReturnI {
     searchInputRef: RefObject<HTMLInputElement>;
     searchQuery: string;
     selectedSuggestionIndex: number;
-    shortcutText: string;
     showSuggestions: boolean;
     suggestions: SuggestionI[];
 }
@@ -38,9 +37,6 @@ export function useTaskSearch(): UseTaskSearchReturnI {
             tasks: state.tasks,
         }))
     );
-
-    const isMac = typeof navigator !== 'undefined' ? /Mac|iPod|iPhone|iPad/.test(navigator.platform) : false;
-    const shortcutText = isMac ? '⌘K' : 'Ctrl+K';
 
     const suggestions = useMemo(() => {
         if (!searchQuery.trim()) {
@@ -79,20 +75,6 @@ export function useTaskSearch(): UseTaskSearchReturnI {
             text: suggestion,
         }));
     }, [searchQuery, tasks, filters]);
-
-    // Keyboard shortcut to focus search (Cmd+K on Mac, Ctrl+K on Windows/Linux)
-    useEffect(() => {
-        const handleGlobalKeyDown = (event: globalThis.KeyboardEvent) => {
-            if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-                event.preventDefault();
-                searchInputRef.current?.focus();
-            }
-        };
-
-        document.addEventListener('keydown', handleGlobalKeyDown);
-
-        return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-    }, []);
 
     // Close suggestions when clicking outside
     useEffect(() => {
@@ -174,7 +156,6 @@ export function useTaskSearch(): UseTaskSearchReturnI {
         searchInputRef,
         searchQuery,
         selectedSuggestionIndex,
-        shortcutText,
         showSuggestions,
         suggestions,
     };
