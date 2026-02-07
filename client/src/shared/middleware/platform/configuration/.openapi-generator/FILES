@@ -12,7 +12,6 @@ apis/WorkflowNodeDynamicPropertiesApi.ts
 apis/WorkflowNodeOptionApi.ts
 apis/WorkflowNodeOutputApi.ts
 apis/WorkflowNodeParameterApi.ts
-apis/WorkflowNodeScriptApi.ts
 apis/WorkflowNodeTestOutputApi.ts
 apis/WorkflowTestConfigurationApi.ts
 apis/index.ts
@@ -42,6 +41,7 @@ docs/DateProperty.md
 docs/DateTimeProperty.md
 docs/DeleteClusterElementParameter200Response.md
 docs/DeleteClusterElementParameterRequest.md
+docs/DeleteWorkflowTestConfigurationConnectionRequest.md
 docs/DynamicPropertiesProperty.md
 docs/Environment.md
 docs/EnvironmentApi.md
@@ -66,7 +66,6 @@ docs/PropertiesDataSource.md
 docs/Property.md
 docs/PropertyType.md
 docs/Resources.md
-docs/SaveWorkflowTestConfigurationConnectionRequest.md
 docs/SaveWorkflowTestConfigurationInputsRequest.md
 docs/ScriptTestExecution.md
 docs/StringProperty.md
@@ -98,7 +97,6 @@ docs/WorkflowNodeOptionApi.md
 docs/WorkflowNodeOutput.md
 docs/WorkflowNodeOutputApi.md
 docs/WorkflowNodeParameterApi.md
-docs/WorkflowNodeScriptApi.md
 docs/WorkflowNodeTestOutput.md
 docs/WorkflowNodeTestOutputApi.md
 docs/WorkflowOutput.md
@@ -130,6 +128,7 @@ models/DateProperty.ts
 models/DateTimeProperty.ts
 models/DeleteClusterElementParameter200Response.ts
 models/DeleteClusterElementParameterRequest.ts
+models/DeleteWorkflowTestConfigurationConnectionRequest.ts
 models/DynamicPropertiesProperty.ts
 models/Environment.ts
 models/ExecutionError.ts
@@ -152,7 +151,6 @@ models/PropertiesDataSource.ts
 models/Property.ts
 models/PropertyType.ts
 models/Resources.ts
-models/SaveWorkflowTestConfigurationConnectionRequest.ts
 models/SaveWorkflowTestConfigurationInputsRequest.ts
 models/ScriptTestExecution.ts
 models/StringProperty.ts
