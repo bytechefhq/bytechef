@@ -24,7 +24,6 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.FormatUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApiTokenLocation;
 import com.bytechef.component.definition.Authorization.ApplyFunction;
@@ -108,7 +107,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             componentName, connectionVersion, authorizationType);
 
         try {
-            return OptionalUtils.get(authorization.getAcquire())
+            return authorization.getAcquire()
+                .orElseThrow()
                 .apply(ParametersFactory.create(connectionParameters), context);
         } catch (Exception e) {
             throw new ConfigurationException(e, ConnectionDefinitionErrorType.ACQUIRE_FAILED);
@@ -123,8 +123,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
 
-        ApplyFunction applyFunction = OptionalUtils.orElse(
-            authorization.getApply(), getDefaultApplyFunction(authorization.getType()));
+        ApplyFunction applyFunction = authorization.getApply()
+            .orElse(getDefaultApplyFunction(authorization.getType()));
 
         try {
             return applyFunction.apply(ParametersFactory.create(connectionParameters), context);
@@ -167,9 +167,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
             componentDefinitionRegistry.getConnectionDefinition(componentName, componentConnection.getVersion());
 
-        BaseUriFunction baseUriFunction = OptionalUtils.orElse(
-            connectionDefinition.getBaseUri(),
-            (connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
+        BaseUriFunction baseUriFunction = connectionDefinition.getBaseUri()
+            .orElse((connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
 
         return Optional.ofNullable(
             baseUriFunction.apply(ParametersFactory.create(componentConnection.parameters()), context));
@@ -211,26 +210,23 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             logger.trace("Executing with persisted refresh token {}", authorization.getRefreshToken());
         }
 
-        RefreshFunction refreshFunction = OptionalUtils.orElse(
-            authorization.getRefresh(),
-            getDefaultRefreshFunction(
-                OptionalUtils.orElse(
-                    authorization.getClientId(),
-                    (connectionParameters1, context1) -> getDefaultClientId(connectionParameters1)),
-                OptionalUtils.orElse(
-                    authorization.getClientSecret(),
-                    (connectionParameters1, context1) -> getDefaultClientSecret(connectionParameters1)),
-                OptionalUtils.orElse(
-                    authorization.getRefreshToken(),
-                    (connectionParameters1, context1) -> getDefaultRefreshToken(connectionParameters1)),
-                OptionalUtils.orElse(
-                    authorization.getRefreshUrl(),
-                    (connectionParameters1, context1) -> getDefaultRefreshUrl(
-                        connectionParameters1,
-                        OptionalUtils.orElse(
-                            authorization.getTokenUrl(),
-                            (connectionParameters2, context2) -> getDefaultTokenUrl(connectionParameters2)),
-                        context1))));
+        RefreshFunction refreshFunction = authorization.getRefresh()
+            .orElse(
+                getDefaultRefreshFunction(
+                    authorization.getClientId()
+                        .orElse((connectionParameters1, context1) -> getDefaultClientId(connectionParameters1)),
+                    authorization.getClientSecret()
+                        .orElse((connectionParameters1, context1) -> getDefaultClientSecret(connectionParameters1)),
+                    authorization.getRefreshToken()
+                        .orElse((connectionParameters1, context1) -> getDefaultRefreshToken(connectionParameters1)),
+                    authorization.getRefreshUrl()
+                        .orElse(
+                            (connectionParameters1, context1) -> getDefaultRefreshUrl(
+                                connectionParameters1,
+                                authorization.getTokenUrl()
+                                    .orElse((connectionParameters2, context2) -> getDefaultTokenUrl(
+                                        connectionParameters2)),
+                                context1))));
 
         try {
             if (logger.isTraceEnabled()) {
@@ -253,7 +249,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
 
-        return OptionalUtils.orElse(authorization.getDetectOn(), List.of());
+        return authorization.getDetectOn()
+            .orElse(List.of());
     }
 
     @Override
@@ -263,7 +260,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
 
-        return OptionalUtils.orElse(authorization.getRefreshOn(), DEFAULT_REFRESH_ON);
+        return authorization.getRefreshOn()
+            .orElse(DEFAULT_REFRESH_ON);
     }
 
     @Override
@@ -281,10 +279,12 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return toConnectionDefinition(
             componentDefinitionRegistry.getComponentDefinitions(componentName)
                 .stream()
-                .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getConnection()))
+                .filter(componentDefinition -> componentDefinition.getConnection()
+                    .isPresent())
                 .filter(componentDefinition -> {
-                    com.bytechef.component.definition.ConnectionDefinition connectionDefinition = OptionalUtils.get(
-                        componentDefinition.getConnection());
+                    com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
+                        componentDefinition.getConnection()
+                            .orElseThrow();
 
                     return connectionDefinition.getVersion() == connectionVersion;
                 })
@@ -305,7 +305,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public List<ConnectionDefinition> getConnectionDefinitions() {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
-            .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getConnection()))
+            .filter(componentDefinition -> componentDefinition.getConnection()
+                .isPresent())
             .map(ConnectionDefinitionServiceImpl::toConnectionDefinition)
             .toList();
     }
@@ -342,8 +343,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String verifier = null;
 
         if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
-            PkceFunction pkceFunction = OptionalUtils.orElse(
-                authorization.getPkce(), getDefaultPkceFunction());
+            PkceFunction pkceFunction = authorization.getPkce()
+                .orElse(getDefaultPkceFunction());
 
             // TODO pkce
             Authorization.Pkce pkce;
@@ -358,21 +359,15 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             verifier = pkce.verifier();
         }
 
-        AuthorizationCallbackFunction authorizationCallbackFunction = OptionalUtils.orElse(
-            authorization.getAuthorizationCallback(),
-            getDefaultAuthorizationCallbackFunction(
-                OptionalUtils.orElse(
-                    authorization.getClientId(),
-                    (connectionParameters1, context1) -> getDefaultClientId(
-                        connectionParameters1)),
-                OptionalUtils.orElse(
-                    authorization.getClientSecret(),
-                    (connectionParameters1, context1) -> getDefaultClientSecret(
-                        connectionParameters1)),
-                OptionalUtils.orElse(
-                    authorization.getTokenUrl(),
-                    (connectionParameters1, context1) -> getDefaultTokenUrl(
-                        connectionParameters1))));
+        AuthorizationCallbackFunction authorizationCallbackFunction = authorization.getAuthorizationCallback()
+            .orElse(
+                getDefaultAuthorizationCallbackFunction(
+                    authorization.getClientId()
+                        .orElse((connectionParameters1, context1) -> getDefaultClientId(connectionParameters1)),
+                    authorization.getClientSecret()
+                        .orElse((connectionParameters1, context1) -> getDefaultClientSecret(connectionParameters1)),
+                    authorization.getTokenUrl()
+                        .orElse((connectionParameters1, context1) -> getDefaultTokenUrl(connectionParameters1))));
 
         try {
             return authorizationCallbackFunction.apply(
@@ -393,7 +388,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         if (componentDefinition instanceof ScriptComponentDefinition) {
             return componentDefinitionRegistry.getComponentDefinitions()
                 .stream()
-                .filter(curComponentDefinition -> OptionalUtils.isPresent(curComponentDefinition.getConnection()))
+                .filter(curComponentDefinition -> curComponentDefinition.getConnection()
+                    .isPresent())
                 .toList();
         } else {
             return List.of(componentDefinition);
@@ -646,20 +642,15 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
 
-        AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
-            authorization.getAuthorizationUrl(),
-            (curConnectionParameters, context1) -> getDefaultAuthorizationUrl(
-                curConnectionParameters));
-        ClientIdFunction clientIdFunction = OptionalUtils.orElse(
-            authorization.getClientId(),
-            (curConnectionParameters, context1) -> getDefaultClientId(curConnectionParameters));
-        ScopesFunction scopesFunction = OptionalUtils.orElse(
-            authorization.getScopes(),
-            (curConnectionParameters, context1) -> getDefaultScopes(curConnectionParameters));
+        AuthorizationUrlFunction authorizationUrlFunction = authorization.getAuthorizationUrl()
+            .orElse((curConnectionParameters, context1) -> getDefaultAuthorizationUrl(curConnectionParameters));
+        ClientIdFunction clientIdFunction = authorization.getClientId()
+            .orElse((curConnectionParameters, context1) -> getDefaultClientId(curConnectionParameters));
+        ScopesFunction scopesFunction = authorization.getScopes()
+            .orElse((curConnectionParameters, context1) -> getDefaultScopes(curConnectionParameters));
         OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction =
-            OptionalUtils.orElse(
-                authorization.getOauth2AuthorizationExtraQueryParameters(),
-                (curConnectionParameters, context1) -> Map.of());
+            authorization.getOauth2AuthorizationExtraQueryParameters()
+                .orElse((curConnectionParameters, context1) -> Map.of());
 
         Parameters parameters = ParametersFactory.create(connectionParameters);
 
@@ -686,7 +677,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Optional<String> titleOptional = componentDefinition.getTitle();
 
         return new ConnectionDefinition(
-            OptionalUtils.get(componentDefinition.getConnection()), componentDefinition.getName(),
+            componentDefinition.getConnection()
+                .orElseThrow(),
+            componentDefinition.getName(),
             titleOptional.orElse(componentDefinition.getName()), descriptionOptional.orElse(null));
     }
 }
