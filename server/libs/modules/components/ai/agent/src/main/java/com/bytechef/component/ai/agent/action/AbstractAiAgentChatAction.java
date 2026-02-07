@@ -226,13 +226,13 @@ public abstract class AbstractAiAgentChatAction {
 
     private static @Nullable String getToolDescription(ClusterElement clusterElement) {
         String toolDescription = null;
-        Map<String, ?> params = clusterElement.getParameters();
+        Map<String, ?> parameters = clusterElement.getParameters();
 
-        if (params != null) {
-            Object desc = params.get("description");
+        if (parameters != null) {
+            Object description = parameters.get("description");
 
-            if (desc instanceof String s && !s.isBlank()) {
-                toolDescription = s;
+            if (description instanceof String string && !string.isBlank()) {
+                toolDescription = string;
             }
         }
 
@@ -242,11 +242,12 @@ public abstract class AbstractAiAgentChatAction {
             if (extensions != null) {
                 Object desc = extensions.get("description");
 
-                if (desc instanceof String s && !s.isBlank()) {
-                    toolDescription = s;
+                if (desc instanceof String string && !string.isBlank()) {
+                    toolDescription = string;
                 }
             }
         }
+
         return toolDescription;
     }
 }
