@@ -1,14 +1,5 @@
 import Button from '@/components/Button/Button';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import UnsavedChangesAlertDialog from '@/components/UnsavedChangesAlertDialog';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -57,8 +48,8 @@ const WorkflowCodeEditorSheet = ({
     const [definition, setDefinition] = useState<string>(workflow.definition!);
     const [dirty, setDirty] = useState<boolean>(false);
     const [jobId, setJobId] = useState<string | null>(null);
-    const [showCloseAlertDialog, setShowCloseAlertDialog] = useState(false);
     const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
+    const [unsavedChangesAlertDialogOpen, setUnsavedChangesAlertDialogOpen] = useState(false);
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
 
@@ -123,7 +114,7 @@ const WorkflowCodeEditorSheet = ({
             }
 
             if (!open && dirty) {
-                setShowCloseAlertDialog(true);
+                setUnsavedChangesAlertDialogOpen(true);
             } else {
                 onSheetOpenClose(open);
             }
@@ -187,6 +178,15 @@ const WorkflowCodeEditorSheet = ({
             });
         }
     }, [closeWorkflowTestStream, jobId, persistJobId, setStreamRequest]);
+
+    const handleUnsavedChangesAlertDialogCancel = useCallback(() => {
+        setUnsavedChangesAlertDialogOpen(false);
+    }, []);
+
+    const handleUnsavedChangesAlertDialogClose = useCallback(() => {
+        setUnsavedChangesAlertDialogOpen(false);
+        onSheetOpenClose(false);
+    }, [onSheetOpenClose]);
 
     useEffect(() => {
         if (!workflow.id || currentEnvironmentId === undefined) return;
@@ -358,40 +358,11 @@ const WorkflowCodeEditorSheet = ({
                 />
             </SheetContent>
 
-            <AlertDialog open={showCloseAlertDialog}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                        <AlertDialogDescription>
-                            There are unsaved changes. This action cannot be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                        <AlertDialogCancel
-                            className="shadow-none"
-                            onClick={() => {
-                                setShowCloseAlertDialog(false);
-                            }}
-                        >
-                            Cancel
-                        </AlertDialogCancel>
-
-                        <AlertDialogAction
-                            onClick={() => {
-                                setShowCloseAlertDialog(false);
-
-                                if (onSheetOpenClose) {
-                                    onSheetOpenClose(true);
-                                }
-                            }}
-                        >
-                            Close
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <UnsavedChangesAlertDialog
+                onCancel={handleUnsavedChangesAlertDialogCancel}
+                onClose={handleUnsavedChangesAlertDialogClose}
+                open={unsavedChangesAlertDialogOpen}
+            />
 
             {showWorkflowTestConfigurationDialog && (
                 <WorkflowTestConfigurationDialog
