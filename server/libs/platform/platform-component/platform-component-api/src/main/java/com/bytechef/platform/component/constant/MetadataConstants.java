@@ -22,6 +22,7 @@ package com.bytechef.platform.component.constant;
 public class MetadataConstants {
 
     public static final String CONNECTION_IDS = "connectionIds";
+    public static final String OUTPUT_REFERENCE_PATHS = "outputReferencePaths";
     public static final String EDITOR_ENVIRONMENT = "editorEnvironment";
     public static final String ENVIRONMENT_ID = "environmentId";
     public static final String JOB_PRINCIPAL_ID = "jobPrincipalId";
