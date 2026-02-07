@@ -1,0 +1,15 @@
+mutation saveWorkflowTestConfigurationConnection(
+    $workflowId: String!
+    $workflowNodeName: String!
+    $workflowConnectionKey: String!
+    $connectionId: Long!
+    $environmentId: Long!
+) {
+    saveWorkflowTestConfigurationConnection(
+        workflowId: $workflowId
+        workflowNodeName: $workflowNodeName
+        workflowConnectionKey: $workflowConnectionKey
+        connectionId: $connectionId
+        environmentId: $environmentId
+    )
+}
