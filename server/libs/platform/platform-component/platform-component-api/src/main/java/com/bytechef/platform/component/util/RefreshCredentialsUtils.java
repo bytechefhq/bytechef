@@ -29,38 +29,34 @@ import java.util.regex.Pattern;
 public class RefreshCredentialsUtils {
 
     public static boolean matches(List<Object> refreshOn, Exception exception) {
-        boolean matches = false;
+        List<Integer> statusCodes = CollectionUtils.map(
+            CollectionUtils.filter(refreshOn, item -> item instanceof Integer),
+            item -> (Integer) item);
 
-        if (exception instanceof ProviderException providerException
-            && Objects.nonNull(providerException.getStatusCode())) {
-
-            matches = matches(
-                providerException.getStatusCode(),
-                CollectionUtils.map(
-                    CollectionUtils.filter(refreshOn, item -> item instanceof Integer),
-                    item -> (Integer) item));
-        }
-
-        if (matches) {
-            return matches;
-        }
+        List<String> patterns = CollectionUtils.map(
+            CollectionUtils.filter(refreshOn, item -> item instanceof String),
+            item -> (String) item);
 
         Throwable throwable = exception;
 
-        while (Objects.nonNull(throwable) && Objects.nonNull(throwable.getMessage())) {
-            matches = matches(
-                throwable.getMessage(),
-                CollectionUtils.map(
-                    CollectionUtils.filter(refreshOn, item -> item instanceof String), item -> (String) item));
+        while (Objects.nonNull(throwable)) {
+            // Check for ProviderException status codes anywhere in the exception chain
+            if (throwable instanceof ProviderException providerException
+                && Objects.nonNull(providerException.getStatusCode())
+                && matches(providerException.getStatusCode(), statusCodes)) {
 
-            if (matches) {
-                return matches;
+                return true;
+            }
+
+            // Check for message pattern matches
+            if (Objects.nonNull(throwable.getMessage()) && matches(throwable.getMessage(), patterns)) {
+                return true;
             }
 
             throwable = throwable.getCause();
         }
 
-        return matches;
+        return false;
     }
 
     /**

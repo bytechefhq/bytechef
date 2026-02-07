@@ -45,6 +45,9 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.annotation.WithTokenRefresh;
+import com.bytechef.platform.component.annotation.WithTokenRefresh.ComponentNameParam;
+import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionParam;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
@@ -59,7 +62,6 @@ import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.component.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -86,16 +88,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
     private final ApplicationEventPublisher eventPublisher;
-    private final TokenRefreshHelper tokenRefreshHelper;
 
     public TriggerDefinitionServiceImpl(
         @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
-        ApplicationEventPublisher eventPublisher, @Lazy TokenRefreshHelper tokenRefreshHelper) {
+        ApplicationEventPublisher eventPublisher) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
         this.eventPublisher = eventPublisher;
-        this.tokenRefreshHelper = tokenRefreshHelper;
     }
 
     @Override
@@ -189,37 +189,34 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = TriggerDefinitionErrorType.class,
+        errorTypeField = "OPTIONS_FAILED")
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String triggerName, String propertyName,
+        @ComponentNameParam String componentName, int componentVersion, String triggerName,
+        String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable String searchText,
-        @Nullable ComponentConnection componentConnection) {
+        @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, componentConnection, null, null, true);
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, triggerContext, null,
-            (componentConnection1, triggerContext1) -> executeOptions(
-                componentName, componentVersion, triggerName, inputParameters,
-                propertyName, lookupDependsOnPaths, searchText, componentConnection1, triggerContext1),
-            componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection1, null, null, true));
+        return doExecuteOptions(
+            componentName, componentVersion, triggerName, inputParameters,
+            propertyName, lookupDependsOnPaths, searchText, componentConnection, triggerContext);
     }
 
     @Override
+    @WithTokenRefresh
     public @Nullable OutputResponse executeOutput(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection) {
+        @ComponentNameParam String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, componentConnection, null, null, true);
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, triggerContext, null,
-            (componentConnection1, triggerContext1) -> executeOutput(
-                componentName, componentVersion, triggerName, inputParameters, componentConnection1, triggerContext1),
-            componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection1, null, null, true));
+        return doExecuteOutput(
+            componentName, componentVersion, triggerName, inputParameters, componentConnection, triggerContext);
     }
 
     @Override
@@ -243,84 +240,71 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = TriggerDefinitionErrorType.class,
+        errorTypeField = "TRIGGER_TEST_FAILED")
     public TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
-        @Nullable String workflowUuid,
+        @ComponentNameParam String componentName, int componentVersion, String triggerName,
+        @Nullable Long jobPrincipalId, @Nullable String workflowUuid,
         Map<String, ?> inputParameters, @Nullable Object triggerState, @Nullable WebhookRequest webhookRequest,
-        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, PlatformType type,
-        boolean editorEnvironment) {
+        @ConnectionParam @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
+        PlatformType type, boolean editorEnvironment) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
             environmentId, type, editorEnvironment);
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, triggerContext,
-            TriggerDefinitionErrorType.TRIGGER_TEST_FAILED,
-            (componentConnection1, triggerContext1) -> executeTrigger(
-                componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
-                componentConnection1, triggerContext1),
-            componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection1,
-                environmentId, type, editorEnvironment));
+        return doExecuteTrigger(
+            componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
+            componentConnection, triggerContext);
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = TriggerDefinitionErrorType.class,
+        errorTypeField = "DYNAMIC_WEBHOOK_DISABLE_FAILED")
     public void executeWebhookDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Map<String, ?> outputParameters,
-        @Nullable ComponentConnection componentConnection) {
+        @ComponentNameParam String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String workflowExecutionId, Map<String, ?> outputParameters,
+        @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false);
 
-        tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, triggerContext, null,
-            (componentConnection1, triggerContext1) -> {
-                executeWebhookDisable(
-                    componentName, componentVersion, triggerName, inputParameters, workflowExecutionId,
-                    outputParameters, componentConnection1, triggerContext1);
-
-                return null;
-            },
-            componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection1, null, null, false));
+        doExecuteWebhookDisable(
+            componentName, componentVersion, triggerName, inputParameters, workflowExecutionId,
+            outputParameters, componentConnection, triggerContext);
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = TriggerDefinitionErrorType.class,
+        errorTypeField = "DYNAMIC_WEBHOOK_ENABLE_FAILED")
     public @Nullable WebhookEnableOutput executeWebhookEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, String webhookUrl, @Nullable ComponentConnection componentConnection,
-        long environmentId) {
+        @ComponentNameParam String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String workflowExecutionId, String webhookUrl,
+        @ConnectionParam @Nullable ComponentConnection componentConnection, long environmentId) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, componentConnection, environmentId, null, false);
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, triggerContext,
-            TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_ENABLE_FAILED,
-            (componentConnection1, triggerContext1) -> executeWebhookEnable(
-                componentName, componentVersion, triggerName, inputParameters,
-                webhookUrl, workflowExecutionId, componentConnection1, triggerContext1),
-            componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection1, environmentId, null,
-                false));
+        return doExecuteWebhookEnable(
+            componentName, componentVersion, triggerName, inputParameters,
+            webhookUrl, workflowExecutionId, componentConnection, triggerContext);
     }
 
     @Override
+    @WithTokenRefresh
     public WebhookValidateResponse executeWebhookValidate(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection) {
+        @ComponentNameParam String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, WebhookRequest webhookRequest,
+        @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false);
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, triggerContext, null,
-            (componentConnection1, triggerContext1) -> executeWebhookValidate(
-                componentName, componentVersion, triggerName, inputParameters, webhookRequest, triggerContext1),
-            componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection1, null, null, false));
+        return doExecuteWebhookValidate(
+            componentName, componentVersion, triggerName, inputParameters, webhookRequest, triggerContext);
     }
 
     @Override
@@ -390,7 +374,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return triggerDefinition.isOutputFunctionDefined();
     }
 
-    private List<Option> executeOptions(
+    private List<Option> doExecuteOptions(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String propertyName, List<String> lookupDependsOnPaths, @Nullable String searchText,
         ComponentConnection componentConnection, TriggerContext context) {
@@ -413,7 +397,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
     }
 
-    private @Nullable OutputResponse executeOutput(
+    private @Nullable OutputResponse doExecuteOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, TriggerContext context) {
 
@@ -498,7 +482,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @SuppressWarnings("unchecked")
-    private TriggerOutput executeTrigger(
+    private TriggerOutput doExecuteTrigger(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         @Nullable Object triggerState, WebhookRequest webhookRequest, ComponentConnection componentConnection,
         TriggerContext context) {
@@ -537,7 +521,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return triggerOutput;
     }
 
-    private void executeWebhookDisable(
+    private void doExecuteWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, Map<String, ?> outputParameters, @Nullable ComponentConnection componentConnection,
         TriggerContext context) {
@@ -565,7 +549,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
     }
 
-    private @Nullable WebhookEnableOutput executeWebhookEnable(
+    private @Nullable WebhookEnableOutput doExecuteWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String webhookUrl, String workflowExecutionId, @Nullable ComponentConnection componentConnection,
         TriggerContext context) {
@@ -593,7 +577,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
     }
 
-    private WebhookValidateResponse executeWebhookValidate(
+    private WebhookValidateResponse doExecuteWebhookValidate(
         String componentName, int componentVersion, String triggerName,
         Map<String, ?> inputParameters, WebhookRequest webhookRequest, TriggerContext context) {
 
