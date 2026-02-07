@@ -15,7 +15,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDynamicPr
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOptionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOutputApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeParameterApi.java
-src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeScriptApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeTestOutputApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowTestConfigurationApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ActionDefinitionBasicModel.java
@@ -40,6 +39,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/DatePropertyMod
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DateTimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteClusterElementParameter200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteClusterElementParameterRequestModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteWorkflowTestConfigurationConnectionRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ExecutionErrorModel.java
@@ -62,7 +62,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertiesDataS
 src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertyTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ResourcesModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/SaveWorkflowTestConfigurationConnectionRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/SaveWorkflowTestConfigurationInputsRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ScriptTestExecutionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/StringPropertyModel.java
