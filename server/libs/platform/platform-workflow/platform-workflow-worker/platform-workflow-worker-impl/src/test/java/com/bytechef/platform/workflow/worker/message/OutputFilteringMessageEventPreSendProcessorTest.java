@@ -437,6 +437,68 @@ class OutputFilteringMessageEventPreSendProcessorTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void testProcessFiltersWithArrayIndexedPaths() {
+        Map<String, Object> fullOutput = Map.of(
+            "items", List.of(
+                Map.of("name", "First", "value", 10),
+                Map.of("name", "Second", "value", 20)),
+            "response", Map.of(
+                "elements", List.of(
+                    Map.of("propBool", true, "propNumber", 3.5))),
+            "unused", "data");
+
+        FileEntry originalOutputFileEntry = mock(FileEntry.class);
+        FileEntry filteredOutputFileEntry = mock(FileEntry.class);
+
+        when(taskFileStorage.readTaskExecutionOutput(originalOutputFileEntry)).thenReturn(fullOutput);
+        when(taskFileStorage.storeTaskExecutionOutput(anyLong(), anyLong(), any()))
+            .thenAnswer(invocation -> {
+                Map<String, Object> filteredOutput = (Map<String, Object>) invocation.getArgument(2);
+
+                assertThat(filteredOutput).containsKey("items[0]");
+                assertThat(filteredOutput.get("items[0]")).isInstanceOf(Map.class);
+
+                Map<String, Object> firstItem = (Map<String, Object>) filteredOutput.get("items[0]");
+
+                assertThat(firstItem).containsEntry("name", "First");
+                assertThat(firstItem).doesNotContainKey("value");
+
+                assertThat(filteredOutput).containsKey("response");
+
+                Map<String, Object> responseMap = (Map<String, Object>) filteredOutput.get("response");
+
+                assertThat(responseMap).containsKey("elements[0]");
+                assertThat(responseMap.get("elements[0]")).isInstanceOf(Map.class);
+
+                Map<String, Object> firstElement = (Map<String, Object>) responseMap.get("elements[0]");
+
+                assertThat(firstElement).containsEntry("propBool", true);
+
+                assertThat(filteredOutput).doesNotContainKey("unused");
+
+                return filteredOutputFileEntry;
+            });
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(1L)
+            .jobId(100L)
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(WorkflowConstants.NAME, "accelo_1", WorkflowConstants.TYPE, "accelo/v1/createContact",
+                        WorkflowConstants.PARAMETERS, Map.of())))
+            .build();
+
+        taskExecution.setOutput(originalOutputFileEntry);
+        taskExecution.putMetadata(MetadataConstants.OUTPUT_REFERENCE_PATHS,
+            Set.of("items[0].name", "response.elements[0].propBool"));
+
+        TaskExecutionCompleteEvent event = new TaskExecutionCompleteEvent(taskExecution);
+
+        processor.process(event);
+    }
+
+    @Test
     void testProcessPassesThroughWhenOutputIsList() {
         FileEntry outputFileEntry = mock(FileEntry.class);
 

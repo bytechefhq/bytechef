@@ -26,9 +26,12 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -43,6 +46,7 @@ import org.springframework.stereotype.Component;
 @Component
 class OutputFilteringMessageEventPreSendProcessor implements MessageEventPreSendProcessor {
 
+    private static final Pattern ARRAY_INDEX_PATTERN = Pattern.compile("^(.+?)\\[(\\d+)]$");
     private static final Logger logger = LoggerFactory.getLogger(OutputFilteringMessageEventPreSendProcessor.class);
 
     private final TaskFileStorage taskFileStorage;
@@ -95,7 +99,7 @@ class OutputFilteringMessageEventPreSendProcessor implements MessageEventPreSend
 
         if (logger.isDebugEnabled()) {
             logger.debug(
-                "Filtered output for task name='{}', type='{}': kept {} paths out of {} total keys",
+                "Filtered output for task name='{}', type='{}': kept {} paths out of {} top-level keys",
                 taskExecution.getName(), taskExecution.getType(), paths.size(), outputMap.size());
         }
 
@@ -112,11 +116,9 @@ class OutputFilteringMessageEventPreSendProcessor implements MessageEventPreSend
             Object currentValue = outputMap;
 
             for (String segment : segments) {
-                if (currentValue instanceof Map<?, ?> currentMap) {
-                    currentValue = currentMap.get(segment);
-                } else {
-                    currentValue = null;
+                currentValue = resolveSegment(currentValue, segment);
 
+                if (currentValue == null) {
                     break;
                 }
             }
@@ -127,6 +129,33 @@ class OutputFilteringMessageEventPreSendProcessor implements MessageEventPreSend
         }
 
         return filteredOutput;
+    }
+
+    private static Object resolveSegment(Object currentValue, String segment) {
+        Matcher arrayMatcher = ARRAY_INDEX_PATTERN.matcher(segment);
+
+        if (arrayMatcher.matches()) {
+            String key = arrayMatcher.group(1);
+            int index = Integer.parseInt(arrayMatcher.group(2));
+
+            if (currentValue instanceof Map<?, ?> currentMap) {
+                Object listValue = currentMap.get(key);
+
+                if (listValue instanceof List<?> list && index < list.size()) {
+                    return list.get(index);
+                }
+
+                return null;
+            }
+
+            return null;
+        }
+
+        if (currentValue instanceof Map<?, ?> currentMap) {
+            return currentMap.get(segment);
+        }
+
+        return null;
     }
 
     @SuppressWarnings("unchecked")
