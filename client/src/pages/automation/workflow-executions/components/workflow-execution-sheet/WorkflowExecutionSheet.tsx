@@ -1,9 +1,13 @@
+import Button from '@/components/Button/Button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Spinner} from '@/components/ui/spinner';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
-import {WorkflowIcon} from 'lucide-react';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {SparklesIcon, WorkflowIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
 
 import WorkflowExecutionSheetContent from './WorkflowExecutionSheetContent';
@@ -12,11 +16,17 @@ import useWorkflowExecutionSheet from './hooks/useWorkflowExecutionSheet';
 
 const WorkflowExecutionSheet = () => {
     const {
+        copilotEnabled,
+        copilotPanelOpen,
+        handleCopilotClick,
+        handleCopilotClose,
         handleOpenChange,
         workflowExecution,
         workflowExecutionLoading,
         workflowExecutionSheetOpen,
     } = useWorkflowExecutionSheet();
+
+    const ff_4077 = useFeatureFlagsStore()('ff-4077');
 
     return (
         <Sheet onOpenChange={handleOpenChange} open={workflowExecutionSheetOpen}>
@@ -46,6 +56,22 @@ const WorkflowExecutionSheet = () => {
                                 </div>
 
                                 <div className="flex items-center gap-1">
+                                    {ff_4077 && copilotEnabled && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    className="[&_svg]:size-5"
+                                                    icon={<SparklesIcon />}
+                                                    onClick={handleCopilotClick}
+                                                    size="icon"
+                                                    variant="ghost"
+                                                />
+                                            </TooltipTrigger>
+
+                                            <TooltipContent>Open Copilot panel</TooltipContent>
+                                        </Tooltip>
+                                    )}
+
                                     <SheetCloseButton />
                                 </div>
                             </header>
@@ -87,6 +113,12 @@ const WorkflowExecutionSheet = () => {
                         </>
                     )}
                 </div>
+
+                <CopilotPanel
+                    className="h-full rounded-r-md border-l"
+                    onClose={handleCopilotClose}
+                    open={copilotPanelOpen}
+                />
             </SheetContent>
         </Sheet>
     );
