@@ -40,11 +40,11 @@ public class ObservabilityEnvironmentPostProcessor implements EnvironmentPostPro
                 StringUtils.join(
                     environment.getProperty("spring.autoconfigure.exclude"),
                     """
-                        ,org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.tracing.otlp.OtlpTracingAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.tracing.OpenTelemetryTracingAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.logging.OpenTelemetryLoggingAutoConfiguration
+                        , org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusMetricsExportAutoConfiguration
+                        , org.springframework.boot.micrometer.tracing.opentelemetry.autoconfigure.OpenTelemetryTracingAutoConfiguration
+                        , org.springframework.boot.micrometer.tracing.opentelemetry.autoconfigure.otlp.OtlpTracingAutoConfiguration
+                        , org.springframework.boot.opentelemetry.autoconfigure.OpenTelemetrySdkAutoConfiguration
+                        , org.springframework.boot.opentelemetry.autoconfigure.logging.OpenTelemetryLoggingAutoConfiguration
                         """));
 
             source.put("bytechef.observability.loki.appender.level", "OFF");
