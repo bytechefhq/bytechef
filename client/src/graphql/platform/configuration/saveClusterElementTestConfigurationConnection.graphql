@@ -1,0 +1,19 @@
+mutation saveClusterElementTestConfigurationConnection(
+    $workflowId: String!
+    $workflowNodeName: String!
+    $clusterElementType: String!
+    $clusterElementWorkflowNodeName: String!
+    $workflowConnectionKey: String!
+    $connectionId: Long!
+    $environmentId: Long!
+) {
+    saveClusterElementTestConfigurationConnection(
+        workflowId: $workflowId
+        workflowNodeName: $workflowNodeName
+        clusterElementType: $clusterElementType
+        clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+        workflowConnectionKey: $workflowConnectionKey
+        connectionId: $connectionId
+        environmentId: $environmentId
+    )
+}
