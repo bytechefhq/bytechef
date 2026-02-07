@@ -10,7 +10,7 @@ interface UseClusterElementsCanvasDialogProps {
 }
 
 export default function useClusterElementsCanvasDialog({onOpenChange}: UseClusterElementsCanvasDialogProps) {
-    const {setCopilotPanelOpen} = useClusterElementsCanvasDialogStore();
+    const setCopilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setCopilotPanelOpen);
 
     const ai = useApplicationInfoStore((state) => state.ai);
     const setContext = useCopilotStore((state) => state.setContext);
