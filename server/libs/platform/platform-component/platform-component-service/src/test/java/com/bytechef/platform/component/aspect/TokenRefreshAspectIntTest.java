@@ -175,7 +175,7 @@ class TokenRefreshAspectIntTest {
     }
 
     @Test
-    void testExecuteConcurrentRefreshOnlyOneRefreshHappens() throws InterruptedException {
+    void testExecuteConcurrentRefreshMultipleRefreshesHappen() throws InterruptedException {
         ComponentConnection connection = createOAuth2Connection();
 
         setupRefreshOn401();

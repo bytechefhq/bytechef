@@ -108,7 +108,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         try {
             return authorization.getAcquire()
-                .orElseThrow()
+                .orElseThrow(() -> new IllegalStateException("Acquire function is not defined."))
                 .apply(ParametersFactory.create(connectionParameters), context);
         } catch (Exception e) {
             throw new ConfigurationException(e, ConnectionDefinitionErrorType.ACQUIRE_FAILED);
