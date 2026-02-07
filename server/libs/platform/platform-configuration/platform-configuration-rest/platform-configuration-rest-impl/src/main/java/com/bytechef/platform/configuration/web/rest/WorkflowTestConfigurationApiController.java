@@ -21,7 +21,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.configuration.web.rest.model.SaveWorkflowTestConfigurationConnectionRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowTestConfigurationConnectionRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.SaveWorkflowTestConfigurationInputsRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationConnectionModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationModel;
@@ -89,26 +89,13 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
-    public ResponseEntity<Void> saveWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String workflowConnectionKey, Long environmentId,
-        SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel) {
-
-        workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
-            workflowId, workflowNodeName, workflowConnectionKey,
-            saveWorkflowTestConfigurationConnectionRequestModel.getConnectionId(), environmentId);
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
     public ResponseEntity<Void> deleteWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String workflowConnectionKey, Long environmentId,
-        SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel) {
+        DeleteWorkflowTestConfigurationConnectionRequestModel deleteWorkflowTestConfigurationConnectionRequestModel) {
 
         workflowTestConfigurationFacade.deleteWorkflowTestConfigurationConnection(
             workflowId, workflowNodeName, workflowConnectionKey,
-            saveWorkflowTestConfigurationConnectionRequestModel.getConnectionId(), environmentId);
+            deleteWorkflowTestConfigurationConnectionRequestModel.getConnectionId(), environmentId);
 
         return ResponseEntity.noContent()
             .build();
