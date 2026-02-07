@@ -47,8 +47,8 @@ const WorkflowCodeEditorSheet = ({
         handleRunClick,
         handleSaveClick,
         handleStopClick,
-        handleUnsavedChangesAlertDialogOpen,
         handleUnsavedChangesAlertDialogClose,
+        handleUnsavedChangesAlertDialogOpen,
         handleWorkflowTestConfigurationDialog,
         showWorkflowTestConfigurationDialog,
         unsavedChangesAlertDialogOpen,
@@ -170,7 +170,7 @@ const WorkflowCodeEditorSheet = ({
                                             folding: true,
                                             foldingStrategy: 'indentation',
                                         }}
-                                        value={workflow.definition!}
+                                        value={definition}
                                     />
                                 </Suspense>
                             </ResizablePanel>
