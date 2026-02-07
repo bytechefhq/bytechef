@@ -51,13 +51,15 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.annotation.WithTokenRefresh;
+import com.bytechef.platform.component.annotation.WithTokenRefresh.ComponentNameParam;
+import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionParam;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.exception.ConnectionDefinitionErrorType;
-import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
 import java.net.URI;
@@ -89,15 +91,12 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
-    private final TokenRefreshHelper tokenRefreshHelper;
 
     public ConnectionDefinitionServiceImpl(
-        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
-        @Lazy TokenRefreshHelper tokenRefreshHelper) {
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
-        this.tokenRefreshHelper = tokenRefreshHelper;
     }
 
     @Override
@@ -152,15 +151,14 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection) {
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName,
-            -1,
-            componentConnection,
-            contextFactory.createContext(componentName, componentConnection),
-            ConnectionDefinitionErrorType.INVALID_CLAIM,
-            (componentConnection1, context) -> executeBaseUriInternal(componentName, componentConnection1, context),
-            componentConnection1 -> contextFactory.createContext(componentName, componentConnection1));
+    @WithTokenRefresh(
+        errorTypeClass = ConnectionDefinitionErrorType.class,
+        errorTypeField = "INVALID_CLAIM")
+    public Optional<String> executeBaseUri(
+        @ComponentNameParam String componentName, @ConnectionParam ComponentConnection componentConnection) {
+        Context context = contextFactory.createContext(componentName, componentConnection);
+
+        return executeBaseUriInternal(componentName, componentConnection, context);
     }
 
     private Optional<String> executeBaseUriInternal(

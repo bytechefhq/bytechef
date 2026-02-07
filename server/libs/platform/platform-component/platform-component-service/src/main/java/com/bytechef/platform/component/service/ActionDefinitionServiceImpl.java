@@ -39,8 +39,10 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.annotation.WithTokenRefresh;
+import com.bytechef.platform.component.annotation.WithTokenRefresh.ComponentNameParam;
+import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionParam;
 import com.bytechef.platform.component.context.ContextFactory;
-import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamResponsePerformFunction;
@@ -51,7 +53,6 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
-import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -72,62 +73,56 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
-    private final TokenRefreshHelper tokenRefreshHelper;
 
     public ActionDefinitionServiceImpl(
-        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
-        @Lazy TokenRefreshHelper tokenRefreshHelper) {
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
-        this.tokenRefreshHelper = tokenRefreshHelper;
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = ActionDefinitionErrorType.class,
+        errorTypeField = "EXECUTE_DYNAMIC_PROPERTIES")
     public List<Property> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String workflowId,
-        @Nullable ComponentConnection componentConnection) {
+        @ComponentNameParam String componentName, int componentVersion, String actionName,
+        String propertyName, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String workflowId,
+        @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, null, null, null, workflowId, componentConnection, null, null,
             true);
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, actionContext,
-            ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES,
-            (componentConnection1, actionContext1) -> executeDynamicProperties(
-                componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-                componentConnection1, actionContext1),
-            componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, workflowId, componentConnection1, null,
-                null, true));
+        return doExecuteDynamicProperties(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            componentConnection, actionContext);
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = ActionDefinitionErrorType.class,
+        errorTypeField = "EXECUTE_OPTIONS")
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable ComponentConnection componentConnection) {
+        @ComponentNameParam String componentName, int componentVersion, String actionName,
+        String propertyName, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, null, null, null, null, componentConnection, null, null, true);
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, actionContext,
-            ActionDefinitionErrorType.EXECUTE_OPTIONS,
-            (componentConnection1, actionContext1) -> executeOptions(
-                componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-                searchText, componentConnection1, actionContext1),
-            componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null, null,
-                true));
+        return doExecuteOptions(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, componentConnection, actionContext);
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = ActionDefinitionErrorType.class,
+        errorTypeField = "EXECUTE_OUTPUT")
     public @Nullable OutputResponse executeOutput(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections) {
+        @ComponentNameParam String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, @ConnectionParam Map<String, ComponentConnection> componentConnections) {
 
         BaseOutputFunction baseOutputFunction = (BaseOutputFunction) componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName)
@@ -146,14 +141,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentName, componentVersion, actionName, null, null, null, null, firstComponentConnection, null,
                 null, true);
 
-            return tokenRefreshHelper.executeSingleConnectionFunction(
-                componentName, componentVersion, firstComponentConnection, actionContext,
-                ActionDefinitionErrorType.EXECUTE_OUTPUT,
-                (componentConnection1, actionContext1) -> executeSingleConnectionOutput(
-                    outputFunction, inputParameters, componentConnection1, actionContext1),
-                componentConnection1 -> contextFactory.createActionContext(
-                    componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null,
-                    null, true));
+            return executeSingleConnectionOutput(
+                outputFunction, inputParameters, firstComponentConnection, actionContext);
         } else {
             ActionContext actionContext = contextFactory.createActionContext(
                 componentName, componentVersion, actionName, null, null, null, null, null, null, null, true);
@@ -165,11 +154,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = ActionDefinitionErrorType.class,
+        errorTypeField = "EXECUTE_PERFORM")
     public Object executePerform(
-        String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
-        Long jobId, String workflowId, Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
-        boolean editorEnvironment, PlatformType type) {
+        @ComponentNameParam String componentName, int componentVersion, String actionName,
+        Long jobPrincipalId,
+        Long jobPrincipalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
+        @ConnectionParam Map<String, ComponentConnection> componentConnections,
+        Map<String, ?> extensions, Long environmentId, boolean editorEnvironment, PlatformType type) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition = componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName);
@@ -185,15 +178,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
                 firstComponentConnection, environmentId, type, editorEnvironment);
 
-            return tokenRefreshHelper.executeSingleConnectionFunction(
-                componentName, componentVersion, firstComponentConnection, actionContext,
-                ActionDefinitionErrorType.EXECUTE_PERFORM,
-                (componentConnection1, actionContext1) -> executeSingleConnectionPerform(
-                    performFunction, inputParameters, componentConnection1,
-                    actionContext1),
-                componentConnection1 -> contextFactory.createActionContext(
-                    componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                    workflowId, componentConnection1, environmentId, type, editorEnvironment));
+            return executeSingleConnectionPerform(
+                performFunction, inputParameters, firstComponentConnection, actionContext);
         } else {
             ActionContext actionContext = contextFactory.createActionContext(
                 componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
@@ -214,11 +200,13 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = ActionDefinitionErrorType.class,
+        errorTypeField = "EXECUTE_PERFORM")
     public Object executePerformForPolyglot(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, ActionContext context) {
-
-        ActionContextAware actionContextAware = (ActionContextAware) context;
+        @ComponentNameParam String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection,
+        @Nullable Long environmentId, ActionContext context) {
 
         PerformFunction performFunction =
             (PerformFunction) componentDefinitionRegistry
@@ -226,16 +214,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .getPerform()
                 .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, context,
-            ActionDefinitionErrorType.EXECUTE_PERFORM,
-            (componentConnection1, actionContext1) -> executeSingleConnectionPerform(
-                performFunction, inputParameters, componentConnection1, actionContext1),
-            componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
-                actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
-                actionContextAware.getWorkflowId(), componentConnection1, environmentId,
-                actionContextAware.getPlatformType(), actionContextAware.isEditorEnvironment()));
+        return executeSingleConnectionPerform(performFunction, inputParameters, componentConnection, context);
     }
 
     @Override
@@ -314,10 +293,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             getLookupDependsOnPathsMap(lookupDependsOnPaths));
     }
 
-    private List<Property> executeDynamicProperties(
+    private List<Property> doExecuteDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        ComponentConnection componentConnection, ActionContext context) {
+        @Nullable ComponentConnection componentConnection, ActionContext context) {
 
         ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
 
@@ -398,10 +377,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         }
     }
 
-    private List<Option> executeOptions(
+    private List<Option> doExecuteOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection, ActionContext context) {
+        @Nullable ComponentConnection componentConnection, ActionContext context) {
 
         try {
             ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);

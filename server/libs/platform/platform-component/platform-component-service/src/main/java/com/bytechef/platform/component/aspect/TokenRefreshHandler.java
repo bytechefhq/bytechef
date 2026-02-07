@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.util;
+package com.bytechef.platform.component.aspect;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.EXPIRES_IN;
@@ -22,12 +22,9 @@ import static com.bytechef.component.definition.Authorization.REFRESH_TOKEN;
 
 import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.exception.ProviderException;
-import com.bytechef.exception.ConfigurationException;
-import com.bytechef.exception.ErrorType;
-import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
@@ -37,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,20 +42,24 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 /**
- * @author Igor Beslic
+ * Handler responsible for refreshing OAuth2 credentials and managing credential status. This handler is used by the
+ * TokenRefreshAspect to perform the actual credential refresh operation.
+ *
+ * @author Ivica Cardic
  */
 @Component
-public class TokenRefreshHelper {
+public class TokenRefreshHandler {
 
-    private static final String CACHE = TokenRefreshHelper.class.getName() + ".reentrantLock";
-    private static final Logger logger = LoggerFactory.getLogger(TokenRefreshHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TokenRefreshHandler.class);
+
+    private static final String CACHE = TokenRefreshHandler.class.getName() + ".reentrantLock";
 
     private final CacheManager cacheManager;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public TokenRefreshHelper(
+    public TokenRefreshHandler(
         CacheManager cacheManager, ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService) {
 
@@ -69,55 +68,48 @@ public class TokenRefreshHelper {
         this.connectionService = connectionService;
     }
 
-    public <V, C extends Context> V executeSingleConnectionFunction(
-        String componentName, int componentVersion, ComponentConnection componentConnection,
-        C context, ErrorType errorType, BiFunction<ComponentConnection, C, V> performFunction,
-        Function<ComponentConnection, C> contextFunction) {
+    /**
+     * Checks if a token refresh should be attempted for the given exception.
+     *
+     * @param componentName       the name of the component
+     * @param componentConnection the component connection containing authorization info
+     * @param exception           the exception that occurred
+     * @return true if refresh should be attempted, false otherwise
+     */
+    public boolean shouldRefresh(String componentName, ComponentConnection componentConnection, Exception exception) {
+        if (componentConnection == null || componentConnection.authorizationType() == null ||
+            exception.getMessage() == null) {
 
-        try {
-            return performFunction.apply(componentConnection, context);
-        } catch (Exception exception) {
-            if (Objects.isNull(componentConnection) || Objects.isNull(componentConnection.authorizationType())
-                || Objects.isNull(exception.getMessage())) {
-
-                throw exception;
-            }
-
-            List<Object> refreshOn = connectionDefinitionService.getAuthorizationRefreshOn(
-                componentName, componentConnection.version(),
-                Objects.requireNonNull(componentConnection.authorizationType()));
-
-            if (componentConnection.canCredentialsBeRefreshed() &&
-                RefreshCredentialsUtils.matches(refreshOn, exception)) {
-
-                componentConnection = getRefreshedCredentialsComponentConnection(componentConnection, context);
-
-                return performFunction.apply(componentConnection, contextFunction.apply(componentConnection));
-            }
-
-            if (exception instanceof ProviderException) {
-                throw new ConfigurationException(exception, errorType);
-            }
-
-            if (exception instanceof ConfigurationException ||
-                exception instanceof ExecutionException) {
-
-                throw exception;
-            }
-
-            throw exception;
+            return false;
         }
+
+        if (!componentConnection.canCredentialsBeRefreshed()) {
+            return false;
+        }
+
+        List<Object> refreshOn = connectionDefinitionService.getAuthorizationRefreshOn(
+            componentName, componentConnection.version(),
+            Objects.requireNonNull(componentConnection.authorizationType()));
+
+        return RefreshCredentialsUtils.matches(refreshOn, exception);
     }
 
-    private ComponentConnection getRefreshedCredentialsComponentConnection(
-        ComponentConnection componentConnection, Context context) {
-
+    /**
+     * Refreshes the credentials for the given connection. For OAuth2 authorization code flows, this will refresh the
+     * access token using the refresh token. For custom authorization types, this will acquire new credentials.
+     *
+     * @param componentConnection the component connection to refresh
+     * @param context             the context for the refresh operation
+     * @return a new ComponentConnection with the refreshed credentials
+     * @throws RuntimeException if the refresh operation fails
+     */
+    public ComponentConnection refreshCredentials(ComponentConnection componentConnection, Context context) {
         Connection connection;
         Map<String, ?> parameters;
 
         try {
-            if (logger.isTraceEnabled()) {
-                logger.trace(
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
                     "Getting refreshed credentials with oAuth2AuthorizationCode set to {}",
                     componentConnection.isAuthorizationOauth2AuthorizationCode());
             }
@@ -142,8 +134,8 @@ public class TokenRefreshHelper {
                     }
                 };
 
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Refresh token execution executed");
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("Refresh token execution executed");
                 }
             } else {
                 parameters = connectionDefinitionService.executeAcquire(
@@ -151,13 +143,13 @@ public class TokenRefreshHelper {
                     Objects.requireNonNull(componentConnection.authorizationType()),
                     componentConnection.getParameters(), context);
 
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Acquire executed");
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("Acquire executed");
                 }
             }
 
-            if (logger.isTraceEnabled()) {
-                logger.trace("Refresh token execution executed");
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Credential refresh completed");
             }
 
             Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
@@ -176,10 +168,9 @@ public class TokenRefreshHelper {
                 reentrantLock.unlock();
             }
         } catch (Exception exception) {
-            connectionService.updateConnectionCredentialStatus(
-                componentConnection.connectionId(), Connection.CredentialStatus.INVALID);
+            markCredentialsInvalid(componentConnection.connectionId());
 
-            logger.error("Unable to complete refresh token procedure", exception);
+            LOGGER.error("Unable to complete refresh token procedure", exception);
 
             throw exception;
         }
@@ -187,5 +178,14 @@ public class TokenRefreshHelper {
         return new ComponentConnection(
             componentConnection.componentName(), connection.getConnectionVersion(), componentConnection.connectionId(),
             connection.getParameters(), connection.getAuthorizationType());
+    }
+
+    /**
+     * Marks the credentials for the given connection as invalid.
+     *
+     * @param connectionId the ID of the connection to mark as invalid
+     */
+    public void markCredentialsInvalid(long connectionId) {
+        connectionService.updateConnectionCredentialStatus(connectionId, Connection.CredentialStatus.INVALID);
     }
 }

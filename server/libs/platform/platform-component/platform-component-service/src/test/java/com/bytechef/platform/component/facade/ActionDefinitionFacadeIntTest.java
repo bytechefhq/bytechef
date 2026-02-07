@@ -23,7 +23,6 @@ import com.bytechef.platform.component.config.ComponentRegistryConfigurationShar
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -59,9 +58,6 @@ public class ActionDefinitionFacadeIntTest {
 
     @Autowired
     private ContextFactory contextFactory;
-
-    @Autowired
-    private TokenRefreshHelper tokenRefreshHelper;
 
     @Disabled
     @Test
