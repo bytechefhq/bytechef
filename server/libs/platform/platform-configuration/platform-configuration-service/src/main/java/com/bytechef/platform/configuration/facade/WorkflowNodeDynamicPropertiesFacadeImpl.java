@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.Property;
@@ -28,12 +29,14 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 
 /**
@@ -76,7 +79,8 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         long environmentId) {
 
-        Long connectionId = getConnectionId(workflowId, workflowNodeName, environmentId);
+        Long connectionId = getClusterElementConnectionId(
+            workflowId, clusterElementWorkflowNodeName, environmentId);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -140,6 +144,21 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                         MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
                     lookupDependsOnPaths, workflowId, connectionId);
             });
+    }
+
+    private Long getClusterElementConnectionId(
+        String workflowId, String clusterElementWorkflowNodeName, long environmentId) {
+
+        return workflowTestConfigurationService
+            .fetchWorkflowTestConfiguration(workflowId, environmentId)
+            .stream()
+            .flatMap(workflowTestConfiguration -> CollectionUtils.stream(
+                workflowTestConfiguration.getConnections()))
+            .filter(connection -> Objects.equals(
+                connection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
+            .findFirst()
+            .map(WorkflowTestConfigurationConnection::getConnectionId)
+            .orElse(null);
     }
 
     private Long getConnectionId(String workflowId, String workflowNodeName, long environmentId) {
