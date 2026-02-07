@@ -154,6 +154,9 @@ spring:
     exclude:
       org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,
       org.springframework.boot.neo4j.autoconfigure.Neo4jAutoConfiguration
+  batch:
+    job:
+      enabled: false
   cache:
     type: ${bytechef.cache.provider}
   cloud:
