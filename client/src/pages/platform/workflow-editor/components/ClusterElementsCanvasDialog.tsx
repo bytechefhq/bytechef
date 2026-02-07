@@ -1,14 +1,19 @@
 import Button from '@/components/Button/Button';
 import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ClusterElementsWorkflowEditor from '@/pages/platform/cluster-element-editor/components/ClusterElementsWorkflowEditor';
 import {DataPillPanelSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
+import useClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/hooks/useClusterElementsCanvasDialog';
+import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
-import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {XIcon} from 'lucide-react';
+import {SparklesIcon, XIcon} from 'lucide-react';
 import {Suspense, lazy} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 const DataPillPanel = lazy(() => import('./datapills/DataPillPanel'));
 
@@ -29,15 +34,14 @@ const ClusterElementsCanvasDialog = ({
     updateWorkflowMutation,
     workflowNodeOutputs,
 }: ClusterElementsCanvasDialogProps) => {
+    const {copilotEnabled, handleCopilotClick, handleCopilotClose, handleOpenChange} = useClusterElementsCanvasDialog({
+        onOpenChange,
+    });
+
+    const copilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.copilotPanelOpen);
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
 
-    const handleOpenChange = (isOpen: boolean) => {
-        onOpenChange(isOpen);
-
-        if (!isOpen) {
-            useWorkflowNodeDetailsPanelStore.getState().reset();
-        }
-    };
+    const ff_4070 = useFeatureFlagsStore()('ff-4070');
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
@@ -51,11 +55,32 @@ const ClusterElementsCanvasDialog = ({
                 <ClusterElementsWorkflowEditor />
 
                 <WorkflowNodeDetailsPanel
-                    className="fixed inset-y-0 right-0 rounded-l-none"
+                    className={twMerge(
+                        'fixed inset-y-0 right-0 rounded-l-none',
+                        copilotPanelOpen && 'right-[450px] rounded-r-none border-r-0'
+                    )}
                     closeButton={
-                        <DialogClose asChild>
-                            <Button icon={<XIcon />} size="icon" title="Close the canvas" variant="ghost" />
-                        </DialogClose>
+                        <div className="flex items-center gap-1">
+                            {ff_4070 && copilotEnabled && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            className="[&_svg]:size-5"
+                                            icon={<SparklesIcon />}
+                                            onClick={handleCopilotClick}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Open Copilot panel</TooltipContent>
+                                </Tooltip>
+                            )}
+
+                            <DialogClose asChild>
+                                <Button icon={<XIcon />} size="icon" title="Close the canvas" variant="ghost" />
+                            </DialogClose>
+                        </div>
                     }
                     invalidateWorkflowQueries={invalidateWorkflowQueries}
                     previousComponentDefinitions={previousComponentDefinitions}
@@ -66,12 +91,21 @@ const ClusterElementsCanvasDialog = ({
                 {dataPillPanelOpen && (
                     <Suspense fallback={<DataPillPanelSkeleton />}>
                         <DataPillPanel
-                            className="fixed inset-y-0 right-[465px] rounded-none"
+                            className={twMerge(
+                                'fixed inset-y-0 right-[465px] rounded-none',
+                                copilotPanelOpen && 'right-[915px]'
+                            )}
                             previousComponentDefinitions={previousComponentDefinitions}
                             workflowNodeOutputs={workflowNodeOutputs}
                         />
                     </Suspense>
                 )}
+
+                <CopilotPanel
+                    className="fixed inset-y-0 right-0 rounded-r-md border-l"
+                    onClose={handleCopilotClose}
+                    open={copilotPanelOpen}
+                />
             </DialogContent>
         </Dialog>
     );
