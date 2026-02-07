@@ -78,7 +78,7 @@ public abstract class AbstractAiAgentChatAction {
 
         ChatModel chatModel = (ChatModel) modelFunction.apply(
             ParametersFactory.create(
-                MapUtils.concat(Map.copyOf(inputParameters.toMap()), Map.copyOf(clusterElement.getParameters()))),
+                MapUtils.concat(new HashMap<>(inputParameters.toMap()), new HashMap<>(clusterElement.getParameters()))),
             ParametersFactory.create(componentConnection.getParameters()), true);
 
         ChatClient chatClient = ChatClient.builder(chatModel)
