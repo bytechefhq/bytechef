@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.log.config;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage.Provider;
+import com.bytechef.config.ApplicationProperties.FileStorage.Provider;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorageImpl;
@@ -34,8 +34,7 @@ class LogFileStorageConfiguration {
     LogFileStorage logFileStorage(
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
 
-        Provider provider = applicationProperties.getWorkflow()
-            .getOutputStorage()
+        Provider provider = applicationProperties.getFileStorage()
             .getProvider();
 
         return new LogFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
