@@ -147,7 +147,8 @@ class OutputFilteringMessageEventPreSendProcessor implements MessageEventPreSend
             boolean coveredByParent = false;
 
             for (String includedPath : normalizedPaths) {
-                if (path.startsWith(includedPath + ".") || path.equals(includedPath)) {
+                if (path.equals(includedPath) || path.startsWith(includedPath + ".")
+                    || path.startsWith(includedPath + "[")) {
                     coveredByParent = true;
 
                     break;

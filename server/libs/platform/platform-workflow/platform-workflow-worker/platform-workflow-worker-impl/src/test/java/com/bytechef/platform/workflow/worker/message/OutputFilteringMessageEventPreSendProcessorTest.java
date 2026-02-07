@@ -639,4 +639,52 @@ class OutputFilteringMessageEventPreSendProcessorTest {
 
         processor.process(event);
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testProcessNormalizesParentPathCoveringBracketChildPaths() {
+        Map<String, Object> fullOutput = Map.of(
+            "items", List.of(
+                Map.of("name", "First", "value", 10),
+                Map.of("name", "Second", "value", 20)),
+            "unused", "data");
+
+        FileEntry originalOutputFileEntry = mock(FileEntry.class);
+        FileEntry filteredOutputFileEntry = mock(FileEntry.class);
+
+        when(taskFileStorage.readTaskExecutionOutput(originalOutputFileEntry)).thenReturn(fullOutput);
+        when(taskFileStorage.storeTaskExecutionOutput(anyLong(), anyLong(), any()))
+            .thenAnswer(invocation -> {
+                Map<String, Object> filteredOutput = (Map<String, Object>) invocation.getArgument(2);
+
+                assertThat(filteredOutput).containsKey("items");
+
+                List<Object> itemsList = (List<Object>) filteredOutput.get("items");
+
+                assertThat(itemsList)
+                    .isEqualTo(List.of(
+                        Map.of("name", "First", "value", 10),
+                        Map.of("name", "Second", "value", 20)));
+                assertThat(filteredOutput).doesNotContainKey("unused");
+
+                return filteredOutputFileEntry;
+            });
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(1L)
+            .jobId(100L)
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(WorkflowConstants.NAME, "accelo_1", WorkflowConstants.TYPE, "accelo/v1/createContact",
+                        WorkflowConstants.PARAMETERS, Map.of())))
+            .build();
+
+        taskExecution.setOutput(originalOutputFileEntry);
+        taskExecution.putMetadata(MetadataConstants.OUTPUT_REFERENCE_PATHS,
+            Set.of("items", "items[0].name"));
+
+        TaskExecutionCompleteEvent event = new TaskExecutionCompleteEvent(taskExecution);
+
+        processor.process(event);
+    }
 }
