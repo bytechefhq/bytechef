@@ -1,4 +1,5 @@
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {NodeDataType, TabNameType} from '@/shared/types';
 import {NodeProps} from '@xyflow/react';
 import {useCallback} from 'react';
@@ -20,6 +21,7 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
             }))
         );
     const setRightSidebarOpen = useRightSidebarStore((state) => state.setRightSidebarOpen);
+    const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
 
     const {nodes} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -48,6 +50,7 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         }
 
         setRightSidebarOpen(false);
+        setWorkflowTestChatPanelOpen(false);
         setActiveTab(activeTab ?? 'description');
         setCurrentNode({...data, description: ''});
 
@@ -69,6 +72,7 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         clusterElementsCanvasNodes,
         clusterElementsCanvasOpen,
         setRightSidebarOpen,
+        setWorkflowTestChatPanelOpen,
         setActiveTab,
         activeTab,
         setCurrentNode,
