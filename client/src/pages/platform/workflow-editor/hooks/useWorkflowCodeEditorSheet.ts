@@ -86,16 +86,18 @@ const useWorkflowCodeEditorSheet = ({
 
     const handleOpenChange = useCallback(
         (open: boolean) => {
+            if (!open && dirty) {
+                setUnsavedChangesAlertDialogOpen(true);
+
+                return;
+            }
+
             if (!open) {
                 useCopilotStore.getState().restoreConversationState();
                 setCopilotPanelOpen(false);
             }
 
-            if (!open && dirty) {
-                setUnsavedChangesAlertDialogOpen(true);
-            } else {
-                onSheetOpenClose(open);
-            }
+            onSheetOpenClose(open);
         },
         [dirty, onSheetOpenClose]
     );
@@ -166,9 +168,15 @@ const useWorkflowCodeEditorSheet = ({
     );
 
     const handleUnsavedChangesAlertDialogClose = useCallback(() => {
+        useCopilotStore.getState().restoreConversationState();
+        setCopilotPanelOpen(false);
         setUnsavedChangesAlertDialogOpen(false);
         onSheetOpenClose(false);
     }, [onSheetOpenClose]);
+
+    useEffect(() => {
+        setDefinition(workflow.definition!);
+    }, [workflow.definition]);
 
     useEffect(() => {
         if (!workflow.id || currentEnvironmentId === undefined) return;
