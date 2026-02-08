@@ -577,11 +577,16 @@ describe('useOAuth2', () => {
         });
 
         // Simulate popup closing without any OAuth data
-        (mockWindow as Window & {window: {closed: boolean}}).window.closed = true;
+        (mockWindow as unknown as {closed: boolean}).closed = true;
 
-        // Advance timers to trigger the interval check
+        // First interval tick detects the popup is closed and records the time
         act(() => {
             vi.advanceTimersByTime(300);
+        });
+
+        // Advance past the 120-second grace period so the hook treats the popup as abandoned
+        act(() => {
+            vi.advanceTimersByTime(121_000);
         });
 
         expect(result.current.loading).toBe(false);
