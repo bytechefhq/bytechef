@@ -541,20 +541,6 @@ public class ComponentTools {
                             componentDefinition.getName(), componentDefinition.getVersion(), trigger.getName(),
                             Map.of(), null);
                     }
-
-                    if (outputResponse == null) {
-                        try {
-                            var output = triggerDefinitionFacade.executeTrigger(
-                                componentDefinition.getName(), componentDefinition.getVersion(), trigger.getName(),
-                                null, null, null, null, null, null, null, null, true);
-                            if (output != null) {
-                                outputResponse = SchemaUtils.toOutput(
-                                    output, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
-                            }
-                        } catch (Exception e) {
-                            throw new Exception("Please make a " + componentDefinition.getName() + " connector");
-                        }
-                    }
                 }
             } else {
                 // If not found in triggers, try actions
