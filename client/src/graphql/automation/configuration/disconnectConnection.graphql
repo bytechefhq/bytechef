@@ -1,0 +1,3 @@
+mutation DisconnectConnection($connectionId: ID!) {
+    disconnectConnection(connectionId: $connectionId)
+}
