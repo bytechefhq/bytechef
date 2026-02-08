@@ -1,36 +1,16 @@
 import Button from '@/components/Button/Button';
-import {ChangeEvent, useRef, useState} from 'react';
 import {ControllerRenderProps, FieldPath, FieldValues} from 'react-hook-form';
+
+import useOpenApiSpecificationField from './hooks/useOpenApiSpecificationField';
 
 const OpenApiSpecificationField = <T extends FieldValues, K extends FieldPath<T>>({
     field,
 }: {
     field: ControllerRenderProps<T, K>;
 }) => {
-    const hiddenInputRef = useRef<HTMLInputElement>(null);
-
-    const [name, setName] = useState<string>();
-    const [preview, setPreview] = useState<string>();
-
-    const handleUploadedFile = async (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.item(0);
-
-        if (file) {
-            setName(file.name);
-
-            field.onChange(await file.text());
-
-            const urlIcon = URL.createObjectURL(file);
-
-            setPreview(urlIcon);
-        }
-    };
-
-    const onUpload = () => {
-        hiddenInputRef.current?.click();
-    };
-
-    const uploadButtonLabel = preview ? 'Change spec' : 'Upload spec';
+    const {handleUploadedFile, hiddenInputRef, name, onUpload, uploadButtonLabel} = useOpenApiSpecificationField({
+        field,
+    });
 
     return (
         <div className="flex items-center space-x-4">
@@ -43,7 +23,7 @@ const OpenApiSpecificationField = <T extends FieldValues, K extends FieldPath<T>
             <input
                 accept=".yml,.yaml"
                 className="hidden"
-                onChange={(e) => handleUploadedFile(e)}
+                onChange={(event) => handleUploadedFile(event)}
                 ref={hiddenInputRef}
                 type="file"
                 value=""

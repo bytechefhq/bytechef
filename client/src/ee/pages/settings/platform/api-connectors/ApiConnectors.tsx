@@ -10,24 +10,11 @@ import ApiConnectorList from '@/ee/pages/settings/platform/api-connectors/compon
 // import {useGetApiConnectorsQuery} from '@/ee/shared/queries/platform/apiConnectors.queries';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {ApiConnector} from '@/shared/middleware/graphql';
 import {Link2Icon} from 'lucide-react';
 
 // TODO: Remove mock data when useGetApiConnectorsQuery is implemented
-const mockApiConnectors: Array<{
-    description?: string;
-    enabled: boolean;
-    endpoints?: Array<{
-        httpMethod: string;
-        id: string;
-        lastExecutionDate?: Date;
-        name: string;
-        path: string;
-    }>;
-    id: string;
-    lastModifiedDate?: Date;
-    name: string;
-    title: string;
-}> = [];
+const mockApiConnectors: ApiConnector[] = [];
 
 const ApiConnectors = () => {
     // TODO: Uncomment when apiConnectors.queries is implemented
