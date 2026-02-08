@@ -33,11 +33,12 @@ public class GraphQlClientComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("graphQl")
         .title("GraphQL Client")
         .description(
-            "The GraphQL client connector offers a comprehensive overview of your API's data, empowering users " +
-                "to request precisely what they need and nothing beyond that.")
+            "Execute GraphQL queries against a GraphQL API, allowing you to fetch exactly the data you need " +
+                "using queries and variables.")
         .icon("path:assets/graphql-client.svg")
         .categories(ComponentCategory.HELPERS)
-        .actions(GraphQlClientQueryAction.ACTION_DEFINITION);
+        .actions(GraphQlClientQueryAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

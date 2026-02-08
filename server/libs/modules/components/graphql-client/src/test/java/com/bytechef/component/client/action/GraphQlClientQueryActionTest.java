@@ -16,28 +16,38 @@
 
 package com.bytechef.component.client.action;
 
+import static com.bytechef.component.graphql.client.constant.GraphQlConstants.GRAPHQL_ENDPOINT;
 import static com.bytechef.component.graphql.client.constant.GraphQlConstants.HEADERS;
 import static com.bytechef.component.graphql.client.constant.GraphQlConstants.QUERY;
 import static com.bytechef.component.graphql.client.constant.GraphQlConstants.VARIABLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.graphql.client.action.GraphQlClientQueryAction;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  **/
-
+@ExtendWith(MockContextSetupExtension.class)
 class GraphQlClientQueryActionTest {
 
     public static final String EXAMPLE_QUERY = """
@@ -47,30 +57,31 @@ class GraphQlClientQueryActionTest {
           }
         }""";
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ArgumentCaptor<Map<String, List<String>>> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            HEADERS, Map.of("Content-Type", "application/json"),
-            VARIABLES, Map.of("characterId", 1),
-            QUERY, EXAMPLE_QUERY));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<Map<String, List<String>>> mapArgumentCaptor = forClass(Map.class);
     private final Object mockedObject = mock(Object.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedContext.http(any()))
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(
+                GRAPHQL_ENDPOINT, "/graphql",
+                HEADERS, Map.of("Content-Type", "application/json"),
+                VARIABLES, Map.of("characterId", 1),
+                QUERY, EXAMPLE_QUERY));
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.headers(mapArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
@@ -78,12 +89,22 @@ class GraphQlClientQueryActionTest {
 
         assertEquals(mockedObject, result);
 
-        Map<String, List<String>> headers = mapArgumentCaptor.getValue();
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-        assertEquals(headers, Map.of("Content-Type", List.of("application/json")));
+        assertNotNull(capturedFunction);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
-        assertEquals(Map.of(VARIABLES, Map.of("characterId", 1), QUERY, EXAMPLE_QUERY), body.getContent());
+        Configuration configuration = configurationBuilder.build();
+
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/graphql", stringArgumentCaptor.getValue());
+        assertEquals(Map.of("Content-Type", List.of("application/json")), mapArgumentCaptor.getValue());
+        assertEquals(
+            Http.Body.of(
+                Map.of(VARIABLES, Map.of("characterId", 1), QUERY, EXAMPLE_QUERY), Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }

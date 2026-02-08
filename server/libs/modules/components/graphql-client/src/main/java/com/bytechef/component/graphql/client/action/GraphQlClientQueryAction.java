@@ -44,6 +44,7 @@ public class GraphQlClientQueryAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("rawQuery")
         .title("Raw Query")
         .description("Run a raw query to a GraphQL endpoint.")
+        .help("", "https://docs.bytechef.io/reference/components/graphql-client_v1#raw-query")
         .properties(
             string(GRAPHQL_ENDPOINT)
                 .label("GraphQL Endpoint")
