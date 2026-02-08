@@ -1,6 +1,6 @@
 import {MutableRefObject, useCallback, useRef, useState} from 'react';
 
-import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from './constants';
+import {OAUTH_BROADCAST_CHANNEL, OAUTH_RESPONSE, OAUTH_STATE_KEY, OAUTH_STORAGE_KEY} from './constants';
 import {objectToQuery} from './tools';
 
 export interface TokenPayloadI {
@@ -93,17 +93,37 @@ const closePopup = (popupRef: MutableRefObject<Window | null | undefined>) => {
     popupRef.current?.close();
 };
 
+const clearStorageResponse = () => {
+    try {
+        localStorage.removeItem(OAUTH_STORAGE_KEY);
+    } catch {
+        // Ignore localStorage errors
+    }
+};
+
 const cleanup = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     intervalRef: MutableRefObject<any>,
     popupRef: MutableRefObject<Window | null | undefined>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleMessageListener: any
+    handleMessageListener: any,
+    broadcastChannel?: BroadcastChannel,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handleStorageListener?: any
 ) => {
     clearInterval(intervalRef.current);
     closePopup(popupRef);
     removeState();
+    clearStorageResponse();
     window.removeEventListener('message', handleMessageListener);
+
+    if (broadcastChannel) {
+        broadcastChannel.close();
+    }
+
+    if (handleStorageListener) {
+        window.removeEventListener('storage', handleStorageListener);
+    }
 };
 
 const useOAuth2 = (props: Oauth2Props) => {
@@ -136,6 +156,9 @@ const useOAuth2 = (props: Oauth2Props) => {
             loading: true,
         });
 
+        // Clear any stale storage response from previous attempts
+        clearStorageResponse();
+
         // 2. Generate and save state
         const state = generateState();
         saveState(state);
@@ -153,18 +176,21 @@ const useOAuth2 = (props: Oauth2Props) => {
             )
         );
 
-        // 4. Register message listener
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        async function handleMessageListener(message: MessageEvent<any>) {
-            const type = message?.data?.type;
+        // Track listeners for cleanup
+        let broadcastChannel: BroadcastChannel | undefined;
 
-            if (type !== OAUTH_RESPONSE || curStateRef.current === message?.data?.payload?.state) {
+        // Shared function to process OAuth response data
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        function processOAuthResponse(data: any) {
+            const type = data?.type;
+
+            if (type !== OAUTH_RESPONSE || curStateRef.current === data?.payload?.state) {
                 return;
             }
 
             // Validate state to prevent CSRF attacks
             const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
-            const receivedState = message?.data?.payload?.state;
+            const receivedState = data?.payload?.state;
 
             if (!receivedState || savedState !== receivedState) {
                 setUI({
@@ -176,7 +202,7 @@ const useOAuth2 = (props: Oauth2Props) => {
                     onError('OAuth error: State mismatch.');
                 }
 
-                cleanup(intervalRef, popupRef, handleMessageListener);
+                doCleanup();
 
                 return;
             }
@@ -184,7 +210,7 @@ const useOAuth2 = (props: Oauth2Props) => {
             curStateRef.current = receivedState;
 
             try {
-                const error = message?.data?.error;
+                const error = data?.error;
 
                 if (error) {
                     setUI({
@@ -196,7 +222,7 @@ const useOAuth2 = (props: Oauth2Props) => {
                         onError(error);
                     }
                 } else {
-                    const payload = message?.data?.payload;
+                    const payload = data?.payload;
 
                     if (responseType === 'code' && onCodeSuccess) {
                         onCodeSuccess(payload);
@@ -219,37 +245,87 @@ const useOAuth2 = (props: Oauth2Props) => {
                     loading: false,
                 });
             } finally {
-                // Clear stuff ...
-                cleanup(intervalRef, popupRef, handleMessageListener);
+                doCleanup();
             }
+        }
+
+        // 4. Register message listener (primary method via window.opener.postMessage)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        function handleMessageListener(message: MessageEvent<any>) {
+            processOAuthResponse(message?.data);
         }
         window.addEventListener('message', handleMessageListener);
 
-        // 4. Begin interval to check if popup was closed forcefully by the user
+        // 5. Register BroadcastChannel listener (fallback when window.opener is lost)
+        if (typeof BroadcastChannel !== 'undefined') {
+            try {
+                broadcastChannel = new BroadcastChannel(OAUTH_BROADCAST_CHANNEL);
+
+                broadcastChannel.onmessage = (event) => {
+                    processOAuthResponse(event.data);
+                };
+            } catch {
+                // BroadcastChannel not supported in this context
+            }
+        }
+
+        // 6. Register storage event listener (final fallback)
+        const handleStorageListener = (event: StorageEvent) => {
+            if (event.key !== OAUTH_STORAGE_KEY || !event.newValue) {
+                return;
+            }
+
+            try {
+                const data = JSON.parse(event.newValue);
+
+                processOAuthResponse(data);
+            } catch {
+                // Ignore JSON parse errors
+            }
+        };
+        window.addEventListener('storage', handleStorageListener);
+
+        // Cleanup function that includes all listeners
+        function doCleanup() {
+            cleanup(intervalRef, popupRef, handleMessageListener, broadcastChannel, handleStorageListener);
+        }
+
+        // 7. Begin interval to check if popup was closed forcefully by the user
+        // Also check localStorage directly in case storage event wasn't triggered (same-origin)
         intervalRef.current = setInterval(() => {
             const popupClosed = !popupRef.current?.window || popupRef.current?.window?.closed;
+
             if (popupClosed) {
+                // Check localStorage for response (handles same-origin case where storage event doesn't fire)
+                try {
+                    const storedResponse = localStorage.getItem(OAUTH_STORAGE_KEY);
+
+                    if (storedResponse) {
+                        const data = JSON.parse(storedResponse);
+
+                        processOAuthResponse(data);
+
+                        return;
+                    }
+                } catch {
+                    // Ignore localStorage errors
+                }
+
                 // Popup was closed before completing auth...
-                setUI((ui) => ({
-                    ...ui,
+                setUI((currentUI) => ({
+                    ...currentUI,
                     loading: false,
                 }));
 
                 console.warn('Warning: Popup was closed before completing authentication.');
 
-                clearInterval(intervalRef.current);
-                removeState();
-                window.removeEventListener('message', handleMessageListener);
+                doCleanup();
             }
         }, 250);
 
-        // 5. Remove listener(s) on unmount
+        // 8. Remove listener(s) on unmount
         return () => {
-            window.removeEventListener('message', handleMessageListener);
-
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
+            doCleanup();
         };
     }, [authorizationUrl, clientId, redirectUri, scope, responseType, onCodeSuccess, onTokenSuccess, onError, setUI]);
 
