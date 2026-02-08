@@ -47,25 +47,26 @@ public class ImageHelperCropImageAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("cropImage")
         .title("Crop Image")
         .description("Crops an image to the specified dimensions.")
+        .help("", "https://docs.bytechef.io/reference/components/image-helper_v1#crop-image")
         .properties(
             IMAGE_PROPERTY,
             integer(X_COORDINATE)
                 .label("X Coordinate")
-                .description("The horizontal starting point of the crop area")
+                .description("The horizontal starting point of the crop area.")
                 .minValue(0)
                 .required(true),
             integer(Y_COORDINATE)
                 .label("Y Coordinate")
-                .description("The vertical starting point of the crop area")
+                .description("The vertical starting point of the crop area.")
                 .minValue(0)
                 .required(true),
             integer(WIDTH)
                 .label("Width")
-                .description("Width of the crop area")
+                .description("Width of the crop area.")
                 .required(true),
             integer(HEIGHT)
                 .label("Height")
-                .description("Height of the crop area")
+                .description("Height of the crop area.")
                 .required(true),
             RESULT_FILE_NAME_PROPERTY)
         .output(outputSchema(fileEntry().description("Cropped image.")))
@@ -74,8 +75,8 @@ public class ImageHelperCropImageAction {
     private ImageHelperCropImageAction() {
     }
 
-    protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         FileEntry imageFileEntry = inputParameters.getRequiredFileEntry(IMAGE);
 
@@ -91,8 +92,7 @@ public class ImageHelperCropImageAction {
         BufferedImage croppedImage = bufferedImage.getSubimage(x, y, width, height);
 
         return storeBufferedImage(
-            context, croppedImage, imageFileEntry.getExtension(),
-            inputParameters.getRequiredString(RESULT_FILE_NAME));
+            context, croppedImage, imageFileEntry.getExtension(), inputParameters.getRequiredString(RESULT_FILE_NAME));
     }
 
     private static void validate(int x, int y, int width, int height, int imageWidth, int imageHeight)

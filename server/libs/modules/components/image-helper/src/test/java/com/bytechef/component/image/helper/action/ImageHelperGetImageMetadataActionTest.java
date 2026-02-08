@@ -16,92 +16,90 @@
 
 package com.bytechef.component.image.helper.action;
 
-import static com.bytechef.component.image.helper.constant.ImageHelperConstants.HEIGHT;
 import static com.bytechef.component.image.helper.constant.ImageHelperConstants.IMAGE;
-import static com.bytechef.component.image.helper.constant.ImageHelperConstants.RESULT_FILE_NAME;
-import static com.bytechef.component.image.helper.constant.ImageHelperConstants.WIDTH;
-import static com.bytechef.component.image.helper.constant.ImageHelperConstants.X_COORDINATE;
-import static com.bytechef.component.image.helper.constant.ImageHelperConstants.Y_COORDINATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.image.helper.util.ImageHelperUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.stream.ImageInputStream;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
+import org.w3c.dom.Node;
 
 /**
- * @author Jakub Smolnický
+ * @author Marija Horvat
  */
-class ImageHelperCropImageActionTest {
+class ImageHelperGetImageMetadataActionTest {
 
-    private final ArgumentCaptor<BufferedImage> bufferedImageArgumentCaptor = forClass(BufferedImage.class);
     @SuppressWarnings("unchecked")
     private final ArgumentCaptor<ContextFunction<Context.File, ?>> contextFunctionArgumentCaptor =
         forClass(ContextFunction.class);
-    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final Context mockedContext = mock(Context.class);
     private final Context.File mockedContextFile = mock(Context.File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final File mockedFile = mock(File.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
-        X_COORDINATE, 50, Y_COORDINATE, 50, WIDTH, 100, HEIGHT, 100, IMAGE, mockedFileEntry,
-        RESULT_FILE_NAME, "croppedImage"));
-    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final IIOMetadata mockedIioMetadata = mock(IIOMetadata.class);
+    private final ImageInputStream mockedImageInputStream = mock(ImageInputStream.class);
+    private final ImageReader mockedImageReader = mock(ImageReader.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(IMAGE, mockedFileEntry));
+    private final Node mockedNode = mock(Node.class);
 
     @Test
     void testPerform() throws Exception {
-        BufferedImage originalImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
-
-        when(mockedFileEntry.getExtension())
-            .thenReturn("png");
         when(mockedContext.file(contextFunctionArgumentCaptor.capture()))
             .thenAnswer(invocation -> {
                 ContextFunction<Context.File, ?> function = invocation.getArgument(0);
 
                 return function.apply(mockedContextFile);
             });
+
         when(mockedContextFile.toTempFile(mockedFileEntry))
             .thenReturn(mockedFile);
 
-        try (MockedStatic<ImageHelperUtils> imageHelperUtilsMockedStatic = mockStatic(ImageHelperUtils.class);
-            MockedStatic<ImageIO> imageIOMockedStatic = mockStatic(ImageIO.class)) {
+        try (MockedStatic<ImageIO> imageIOMock = mockStatic(ImageIO.class)) {
 
-            imageHelperUtilsMockedStatic.when(() -> ImageHelperUtils.storeBufferedImage(
-                contextArgumentCaptor.capture(),
-                bufferedImageArgumentCaptor.capture(),
-                stringArgumentCaptor.capture(),
-                stringArgumentCaptor.capture()))
-                .thenReturn(mockedFileEntry);
+            imageIOMock.when(() -> ImageIO.createImageInputStream(mockedFile))
+                .thenReturn(mockedImageInputStream);
 
-            imageIOMockedStatic.when(() -> ImageIO.read(mockedFile))
-                .thenReturn(originalImage);
+            imageIOMock.when(() -> ImageIO.getImageReaders(mockedImageInputStream))
+                .thenReturn(Collections.singletonList(mockedImageReader)
+                    .iterator());
 
-            FileEntry result =
-                ImageHelperCropImageAction.perform(mockedParameters, any(Parameters.class), mockedContext);
+            when(mockedImageReader.getImageMetadata(0))
+                .thenReturn(mockedIioMetadata);
+            when(mockedIioMetadata.getMetadataFormatNames())
+                .thenReturn(new String[] {
+                    "formatA", "formatB"
+                });
+            when(mockedIioMetadata.getAsTree(any()))
+                .thenReturn(mockedNode);
 
-            assertEquals(mockedFileEntry, result);
-            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+            Map<String, Object> result = ImageHelperGetImageMetadataAction.perform(
+                mockedParameters, any(Parameters.class), mockedContext);
 
-            BufferedImage croppedImage = bufferedImageArgumentCaptor.getValue();
+            assertEquals(2, result.size());
+            assertNotNull(result.get("formatA"));
+            assertNotNull(result.get("formatB"));
 
-            assertEquals(100, croppedImage.getWidth());
-            assertEquals(100, croppedImage.getHeight());
-            assertEquals(List.of("png", "croppedImage"), stringArgumentCaptor.getAllValues());
+            verify(mockedContextFile).toTempFile(mockedFileEntry);
+            verify(mockedImageReader).setInput(mockedImageInputStream, true);
 
             ContextFunction<Context.File, ?> contextFunction = contextFunctionArgumentCaptor.getValue();
 

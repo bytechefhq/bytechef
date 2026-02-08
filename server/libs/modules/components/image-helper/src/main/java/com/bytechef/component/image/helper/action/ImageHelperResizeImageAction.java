@@ -46,15 +46,16 @@ public class ImageHelperResizeImageAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("resizeImage")
         .title("Resize Image")
         .description("Resizes an image to the specified width and height.")
+        .help("", "https://docs.bytechef.io/reference/components/image-helper_v1#resize-image")
         .properties(
             IMAGE_PROPERTY,
             integer(WIDTH)
                 .label("Width")
-                .description("Width in pixels")
+                .description("The target width of the image in pixels.")
                 .required(true),
             integer(HEIGHT)
                 .label("Height")
-                .description("Height in pixels")
+                .description("The target height of the image in pixels.")
                 .required(true),
             RESULT_FILE_NAME_PROPERTY)
         .output(outputSchema(fileEntry().description("Resized image.")))
@@ -63,17 +64,18 @@ public class ImageHelperResizeImageAction {
     private ImageHelperResizeImageAction() {
     }
 
-    protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, Context actionContext) throws IOException {
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
+
         FileEntry image = inputParameters.getRequiredFileEntry(IMAGE);
 
-        BufferedImage bufferedImage = ImageIO.read((File) actionContext.file(file -> file.toTempFile(image)));
+        BufferedImage bufferedImage = ImageIO.read((File) context.file(file -> file.toTempFile(image)));
 
         BufferedImage resizedImage = getResizedImage(
             inputParameters.getRequiredInteger(WIDTH), inputParameters.getRequiredInteger(HEIGHT), bufferedImage);
 
         return storeBufferedImage(
-            actionContext, resizedImage, image.getExtension(), inputParameters.getRequiredString(RESULT_FILE_NAME));
+            context, resizedImage, image.getExtension(), inputParameters.getRequiredString(RESULT_FILE_NAME));
     }
 
     private static BufferedImage getResizedImage(int width, int height, BufferedImage bufferedImage) {

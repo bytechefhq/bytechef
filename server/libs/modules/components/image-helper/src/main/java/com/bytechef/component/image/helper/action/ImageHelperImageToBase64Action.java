@@ -34,6 +34,7 @@ public class ImageHelperImageToBase64Action {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("imageToBase64")
         .title("Image to Base64")
         .description("Converts image to Base64 string.")
+        .help("", "https://docs.bytechef.io/reference/components/image-helper_v1#image-to-base64")
         .properties(IMAGE_PROPERTY)
         .output(outputSchema(string().description("Base64 encoded image.")))
         .perform(ImageHelperImageToBase64Action::perform);
@@ -41,11 +42,9 @@ public class ImageHelperImageToBase64Action {
     private ImageHelperImageToBase64Action() {
     }
 
-    protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context actionContext) {
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        byte[] fileContent = context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(IMAGE)));
 
-        byte[] fileContent = actionContext.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(IMAGE)));
-
-        return actionContext.encoder(encoder -> encoder.base64EncodeToString(fileContent));
+        return context.encoder(encoder -> encoder.base64EncodeToString(fileContent));
     }
 }
