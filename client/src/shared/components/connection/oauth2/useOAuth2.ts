@@ -32,6 +32,13 @@ export interface Oauth2Props {
 const POPUP_HEIGHT = 800;
 const POPUP_WIDTH = 600;
 
+// Grace period before treating popup as truly closed. OAuth providers like Slack may use
+// Cross-Origin-Opener-Policy (COOP) headers which make the popup appear "closed" to the parent
+// as soon as it navigates cross-origin, even though the popup is still alive. This grace period
+// keeps listeners active so that when oauth.html eventually loads and sends the response via
+// BroadcastChannel or localStorage, the parent can still receive it.
+const POPUP_CLOSED_GRACE_PERIOD_MS = 120_000;
+
 const enhanceAuthorizationUrl = (
     authorizeUrl: string,
     clientId: string,
@@ -290,36 +297,56 @@ const useOAuth2 = (props: Oauth2Props) => {
             cleanup(intervalRef, popupRef, handleMessageListener, broadcastChannel, handleStorageListener);
         }
 
-        // 7. Begin interval to check if popup was closed forcefully by the user
-        // Also check localStorage directly in case storage event wasn't triggered (same-origin)
+        // 7. Begin interval to poll for OAuth response and detect popup close.
+        // Uses a grace period because OAuth providers (e.g. Slack) may set COOP headers that make
+        // the popup appear "closed" during cross-origin navigation, even though auth is still in progress.
+        let popupClosedAt: number | null = null;
+
         intervalRef.current = setInterval(() => {
-            const popupClosed = !popupRef.current?.window || popupRef.current?.window?.closed;
+            // Always check localStorage for response (works regardless of popup state)
+            try {
+                const storedResponse = localStorage.getItem(OAUTH_STORAGE_KEY);
 
-            if (popupClosed) {
-                // Check localStorage for response (handles same-origin case where storage event doesn't fire)
-                try {
-                    const storedResponse = localStorage.getItem(OAUTH_STORAGE_KEY);
+                if (storedResponse) {
+                    const data = JSON.parse(storedResponse);
 
-                    if (storedResponse) {
-                        const data = JSON.parse(storedResponse);
+                    processOAuthResponse(data);
 
-                        processOAuthResponse(data);
+                    return;
+                }
+            } catch {
+                // Ignore localStorage errors
+            }
 
-                        return;
-                    }
-                } catch {
-                    // Ignore localStorage errors
+            // Check if popup appears closed (may be a false positive due to COOP)
+            let popupAppearsClosed = false;
+
+            try {
+                popupAppearsClosed = !popupRef.current || popupRef.current.closed;
+            } catch {
+                // Cross-origin access error means popup is alive at a different origin
+                popupAppearsClosed = false;
+            }
+
+            if (popupAppearsClosed) {
+                if (!popupClosedAt) {
+                    popupClosedAt = Date.now();
                 }
 
-                // Popup was closed before completing auth...
-                setUI((currentUI) => ({
-                    ...currentUI,
-                    loading: false,
-                }));
+                // Only clean up after grace period expires without receiving a response
+                if (Date.now() - popupClosedAt > POPUP_CLOSED_GRACE_PERIOD_MS) {
+                    setUI((currentUI) => ({
+                        ...currentUI,
+                        loading: false,
+                    }));
 
-                console.warn('Warning: Popup was closed before completing authentication.');
+                    console.warn('Warning: Popup was closed before completing authentication.');
 
-                doCleanup();
+                    doCleanup();
+                }
+            } else {
+                // Popup is open — reset grace period tracker
+                popupClosedAt = null;
             }
         }, 250);
 
