@@ -29,6 +29,8 @@ import com.bytechef.ai.mcp.tool.automation.impl.ReadProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ReadProjectWorkflowToolsImpl;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
+import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +65,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             """;
 
     private final WorkflowService workflowService;
+    private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final List<Object> tools;
     private final ProjectTools projectTools;
     private final ProjectWorkflowTools projectWorkflowTools;
@@ -73,7 +76,8 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     private final ChatMemory chatMemory;
     private final List<Advisor> advisors;
 
-    protected WorkflowEditorSpringAIAgent(final Builder builder, final WorkflowService workflowService)
+    protected WorkflowEditorSpringAIAgent(final Builder builder, final WorkflowService workflowService,
+        final WorkflowNodeOutputFacade workflowNodeOutputFacade)
         throws AGUIException {
 
         super(builder);
@@ -89,6 +93,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         this.readProjectWorkflowTools = new ReadProjectWorkflowToolsImpl(projectWorkflowTools);
 
         this.workflowService = workflowService;
+        this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.chatClient = builder.chatClient;
     }
 
@@ -98,9 +103,13 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
     @Override
     protected SystemMessage createSystemMessage(State state, List<Context> contexts) {
-        Workflow workflow = workflowService.getWorkflow((String) state.get("workflowId"));
-
+        String workflowId = (String) state.get("workflowId");
+        Workflow workflow = workflowService.getWorkflow(workflowId);
         contexts.add(new Context("Current Workflow Definition", workflow.getDefinition()));
+
+        List<WorkflowNodeOutputDTO> previousWorkflowNodeOutputs =
+            workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(workflowId, null, 0);
+        contexts.add(new Context("Current Outputs", getSampleOutputs(previousWorkflowNodeOutputs)));
 
         List<String> contextStrings = contexts.stream()
             .map(Context::toString)
@@ -109,7 +118,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         String message = "%s%n%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
             Objects.nonNull(this.systemMessageProvider)
                 ? this.systemMessageProvider.apply(this) : this.systemMessage,
-            ADDITIONAL_RULES, state, String.join("%n", contextStrings));
+            ADDITIONAL_RULES, state, String.join("\n", contextStrings));
 
         SystemMessage systemMessage = new SystemMessage();
 
@@ -117,6 +126,17 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         systemMessage.setContent(message);
 
         return systemMessage;
+    }
+
+    private String getSampleOutputs(List<WorkflowNodeOutputDTO> previousWorkflowNodeOutputs) {
+        StringBuilder stringBuilder = new StringBuilder("\n");
+        for (WorkflowNodeOutputDTO previousWorkflowNodeOutput : previousWorkflowNodeOutputs) {
+            stringBuilder.append(previousWorkflowNodeOutput.workflowNodeName())
+                .append(": ")
+                .append(previousWorkflowNodeOutput.getSampleOutput())
+                .append("\n");
+        }
+        return stringBuilder.toString();
     }
 
     @Override
@@ -217,6 +237,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     public static class Builder extends SpringAIAgent.Builder {
 
         private WorkflowService workflowService;
+        private WorkflowNodeOutputFacade workflowNodeOutputFacade;
         private List<Object> tools;
         private ChatClient chatClient;
         private ChatModel chatModel;
@@ -319,11 +340,18 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
+        public Builder workflowNodeOutputFacade(final WorkflowNodeOutputFacade workflowNodeOutputFacade) {
+            this.workflowNodeOutputFacade = workflowNodeOutputFacade;
+
+            return this;
+        }
+
         public WorkflowEditorSpringAIAgent build() throws AGUIException {
             this.chatClient = ChatClient.builder(chatModel)
                 .build();
 
-            return new WorkflowEditorSpringAIAgent(this, workflowService);
+            return new WorkflowEditorSpringAIAgent(this, workflowService, this.workflowNodeOutputFacade);
         }
     }
 }

@@ -21,6 +21,7 @@ import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.model.SafeAnthropicChatModel;
 import com.bytechef.ee.ai.copilot.util.Source;
+import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.observation.ObservationRegistry;
@@ -204,7 +205,7 @@ public class CopilotConfiguration {
     WorkflowEditorSpringAIAgent workflowEditorSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectTools,
         ProjectWorkflowToolsImpl projectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
-        WorkflowService workflowService)
+        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR.name();
@@ -217,6 +218,7 @@ public class CopilotConfiguration {
             .state(new State())
             .tools(List.of(projectTools, projectWorkflowTools, componentTools, taskTools))
             .workflowService(workflowService)
+            .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .build();
     }
 
