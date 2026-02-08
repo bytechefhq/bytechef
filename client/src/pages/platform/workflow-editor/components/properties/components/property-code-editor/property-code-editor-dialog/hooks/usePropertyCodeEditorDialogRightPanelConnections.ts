@@ -1,10 +1,13 @@
 import {connectionFormSchema} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsPopover';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
+import {ClusterElementItemType, ClusterElementsType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
+import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
@@ -24,6 +27,8 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
 }: UsePropertyCodeEditorDialogRightPanelConnectionsPropsI) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
+    const queryClient = useQueryClient();
+
     const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore(
         useShallow((state) => ({
             setShowConnectionNote: state.setShowConnectionNote,
@@ -32,6 +37,10 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
     );
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const rootClusterElementNodeData = useWorkflowEditorStore(useShallow((state) => state.rootClusterElementNodeData));
+
+    const isClusterElement = currentNode?.clusterElementType && rootClusterElementNodeData?.workflowNodeName;
 
     const {
         ConnectionKeys,
@@ -58,16 +67,55 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
 
         let workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow?.definition);
 
-        const scriptWorkflowTask = workflowDefinition.tasks?.filter((task) => task.name === workflowNodeName)[0];
+        if (isClusterElement) {
+            const parentTaskName = rootClusterElementNodeData?.workflowNodeName;
+            const clusterElementType = currentNode?.clusterElementType as keyof ClusterElementsType;
 
-        if (!scriptWorkflowTask) {
-            return;
-        }
+            const parentTask = workflowDefinition.tasks?.find((task) => task.name === parentTaskName);
 
-        workflowDefinition = {
-            ...workflowDefinition,
-            tasks: [
-                ...workflowDefinition.tasks!.map((task) => {
+            const clusterElementValue = parentTask?.clusterElements?.[clusterElementType];
+
+            if (!clusterElementValue || Array.isArray(clusterElementValue)) {
+                return;
+            }
+
+            workflowDefinition = {
+                ...workflowDefinition,
+                tasks: workflowDefinition.tasks!.map((task) => {
+                    if (task.name === parentTaskName) {
+                        const clusterElement = task.clusterElements![clusterElementType] as ClusterElementItemType;
+
+                        return {
+                            ...task,
+                            clusterElements: {
+                                ...task.clusterElements,
+                                [clusterElementType]: {
+                                    ...clusterElement,
+                                    connections: {
+                                        ...(clusterElement.connections ?? {}),
+                                        [values.name]: {
+                                            componentName: values.componentName,
+                                            componentVersion: values.componentVersion,
+                                        },
+                                    },
+                                },
+                            },
+                        } as WorkflowTaskType;
+                    }
+
+                    return task;
+                }),
+            };
+        } else {
+            const scriptWorkflowTask = workflowDefinition.tasks?.find((task) => task.name === workflowNodeName);
+
+            if (!scriptWorkflowTask) {
+                return;
+            }
+
+            workflowDefinition = {
+                ...workflowDefinition,
+                tasks: workflowDefinition.tasks!.map((task) => {
                     if (task.name === workflowNodeName) {
                         return {
                             ...scriptWorkflowTask,
@@ -79,20 +127,31 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
                                 },
                             },
                         } as WorkflowTaskType;
-                    } else {
-                        return task;
                     }
-                }),
-            ],
-        };
 
-        updateWorkflowMutation!.mutate({
-            id: workflow.id!,
-            workflow: {
-                definition: JSON.stringify(workflowDefinition, null, SPACE),
-                version: workflow.version,
+                    return task;
+                }),
+            };
+        }
+
+        updateWorkflowMutation!.mutate(
+            {
+                id: workflow.id!,
+                workflow: {
+                    definition: JSON.stringify(workflowDefinition, null, SPACE),
+                    version: workflow.version,
+                },
             },
-        });
+            {
+                onSuccess: () => {
+                    if (isClusterElement) {
+                        queryClient.invalidateQueries({queryKey: ['clusterElementComponentConnections']});
+                    } else {
+                        queryClient.invalidateQueries({queryKey: ['workflowNodeComponentConnections']});
+                    }
+                },
+            }
+        );
     };
 
     const handleOnRemoveClick = (workflowConnectionKey: string) => {
@@ -102,38 +161,85 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
 
         let workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow?.definition);
 
-        const scriptWorkflowTask = workflowDefinition.tasks?.filter((task) => task.name === workflowNodeName)[0];
+        if (isClusterElement) {
+            const parentTaskName = rootClusterElementNodeData?.workflowNodeName;
+            const clusterElementType = currentNode?.clusterElementType as keyof ClusterElementsType;
 
-        if (!scriptWorkflowTask) {
-            return;
-        }
+            const parentTask = workflowDefinition.tasks?.find((task) => task.name === parentTaskName);
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {[workflowConnectionKey]: removed, ...remainingConnections} = scriptWorkflowTask.connections ?? {};
+            const clusterElementValue = parentTask?.clusterElements?.[clusterElementType];
 
-        workflowDefinition = {
-            ...workflowDefinition,
-            tasks: [
-                ...workflowDefinition.tasks!.map((task) => {
+            if (!clusterElementValue || Array.isArray(clusterElementValue)) {
+                return;
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const {[workflowConnectionKey]: removed, ...remainingConnections} = clusterElementValue.connections ?? {};
+
+            workflowDefinition = {
+                ...workflowDefinition,
+                tasks: workflowDefinition.tasks!.map((task) => {
+                    if (task.name === parentTaskName) {
+                        const clusterElement = task.clusterElements![clusterElementType] as ClusterElementItemType;
+
+                        return {
+                            ...task,
+                            clusterElements: {
+                                ...task.clusterElements,
+                                [clusterElementType]: {
+                                    ...clusterElement,
+                                    connections: remainingConnections,
+                                },
+                            },
+                        } as WorkflowTaskType;
+                    }
+
+                    return task;
+                }),
+            };
+        } else {
+            const scriptWorkflowTask = workflowDefinition.tasks?.find((task) => task.name === workflowNodeName);
+
+            if (!scriptWorkflowTask) {
+                return;
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const {[workflowConnectionKey]: removed, ...remainingConnections} = scriptWorkflowTask.connections ?? {};
+
+            workflowDefinition = {
+                ...workflowDefinition,
+                tasks: workflowDefinition.tasks!.map((task) => {
                     if (task.name === workflowNodeName) {
                         return {
                             ...scriptWorkflowTask,
                             connections: remainingConnections,
                         } as WorkflowTaskType;
-                    } else {
-                        return task;
                     }
-                }),
-            ],
-        };
 
-        updateWorkflowMutation!.mutate({
-            id: workflow.id!,
-            workflow: {
-                definition: JSON.stringify(workflowDefinition, null, SPACE),
-                version: workflow.version,
+                    return task;
+                }),
+            };
+        }
+
+        updateWorkflowMutation!.mutate(
+            {
+                id: workflow.id!,
+                workflow: {
+                    definition: JSON.stringify(workflowDefinition, null, SPACE),
+                    version: workflow.version,
+                },
             },
-        });
+            {
+                onSuccess: () => {
+                    if (isClusterElement) {
+                        queryClient.invalidateQueries({queryKey: ['clusterElementComponentConnections']});
+                    } else {
+                        queryClient.invalidateQueries({queryKey: ['workflowNodeComponentConnections']});
+                    }
+                },
+            }
+        );
     };
 
     return {

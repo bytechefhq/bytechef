@@ -28,7 +28,6 @@ const PropertyCodeEditorDialog = ({
 }: PropertyCodeEditorDialogProps) => {
     const {
         copilotPanelOpen,
-        currentWorkflowTask,
         handleCopilotClose,
         handleOpenChange,
         handleUnsavedChangesAlertDialogCancel,
@@ -68,7 +67,6 @@ const PropertyCodeEditorDialog = ({
                             </ResizablePanelGroup>
 
                             <PropertyCodeEditorDialogRightPanel
-                                componentConnections={currentWorkflowTask?.connections || []}
                                 workflow={workflow}
                                 workflowNodeName={workflowNodeName}
                             />
