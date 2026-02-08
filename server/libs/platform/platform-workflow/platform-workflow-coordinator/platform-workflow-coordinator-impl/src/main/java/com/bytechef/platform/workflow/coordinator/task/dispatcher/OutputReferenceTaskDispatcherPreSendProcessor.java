@@ -60,7 +60,7 @@ class OutputReferenceTaskDispatcherPreSendProcessor implements TaskDispatcherPre
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         Set<String> referencedOutputPaths = WorkflowTaskReferenceUtils.extractReferencedOutputPaths(
-            workflow.getTasks(), taskExecution.getName());
+            workflow.getTasks(true), taskExecution.getName());
 
         if (!referencedOutputPaths.isEmpty()) {
             taskExecution.putMetadata(MetadataConstants.OUTPUT_REFERENCE_PATHS, referencedOutputPaths);
