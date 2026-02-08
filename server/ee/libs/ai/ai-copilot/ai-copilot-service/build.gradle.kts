@@ -115,6 +115,7 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
     implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-automation-impl"))
     implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-platform"))

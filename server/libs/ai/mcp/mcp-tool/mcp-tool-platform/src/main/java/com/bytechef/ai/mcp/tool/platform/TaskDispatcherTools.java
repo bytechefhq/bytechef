@@ -269,7 +269,7 @@ public class TaskDispatcherTools {
         return switch (taskDispatcher) {
             case "condition" ->
                 """
-                    If 'rawExpression' is true, then fill out 'expression', if false fill out 'conditions'.
+                    If 'rawExpression' is true, then fill out 'expression' with Spring Expression Language (SpEL), if false fill out 'conditions'.
                     'expression' is the raw expression that will be evaluated.
                     Example:
                     "expression": "${taskName.numberProperty} >= 7 && !contains({'EMPTY','REGEX'}, ${taskName.stringProperty}) || ${taskName.booleanProperty} != false"
