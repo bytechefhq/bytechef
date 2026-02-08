@@ -355,10 +355,14 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             return false;
         }
 
+        // Remove string literals (single and double quoted, including those with escaped quotes)
+        String conditionWithoutStrings = displayCondition.replaceAll(
+            "'(?:[^'\\\\]|\\\\.)*'|\"(?:[^\"\\\\]|\\\\.)*\"", "");
+
         String regex = "(^|.*\\W)" + parameterPath + "(\\W.*|$)";
 
         Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(displayCondition);
+        Matcher matcher = pattern.matcher(conditionWithoutStrings);
 
         return matcher.find();
     }
