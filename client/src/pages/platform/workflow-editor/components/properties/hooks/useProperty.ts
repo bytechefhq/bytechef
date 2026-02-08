@@ -681,10 +681,12 @@ export const useProperty = ({
 
             if (fromAi) {
                 if (editorRef.current) {
-                    editorRef.current.commands.setContent(`fromAi(${property.name}, 'description')`);
+                    const fromAi = `=fromAi('${property.name}', 'description')`;
+
+                    editorRef.current.commands.setContent(fromAi);
                     editorRef.current.setEditable(false);
 
-                    value = `fromAi(${property.name}, 'description')`;
+                    value = fromAi;
                 }
             } else {
                 if (editorRef.current) {
