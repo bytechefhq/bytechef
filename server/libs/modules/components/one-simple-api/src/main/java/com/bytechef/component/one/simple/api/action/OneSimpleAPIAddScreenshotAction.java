@@ -1,0 +1,125 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.component.one.simple.api.action;
+
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.CUSTOM_CSS;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.FULL_PAGE;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.HTML;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.SOURCE;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.URL;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.WAIT;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author Ivona Pavela
+ */
+public class OneSimpleAPIAddScreenshotAction {
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addScreenshot")
+        .title("Add Screenshot")
+        .description("Turn a URL into a screenshot")
+        .properties(
+            string(SOURCE)
+                .label("Source")
+                .description("Provide either a URL to capture or raw HTML content.")
+                .options(
+                    option("URL", "URL"),
+                    option("HTML", "HTML"))
+                .required(true),
+            string(URL)
+                .label("URL")
+                .description("Place the URL you want to turn into screenshot.")
+                .displayCondition("source == 'URL'")
+                .required(true),
+            string(HTML)
+                .label("HTML")
+                .description("Place the raw HTML to render.")
+                .displayCondition("source == 'HTML'")
+                .required(true),
+            string(CUSTOM_CSS)
+                .label("Custom CSS")
+                .description("Custom CSS to inject into the page.")
+                .required(false),
+            integer(WAIT)
+                .label("Wait")
+                .description("Time to wait before capturing (milliseconds).")
+                .required(false),
+            bool(FULL_PAGE)
+                .label("Full Page Screenshot")
+                .description("Capture the entire scrollable page.")
+                .required(false))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        integer("width")
+                            .description("Screenshot width"),
+                        integer("height")
+                            .description("Screenshot height"),
+                        string(FULL_PAGE)
+                            .description("Whether the screenshot was captured as full page."),
+                        string(URL)
+                            .description("The URL that was captured"))))
+        .perform(OneSimpleAPIAddScreenshotAction::perform);
+
+    public static Object
+        perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        Map<String, Object> body = getBody(inputParameters);
+
+        return actionContext.http(http -> http.post("/screenshot"))
+            .body(Http.Body.of(body))
+            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+    }
+
+    private static Map<String, Object> getBody(Parameters inputParameters) {
+
+        Map<String, Object> body = new HashMap<>();
+
+        addFields(body, URL, inputParameters.getString(URL));
+        addFields(body, HTML, inputParameters.getString(HTML));
+        addFields(body, CUSTOM_CSS, inputParameters.getString(CUSTOM_CSS));
+        addFields(body, WAIT, inputParameters.getInteger(WAIT));
+        addFields(body, FULL_PAGE, inputParameters.getBoolean(FULL_PAGE));
+
+        return body;
+    }
+
+    private static void addFields(Map<String, Object> body, String fieldName, Object value) {
+        if (value != null) {
+            body.put(fieldName, value);
+        }
+    }
+}
