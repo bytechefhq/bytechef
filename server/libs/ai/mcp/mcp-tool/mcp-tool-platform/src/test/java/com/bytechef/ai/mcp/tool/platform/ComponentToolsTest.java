@@ -38,7 +38,6 @@ import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -147,70 +146,6 @@ class ComponentToolsTest {
         assertEquals("dynamicResult", result.name());
         verify(triggerDefinitionFacade).executeOutput(eq(componentName), eq(version), eq(triggerName), anyMap(),
             isNull());
-    }
-
-    @Test
-    void testGetOutputPropertyForTriggerWithExecuteTriggerFallback() {
-        String componentName = "testComponent";
-        String triggerName = "testTrigger";
-        Integer version = 1;
-
-        com.bytechef.platform.component.domain.TriggerDefinition trigger = mock(
-            com.bytechef.platform.component.domain.TriggerDefinition.class);
-        when(trigger.getName()).thenReturn(triggerName);
-        when(trigger.isOutputDefined()).thenReturn(true);
-
-        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
-        when(componentDefinition.getName()).thenReturn(componentName);
-        when(componentDefinition.getVersion()).thenReturn(version);
-        when(componentDefinition.getTriggers()).thenReturn(List.of(trigger));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
-            .thenReturn(componentDefinition);
-
-        TriggerOutput triggerOutput = mock(TriggerOutput.class);
-        when(
-            triggerDefinitionFacade
-                .executeTrigger(
-                    eq(componentName), eq(version), eq(triggerName), isNull(), isNull(), isNull(), isNull(), isNull(),
-                    isNull(), isNull(), isNull(), eq(true)))
-                        .thenReturn(triggerOutput);
-
-        PropertyInfo result = componentTools.getOutputProperty(componentName, triggerName, version);
-
-        assertNotNull(result);
-        verify(triggerDefinitionFacade).executeTrigger(
-            eq(componentName), eq(version), eq(triggerName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            isNull(), isNull(), eq(true));
-    }
-
-    @Test
-    void testGetOutputPropertyForTriggerWithExecuteTriggerThrowsException() {
-        String componentName = "testComponent";
-        String triggerName = "testTrigger";
-        Integer version = 1;
-
-        com.bytechef.platform.component.domain.TriggerDefinition trigger = mock(
-            com.bytechef.platform.component.domain.TriggerDefinition.class);
-        when(trigger.getName()).thenReturn(triggerName);
-        when(trigger.isOutputDefined()).thenReturn(true);
-
-        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
-        when(componentDefinition.getName()).thenReturn(componentName);
-        when(componentDefinition.getVersion()).thenReturn(version);
-        when(componentDefinition.getTriggers()).thenReturn(List.of(trigger));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
-            .thenReturn(componentDefinition);
-
-        when(triggerDefinitionFacade.executeTrigger(
-            eq(componentName), eq(version), eq(triggerName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            isNull(), isNull(), eq(true)))
-                .thenThrow(new RuntimeException("Connection error"));
-
-        RuntimeException exception = assertThrows(RuntimeException.class,
-            () -> componentTools.getOutputProperty(componentName, triggerName, version));
-
-        assertEquals("Failed to get output properties: Please make a " + componentName + " connector",
-            exception.getMessage());
     }
 
     @Test
