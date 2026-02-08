@@ -32,11 +32,6 @@ export interface Oauth2Props {
 const POPUP_HEIGHT = 800;
 const POPUP_WIDTH = 600;
 
-// Grace period before treating popup as truly closed. OAuth providers like Slack may use
-// Cross-Origin-Opener-Policy (COOP) headers which make the popup appear "closed" to the parent
-// as soon as it navigates cross-origin, even though the popup is still alive. This grace period
-// keeps listeners active so that when oauth.html eventually loads and sends the response via
-// BroadcastChannel or localStorage, the parent can still receive it.
 const POPUP_CLOSED_GRACE_PERIOD_MS = 120_000;
 
 const enhanceAuthorizationUrl = (
@@ -157,20 +152,17 @@ const useOAuth2 = (props: Oauth2Props) => {
     }>({error: null, loading: false});
 
     const getAuth = useCallback(() => {
-        // 1. Init
         setUI({
             error: null,
             loading: true,
         });
 
-        // Clear any stale storage response from previous attempts
         clearStorageResponse();
 
-        // 2. Generate and save state
         const state = generateState();
+
         saveState(state);
 
-        // 3. Open popup
         popupRef.current = openPopup(
             enhanceAuthorizationUrl(
                 authorizationUrl,
@@ -183,10 +175,8 @@ const useOAuth2 = (props: Oauth2Props) => {
             )
         );
 
-        // Track listeners for cleanup
         let broadcastChannel: BroadcastChannel | undefined;
 
-        // Shared function to process OAuth response data
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         function processOAuthResponse(data: any) {
             const type = data?.type;
@@ -256,14 +246,12 @@ const useOAuth2 = (props: Oauth2Props) => {
             }
         }
 
-        // 4. Register message listener (primary method via window.opener.postMessage)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         function handleMessageListener(message: MessageEvent<any>) {
             processOAuthResponse(message?.data);
         }
         window.addEventListener('message', handleMessageListener);
 
-        // 5. Register BroadcastChannel listener (fallback when window.opener is lost)
         if (typeof BroadcastChannel !== 'undefined') {
             try {
                 broadcastChannel = new BroadcastChannel(OAUTH_BROADCAST_CHANNEL);
@@ -276,7 +264,6 @@ const useOAuth2 = (props: Oauth2Props) => {
             }
         }
 
-        // 6. Register storage event listener (final fallback)
         const handleStorageListener = (event: StorageEvent) => {
             if (event.key !== OAUTH_STORAGE_KEY || !event.newValue) {
                 return;
@@ -292,18 +279,13 @@ const useOAuth2 = (props: Oauth2Props) => {
         };
         window.addEventListener('storage', handleStorageListener);
 
-        // Cleanup function that includes all listeners
         function doCleanup() {
             cleanup(intervalRef, popupRef, handleMessageListener, broadcastChannel, handleStorageListener);
         }
 
-        // 7. Begin interval to poll for OAuth response and detect popup close.
-        // Uses a grace period because OAuth providers (e.g. Slack) may set COOP headers that make
-        // the popup appear "closed" during cross-origin navigation, even though auth is still in progress.
         let popupClosedAt: number | null = null;
 
         intervalRef.current = setInterval(() => {
-            // Always check localStorage for response (works regardless of popup state)
             try {
                 const storedResponse = localStorage.getItem(OAUTH_STORAGE_KEY);
 
@@ -318,13 +300,11 @@ const useOAuth2 = (props: Oauth2Props) => {
                 // Ignore localStorage errors
             }
 
-            // Check if popup appears closed (may be a false positive due to COOP)
             let popupAppearsClosed = false;
 
             try {
                 popupAppearsClosed = !popupRef.current || popupRef.current.closed;
             } catch {
-                // Cross-origin access error means popup is alive at a different origin
                 popupAppearsClosed = false;
             }
 
@@ -333,7 +313,6 @@ const useOAuth2 = (props: Oauth2Props) => {
                     popupClosedAt = Date.now();
                 }
 
-                // Only clean up after grace period expires without receiving a response
                 if (Date.now() - popupClosedAt > POPUP_CLOSED_GRACE_PERIOD_MS) {
                     setUI((currentUI) => ({
                         ...currentUI,
@@ -345,12 +324,10 @@ const useOAuth2 = (props: Oauth2Props) => {
                     doCleanup();
                 }
             } else {
-                // Popup is open — reset grace period tracker
                 popupClosedAt = null;
             }
         }, 250);
 
-        // 8. Remove listener(s) on unmount
         return () => {
             doCleanup();
         };
