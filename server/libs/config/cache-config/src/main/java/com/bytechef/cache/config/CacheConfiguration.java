@@ -41,7 +41,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableCaching
 public class CacheConfiguration implements CachingConfigurer {
 
-    private static final String REENTRANT_LOCK_CACHE = "TokenRefreshHelper.reentrantLock";
+    private static final String REENTRANT_LOCK_CACHE =
+        "com.bytechef.platform.component.aspect.TokenRefreshHandler.reentrantLock";
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef", name = "cache.provider", havingValue = "redis")

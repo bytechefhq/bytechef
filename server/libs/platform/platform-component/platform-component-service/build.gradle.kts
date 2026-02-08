@@ -1,6 +1,7 @@
 dependencies {
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.aspectj:aspectjweaver")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-jdbc")

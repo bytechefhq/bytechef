@@ -36,6 +36,9 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.annotation.WithTokenRefresh;
+import com.bytechef.platform.component.annotation.WithTokenRefresh.ComponentNameParam;
+import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionParam;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAdapater;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
@@ -45,7 +48,6 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ClusterElementDefinitionErrorType;
-import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -62,55 +64,48 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
-    private final TokenRefreshHelper tokenRefreshHelper;
 
     @SuppressFBWarnings("EI")
     public ClusterElementDefinitionServiceImpl(
-        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
-        TokenRefreshHelper tokenRefreshHelper) {
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
-        this.tokenRefreshHelper = tokenRefreshHelper;
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = ClusterElementDefinitionErrorType.class,
+        errorTypeField = "EXECUTE_DYNAMIC_PROPERTIES")
     public List<Property> executeDynamicProperties(
-        String componentName, int componentVersion, String clusterElementName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        @Nullable ComponentConnection componentConnection) {
+        @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
+        String propertyName, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
         ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
             componentName, componentVersion, clusterElementName, componentConnection, true);
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, clusterElementContext,
-            ClusterElementDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES,
-            (componentConnection1, clusterElementContext1) -> executeDynamicProperties(
-                componentName, componentVersion, clusterElementName, propertyName, inputParameters,
-                lookupDependsOnPaths, componentConnection1, clusterElementContext1),
-            componentConnection1 -> contextFactory.createClusterElementContext(
-                componentName, componentVersion, clusterElementName, componentConnection1, true));
+        return doExecuteDynamicProperties(
+            componentName, componentVersion, clusterElementName, propertyName, inputParameters,
+            lookupDependsOnPaths, componentConnection, clusterElementContext);
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = ClusterElementDefinitionErrorType.class,
+        errorTypeField = "EXECUTE_OPTIONS")
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String clusterElementName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable ComponentConnection componentConnection, ClusterElementResolverFunction clusterElementResolver) {
+        @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
+        String propertyName, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @ConnectionParam @Nullable ComponentConnection componentConnection,
+        ClusterElementResolverFunction clusterElementResolver) {
 
         ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
             componentName, componentVersion, clusterElementName, componentConnection, true, clusterElementResolver);
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, clusterElementContext,
-            ClusterElementDefinitionErrorType.EXECUTE_OPTIONS,
-            (componentConnection1, clusterElementContext1) -> executeOptions(
-                componentName, componentVersion, clusterElementName, propertyName, inputParameters,
-                lookupDependsOnPaths, searchText, componentConnection1, clusterElementContext1),
-            componentConnection1 -> contextFactory.createClusterElementContext(
-                componentName, componentVersion, clusterElementName, componentConnection1, true,
-                clusterElementResolver));
+        return doExecuteOptions(
+            componentName, componentVersion, clusterElementName, propertyName, inputParameters,
+            lookupDependsOnPaths, searchText, componentConnection, clusterElementContext);
     }
 
     @Override
@@ -138,21 +133,20 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = ClusterElementDefinitionErrorType.class,
+        errorTypeField = "EXECUTE_PERFORM")
     public Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
+        @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
+        Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection,
+        boolean editorEnvironment) {
 
         ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
             componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment);
 
-        return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, clusterElementContext,
-            ClusterElementDefinitionErrorType.EXECUTE_PERFORM,
-            (componentConnection1, clusterElementContext1) -> executeTool(
-                componentName, componentVersion, clusterElementName, inputParameters, componentConnection1,
-                clusterElementContext1),
-            componentConnection1 -> contextFactory.createClusterElementContext(
-                componentName, componentVersion, clusterElementName, componentConnection1, editorEnvironment));
+        return doExecuteTool(
+            componentName, componentVersion, clusterElementName, inputParameters, componentConnection,
+            clusterElementContext);
     }
 
     @Override
@@ -275,10 +269,10 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             getLookupDependsOnPathsMap(lookupDependsOnPaths));
     }
 
-    private List<Property> executeDynamicProperties(
+    private List<Property> doExecuteDynamicProperties(
         String componentName, int componentVersion, String clusterElementNameName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        ComponentConnection componentConnection, ClusterElementContext context) {
+        @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
 
         ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
 
@@ -307,10 +301,10 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         }
     }
 
-    private List<Option> executeOptions(
+    private List<Option> doExecuteOptions(
         String componentName, int componentVersion, String clusterElementName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection, ClusterElementContext context) {
+        @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
 
         try {
             ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
@@ -353,7 +347,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         }
     }
 
-    private Object executeTool(
+    private Object doExecuteTool(
         String componentName, Integer componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
 

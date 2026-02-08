@@ -31,7 +31,7 @@ val cleanResources by tasks.registering(Delete::class) {
     delete("build/resources")
 }
 
-val compileJava by tasks.existing(JavaCompile::class) {
+tasks.withType(JavaCompile::class) {
     options.compilerArgs.add("-parameters")
 }
 
