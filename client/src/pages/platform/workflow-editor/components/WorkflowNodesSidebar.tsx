@@ -1,6 +1,11 @@
 import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {useEffect, useState} from 'react';
+import {
+    ComponentDefinitionWithActionsProps,
+    useGetComponentDefinitionsWithActionsQuery,
+} from '@/shared/queries/platform/componentDefinitionsGraphQL.queries';
+import {useEffect, useMemo, useState} from 'react';
+import {useDebounce} from 'use-debounce';
 
 import WorkflowNodesTabs from './workflow-nodes-tabs/WorkflowNodesTabs';
 
@@ -13,9 +18,10 @@ const WorkflowNodesSidebar = ({
     };
 }) => {
     const [filter, setFilter] = useState('');
+    const [debouncedFilter] = useDebounce(filter, 300);
 
     const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
-        Array<ComponentDefinitionBasic>
+        Array<ComponentDefinitionBasic | ComponentDefinitionWithActionsProps>
     >([]);
 
     const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
@@ -23,38 +29,45 @@ const WorkflowNodesSidebar = ({
     >([]);
 
     const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
-        Array<ComponentDefinitionBasic>
+        Array<ComponentDefinitionBasic | ComponentDefinitionWithActionsProps>
     >([]);
 
     const {componentDefinitions, taskDispatcherDefinitions} = data;
 
+    const trimmedFilter = debouncedFilter.trim();
+
+    const {data: searchedComponentDefinitions, isLoading: isSearchLoading} =
+        useGetComponentDefinitionsWithActionsQuery(trimmedFilter);
+
+    const componentsWithActions = useMemo(() => {
+        if (trimmedFilter && searchedComponentDefinitions && !isSearchLoading) {
+            return searchedComponentDefinitions;
+        }
+
+        return componentDefinitions;
+    }, [trimmedFilter, searchedComponentDefinitions, isSearchLoading, componentDefinitions]);
+
     useEffect(() => {
         setFilteredActionComponentDefinitions(
-            componentDefinitions.filter(
-                (componentDefinition) =>
-                    componentDefinition?.actionsCount &&
-                    (componentDefinition.name?.toLowerCase().includes(filter.toLowerCase()) ||
-                        componentDefinition?.title?.toLowerCase().includes(filter.toLowerCase()))
+            componentsWithActions.filter(
+                (componentDefinition) => componentDefinition?.actionsCount && componentDefinition.actionsCount > 0
             )
         );
 
         setFilteredTaskDispatcherDefinitions(
             taskDispatcherDefinitions.filter(
                 (taskDispatcherDefinition) =>
-                    taskDispatcherDefinition.name?.toLowerCase().includes(filter.toLowerCase()) ||
-                    taskDispatcherDefinition?.title?.toLowerCase().includes(filter.toLowerCase())
+                    taskDispatcherDefinition.name?.toLowerCase().includes(trimmedFilter.toLowerCase()) ||
+                    taskDispatcherDefinition?.title?.toLowerCase().includes(trimmedFilter.toLowerCase())
             )
         );
 
         setFilteredTriggerComponentDefinitions(
-            componentDefinitions.filter(
-                (componentDefinition) =>
-                    componentDefinition?.triggersCount &&
-                    (componentDefinition.name?.toLowerCase().includes(filter.toLowerCase()) ||
-                        componentDefinition?.title?.toLowerCase().includes(filter.toLowerCase()))
+            componentsWithActions.filter(
+                (componentDefinition) => componentDefinition?.triggersCount && componentDefinition.triggersCount > 0
             )
         );
-    }, [componentDefinitions, filter, taskDispatcherDefinitions]);
+    }, [componentsWithActions, trimmedFilter, taskDispatcherDefinitions]);
 
     return (
         <aside className="absolute inset-y-2 right-14 flex w-96 flex-col overflow-hidden rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary pb-4">
