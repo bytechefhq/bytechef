@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
-    testImplementation(libs.loki.logback.appender)
     testImplementation(project(":server:libs:config:messages-config"))
     testImplementation("org.springframework.boot:spring-boot-starter-mail-test")
     testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf-test")
