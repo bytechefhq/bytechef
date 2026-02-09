@@ -19,6 +19,7 @@ package com.bytechef.component.microsoft.share.point.connection;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.microsoft.commons.MicrosoftConnection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,7 +28,24 @@ import java.util.Map;
 public class MicrosoftSharePointConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        (connection, context) -> Map.of("Sites.Manage.All", true, "Sites.ReadWrite.All", true, "offline_access", true));
+        (connection, context) -> {
+            Map<String, Boolean> map = new HashMap<>();
+
+            map.put("Files.Read", false);
+            map.put("Files.Read.All", false);
+            map.put("Files.ReadWrite", false);
+            map.put("Files.ReadWrite.All", false);
+            map.put("SharePointTenantSettings.Read.All", false);
+            map.put("SharePointTenantSettings.ReadWrite.All", false);
+            map.put("Sites.FullControl.All", false);
+            map.put("Sites.Manage.All", true);
+            map.put("Sites.Read.All", true);
+            map.put("Sites.ReadWrite.All", true);
+            map.put("Sites.Selected", false);
+            map.put("offline_access", true);
+
+            return map;
+        });
 
     private MicrosoftSharePointConnection() {
     }

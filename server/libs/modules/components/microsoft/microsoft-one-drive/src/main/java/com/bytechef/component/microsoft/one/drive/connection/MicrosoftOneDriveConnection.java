@@ -30,6 +30,13 @@ public class MicrosoftOneDriveConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        (connection, context) -> Map.of("Files.ReadWrite", true, "offline_access", true));
+        (connection, context) -> Map.of(
+            "Files.Read", false,
+            "Files.Read.All", false,
+            "Files.ReadWrite", true,
+            "Files.ReadWrite.All", false,
+            "Sites.Read.All", false,
+            "Sites.ReadWrite.All", false,
+            "offline_access", true));
 
 }
