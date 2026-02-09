@@ -44,15 +44,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = {
-    "com.bytechef.encryption", "com.bytechef.platform.connection"
-})
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.encryption", "com.bytechef.platform.connection"
+    })
 @EnableAutoConfiguration
 @Import({
     JacksonConfiguration.class, LiquibaseConfiguration.class
@@ -150,9 +151,7 @@ public class ConnectionIntTestConfiguration {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
     }
 
-    @EnableJdbcRepositories(basePackages = {
-        "com.bytechef.platform.connection.repository", "com.bytechef.platform.tag.repository"
-    })
+    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class ConnectionIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
         private final Encryption encryption;

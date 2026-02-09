@@ -21,6 +21,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("com.zaxxer:HikariCP")
+    testImplementation(project(":server:libs:core:encryption:encryption-api"))
+    testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-mail-test")
     testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")

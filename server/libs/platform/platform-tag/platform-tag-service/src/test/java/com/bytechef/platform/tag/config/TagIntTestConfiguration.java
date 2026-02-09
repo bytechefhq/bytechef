@@ -22,17 +22,15 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 
-@ComponentScan(basePackages = {
-    "com.bytechef.platform.tag"
-})
+@ComponentScan(basePackages = "com.bytechef.platform.tag")
 @EnableAutoConfiguration
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class TagIntTestConfiguration {
 
-    @EnableJdbcRepositories(basePackages = "com.bytechef.platform.tag.repository")
+    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class TagIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
     }
 }

@@ -35,12 +35,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -78,16 +78,12 @@ public class JdbcWorkflowRepositoryIntTest {
         Assertions.assertEquals(1, CollectionUtils.size(resultWorkflow.getTasks()));
     }
 
-    @ComponentScan(
-        basePackages = {
-            "com.bytechef.atlas.configuration.repository.jdbc",
-        })
-    @EnableAutoConfiguration
+    @EnableAutoConfiguration(exclude = DataJdbcRepositoriesAutoConfiguration.class)
     @EnableCaching
     @Configuration
     public static class WorkflowConfigurationRepositoryIntTestConfiguration {
 
-        @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.configuration.repository.jdbc")
+        @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
         public static class WorkflowConfigurationIntJdbcTestConfiguration extends AbstractIntTestJdbcConfiguration {
 
             private final ObjectMapper objectMapper;

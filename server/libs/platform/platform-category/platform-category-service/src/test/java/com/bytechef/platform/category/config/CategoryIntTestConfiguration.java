@@ -22,20 +22,18 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = {
-    "com.bytechef.platform.category"
-})
+@ComponentScan(basePackages = "com.bytechef.platform.category")
 @Import(LiquibaseConfiguration.class)
 @EnableAutoConfiguration
 @Configuration
 public class CategoryIntTestConfiguration {
 
-    @EnableJdbcRepositories(basePackages = "com.bytechef.platform.category.repository")
+    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class CategoryJdbcIntTestConfiguration extends AbstractIntTestJdbcConfiguration {
     }
 }

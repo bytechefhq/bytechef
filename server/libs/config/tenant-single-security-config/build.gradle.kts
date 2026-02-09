@@ -10,6 +10,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("org.apache.commons:commons-lang3")
+    testImplementation(project(":server:libs:core:encryption:encryption-api"))
+    testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation("org.springframework:spring-context-support")
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")

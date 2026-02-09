@@ -35,7 +35,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -65,12 +65,7 @@ public class PlatformMcpIntTestConfiguration {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
     }
 
-    @EnableJdbcRepositories(
-        basePackages = {
-            "com.bytechef.platform.mcp.repository",
-            "com.bytechef.platform.connection.repository",
-            "com.bytechef.platform.tag.repository"
-        })
+    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class PlatformMcpIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
         private final Encryption encryption;

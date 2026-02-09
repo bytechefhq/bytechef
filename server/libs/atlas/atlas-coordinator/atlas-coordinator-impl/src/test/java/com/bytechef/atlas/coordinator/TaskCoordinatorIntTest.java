@@ -76,7 +76,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -183,9 +183,7 @@ public class TaskCoordinatorIntTest {
                 new ConcurrentMapCacheManager(), workflowCrudRepositories, workflowRepositories);
         }
 
-        @EnableJdbcRepositories(basePackages = {
-            "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.atlas.execution.repository.jdbc"
-        })
+        @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
         public static class CoordinatorIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
             private final ObjectMapper objectMapper;

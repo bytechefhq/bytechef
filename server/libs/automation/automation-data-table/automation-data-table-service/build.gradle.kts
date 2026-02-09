@@ -1,5 +1,6 @@
 dependencies {
     implementation("de.siegmar:fastcsv:2.2.2")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")

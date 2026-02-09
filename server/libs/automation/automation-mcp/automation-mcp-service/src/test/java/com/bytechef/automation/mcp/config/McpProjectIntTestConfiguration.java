@@ -47,7 +47,7 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -55,7 +55,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.automation.configuration",
+        "com.bytechef.automation.configuration",
         "com.bytechef.automation.mcp", "com.bytechef.commons.util", "com.bytechef.jackson.config",
         "com.bytechef.platform.category", "com.bytechef.platform.connection", "com.bytechef.platform.mcp",
         "com.bytechef.platform.tag"
@@ -94,13 +94,7 @@ public class McpProjectIntTestConfiguration {
         return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 
-    @EnableJdbcRepositories(
-        basePackages = {
-            "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.platform.category.repository",
-            "com.bytechef.automation.configuration.repository", "com.bytechef.automation.mcp.repository",
-            "com.bytechef.platform.tag.repository", "com.bytechef.platform.configuration.repository",
-            "com.bytechef.platform.mcp.repository"
-        })
+    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class McpProjectIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
         private final ObjectMapper objectMapper;

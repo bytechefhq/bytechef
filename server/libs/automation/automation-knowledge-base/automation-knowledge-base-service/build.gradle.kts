@@ -1,5 +1,6 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.ai:spring-ai-autoconfigure-vector-store-pgvector")
     implementation("org.springframework.ai:spring-ai-openai")

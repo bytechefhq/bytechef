@@ -23,12 +23,10 @@ import org.springframework.data.auditing.CurrentDateTimeProvider;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
-import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 
 /**
  * @author Ivica Cardic
  */
-@EnableJdbcAuditing
 @TestConfiguration
 public abstract class AbstractIntTestJdbcConfiguration extends AbstractJdbcConfiguration {
 

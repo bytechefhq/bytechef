@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
 import org.springframework.stereotype.Repository;
 
 /**
- * Marker annotation for JDBC repositories that use a different datasource and should be excluded from the default
- * {@link com.bytechef.jdbc.config.AuditingJdbcConfiguration} scan.
+ * Marker annotation for JDBC repositories that use a different datasource and should be excluded from the module's
+ * default {@code @EnableJdbcRepositories} scan.
  *
  * <p>
  * Repositories annotated with this annotation must configure their own {@code @EnableJdbcRepositories} with appropriate

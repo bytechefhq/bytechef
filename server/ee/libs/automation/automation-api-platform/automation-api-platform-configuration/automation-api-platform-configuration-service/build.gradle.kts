@@ -1,5 +1,6 @@
 dependencies {
     implementation(libs.io.swagger.parser.v3.swagger.parser)
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))

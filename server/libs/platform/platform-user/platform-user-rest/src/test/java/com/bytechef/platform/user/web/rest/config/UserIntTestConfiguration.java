@@ -18,6 +18,7 @@ package com.bytechef.platform.user.web.rest.config;
 
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
@@ -29,16 +30,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = {
-    "com.bytechef.platform.mail", "com.bytechef.platform.user", "com.bytechef.web.rest", "com.bytechef.tenant",
-    "com.bytechef.ee.tenant"
-})
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.encryption", "com.bytechef.platform.mail", "com.bytechef.platform.user",
+        "com.bytechef.web.rest", "com.bytechef.tenant", "com.bytechef.ee.tenant"
+    })
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
@@ -46,7 +49,12 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
     LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class, SecurityConfiguration.class
 })
 @Configuration
-public class UserIntTestConfiguration {
+public class UserIntTestConfiguration extends AbstractJdbcConfiguration {
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
 
     @Bean
     JavaMailSender javaMailSender() {
