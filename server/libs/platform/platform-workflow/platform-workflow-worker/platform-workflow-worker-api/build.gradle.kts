@@ -4,9 +4,10 @@ dependencies {
     api(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
     implementation("org.apache.commons:commons-lang3")
-    implementation("org.springframework:spring-expression")
+    api("org.springframework:spring-expression")
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:core:evaluator:evaluator-api"))
+
+    testImplementation(project(":server:libs:core:evaluator:evaluator-api"))
 
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))

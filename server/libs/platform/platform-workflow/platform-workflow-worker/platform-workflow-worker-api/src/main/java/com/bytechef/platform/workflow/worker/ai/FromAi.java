@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.worker.ai;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -32,9 +33,48 @@ public class FromAi implements MethodExecutor {
             throw new IllegalArgumentException("fromAi requires at least a name argument.");
         }
 
-        String name = (String) arguments[0];
-        String description = arguments.length > 1 ? (String) arguments[1] : null;
-        String type = arguments.length > 2 ? (String) arguments[2] : "STRING";
+        if (arguments.length > 4) {
+            throw new IllegalArgumentException(
+                "fromAi accepts at most 4 arguments (name, description, type, default).");
+        }
+
+        Object nameArgument = arguments[0];
+
+        if (!(nameArgument instanceof String string) || StringUtils.isBlank(string)) {
+            throw new IllegalArgumentException("fromAi name argument must be a non-empty String.");
+        }
+
+        String name = string.trim();
+
+        String description = null;
+
+        if (arguments.length > 1) {
+            Object descriptionArgument = arguments[1];
+
+            if (descriptionArgument != null && !(descriptionArgument instanceof String)) {
+                throw new IllegalArgumentException("fromAi description argument must be a String or null.");
+            }
+
+            description = (String) descriptionArgument;
+        }
+
+        String type = "STRING";
+
+        if (arguments.length > 2) {
+            Object typeArgument = arguments[2];
+
+            if (typeArgument != null && !(typeArgument instanceof String)) {
+                throw new IllegalArgumentException("fromAi type argument must be a String or null.");
+            }
+
+            String typeCandidate = (String) typeArgument;
+
+            if (typeCandidate != null && !typeCandidate.trim()
+                .isEmpty()) {
+                type = typeCandidate;
+            }
+        }
+
         Object defaultValue = arguments.length > 3 ? arguments[3] : null;
 
         return new TypedValue(new FromAiResult(name, description, type, defaultValue));
