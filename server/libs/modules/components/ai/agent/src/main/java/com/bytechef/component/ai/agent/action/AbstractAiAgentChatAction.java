@@ -258,8 +258,7 @@ public abstract class AbstractAiAgentChatAction {
             }
 
             return clusterElementDefinitionService.executeTool(
-                componentName, componentVersion, clusterElementName,
-                MapUtils.concat(request, resolvedParameters),
+                componentName, componentVersion, clusterElementName, MapUtils.concat(request, resolvedParameters),
                 componentConnection, editorEnvironment);
         };
     }

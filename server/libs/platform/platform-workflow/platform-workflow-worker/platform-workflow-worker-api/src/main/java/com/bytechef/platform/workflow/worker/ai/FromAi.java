@@ -69,9 +69,10 @@ public class FromAi implements MethodExecutor {
 
             String typeCandidate = (String) typeArgument;
 
-            if (typeCandidate != null && !typeCandidate.trim()
-                .isEmpty()) {
-                type = typeCandidate;
+            String trimmedTypeCandidate = typeCandidate != null ? typeCandidate.trim() : null;
+
+            if (trimmedTypeCandidate != null && !trimmedTypeCandidate.isEmpty()) {
+                type = trimmedTypeCandidate;
             }
         }
 
