@@ -459,6 +459,12 @@ const PropertyComboBox = ({
                                     <CommandItem
                                         className="cursor-pointer font-normal hover:bg-muted"
                                         key={option.value.toString()}
+                                        keywords={
+                                            [
+                                                typeof option.label === 'string' ? option.label : undefined,
+                                                option.description,
+                                            ].filter(Boolean) as string[]
+                                        }
                                         onSelect={() => handleValueChange(option.value.toString())}
                                         value={option.value.toString()}
                                     >
