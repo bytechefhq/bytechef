@@ -7,6 +7,7 @@ query ComponentDefinitionSearch($query: String!) {
         version
         actionsCount
         triggersCount
+        clusterElementsCount
         componentCategories {
             name
             label
@@ -21,6 +22,11 @@ query ComponentDefinitionSearch($query: String!) {
             title
             description
         }
+        clusterElements {
+            type {
+                name
+                label
+            }
+        }
     }
 }
-

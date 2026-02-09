@@ -38,10 +38,7 @@ export const useGetComponentDefinitionsWithActionsQuery = (searchQuery?: string)
             return null;
         }
 
-        return result.data.componentDefinitionSearch.map((component) => ({
-            ...component,
-            clusterElementsCount: {},
-        })) as ComponentDefinitionWithActionsProps[];
+        return result.data.componentDefinitionSearch as ComponentDefinitionWithActionsProps[];
     }, [result.data]);
 
     return {

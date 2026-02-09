@@ -3288,7 +3288,7 @@ export type ComponentDefinitionSearchQueryVariables = Exact<{
 }>;
 
 
-export type ComponentDefinitionSearchQuery = { __typename?: 'Query', componentDefinitionSearch: Array<{ __typename?: 'ComponentDefinition', name: string, title?: string | null, icon?: string | null, description?: string | null, version?: number | null, actionsCount?: number | null, triggersCount?: number | null, componentCategories?: Array<{ __typename?: 'ComponentCategory', name: string, label?: string | null }> | null, actions?: Array<{ __typename?: 'ActionDefinition', name: string, title?: string | null, description?: string | null }> | null, triggers?: Array<{ __typename?: 'TriggerDefinition', name: string, title?: string | null, description?: string | null }> | null }> };
+export type ComponentDefinitionSearchQuery = { __typename?: 'Query', componentDefinitionSearch: Array<{ __typename?: 'ComponentDefinition', name: string, title?: string | null, icon?: string | null, description?: string | null, version?: number | null, actionsCount?: number | null, triggersCount?: number | null, clusterElementsCount?: any | null, componentCategories?: Array<{ __typename?: 'ComponentCategory', name: string, label?: string | null }> | null, actions?: Array<{ __typename?: 'ActionDefinition', name: string, title?: string | null, description?: string | null }> | null, triggers?: Array<{ __typename?: 'TriggerDefinition', name: string, title?: string | null, description?: string | null }> | null, clusterElements?: Array<{ __typename?: 'ClusterElementDefinition', type?: { __typename?: 'ClusterElementType', name?: string | null, label?: string | null } | null }> | null }> };
 
 export type CreateApiKeyMutationVariables = Exact<{
   name: Scalars['String']['input'];
@@ -6061,6 +6061,7 @@ export const ComponentDefinitionSearchDocument = `
     version
     actionsCount
     triggersCount
+    clusterElementsCount
     componentCategories {
       name
       label
@@ -6074,6 +6075,12 @@ export const ComponentDefinitionSearchDocument = `
       name
       title
       description
+    }
+    clusterElements {
+      type {
+        name
+        label
+      }
     }
   }
 }
