@@ -124,7 +124,7 @@ export default function saveProperty({
                     type,
                     value,
                 },
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
+                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || currentNode?.workflowNodeName || '',
             },
             {
                 onSuccess: (response) => handleSuccess(response),

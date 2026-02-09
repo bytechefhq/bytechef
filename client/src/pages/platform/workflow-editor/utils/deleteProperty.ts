@@ -89,7 +89,7 @@ export default function deleteProperty(
                 },
                 environmentId: environmentStore.getState().currentEnvironmentId,
                 id: workflowId,
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
+                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || currentNode?.workflowNodeName || '',
             },
             {
                 onSuccess: (response) => {
