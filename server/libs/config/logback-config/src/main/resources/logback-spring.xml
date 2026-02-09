@@ -10,11 +10,13 @@
               class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
     </appender>
 
+    <!-- See https://github.com/open-telemetry/opentelemetry-java-instrumentation/issues/13069
     <appender name="ASYNC-OpenTelemetry" class="ch.qos.logback.classic.AsyncAppender">
         <queueSize>1024</queueSize>
         <neverBlock>true</neverBlock>
         <appender-ref ref="OpenTelemetry"/>
     </appender>
+    -->
 
     <!--<logger name="com.bytechef" level="INFO"/>-->
 
@@ -52,7 +54,7 @@
 
     <root level="${log.level}">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="ASYNC-OpenTelemetry"/>
+        <appender-ref ref="OpenTelemetry"/>
     </root>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
