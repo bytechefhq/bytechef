@@ -18,53 +18,75 @@ package com.bytechef.component.gitlab.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.gitlab.constant.GitlabConstants.ID;
+import static com.bytechef.component.gitlab.constant.GitlabConstants.PROJECT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class GitlabUtilsTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ArgumentCaptor<Map<String, List<String>>> queryArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<Map<String, List<String>>> queryArgumentCaptor = forClass(Map.class);
 
     @BeforeEach()
-    void beforeEach() {
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
+    void beforeEach(Http.Executor mockedExecutor) {
         when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
     }
 
     @Test
-    void testGetProjectOptions() {
+    void testGetProjectOptions(
+        Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<Context.ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedParameters = mock(Parameters.class);
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of("name", "some name", ID, 123)));
 
         List<Option<String>> expectedOptions = List.of(option("some name", "123"));
         assertEquals(expectedOptions,
-            GitlabUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            GitlabUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        Context.ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/projects", stringArgumentCaptor.getValue());
 
         Map<String, List<String>> query = queryArgumentCaptor.getValue();
 
@@ -72,14 +94,36 @@ class GitlabUtilsTest {
     }
 
     @Test
-    void testGetIssueOptions() {
+    void testGetIssueOptions(
+        Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<Context.ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(PROJECT_ID, "1"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of("title", "some name", "iid", 123)));
 
         List<Option<Long>> expectedOptions = List.of(option("some name", 123));
 
         assertEquals(expectedOptions,
-            GitlabUtils.getIssueIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            GitlabUtils.getIssueIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        Context.ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/projects/1/issues", stringArgumentCaptor.getValue());
+
     }
 
 }
