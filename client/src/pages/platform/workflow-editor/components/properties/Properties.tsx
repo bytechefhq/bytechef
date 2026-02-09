@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import Property from '@/pages/platform/workflow-editor/components/properties/Property';
 import {GetClusterElementParameterDisplayConditions200Response} from '@/shared/middleware/platform/configuration';
@@ -83,10 +84,12 @@ const Properties = ({
 
             {!!advancedProperties.length && (
                 <Collapsible className="group flex w-full flex-col justify-center">
-                    <CollapsibleTrigger className="mx-4 flex items-center justify-center rounded-md px-4 py-2 text-center hover:bg-gray-100">
-                        <h2 className="text-sm text-gray-500">Advanced Properties</h2>
+                    <CollapsibleTrigger asChild>
+                        <Button className="mx-4" variant="outline">
+                            <span>Show Advanced Properties</span>
 
-                        <ChevronDownIcon className="ml-2 size-4 text-gray-500 transition-all group-data-[state=open]:rotate-180" />
+                            <ChevronDownIcon className="size-4 transition-all group-data-[state=open]:rotate-180" />
+                        </Button>
                     </CollapsibleTrigger>
 
                     <CollapsibleContent>
