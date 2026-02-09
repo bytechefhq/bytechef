@@ -29,6 +29,18 @@ interface WorkflowNodesListProps {
     sourceNodeId?: string;
 }
 
+const hasClusterElementType = (component: ComponentDefinitionWithActionsProps, clusterElementType: string): boolean => {
+    const clusterTypeSnakeCase = convertNameToSnakeCase(clusterElementType);
+
+    const hasClusterElementsCount = component.clusterElementsCount?.[clusterTypeSnakeCase];
+
+    const hasClusterElements = component.clusterElements?.some(
+        (element) => element.type?.name === clusterTypeSnakeCase
+    );
+
+    return !!(hasClusterElementsCount || hasClusterElements);
+};
+
 const WorkflowNodesPopoverMenuComponentList = memo(
     ({
         actionPanelOpen,
@@ -85,7 +97,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 return searchedComponentDefinitions;
             }
 
-            return componentDefinitions as ComponentDefinitionWithActionsProps[];
+            return componentDefinitions;
         }, [trimmedFilter, searchedComponentDefinitions, isSearchLoading, componentDefinitions]);
 
         useEffect(
@@ -93,52 +105,59 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 setFilteredTaskDispatcherDefinitions(
                     filterTaskDispatcherDefinitions(
                         taskDispatcherDefinitions,
-                        debouncedFilter,
+                        trimmedFilter,
                         edgeId,
                         sourceNodeId,
                         nodes
                     )
                 ),
-            [taskDispatcherDefinitions, debouncedFilter, sourceNodeId, edgeId, nodes]
+            [taskDispatcherDefinitions, trimmedFilter, sourceNodeId, edgeId, nodes]
         );
 
         useEffect(() => {
             if (componentsWithActions) {
-                setFilteredActionComponentDefinitions(
-                    componentsWithActions
-                        .filter(({actionsCount}) => actionsCount && actionsCount > 0)
-                        .filter(
-                            ({name}) =>
-                                ((!ff_797 && name !== 'dataStream') || ff_797) &&
-                                ((!ff_1652 && name !== 'aiAgent') || ff_1652) &&
-                                ((!ff_4000 && name !== 'knowledgeBase') || ff_4000)
-                        )
-                );
+                let actionComponents = componentsWithActions
+                    .filter(({actionsCount}) => actionsCount && actionsCount > 0)
+                    .filter(
+                        ({name}) =>
+                            ((!ff_797 && name !== 'dataStream') || ff_797) &&
+                            ((!ff_1652 && name !== 'aiAgent') || ff_1652) &&
+                            ((!ff_4000 && name !== 'knowledgeBase') || ff_4000)
+                    );
 
-                setFilteredTriggerComponentDefinitions(
-                    componentsWithActions
-                        .filter(({triggersCount}) => triggersCount && triggersCount > 0)
-                        .filter(({name}) => (!ff_3827 && name !== 'form') || ff_3827)
-                );
+                if (clusterElementType) {
+                    actionComponents = actionComponents.filter((component) =>
+                        hasClusterElementType(component, clusterElementType)
+                    );
+                }
+
+                setFilteredActionComponentDefinitions(actionComponents);
+
+                let triggerComponents = componentsWithActions
+                    .filter(({triggersCount}) => triggersCount && triggersCount > 0)
+                    .filter(({name}) => (!ff_3827 && name !== 'form') || ff_3827);
+
+                if (clusterElementType) {
+                    triggerComponents = triggerComponents.filter((component) =>
+                        hasClusterElementType(component, clusterElementType)
+                    );
+                }
+
+                setFilteredTriggerComponentDefinitions(triggerComponents);
 
                 if (clusterElementType) {
                     setFilteredClusterElementComponentDefinitions(
                         componentsWithActions
-                            .filter(({clusterElements, clusterElementsCount, name, title}) => {
-                                const nameIncludes = name?.toLowerCase().includes(trimmedFilter.toLowerCase());
-                                const titleIncludes = title?.toLowerCase().includes(trimmedFilter.toLowerCase());
+                            .filter((component) => {
+                                if (!hasClusterElementType(component, clusterElementType)) {
+                                    return false;
+                                }
 
-                                const hasClusterElementsCount =
-                                    clusterElementsCount?.[convertNameToSnakeCase(clusterElementType as string)];
+                                if (trimmedFilter) {
+                                    return true;
+                                }
 
-                                const hasClusterElements = clusterElements?.some(
-                                    (element) =>
-                                        element.type?.name === convertNameToSnakeCase(clusterElementType as string)
-                                );
-
-                                return (
-                                    (hasClusterElementsCount || hasClusterElements) && (nameIncludes || titleIncludes)
-                                );
+                                return true;
                             })
                             .filter(({name}) => (!ff_3839 && name !== 'aiAgent') || ff_3839)
                     );
