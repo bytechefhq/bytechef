@@ -2,7 +2,6 @@ import Button from '@/components/Button/Button';
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
-import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogCloseButton,
@@ -17,7 +16,6 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
@@ -44,12 +42,14 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {CircleQuestionMarkIcon, ClipboardIcon, RocketIcon} from 'lucide-react';
+import {ClipboardIcon, RocketIcon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {twMerge} from 'tailwind-merge';
 
 import ComponentSelectionInput from './ComponentSelectionInput';
 import OAuth2Button from './OAuth2Button';
+import Scopes from './Scopes';
 
 export interface ConnectionDialogFormProps {
     authorizationType: string;
@@ -58,6 +58,7 @@ export interface ConnectionDialogFormProps {
     id?: number;
     name: string;
     parameters: {[key: string]: object};
+    selectedScopes?: {[key: string]: boolean};
     tags: Array<Tag | {label: string; value: string}>;
 }
 
@@ -126,7 +127,7 @@ const ConnectionDialog = ({
         },
     });
 
-    const {control, formState, getValues, handleSubmit, reset: formReset, setValue} = form;
+    const {control, formState, getValues, handleSubmit, reset: formReset, setValue, watch} = form;
 
     const {
         data: connectionDefinition,
@@ -413,7 +414,10 @@ const ConnectionDialog = ({
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
+            <DialogContent
+                className={twMerge('gap-0 p-0', wizardStep === 'oauth_step' && 'max-w-xl')}
+                onInteractOutside={(event) => event.preventDefault()}
+            >
                 <Form {...form}>
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 pb-4 pt-6">
                         <div className="flex flex-col space-y-1">
@@ -632,7 +636,7 @@ const ConnectionDialog = ({
                                         control={control}
                                         name="tags"
                                         render={({field}) => (
-                                            <FormItem>
+                                            <FormItem className="pb-2">
                                                 <FormLabel>Tags</FormLabel>
 
                                                 <FormControl>
@@ -683,7 +687,25 @@ const ConnectionDialog = ({
                                     </AlertDescription>
                                 </Alert>
 
-                                {scopes && scopes.length > 0 && <Scopes scopes={scopes} />}
+                                {scopes && Object.keys(scopes).length > 0 && (
+                                    <FormField
+                                        control={control}
+                                        name="selectedScopes"
+                                        render={({field}) => {
+                                            const hasSelectedScopes =
+                                                field.value &&
+                                                Object.keys(field.value).length === Object.keys(scopes).length;
+
+                                            return (
+                                                <Scopes
+                                                    onSelectedScopesChange={field.onChange}
+                                                    scopeDefinitions={scopes}
+                                                    selectedScopes={hasSelectedScopes ? field.value : scopes}
+                                                />
+                                            );
+                                        }}
+                                    />
+                                )}
                             </>
                         )}
                     </div>
@@ -729,6 +751,10 @@ const ConnectionDialog = ({
                                     <Button
                                         label="Next"
                                         onClick={handleSubmit(() => {
+                                            setValue('selectedScopes', {
+                                                ...(oAuth2AuthorizationParameters?.scopes ?? {}),
+                                            });
+
                                             setWizardStep('oauth_step');
                                         })}
                                         type="submit"
@@ -750,7 +776,7 @@ const ConnectionDialog = ({
                                             onTokenSuccess={handleTokenSuccess}
                                             redirectUri={oAuth2Properties?.redirectUri ?? ''}
                                             responseType={isOAuth2AuthorizationType ? 'code' : 'token'}
-                                            scope={oAuth2AuthorizationParameters?.scopes?.join(' ')}
+                                            scopes={watch('selectedScopes') ?? oAuth2AuthorizationParameters?.scopes}
                                         />
                                     )}
                             </>
@@ -796,31 +822,5 @@ const RedirectUriInput = ({redirectUri}: {redirectUri?: string}) => {
         </div>
     );
 };
-
-const Scopes = ({scopes}: {scopes: string[]}) => (
-    <div className="space-y-2 py-2">
-        <div className="flex items-center space-x-1">
-            <span className="text-sm font-semibold">Scopes</span>
-
-            <Tooltip>
-                <TooltipTrigger>
-                    <CircleQuestionMarkIcon className="size-4 text-muted-foreground" />
-                </TooltipTrigger>
-
-                <TooltipContent>OAuth permission scopes used for this connection.</TooltipContent>
-            </Tooltip>
-        </div>
-
-        <div className="space-y-1">
-            {scopes.map((scope) => (
-                <div className="flex items-center space-x-1" key={scope}>
-                    <Checkbox checked disabled key={scope} />
-
-                    <Label htmlFor={scope}>{scope}</Label>
-                </div>
-            ))}
-        </div>
-    </div>
-);
 
 export default ConnectionDialog;
