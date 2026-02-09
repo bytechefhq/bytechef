@@ -40,7 +40,7 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
 @ComponentScan(
@@ -102,10 +102,7 @@ public class KnowledgeBaseIntTestConfiguration {
         return new com.fasterxml.jackson.databind.ObjectMapper();
     }
 
-    @EnableJdbcRepositories(basePackages = {
-        "com.bytechef.automation.knowledgebase.repository",
-        "com.bytechef.platform.tag.repository"
-    })
+    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class KnowledgeBaseIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
         private final ObjectMapper objectMapper;

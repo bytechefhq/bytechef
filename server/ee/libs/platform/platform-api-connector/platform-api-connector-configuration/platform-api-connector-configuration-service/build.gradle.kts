@@ -16,6 +16,8 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-api"))
 
 
+    implementation("org.springframework.data:spring-data-jdbc")
+
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))

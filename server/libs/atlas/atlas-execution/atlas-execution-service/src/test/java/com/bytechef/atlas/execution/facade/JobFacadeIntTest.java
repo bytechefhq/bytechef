@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -64,10 +64,7 @@ public class JobFacadeIntTest {
             () -> jobFacade.createJob(new JobParametersDTO("aGVsbG8x", Collections.emptyMap())));
     }
 
-    @ComponentScan(
-        basePackages = {
-            "com.bytechef.atlas.execution.facade", "com.bytechef.atlas.execution.repository.jdbc"
-        })
+    @ComponentScan(basePackages = "com.bytechef.atlas.execution.facade")
     @EnableAutoConfiguration
     @Configuration
     public static class WorkflowExecutionIntTestConfiguration {
@@ -95,7 +92,7 @@ public class JobFacadeIntTest {
             return new JobServiceImpl(jobRepository);
         }
 
-        @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")
+        @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
         public static class WorkflowIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
         }
     }

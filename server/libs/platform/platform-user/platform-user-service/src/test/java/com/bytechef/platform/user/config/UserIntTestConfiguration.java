@@ -17,6 +17,7 @@
 package com.bytechef.platform.user.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -27,10 +28,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@ComponentScan(basePackages = "com.bytechef.platform.user")
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.encryption", "com.bytechef.platform.user"
+    })
 @EnableAutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
@@ -38,7 +43,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     AuditingJdbcConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
 })
 @Configuration
-public class UserIntTestConfiguration {
+public class UserIntTestConfiguration extends AbstractJdbcConfiguration {
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
 
     @Bean
     PasswordEncoder passwordEncoder() {

@@ -44,7 +44,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
 @ComponentScan(
@@ -112,7 +112,7 @@ public class ComponentRegistryConfiguration {
         return new TaskFileStorageImpl(new Base64FileStorageService());
     }
 
-    @EnableJdbcRepositories(basePackages = "com.bytechef.platform.connection.repository")
+    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class ConnectionIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
         private final Encryption encryption;

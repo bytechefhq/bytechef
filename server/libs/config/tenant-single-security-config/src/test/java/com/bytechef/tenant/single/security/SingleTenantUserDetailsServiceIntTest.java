@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.mail.MailService;
@@ -37,8 +38,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -51,9 +55,11 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan({
-    "com.bytechef.platform.user", "com.bytechef.security, com.bytechef.tenant.single.security"
-})
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.encryption", "com.bytechef.platform.user", "com.bytechef.security",
+        "com.bytechef.tenant.single.security"
+    })
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
 @EnableCaching
@@ -63,6 +69,15 @@ import org.springframework.transaction.annotation.Transactional;
     SecurityConfiguration.class
 })
 class SingleTenantUserDetailsServiceIntTest {
+
+    @TestConfiguration
+    static class TestConfig extends AbstractJdbcConfiguration {
+
+        @Bean
+        EncryptionKey encryptionKey() {
+            return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+        }
+    }
 
     private static final String USER_ONE_LOGIN = "test-user-one";
     private static final String USER_ONE_EMAIL = "test-user-one@localhost.com";

@@ -30,14 +30,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 
 /**
  * @author Ivica Cardic
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.encryption", "com.bytechef.platform.category",
+        "com.bytechef.encryption", "com.bytechef.platform.category",
         "com.bytechef.ee.embedded.configuration", "com.bytechef.platform.tag"
     })
 @EnableAutoConfiguration
@@ -59,11 +59,7 @@ public class IntegrationIntTestConfiguration {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
     }
 
-    @EnableJdbcRepositories(
-        basePackages = {
-            "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.platform.category.repository",
-            "com.bytechef.ee.embedded.configuration.repository", "com.bytechef.platform.tag.repository"
-        })
+    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class IntegrationIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
     }
 }
