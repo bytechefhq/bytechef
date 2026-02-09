@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.observability.config;
+package com.bytechef.ee.observability.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

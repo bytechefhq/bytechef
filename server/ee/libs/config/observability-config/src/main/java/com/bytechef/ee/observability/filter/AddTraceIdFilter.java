@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.observability.config;
+package com.bytechef.ee.observability.filter;
 
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
