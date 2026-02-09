@@ -53,15 +53,43 @@ public class FromAiInputSchemaUtils {
                 parameterObjectNode.put("description", fromAiResult.description());
             }
 
+            Object defaultValue = fromAiResult.defaultValue();
+
+            if (defaultValue != null) {
+                if (defaultValue instanceof Boolean booleanValue) {
+                    parameterObjectNode.put("default", booleanValue);
+                } else if (defaultValue instanceof Integer integerValue) {
+                    parameterObjectNode.put("default", integerValue);
+                } else if (defaultValue instanceof Long longValue) {
+                    parameterObjectNode.put("default", longValue);
+                } else if (defaultValue instanceof Double doubleValue) {
+                    parameterObjectNode.put("default", doubleValue);
+                } else if (defaultValue instanceof Float floatValue) {
+                    parameterObjectNode.put("default", floatValue);
+                } else if (defaultValue instanceof String stringValue) {
+                    parameterObjectNode.put("default", stringValue);
+                } else {
+                    parameterObjectNode.putPOJO("default", defaultValue);
+                }
+            }
+
             propertiesObjectNode.set(fromAiResult.name(), parameterObjectNode);
-            requiredArray.add(fromAiResult.name());
+
+            if (defaultValue == null) {
+                requiredArray.add(fromAiResult.name());
+            }
         }
 
         return schemaObjectNode.toPrettyString();
     }
 
     private static String getJsonSchemaType(String type) {
-        return switch (type.toUpperCase()) {
+        if (type == null || type.isBlank()) {
+            return "string";
+        }
+
+        return switch (type.trim()
+            .toUpperCase()) {
             case "BOOLEAN" -> "boolean";
             case "INTEGER" -> "integer";
             case "NUMBER" -> "number";
