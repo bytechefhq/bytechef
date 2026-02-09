@@ -2,6 +2,7 @@ logging:
   level:
     ROOT: INFO
     com.bytechef: DEBUG
+    com.bytechef.ee.observability: INFO
     org.springframework.ai.chat.client.advisor': DEBUG
 
 server:

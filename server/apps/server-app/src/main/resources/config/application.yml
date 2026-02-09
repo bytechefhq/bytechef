@@ -92,22 +92,29 @@ management:
   observations:
     key-values:
       application: ${spring.application.name}
-  # Prometheus is the default metrics backend
-  prometheus:
-    metrics:
+  opentelemetry:
+    tracing:
       export:
-        enabled: ${bytechef.observability.enabled}
-        step: 60
+        otlp:
+          endpoint: http://localhost:4318/v1/traces
+    logging:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/logs
+  logging:
+    export:
+      enabled: ${bytechef.observability.enabled}
   tracing:
-    enabled: ${bytechef.observability.enabled}
+    export:
+      enabled: ${bytechef.observability.enabled}
     sampling:
       probability: 1.0
   otlp:
     metrics:
       export:
         enabled: ${bytechef.observability.enabled}
-    tracing:
-      endpoint: ${bytechef.tracing.otlp.endpoint}
+        step: 10s
+        url: http://localhost:4318/v1/metrics
 
 openapi:
   openAPIDefinition:
