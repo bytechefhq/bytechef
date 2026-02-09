@@ -44,12 +44,12 @@ public class InsightlyComponentHandler extends AbstractInsightlyComponentHandler
             switch (name) {
                 case "createContact" ->
                     actionDefinition.help("",
-                        "https://docs.bytechef.io/reference/components/insightly_v1/createContact");
+                        "https://docs.bytechef.io/reference/components/insightly_v1#create-contact");
                 case "createOrganization" ->
                     actionDefinition.help("",
-                        "https://docs.bytechef.io/reference/components/insightly_v1/createOrganization");
+                        "https://docs.bytechef.io/reference/components/insightly_v1#create-organization");
                 case "createTask" ->
-                    actionDefinition.help("", "https://docs.bytechef.io/reference/components/insightly_v1/createTask");
+                    actionDefinition.help("", "https://docs.bytechef.io/reference/components/insightly_v1#create-task");
 
                 default -> {
                 }
