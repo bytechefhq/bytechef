@@ -10,7 +10,7 @@ interface OAuth2ButtonProps {
     extraQueryParameters?: Record<string, any>;
     redirectUri: string;
     responseType: 'code' | 'token';
-    scope?: string;
+    scopes?: {[key: string]: boolean};
     onClick: (getAuth: () => void) => void;
     onCodeSuccess?: (payload: CodePayloadI) => void;
     onError?: (error: string) => void;
@@ -27,7 +27,7 @@ const OAuth2Button = ({
     onTokenSuccess,
     redirectUri,
     responseType,
-    scope,
+    scopes,
 }: OAuth2ButtonProps) => {
     const {getAuth, loading} = useOAuth2({
         authorizationUrl,
@@ -38,7 +38,7 @@ const OAuth2Button = ({
         onTokenSuccess,
         redirectUri,
         responseType,
-        scope,
+        scopes,
     });
 
     return (
