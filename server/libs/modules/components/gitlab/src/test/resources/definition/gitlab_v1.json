@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new project issue.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gitlab_v1#create-issue"
+    },
     "metadata": {
       "method": "POST",
       "path": "/projects/{projectId}/issues"
@@ -407,7 +410,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a comment to the specified issue.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gitlab_v1#create-comment-on-issue"
+    },
     "metadata": {
       "method": "POST",
       "path": "/projects/{projectId}/issues/{issueId}/notes"
@@ -1342,14 +1348,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gitlab_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://docs.gitlab.com/api/rest/"
+  },
   "description": "GitLab is a web-based DevOps lifecycle tool that provides a Git repository manager, CI/CD pipelines, issue tracking, and more in a single application.",
   "icon": "path:assets/gitlab.svg",
   "metadata": null,
@@ -1363,7 +1375,10 @@
     "deprecated": null,
     "description": "Triggers when a new issue is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gitlab_v1#new-issue"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newIssue",
