@@ -116,11 +116,6 @@ public class ApplicationProperties {
 
     /** Webhook URL for external integrations */
     private String webhookUrl;
-
-    /** Distributed tracing configuration */
-    private Tracing tracing = new Tracing();
-
-    /** Worker node configuration */
     private Worker worker = new Worker();
 
     /** Workflow engine configuration */
@@ -220,10 +215,6 @@ public class ApplicationProperties {
 
     public Tenant getTenant() {
         return tenant;
-    }
-
-    public Tracing getTracing() {
-        return tracing;
     }
 
     public String getWebhookUrl() {
@@ -334,10 +325,6 @@ public class ApplicationProperties {
         this.tenant = tenant;
     }
 
-    public void setTracing(Tracing tracing) {
-        this.tracing = tracing;
-    }
-
     public void setWebhookUrl(String webhookUrl) {
         this.webhookUrl = webhookUrl;
     }
@@ -358,105 +345,12 @@ public class ApplicationProperties {
         /** Whether observability features are enabled */
         private boolean enabled;
 
-        /** Loki log aggregation configuration */
-        private Loki loki;
-
         public boolean isEnabled() {
             return enabled;
         }
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
-        }
-
-        public Loki getLoki() {
-            return loki;
-        }
-
-        public void setLoki(Loki loki) {
-            this.loki = loki;
-        }
-
-        /**
-         * Loki log aggregation system configuration.
-         */
-        public static class Loki {
-
-            /** Loki appender configuration */
-            private Appender appender = new Appender();
-
-            public Appender getAppender() {
-                return appender;
-            }
-
-            public void setAppender(Appender appender) {
-                this.appender = appender;
-            }
-
-            /**
-             * Loki log appender configuration.
-             */
-            public static class Appender {
-
-                /** HTTP endpoint configuration for Loki */
-                private Http http;
-
-                /** Logging level for Loki appender */
-                private Level level = Level.OFF;
-
-                public Http getHttp() {
-                    return http;
-                }
-
-                public void setHttp(Http http) {
-                    this.http = http;
-                }
-
-                /**
-                 * Logging levels for Loki appender.
-                 */
-                public enum Level {
-                    /** Logging disabled */
-                    OFF,
-                    /** Error level */
-                    ERROR,
-                    /** Warning level */
-                    WARN,
-                    /** Info level */
-                    INFO,
-                    /** Debug level */
-                    DEBUG,
-                    /** Trace level */
-                    TRACE,
-                    /** All logging enabled */
-                    ALL
-                }
-
-                public Level getLevel() {
-                    return level;
-                }
-
-                public void setLevel(Level level) {
-                    this.level = level;
-                }
-
-                /**
-                 * HTTP endpoint configuration for sending logs to Loki.
-                 */
-                public static class Http {
-
-                    /** Loki HTTP endpoint URL */
-                    private String url;
-
-                    public String getUrl() {
-                        return url;
-                    }
-
-                    public void setUrl(String url) {
-                        this.url = url;
-                    }
-                }
-            }
         }
     }
 
@@ -2801,40 +2695,6 @@ public class ApplicationProperties {
 
         public void setMode(Mode mode) {
             this.mode = mode;
-        }
-    }
-
-    /**
-     * Distributed tracing configuration using OpenTelemetry.
-     */
-    public static class Tracing {
-
-        /** OTLP exporter configuration */
-        private Otlp otlp = new Otlp();
-
-        public Otlp getOtlp() {
-            return otlp;
-        }
-
-        public void setOtlp(Otlp otlp) {
-            this.otlp = otlp;
-        }
-    }
-
-    /**
-     * OpenTelemetry Protocol (OTLP) exporter configuration.
-     */
-    public static class Otlp {
-
-        /** OTLP collector endpoint URL */
-        private String endpoint;
-
-        public String getEndpoint() {
-            return endpoint;
-        }
-
-        public void setEndpoint(String endpoint) {
-            this.endpoint = endpoint;
         }
     }
 

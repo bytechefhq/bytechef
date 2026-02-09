@@ -66,19 +66,29 @@ management:
   observations:
     key-values:
       application: ${spring.application.name}
-  # Prometheus is the default metrics backend
-  prometheus:
-    metrics:
+  opentelemetry:
+    tracing:
       export:
-        enabled: true
-        step: 60
+        otlp:
+          endpoint: http://localhost:4318/v1/traces
+    logging:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/logs
+  logging:
+    export:
+      enabled: ${bytechef.observability.enabled}
   tracing:
+    export:
+      enabled: ${bytechef.observability.enabled}
     sampling:
       probability: 1.0
-  zipkin:
-    tracing:
-      endpoint: ${bytechef.tracing.zipkin.endpoint}
-      encoding: PROTO3
+  otlp:
+    metrics:
+      export:
+        enabled: ${bytechef.observability.enabled}
+        step: 10s
+        url: http://localhost:4318/v1/metrics
 
 openapi:
   openAPIDefinition:
@@ -167,9 +177,6 @@ bytechef:
   # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single
-  tracing:
-    zipkin:
-      endpoint: http://localhost:4318/v1/traces
   webhook-url: http://127.0.0.1:7888/webhooks/{id}
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
@@ -188,8 +195,3 @@ bytechef:
     repository:
       jdbc:
         enabled: true
-  loki:
-    appender:
-      level: "OFF"
-      http:
-        url: http://localhost:3100/loki/api/v1/push
