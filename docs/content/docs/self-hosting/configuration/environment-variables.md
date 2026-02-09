@@ -141,13 +141,6 @@ ByteChef can be configured using environment variables. This page documents all 
 |---|---|---|
 | `BYTECHEF_HELP_HUB_ENABLED` | Enable or disable the help hub | `true` |
 
-## Observability Configuration
-
-| Environment Variable | Description | Default Value |
-|---|---|---|
-| `BYTECHEF_OBSERVABILITY_LOKI_APPENDER_LEVEL` | Log level for Loki appender | `ALL` |
-| `BYTECHEF_OBSERVABILITY_LOKI_APPENDER_HTTP_URL` | Loki HTTP URL | `http://localhost:3100/loki/api/v1/push` |
-
 ## Mail Configuration
 
 | Environment Variable | Description | Default Value |
@@ -221,11 +214,11 @@ System administrator is used for accessing protected data reachable through /act
 |---|---|---|
 | `BYTECHEF_WEBHOOK_URL` | Webhook URL | `BYTECHEF_PUBLIC_URL/webhooks/{id}` |
 
-## Tracing Configuration
+## Observability Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_TRACING_OTLP_ENDPOINT` | OpenTelemetry endpoint | `http://localhost:4318/v1/traces` |
+| `BYTECHEF_OBSERVABILITY_ENABLED` | Enable or disable OTel metrics, logging and tracing | `false` |
 
 ## Worker Configuration
 
