@@ -8,7 +8,7 @@
     "description": "Creates new contact.",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/insightly_v1/createContact"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/insightly_v1#create-contact"
     },
     "metadata": {
       "path": "/Contacts",
@@ -471,7 +471,7 @@
     "description": "Creates new organization.",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/insightly_v1/createOrganization"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/insightly_v1#create-organization"
     },
     "metadata": {
       "path": "/Organisations",
@@ -798,7 +798,7 @@
     "description": "Creates new task.",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/insightly_v1/createTask"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/insightly_v1#create-task"
     },
     "metadata": {
       "path": "/Tasks",
