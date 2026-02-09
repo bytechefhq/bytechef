@@ -24,7 +24,7 @@ const ApiConnectorEndpointListItem = ({
 
     return (
         <>
-            <button className="flex flex-1 items-center text-left" onClick={handleClick} type="button">
+            <Button className="flex flex-1 items-center justify-start text-left" onClick={handleClick} variant="ghost">
                 <div className="flex flex-1 items-center">
                     {method && (
                         <Badge
@@ -40,7 +40,7 @@ const ApiConnectorEndpointListItem = ({
 
                     <div className="text-xs text-gray-500">{apiConnectorEndpoint.path}</div>
                 </div>
-            </button>
+            </Button>
 
             <div className="flex items-center justify-end gap-x-6">
                 {lastExecutionDate ? (

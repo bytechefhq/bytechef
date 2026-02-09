@@ -17,21 +17,17 @@ const ApiConnectorCreateMenu = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                    onSelect={() => handleMenuItemClick('/automation/settings/api-connectors/new/manual')}
-                >
+                <DropdownMenuItem onClick={() => handleMenuItemClick('/automation/settings/api-connectors/new/manual')}>
                     <PlusIcon className="mr-2 size-4" />
                     Create API Connector
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                    onSelect={() => handleMenuItemClick('/automation/settings/api-connectors/new/import')}
-                >
+                <DropdownMenuItem onClick={() => handleMenuItemClick('/automation/settings/api-connectors/new/import')}>
                     <FileUpIcon className="mr-2 size-4" />
                     Import Open API file
                 </DropdownMenuItem>
 
-                <DropdownMenuItem onSelect={() => handleMenuItemClick('/automation/settings/api-connectors/new/ai')}>
+                <DropdownMenuItem onClick={() => handleMenuItemClick('/automation/settings/api-connectors/new/ai')}>
                     <LinkIcon className="mr-2 size-4" />
                     Create from documentation URL
                 </DropdownMenuItem>
