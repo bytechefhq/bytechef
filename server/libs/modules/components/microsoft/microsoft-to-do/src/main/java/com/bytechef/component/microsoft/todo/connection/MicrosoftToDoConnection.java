@@ -26,7 +26,11 @@ import java.util.Map;
 public class MicrosoftToDoConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        (connection, context) -> Map.of("Tasks.ReadWrite", true, "offline_access", true));
+        (connection, context) -> Map.of(
+            "Tasks.Read", false,
+            "Tasks.Read.All", false,
+            "Tasks.ReadWrite", true,
+            "offline_access", true));
 
     private MicrosoftToDoConnection() {
     }

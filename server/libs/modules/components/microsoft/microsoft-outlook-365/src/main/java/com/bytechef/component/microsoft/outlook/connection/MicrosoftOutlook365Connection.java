@@ -19,6 +19,7 @@ package com.bytechef.component.microsoft.outlook.connection;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.microsoft.commons.MicrosoftConnection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -28,9 +29,28 @@ import java.util.Map;
 public class MicrosoftOutlook365Connection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        (connection, context) -> Map.of(
-            "Mail.ReadWrite", true, "MailboxSettings.Read", true, "Mail.Send", true, "offline_access", true,
-            "Calendars.ReadWrite", true));
+        (connection, context) -> {
+            Map<String, Boolean> map = new HashMap<>();
+
+            map.put("Calendars.Read", false);
+            map.put("Calendars.Read.Shared", false);
+            map.put("Calendars.ReadBasic", false);
+            map.put("Calendars.ReadWrite", true);
+            map.put("Calendars.ReadWrite.Shared", true);
+            map.put("Mail.Read", false);
+            map.put("Mail.ReadBasic", false);
+            map.put("Mail.ReadBasic.All", false);
+            map.put("Mail.ReadWrite", true);
+            map.put("Mail.Send", true);
+            map.put("MailboxSettings.Read", true);
+            map.put("MailboxSettings.ReadWrite", false);
+            map.put("User.Read", false);
+            map.put("User.Read.All", false);
+            map.put("User.ReadBasic.All", false);
+            map.put("offline_access", true);
+
+            return map;
+        });
 
     private MicrosoftOutlook365Connection() {
     }
