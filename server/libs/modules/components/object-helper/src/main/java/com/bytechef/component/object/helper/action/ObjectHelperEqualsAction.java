@@ -45,7 +45,7 @@ public class ObjectHelperEqualsAction {
                 .description("The target object to compare against.")
                 .required(true))
         .output(outputSchema(bool().description("Indicates whether the two objects are equal.")))
-        .help("", "https://docs.bytechef.io/reference/components/object-helper#equals")
+        .help("", "https://docs.bytechef.io/reference/components/object-helper_v1#equals")
         .perform(ObjectHelperEqualsAction::perform);
 
     private ObjectHelperEqualsAction() {

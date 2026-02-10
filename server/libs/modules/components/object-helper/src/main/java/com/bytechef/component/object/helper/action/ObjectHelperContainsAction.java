@@ -47,7 +47,7 @@ public class ObjectHelperContainsAction {
                 .description("Key to check for existence.")
                 .required(true))
         .output(outputSchema(bool().description("Indicator of whether the key exists in the object.")))
-        .help("", "https://docs.bytechef.io/reference/components/object-helper#contains")
+        .help("", "https://docs.bytechef.io/reference/components/object-helper_v1#contains")
         .perform(ObjectHelperContainsAction::perform);
 
     private ObjectHelperContainsAction() {
