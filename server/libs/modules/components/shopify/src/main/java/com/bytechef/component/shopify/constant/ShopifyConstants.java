@@ -29,7 +29,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 public class ShopifyConstants {
 
     public static final String EMAIL = "email";
-    public static final String HAS_VARIANTS = "hasVariants";
     public static final String ID = "id";
     public static final String INPUT = "input";
     public static final String LINE_ITEMS = "lineItems";
