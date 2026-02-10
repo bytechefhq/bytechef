@@ -84,6 +84,7 @@ public class ShopifyGetOrderAction {
                                                     .description("ID of the lineItem."),
                                                 string("name")
                                                     .description("Name of the lineItem.")))))))
+        .help("", "https://docs.bytechef.io/reference/components/shopify_v1#get-order")
         .perform(ShopifyGetOrderAction::perform);
 
     private ShopifyGetOrderAction() {

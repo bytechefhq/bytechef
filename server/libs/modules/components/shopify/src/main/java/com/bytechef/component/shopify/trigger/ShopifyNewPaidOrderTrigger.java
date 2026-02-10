@@ -42,6 +42,7 @@ public class ShopifyNewPaidOrderTrigger {
         .title("New Paid Order")
         .description("Triggers when paid order is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
+        .help("", "https://docs.bytechef.io/reference/components/shopify_v1#new-paid-order")
         .output()
         .webhookEnable(ShopifyNewPaidOrderTrigger::webhookEnable)
         .webhookDisable(ShopifyNewPaidOrderTrigger::webhookDisable)
