@@ -65,7 +65,7 @@ Name: startResumePlayback
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| deviceId | Device ID | STRING |  | false |
+| deviceId | Device ID | STRING | The id of the device this command is targeting. If not supplied, the user's currently active device is the target. | false |
 | context_uri | Context Uri | STRING | Spotify URI of the context to play (album, artist, playlist). | false |
 | uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> | Spotify track URIs to play. | false |
 | position_ms | Position | INTEGER | The position in milliseconds to start playback from. | false |
@@ -103,7 +103,7 @@ Name: addItemsToPlaylist
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| playlist_id | Playlist ID | STRING |  | true |
+| playlist_id | Playlist ID | STRING | ID of the playlist the items will be added to. | true |
 | uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
 | position | Position | INTEGER | Position to insert the items, a zero-based index. | false |
 
@@ -144,6 +144,9 @@ Type: OBJECT
 }
 ```
 
+#### Find playlist ID
+
+To find Playlist ID, click [here](/reference/components/spotify_v1#how-to-find-playlist-id)
 
 
 
@@ -235,3 +238,12 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find playlist ID
+
+1. In your Spotify web app open playlist you want to find ID for.
+2. In **URL** you will see number like this `/playlist/3rfk5UPuFRMexzVirYZliv`
+3. Because of that your playlist ID is **3rfk5UPuFRMexzVirYZliv**
