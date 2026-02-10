@@ -44,17 +44,18 @@ export const usePropertyCodeEditorDialogToolbar = ({
         }))
     );
 
-    const setContext = useCopilotStore((state) => state.setContext);
     const ai = useApplicationInfoStore((state) => state.ai);
+    const setContext = useCopilotStore((state) => state.setContext);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const ff_1570 = useFeatureFlagsStore()('ff-1570');
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const rootClusterElementNodeData = useWorkflowEditorStore(useShallow((state) => state.rootClusterElementNodeData));
 
-    const testClusterElementScriptMutation = useTestClusterElementScriptMutation();
-    const testWorkflowNodeScriptMutation = useTestWorkflowNodeScriptMutation();
+    const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
     const copilotEnabled = ai.copilot.enabled && ff_1570;
+
+    const testClusterElementScriptMutation = useTestClusterElementScriptMutation();
+    const testWorkflowNodeScriptMutation = useTestWorkflowNodeScriptMutation();
 
     const handleCopilotClick = useCallback(() => {
         const currentContext = useCopilotStore.getState().context;

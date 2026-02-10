@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {DialogClose} from '@/components/ui/dialog';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {usePropertyCodeEditorDialogToolbar} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Loader2Icon, PlayIcon, SaveIcon, SparklesIcon, SquareIcon, XIcon} from 'lucide-react';
 
 interface PropertyCodeEditorDialogToolbarProps {
@@ -32,6 +33,8 @@ const PropertyCodeEditorDialogToolbar = ({
         workflowId,
         workflowNodeName,
     });
+
+    const ff_2504 = useFeatureFlagsStore()('ff-2504');
 
     return (
         <div className="flex flex-row items-center justify-between space-y-0 border-b border-b-border/50 p-3">
@@ -75,7 +78,7 @@ const PropertyCodeEditorDialogToolbar = ({
                     <Button icon={<SquareIcon />} onClick={handleStopClick} size="icon" variant="destructive" />
                 )}
 
-                {copilotEnabled && (
+                {ff_2504 && copilotEnabled && (
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
