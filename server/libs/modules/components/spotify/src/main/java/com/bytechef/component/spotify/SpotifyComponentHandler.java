@@ -28,6 +28,7 @@ import java.util.List;
 
 /**
  * @author Monika Kušter
+ * @author Nikolina Spehar
  */
 @AutoService(OpenApiComponentHandler.class)
 public class SpotifyComponentHandler extends AbstractSpotifyComponentHandler {
@@ -43,9 +44,34 @@ public class SpotifyComponentHandler extends AbstractSpotifyComponentHandler {
     }
 
     @Override
+    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
+        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
+            String name = actionDefinition.getName();
+
+            switch (name) {
+                case "addItemsToPlaylist" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/spotify_v1#add-items-to-a-playlist");
+                case "startResumePlayback" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/spotify_v1#playresume-playback");
+                default -> {
+                }
+            }
+        }
+
+        return super.modifyActions(actionDefinitions);
+    }
+
+    @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/spotify.svg");
+            .customActionHelp(
+                "Spotify Web API documentation", "https://developer.spotify.com/documentation/web-api")
+            .icon("path:assets/spotify.svg")
+            .version(1);
     }
 }

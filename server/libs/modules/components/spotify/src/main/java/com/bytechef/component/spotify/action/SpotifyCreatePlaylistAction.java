@@ -99,6 +99,7 @@ public class SpotifyCreatePlaylistAction {
                                     .description("The Spotify URI for the user.")),
                         bool(PUBLIC)
                             .description("The playlist's public/private status."))))
+        .help("", "https://docs.bytechef.io/reference/components/spotify_v1#create-playlist")
         .perform(SpotifyCreatePlaylistAction::perform);
 
     private SpotifyCreatePlaylistAction() {
