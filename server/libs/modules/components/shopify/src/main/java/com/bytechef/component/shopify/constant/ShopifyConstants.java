@@ -29,9 +29,11 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 public class ShopifyConstants {
 
     public static final String EMAIL = "email";
+    public static final String HAS_VARIANTS = "hasVariants";
     public static final String ID = "id";
     public static final String INPUT = "input";
     public static final String LINE_ITEMS = "lineItems";
+    public static final String NAME = "name";
     public static final String NOTE = "note";
     public static final String NOTIFY_CUSTOMER = "notifyCustomer";
     public static final String ORDER = "order";
@@ -40,6 +42,7 @@ public class ShopifyConstants {
     public static final String PRODUCT = "product";
     public static final String PRODUCTS = "products";
     public static final String PRODUCT_ID = "productId";
+    public static final String PRODUCT_OPTIONS = "productOptions";
     public static final String QUANTITY = "quantity";
     public static final String QUERY = "query";
     public static final String REASON = "reason";
@@ -47,7 +50,10 @@ public class ShopifyConstants {
     public static final String RESTOCK = "restock";
     public static final String SHOP_NAME = "shopName";
     public static final String STAFF_NOTE = "staffNote";
+    public static final String STATUS = "status";
     public static final String TAGS = "tags";
+    public static final String TITLE = "title";
+    public static final String VALUES = "values";
     public static final String VARIABLES = "variables";
     public static final String VARIANT_ID = "variantId";
 
