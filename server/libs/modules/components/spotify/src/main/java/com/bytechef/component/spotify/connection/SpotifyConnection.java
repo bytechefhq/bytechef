@@ -45,7 +45,7 @@ public class SpotifyConnection {
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://accounts.spotify.com/authorize")
             .scopes((connection, context) -> List.of("playlist-modify-private", "playlist-modify-public",
-                "user-modify-playback-state"))
+                "user-modify-playback-state", "user-read-playback-state"))
             .tokenUrl((connectionParameters, context) -> "https://accounts.spotify.com/api/token")
             .refreshUrl((connectionParameters, context) -> "https://accounts.spotify.com/api/token"));
 

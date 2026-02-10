@@ -48,6 +48,7 @@ public class SpotifyAddItemsToPlaylistAction {
 
             ))
         .properties(string("playlist_id").label("Playlist ID")
+            .description("ID of the playlist the items will be added to.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<String>) SpotifyUtils::getPlaylistIdOptions)
             .metadata(
