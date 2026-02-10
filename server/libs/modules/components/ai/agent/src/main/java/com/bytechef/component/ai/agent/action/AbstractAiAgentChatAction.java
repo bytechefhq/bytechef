@@ -22,6 +22,7 @@ import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.ai.agent.util.FromAiInputSchemaUtils;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -36,6 +37,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.workflow.worker.ai.FromAiResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -185,14 +187,20 @@ public abstract class AbstractAiAgentChatAction {
 
             ComponentConnection componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
 
+            Map<String, ?> toolParameters = clusterElement.getParameters();
+            List<FromAiResult> fromAiResults = extractFromAiResults(toolParameters);
+
             FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback.builder(
                 clusterElementDefinition.getName(),
                 getToolCallbackFunction(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
-                    clusterElementDefinition.getName(), clusterElement.getParameters(), componentConnection,
+                    clusterElementDefinition.getName(), toolParameters, componentConnection,
                     editorEnvironment))
                 .inputType(Map.class)
-                .inputSchema(JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties()));
+                .inputSchema(
+                    fromAiResults.isEmpty()
+                        ? JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties())
+                        : FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
             // Prefer the per-tool description provided as a PROPERTY (cluster element parameter), then fall back to the
             // extension-based description for backward compatibility, otherwise use the cluster element definition
@@ -215,13 +223,45 @@ public abstract class AbstractAiAgentChatAction {
         return toolCallbacks;
     }
 
+    private static List<FromAiResult> extractFromAiResults(Map<String, ?> parameters) {
+        List<FromAiResult> fromAiResults = new ArrayList<>();
+
+        if (parameters != null) {
+            for (Map.Entry<String, ?> entry : parameters.entrySet()) {
+                if (entry.getValue() instanceof FromAiResult fromAiResult) {
+                    fromAiResults.add(fromAiResult);
+                }
+            }
+        }
+
+        return fromAiResults;
+    }
+
     private Function<Map<String, Object>, Object> getToolCallbackFunction(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
         ComponentConnection componentConnection, boolean editorEnvironment) {
 
-        return request -> clusterElementDefinitionService.executeTool(
-            componentName, componentVersion, clusterElementName, MapUtils.concat(request, new HashMap<>(parameters)),
-            componentConnection, editorEnvironment);
+        return request -> {
+            Map<String, Object> resolvedParameters = new HashMap<>();
+
+            for (Map.Entry<String, ?> entry : parameters.entrySet()) {
+                Object value = entry.getValue();
+
+                if (value instanceof FromAiResult fromAiResult) {
+                    Object requestValue = request.get(fromAiResult.name());
+
+                    resolvedParameters.put(
+                        entry.getKey(), requestValue != null ? requestValue : fromAiResult.defaultValue());
+                } else {
+                    resolvedParameters.put(entry.getKey(), value);
+                }
+            }
+
+            return clusterElementDefinitionService.executeTool(
+                componentName, componentVersion, clusterElementName,
+                MapUtils.concat(request, resolvedParameters),
+                componentConnection, editorEnvironment);
+        };
     }
 
     private static @Nullable String getToolDescription(ClusterElement clusterElement) {
