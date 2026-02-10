@@ -51,6 +51,7 @@ public class CryptoHelperRsaEncryptAction {
                 .description("File object with content that will be encrypted.")
                 .required(true))
         .output(outputSchema(fileEntry().description("RSA encrypted file.")))
+        .help("", "https://docs.bytechef.io/reference/components/crypto-helper_v1#rsa-encrypt")
         .perform(CryptoHelperRsaEncryptAction::perform);
 
     private CryptoHelperRsaEncryptAction() {

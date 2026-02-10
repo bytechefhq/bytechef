@@ -60,7 +60,8 @@ public class CryptoHelperComponentHandler implements ComponentHandler {
             tool(CryptoHelperRsaDecryptAction.ACTION_DEFINITION),
             tool(CryptoHelperRsaEncryptAction.ACTION_DEFINITION),
             tool(CryptoHelperSignAction.ACTION_DEFINITION),
-            tool(CryptoHelperVerifyAction.ACTION_DEFINITION));
+            tool(CryptoHelperVerifyAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

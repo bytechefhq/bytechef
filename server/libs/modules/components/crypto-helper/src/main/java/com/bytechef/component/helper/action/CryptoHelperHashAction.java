@@ -50,6 +50,7 @@ public class CryptoHelperHashAction {
                 .description("Calculates the hash of the provided input.")
                 .required(true))
         .output(outputSchema(string().description("Hashed value of the input")))
+        .help("", "https://docs.bytechef.io/reference/components/crypto-helper_v1#hash")
         .perform(CryptoHelperHashAction::perform);
 
     private CryptoHelperHashAction() {

@@ -52,6 +52,7 @@ public class CryptoHelperRsaDecryptAction {
                 .description("File object with content that will be decrypted.")
                 .required(true))
         .output(outputSchema(fileEntry().description("File object with decrypted content.")))
+        .help("", "https://docs.bytechef.io/reference/components/crypto-helper_v1#rsa-decrypt")
         .perform(CryptoHelperRsaDecryptAction::perform);
 
     private CryptoHelperRsaDecryptAction() {

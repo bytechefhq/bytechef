@@ -55,6 +55,7 @@ public class CryptoHelperHmacAction {
                 .description("Key that will be used for the encryption.")
                 .required(true))
         .output(outputSchema(string().description("Hmac value of the input")))
+        .help("", "https://docs.bytechef.io/reference/components/crypto-helper_v1#hmac")
         .perform(CryptoHelperHmacAction::perform);
 
     private CryptoHelperHmacAction() {
