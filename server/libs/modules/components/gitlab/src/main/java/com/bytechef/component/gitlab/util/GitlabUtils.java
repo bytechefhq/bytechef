@@ -39,16 +39,16 @@ public class GitlabUtils extends AbstractGitlabUtils {
     }
 
     public static List<Option<Long>> getIssueIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<Long>> options = new ArrayList<>();
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/projects/" + inputParameters.getRequiredString(PROJECT_ID) + "/issues"))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<Long>> options = new ArrayList<>();
 
         for (Map<String, Object> item : body) {
             options.add(option((String) item.get("title"), ((Integer) item.get("iid")).intValue()));
@@ -58,24 +58,24 @@ public class GitlabUtils extends AbstractGitlabUtils {
     }
 
     public static List<Option<String>> getProjectIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/projects"))
             .queryParameters(
-                Map.of(
-                    "simple", List.of("true"),
-                    "membership", List.of("true")))
+                "simple", "true",
+                "membership", "true")
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
         for (Map<String, Object> item : body) {
-            options.add(option((String) item.get("name"), item.get(ID)
-                .toString()));
+            Integer id = (Integer) item.get(ID);
+
+            options.add(option((String) item.get("name"), id.toString()));
         }
 
         return options;

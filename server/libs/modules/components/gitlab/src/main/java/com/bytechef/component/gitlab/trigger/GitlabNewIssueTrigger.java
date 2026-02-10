@@ -71,14 +71,14 @@ public class GitlabNewIssueTrigger {
                             .description("The ID of the project."),
                         string("title")
                             .description("The title of the issue."))))
-        .webhookEnable(GitlabNewIssueTrigger::dynamicWebhookEnable)
-        .webhookDisable(GitlabNewIssueTrigger::dynamicWebhookDisable)
-        .webhookRequest(GitlabNewIssueTrigger::dynamicWebhookRequest);
+        .webhookEnable(GitlabNewIssueTrigger::webhookEnable)
+        .webhookDisable(GitlabNewIssueTrigger::webhookDisable)
+        .webhookRequest(GitlabNewIssueTrigger::webhookRequest);
 
     private GitlabNewIssueTrigger() {
     }
 
-    protected static WebhookEnableOutput dynamicWebhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
         TriggerContext context) {
 
@@ -96,19 +96,18 @@ public class GitlabNewIssueTrigger {
         return new WebhookEnableOutput(Map.of(ID, (Integer) body.get(ID)), null);
     }
 
-    protected static void dynamicWebhookDisable(
+    protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        context
-            .http(http -> http.delete(
+        context.http(
+            http -> http.delete(
                 "/projects/" + inputParameters.getRequiredString(PROJECT_ID) + "/hooks/" +
                     outputParameters.getInteger(ID)))
-            .configuration(responseType(Http.ResponseType.JSON))
             .execute();
     }
 
-    protected static Object dynamicWebhookRequest(
+    protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
@@ -119,7 +118,5 @@ public class GitlabNewIssueTrigger {
         }
 
         return Collections.emptyMap();
-
     }
-
 }
