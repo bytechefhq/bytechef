@@ -1,9 +1,7 @@
-import {useImportOpenApiSpecificationMutation} from '@/shared/middleware/graphql';
-import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
 
 import {useApiConnectorWizardStore} from '../../stores/useApiConnectorWizardStore';
+import useImportApiConnector from './useImportApiConnector';
 
 interface UseApiConnectorImportPageI {
     canProceed: boolean;
@@ -16,47 +14,16 @@ interface UseApiConnectorImportPageI {
 }
 
 const useApiConnectorImportPage = (): UseApiConnectorImportPageI => {
-    const {currentStep, icon, name, nextStep, previousStep, reset, specification} = useApiConnectorWizardStore();
+    const {currentStep, name, nextStep, previousStep, reset, specification} = useApiConnectorWizardStore();
 
-    const navigate = useNavigate();
-    const queryClient = useQueryClient();
+    const {handleCancel, handleSave, isPending} = useImportApiConnector();
 
     useEffect(() => {
         reset();
     }, [reset]);
 
-    const onSuccess = () => {
-        queryClient.invalidateQueries({
-            queryKey: ['apiConnectors'],
-        });
-
-        reset();
-        navigate('/automation/settings/api-connectors');
-    };
-
-    const importOpenApiSpecificationMutation = useImportOpenApiSpecificationMutation({onSuccess});
-
     const handleNext = () => {
         nextStep();
-    };
-
-    const handleSave = () => {
-        if (!name || !specification) {
-            return;
-        }
-
-        importOpenApiSpecificationMutation.mutate({
-            input: {
-                icon: icon || undefined,
-                name,
-                specification,
-            },
-        });
-    };
-
-    const handleCancel = () => {
-        reset();
-        navigate('/automation/settings/api-connectors');
     };
 
     const canProceed = (() => {
@@ -73,7 +40,7 @@ const useApiConnectorImportPage = (): UseApiConnectorImportPageI => {
         handleCancel,
         handleNext,
         handleSave,
-        isPending: importOpenApiSpecificationMutation.isPending,
+        isPending,
         previousStep,
     };
 };

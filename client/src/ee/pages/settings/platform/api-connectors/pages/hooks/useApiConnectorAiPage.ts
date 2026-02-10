@@ -13,6 +13,7 @@ import {parse as yamlParse, stringify as yamlStringify} from 'yaml';
 
 import {useApiConnectorWizardStore} from '../../stores/useApiConnectorWizardStore';
 import {DiscoveredEndpointI} from '../../types/api-connector-wizard.types';
+import {API_CONNECTORS_PATH} from './useImportApiConnector';
 
 // Maximum number of polling attempts before timing out (5 minutes at 1 second intervals)
 const MAX_POLLING_ATTEMPTS = 300;
@@ -64,7 +65,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         });
 
         reset();
-        navigate('/automation/settings/api-connectors');
+        navigate(API_CONNECTORS_PATH);
     };
 
     const importOpenApiSpecificationMutation = useImportOpenApiSpecificationMutation({onSuccess});
@@ -85,7 +86,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
 
     const pollingStartTimeRef = useRef<number | null>(null);
 
-    const {data: jobStatusData} = useGenerationJobStatusQuery(
+    const {data: jobStatusData, isError: isJobStatusError} = useGenerationJobStatusQuery(
         {jobId: jobId || ''},
         {
             enabled: !!jobId,
@@ -118,6 +119,15 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
     );
 
     const jobStatus = jobStatusData?.generationJobStatus;
+
+    useEffect(() => {
+        if (isJobStatusError && isProcessing) {
+            setError('Failed to check generation status. Please try again.');
+            setIsProcessing(false);
+            setJobId(null);
+            pollingStartTimeRef.current = null;
+        }
+    }, [isJobStatusError, isProcessing, setError, setIsProcessing, setJobId]);
 
     // Track if job completed to prevent timeout from firing after completion
     const jobCompletedRef = useRef(false);
@@ -364,7 +374,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         }
 
         reset();
-        navigate('/automation/settings/api-connectors');
+        navigate(API_CONNECTORS_PATH);
     };
 
     const canProceed = (() => {

@@ -116,10 +116,14 @@ export default function useApiConnectorWizardReviewStep({
     }, [baseUrl, endpoints, name]);
 
     useEffect(() => {
-        if (mode === 'manual' && endpoints.length > 0) {
-            const generatedSpec = generateOpenApiSpec();
+        if (mode === 'manual') {
+            if (endpoints.length > 0) {
+                const generatedSpec = generateOpenApiSpec();
 
-            setSpecification(generatedSpec);
+                setSpecification(generatedSpec);
+            } else {
+                setSpecification(undefined);
+            }
         }
     }, [endpoints, generateOpenApiSpec, mode, setSpecification]);
 
