@@ -47,7 +47,7 @@ public class ObjectHelperDeleteKeyValuePairAction {
                 .description("The key of the key-value pair to delete.")
                 .required(true))
         .output()
-        .help("", "https://docs.bytechef.io/reference/components/object-helper#delete-key-value-pair")
+        .help("", "https://docs.bytechef.io/reference/components/object-helper_v1#delete-key-value-pair")
         .perform(ObjectHelperDeleteKeyValuePairAction::perform);
 
     protected static Object perform(
