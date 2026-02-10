@@ -8,7 +8,7 @@
     "description": "Encode/decode a specified string.",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper#base64-encodedecode"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#base64-encodedecode"
     },
     "metadata": null,
     "name": "base64EncodeDecode",
