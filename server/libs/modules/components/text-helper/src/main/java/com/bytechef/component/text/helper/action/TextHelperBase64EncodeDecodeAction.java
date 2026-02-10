@@ -48,7 +48,7 @@ public class TextHelperBase64EncodeDecodeAction {
                 .required(true),
             OPERATION_PROPERTY)
         .output(outputSchema(string().description("Base64 encoded/decoded content.")))
-        .help("", "https://docs.bytechef.io/reference/components/text-helper#base64-encodedecode")
+        .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#base64-encodedecode")
         .perform(TextHelperBase64EncodeDecodeAction::perform);
 
     private TextHelperBase64EncodeDecodeAction() {
