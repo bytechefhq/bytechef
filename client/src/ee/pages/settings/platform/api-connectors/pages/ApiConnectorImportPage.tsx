@@ -25,7 +25,7 @@ const ApiConnectorImportPage = () => {
             onNext={handleNext}
             onPrevious={previousStep}
             onSave={handleSave}
-            pageTitle="Import Open API"
+            pageTitle="Import OpenAPI"
             steps={WIZARD_STEPS.import}
         >
             {renderStepContent()}
