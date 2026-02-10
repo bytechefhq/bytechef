@@ -17,9 +17,11 @@ paths:
         - name: "deviceId"
           in: "query"
           required: false
+          description: "The id of the device this command is targeting. If not supplied, the user's currently active device is the target."
           schema:
             title: "Device ID"
             type: "string"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:
@@ -52,6 +54,7 @@ paths:
       parameters:
         - name: "playlist_id"
           in: "path"
+          description: "ID of the playlist the items will be added to."
           required: true
           schema:
             title: "Playlist ID"
@@ -101,3 +104,4 @@ components:
             "playlist-modify-private": " "
             "playlist-modify-public": " "
             "user-modify-playback-state": " "
+            "user-read-playback-state": " "

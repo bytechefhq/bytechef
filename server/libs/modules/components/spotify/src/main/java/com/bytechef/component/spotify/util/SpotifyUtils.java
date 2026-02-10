@@ -70,4 +70,27 @@ public class SpotifyUtils extends AbstractSpotifyUtils {
 
         return options;
     }
+
+    public static List<Option<String>> getDeviceIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        Map<String, Object> body = context
+            .http(http -> http.get("/me/player/devices"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("devices") instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
+                }
+            }
+        }
+
+        return options;
+    }
 }
