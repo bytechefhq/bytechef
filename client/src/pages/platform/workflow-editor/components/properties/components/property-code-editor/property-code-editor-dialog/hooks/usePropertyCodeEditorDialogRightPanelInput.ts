@@ -35,12 +35,15 @@ export const usePropertyCodeEditorDialogRightPanelInput = ({
             setJsonValue(newValue);
 
             try {
-                const parsed = JSON.parse(newValue) as InputValueType;
+                const parsed = JSON.parse(newValue);
 
-                setInputParameters(parsed);
-                setParseError(null);
+                if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+                    setInputParameters(parsed as InputValueType);
+                    setParseError(null);
+                } else {
+                    setParseError('JSON must be an object');
+                }
             } catch {
-                setInputParameters(undefined);
                 setParseError('Invalid JSON');
             }
         },
@@ -57,7 +60,6 @@ export const usePropertyCodeEditorDialogRightPanelInput = ({
 
     return {
         handleEditorChange,
-        handleInputParameters: setInputParameters,
         handleReset,
         hasChanges,
         jsonValue,
