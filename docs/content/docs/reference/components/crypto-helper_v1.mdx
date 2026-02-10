@@ -160,6 +160,9 @@ Type: FILE_ENTRY
 }
 ```
 
+#### Generate PGP key pair
+
+To generate PGP key pair, click [here](/reference/components/crypto-helper_v1#how-to-generate-pgp-key-pair)
 
 
 
@@ -284,6 +287,9 @@ Type: FILE_ENTRY
 }
 ```
 
+#### Generate RSA key pair
+
+To generate RSA key pair, click [here](/reference/components/crypto-helper_v1#how-to-generate-rsa-key-pair)
 
 
 
@@ -408,6 +414,9 @@ Type: FILE_ENTRY
 }
 ```
 
+#### Generate RSA key pair
+
+To generate RSA key pair, click [here](/reference/components/crypto-helper_v1#how-to-generate-rsa-key-pair)
 
 
 
@@ -460,6 +469,9 @@ Type: BOOLEAN
 
 
 
+#### Generate RSA key pair
+
+To generate RSA key pair, click [here](/reference/components/crypto-helper_v1#how-to-generate-rsa-key-pair)
 
 
 
@@ -469,29 +481,22 @@ Type: BOOLEAN
 
 # Additional Instructions
 
-How to generate RSA key pair:
+### How to generate RSA key pair
 
-    1. Run this command in terminal to create private_key.pem in the working directory:
-        openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
-        
-    2. Run this command in terminal to extract public key form the private key:
-        openssl rsa -pubout -in private_key.pem -out public_key.pem
-    
-    3. To read the keys run this in terminal:
-        cat public_key.pem or cat private_key.pem
+1. Run this command in terminal to create private_key.pem in the working directory:
+        `openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048`
+2. Run this command in terminal to extract public key form the private key:
+        `openssl rsa -pubout -in private_key.pem -out public_key.pem`
+3. To read the keys run this in terminal:
+        `cat public_key.pem or cat private_key.pem`
 
-How to generate PGP key pair:
+### How to generate PGP key pair
 
-    Run these commands in terminal.
-
-    1. sudo apt install gnupg
-
-    2. gpg --full-generate-key
-
-    3. When prompted write your name, email address, comment and passphrase
-
-    4. To get public key run:
-        gpg --armor --export &lt;our_email_address&gt; &gt; public_key.asc
-
-    5. To get private key run:
-        gpg --armor --export-secret-key &lt;our_email_address&gt; &gt; private_key.asc
+1. Run these commands in terminal.
+2. `sudo apt install gnupg`
+3. `gpg --full-generate-key`
+4. When prompted write your name, email address, comment and passphrase
+5. To get public key run:
+        `gpg --armor --export &lt;our_email_address&gt; &gt; public_key.asc`
+6. To get private key run:
+        `gpg --armor --export-secret-key &lt;our_email_address&gt; &gt; private_key.asc`
