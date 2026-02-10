@@ -119,7 +119,7 @@ export const useApiConnectorWizardStore = create<ApiConnectorWizardStoreType>()(
                 set({selectedEndpointIds});
             },
 
-            setSpecification: (specification: string) => {
+            setSpecification: (specification?: string) => {
                 set({specification});
             },
 

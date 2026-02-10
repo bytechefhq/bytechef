@@ -26,7 +26,7 @@ export interface ApiConnectorWizardActionsI {
     setJobId: (jobId: string | null) => void;
     setName: (name: string) => void;
     setSelectedEndpointIds: (ids: string[]) => void;
-    setSpecification: (specification: string) => void;
+    setSpecification: (specification?: string) => void;
     setUserPrompt: (userPrompt: string) => void;
     toggleEndpointSelection: (id: string) => void;
     updateEndpoint: (id: string, endpoint: Partial<EndpointDefinitionI>) => void;
