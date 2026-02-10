@@ -173,7 +173,7 @@ export const getLayoutedElements = async ({
         }
     });
 
-    dagreModule.layout(dagreGraph);
+    dagreModule.layout(dagreGraph, {disableOptimalOrderHeuristic: true});
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const containsNodePosition = (metadata: any): metadata is {ui: {nodePosition: {x: number; y: number}}} =>
