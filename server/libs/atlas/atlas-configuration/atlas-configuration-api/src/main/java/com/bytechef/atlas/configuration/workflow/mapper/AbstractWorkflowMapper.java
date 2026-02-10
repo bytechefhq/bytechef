@@ -45,21 +45,34 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractWorkflowMapper.class);
 
-    private static final List<String> additionalWorkflowReservedWords = new ArrayList<>();
+    private static volatile List<String> additionalWorkflowReservedWords;
 
-    static {
-        try {
-            ServiceLoader<WorkflowReservedWordContributor> serviceLoader = ServiceLoader.load(
-                WorkflowReservedWordContributor.class);
+    private static List<String> getAdditionalWorkflowReservedWords() {
+        if (additionalWorkflowReservedWords == null) {
+            synchronized (AbstractWorkflowMapper.class) {
+                if (additionalWorkflowReservedWords == null) {
+                    List<String> reservedWords = new ArrayList<>();
 
-            for (WorkflowReservedWordContributor workflowReservedWordContributor : serviceLoader) {
-                additionalWorkflowReservedWords.addAll(workflowReservedWordContributor.getReservedWords());
-            }
-        } catch (ServiceConfigurationError e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(e.getMessage(), e);
+                    try {
+                        ServiceLoader<WorkflowReservedWordContributor> serviceLoader = ServiceLoader.load(
+                            WorkflowReservedWordContributor.class,
+                            WorkflowReservedWordContributor.class.getClassLoader());
+
+                        for (WorkflowReservedWordContributor workflowReservedWordContributor : serviceLoader) {
+                            reservedWords.addAll(workflowReservedWordContributor.getReservedWords());
+                        }
+                    } catch (ServiceConfigurationError serviceConfigurationError) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(serviceConfigurationError.getMessage(), serviceConfigurationError);
+                        }
+                    }
+
+                    additionalWorkflowReservedWords = reservedWords;
+                }
             }
         }
+
+        return additionalWorkflowReservedWords;
     }
 
     private final Workflow.Format format;
@@ -154,7 +167,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
             Assert.isTrue(
                 CollectionUtils.contains(
                     CollectionUtils.concat(
-                        WorkflowConstants.WORKFLOW_DEFINITION_CONSTANTS, additionalWorkflowReservedWords),
+                        WorkflowConstants.WORKFLOW_DEFINITION_CONSTANTS, getAdditionalWorkflowReservedWords()),
                     k),
                 "unknown workflow definition property: " + k);
 
