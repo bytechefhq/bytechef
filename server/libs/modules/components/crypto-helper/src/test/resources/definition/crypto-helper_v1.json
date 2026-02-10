@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Computes and returns the hash of the input.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/crypto-helper_v1#hash"
+    },
     "metadata": null,
     "name": "hash",
     "outputDefinition": {
@@ -133,7 +136,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Computes and returns the HMAC of the input.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/crypto-helper_v1#hmac"
+    },
     "metadata": null,
     "name": "hmac",
     "outputDefinition": {
@@ -282,7 +288,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Decrypts PGP encrypted file using private key and passphrase.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/crypto-helper_v1#pgp-decrypt"
+    },
     "metadata": null,
     "name": "pgpDecrypt",
     "outputDefinition": {
@@ -665,7 +674,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Encrypts the file using PGP public key.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/crypto-helper_v1#pgp-encrypt"
+    },
     "metadata": null,
     "name": "pgpEncrypt",
     "outputDefinition": {
@@ -1026,7 +1038,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Decrypts RSA encrypted file using RSA private key.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/crypto-helper_v1#rsa-decrypt"
+    },
     "metadata": null,
     "name": "rsaDecrypt",
     "outputDefinition": {
@@ -1387,7 +1402,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Encrypts the file using the RSA public key.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/crypto-helper_v1#rsa-encrypt"
+    },
     "metadata": null,
     "name": "rsaEncrypt",
     "outputDefinition": {
@@ -1748,7 +1766,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Cryptographically signs a file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/crypto-helper_v1#sign"
+    },
     "metadata": null,
     "name": "sign",
     "outputDefinition": {
@@ -2109,7 +2130,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Verify the signature using public RSA key.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/crypto-helper_v1#verify"
+    },
     "metadata": null,
     "name": "verify",
     "outputDefinition": {
