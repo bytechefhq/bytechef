@@ -84,9 +84,8 @@ Visit: `http://YOUR_EC2_IP:8080`
 | Testing/Development | t3.medium | 4 GB | ~$30 |
 | Production | t3.large | 8 GB | ~$60 |
 
-<Callout type="error">
-Do not use t2.micro, t3.micro, or t3.small. These instances have insufficient memory and will crash.
-</Callout>
+
+Do not use `t2.micro`, `t3.micro`, or `t3.small`. These instances have insufficient memory and will crash.
 
 ## Managing ByteChef
 
