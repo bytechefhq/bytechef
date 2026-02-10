@@ -174,6 +174,9 @@ Type: OBJECT
 }
 ```
 
+#### Find order ID
+
+To find the Order ID, click [here](/reference/components/shopify_v1#how-to-find-your-order-id).
 
 
 
@@ -235,6 +238,9 @@ Type: OBJECT
 }
 ```
 
+#### Find order ID
+
+To find the Order ID, click [here](/reference/components/shopify_v1#how-to-find-your-order-id).
 
 
 
@@ -304,6 +310,81 @@ Type: OBJECT
 }
 ```
 
+#### Find product ID
+
+To find the Product ID, click [here](/reference/components/shopify_v1#how-to-find-your-product-id).
+
+
+
+### Create Product
+Name: createProduct
+
+`Create new product for your store.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Title | STRING | Title of new product. | true |
+| productOptions | Product Options | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), [STRING\($value)]\(values)&#125;\($productOption)] </details> | Options that will describe the product, for example: size, color. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Product",
+  "name" : "createProduct",
+  "parameters" : {
+    "title" : "",
+    "productOptions" : [ {
+      "name" : "",
+      "values" : [ "" ]
+    } ]
+  },
+  "type" : "shopify/v1/createProduct"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| product | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(title), [&#123;STRING\(id), STRING\(name), INTEGER\(position), [&#123;STRING\(id), STRING\(name), BOOLEAN\(hasVariants)&#125;]\(optionValues)&#125;]\(options)&#125; </details> | The created product. |
+| userErrors | ARRAY <details> <summary> Items </summary> [&#123;STRING\(field), STRING\(message)&#125;] </details> | The list of errors that occurred from executing the mutation. |
+
+
+
+
+#### Output Example
+```json
+{
+  "product" : {
+    "id" : "",
+    "title" : "",
+    "options" : [ {
+      "id" : "",
+      "name" : "",
+      "position" : 1,
+      "optionValues" : [ {
+        "id" : "",
+        "name" : "",
+        "hasVariants" : false
+      } ]
+    } ]
+  },
+  "userErrors" : [ {
+    "field" : "",
+    "message" : ""
+  } ]
+}
+```
+
 
 
 
@@ -356,6 +437,63 @@ Type: OBJECT
     "message" : ""
   } ]
 }
+```
+
+#### Find order ID
+
+To find the Order ID, click [here](/reference/components/shopify_v1#how-to-find-your-order-id).
+
+
+
+### Get Abandoned Carts
+Name: getAbandonedCarts
+
+`Retrieves abandoned carts.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Abandoned Carts",
+  "name" : "getAbandonedCarts",
+  "type" : "shopify/v1/getAbandonedCarts"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the abandoned cart. |
+| abandonedCheckoutUrl | STRING | URL that leads to the abandoned checkout. |
+| createdAt | STRING | DateTime when the cart was created. |
+| customer | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(firstName), STRING\(lastName), STRING\(email)&#125; </details> | Customer info. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "abandonedCheckoutUrl" : "",
+  "createdAt" : "",
+  "customer" : {
+    "id" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "email" : ""
+  }
+} ]
 ```
 
 
@@ -429,6 +567,9 @@ Type: OBJECT
 }
 ```
 
+#### Find order ID
+
+To find the Order ID, click [here](/reference/components/shopify_v1#how-to-find-your-order-id).
 
 
 
@@ -494,6 +635,9 @@ Type: OBJECT
 }
 ```
 
+#### Find order ID
+
+To find the Order ID, click [here](/reference/components/shopify_v1#how-to-find-your-order-id).
 
 
 
@@ -578,3 +722,25 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find your order ID
+
+You can find it only if you are the store owner
+
+1. You have order by its **order number** (e.g. #1042).
+2. In your **Shopify Admin** go in **Orders**.
+3. Find order you want to find ID for and open it.
+4. In **URL** you will see number like this `/orders/7157417935093`
+5. Because of that your order ID is **gid://shopify/Order/7157417935093**
+
+### How to find your product ID
+
+You can find it only if you are the store owner
+
+1. In your **Shopify Admin** go in **Products**.
+2. Find product you want to find ID for and open it.
+3. In **URL** you will see number like this `/products/8335757639925`
+4. Because of that your order ID is **gid://shopify/Product/8335757639925**
