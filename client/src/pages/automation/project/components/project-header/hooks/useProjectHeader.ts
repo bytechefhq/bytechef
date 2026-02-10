@@ -17,14 +17,14 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useCallback, useEffect, useState} from 'react';
-import {ImperativePanelHandle} from 'react-resizable-panels';
+import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 const workflowTestApi = new WorkflowTestApi();
 
 interface UseProjectHeaderProps {
-    bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
+    bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
     chatTrigger?: boolean;
     projectId: number;
 }
@@ -80,8 +80,8 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
     } = useWorkflowTestStream({
         onError: () => setJobId(null),
         onResult: () => {
-            if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize() === 0) {
-                bottomResizablePanelRef.current.resize(35);
+            if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize().asPercentage === 0) {
+                bottomResizablePanelRef.current.resize(350);
             }
 
             setJobId(null);
@@ -142,7 +142,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         setWorkflowTestExecution(undefined);
 
         if (bottomResizablePanelRef.current) {
-            bottomResizablePanelRef.current.resize(35);
+            bottomResizablePanelRef.current.resize(350);
         }
 
         if (workflow.id) {
@@ -186,7 +186,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         setShowBottomPanelOpen(!showBottomPanel);
 
         if (bottomResizablePanelRef.current) {
-            bottomResizablePanelRef.current.resize(!showBottomPanel ? 35 : 0);
+            bottomResizablePanelRef.current.resize(!showBottomPanel ? 350 : 0);
         }
     };
 

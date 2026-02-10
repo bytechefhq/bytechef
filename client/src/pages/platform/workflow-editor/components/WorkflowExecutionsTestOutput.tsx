@@ -19,7 +19,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 
 const WorkflowExecutionsTestOutput = ({
     onCloseClick,
-    resizablePanelSize = 30,
+    resizablePanelSize = 350,
     workflowIsRunning,
     workflowTestExecution,
 }: {
@@ -100,7 +100,7 @@ const WorkflowExecutionsTestOutput = ({
                     {!workflowIsRunning && (
                         <>
                             {workflowTestExecution?.job && (
-                                <ResizablePanelGroup direction="horizontal">
+                                <ResizablePanelGroup orientation="horizontal">
                                     <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
                                         <ScrollArea className="h-full pl-1 pr-4">
                                             <Accordion

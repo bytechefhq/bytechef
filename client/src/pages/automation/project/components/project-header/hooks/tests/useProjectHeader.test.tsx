@@ -151,20 +151,18 @@ vi.mock('@/shared/hooks/useSSE', async () => {
 });
 
 // ---- Helpers ----
-import type {ImperativePanelHandle} from 'react-resizable-panels';
+import type {PanelImperativeHandle} from 'react-resizable-panels';
 
 type PanelRefType = {
-    current: ImperativePanelHandle;
+    current: PanelImperativeHandle;
 };
 
 function makePanelRef(getSizeReturn = 0): PanelRefType {
-    const handle: ImperativePanelHandle = {
+    const handle: PanelImperativeHandle = {
         collapse: vi.fn(),
         expand: vi.fn(),
-        getId: vi.fn().mockReturnValue('panel'),
-        getSize: vi.fn().mockReturnValue(getSizeReturn),
+        getSize: vi.fn().mockReturnValue({asPercentage: getSizeReturn, inPixels: 0}),
         isCollapsed: vi.fn().mockReturnValue(false),
-        isExpanded: vi.fn().mockReturnValue(true),
         resize: vi.fn(),
     };
     return {current: handle};
@@ -228,7 +226,7 @@ describe('useProjectHeader', () => {
         act(() => latest.handlers?.result?.({ok: true}));
         await waitFor(() => expect(hoisted.editorSpies.setWorkflowIsRunning).toHaveBeenCalledWith(false));
         expect(hoisted.editorSpies.setWorkflowTestExecution).toHaveBeenCalled();
-        expect(panelRef.current.resize).toHaveBeenCalledWith(35);
+        expect(panelRef.current.resize).toHaveBeenCalledWith(350);
         expect(localStorage.getItem(storageKey)).toBeNull();
 
         // Expose returned API just to avoid unused warning
@@ -285,7 +283,7 @@ describe('useProjectHeader', () => {
 
         // Panel opened and resized
         expect(hoisted.editorSpies.setShowBottomPanelOpen).toHaveBeenCalledWith(true);
-        expect(panelRef.current.resize).toHaveBeenCalledWith(35);
+        expect(panelRef.current.resize).toHaveBeenCalledWith(350);
         // Execution cleared and analytics tracked
         expect(hoisted.editorSpies.setWorkflowTestExecution).toHaveBeenCalledWith(undefined);
         expect(hoisted.analyticsSpies.captureProjectWorkflowTested).toHaveBeenCalled();

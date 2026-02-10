@@ -54,14 +54,14 @@ const PropertyCodeEditorDialog = ({
                         />
 
                         <div className="flex min-w-0 flex-1">
-                            <ResizablePanelGroup className="flex-1" direction="vertical">
-                                <ResizablePanel defaultSize={75}>
+                            <ResizablePanelGroup className="flex-1" orientation="vertical">
+                                <ResizablePanel defaultSize={750}>
                                     <PropertyCodeEditorDialogEditor language={language} />
                                 </ResizablePanel>
 
                                 <ResizableHandle className="bg-muted" />
 
-                                <ResizablePanel defaultSize={25}>
+                                <ResizablePanel defaultSize={250}>
                                     <PropertyCodeEditorDialogExecutionOutput />
                                 </ResizablePanel>
                             </ResizablePanelGroup>

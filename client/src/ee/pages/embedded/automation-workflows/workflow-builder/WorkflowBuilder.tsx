@@ -76,8 +76,8 @@ const WorkflowBuilder = () => {
             />
 
             <div className="flex flex-1">
-                <ResizablePanelGroup className="flex-1 bg-transparent" direction="vertical">
-                    <ResizablePanel className="relative flex" defaultSize={65}>
+                <ResizablePanelGroup className="flex-1 bg-transparent" orientation="vertical">
+                    <ResizablePanel className="relative flex" defaultSize={650}>
                         <WorkflowEditorProvider
                             value={{
                                 ConnectionKeys: ConnectionKeys,
@@ -112,7 +112,7 @@ const WorkflowBuilder = () => {
 
                     <ResizableHandle className="bg-muted" />
 
-                    <ResizablePanel className="bg-background" defaultSize={0} ref={bottomResizablePanelRef}>
+                    <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
                         <WorkflowExecutionsTestOutput
                             onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
                             workflowIsRunning={workflowIsRunning}

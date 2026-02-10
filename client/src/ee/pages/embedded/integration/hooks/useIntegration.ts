@@ -18,7 +18,7 @@ import {
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
-import {ImperativePanelHandle} from 'react-resizable-panels';
+import {PanelImperativeHandle} from 'react-resizable-panels';
 
 export const useIntegration = ({
     integrationId,
@@ -32,7 +32,7 @@ export const useIntegration = ({
     const {setWorkflow, workflow} = useWorkflowDataStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
 
-    const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
+    const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
 
     const {data: curWorkflow} = useGetIntegrationWorkflowQuery(integrationId!, integrationWorkflowId!);
 

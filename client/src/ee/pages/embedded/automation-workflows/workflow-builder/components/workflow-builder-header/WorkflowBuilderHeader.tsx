@@ -13,11 +13,11 @@ import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsFetching} from '@tanstack/react-query';
 import {EditIcon} from 'lucide-react';
 import {RefObject} from 'react';
-import {ImperativePanelHandle} from 'react-resizable-panels';
+import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectHeaderProps {
-    bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
+    bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
     chatTrigger?: boolean;
     projectId: number;
     runDisabled: boolean;

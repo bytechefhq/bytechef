@@ -57,7 +57,7 @@ const WorkflowExecutionSheet = () => {
                         <Spinner className="size-6" />
                     </div>
                 ) : (
-                    <ResizablePanelGroup direction="horizontal">
+                    <ResizablePanelGroup orientation="horizontal">
                         <ResizablePanel
                             className="flex h-full w-1/2 flex-col border-r border-stroke-neutral-secondary bg-surface-neutral-primary"
                             defaultSize={50}
@@ -72,7 +72,7 @@ const WorkflowExecutionSheet = () => {
 
                         <ResizableHandle />
 
-                        <ResizablePanel className="w-1/2" defaultSize={50}>
+                        <ResizablePanel className="w-1/2" defaultSize={500}>
                             {workflowExecution && (
                                 <WorkflowReadOnlyProvider
                                     value={{
