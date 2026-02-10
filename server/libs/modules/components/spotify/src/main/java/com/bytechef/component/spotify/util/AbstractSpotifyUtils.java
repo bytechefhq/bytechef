@@ -35,4 +35,12 @@ public abstract class AbstractSpotifyUtils {
 
         return List.of();
     }
+
+    public static List<Option<String>> getDeviceIdOptions(
+        Parameters inputParameters,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
+        Context context) {
+
+        return List.of();
+    }
 }

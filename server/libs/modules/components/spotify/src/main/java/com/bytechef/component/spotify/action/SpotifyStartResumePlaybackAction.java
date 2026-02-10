@@ -23,7 +23,9 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.spotify.util.SpotifyUtils;
 import java.util.Map;
 
 /**
@@ -42,7 +44,10 @@ public class SpotifyStartResumePlaybackAction {
 
             ))
         .properties(string("deviceId").label("Device ID")
+            .description(
+                "The id of the device this command is targeting. If not supplied, the user's currently active device is the target.")
             .required(false)
+            .options((ActionDefinition.OptionsFunction<String>) SpotifyUtils::getDeviceIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)),
