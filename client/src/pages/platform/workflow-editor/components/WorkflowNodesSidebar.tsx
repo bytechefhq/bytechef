@@ -18,6 +18,7 @@ const WorkflowNodesSidebar = ({
     };
 }) => {
     const [filter, setFilter] = useState('');
+
     const [debouncedFilter] = useDebounce(filter, 300);
 
     const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<

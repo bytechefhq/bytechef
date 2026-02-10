@@ -55,6 +55,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         sourceNodeId,
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
+
         const [debouncedFilter] = useDebounce(filter, 300);
 
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
@@ -148,17 +149,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 if (clusterElementType) {
                     setFilteredClusterElementComponentDefinitions(
                         componentsWithActions
-                            .filter((component) => {
-                                if (!hasClusterElementType(component, clusterElementType)) {
-                                    return false;
-                                }
-
-                                if (trimmedFilter) {
-                                    return true;
-                                }
-
-                                return true;
-                            })
+                            .filter((component) => hasClusterElementType(component, clusterElementType))
                             .filter(({name}) => (!ff_3839 && name !== 'aiAgent') || ff_3839)
                     );
                 }
