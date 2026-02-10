@@ -17,24 +17,23 @@
 package com.bytechef.component.gitlab.trigger;
 
 import static com.bytechef.component.gitlab.constant.GitlabConstants.ID;
+import static com.bytechef.component.gitlab.constant.GitlabConstants.PROJECT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
-import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
-import java.time.Instant;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,76 +43,101 @@ import org.mockito.ArgumentCaptor;
  */
 class GitlabNewIssueTriggerTest {
 
-    protected Parameters mockedWebhookEnableOutput = mock(Parameters.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
-    protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);
-    protected WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
-    protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    protected String workflowExecutionId = "testWorkflowExecutionId";
+    private final Http mockedHttp = mock(Http.class);
+    private Parameters mockedInputParameters;
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testDynamicWebhookEnable() {
+    void testWebhookEnable() {
+        mockedInputParameters = MockParametersFactory.create(Map.of(PROJECT_ID, "abc"));
         String webhookUrl = "testWebhookUrl";
 
-        when(mockedTriggerContext.http(any()))
+        when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, 123));
 
-        WebhookEnableOutput webhookEnableOutput = GitlabNewIssueTrigger.dynamicWebhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+        WebhookEnableOutput webhookEnableOutput = GitlabNewIssueTrigger.webhookEnable(
+            mockedInputParameters, null, webhookUrl, "", mockedTriggerContext);
 
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        Instant webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, 123), null);
 
-        Map<String, Object> expectedParameters = Map.of(ID, 123);
+        assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
 
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        assertNotNull(capturedFunction);
 
-        assertEquals(Map.of("url", webhookUrl, "issues_events", true, "push_events", false), body.getContent());
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/projects/abc/hooks", stringArgumentCaptor.getValue());
+        assertEquals(
+            Http.Body.of(
+                Map.of("url", webhookUrl, "issues_events", true, "push_events", false),
+                Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 
     @Test
-    void testDynamicWebhookDisable() {
-        when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+    void testWebhookDisable() {
+        mockedInputParameters = MockParametersFactory.create(Map.of(PROJECT_ID, "xy"));
+        Parameters mockedOutputParameters = MockParametersFactory.create(Map.of(ID, 2));
+
+        when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        GitlabNewIssueTrigger.dynamicWebhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+        GitlabNewIssueTrigger.webhookDisable(mockedInputParameters, null, mockedOutputParameters, "",
+            mockedTriggerContext);
 
-        verify(mockedTriggerContext, times(1)).http(any());
-        verify(mockedExecutor, times(1)).configuration(any());
-        verify(mockedExecutor, times(1)).execute();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+        assertEquals("/projects/xy/hooks/2", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testDynamicWebhookRequest() {
+    void testWebhookRequest() {
         Map<String, Object> map = Map.of("key", Map.of(ID, "123"), "action", "open");
 
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
             .thenReturn(Map.of("object_attributes", map));
 
-        Object result = GitlabNewIssueTrigger.dynamicWebhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+        Object result = GitlabNewIssueTrigger.webhookRequest(
+            null, null, null, null, mockedWebhookBody,
+            null, null, null);
 
         assertEquals(map, result);
     }
