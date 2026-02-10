@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.ID;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.NAME;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
@@ -38,8 +37,8 @@ public class SpotifyUtils extends AbstractSpotifyUtils {
     private SpotifyUtils() {
     }
 
-    public static String getCurrentUserId(ActionContext actionContext) {
-        Map<String, Object> body = actionContext
+    public static String getCurrentUserId(Context context) {
+        Map<String, Object> body = context
             .http(http -> http.get("/me"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
