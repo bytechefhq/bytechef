@@ -9,6 +9,7 @@ import {UseMutationResult} from '@tanstack/react-query';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {decodePath} from './encodingUtils';
+import {enqueueWorkflowMutation} from './workflowMutationQueue';
 
 interface SavePropertyProps {
     fromAi?: boolean;
@@ -80,14 +81,40 @@ export default function saveProperty({
     }
 
     if (currentNode && currentNode.clusterElementType) {
-        updateClusterElementParameterMutation?.mutate(
+        const clusterElementType = currentNode.clusterElementType;
+        const clusterElementWorkflowNodeName = currentNode.workflowNodeName;
+
+        enqueueWorkflowMutation(() =>
+            updateClusterElementParameterMutation!.mutateAsync(
+                {
+                    clusterElementType,
+                    clusterElementWorkflowNodeName,
+                    environmentId: environmentStore.getState().currentEnvironmentId,
+                    id: workflowId,
+                    updateClusterElementParameterRequest: {
+                        fromAiInMetadata: fromAi,
+                        includeInMetadata,
+                        path: decodedPath,
+                        type,
+                        value,
+                    },
+                    workflowNodeName: rootClusterElementNodeData?.workflowNodeName ?? '',
+                },
+                {
+                    onSuccess: (response) => handleSuccess(response),
+                }
+            )
+        );
+
+        return;
+    }
+
+    enqueueWorkflowMutation(() =>
+        updateWorkflowNodeParameterMutation.mutateAsync(
             {
-                clusterElementType: currentNode.clusterElementType,
-                clusterElementWorkflowNodeName: currentNode.workflowNodeName,
                 environmentId: environmentStore.getState().currentEnvironmentId,
                 id: workflowId,
-                updateClusterElementParameterRequest: {
-                    fromAiInMetadata: fromAi,
+                updateWorkflowNodeParameterRequest: {
                     includeInMetadata,
                     path: decodedPath,
                     type,
@@ -98,25 +125,6 @@ export default function saveProperty({
             {
                 onSuccess: (response) => handleSuccess(response),
             }
-        );
-
-        return;
-    }
-
-    updateWorkflowNodeParameterMutation.mutate(
-        {
-            environmentId: environmentStore.getState().currentEnvironmentId,
-            id: workflowId,
-            updateWorkflowNodeParameterRequest: {
-                includeInMetadata,
-                path: decodedPath,
-                type,
-                value,
-            },
-            workflowNodeName: currentComponent.workflowNodeName,
-        },
-        {
-            onSuccess: (response) => handleSuccess(response),
-        }
+        )
     );
 }
