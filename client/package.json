@@ -106,7 +106,7 @@
     "react-hook-form": "^7.71.1",
     "react-inlinesvg": "^4.2.0",
     "react-json-view": "^1.21.3",
-    "react-resizable-panels": "^3.0.6",
+    "react-resizable-panels": "^4.6.2",
     "react-router-dom": "^7.13.0",
     "react-select": "^5.10.2",
     "react-shiki": "^0.9.1",
