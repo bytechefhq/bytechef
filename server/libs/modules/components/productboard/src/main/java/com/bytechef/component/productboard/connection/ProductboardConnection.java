@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -51,8 +52,39 @@ public class ProductboardConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/authorize")
-                .scopes((connectionParameters, context) -> Map.of("notes:create", false, "notes:read", false,
-                    "notes:manage", false, "product_hierarchy_data:read", false))
+                .scopes((connectionParameters, context) -> {
+                    Map<String, Boolean> scopeMap = new HashMap<>();
+
+                    scopeMap.put("custom_fields:read", false);
+                    scopeMap.put("members_pii:read", false);
+                    scopeMap.put("notes:create", true);
+                    scopeMap.put("notes:read", true);
+                    scopeMap.put("notes:manage", true);
+                    scopeMap.put("companies:read", false);
+                    scopeMap.put("plugin_integrations:manage", false);
+                    scopeMap.put("product_hierarchy_data:create", false);
+                    scopeMap.put("product_hierarchy_data:manage", false);
+                    scopeMap.put("product_hierarchy_data:read", true);
+                    scopeMap.put("releases:create", false);
+                    scopeMap.put("releases:manage", false);
+                    scopeMap.put("releases:read", false);
+                    scopeMap.put("users:manage", false);
+                    scopeMap.put("users:read", false);
+                    scopeMap.put("users_pii:read", false);
+                    scopeMap.put("objectives:read", false);
+                    scopeMap.put("objectives:create", false);
+                    scopeMap.put("objectives:manage", false);
+                    scopeMap.put("key_results:read", false);
+                    scopeMap.put("key_results:create", false);
+                    scopeMap.put("key_results:manage", false);
+                    scopeMap.put("initiatives:read", false);
+                    scopeMap.put("initiatives:create", false);
+                    scopeMap.put("initiatives:manage", false);
+                    scopeMap.put("feedback_form_configurations:read", false);
+                    scopeMap.put("feedback_forms:create", false);
+
+                    return scopeMap;
+                })
                 .tokenUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/token")
                 .refreshUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/token"));
 

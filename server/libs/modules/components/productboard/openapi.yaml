@@ -11,6 +11,9 @@ paths:
       summary: "Get Feature"
       description: "Returns detail of a specific feature."
       operationId: "getFeature"
+      security:
+        - "oauth2":
+            - "product_hierarchy_data:read"
       parameters:
         - name: "featureId"
           description: "ID of the feature"
@@ -35,6 +38,9 @@ paths:
       summary: "Create Note"
       description: "Creates a new note."
       operationId: "createNote"
+      security:
+        - "oauth2":
+            - "notes:create"
       responses:
         201:
           description: "Note created"
@@ -76,6 +82,9 @@ paths:
       summary: "Get Note"
       description: "Returns detail of a specific note."
       operationId: "getNote"
+      security:
+        - "oauth2":
+            - "notes:read"
       parameters:
         - name: "noteId"
           description: "ID of the note"
@@ -99,6 +108,10 @@ paths:
       summary: "Update Note"
       description: "Updates a note."
       operationId: "updateNote"
+      security:
+        - "oauth2":
+            - "notes:manage"
+            - "notes:read"
       parameters:
         - name: "noteId"
           description: "ID of the note"
@@ -157,6 +170,10 @@ paths:
       summary: "Delete Note"
       description: "Deletes a note."
       operationId: "deleteNote"
+      security:
+        - "oauth2":
+            - "notes:manage"
+            - "notes:read"
       parameters:
         - name: "noteId"
           description: "ID of the note"
@@ -362,7 +379,7 @@ components:
     Owner:
       type: "object"
       required:
-      - "email"
+        - "email"
       properties:
         email:
           type: "string"
@@ -383,7 +400,30 @@ components:
           tokenUrl: "https://app.productboard.com/oauth2/token"
           refreshUrl: "https://app.productboard.com/oauth2/token"
           scopes:
-            notes:create: "The application will be able to create notes."
-            notes:read: "The application will be able to read notes."
-            notes:manage: "The application will be able to manage notes."
-            product_hierarchy_data:read: "The application will be able to read product hierarchy data."
+            custom_fields:read: ""
+            members_pii:read: ""
+            notes:create: ""
+            notes:read: ""
+            notes:manage: ""
+            companies:read: ""
+            plugin_integrations:manage: ""
+            product_hierarchy_data:create: ""
+            product_hierarchy_data:manage: ""
+            product_hierarchy_data:read: ""
+            releases:create: ""
+            releases:manage: ""
+            releases:read: ""
+            users:manage: ""
+            users:read: ""
+            users_pii:read: ""
+            objectives:read: ""
+            objectives:create: ""
+            objectives:manage: ""
+            key_results:read: ""
+            key_results:create: ""
+            key_results:manage: ""
+            initiatives:read: ""
+            initiatives:create: ""
+            initiatives:manage: ""
+            feedback_form_configurations:read: ""
+            feedback_forms:create: ""
