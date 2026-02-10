@@ -25,8 +25,8 @@ import static com.bytechef.component.spotify.constant.SpotifyConstants.ID;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.NAME;
 import static com.bytechef.component.spotify.util.SpotifyUtils.getCurrentUserId;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -106,10 +106,10 @@ public class SpotifyCreatePlaylistAction {
     }
 
     public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return actionContext
-            .http(http -> http.post("/users/" + getCurrentUserId(actionContext) + "/playlists"))
+        return context
+            .http(http -> http.post("/users/" + getCurrentUserId(context) + "/playlists"))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getString(NAME),
