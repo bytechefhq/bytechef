@@ -89,6 +89,7 @@ public class ShopifyUpdateOrderAction {
                                         string()
                                             .description("Tag of the order."))),
                         USER_ERRORS_PROPERTY)))
+        .help("", "https://docs.bytechef.io/reference/components/shopify_v1#update-order")
         .perform(ShopifyUpdateOrderAction::perform);
 
     private ShopifyUpdateOrderAction() {

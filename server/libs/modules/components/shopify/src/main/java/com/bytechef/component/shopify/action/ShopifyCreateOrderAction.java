@@ -99,6 +99,7 @@ public class ShopifyCreateOrderAction {
                                                                 string("id")
                                                                     .description("ID of the product variant.")))))),
                         USER_ERRORS_PROPERTY)))
+        .help("", "https://docs.bytechef.io/reference/components/shopify_v1#create-order")
         .perform(ShopifyCreateOrderAction::perform);
 
     private ShopifyCreateOrderAction() {

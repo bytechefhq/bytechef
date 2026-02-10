@@ -42,6 +42,7 @@ public class ShopifyNewCancelledOrderTrigger {
         .title("New Cancelled Order")
         .description("Triggers when order is cancelled.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
+        .help("", "https://docs.bytechef.io/reference/components/shopify_v1#new-cancelled-order")
         .output()
         .webhookEnable(ShopifyNewCancelledOrderTrigger::webhookEnable)
         .webhookDisable(ShopifyNewCancelledOrderTrigger::webhookDisable)

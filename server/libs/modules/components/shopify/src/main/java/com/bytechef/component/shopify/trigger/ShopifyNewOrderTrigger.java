@@ -42,6 +42,7 @@ public class ShopifyNewOrderTrigger {
         .title("New Order")
         .description("Triggers when new order is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
+        .help("", "https://docs.bytechef.io/reference/components/shopify_v1#new-order")
         .output()
         .webhookEnable(ShopifyNewOrderTrigger::webhookEnable)
         .webhookDisable(ShopifyNewOrderTrigger::webhookDisable)

@@ -78,6 +78,7 @@ public class ShopifyCloseOrderAction {
                                         string("discountCode")
                                             .description("The discount code used for an order."))),
                         USER_ERRORS_PROPERTY)))
+        .help("", "https://docs.bytechef.io/reference/components/shopify_v1#close-order")
         .perform(ShopifyCloseOrderAction::perform);
 
     private ShopifyCloseOrderAction() {

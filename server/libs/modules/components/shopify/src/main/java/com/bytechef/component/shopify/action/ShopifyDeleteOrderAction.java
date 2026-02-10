@@ -53,6 +53,7 @@ public class ShopifyDeleteOrderAction {
                         string("deletedId")
                             .description("ID of the deleted order."),
                         USER_ERRORS_PROPERTY)))
+        .help("", "https://docs.bytechef.io/reference/components/shopify_v1#delete-order")
         .perform(ShopifyDeleteOrderAction::perform);
 
     private ShopifyDeleteOrderAction() {

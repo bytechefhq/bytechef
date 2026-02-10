@@ -103,6 +103,7 @@ public class ShopifyCancelOrderAction {
                                         "This field will only resolve once the job is done. Can be used to ask for " +
                                             "object(s) that have been changed by the job.")),
                         USER_ERRORS_PROPERTY)))
+        .help("", "https://docs.bytechef.io/reference/components/shopify_v1#cancel-order")
         .perform(ShopifyCancelOrderAction::perform);
 
     private ShopifyCancelOrderAction() {
