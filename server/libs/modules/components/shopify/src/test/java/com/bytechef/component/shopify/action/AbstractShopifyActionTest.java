@@ -20,7 +20,7 @@ import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.shopify.util.ShopifyOptionsUtils;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import java.util.List;
@@ -35,14 +35,14 @@ import org.mockito.MockedStatic;
  */
 abstract class AbstractShopifyActionTest {
 
-    protected final ArgumentCaptor<ActionContext> actionContextArgumentCaptor = forClass(ActionContext.class);
-    protected final ActionContext mockedActionContext = mock(ActionContext.class);
-    @SuppressWarnings("unchecked")
-    protected final ArgumentCaptor<Map<String, Object>> mapArgumentCaptor = forClass(Map.class);
+    ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     @SuppressWarnings("unchecked")
     protected final ArgumentCaptor<List<Object>> listArgumentCaptor = forClass(List.class);
-    protected MockedStatic<ShopifyUtils> shopifyUtilsMockedStatic;
+    @SuppressWarnings("unchecked")
+    protected final ArgumentCaptor<Map<String, Object>> mapArgumentCaptor = forClass(Map.class);
+    protected final Context mockedContext = mock(Context.class);
     protected MockedStatic<ShopifyOptionsUtils> shopifyOptionsUtilsMockedStatic;
+    protected MockedStatic<ShopifyUtils> shopifyUtilsMockedStatic;
     protected final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @BeforeEach

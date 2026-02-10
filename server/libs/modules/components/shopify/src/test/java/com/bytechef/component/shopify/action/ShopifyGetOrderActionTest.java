@@ -19,16 +19,12 @@ package com.bytechef.component.shopify.action;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,24 +35,17 @@ class ShopifyGetOrderActionTest extends AbstractShopifyActionTest {
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ORDER_ID, "testOrderId"));
 
     @Test
-    void testPerform() throws Exception {
+    void testPerform() {
         shopifyUtilsMockedStatic
             .when(() -> ShopifyUtils.executeGraphQlOperation(
                 stringArgumentCaptor.capture(),
-                actionContextArgumentCaptor.capture(),
+                contextArgumentCaptor.capture(),
                 mapArgumentCaptor.capture(),
                 stringArgumentCaptor.capture()))
             .thenReturn(Map.of());
 
-        Optional<? extends ActionDefinition.BasePerformFunction> performFunction =
-            ShopifyGetOrderAction.ACTION_DEFINITION.getPerform();
-
-        assertTrue(performFunction.isPresent());
-
-        PerformFunction singleConnectionPerformFunction = (PerformFunction) performFunction.get();
-
-        Object result = singleConnectionPerformFunction.apply(
-            mockedParameters, null, mockedActionContext);
+        Object result = ShopifyGetOrderAction.perform(
+            mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
 
@@ -89,6 +78,6 @@ class ShopifyGetOrderActionTest extends AbstractShopifyActionTest {
 
         assertEquals(List.of(expectedQuery, "order"), stringArgumentCaptor.getAllValues());
         assertEquals(expectedVariables, mapArgumentCaptor.getValue());
-        assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+        assertEquals(mockedContext, contextArgumentCaptor.getValue());
     }
 }
