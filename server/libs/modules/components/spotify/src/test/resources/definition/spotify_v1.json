@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Start or resume current playback on an active device.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/spotify_v1#playresume-playback"
+    },
     "metadata": {
       "path": "/me/player/play",
       "mimeType": "application/json",
@@ -19,9 +22,9 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The id of the device this command is targeting. If not supplied, the user's currently active device is the target.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -35,7 +38,10 @@
       "minLength": null,
       "name": "deviceId",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -145,7 +151,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds one or more items to your playlist.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/spotify_v1#add-items-to-a-playlist"
+    },
     "metadata": {
       "path": "/playlists/{playlist_id}/tracks",
       "mimeType": "application/json",
@@ -263,7 +272,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "ID of the playlist the items will be added to.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -364,7 +373,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new playlist",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/spotify_v1#create-playlist"
+    },
     "metadata": null,
     "name": "createPlaylist",
     "outputDefinition": {
@@ -1186,9 +1198,9 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The id of the device this command is targeting. If not supplied, the user's currently active device is the target.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1202,7 +1214,10 @@
       "minLength": null,
       "name": "deviceId",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -1424,7 +1439,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "ID of the playlist the items will be added to.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2419,7 +2434,10 @@
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "Spotify Web API documentation",
+    "learnMoreUrl": "https://developer.spotify.com/documentation/web-api"
+  },
   "description": "Spotify is a popular music streaming service that offers a vast library of songs, podcasts, and playlists for users to enjoy.",
   "icon": "path:assets/spotify.svg",
   "metadata": null,
