@@ -21,49 +21,83 @@ import static com.bytechef.component.spotify.action.SpotifyCreatePlaylistAction.
 import static com.bytechef.component.spotify.action.SpotifyCreatePlaylistAction.PUBLIC;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.spotify.util.SpotifyUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class SpotifyCreatePlaylistActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        Map<String, Object> map = Map.of(NAME, "name", DESCRIPTION, "desc", PUBLIC, true, COLLABORATIVE, true);
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        String mockedCurrentUserId = "userId";
+
+        Map<String, Object> map = Map.of(
+            NAME, "name", DESCRIPTION, "desc", PUBLIC, true, COLLABORATIVE, true);
         Parameters parameters = MockParametersFactory.create(map);
 
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
+        try (MockedStatic<SpotifyUtils> spotifyUtilsMockedStatic = mockStatic(SpotifyUtils.class)) {
+            spotifyUtilsMockedStatic.when(() -> SpotifyUtils.getCurrentUserId(contextArgumentCaptor.capture()))
+                .thenReturn(mockedCurrentUserId);
 
-        Object result = SpotifyCreatePlaylistAction.perform(parameters, parameters, mockedActionContext);
+            when(mockedHttp.post(stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedResponse.getBody(any(TypeReference.class)))
+                .thenReturn(Map.of());
 
-        assertNull(result);
+            Map<String, Object> result = SpotifyCreatePlaylistAction.perform(parameters, parameters, mockedContext);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+            assertEquals(Map.of(), result);
 
-        assertEquals(map, body.getContent());
+            Http.Body body = bodyArgumentCaptor.getValue();
+
+            assertEquals(map, body.getContent());
+
+            ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+            Http.Configuration configuration = configurationBuilder.build();
+
+            Http.ResponseType responseType = configuration.getResponseType();
+
+            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+            assertEquals("/users/" + mockedCurrentUserId + "/playlists", stringArgumentCaptor.getValue());
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+        }
     }
 }
