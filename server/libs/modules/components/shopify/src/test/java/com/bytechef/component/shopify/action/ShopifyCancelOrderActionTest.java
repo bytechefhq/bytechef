@@ -24,16 +24,12 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.REFUND_ME
 import static com.bytechef.component.shopify.constant.ShopifyConstants.RESTOCK;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.STAFF_NOTE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
-import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -51,24 +47,18 @@ class ShopifyCancelOrderActionTest extends AbstractShopifyActionTest {
             STAFF_NOTE, "staff note"));
 
     @Test
-    void testPerform() throws Exception {
+    void testPerform() {
+
         shopifyUtilsMockedStatic
             .when(() -> ShopifyUtils.executeGraphQlOperation(
                 stringArgumentCaptor.capture(),
-                actionContextArgumentCaptor.capture(),
+                contextArgumentCaptor.capture(),
                 mapArgumentCaptor.capture(),
                 stringArgumentCaptor.capture()))
             .thenReturn(Map.of());
 
-        Optional<? extends BasePerformFunction> basePerformFunction =
-            ShopifyCancelOrderAction.ACTION_DEFINITION.getPerform();
-
-        assertTrue(basePerformFunction.isPresent());
-
-        PerformFunction singleConnectionPerformFunction = (PerformFunction) basePerformFunction.get();
-
-        Object result = singleConnectionPerformFunction.apply(
-            mockedParameters, null, mockedActionContext);
+        Object result = ShopifyCancelOrderAction.perform(
+            mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
 
@@ -115,6 +105,6 @@ class ShopifyCancelOrderActionTest extends AbstractShopifyActionTest {
 
         assertEquals(List.of(expectedQuery, "orderCancel"), stringArgumentCaptor.getAllValues());
         assertEquals(expectedVariables, mapArgumentCaptor.getValue());
-        assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+        assertEquals(mockedContext, contextArgumentCaptor.getValue());
     }
 }
