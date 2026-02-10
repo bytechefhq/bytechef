@@ -25,7 +25,9 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.shopify.action.ShopifyCancelOrderAction;
 import com.bytechef.component.shopify.action.ShopifyCloseOrderAction;
 import com.bytechef.component.shopify.action.ShopifyCreateOrderAction;
+import com.bytechef.component.shopify.action.ShopifyCreateProductAction;
 import com.bytechef.component.shopify.action.ShopifyDeleteOrderAction;
+import com.bytechef.component.shopify.action.ShopifyGetAbandonedCartsAction;
 import com.bytechef.component.shopify.action.ShopifyGetOrderAction;
 import com.bytechef.component.shopify.action.ShopifyUpdateOrderAction;
 import com.bytechef.component.shopify.connection.ShopifyConnection;
@@ -49,24 +51,30 @@ public class ShopifyComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.E_COMMERCE)
         .connection(ShopifyConnection.CONNECTION_DEFINITION)
         .customAction(true)
+        .customActionHelp("Shopify API docs", "https://shopify.dev/docs/api/admin-graphql/latest")
         .actions(
             ShopifyCancelOrderAction.ACTION_DEFINITION,
             ShopifyCloseOrderAction.ACTION_DEFINITION,
             ShopifyCreateOrderAction.ACTION_DEFINITION,
+            ShopifyCreateProductAction.ACTION_DEFINITION,
             ShopifyDeleteOrderAction.ACTION_DEFINITION,
+            ShopifyGetAbandonedCartsAction.ACTION_DEFINITION,
             ShopifyGetOrderAction.ACTION_DEFINITION,
             ShopifyUpdateOrderAction.ACTION_DEFINITION)
         .clusterElements(
             tool(ShopifyCancelOrderAction.ACTION_DEFINITION),
             tool(ShopifyCloseOrderAction.ACTION_DEFINITION),
             tool(ShopifyCreateOrderAction.ACTION_DEFINITION),
+            tool(ShopifyCreateProductAction.ACTION_DEFINITION),
             tool(ShopifyDeleteOrderAction.ACTION_DEFINITION),
+            tool(ShopifyGetAbandonedCartsAction.ACTION_DEFINITION),
             tool(ShopifyGetOrderAction.ACTION_DEFINITION),
             tool(ShopifyUpdateOrderAction.ACTION_DEFINITION))
         .triggers(
             ShopifyNewCancelledOrderTrigger.TRIGGER_DEFINITION,
             ShopifyNewOrderTrigger.TRIGGER_DEFINITION,
-            ShopifyNewPaidOrderTrigger.TRIGGER_DEFINITION);
+            ShopifyNewPaidOrderTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
