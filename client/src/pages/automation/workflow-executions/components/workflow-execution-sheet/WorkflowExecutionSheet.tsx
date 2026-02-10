@@ -77,7 +77,7 @@ const WorkflowExecutionSheet = () => {
                             </header>
 
                             <div className="flex min-h-0 flex-1 p-3">
-                                <ResizablePanelGroup className="h-full" direction="horizontal">
+                                <ResizablePanelGroup className="h-full" orientation="horizontal">
                                     <ResizablePanel
                                         className="flex min-h-0 w-1/2 flex-col overflow-hidden rounded-md bg-surface-neutral-primary"
                                         defaultSize={50}

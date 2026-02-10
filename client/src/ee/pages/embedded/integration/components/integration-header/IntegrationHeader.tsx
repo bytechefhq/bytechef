@@ -37,7 +37,7 @@ import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
 import {RefObject, useCallback, useEffect, useState} from 'react';
-import {ImperativePanelHandle} from 'react-resizable-panels';
+import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -50,7 +50,7 @@ const IntegrationHeader = ({
     runDisabled,
     updateWorkflowMutation,
 }: {
-    bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
+    bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
     integrationId: number;
     integrationWorkflowId: number;
     runDisabled: boolean;
@@ -106,7 +106,7 @@ const IntegrationHeader = ({
     } = useWorkflowTestStream({
         onError: () => setJobId(null),
         onResult: () => {
-            if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize() === 0) {
+            if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize().asPercentage === 0) {
                 bottomResizablePanelRef.current.resize(35);
             }
 

@@ -3,13 +3,13 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {SquareChevronRightIcon} from 'lucide-react';
 import {RefObject} from 'react';
-import {ImperativePanelHandle} from 'react-resizable-panels';
+import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useShallow} from 'zustand/react/shallow';
 
 const IntegrationHeaderOutputButton = ({
     bottomResizablePanelRef,
 }: {
-    bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
+    bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
 }) => {
     const {setShowBottomPanelOpen, showBottomPanel} = useWorkflowEditorStore(
         useShallow((state) => ({

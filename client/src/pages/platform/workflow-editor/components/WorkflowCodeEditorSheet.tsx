@@ -157,9 +157,9 @@ const WorkflowCodeEditorSheet = ({
                     <div className="flex min-h-0 flex-1">
                         <ResizablePanelGroup
                             className="flex-1 rounded-md bg-surface-neutral-primary"
-                            direction="vertical"
+                            orientation="vertical"
                         >
-                            <ResizablePanel defaultSize={75}>
+                            <ResizablePanel defaultSize={750}>
                                 <Suspense fallback={<MonacoEditorLoader />}>
                                     <MonacoEditor
                                         className="size-full"
@@ -177,7 +177,7 @@ const WorkflowCodeEditorSheet = ({
 
                             <ResizableHandle className="bg-muted" />
 
-                            <ResizablePanel defaultSize={25}>
+                            <ResizablePanel defaultSize={500}>
                                 {workflowIsRunning ? (
                                     <div className="flex items-center gap-x-1 p-3">
                                         <span className="flex animate-spin text-gray-400">
@@ -188,7 +188,7 @@ const WorkflowCodeEditorSheet = ({
                                     </div>
                                 ) : (
                                     <WorkflowExecutionsTestOutput
-                                        resizablePanelSize={40}
+                                        resizablePanelSize={400}
                                         workflowIsRunning={workflowIsRunning}
                                         workflowTestExecution={workflowTestExecution}
                                     />

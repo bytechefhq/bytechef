@@ -27,7 +27,7 @@ import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/compone
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
-import {ImperativePanelHandle} from 'react-resizable-panels';
+import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -56,7 +56,7 @@ export const useProject = () => {
     const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
+    const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
 
     const {projectId, projectWorkflowId} = useParams();
     const navigate = useNavigate();

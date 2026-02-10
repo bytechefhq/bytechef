@@ -19,7 +19,7 @@ import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workf
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
-import {ImperativePanelHandle} from 'react-resizable-panels';
+import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
 
 export const useWorkflowBuilder = () => {
@@ -38,7 +38,7 @@ export const useWorkflowBuilder = () => {
         setWorkflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore();
 
-    const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
+    const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
 
     const {workflowUuid} = useParams();
 
