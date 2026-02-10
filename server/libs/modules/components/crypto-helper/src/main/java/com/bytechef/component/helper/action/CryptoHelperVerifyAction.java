@@ -53,6 +53,7 @@ public class CryptoHelperVerifyAction {
                 .description("Signature that will be verified.")
                 .required(true))
         .output(outputSchema(bool().description("Outcome of the verification of the signature.")))
+        .help("", "https://docs.bytechef.io/reference/components/crypto-helper_v1#verify")
         .perform(CryptoHelperVerifyAction::perform);
 
     private CryptoHelperVerifyAction() {

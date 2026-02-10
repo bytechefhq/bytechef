@@ -51,6 +51,7 @@ public class CryptoHelperSignAction {
                 .description("File object with content that will be signed")
                 .required(true))
         .output(outputSchema(fileEntry().description("Signature of the file.")))
+        .help("", "https://docs.bytechef.io/reference/components/crypto-helper_v1#sign")
         .perform(CryptoHelperSignAction::perform);
 
     private CryptoHelperSignAction() {

@@ -74,6 +74,7 @@ public class CryptoHelperPgpDecryptAction {
                 .description("Passphrase that was used for encryption.")
                 .required(true))
         .output(outputSchema(fileEntry().description("File object with decrypted content.")))
+        .help("", "https://docs.bytechef.io/reference/components/crypto-helper_v1#pgp-decrypt")
         .perform(CryptoHelperPgpDecryptAction::perform);
 
     private CryptoHelperPgpDecryptAction() {

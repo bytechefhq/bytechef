@@ -70,6 +70,7 @@ public class CryptoHelperPgpEncryptAction {
                 .description("File object with content that will be encrypted.")
                 .required(true))
         .output(outputSchema(fileEntry().description("PGP encrypted file.")))
+        .help("", "https://docs.bytechef.io/reference/components/crypto-helper_v1#pgp-encrypt")
         .perform(CryptoHelperPgpEncryptAction::perform);
 
     private CryptoHelperPgpEncryptAction() {
