@@ -19,61 +19,158 @@ package com.bytechef.component.pipedrive.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
 
-import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * @author Ivica Cardic
  * @author Monika Kušter
  */
-public class PipedriveUtils {
+public class PipedriveUtils extends AbstractPipedriveUtils {
 
     private PipedriveUtils() {
     }
 
-    public static OptionsFunction<String> getOptions(String path, String dependsOn) {
-        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
-            Map<String, ?> response = context
-                .http(http -> http.get(path))
-                .queryParameters(
-                    dependsOn == null
-                        ? Map.of()
-                        : Map.of(dependsOn, List.of(inputParameters.getString(dependsOn, ""))))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
+    public static List<Option<String>> getCurrencyOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
 
-            context.log(log -> log.debug("Response for path='%s': %s".formatted(path, response)));
+        return getStringOptions(context, "/currencies");
+    }
 
-            List<Option<String>> options = new ArrayList<>();
+    public static List<Option<Long>> getDealIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
 
-            if (response.get("data") instanceof List<?> list) {
-                for (Object o : list) {
-                    if (o instanceof Map<?, ?> map) {
-                        String id = map.get(ID)
-                            .toString();
-                        String name = (String) map.get("name");
+        return getLongOptions(context, "/deals");
+    }
 
-                        if (path.equals("/deals")) {
-                            options.add(option((String) map.get("title"), id));
-                        } else if (path.equals("/currencies")) {
-                            options.add(option(name, (String) map.get("symbol")));
-                        } else {
-                            options.add(option(name, id));
-                        }
-                    }
+    public static List<Option<Long>> getFilterIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getLongOptions(context, "/filters");
+    }
+
+    public static List<Option<String>> getLabelIdsOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getStringOptions(context, "/dealLabels");
+    }
+
+    public static List<Option<String>> getLeadIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getStringOptions(context, "/lead");
+    }
+
+    public static List<Option<Long>> getOrgIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getLongOptions(context, "/organizations");
+    }
+
+    public static List<Option<Long>> getOrganizationIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getLongOptions(context, "/organizations");
+    }
+
+    public static List<Option<Long>> getOwnerIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getLongOptions(context, "/users");
+    }
+
+    public static List<Option<Long>> getPersonIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getLongOptions(context, "/persons");
+    }
+
+    public static List<Option<Long>> getPipelineIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getLongOptions(context, "/pipelines");
+    }
+
+    public static List<Option<Long>> getStageIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getLongOptions(context, "/stages");
+    }
+
+    public static List<Option<Long>> getUserIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getLongOptions(context, "/users");
+    }
+
+    private static List<Option<String>> getStringOptions(Context context, String path) {
+        return getOptions(context, path, (map, pathKey) -> {
+            String name = (String) map.get("name");
+
+            if (pathKey.equals("/currencies")) {
+                return option(name, (String) map.get("symbol"));
+            } else {
+                return option(name, (String) map.get(ID));
+            }
+        });
+    }
+
+    private static List<Option<Long>> getLongOptions(Context context, String path) {
+        return getOptions(context, path, (map, pathKey) -> {
+            int id = (Integer) map.get(ID);
+            String name = (String) map.get("name");
+
+            if (pathKey.equals("/deals")) {
+                return option((String) map.get("title"), id);
+            } else {
+                return option(name, id);
+            }
+        });
+    }
+
+    private static <T> List<Option<T>> getOptions(
+        Context context, String path, BiFunction<Map<?, ?>, String, Option<T>> optionMapper) {
+
+        Map<String, ?> response = context
+            .http(http -> http.get(path))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        context.log(log -> log.debug("Response for path='%s': %s".formatted(path, response)));
+
+        List<Option<T>> options = new ArrayList<>();
+
+        if (response.get("data") instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    options.add(optionMapper.apply(map, path));
                 }
             }
+        }
 
-            return options;
-        };
+        return options;
     }
 
     public static Integer subscribeWebhook(
