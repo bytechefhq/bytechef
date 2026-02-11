@@ -45,7 +45,8 @@ public class DevtoGetArticleAction {
 
             ))
         .properties(integer("articleId").label("Article ID")
-            .description("The unique identifier of the article.")
+            .description(
+                "The unique identifier of the article. Only your articles are listed in the options. See documentation for instructions on how to find ID of any article.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<Long>) DevtoUtils::getArticleIdOptions)
             .metadata(

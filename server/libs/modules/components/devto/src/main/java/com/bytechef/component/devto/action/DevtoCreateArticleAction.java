@@ -46,10 +46,10 @@ public class DevtoCreateArticleAction {
             ))
         .properties(object("article").properties(string("title").label("Title")
             .description("The title of the article.")
-            .required(false),
+            .required(true),
             string("body_markdown").label("Body Markdown")
                 .description("The body of the article in markdown format.")
-                .required(false),
+                .required(true),
             bool("published").label("Published")
                 .description("Whether the article should be published immediately.")
                 .defaultValue(false)

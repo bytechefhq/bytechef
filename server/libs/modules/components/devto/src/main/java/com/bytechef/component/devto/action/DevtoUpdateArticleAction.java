@@ -48,7 +48,7 @@ public class DevtoUpdateArticleAction {
 
             ))
         .properties(integer("articleId").label("Article ID")
-            .description("The unique identifier of the article.")
+            .description("The unique identifier of the article. You can update only your own articles.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<Long>) DevtoUtils::getArticleIdOptions)
             .metadata(
@@ -56,10 +56,10 @@ public class DevtoUpdateArticleAction {
                     "type", PropertyType.PATH)),
             object("article").properties(string("title").label("Title")
                 .description("The title of the article.")
-                .required(false),
+                .required(true),
                 string("body_markdown").label("Body Markdown")
                     .description("The body of the article in markdown format.")
-                    .required(false),
+                    .required(true),
                 bool("published").label("Published")
                     .description("Whether the article should be published immediately.")
                     .required(false),
@@ -70,7 +70,7 @@ public class DevtoUpdateArticleAction {
                     Map.of(
                         "type", PropertyType.BODY))
                 .label("Article")
-                .required(true))
+                .required(false))
         .output(outputSchema(object().properties(DevtoArticleResponseProperties.PROPERTIES)
             .metadata(
                 Map.of(
