@@ -106,7 +106,9 @@ public class GithubUtils {
 
         for (Object item : body) {
             if (item instanceof Map<?, ?> map) {
-                options.add(option((String) map.get(NAME), String.valueOf(map.get(value))));
+                String optionValue = String.valueOf(map.get(value));
+
+                options.add(option(map.get(NAME) == null ? optionValue : (String) map.get(NAME), optionValue));
             }
         }
 
