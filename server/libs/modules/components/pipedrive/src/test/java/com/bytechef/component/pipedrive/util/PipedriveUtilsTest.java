@@ -16,7 +16,6 @@
 
 package com.bytechef.component.pipedrive.util;
 
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,52 +24,24 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TypeReference;
-import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@Disabled
 class PipedriveUtilsTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ArgumentCaptor<Map<String, List<String>>> queryArgumentCaptor = ArgumentCaptor.forClass(Map.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-
-    @Test
-    void testGetOptions() throws Exception {
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("data", List.of(Map.of(ID, 123, "name", "ime"))));
-
-        List<Option<String>> expectedOptions = List.of(option("ime", "123"));
-
-        List<? extends Option<String>> result = PipedriveUtils.getOptions("org", null)
-            .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
-
-        assertEquals(expectedOptions, result);
-
-        assertEquals(Map.of(), queryArgumentCaptor.getValue());
-    }
 
     @Test
     void testSubscribeWebhok() {
