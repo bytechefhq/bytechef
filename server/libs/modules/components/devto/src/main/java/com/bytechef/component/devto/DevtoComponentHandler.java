@@ -22,6 +22,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -37,11 +38,39 @@ import java.util.Optional;
 public class DevtoComponentHandler extends AbstractDevtoComponentHandler {
 
     @Override
+    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
+        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
+            String name = actionDefinition.getName();
+
+            switch (name) {
+                case "createArticle" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/devto_v1#create-article");
+                case "getArticle" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/devto_v1#get-article");
+                case "updateArticle" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/devto_v1#update-article");
+                default -> {
+                }
+            }
+        }
+
+        return super.modifyActions(actionDefinitions);
+    }
+
+    @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp("Dev.to API documentation", "https://developers.forem.com/api")
             .icon("path:assets/devto.svg")
-            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
+            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
+            .version(1);
     }
 
     @Override
