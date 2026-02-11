@@ -39,7 +39,6 @@ import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConsta
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.WAIT;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.WIDTH;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -127,11 +126,11 @@ public class OneSimpleAPIAddScreenshotAction {
         .perform(OneSimpleAPIAddScreenshotAction::perform);
 
     public static Object
-        perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Map<String, Object> body = getBody(inputParameters);
 
-        return actionContext.http(http -> http.post("/screenshot"))
+        return context.http(http -> http.post("/screenshot"))
             .body(Http.Body.of(body))
             .configuration(responseType(Context.Http.ResponseType.JSON))
             .execute()

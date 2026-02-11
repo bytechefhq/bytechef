@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -41,7 +41,7 @@ import org.mockito.ArgumentCaptor;
  */
 class OneSimpleAPICurrencyConverterActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
@@ -51,7 +51,7 @@ class OneSimpleAPICurrencyConverterActionTest {
 
     @Test
     void testPerform() {
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -63,7 +63,7 @@ class OneSimpleAPICurrencyConverterActionTest {
             .thenReturn(mockedObject);
 
         Object result =
-            OneSimpleAPICurrencyConverterAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            OneSimpleAPICurrencyConverterAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
 
