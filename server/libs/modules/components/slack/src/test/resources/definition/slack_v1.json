@@ -1776,6 +1776,23 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date and time when the message should be sent.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Post at",
+      "metadata": { },
+      "name": "post_at",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
       "controlType": "TEXT_AREA",
       "defaultValue": null,
       "description": "The text of your message.",
@@ -2498,6 +2515,23 @@
       "regex": null,
       "required": true,
       "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date and time when the message should be sent.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Post at",
+      "metadata": { },
+      "name": "post_at",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "DATE_TIME"
     }, {
       "advancedOption": null,
       "controlType": "TEXT_AREA",
@@ -4295,6 +4329,23 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date and time when the message should be sent.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Post at",
+      "metadata": { },
+      "name": "post_at",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
       "controlType": "TEXT_AREA",
       "defaultValue": null,
       "description": "The text of your message.",
@@ -5016,6 +5067,23 @@
       "regex": null,
       "required": true,
       "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date and time when the message should be sent.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Post at",
+      "metadata": { },
+      "name": "post_at",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "DATE_TIME"
     }, {
       "advancedOption": null,
       "controlType": "TEXT_AREA",
