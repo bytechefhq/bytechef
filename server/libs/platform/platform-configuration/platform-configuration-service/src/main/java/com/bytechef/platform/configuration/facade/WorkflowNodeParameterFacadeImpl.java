@@ -225,6 +225,21 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
+    public Set<String> getClusterElementMissingRequiredProperties(
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName) {
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
+
+        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
+            workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, definitionMap);
+
+        return workflowNodeStructure.missingRequiredProperties;
+    }
+
+    @Override
     public DisplayConditionResultDTO getWorkflowNodeDisplayConditions(
         String workflowId, String workflowNodeName, long environmentId) {
 
@@ -252,6 +267,18 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         return new DisplayConditionResultDTO(
             displayConditionMap, new ArrayList<>(workflowNodeStructure.missingRequiredProperties));
+    }
+
+    @Override
+    public Set<String> getWorkflowNodeMissingRequiredProperties(String workflowId, String workflowNodeName) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
+
+        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
+            workflowNodeName, null, null, definitionMap);
+
+        return workflowNodeStructure.missingRequiredProperties;
     }
 
     @Override

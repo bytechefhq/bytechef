@@ -1,0 +1,13 @@
+extend type Query {
+    clusterElementMissingRequiredProperties(
+        workflowId: String!
+        workflowNodeName: String!
+        clusterElementTypeName: String!
+        clusterElementWorkflowNodeName: String!
+    ): [String!]!
+
+    workflowNodeMissingRequiredProperties(
+        workflowId: String!
+        workflowNodeName: String!
+    ): [String!]!
+}
