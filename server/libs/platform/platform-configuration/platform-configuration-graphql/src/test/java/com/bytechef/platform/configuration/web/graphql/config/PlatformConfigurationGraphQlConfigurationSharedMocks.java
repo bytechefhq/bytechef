@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.web.graphql.config;
 
+import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeScriptFacade;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,6 +30,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
+    WorkflowNodeParameterFacade.class,
     WorkflowNodeScriptFacade.class
 })
 public @interface PlatformConfigurationGraphQlConfigurationSharedMocks {
