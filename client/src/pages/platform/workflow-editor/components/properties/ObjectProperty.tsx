@@ -66,7 +66,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                             subProperty.custom && name && subProperty.name && currentComponent ? (
                                 <DeletePropertyButton
                                     onClick={() => handleDeleteClick(subProperty)}
-                                    propertyName={subProperty.name}
+                                    propertyName={subProperty.label ?? subProperty.name}
                                 />
                             ) : undefined
                         }
