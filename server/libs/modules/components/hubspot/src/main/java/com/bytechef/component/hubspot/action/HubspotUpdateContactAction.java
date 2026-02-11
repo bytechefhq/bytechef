@@ -42,7 +42,7 @@ public class HubspotUpdateContactAction {
         .metadata(
             Map.of(
                 "method", "PATCH",
-                "path", "/crm/v3/objects/contacts", "bodyContentType", BodyContentType.JSON, "mimeType",
+                "path", "/crm/v3/objects/contacts/{contactId}", "bodyContentType", BodyContentType.JSON, "mimeType",
                 "application/json"
 
             ))

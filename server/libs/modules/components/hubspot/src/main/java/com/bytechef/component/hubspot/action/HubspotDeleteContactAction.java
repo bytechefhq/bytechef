@@ -37,7 +37,7 @@ public class HubspotDeleteContactAction {
         .metadata(
             Map.of(
                 "method", "DELETE",
-                "path", "/crm/v3/objects/contacts"
+                "path", "/crm/v3/objects/contacts/{contactId}"
 
             ))
         .properties(string("contactId").label("Contact ID")
