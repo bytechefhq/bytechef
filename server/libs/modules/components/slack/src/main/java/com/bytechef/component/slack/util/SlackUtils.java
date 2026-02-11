@@ -22,6 +22,7 @@ import static com.bytechef.component.slack.constant.SlackConstants.ERROR;
 import static com.bytechef.component.slack.constant.SlackConstants.ID;
 import static com.bytechef.component.slack.constant.SlackConstants.NAME;
 import static com.bytechef.component.slack.constant.SlackConstants.OK;
+import static com.bytechef.component.slack.constant.SlackConstants.POST_AT;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 
 import com.bytechef.component.definition.ActionContext;
@@ -30,6 +31,9 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,6 +77,33 @@ public class SlackUtils {
                 Http.Body.of(
                     CHANNEL, channel,
                     TEXT, text,
+                    "blocks", blocks))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if ((boolean) body.get(OK)) {
+            return body;
+        } else {
+            throw new ProviderException((String) body.get(ERROR));
+        }
+    }
+
+    public static Object scheduleMessage(
+        String channel, String text, LocalDateTime schedule, List<Map<String, Object>> blocks,
+        ActionContext actionContext) {
+
+        String timeZone = getSlackTimeZone(actionContext);
+        ZonedDateTime zonedSchedule = schedule.atZone(ZoneId.of(timeZone));
+        long seconds = zonedSchedule.toEpochSecond();
+
+        Map<String, Object> body = actionContext
+            .http(http -> http.post("/chat.scheduleMessage"))
+            .body(
+                Http.Body.of(
+                    CHANNEL, channel,
+                    TEXT, text,
+                    POST_AT, seconds,
                     "blocks", blocks))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -131,4 +162,31 @@ public class SlackUtils {
 
         return options;
     }
+
+    private static String getSlackTimeZone(ActionContext actionContext) {
+
+        String userID = getUserId(actionContext);
+
+        Map<String, Object> body = actionContext.http(http -> http.get("/users.info"))
+            .queryParameters("user", userID)
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        Map<String, Object> user = (Map<String, Object>) body.get("user");
+        return (String) user.get("tz");
+
+    }
+
+    private static String getUserId(ActionContext actionContext) {
+
+        Map<String, Object> body = actionContext.http(http -> http
+            .get("/auth.test"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<Map<String, Object>>() {});
+
+        return (String) body.get("user_id");
+    }
+
 }

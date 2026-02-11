@@ -18,18 +18,22 @@ package com.bytechef.component.slack.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MESSAGE_RESPONSE_PROPERTY;
+import static com.bytechef.component.slack.constant.SlackConstants.POST_AT;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT_PROPERTY;
+import static com.bytechef.component.slack.util.SlackUtils.scheduleMessage;
 import static com.bytechef.component.slack.util.SlackUtils.sendMessage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.slack.util.SlackUtils;
+import java.time.LocalDateTime;
 
 /**
  * @author Mario Cvjetojevic
@@ -48,6 +52,10 @@ public class SlackSendDirectMessageAction {
                 .description("ID of the user to send the direct message to.")
                 .options((OptionsFunction<String>) SlackUtils::getUserIdOptions)
                 .required(true),
+            dateTime(POST_AT)
+                .label("Post at")
+                .description("Date and time when the message should be sent.")
+                .required(false),
             TEXT_PROPERTY)
         .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))
         .perform(SlackSendDirectMessageAction::perform);
@@ -58,8 +66,15 @@ public class SlackSendDirectMessageAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
+        LocalDateTime schedule = inputParameters.getLocalDateTime(POST_AT);
+
+        if (schedule != null) {
+            return scheduleMessage(inputParameters.getRequiredString(CHANNEL),
+                inputParameters.getRequiredString(TEXT),
+                schedule, null, actionContext);
+        }
+
         return sendMessage(
             inputParameters.getRequiredString(CHANNEL), inputParameters.getRequiredString(TEXT), null, actionContext);
     }
-
 }
