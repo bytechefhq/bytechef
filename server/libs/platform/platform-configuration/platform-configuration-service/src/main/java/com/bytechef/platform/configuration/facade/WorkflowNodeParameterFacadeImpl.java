@@ -1379,7 +1379,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 }
             } else {
                 if (i < parameterPathParts.length - 1) {
-                    if (map.containsKey(pathItem)) {
+                    if (map.containsKey(pathItem) && map.get(pathItem) != null) {
                         map = (Map<String, Object>) map.get(pathItem);
                     } else {
                         Map<String, Object> subParameterMap = new HashMap<>();

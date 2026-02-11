@@ -3261,6 +3261,88 @@ public class WorkflowNodeParameterFacadeTest {
         }
     }
 
+    @Test
+    void testUpdateWorkflowNodeParameterWithNullNestedObjectProperty() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "value.nestedproperty.childproperty";
+        Object value = new HashMap<>();
+        String type = "OBJECT";
+        boolean includeInMetadata = true;
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> nestedObjectValue = new HashMap<>();
+
+            nestedObjectValue.put("nestedproperty", null);
+
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("type", "OBJECT");
+            parameters.put("value", nestedObjectValue);
+
+            Map<String, Object> dynamicPropertyTypes = new HashMap<>();
+
+            dynamicPropertyTypes.put("value.nestedproperty", "OBJECT");
+
+            Map<String, Object> uiMetadata = new HashMap<>();
+
+            uiMetadata.put("dynamicPropertyTypes", dynamicPropertyTypes);
+
+            Map<String, Object> metadata = new HashMap<>();
+
+            metadata.put("ui", uiMetadata);
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", "task1");
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", metadata);
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(actionDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+
+            Map<String, Object> resultNestedProperty = (Map<String, Object>) nestedObjectValue.get("nestedproperty");
+
+            assertNotNull(resultNestedProperty);
+            assertEquals(value, resultNestedProperty.get("childproperty"));
+
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
