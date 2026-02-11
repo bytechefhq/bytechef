@@ -41,7 +41,8 @@ public class AsanaUtils extends AbstractAsanaUtils {
         String searchText, Context context) {
 
         Map<String, List<Map<String, String>>> body = context
-            .http(http -> http.get("/users?workspace=" + inputParameters.getRequiredString(WORKSPACE)))
+            .http(http -> http
+                .get("/users?workspace=" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -54,7 +55,8 @@ public class AsanaUtils extends AbstractAsanaUtils {
         String searchText, Context context) {
 
         Map<String, List<Map<String, String>>> body = context
-            .http(http -> http.get("/projects?workspace=" + inputParameters.getRequiredString(WORKSPACE)))
+            .http(http -> http
+                .get("/projects?workspace=" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -80,8 +82,7 @@ public class AsanaUtils extends AbstractAsanaUtils {
 
         Map<String, List<Map<String, String>>> body = context
             .http(http -> http.get(
-                "/workspaces/" + inputParameters.getRequiredFromPath(
-                    "__item.data." + WORKSPACE, String.class) + "/teams"))
+                "/workspaces/" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class) + "/teams"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
