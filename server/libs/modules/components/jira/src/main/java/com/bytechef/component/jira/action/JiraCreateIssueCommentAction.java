@@ -45,6 +45,7 @@ public class JiraCreateIssueCommentAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssueComment")
         .title("Create Issue Comment")
         .description("Adds a comment to an issue.")
+        .help("", "https://docs.bytechef.io/reference/components/jira_v1#create-issue-comment")
         .properties(
             string(PROJECT)
                 .label("Project ID")

@@ -38,6 +38,7 @@ public class JiraAssignIssueAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("assignIssue")
         .title("Assign Issue")
         .description("Assigns an existing issue to a specific user.")
+        .help("", "https://docs.bytechef.io/reference/components/jira_v1#assign-issue")
         .properties(
             string(PROJECT)
                 .label("Project ID")

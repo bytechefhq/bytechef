@@ -50,6 +50,7 @@ public class JiraEditIssueAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("editIssue")
         .title("Edit Issue")
         .description("Edits an issue.")
+        .help("", "https://docs.bytechef.io/reference/components/jira_v1#edit-issue")
         .properties(
             string(PROJECT)
                 .label("Project ID")

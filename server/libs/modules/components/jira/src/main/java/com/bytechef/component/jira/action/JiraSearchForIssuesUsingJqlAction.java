@@ -44,6 +44,7 @@ public class JiraSearchForIssuesUsingJqlAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchForIssuesUsingJql")
         .title("Search Issues")
         .description("Search for issues using JQL.")
+        .help("", "https://docs.bytechef.io/reference/components/jira_v1#search-issues")
         .properties(
             string(JQL)
                 .label("JQL")
