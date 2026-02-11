@@ -8,7 +8,7 @@
     "description": "Converts pdf to image.",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper#convert-to-image"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper_v1#convert-to-image"
     },
     "metadata": null,
     "name": "convertToImage",
@@ -414,7 +414,7 @@
     "description": "Extracts text from a PDF file.",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper#extract-text"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper_v1#extract-text"
     },
     "metadata": null,
     "name": "extractText",
@@ -592,7 +592,7 @@
     "description": "Converts image to PDF.",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper#image-to-pdf"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper_v1#image-to-pdf"
     },
     "metadata": null,
     "name": "imageToPdf",
@@ -977,7 +977,7 @@
     "description": "Converts text to PDF.",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper#text-to-pdf"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pdf-helper_v1#text-to-pdf"
     },
     "metadata": null,
     "name": "textToPdf",
