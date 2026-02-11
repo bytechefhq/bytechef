@@ -34,6 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -59,6 +60,9 @@ public class SpaWebFilterIntTest {
 
     @MockitoBean
     private AuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @MockitoBean
+    private PasswordEncoder passwordEncoder;
 
     @MockitoBean
     private RememberMeServices rememberMeServices;

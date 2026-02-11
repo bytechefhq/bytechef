@@ -2676,6 +2676,9 @@ public class ApplicationProperties {
         /** Remember-me authentication configuration */
         private RememberMe rememberMe = new RememberMe();
 
+        /** Social login (OAuth2) configuration */
+        private SocialLogin socialLogin = new SocialLogin();
+
         /** System user credentials configuration */
         private System system = new System();
 
@@ -2693,6 +2696,14 @@ public class ApplicationProperties {
 
         public void setRememberMe(RememberMe rememberMe) {
             this.rememberMe = rememberMe;
+        }
+
+        public SocialLogin getSocialLogin() {
+            return socialLogin;
+        }
+
+        public void setSocialLogin(SocialLogin socialLogin) {
+            this.socialLogin = socialLogin;
         }
 
         public System getSystem() {
@@ -2745,6 +2756,90 @@ public class ApplicationProperties {
 
             public void setPassword(String password) {
                 this.password = password;
+            }
+        }
+
+        /**
+         * Social login (OAuth2) configuration for Google and GitHub providers.
+         */
+        public static class SocialLogin {
+
+            /** Whether social login is enabled */
+            private boolean enabled;
+
+            /** Google OAuth2 configuration */
+            private Provider google = new Provider();
+
+            /** GitHub OAuth2 configuration */
+            private Provider github = new Provider();
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public Provider getGoogle() {
+                return google;
+            }
+
+            public Provider getGithub() {
+                return github;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public void setGoogle(Provider google) {
+                this.google = google;
+            }
+
+            public void setGithub(Provider github) {
+                this.github = github;
+            }
+
+            /**
+             * OAuth2 provider credentials.
+             */
+            public static class Provider {
+
+                /** OAuth2 client ID */
+                private String clientId;
+
+                /** OAuth2 client secret */
+                private String clientSecret;
+
+                public String getClientId() {
+                    return clientId;
+                }
+
+                public String getClientSecret() {
+                    return clientSecret;
+                }
+
+                public void setClientId(String clientId) {
+                    this.clientId = clientId;
+                }
+
+                public void setClientSecret(String clientSecret) {
+                    this.clientSecret = clientSecret;
+                }
+            }
+        }
+
+        /**
+         * Two-factor authentication configuration.
+         */
+        public static class TwoFactorAuthentication {
+
+            /** Whether two-factor authentication is enabled */
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
             }
         }
     }

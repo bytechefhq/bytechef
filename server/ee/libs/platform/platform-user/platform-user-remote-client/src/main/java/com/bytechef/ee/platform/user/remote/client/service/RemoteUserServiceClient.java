@@ -69,6 +69,11 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
+    public Optional<User> fetchUserByAuthProviderAndProviderId(String authProvider, String providerId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<User> fetchUserByEmail(String email) {
         throw new UnsupportedOperationException();
     }
@@ -90,6 +95,13 @@ public class RemoteUserServiceClient implements UserService {
 
     @Override
     public User getUser(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public User findOrCreateSocialUser(
+        String email, String firstName, String lastName, String imageUrl, String authProvider, String providerId) {
+
         throw new UnsupportedOperationException();
     }
 

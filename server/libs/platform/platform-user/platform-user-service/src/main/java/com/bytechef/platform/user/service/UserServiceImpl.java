@@ -233,6 +233,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<User> fetchUserByAuthProviderAndProviderId(String authProvider, String providerId) {
+        return userRepository.findByAuthProviderAndProviderId(authProvider, providerId);
+    }
+
+    @Override
     public Optional<User> fetchUserByEmail(String email) {
         return userRepository.findByEmailIgnoreCase(email);
     }
@@ -240,6 +245,79 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> fetchUserByLogin(String login) {
         return userRepository.findByLogin(login);
+    }
+
+    @Override
+    @Transactional
+    public User findOrCreateSocialUser(
+        String email, String firstName, String lastName, String imageUrl, String authProvider, String providerId) {
+
+        Optional<User> existingUser = userRepository.findByAuthProviderAndProviderId(authProvider, providerId);
+
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setImageUrl(imageUrl);
+
+            user = userRepository.save(user);
+
+            clearUserCaches(user);
+
+            return user;
+        }
+
+        Optional<User> existingEmailUser = userRepository.findByEmailIgnoreCase(email);
+
+        if (existingEmailUser.isPresent()) {
+            User user = existingEmailUser.get();
+
+            user.setAuthProvider(authProvider);
+            user.setProviderId(providerId);
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setImageUrl(imageUrl);
+
+            if (!user.isActivated()) {
+                user.setActivated(true);
+                user.setActivationKey(null);
+            }
+
+            user = userRepository.save(user);
+
+            clearUserCaches(user);
+
+            return user;
+        }
+
+        User newUser = new User();
+
+        newUser.setLogin(email.toLowerCase());
+        newUser.setEmail(email.toLowerCase());
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
+        newUser.setImageUrl(imageUrl);
+        newUser.setAuthProvider(authProvider);
+        newUser.setProviderId(providerId);
+        newUser.setActivated(true);
+        newUser.setLangKey(UserConstants.DEFAULT_LANGUAGE);
+        newUser.setPassword(passwordEncoder.encode(RandomUtils.generatePassword()));
+
+        Set<Authority> authorities = new HashSet<>();
+
+        authorityRepository.findByName(AuthorityConstants.ADMIN)
+            .ifPresent(authorities::add);
+
+        newUser.setAuthorities(authorities);
+
+        userRepository.save(newUser);
+
+        clearUserCaches(newUser);
+
+        logger.debug("Created social login user: {}", newUser);
+
+        return newUser;
     }
 
     @Override

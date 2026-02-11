@@ -44,6 +44,8 @@ public interface UserRepository extends ListCrudRepository<User, Long>, ListPagi
 
     Optional<User> findByActivationKey(String activationKey);
 
+    Optional<User> findByAuthProviderAndProviderId(String authProvider, String providerId);
+
     @Cacheable(cacheNames = USERS_BY_EMAIL_CACHE)
     Optional<User> findByEmailIgnoreCase(String email);
 

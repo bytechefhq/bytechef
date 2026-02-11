@@ -30,6 +30,8 @@ info:
   signUp:
     activationRequired: ${bytechef.sign-up.activation-required}
     enabled: ${bytechef.sign-up.enabled}
+  socialLogin:
+    enabled: ${bytechef.security.social-login.enabled}
 
 logging:
   level:
