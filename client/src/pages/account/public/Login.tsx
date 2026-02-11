@@ -12,7 +12,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {EyeIcon, EyeOffIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {Link, Navigate, useLocation, useNavigate} from 'react-router-dom';
+import {Link, Navigate, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -45,6 +45,8 @@ const Login = () => {
 
     const navigate = useNavigate();
 
+    const [searchParams] = useSearchParams();
+
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             email: '',
@@ -68,6 +70,17 @@ const Login = () => {
     };
 
     const {from} = pageLocation.state || {from: {pathname: '/', search: pageLocation.search}};
+
+    useEffect(() => {
+        if (searchParams.get('error') === 'oauth2') {
+            navigate('/account-error', {
+                state: {
+                    error: 'Failed to sign in with social provider. Please try again or use email/password.',
+                    fromInternalFlow: true,
+                },
+            });
+        }
+    }, [navigate, searchParams]);
 
     useEffect(() => {
         if (loginError && !authenticated) {
@@ -102,6 +115,9 @@ const Login = () => {
                                 <Button
                                     icon={<img alt="Google logo" src={googleLogo} />}
                                     label="Continue with Google"
+                                    onClick={() => {
+                                        window.location.href = '/oauth2/authorization/google';
+                                    }}
                                     size="lg"
                                     variant="outline"
                                 />
@@ -109,6 +125,9 @@ const Login = () => {
                                 <Button
                                     icon={<img alt="Github logo" src={githubLogo} />}
                                     label="Continue with Github"
+                                    onClick={() => {
+                                        window.location.href = '/oauth2/authorization/github';
+                                    }}
                                     size="lg"
                                     variant="outline"
                                 />
