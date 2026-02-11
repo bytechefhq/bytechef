@@ -19,6 +19,7 @@ package com.bytechef.ai.mcp.server.config;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
+import com.bytechef.ai.mcp.tool.platform.SearchTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -57,14 +58,16 @@ public class ManagementMcpServerConfiguration {
     private final ProjectToolsImpl projectTools;
     private final ProjectWorkflowToolsImpl projectWorkflowTools;
     private final TaskTools taskTools;
+    private final SearchTools searchTools;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
-        ProjectToolsImpl projectTools, ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools) {
+        ProjectToolsImpl projectTools, ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools, SearchTools searchTools) {
 
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
         this.taskTools = taskTools;
+        this.searchTools = searchTools;
     }
 
     @Bean
@@ -100,7 +103,7 @@ public class ManagementMcpServerConfiguration {
      */
     @Bean
     ToolCallbackProvider toolCallbackProvider() {
-        return ToolCallbackProvider.from(ToolCallbacks.from(projectTools, projectWorkflowTools, taskTools));
+        return ToolCallbackProvider.from(ToolCallbacks.from(projectTools, projectWorkflowTools, taskTools, searchTools));
     }
 
     @Bean

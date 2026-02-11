@@ -1,7 +1,7 @@
 dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
-    implementation("io.modelcontextprotocol.sdk:mcp-spring-webmvc:0.14.0")
+    implementation("io.modelcontextprotocol.sdk:mcp-spring-webmvc:0.17.0")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.ai:spring-ai-mcp")
