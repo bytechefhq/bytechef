@@ -30,7 +30,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
 import static com.bytechef.component.jira.util.JiraUtils.getProjectName;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
@@ -50,7 +49,7 @@ public class JiraOptionsUtils {
 
     public static List<Option<String>> getIssueIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -98,7 +97,7 @@ public class JiraOptionsUtils {
 
     public static List<Option<String>> getPriorityIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         List<Object> body = context
             .http(http -> http.get("/priority"))
@@ -148,7 +147,7 @@ public class JiraOptionsUtils {
 
     public static List<Option<String>> getStatusIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -171,7 +170,7 @@ public class JiraOptionsUtils {
 
     public static List<Option<String>> getUserIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         List<Option<String>> options = new ArrayList<>();
 

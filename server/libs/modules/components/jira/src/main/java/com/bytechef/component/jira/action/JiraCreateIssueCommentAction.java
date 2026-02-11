@@ -18,11 +18,10 @@ package com.bytechef.component.jira.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.jira.constant.JiraConstants.COMMENT;
+import static com.bytechef.component.jira.constant.JiraConstants.COMMENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
@@ -62,32 +61,7 @@ public class JiraCreateIssueCommentAction {
                 .label("Comment")
                 .description("The text of the comment.")
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string("self"),
-                        string("id"),
-                        object("author")
-                            .properties(
-                                string("accountId"),
-                                bool("active"),
-                                string("displayName"),
-                                string("self")),
-                        string("body"),
-                        object("updateAuthor")
-                            .properties(
-                                string("accountId"),
-                                bool("active"),
-                                string("displayName"),
-                                string("self")),
-                        string("created"),
-                        string("updated"),
-                        object("visibility")
-                            .properties(
-                                string("identifier"),
-                                string("type"),
-                                string("value")))))
+        .output(outputSchema(COMMENT_OUTPUT_PROPERTY))
         .perform(JiraCreateIssueCommentAction::perform);
 
     private JiraCreateIssueCommentAction() {
