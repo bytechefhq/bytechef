@@ -50,7 +50,7 @@ class HubspotUtilsTest {
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of("__item", Map.of("properties", Map.of("pipeline", "123"))));
+        MockParametersFactory.create(Map.of("properties", Map.of("pipeline", "123")));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
