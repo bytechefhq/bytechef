@@ -64,7 +64,7 @@ public class PdfHelperConvertToImageAction {
                     .items(
                         fileEntry()
                             .description("Image of a page in the PDF file."))))
-        .help("", "https://docs.bytechef.io/reference/components/pdf-helper#convert-to-image")
+        .help("", "https://docs.bytechef.io/reference/components/pdf-helper_v1#convert-to-image")
         .perform(PdfHelperConvertToImageAction::perform);
 
     private PdfHelperConvertToImageAction() {
