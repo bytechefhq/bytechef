@@ -1,12 +1,8 @@
 import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {
-    ComponentDefinitionWithActionsProps,
-    useGetComponentDefinitionsWithActionsQuery,
-} from '@/shared/queries/platform/componentDefinitionsGraphQL.queries';
-import {useEffect, useMemo, useState} from 'react';
-import {useDebounce} from 'use-debounce';
+import {useMemo} from 'react';
 
+import {useFilteredComponentDefinitions} from '../hooks/useFilteredComponentDefinitions';
 import WorkflowNodesTabs from './workflow-nodes-tabs/WorkflowNodesTabs';
 
 const WorkflowNodesSidebar = ({
@@ -17,58 +13,35 @@ const WorkflowNodesSidebar = ({
         taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     };
 }) => {
-    const [filter, setFilter] = useState('');
+    const {componentsWithActions, filter, setFilter, trimmedFilter} = useFilteredComponentDefinitions(
+        data.componentDefinitions
+    );
 
-    const [debouncedFilter] = useDebounce(filter, 300);
-
-    const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
-        Array<ComponentDefinitionBasic | ComponentDefinitionWithActionsProps>
-    >([]);
-
-    const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
-        Array<TaskDispatcherDefinition>
-    >([]);
-
-    const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
-        Array<ComponentDefinitionBasic | ComponentDefinitionWithActionsProps>
-    >([]);
-
-    const {componentDefinitions, taskDispatcherDefinitions} = data;
-
-    const trimmedFilter = debouncedFilter.trim();
-
-    const {data: searchedComponentDefinitions, isLoading: isSearchLoading} =
-        useGetComponentDefinitionsWithActionsQuery(trimmedFilter);
-
-    const componentsWithActions = useMemo(() => {
-        if (trimmedFilter && searchedComponentDefinitions && !isSearchLoading) {
-            return searchedComponentDefinitions;
-        }
-
-        return componentDefinitions;
-    }, [trimmedFilter, searchedComponentDefinitions, isSearchLoading, componentDefinitions]);
-
-    useEffect(() => {
-        setFilteredActionComponentDefinitions(
+    const filteredActionComponentDefinitions = useMemo(
+        () =>
             componentsWithActions.filter(
                 (componentDefinition) => componentDefinition?.actionsCount && componentDefinition.actionsCount > 0
-            )
-        );
+            ),
+        [componentsWithActions]
+    );
 
-        setFilteredTaskDispatcherDefinitions(
-            taskDispatcherDefinitions.filter(
+    const filteredTaskDispatcherDefinitions = useMemo(
+        () =>
+            data.taskDispatcherDefinitions.filter(
                 (taskDispatcherDefinition) =>
                     taskDispatcherDefinition.name?.toLowerCase().includes(trimmedFilter.toLowerCase()) ||
                     taskDispatcherDefinition?.title?.toLowerCase().includes(trimmedFilter.toLowerCase())
-            )
-        );
+            ),
+        [data.taskDispatcherDefinitions, trimmedFilter]
+    );
 
-        setFilteredTriggerComponentDefinitions(
+    const filteredTriggerComponentDefinitions = useMemo(
+        () =>
             componentsWithActions.filter(
                 (componentDefinition) => componentDefinition?.triggersCount && componentDefinition.triggersCount > 0
-            )
-        );
-    }, [componentsWithActions, trimmedFilter, taskDispatcherDefinitions]);
+            ),
+        [componentsWithActions]
+    );
 
     return (
         <aside className="absolute inset-y-2 right-14 flex w-96 flex-col overflow-hidden rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary pb-4">
