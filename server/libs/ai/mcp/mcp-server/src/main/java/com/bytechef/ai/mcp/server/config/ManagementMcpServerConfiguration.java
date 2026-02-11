@@ -19,7 +19,7 @@ package com.bytechef.ai.mcp.server.config;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
-import com.bytechef.ai.mcp.tool.platform.SearchTools;
+import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -27,16 +27,22 @@ import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.transport.WebMvcStreamableServerTransportProvider;
 import io.modelcontextprotocol.spec.McpSchema;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.ai.mcp.McpToolUtils;
+import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.servlet.function.RouterFunction;
@@ -58,16 +64,19 @@ public class ManagementMcpServerConfiguration {
     private final ProjectToolsImpl projectTools;
     private final ProjectWorkflowToolsImpl projectWorkflowTools;
     private final TaskTools taskTools;
-    private final SearchTools searchTools;
+    private final ComponentTools componentTools;
+    private final List<McpSyncClient> mcpSyncClientList;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
-        ProjectToolsImpl projectTools, ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools, SearchTools searchTools) {
+        ProjectToolsImpl projectTools, ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools,
+        ComponentTools componentTools, List<McpSyncClient> mcpSyncClientList) {
 
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
         this.taskTools = taskTools;
-        this.searchTools = searchTools;
+        this.componentTools = componentTools;
+        this.mcpSyncClientList = mcpSyncClientList;
     }
 
     @Bean
@@ -102,8 +111,12 @@ public class ManagementMcpServerConfiguration {
      * server by Spring AI's auto-configuration. The MCP server is exposed via Streamable HTTP at /api/mcp endpoint.
      */
     @Bean
+    @Primary
     ToolCallbackProvider toolCallbackProvider() {
-        return ToolCallbackProvider.from(ToolCallbacks.from(projectTools, projectWorkflowTools, taskTools, searchTools));
+        List<ToolCallback> callbacks =
+            new ArrayList<>(List.of(ToolCallbacks.from(projectTools, projectWorkflowTools, componentTools, taskTools)));
+        callbacks.addAll(SyncMcpToolCallbackProvider.syncToolCallbacks(mcpSyncClientList));
+        return ToolCallbackProvider.from(callbacks.toArray(new ToolCallback[0]));
     }
 
     @Bean
