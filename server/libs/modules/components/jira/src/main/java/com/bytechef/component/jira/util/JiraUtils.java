@@ -25,7 +25,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
 import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -58,7 +58,7 @@ public class JiraUtils {
     }
 
     public static String getProjectName(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Map<String, Object> body = context
             .http(http -> http.get("/project/" + inputParameters.getRequiredString(PROJECT)))

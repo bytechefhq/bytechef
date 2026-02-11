@@ -53,7 +53,7 @@ public class JiraNewIssueTrigger {
         .properties(
             string(PROJECT)
                 .label("Project ID")
-                .description("Id of the project where new issue is created.")
+                .description("ID of the project where new issue is created.")
                 .options((OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(ISSUETYPE)

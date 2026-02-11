@@ -65,7 +65,7 @@ public class JiraCreateIssueAction {
                 .required(true),
             string(ISSUETYPE)
                 .label("Issue Type ID")
-                .description("Id of the issue type.")
+                .description("ID of the issue type.")
                 .options((OptionsFunction<String>) JiraOptionsUtils::getIssueTypesIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
