@@ -51,6 +51,7 @@ public class JiraComponentHandler implements ComponentHandler {
                 "agile project management.")
         .icon("path:assets/jira.svg")
         .customAction(true)
+        .customActionHelp("", "https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/")
         .categories(ComponentCategory.PROJECT_MANAGEMENT)
         .connection(JiraConnection.CONNECTION_DEFINITION)
         .actions(
@@ -74,7 +75,8 @@ public class JiraComponentHandler implements ComponentHandler {
         .triggers(
             JiraNewIssueTrigger.TRIGGER_DEFINITION,
             JiraUpdatedIssueTrigger.TRIGGER_DEFINITION)
-        .unifiedApi(JiraUnifiedApi.UNIFIED_API_DEFINITION);
+        .unifiedApi(JiraUnifiedApi.UNIFIED_API_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

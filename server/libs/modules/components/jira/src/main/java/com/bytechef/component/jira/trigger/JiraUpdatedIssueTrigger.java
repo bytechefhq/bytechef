@@ -48,6 +48,7 @@ public class JiraUpdatedIssueTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("updatedIssue")
         .title("Updated Issue")
         .description("Triggers when an issue is updated.")
+        .help("", "https://docs.bytechef.io/reference/components/jira_v1#updated-issue")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(PROJECT)

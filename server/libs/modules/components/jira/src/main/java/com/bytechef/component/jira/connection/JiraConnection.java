@@ -52,7 +52,9 @@ public class JiraConnection {
                 .refreshUrl((parameters, context) -> "https://auth.atlassian.com/oauth/token")
                 .scopes((connection, context) -> List.of(
                     "manage:jira-webhook", "read:jira-work", "write:jira-work", "read:jira-user", "offline_access")))
-        .baseUri((connectionParameters, context) -> getBaseUrl(context));
+        .baseUri((connectionParameters, context) -> getBaseUrl(context))
+        .help("", "https://docs.bytechef.io/reference/components/jira_v1#connection-setup")
+        .version(1);
 
     private JiraConnection() {
     }

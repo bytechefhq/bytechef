@@ -40,6 +40,7 @@ public class JiraTransitionIssueAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("transitionIssue")
         .title("Transition Issue")
         .description("Move an issue to another status.")
+        .help("", "https://docs.bytechef.io/reference/components/jira_v1#transition-issue")
         .properties(
             string(PROJECT)
                 .label("Project ID")

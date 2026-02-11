@@ -52,6 +52,7 @@ public class JiraCreateIssueAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssue")
         .title("Create Issue")
         .description("Creates a new issue.")
+        .help("", "https://docs.bytechef.io/reference/components/jira_v1#create-issue")
         .properties(
             string(PROJECT)
                 .label("Project ID")

@@ -45,6 +45,7 @@ public class JiraListIssueCommentsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listIssueComments")
         .title("List Issue Comments")
         .description("Return all comments for an issue.")
+        .help("", "https://docs.bytechef.io/reference/components/jira_v1#list-issue-comments")
         .properties(
             string(PROJECT)
                 .label("Project ID")
