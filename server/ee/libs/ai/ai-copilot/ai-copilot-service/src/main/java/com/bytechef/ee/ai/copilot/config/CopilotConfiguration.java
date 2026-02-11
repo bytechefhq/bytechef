@@ -11,6 +11,7 @@ import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
+import com.bytechef.ai.mcp.tool.platform.BraveSearchTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -208,8 +209,8 @@ public class CopilotConfiguration {
     WorkflowEditorSpringAIAgent workflowEditorSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectTools,
         ProjectWorkflowToolsImpl projectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
-        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
-        ToolCallbackProvider mcpToolCallbackProvider)
+        BraveSearchTools braveSearchTools, WorkflowService workflowService,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR.name();
@@ -220,11 +221,7 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(systemPromptResource))
             .state(new State())
-            .tools(List.of(projectTools, projectWorkflowTools, componentTools, taskTools))
-            .toolCallbacks(
-                Arrays.stream(mcpToolCallbackProvider.getToolCallbacks())
-                    .filter(callback -> !(callback instanceof MethodToolCallback))
-                    .toList())
+            .tools(List.of(projectTools, projectWorkflowTools, componentTools, taskTools, braveSearchTools))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .build();

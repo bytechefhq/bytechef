@@ -19,6 +19,7 @@ package com.bytechef.ai.mcp.server.config;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
+import com.bytechef.ai.mcp.tool.platform.BraveSearchTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.platform.configuration.service.PropertyService;
@@ -27,7 +28,6 @@ import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.transport.WebMvcStreamableServerTransportProvider;
@@ -35,9 +35,7 @@ import io.modelcontextprotocol.spec.McpSchema;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.ai.mcp.McpToolUtils;
-import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.support.ToolCallbacks;
-import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -65,18 +63,18 @@ public class ManagementMcpServerConfiguration {
     private final ProjectWorkflowToolsImpl projectWorkflowTools;
     private final TaskTools taskTools;
     private final ComponentTools componentTools;
-    private final List<McpSyncClient> mcpSyncClientList;
+    private final BraveSearchTools braveSearchTools;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
         ProjectToolsImpl projectTools, ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools,
-        ComponentTools componentTools, List<McpSyncClient> mcpSyncClientList) {
+        ComponentTools componentTools, BraveSearchTools braveSearchTools) {
 
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
         this.taskTools = taskTools;
         this.componentTools = componentTools;
-        this.mcpSyncClientList = mcpSyncClientList;
+        this.braveSearchTools = braveSearchTools;
     }
 
     @Bean
@@ -113,10 +111,10 @@ public class ManagementMcpServerConfiguration {
     @Bean
     @Primary
     ToolCallbackProvider toolCallbackProvider() {
-        List<ToolCallback> callbacks =
-            new ArrayList<>(List.of(ToolCallbacks.from(projectTools, projectWorkflowTools, componentTools, taskTools)));
-        callbacks.addAll(SyncMcpToolCallbackProvider.syncToolCallbacks(mcpSyncClientList));
-        return ToolCallbackProvider.from(callbacks.toArray(new ToolCallback[0]));
+        return ToolCallbackProvider.from(
+            new ArrayList<>(
+                List.of(ToolCallbacks.from(projectTools, projectWorkflowTools, componentTools, taskTools,
+                    braveSearchTools))));
     }
 
     @Bean
