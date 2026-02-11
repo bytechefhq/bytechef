@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.slack.util.SlackUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -44,20 +45,27 @@ abstract class AbstractSlackActionTest {
     protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     protected ArgumentCaptor<ActionContext> actionContextArgumentCaptor = ArgumentCaptor.forClass(ActionContext.class);
     protected ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
-    protected MockedStatic<SlackUtils> shopifyUtilsMockedStatic;
+    protected ArgumentCaptor<LocalDateTime> localDateTimeArgumentCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
+    protected MockedStatic<SlackUtils> slackUtilsMockedStatic;
 
     @BeforeEach
     void beforeEach() {
-        shopifyUtilsMockedStatic = mockStatic(SlackUtils.class);
+        slackUtilsMockedStatic = mockStatic(SlackUtils.class);
 
-        shopifyUtilsMockedStatic.when(
+        slackUtilsMockedStatic.when(
             () -> SlackUtils.sendMessage(stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                listArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
+            .thenReturn(mockedObject);
+
+        slackUtilsMockedStatic.when(
+            () -> SlackUtils.scheduleMessage(stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                localDateTimeArgumentCaptor.capture(),
                 listArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
             .thenReturn(mockedObject);
     }
 
     @AfterEach
     void afterEach() {
-        shopifyUtilsMockedStatic.close();
+        slackUtilsMockedStatic.close();
     }
 }
