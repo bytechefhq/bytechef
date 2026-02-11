@@ -206,6 +206,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                 .controlType(Property.ControlType.FORMULA_MODE)
                 .placeholder("Write expression, e.g. =1 + 1 == 2")
                 .displayCondition("%s == true".formatted(RAW_EXPRESSION))
+                .defaultValue("=")
                 .required(true))
         .taskProperties(
             array(CASE_TRUE)

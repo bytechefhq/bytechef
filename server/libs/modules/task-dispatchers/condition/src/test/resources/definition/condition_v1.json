@@ -569,7 +569,7 @@
   }, {
     "advancedOption": null,
     "controlType": "FORMULA_MODE",
-    "defaultValue": null,
+    "defaultValue": "=",
     "description": "The raw expression.",
     "displayCondition": "rawExpression == true",
     "exampleValue": null,
