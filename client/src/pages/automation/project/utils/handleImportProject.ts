@@ -1,10 +1,11 @@
-import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
-import {QueryClient} from '@tanstack/react-query';
+import {ImportProjectRequest} from '@/shared/middleware/automation/configuration';
+import {UseMutationResult} from '@tanstack/react-query';
+import {ChangeEvent} from 'react';
 
-const handleImportProject = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+const handleImportProject = (
+    event: ChangeEvent<HTMLInputElement>,
     currentWorkspaceId: number,
-    queryClient: QueryClient
+    importProjectMutation: UseMutationResult<number, Error, ImportProjectRequest, unknown>
 ) => {
     const file = event.target.files?.[0];
 
@@ -12,26 +13,10 @@ const handleImportProject = async (
         return;
     }
 
-    const formData = new FormData();
-
-    formData.append('file', file);
-
-    try {
-        const response = await fetch(`/api/automation/internal/workspaces/${currentWorkspaceId}/projects/import`, {
-            body: formData,
-            method: 'POST',
-        });
-
-        if (response.ok) {
-            queryClient.invalidateQueries({
-                queryKey: ProjectKeys.projects,
-            });
-        } else {
-            console.error('Failed to import project');
-        }
-    } catch (error) {
-        console.error('Error importing project:', error);
-    }
+    importProjectMutation.mutate({
+        file,
+        workspaceId: currentWorkspaceId,
+    });
 
     if (event.target) {
         event.target.value = '';
