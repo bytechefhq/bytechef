@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.one.simple.api.action.OneSimpleAPIAddScreenshotAction;
 import com.bytechef.component.one.simple.api.action.OneSimpleAPICurrencyConverterAction;
 import com.bytechef.component.one.simple.api.action.OneSimpleAPIUrlShortenerAction;
 import com.bytechef.component.one.simple.api.action.OneSimpleAPIWebPageInformationAction;
@@ -42,6 +43,7 @@ public class OneSimpleAPIComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.DEVELOPER_TOOLS)
         .connection(OneSimpleAPIConnection.CONNECTION_DEFINITION)
         .actions(
+            OneSimpleAPIAddScreenshotAction.ACTION_DEFINITION,
             OneSimpleAPICurrencyConverterAction.ACTION_DEFINITION,
             OneSimpleAPIUrlShortenerAction.ACTION_DEFINITION,
             OneSimpleAPIWebPageInformationAction.ACTION_DEFINITION)

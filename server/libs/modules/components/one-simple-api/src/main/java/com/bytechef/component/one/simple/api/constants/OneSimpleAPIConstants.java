@@ -27,13 +27,36 @@ import java.util.List;
  */
 public class OneSimpleAPIConstants {
 
+    public static final String CUSTOM_CSS = "custom_css";
+    public static final String CUSTOM_SIZE = "custom_size";
     public static final String DESCRIPTION = "description";
+    public static final String ELAPSED = "elapsed";
+    public static final String FORCE_REFRESH = "force";
     public static final String FROM_CURRENCY = "from_currency";
     public static final String FROM_VALUE = "from_value";
-    public static final String TOKEN = "token";
+    public static final String FULL_PAGE = "fullpage";
+    public static final String HTML = "html";
+    public static final String HEIGHT = "height";
+    public static final String SCREEN_SIZE = "screen";
+    public static final String SOURCE = "source";
     public static final String TITLE = "title";
     public static final String TO_CURRENCY = "to_currency";
+    public static final String TOKEN = "token";
+    public static final String TRANSPARENT_BACKGROUND = "background";
     public static final String URL = "url";
+    public static final String WAIT = "wait";
+    public static final String WIDTH = "width";
+
+    public static final List<Option<String>> SCREEN_SIZE_OPTIONS = List.of(
+        option("Default (1920x1080)", "default"),
+        option("Phone (375x667)", "phone"),
+        option("Phone Landscape (667x375)", "landscape-phone"),
+        option("Tablet (768x1024)", "tablet"),
+        option("Tablet Landscape (1024x768)", "landscape-tablet"),
+        option("Retina (2880x1800)", "retina"),
+        option("4K (3840x2160)", "4k"),
+        option("8K (7680x4320)", "8k"),
+        option("Custom Size", CUSTOM_SIZE));
 
     public static final List<Option<String>> CURRENCY_OPTIONS = List.of(
         option("UAE Dirham", "AED"),
