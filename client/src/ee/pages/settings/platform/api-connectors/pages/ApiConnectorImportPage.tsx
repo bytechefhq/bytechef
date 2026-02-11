@@ -8,14 +8,6 @@ const ApiConnectorImportPage = () => {
     const {canProceed, currentStep, handleCancel, handleNext, handleSave, isPending, previousStep} =
         useApiConnectorImportPage();
 
-    const renderStepContent = () => {
-        if (currentStep === 0) {
-            return <ApiConnectorWizardImportStep />;
-        }
-
-        return <ApiConnectorWizardReviewStep mode="import" />;
-    };
-
     return (
         <ApiConnectorWizardLayout
             canProceed={canProceed}
@@ -28,7 +20,7 @@ const ApiConnectorImportPage = () => {
             pageTitle="Import OpenAPI"
             steps={WIZARD_STEPS.import}
         >
-            {renderStepContent()}
+            {currentStep === 0 ? <ApiConnectorWizardImportStep /> : <ApiConnectorWizardReviewStep mode="import" />}
         </ApiConnectorWizardLayout>
     );
 };

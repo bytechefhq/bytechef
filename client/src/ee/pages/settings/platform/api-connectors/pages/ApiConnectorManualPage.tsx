@@ -9,18 +9,6 @@ const ApiConnectorManualPage = () => {
     const {canProceed, currentStep, handleCancel, handleNext, handleSave, isPending, previousStep} =
         useApiConnectorManualPage();
 
-    const renderStepContent = () => {
-        if (currentStep === 0) {
-            return <ApiConnectorWizardBasicStep />;
-        }
-
-        if (currentStep === 1) {
-            return <ApiConnectorWizardEndpointsStep />;
-        }
-
-        return <ApiConnectorWizardReviewStep mode="manual" />;
-    };
-
     return (
         <ApiConnectorWizardLayout
             canProceed={canProceed}
@@ -33,7 +21,11 @@ const ApiConnectorManualPage = () => {
             pageTitle="Create API Connector"
             steps={WIZARD_STEPS.manual}
         >
-            {renderStepContent()}
+            {currentStep === 0 && <ApiConnectorWizardBasicStep />}
+
+            {currentStep === 1 && <ApiConnectorWizardEndpointsStep />}
+
+            {currentStep >= 2 && <ApiConnectorWizardReviewStep mode="manual" />}
         </ApiConnectorWizardLayout>
     );
 };
