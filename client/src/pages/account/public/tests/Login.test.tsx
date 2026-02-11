@@ -4,6 +4,7 @@ import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
 
+import AccountErrorPage from '../AccountErrorPage';
 import Login from '../Login';
 import PasswordResetInit from '../PasswordResetInit';
 import Register from '../Register';
@@ -209,6 +210,25 @@ it('should disable submit button and show loading icon while log in credentials 
 
     expect(logInButton).toBeDisabled();
     expect(screen.getByLabelText('loading icon')).toBeInTheDocument();
+});
+
+it('should redirect to account-error page when ?error=oauth2 is present', async () => {
+    render(
+        <MemoryRouter initialEntries={['/login?error=oauth2']}>
+            <Routes>
+                <Route element={<Login />} path="/login" />
+
+                <Route element={<AccountErrorPage />} path="/account-error" />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    await waitFor(() => {
+        expect(screen.getByText('Error')).toBeInTheDocument();
+        expect(
+            screen.getByText('Failed to sign in with social provider. Please try again or use email/password.')
+        ).toBeInTheDocument();
+    });
 });
 
 it('should show socials login buttons with correct feature flag', async () => {

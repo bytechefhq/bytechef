@@ -2,7 +2,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 const OAuth2Redirect = () => {
@@ -18,19 +18,23 @@ const OAuth2Redirect = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        getAccount().then((account) => {
-            if (account) {
-                analytics.identify(account);
+        getAccount()
+            .then((account) => {
+                if (account) {
+                    analytics.identify(account);
 
-                navigate('/', {replace: true});
-            } else {
+                    navigate('/', {replace: true});
+                } else {
+                    navigate('/login?error=oauth2', {replace: true});
+                }
+            })
+            .catch(() => {
                 navigate('/login?error=oauth2', {replace: true});
-            }
-        });
+            });
     }, [analytics, getAccount, navigate]);
 
     if (authenticated) {
-        navigate('/', {replace: true});
+        return <Navigate replace to="/" />;
     }
 
     return (
