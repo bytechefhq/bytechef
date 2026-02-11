@@ -48,26 +48,34 @@ public class PipedriveConnection {
             .scopes((connectionParameters, context) -> {
                 Map<String, Boolean> scopeMap = new HashMap<>();
 
-                scopeMap.put("deals:read", false);
-                scopeMap.put("deals:full", false);
-                scopeMap.put("goals:read", false);
-                scopeMap.put("goals:full", false);
-                scopeMap.put("leads:read", false);
-                scopeMap.put("leads:full", false);
-                scopeMap.put("activities:read", false);
-                scopeMap.put("activities:full", false);
-                scopeMap.put("contacts:read", false);
-                scopeMap.put("contacts:full", false);
                 scopeMap.put("admin", false);
+                scopeMap.put("activities:full", false);
+                scopeMap.put("activities:read", false);
+                scopeMap.put("base", false);
+                scopeMap.put("contact-fields:full", false);
+                scopeMap.put("contacts:full", true);
+                scopeMap.put("contacts:read", true);
+                scopeMap.put("deal-fields:full", false);
+                scopeMap.put("deals:full", true);
+                scopeMap.put("deals:read", true);
+                scopeMap.put("goals:full", false);
+                scopeMap.put("goals:read", false);
+                scopeMap.put("leads:full", true);
+                scopeMap.put("leads:read", true);
+                scopeMap.put("mail:full", false);
+                scopeMap.put("mail:read", false);
+                scopeMap.put("messengers-integration", false);
+                scopeMap.put("phone-integration", false);
+                scopeMap.put("products:full", false);
+                scopeMap.put("products:read", false);
+                scopeMap.put("projects:full", false);
+                scopeMap.put("projects:read", false);
                 scopeMap.put("recents:read", false);
                 scopeMap.put("search:read", false);
-                scopeMap.put("mail:read", false);
-                scopeMap.put("mail:full", false);
-                scopeMap.put("products:read", false);
-                scopeMap.put("products:full", false);
-                scopeMap.put("users:read", false);
-                scopeMap.put("base", false);
-                scopeMap.put("phone-integration", false);
+                scopeMap.put("users:read", true);
+                scopeMap.put("video-calls", false);
+                scopeMap.put("webhooks:full", false);
+                scopeMap.put("webhooks:read", false);
 
                 return scopeMap;
             })
