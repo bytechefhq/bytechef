@@ -45,6 +45,9 @@ public class User {
     @Column("activation_key")
     private String activationKey;
 
+    @Column("auth_provider")
+    private String authProvider = "LOCAL";
+
     @MappedCollection(idColumn = "user_id")
     private Set<UserAuthority> authorities = new HashSet<>();
 
@@ -88,6 +91,9 @@ public class User {
     @Column("password_hash")
     private String password;
 
+    @Column("provider_id")
+    private String providerId;
+
     @Column("reset_date")
     private Instant resetDate = null;
 
@@ -117,6 +123,10 @@ public class User {
 
     public String getActivationKey() {
         return activationKey;
+    }
+
+    public String getAuthProvider() {
+        return authProvider;
     }
 
     public List<Long> getAuthorityIds() {
@@ -174,6 +184,10 @@ public class User {
         return password;
     }
 
+    public String getProviderId() {
+        return providerId;
+    }
+
     public Instant getResetDate() {
         return resetDate;
     }
@@ -210,6 +224,10 @@ public class User {
 
     public void setActivationKey(String activationKey) {
         this.activationKey = activationKey;
+    }
+
+    public void setAuthProvider(String authProvider) {
+        this.authProvider = authProvider;
     }
 
     public void setAuthorities(Set<Authority> authorities) {
@@ -254,6 +272,10 @@ public class User {
         this.password = password;
     }
 
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
+    }
+
     public void setResetKey(String resetKey) {
         this.resetKey = resetKey;
     }
@@ -286,6 +308,7 @@ public class User {
             ", activated='" + activated + '\'' +
             ", langKey='" + langKey + '\'' +
             ", activationKey='" + activationKey + '\'' +
+            ", authProvider='" + authProvider + '\'' +
             "}";
     }
 }

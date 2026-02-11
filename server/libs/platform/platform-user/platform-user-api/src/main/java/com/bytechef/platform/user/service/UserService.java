@@ -43,9 +43,14 @@ public interface UserService {
 
     Optional<User> fetchUser(long id);
 
+    Optional<User> fetchUserByAuthProviderAndProviderId(String authProvider, String providerId);
+
     Optional<User> fetchUserByEmail(String email);
 
     Optional<User> fetchUserByLogin(String login);
+
+    User findOrCreateSocialUser(
+        String email, String firstName, String lastName, String imageUrl, String authProvider, String providerId);
 
     Page<User> getAllActiveUsers(Pageable pageable);
 

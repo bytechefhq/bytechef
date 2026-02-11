@@ -33,6 +33,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * @author Ivica Cardic
@@ -59,5 +61,10 @@ public class UserIntTestConfiguration extends AbstractJdbcConfiguration {
     @Bean
     JavaMailSender javaMailSender() {
         return new JavaMailSenderImpl();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
