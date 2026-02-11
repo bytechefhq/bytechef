@@ -17,6 +17,7 @@ import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog'
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useImportProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {useGetProjectWorkflowsQuery, useGetWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -93,6 +94,16 @@ const ProjectsLeftSidebar = ({
     );
 
     const queryClient = useQueryClient();
+
+    const importProjectMutation = useImportProjectMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+
+            toast({
+                description: 'Project is imported.',
+            });
+        },
+    });
 
     const importProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: () => {
@@ -335,7 +346,7 @@ const ProjectsLeftSidebar = ({
             <input
                 accept=".zip"
                 className="hidden"
-                onChange={(event) => handleImportProject(event, currentWorkspaceId, queryClient)}
+                onChange={(event) => handleImportProject(event, currentWorkspaceId!, importProjectMutation)}
                 ref={projectHiddenFileInputRef}
                 type="file"
             />
