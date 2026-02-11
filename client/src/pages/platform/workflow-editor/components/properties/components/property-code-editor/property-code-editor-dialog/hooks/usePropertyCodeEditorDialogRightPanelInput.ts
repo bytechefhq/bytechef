@@ -11,6 +11,9 @@ interface UsePropertyCodeEditorDialogRightPanelInputPropsI {
 export const usePropertyCodeEditorDialogRightPanelInput = ({
     input,
 }: UsePropertyCodeEditorDialogRightPanelInputPropsI) => {
+    const [jsonValue, setJsonValue] = useState(() => JSON.stringify(input, null, 2));
+    const [parseError, setParseError] = useState<string | null>(null);
+
     const {setInputParameters} = usePropertyCodeEditorDialogStore(
         useShallow((state) => ({
             setInputParameters: state.setInputParameters,
@@ -18,9 +21,6 @@ export const usePropertyCodeEditorDialogRightPanelInput = ({
     );
 
     const initialJsonValue = useMemo(() => JSON.stringify(input, null, 2), [input]);
-
-    const [jsonValue, setJsonValue] = useState(initialJsonValue);
-    const [parseError, setParseError] = useState<string | null>(null);
 
     useEffect(() => {
         setJsonValue(initialJsonValue);
@@ -35,10 +35,10 @@ export const usePropertyCodeEditorDialogRightPanelInput = ({
             setJsonValue(newValue);
 
             try {
-                const parsed = JSON.parse(newValue);
+                const parsedValue = JSON.parse(newValue);
 
-                if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-                    setInputParameters(parsed as InputValueType);
+                if (typeof parsedValue === 'object' && parsedValue !== null && !Array.isArray(parsedValue)) {
+                    setInputParameters(parsedValue as InputValueType);
                     setParseError(null);
                 } else {
                     setParseError('JSON must be an object');
