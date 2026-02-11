@@ -50,7 +50,7 @@ public class MultiTenantSecurityConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.social-login", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
     OAuth2LoginCustomizer multiTenantOAuth2LoginCustomizer(
         CustomOAuth2UserService customOAuth2UserService, RememberMeServices rememberMeServices,
         TenantService tenantService) {

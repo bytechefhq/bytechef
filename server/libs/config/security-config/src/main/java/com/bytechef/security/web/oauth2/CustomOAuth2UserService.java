@@ -21,21 +21,24 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -58,7 +61,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @SuppressFBWarnings("EI")
     public CustomOAuth2UserService(AuthorityService authorityService, UserService userService) {
         this.authorityService = authorityService;
-        this.restTemplate = new RestTemplate();
+
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+
+        requestFactory.setConnectTimeout(Duration.ofSeconds(5));
+        requestFactory.setReadTimeout(Duration.ofSeconds(5));
+
+        this.restTemplate = new RestTemplate(requestFactory);
         this.userService = userService;
     }
 
@@ -68,7 +77,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String registrationId = userRequest.getClientRegistration()
             .getRegistrationId()
-            .toUpperCase();
+            .toUpperCase(Locale.ROOT);
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
@@ -87,8 +96,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
             .stream()
-            .map(authorityService::fetchAuthority)
-            .map(Optional::get)
+            .map(authorityId -> authorityService.fetchAuthority(authorityId)
+                .orElseThrow(() -> new OAuth2AuthenticationException(
+                    "Unknown authority id " + authorityId + " for user " + user.getLogin())))
             .map(Authority::getName)
             .map(SimpleGrantedAuthority::new)
             .toList();
@@ -186,25 +196,30 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         headers.setBearerAuth(accessToken);
 
-        ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
-            GITHUB_EMAILS_URL, HttpMethod.GET, new HttpEntity<>(headers),
-            new ParameterizedTypeReference<>() {});
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                GITHUB_EMAILS_URL, HttpMethod.GET, new HttpEntity<>(headers),
+                new ParameterizedTypeReference<>() {});
 
-        List<Map<String, Object>> emails = response.getBody();
+            List<Map<String, Object>> emails = response.getBody();
 
-        if (emails == null) {
-            return null;
-        }
-
-        for (Map<String, Object> emailEntry : emails) {
-            Boolean primary = (Boolean) emailEntry.get("primary");
-            Boolean verified = (Boolean) emailEntry.get("verified");
-
-            if (Boolean.TRUE.equals(primary) && Boolean.TRUE.equals(verified)) {
-                return (String) emailEntry.get("email");
+            if (emails == null) {
+                return null;
             }
-        }
 
-        return null;
+            for (Map<String, Object> emailEntry : emails) {
+                Boolean primary = (Boolean) emailEntry.get("primary");
+                Boolean verified = (Boolean) emailEntry.get("verified");
+
+                if (Boolean.TRUE.equals(primary) && Boolean.TRUE.equals(verified)) {
+                    return (String) emailEntry.get("email");
+                }
+            }
+
+            return null;
+        } catch (RestClientException restClientException) {
+            throw new OAuth2AuthenticationException(
+                "Failed to retrieve email from GitHub: " + restClientException.getMessage());
+        }
     }
 }

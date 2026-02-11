@@ -10,5 +10,8 @@
             </column>
             <column name="provider_id" type="VARCHAR(255)"/>
         </addColumn>
+        <addUniqueConstraint tableName="user"
+                             columnNames="auth_provider, provider_id"
+                             constraintName="uk_user_auth_provider_provider_id"/>
     </changeSet>
 </databaseChangeLog>
