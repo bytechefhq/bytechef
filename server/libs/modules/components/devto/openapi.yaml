@@ -26,24 +26,23 @@ paths:
                 article:
                   type: object
                   title: "Article"
+                  required:
+                    - "title"
+                    - "body_markdown"
                   properties:
                     title:
                       type: string
                       description: "The title of the article."
-                      required: true
                     body_markdown:
                       type: string
                       description: "The body of the article in markdown format."
-                      required: true
                     published:
                       type: boolean
                       description: "Whether the article should be published immediately."
                       default: false
-                      required: false
                     description:
                       type: string
                       description: "The description of the article."
-                      required: false
   /articles/{articleId}:
     get:
       summary: "Get Article"
@@ -52,7 +51,7 @@ paths:
       parameters:
         - name: articleId
           in: path
-          description: "The unique identifier of the article."
+          description: "The unique identifier of the article. Only your articles are listed in the options. See documentation for instructions on how to find ID of any article."
           required: true
           schema:
             type: integer
@@ -72,7 +71,7 @@ paths:
       parameters:
         - name: articleId
           in: path
-          description: "The unique identifier of the article."
+          description: "The unique identifier of the article. You can update only your own articles."
           required: true
           schema:
             type: integer
@@ -82,12 +81,13 @@ paths:
         content:
           application/json:
             schema:
-              required:
-                - article
               properties:
                 article:
                   type: object
                   title: "Article"
+                  required:
+                    - "title"
+                    - "body_markdown"
                   properties:
                     title:
                       type: string
