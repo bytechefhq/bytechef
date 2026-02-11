@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -45,7 +46,12 @@ public class MultiTenantOAuth2AuthenticationSuccessHandler implements Authentica
 
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
-        List<String> tenantIds = tenantService.getTenantIdsByUserEmail(oAuth2User.getName());
+        String login = oAuth2User.getName();
+
+        List<String> tenantIds = EmailValidator.getInstance()
+            .isValid(login)
+                ? tenantService.getTenantIdsByUserEmail(login)
+                : tenantService.getTenantIdsByUserLogin(login);
 
         HttpSession session = request.getSession();
 
