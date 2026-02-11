@@ -99,12 +99,10 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
                     return false;
                 }
 
-                // Initialize start time on first poll
                 if (pollingStartTimeRef.current === null) {
                     pollingStartTimeRef.current = Date.now();
                 }
 
-                // Check if we've exceeded the maximum polling duration (5 minutes)
                 const elapsedMs = Date.now() - pollingStartTimeRef.current;
 
                 if (elapsedMs >= MAX_POLLING_ATTEMPTS * 1000) {
@@ -129,7 +127,6 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         }
     }, [isJobStatusError, isProcessing, setError, setIsProcessing, setJobId]);
 
-    // Track if job completed to prevent timeout from firing after completion
     const jobCompletedRef = useRef(false);
 
     // Handle polling timeout by checking elapsed time
@@ -141,7 +138,6 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         }
 
         const timeoutId = setTimeout(() => {
-            // Don't show timeout error if job already completed
             if (jobCompletedRef.current) {
                 return;
             }
@@ -176,7 +172,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
                                     id: `${path}-${method}`,
                                     method: httpMethod,
                                     path,
-                                    resource: resource.charAt(0).toUpperCase() + resource.slice(1),
+                                    resource: `${resource.charAt(0).toUpperCase()}${resource.slice(1)}`,
                                     summary: (operation.summary as string) || undefined,
                                 });
                             }
@@ -247,12 +243,11 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         }
     }, []);
 
-    const filterSpecificationBySelectedEndpoints = useCallback((): string | null => {
+    const getSpecificationFilteredBySelectedEndpoints = useCallback((): string | null => {
         if (!specification) {
             return null;
         }
 
-        // Return full specification if all endpoints are selected
         if (selectedEndpointIds.length === discoveredEndpoints.length) {
             return specification;
         }
@@ -337,7 +332,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
             return;
         }
 
-        const filteredSpecification = filterSpecificationBySelectedEndpoints();
+        const filteredSpecification = getSpecificationFilteredBySelectedEndpoints();
 
         if (!filteredSpecification) {
             toast({
