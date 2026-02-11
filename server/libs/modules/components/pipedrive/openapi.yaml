@@ -12,6 +12,10 @@ paths:
       description: "Returns all deals."
       operationId: "getDeals"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "deals:read"
+            - "users:read"
       tags:
         - "Deals"
       parameters:
@@ -105,6 +109,11 @@ paths:
       description: "Adds a new deal."
       operationId: "addDeal"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "users:read"
+            - "contacts:read"
+            - "deals:full"
       tags:
         - "Deals"
       requestBody:
@@ -227,6 +236,10 @@ paths:
       x-ai-agent-tool: true
       tags:
         - "Deals"
+      security:
+        - "oauth2":
+            - "contacts:read"
+            - "deals:read"
       parameters:
         - in: "query"
           name: "term"
@@ -335,6 +348,9 @@ paths:
       description: "Marks a deal as deleted. After 30 days, the deal will be permanently deleted."
       operationId: "deleteDeal"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "deals:full"
       tags:
         - "Deals"
       parameters:
@@ -366,6 +382,9 @@ paths:
       x-ai-agent-tool: true
       tags:
         - "Deals"
+      security:
+        - "oauth2":
+            - "deals:read"
       parameters:
         - in: "path"
           name: "deal_id"
@@ -427,6 +446,12 @@ paths:
       description: "Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest."
       operationId: "getLeads"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "leads:read"
+            - "users:read"
+            - "contacts:read"
+            - "deals:read"
       parameters:
         - in: "query"
           name: "archived_status"
@@ -523,6 +548,11 @@ paths:
       description: "Creates a lead. A lead always has to be linked to a person or an organization or both."
       operationId: "addLead"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "leads:full"
+            - "users:read"
+            - "contacts:read"
       requestBody:
         content:
           application/json:
@@ -611,6 +641,9 @@ paths:
       description: "Returns details of a specific lead. "
       operationId: "getLeadDetails"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "leads:read"
       parameters:
         - in: "path"
           name: "lead_id"
@@ -657,6 +690,9 @@ paths:
       description: "Deletes a specific lead."
       operationId: "deleteLead"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "leads:full"
       parameters:
         - in: "path"
           name: "lead_id"
@@ -688,6 +724,10 @@ paths:
       x-ai-agent-tool: true
       tags:
         - "Leads"
+      security:
+        - "oauth2":
+            - "leads:read"
+            - "contacts:read"
       parameters:
         - in: "query"
           name: "term"
@@ -774,6 +814,11 @@ paths:
       x-ai-agent-tool: true
       tags:
         - "Organizations"
+      security:
+        - "oauth2":
+            - "contacts:read"
+            - "users:read"
+            - "deals:read"
       parameters:
         - in: "query"
           name: "user_id"
@@ -833,6 +878,10 @@ paths:
       description: "Adds a new organization."
       operationId: "addOrganization"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "contacts:full"
+            - "users:read"
       tags:
         - "Organizations"
       requestBody:
@@ -888,6 +937,9 @@ paths:
       x-ai-agent-tool: true
       tags:
         - "Organizations"
+      security:
+        - "oauth2":
+            - "contacts:read"
       parameters:
         - in: "query"
           name: "term"
@@ -949,6 +1001,9 @@ paths:
       description: "Marks an organization as deleted. After 30 days, the organization will be permanently deleted."
       operationId: "deleteOrganization"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "contacts:full"
       tags:
         - "Organizations"
       parameters:
@@ -980,6 +1035,9 @@ paths:
       x-ai-agent-tool: true
       tags:
         - "Organizations"
+      security:
+        - "oauth2":
+            - "contacts:read"
       parameters:
         - in: "path"
           name: "organization_id"
@@ -1021,6 +1079,11 @@ paths:
       description: "Returns all persons."
       operationId: "getPersons"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "contacts:read"
+            - "deals:read"
+            - "users:read"
       tags:
         - "Persons"
       parameters:
@@ -1114,6 +1177,10 @@ paths:
       description: "Adds a new person."
       operationId: "addPerson"
       x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "contacts:full"
+            - "users:read"
       tags:
         - "Persons"
       requestBody:
@@ -1249,6 +1316,9 @@ paths:
       x-ai-agent-tool: true
       tags:
         - "Persons"
+      security:
+        - "oauth2":
+            - "contacts:read"
       parameters:
         - in: "query"
           name: "term"
@@ -1350,6 +1420,9 @@ paths:
       x-ai-agent-tool: true
       tags:
         - "Persons"
+      security:
+        - "oauth2":
+            - "contacts:full"
       parameters:
         - in: "path"
           name: "person_id"
@@ -1379,6 +1452,9 @@ paths:
       x-ai-agent-tool: true
       tags:
         - "Persons"
+      security:
+        - "oauth2":
+            - "contacts:read"
       parameters:
         - in: "path"
           name: "person_id"
@@ -1455,35 +1531,31 @@ components:
           tokenUrl: "https://oauth.pipedrive.com/oauth/token"
           refreshUrl: "https://oauth.pipedrive.com/oauth/token"
           scopes:
-            deals:read: "Read most data about deals and related entities."
-            deals:full: "Create, read, update and delete deals, its participants and\
-              \ followers."
-            goals:read: "Read data on all goals."
-            goals:full: "Create, read, update and delete goals."
-            leads:read: "Read leads and leads labels."
-            leads:full: "Create, read, update and delete leads and leads labels"
-            activities:read: "Read activities, its fields and types; all files and\
-              \ filters."
-            activities:full: "Create, read, update and delete activities and all files\
-              \ and filters."
-            contacts:read: "Read data about persons and organizations, their related\
-              \ fields and followers."
-            contacts:full: "Create, read, update and delete persons and organizations\
-              \ and their followers."
-            admin: "Allows to do many things that an administrator can do in a Pipedrive\
-              \ company account."
-            recents:read: "Read all recent changes occured in an account."
-            search:read: "Search across the account for deals, persons, organizations,\
-              \ files and products and see details about the returned results."
-            mail:read: "Read mail threads and messages."
-            mail:full: "Read, update and delete mail threads. Also grants read access\
-              \ to mail messages."
-            products:read: "Read products, its fields, files, followers and products\
-              \ connected to a deal."
-            products:full: "Create, read, update and delete products and its fields;\
-              \ add products to deals"
-            users:read: "Read data about users (people with access to a Pipedrive\
-              \ account), their permissions, roles and followers, as well as about\
-              \ legacy teams."
-            base: "Read settings of the authorized user and currencies in an account."
-            phone-integration: "Create, read and delete call logs and its audio recordings."
+            admin: ""
+            activities:full: ""
+            activities:read: ""
+            base: ""
+            contact-fields:full: ""
+            contacts:full: ""
+            contacts:read: ""
+            deal-fields:full: ""
+            deals:full: ""
+            deals:read: ""
+            goals:full: ""
+            goals:read: ""
+            leads:full: ""
+            leads:read: ""
+            mail:full: ""
+            mail:read: ""
+            messengers-integration: ""
+            phone-integration: ""
+            products:full: ""
+            products:read: ""
+            projects:full: ""
+            projects:read: ""
+            recents:read: ""
+            search:read: ""
+            users:read: ""
+            video-calls: ""
+            webhooks:full: ""
+            webhooks:read: ""
