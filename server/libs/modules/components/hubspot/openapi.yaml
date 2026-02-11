@@ -53,26 +53,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Contact"
-    delete:
-      summary: "Delete Contact"
-      description: "Move Contact to the recycling bin."
-      operationId: "deleteContact"
-      x-ai-agent-tool: true
-      security:
-        - "oauth2":
-            - "crm.objects.contacts.write"
-            - "crm.objects.contacts.read"
-      parameters:
-        - name: "contactId"
-          in: "path"
-          required: true
-          schema:
-            title: "Contact ID"
-            type: "string"
-            x-dynamic-options: true
-      responses:
-        204:
-          description: "successful operation"
     get:
       summary: "Get Contact"
       description: "Get contact details."
@@ -96,6 +76,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Contact"
+  /crm/v3/objects/contacts/{contactId}:
+    delete:
+      summary: "Delete Contact"
+      description: "Move Contact to the recycling bin."
+      operationId: "deleteContact"
+      x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "crm.objects.contacts.write"
+            - "crm.objects.contacts.read"
+      parameters:
+        - name: "contactId"
+          in: "path"
+          required: true
+          schema:
+            title: "Contact ID"
+            type: "string"
+            x-dynamic-options: true
+      responses:
+        204:
+          description: "successful operation"
     patch:
       summary: "Update Contact"
       description: "Update Contact properties."
@@ -110,7 +111,6 @@ paths:
           in: "path"
           required: true
           style: "simple"
-          explode: false
           schema:
             title: "Contact"
             description: "Contact to update."
