@@ -79,21 +79,14 @@ public class HubspotUtils extends AbstractHubspotUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, ?> itemMap = inputParameters.getMap("__item");
+        Map<String, Object> body = context
+            .http(http -> http.get("/crm/v3/pipelines/deals/"
+                + inputParameters.getRequiredFromPath("properties.pipeline", String.class) + "/stages"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
-        if (itemMap.get("properties") instanceof Map<?, ?> propertiesMap) {
-            String pipeline = (String) propertiesMap.get("pipeline");
-            Map<String, Object> body =
-                context
-                    .http(http -> http.get("/crm/v3/pipelines/deals/" + pipeline + "/stages"))
-                    .configuration(Http.responseType(Http.ResponseType.JSON))
-                    .execute()
-                    .getBody(new TypeReference<>() {});
-
-            return getOptions(body, LABEL);
-        }
-
-        return List.of();
+        return getOptions(body, LABEL);
     }
 
     public static List<Option<String>> getHubspotOwnerIdOptions(
