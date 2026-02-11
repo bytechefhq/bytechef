@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
 import com.bytechef.platform.configuration.dto.ParameterResultDTO;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -35,8 +36,14 @@ public interface WorkflowNodeParameterFacade {
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, long environmentId);
 
+    Set<String> getClusterElementMissingRequiredProperties(
+        String workflowId, String workflowNodeName, String clusterElementTypeName,
+        String clusterElementWorkflowNodeName);
+
     DisplayConditionResultDTO
         getWorkflowNodeDisplayConditions(String workflowId, String workflowNodeName, long environmentId);
+
+    Set<String> getWorkflowNodeMissingRequiredProperties(String workflowId, String workflowNodeName);
 
     ParameterResultDTO updateClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
