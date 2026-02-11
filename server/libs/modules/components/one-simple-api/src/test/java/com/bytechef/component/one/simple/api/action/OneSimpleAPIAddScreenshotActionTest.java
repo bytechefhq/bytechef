@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
@@ -62,7 +62,7 @@ class OneSimpleAPIAddScreenshotActionTest {
             SCREEN_SIZE, CUSTOM_SIZE,
             WIDTH, 1920,
             HEIGHT, 1080));
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
         forClass(ContextFunction.class);
     private final Http mockedHttp = mock(Http.class);
@@ -76,7 +76,7 @@ class OneSimpleAPIAddScreenshotActionTest {
 
     @Test
     void testPerform() {
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> httpFunctionArgumentCaptor.getValue()
                 .apply(mockedHttp));
         when(mockedHttp.post(stringArgumentCaptor.capture()))
@@ -91,7 +91,7 @@ class OneSimpleAPIAddScreenshotActionTest {
             .thenReturn(responseMap);
 
         Object result = OneSimpleAPIAddScreenshotAction.perform(
-            mockedParameters, mockedParameters, mockedActionContext);
+            mockedParameters, mockedParameters, mockedContext);
         assertEquals(responseMap, result);
 
         ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();

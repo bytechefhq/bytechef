@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -39,7 +39,7 @@ import org.mockito.ArgumentCaptor;
  */
 class OneSimpleAPIUrlShortenerActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(URL, "www.url.com"));
@@ -48,7 +48,7 @@ class OneSimpleAPIUrlShortenerActionTest {
 
     @Test
     void testPerform() {
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -59,7 +59,7 @@ class OneSimpleAPIUrlShortenerActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object result = OneSimpleAPIUrlShortenerAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = OneSimpleAPIUrlShortenerAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
 

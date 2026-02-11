@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.URL;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -58,9 +58,9 @@ public class OneSimpleAPIUrlShortenerAction {
     }
 
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return actionContext.http(http -> http.get("/shortener/new"))
+        return context.http(http -> http.get("/shortener/new"))
             .queryParameters(URL, inputParameters.getRequiredString(URL))
             .configuration(responseType(ResponseType.JSON))
             .execute()
