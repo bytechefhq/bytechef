@@ -455,36 +455,44 @@ const PropertyComboBox = ({
                                     {value === '' && <CheckIcon className="ml-auto size-4" />}
                                 </CommandItem>
 
-                                {(options as Array<ComboBoxItemType>)?.map((option) => (
-                                    <CommandItem
-                                        className="cursor-pointer font-normal hover:bg-muted"
-                                        key={option.value.toString()}
-                                        keywords={[
-                                            typeof option.label === 'string' ? option.label : undefined,
-                                            option.description,
-                                        ].filter(
-                                            (value): value is string => typeof value === 'string' && value.length > 0
-                                        )}
-                                        onSelect={() => handleValueChange(option.value.toString())}
-                                        value={option.value.toString()}
-                                    >
-                                        {option.icon && (
-                                            <InlineSVG className="mr-2 size-6 flex-none" src={option.icon} />
-                                        )}
+                                {(options as Array<ComboBoxItemType>)?.map((option) => {
+                                    const labelAndDescription = [
+                                        typeof option.label === 'string' ? option.label : undefined,
+                                        option.description,
+                                    ];
 
-                                        {option.description ? (
-                                            <div className="flex flex-col gap-1">
+                                    const nonEmptyStrings = labelAndDescription.filter(
+                                        (value): value is string => typeof value === 'string' && value.length > 0
+                                    );
+
+                                    return (
+                                        <CommandItem
+                                            className="cursor-pointer font-normal hover:bg-muted"
+                                            key={option.value.toString()}
+                                            keywords={nonEmptyStrings}
+                                            onSelect={() => handleValueChange(option.value.toString())}
+                                            value={option.value.toString()}
+                                        >
+                                            {option.icon && (
+                                                <InlineSVG className="mr-2 size-6 flex-none" src={option.icon} />
+                                            )}
+
+                                            {option.description ? (
+                                                <div className="flex flex-col gap-1">
+                                                    <span>{option.label}</span>
+
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {option.description}
+                                                    </p>
+                                                </div>
+                                            ) : (
                                                 <span>{option.label}</span>
+                                            )}
 
-                                                <p className="text-xs text-muted-foreground">{option.description}</p>
-                                            </div>
-                                        ) : (
-                                            <span>{option.label}</span>
-                                        )}
-
-                                        {option.value === value && <CheckIcon className="ml-auto size-4" />}
-                                    </CommandItem>
-                                ))}
+                                            {option.value === value && <CheckIcon className="ml-auto size-4" />}
+                                        </CommandItem>
+                                    );
+                                })}
                             </CommandGroup>
                         </CommandList>
                     </Command>
