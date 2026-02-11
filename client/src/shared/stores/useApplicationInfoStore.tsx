@@ -38,6 +38,9 @@ export interface ApplicationInfoI {
         activationRequired: boolean;
         enabled: boolean;
     };
+    socialLogin: {
+        enabled: boolean;
+    };
     templatesSubmissionForm: {
         projects: string;
         workflows: string;
@@ -81,6 +84,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     activationRequired: false,
                     enabled: true,
                 },
+                socialLogin: {
+                    enabled: false,
+                },
                 templatesSubmissionForm: {
                     projects: undefined,
                     workflow: undefined,
@@ -120,6 +126,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             },
                             loading: false,
                             signUp: json.signUp,
+                            socialLogin: {
+                                enabled: json.socialLogin?.enabled === 'true',
+                            },
                             templatesSubmissionForm: json.templatesSubmissionForm,
                         }));
                     }

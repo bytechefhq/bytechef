@@ -3,6 +3,7 @@ import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
+import OAuth2Redirect from '@/pages/account/public/OAuth2Redirect';
 import PasswordResetEmailSent from '@/pages/account/public/PasswordResetEmailSent';
 import PasswordResetFinish from '@/pages/account/public/PasswordResetFinish';
 import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
@@ -370,6 +371,10 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             element: <Register />,
             path: '/register',
+        },
+        {
+            element: <OAuth2Redirect />,
+            path: '/oauth2/redirect',
         },
         {
             element: <PasswordResetInit />,

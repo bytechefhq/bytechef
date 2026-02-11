@@ -155,6 +155,9 @@ const Register = () => {
                                 <Button
                                     icon={<img alt="Google logo" src={googleLogo} />}
                                     label="Continue with Google"
+                                    onClick={() => {
+                                        window.location.href = '/oauth2/authorization/google';
+                                    }}
                                     size="lg"
                                     variant="outline"
                                 />
@@ -162,6 +165,9 @@ const Register = () => {
                                 <Button
                                     icon={<img alt="Github logo" src={githubLogo} />}
                                     label="Continue with Github"
+                                    onClick={() => {
+                                        window.location.href = '/oauth2/authorization/github';
+                                    }}
                                     size="lg"
                                     variant="outline"
                                 />
