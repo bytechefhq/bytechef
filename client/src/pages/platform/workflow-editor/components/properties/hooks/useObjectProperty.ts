@@ -8,7 +8,7 @@ import resolvePath from 'object-resolve-path';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
-import {encodeParameters, encodePath} from '../../../utils/encodingUtils';
+import {decodePath, encodeParameters, encodePath} from '../../../utils/encodingUtils';
 import getParameterItemType from '../../../utils/getParameterItemType';
 import saveProperty from '../../../utils/saveProperty';
 
@@ -95,13 +95,15 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
     }
 
     const handleAddItemClick = useCallback(() => {
+        const encodedPropertyName = encodePath(newPropertyName);
+
         const newItem: SubPropertyType = {
             additionalProperties,
             controlType: VALUE_PROPERTY_CONTROL_TYPES[newPropertyType] as ControlType,
             custom: true,
             expressionEnabled: true,
             label: newPropertyName,
-            name: newPropertyName,
+            name: encodedPropertyName,
             type: (newPropertyType ||
                 additionalProperties?.[0].type ||
                 'STRING') as keyof typeof VALUE_PROPERTY_CONTROL_TYPES,
@@ -114,7 +116,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
             saveProperty({
                 includeInMetadata: true,
-                path: `${path}.${newPropertyName}`,
+                path: `${path}.${encodedPropertyName}`,
                 type: newPropertyType,
                 updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
@@ -270,7 +272,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
                     defaultValue: parameterKeyValue,
                     displayCondition,
                     expressionEnabled: true,
-                    label: parameterKey,
+                    label: decodePath(parameterKey),
                     name: parameterKey,
                     type: parameterItemType as PropertyType,
                 } as PropertyAllType;
@@ -450,14 +452,14 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         }
     }, [properties]);
 
-    // update parameterObject when workflowDefinition changes
+    // update parameterObject when workflowDefinition changes (encode keys to match encoded property names)
     useEffect(() => {
         if (workflow.definition && path) {
             const resolvedParameterObject = resolvePath(currentComponent?.parameters ?? {}, path) as {
                 [key: string]: unknown;
             };
 
-            setParameterObject(resolvedParameterObject);
+            setParameterObject(encodeParameters(resolvedParameterObject) as {[key: string]: unknown});
         }
     }, [workflow.definition, path, currentComponent?.parameters]);
 
