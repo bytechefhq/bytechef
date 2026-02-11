@@ -64,7 +64,7 @@ public class PdfHelperImageToPdfAction {
             outputSchema(
                 fileEntry()
                     .description("PDF file")))
-        .help("", "https://docs.bytechef.io/reference/components/pdf-helper#image-to-pdf")
+        .help("", "https://docs.bytechef.io/reference/components/pdf-helper_v1#image-to-pdf")
         .perform(PdfHelperImageToPdfAction::perform);
 
     private PdfHelperImageToPdfAction() {

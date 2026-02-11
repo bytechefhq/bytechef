@@ -46,7 +46,7 @@ public class PdfHelperExtractTextAction {
                 .description("The PDF file from which to extract text.")
                 .required(true))
         .output(outputSchema(string().description("Extracted text from the PDF file.")))
-        .help("", "https://docs.bytechef.io/reference/components/pdf-helper#extract-text")
+        .help("", "https://docs.bytechef.io/reference/components/pdf-helper_v1#extract-text")
         .perform(PdfHelperExtractTextAction::perform);
 
     private PdfHelperExtractTextAction() {
