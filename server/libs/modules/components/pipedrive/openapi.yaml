@@ -21,18 +21,21 @@ paths:
           schema:
             type: "integer"
             title: "User ID"
+            x-dynamic-options: true
         - in: "query"
           name: "filter_id"
           description: "ID of the filter to use."
           schema:
             type: "integer"
             title: "Filter ID"
+            x-dynamic-options: true
         - in: "query"
           name: "stage_id"
           description: "Deals within the given stage will be returned."
           schema:
             type: "integer"
             title: "Stage ID"
+            x-dynamic-options: true
         - in: "query"
           name: "status"
           schema:
@@ -127,22 +130,27 @@ paths:
                   type: "integer"
                   title: "User ID"
                   description: "ID of the user which will be the owner of the created deal. If not provided, the user making the request will be used."
+                  x-dynamic-options: true
                 person_id:
                   type: "integer"
                   title: "Person ID"
                   description: "ID of the person which this deal will be linked to. This property is required unless `org_id` is specified."
+                  x-dynamic-options: true
                 org_id:
                   type: "integer"
                   title: "Organization ID"
                   description: "ID of the organization which this deal will be linked to. This property is required unless `person_id` is specified."
+                  x-dynamic-options: true
                 pipeline_id:
                   type: "integer"
                   title: "Pipeline ID"
                   description: "Id of the pipeline this deal will be added to. By default, the deal will be added to the first stage of the specified pipeline. Please note that `pipeline_id` and `stage_id`\
                   \ should not be used together as `pipeline_id` will be ignored."
+                  x-dynamic-options: true
                 stage_id:
                   type: "integer"
                   title: "Stage ID"
+                  x-dynamic-options: true
                   description: "Stage this deal will be added to.\
                   \ Please note that a pipeline will be assigned automatically\
                   \ based on the `stage_id`. If omitted, the deal will be placed\
@@ -245,12 +253,14 @@ paths:
           schema:
             type: "integer"
             title: "Person ID"
+            x-dynamic-options: true
           description: "Will filter deals by the provided person."
         - in: "query"
           name: "organization_id"
           schema:
             type: "integer"
             title: "Organization ID"
+            x-dynamic-options: true
           description: "Will filter deals by the provided organization."
         - in: "query"
           name: "status"
@@ -319,7 +329,7 @@ paths:
                               type: "string"
                             status:
                               type: "string"
-  /deals/{id}:
+  /deals/{deal_id}:
     delete:
       summary: "Delete Deal"
       description: "Marks a deal as deleted. After 30 days, the deal will be permanently deleted."
@@ -329,12 +339,13 @@ paths:
         - "Deals"
       parameters:
         - in: "path"
-          name: "id"
-          description: "Id of the deal to delete."
+          name: "deal_id"
+          description: "ID of the deal to delete."
           required: true
           schema:
             type: "integer"
             title: "Deal ID"
+            x-dynamic-options: true
       responses:
         200:
           description: "Delete deal"
@@ -357,11 +368,13 @@ paths:
         - "Deals"
       parameters:
         - in: "path"
-          name: "id"
+          name: "deal_id"
           required: true
           schema:
             type: "integer"
-            title: "Deal"
+            title: "Deal ID"
+            description: "ID of the deal to get details."
+            x-dynamic-options: true
       responses:
         200:
           description: "Successful"
@@ -431,6 +444,7 @@ paths:
           schema:
             type: "integer"
             title: "Owner iD"
+            x-dynamic-options: true
         - in: "query"
           name: "person_id"
           description: "If supplied, only leads matching the given person will be returned.\
@@ -438,6 +452,7 @@ paths:
           schema:
             type: "integer"
             title: "Person ID"
+            x-dynamic-options: true
         - in: "query"
           name: "organization_id"
           description: "If supplied, only leads matching the given organization will\
@@ -446,12 +461,14 @@ paths:
           schema:
             type: "integer"
             title: "Organization ID"
+            x-dynamic-options: true
         - in: "query"
           name: "filter_id"
           description: "Filter to use"
           schema:
             type: "integer"
             title: "Filter ID"
+            x-dynamic-options: true
         - in: "query"
           name: "sort"
           description: "The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys)."
@@ -522,10 +539,12 @@ paths:
                   type: "integer"
                   title: "Owner ID"
                   description: "User which will be the owner of the created lead."
+                  x-dynamic-options: true
                 label_ids:
                   type: "array"
                   title: "Lead Labels IDs"
                   description: "ID of the labels which will be associated with the lead."
+                  x-dynamic-options: true
                   items:
                     type: "string"
                     format: "uuid"
@@ -533,10 +552,12 @@ paths:
                   type: "integer"
                   title: "Person ID"
                   description: "Person which this lead will be linked to."
+                  x-dynamic-options: true
                 organization_id:
                   type: "integer"
                   title: "Organization ID"
                   description: "Organization which this lead will be linked to."
+                  x-dynamic-options: true
                 value:
                   type: "object"
                   description: "The potential value of the lead"
@@ -548,6 +569,7 @@ paths:
                       type: "number"
                     currency:
                       type: "string"
+                      x-dynamic-options: true
                 expected_close_date:
                   type: "string"
                   format: "date"
@@ -581,7 +603,7 @@ paths:
                         format: "date"
                       person_id:
                         type: "integer"
-  /leads/{id}:
+  /leads/{lead_id}:
     get:
       tags:
         - "Leads"
@@ -591,12 +613,14 @@ paths:
       x-ai-agent-tool: true
       parameters:
         - in: "path"
-          name: "id"
+          name: "lead_id"
           required: true
           schema:
             title: "Lead ID"
             type: "string"
             format: "uuid"
+            description: "ID of the lead to get details."
+            x-dynamic-options: true
       responses:
         200:
           description: "Successful response containing payload in the `data` field"
@@ -635,13 +659,14 @@ paths:
       x-ai-agent-tool: true
       parameters:
         - in: "path"
-          name: "id"
-          description: "The ID of the lead"
+          name: "lead_id"
+          description: "ID of the lead to delete."
           required: true
           schema:
             type: "string"
             format: "uuid"
             title: "Lead ID"
+            x-dynamic-options: true
       responses:
         200:
           description: "Successful response with id value only. Used in DELETE calls."
@@ -691,12 +716,14 @@ paths:
           schema:
             type: "integer"
             title: "Person ID"
+            x-dynamic-options: true
           description: "Will filter leads by the provided person ID."
         - in: "query"
           name: "organization_id"
           schema:
             type: "integer"
             title: "Organization ID"
+            x-dynamic-options: true
           description: "Will filter leads by the provided organization ID."
         - in: "query"
           name: "include_fields"
@@ -753,12 +780,14 @@ paths:
           schema:
             title: "User ID"
             type: "integer"
+            x-dynamic-options: true
           description: "Organizations owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied."
         - in: "query"
           name: "filter_id"
           schema:
             title: "Filter ID"
             type: "integer"
+            x-dynamic-options: true
           description: "Filter to use"
         - in: "query"
           name: "first_char"
@@ -822,6 +851,7 @@ paths:
                   type: "integer"
                   description: "ID of the user who will be marked as the owner of this organization."
                   title: "Owner ID"
+                  x-dynamic-options: true
       responses:
         201:
           description: "Success"
@@ -913,7 +943,7 @@ paths:
                                   type: "string"
                             name:
                               type: "string"
-  /organizations/{id}:
+  /organizations/{organization_id}:
     delete:
       summary: "Delete Organization"
       description: "Marks an organization as deleted. After 30 days, the organization will be permanently deleted."
@@ -923,12 +953,13 @@ paths:
         - "Organizations"
       parameters:
         - in: "path"
-          name: "id"
-          description: "Organization to delete"
+          name: "organization_id"
+          description: "ID of the organization to delete."
           required: true
           schema:
-            title: "Organization"
+            title: "Organization ID"
             type: "integer"
+            x-dynamic-options: true
       responses:
         200:
           description: "Success"
@@ -951,12 +982,13 @@ paths:
         - "Organizations"
       parameters:
         - in: "path"
-          name: "id"
-          description: "Organization to get details."
+          name: "organization_id"
+          description: "ID of the organization to get details."
           required: true
           schema:
             type: "integer"
-            title: "Organizaton"
+            title: "Organizaton ID"
+            x-dynamic-options: true
       responses:
         200:
           description: "Success"
@@ -997,12 +1029,14 @@ paths:
           schema:
             title: "User ID"
             type: "integer"
+            x-dynamic-options: true
           description: "Persons owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied."
         - in: "query"
           name: "filter_id"
           schema:
             title: "Filter ID"
             type: "integer"
+            x-dynamic-options: true
           description: "Filter to use."
         - in: "query"
           name: "first_char"
@@ -1098,10 +1132,12 @@ paths:
                   type: "integer"
                   title: "Owner ID"
                   description: "ID of the user who will be marked as the owner of this person."
+                  x-dynamic-options: true
                 org_id:
                   type: "integer"
                   title: "Organization ID"
                   description: "ID of the organization this person will belong to."
+                  x-dynamic-options: true
                 email:
                   type: "array"
                   description: "An email addresses related to the person."
@@ -1242,6 +1278,7 @@ paths:
           schema:
             type: "integer"
             title: "Organization ID"
+            x-dynamic-options: true
           description: "Will filter persons by the provided organization."
       responses:
         200:
@@ -1305,7 +1342,7 @@ paths:
                                     type: "boolean"
                                   label:
                                     type: "string"
-  /persons/{id}:
+  /persons/{person_id}:
     delete:
       summary: "Delete Person"
       description: "Marks a person as deleted. After 30 days, the person will be permanently deleted."
@@ -1315,12 +1352,13 @@ paths:
         - "Persons"
       parameters:
         - in: "path"
-          name: "id"
-          description: "Person to delete"
+          name: "person_id"
+          description: "ID of the person to delete."
           required: true
           schema:
-            title: "Person"
+            title: "Person ID"
             type: "integer"
+            x-dynamic-options: true
       responses:
         "200":
           description: "Success"
@@ -1343,12 +1381,13 @@ paths:
         - "Persons"
       parameters:
         - in: "path"
-          name: "id"
-          description: "Person to get details"
+          name: "person_id"
+          description: "ID of the person to get details."
           required: true
           schema:
-            title: "Person"
+            title: "Person ID"
             type: "integer"
+            x-dynamic-options: true
       responses:
         200:
           description: "Success"

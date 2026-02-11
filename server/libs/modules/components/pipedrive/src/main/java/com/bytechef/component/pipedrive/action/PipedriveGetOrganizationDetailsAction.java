@@ -24,7 +24,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
 /**
@@ -39,12 +41,13 @@ public class PipedriveGetOrganizationDetailsAction {
         .metadata(
             Map.of(
                 "method", "GET",
-                "path", "/organizations/{id}"
+                "path", "/organizations/{organization_id}"
 
             ))
-        .properties(integer("id").label("Organizaton")
-            .description("Organization to get details.")
+        .properties(integer("organization_id").label("Organizaton ID")
+            .description("ID of the organization to get details.")
             .required(true)
+            .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getOrganizationIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))

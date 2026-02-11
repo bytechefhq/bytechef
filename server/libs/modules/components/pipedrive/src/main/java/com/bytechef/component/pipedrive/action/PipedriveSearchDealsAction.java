@@ -27,7 +27,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
 /**
@@ -70,12 +72,14 @@ public class PipedriveSearchDealsAction {
             integer("person_id").label("Person ID")
                 .description("Will filter deals by the provided person.")
                 .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getPersonIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
             integer("organization_id").label("Organization ID")
                 .description("Will filter deals by the provided organization.")
                 .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getOrganizationIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),

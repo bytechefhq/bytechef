@@ -23,7 +23,9 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
 /**
@@ -38,12 +40,13 @@ public class PipedriveDeleteDealAction {
         .metadata(
             Map.of(
                 "method", "DELETE",
-                "path", "/deals/{id}"
+                "path", "/deals/{deal_id}"
 
             ))
-        .properties(integer("id").label("Deal ID")
-            .description("Id of the deal to delete.")
+        .properties(integer("deal_id").label("Deal ID")
+            .description("ID of the deal to delete.")
             .required(true)
+            .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getDealIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
