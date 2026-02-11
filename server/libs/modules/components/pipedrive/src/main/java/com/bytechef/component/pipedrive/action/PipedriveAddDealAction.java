@@ -28,7 +28,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
 /**
@@ -72,35 +74,40 @@ public class PipedriveAddDealAction {
                 .label("User ID")
                 .description(
                     "ID of the user which will be the owner of the created deal. If not provided, the user making the request will be used.")
-                .required(false),
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getUserIdOptions),
             integer("person_id").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Person ID")
                 .description(
                     "ID of the person which this deal will be linked to. This property is required unless `org_id` is specified.")
-                .required(false),
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getPersonIdOptions),
             integer("org_id").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Organization ID")
                 .description(
                     "ID of the organization which this deal will be linked to. This property is required unless `person_id` is specified.")
-                .required(false),
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getOrgIdOptions),
             integer("pipeline_id").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Pipeline ID")
                 .description(
                     "Id of the pipeline this deal will be added to. By default, the deal will be added to the first stage of the specified pipeline. Please note that `pipeline_id` and `stage_id` should not be used together as `pipeline_id` will be ignored.")
-                .required(false),
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getPipelineIdOptions),
             integer("stage_id").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Stage ID")
                 .description(
                     "Stage this deal will be added to. Please note that a pipeline will be assigned automatically based on the `stage_id`. If omitted, the deal will be placed in the first stage of the default pipeline.")
-                .required(false),
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getStageIdOptions),
             string("status").metadata(
                 Map.of(
                     "type", PropertyType.BODY))

@@ -28,7 +28,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
 /**
@@ -57,7 +59,8 @@ public class PipedriveAddLeadAction {
                     "type", PropertyType.BODY))
                 .label("Owner ID")
                 .description("User which will be the owner of the created lead.")
-                .required(false),
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getOwnerIdOptions),
             array("label_ids").items(string().metadata(
                 Map.of(
                     "type", PropertyType.BODY))
@@ -68,23 +71,27 @@ public class PipedriveAddLeadAction {
                         "type", PropertyType.BODY))
                 .label("Lead Labels IDs")
                 .description("ID of the labels which will be associated with the lead.")
-                .required(false),
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<String>) PipedriveUtils::getLabelIdsOptions),
             integer("person_id").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Person ID")
                 .description("Person which this lead will be linked to.")
-                .required(false),
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getPersonIdOptions),
             integer("organization_id").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Organization ID")
                 .description("Organization which this lead will be linked to.")
-                .required(false),
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getOrganizationIdOptions),
             object("value").properties(number("amount").label("Amount")
                 .required(true),
                 string("currency").label("Currency")
-                    .required(true))
+                    .required(true)
+                    .options((ActionDefinition.OptionsFunction<String>) PipedriveUtils::getCurrencyOptions))
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY))

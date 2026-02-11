@@ -23,7 +23,9 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
 /**
@@ -38,12 +40,13 @@ public class PipedriveDeletePersonAction {
         .metadata(
             Map.of(
                 "method", "DELETE",
-                "path", "/persons/{id}"
+                "path", "/persons/{person_id}"
 
             ))
-        .properties(integer("id").label("Person")
-            .description("Person to delete")
+        .properties(integer("person_id").label("Person ID")
+            .description("ID of the person to delete.")
             .required(true)
+            .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getPersonIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))

@@ -26,7 +26,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
 /**
@@ -42,12 +44,13 @@ public class PipedriveGetPersonDetailsAction {
         .metadata(
             Map.of(
                 "method", "GET",
-                "path", "/persons/{id}"
+                "path", "/persons/{person_id}"
 
             ))
-        .properties(integer("id").label("Person")
-            .description("Person to get details")
+        .properties(integer("person_id").label("Person ID")
+            .description("ID of the person to get details.")
             .required(true)
+            .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getPersonIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))

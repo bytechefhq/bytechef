@@ -25,7 +25,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
 /**
@@ -54,7 +56,8 @@ public class PipedriveAddOrganizationAction {
                     "type", PropertyType.BODY))
                 .label("Owner ID")
                 .description("ID of the user who will be marked as the owner of this organization.")
-                .required(false))
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getOwnerIdOptions))
         .output(outputSchema(object()
             .properties(object("data")
                 .properties(integer("id").required(false), integer("company_id").required(false),

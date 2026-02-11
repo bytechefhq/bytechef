@@ -26,7 +26,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
 /**
@@ -48,18 +50,21 @@ public class PipedriveGetDealsAction {
             .description(
                 "Deals matching the given user will be returned. However, `filter_id` and `owned_by_you` takes precedence over `user_id` when supplied.")
             .required(false)
+            .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getUserIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)),
             integer("filter_id").label("Filter ID")
                 .description("ID of the filter to use.")
                 .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getFilterIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
             integer("stage_id").label("Stage ID")
                 .description("Deals within the given stage will be returned.")
                 .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getStageIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),

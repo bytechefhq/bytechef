@@ -27,7 +27,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
 /**
@@ -57,6 +59,7 @@ public class PipedriveGetLeadsAction {
                 .description(
                     "Leads matching the given user will be returned. However, `filter_id` takes precedence over `owner_id` when supplied.")
                 .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getOwnerIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
@@ -64,6 +67,7 @@ public class PipedriveGetLeadsAction {
                 .description(
                     "If supplied, only leads matching the given person will be returned. However, `filter_id` takes precedence over `person_id` when supplied.")
                 .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getPersonIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
@@ -71,12 +75,14 @@ public class PipedriveGetLeadsAction {
                 .description(
                     "If supplied, only leads matching the given organization will be returned. However, `filter_id` takes precedence over `organization_id` when supplied.")
                 .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getOrganizationIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
             integer("filter_id").label("Filter ID")
                 .description("Filter to use")
                 .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) PipedriveUtils::getFilterIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
