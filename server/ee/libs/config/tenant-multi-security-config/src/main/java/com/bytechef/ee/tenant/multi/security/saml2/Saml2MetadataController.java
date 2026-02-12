@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/saml2/metadata")
 @ConditionalOnEEVersion
 @ConditionalOnMultiTenant
-@ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
 class Saml2MetadataController {
 
     private final Saml2MetadataResolver metadataResolver = new OpenSaml5MetadataResolver();

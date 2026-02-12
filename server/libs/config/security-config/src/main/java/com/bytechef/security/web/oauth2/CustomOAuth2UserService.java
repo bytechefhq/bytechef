@@ -26,7 +26,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -50,7 +50,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Ivica Cardic
  */
 @Service
-@ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+@ConditionalOnExpression("${bytechef.security.social-login.enabled:false} or ${bytechef.security.sso.enabled:false}")
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private static final String GITHUB_EMAILS_URL = "https://api.github.com/user/emails";

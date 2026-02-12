@@ -27,7 +27,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -44,7 +44,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
-@ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+@ConditionalOnExpression("${bytechef.security.social-login.enabled:false} or ${bytechef.security.sso.enabled:false}")
 public class CustomOidcUserService extends OidcUserService {
 
     private static final String SSO_PREFIX = "sso-";
