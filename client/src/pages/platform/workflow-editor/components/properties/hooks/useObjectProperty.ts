@@ -26,7 +26,7 @@ interface BuildPropertyFromParameterKeyProps {
     parameterKey: string;
     parameterObject: {[key: string]: unknown};
     path: string;
-    properties: Array<PropertyAllType>;
+    properties?: Array<PropertyAllType>;
 }
 
 const getPropertyKey = (name: string | undefined, displayCondition?: string): string => {
@@ -221,13 +221,13 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             path,
             properties,
         }: BuildPropertyFromParameterKeyProps): PropertyAllType => {
-            let matchingProperty = properties.find(
+            let matchingProperty = properties?.find(
                 (property) => property.name === parameterKey && property.displayCondition === displayCondition
             ) as PropertyAllType | undefined;
 
             if (!matchingProperty) {
                 matchingProperty = !displayCondition
-                    ? (properties.find((property) => property.name === parameterKey) as PropertyAllType | undefined)
+                    ? (properties?.find((property) => property.name === parameterKey) as PropertyAllType | undefined)
                     : undefined;
             }
 
@@ -282,7 +282,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
     // render individual object items with data gathered from parameters
     useEffect(() => {
-        if (!name || !path || !currentComponent?.parameters || !properties) {
+        if (!name || !path || !currentComponent?.parameters) {
             return;
         }
 
