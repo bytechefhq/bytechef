@@ -103,6 +103,7 @@ public class TaskDispatcherJobTestExecutor {
             contextService, SpelEvaluator.create(), jobService, -1,
             role -> (role == JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR)
                 ? asyncMessageBroker : new AsyncMessageBroker(environment),
+            List.of(),
             taskCompletionHandlerFactoriesFunction.apply(contextService, counterService, taskExecutionService),
             List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
