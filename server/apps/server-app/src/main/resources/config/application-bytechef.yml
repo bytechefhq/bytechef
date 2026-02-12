@@ -84,6 +84,12 @@ bytechef:
     redirect-uri: ${bytechef.public-url}/callback
   observability:
     enabled: false
+    logging:
+      endpoint: http://localhost:4318/v1/logs
+    metrics:
+      endpoint: http://localhost:4318/v1/metrics
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
   public-url:
   resources:
     web: file:///opt/bytechef/client/

@@ -70,11 +70,11 @@ management:
     tracing:
       export:
         otlp:
-          endpoint: http://localhost:4318/v1/traces
+          endpoint: ${bytechef.observability.tracing.endpoint}
     logging:
       export:
         otlp:
-          endpoint: http://localhost:4318/v1/logs
+          endpoint: ${bytechef.observability.logging.endpoint}
   logging:
     export:
       enabled: ${bytechef.observability.enabled}
@@ -88,7 +88,7 @@ management:
       export:
         enabled: ${bytechef.observability.enabled}
         step: 10s
-        url: http://localhost:4318/v1/metrics
+        url: ${bytechef.observability.metrics.endpoint}
 
 openapi:
   openAPIDefinition:
