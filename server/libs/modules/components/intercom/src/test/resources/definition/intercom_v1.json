@@ -2595,7 +2595,7 @@
       "refreshOn": null,
       "refreshToken": null,
       "refreshUrl": null,
-      "scopes": { },
+      "scopes": null,
       "title": "OAuth2 Authorization Code",
       "tokenUrl": { },
       "type": "OAUTH2_AUTHORIZATION_CODE"
