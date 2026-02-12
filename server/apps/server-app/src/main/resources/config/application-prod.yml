@@ -2,6 +2,9 @@ logging:
   level:
     ROOT: INFO
     com.bytechef: INFO
+  structured:
+    format:
+      console: ecs
 
 server:
   port: 8080
