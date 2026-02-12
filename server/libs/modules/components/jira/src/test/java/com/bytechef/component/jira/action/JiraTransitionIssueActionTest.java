@@ -22,66 +22,52 @@ import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.STATUS_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.TRANSITION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
-import com.bytechef.component.definition.Context.Http.ResponseType.Type;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Ivona Pavela
  */
+@ExtendWith(MockContextSetupExtension.class)
 class JiraTransitionIssueActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
-    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(ConfigurationBuilder.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(PROJECT, "testProject", ISSUE_ID, "testIssue", STATUS_ID, "5"));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> httpFunctionArgumentCaptor.getValue()
-                .apply(mockedHttp));
+    void testPerform(
+        Context mockedContext, Http.Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
-        Object result = JiraTransitionIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = JiraTransitionIssueAction.perform(mockedParameters, null, mockedContext);
 
         assertNull(result);
 
-        assertEquals("/issue/testIssue/transitions", stringArgumentCaptor.getValue());
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-        Map<String, Object> expectedBody = Map.of(TRANSITION, Map.of(ID, "5"));
-        assertEquals(Body.of(expectedBody), bodyArgumentCaptor.getValue());
+        assertNotNull(capturedFunction);
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
@@ -89,8 +75,8 @@ class JiraTransitionIssueActionTest {
 
         Http.ResponseType responseType = configuration.getResponseType();
 
-        assertEquals(Type.JSON, responseType.getType());
-
-        verify(mockedExecutor).execute();
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/issue/testIssue/transitions", stringArgumentCaptor.getValue());
+        assertEquals(Http.Body.of(Map.of(TRANSITION, Map.of(ID, "5"))), bodyArgumentCaptor.getValue());
     }
 }
