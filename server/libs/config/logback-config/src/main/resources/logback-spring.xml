@@ -6,6 +6,12 @@
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
+    <SpringProfile name="!testint">
+        <appender name="OpenTelemetry"
+                  class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+        </appender>
+    </SpringProfile>
+
     <SpringProfile name="dev">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
     </SpringProfile>
@@ -13,10 +19,6 @@
     <SpringProfile name="prod">
         <include resource="org/springframework/boot/logging/logback/structured-console-appender.xml"/>
     </SpringProfile>
-
-    <appender name="OpenTelemetry"
-              class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
-    </appender>
 
     <!-- See https://github.com/open-telemetry/opentelemetry-java-instrumentation/issues/13069
     <appender name="ASYNC-OpenTelemetry" class="ch.qos.logback.classic.AsyncAppender">
