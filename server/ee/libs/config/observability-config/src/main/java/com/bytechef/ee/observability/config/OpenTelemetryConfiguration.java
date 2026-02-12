@@ -31,6 +31,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.observation.OpenTelemetryServerRequestObservationConvention;
 
+/**
+ * @Matija Petanjek
+ */
 @Configuration(proxyBeanMethods = false)
 public class OpenTelemetryConfiguration {
 
@@ -68,5 +71,4 @@ public class OpenTelemetryConfiguration {
     ClassLoaderMetrics classLoaderMetrics() {
         return new ClassLoaderMetrics(new OpenTelemetryJvmClassLoadingMeterConventions());
     }
-
 }

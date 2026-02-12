@@ -27,13 +27,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * @Matija Petanjek
+ */
 class HeaderLoggerFilter extends OncePerRequestFilter {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(HeaderLoggerFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
+
         logHeaders(request);
+
         filterChain.doFilter(request, response);
     }
 
@@ -42,9 +48,11 @@ class HeaderLoggerFilter extends OncePerRequestFilter {
             .asIterator()
             .forEachRemaining(header -> {
                 List<String> values = new ArrayList<>();
+
                 request.getHeaders(header)
                     .asIterator()
                     .forEachRemaining(values::add);
+
                 LOGGER.debug("{}: {}", header, values.size() == 1 ? values.getFirst() : values);
             });
     }

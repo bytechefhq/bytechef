@@ -20,6 +20,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
 
+/**
+ * @Matija Petanjek
+ */
 @Configuration(proxyBeanMethods = false)
 public class ContextPropagationConfiguration {
 
@@ -27,5 +30,4 @@ public class ContextPropagationConfiguration {
     ContextPropagatingTaskDecorator contextPropagatingTaskDecorator() {
         return new ContextPropagatingTaskDecorator();
     }
-
 }
