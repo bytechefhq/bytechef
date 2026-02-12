@@ -213,7 +213,6 @@ const ProjectWorkflowListItem = ({
                                 <TooltipTrigger asChild>
                                     <div className="shrink-0">
                                         <Badge
-                                            className="whitespace-nowrap"
                                             label={triggerData.actionLabel || triggerData.componentName}
                                             styleType="outline-outline"
                                             weight="semibold"
@@ -228,7 +227,6 @@ const ProjectWorkflowListItem = ({
                         ) : (
                             <div className="shrink-0">
                                 <Badge
-                                    className="whitespace-nowrap"
                                     label={triggerData.actionLabel || triggerData.componentName}
                                     styleType="outline-outline"
                                     weight="semibold"
