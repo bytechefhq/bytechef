@@ -5,10 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -26,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.411987+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-02-12T08:42:40.890500807+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
 public class OAuth2Model {
 
   private @Nullable String authorizationUrl;
@@ -39,7 +36,7 @@ public class OAuth2Model {
   private @Nullable String redirectUri;
 
   @Valid
-  private List<String> scopes = new ArrayList<>();
+  private Map<String, String> scopes = new HashMap<>();
 
   public OAuth2Model authorizationUrl(@Nullable String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
@@ -129,16 +126,16 @@ public class OAuth2Model {
     this.redirectUri = redirectUri;
   }
 
-  public OAuth2Model scopes(List<String> scopes) {
+  public OAuth2Model scopes(Map<String, String> scopes) {
     this.scopes = scopes;
     return this;
   }
 
-  public OAuth2Model addScopesItem(String scopesItem) {
+  public OAuth2Model putScopesItem(String key, String scopesItem) {
     if (this.scopes == null) {
-      this.scopes = new ArrayList<>();
+      this.scopes = new HashMap<>();
     }
-    this.scopes.add(scopesItem);
+    this.scopes.put(key, scopesItem);
     return this;
   }
 
@@ -149,11 +146,11 @@ public class OAuth2Model {
   
   @Schema(name = "scopes", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("scopes")
-  public List<String> getScopes() {
+  public Map<String, String> getScopes() {
     return scopes;
   }
 
-  public void setScopes(List<String> scopes) {
+  public void setScopes(Map<String, String> scopes) {
     this.scopes = scopes;
   }
 
@@ -195,7 +192,7 @@ public class OAuth2Model {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
+  private String toIndentedString(@Nullable Object o) {
     if (o == null) {
       return "null";
     }
