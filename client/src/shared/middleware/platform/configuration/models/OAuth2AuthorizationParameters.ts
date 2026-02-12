@@ -39,10 +39,10 @@ export interface OAuth2AuthorizationParameters {
     clientId?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {{ [key: string]: boolean; }}
      * @memberof OAuth2AuthorizationParameters
      */
-    scopes?: Array<string>;
+    scopes?: { [key: string]: boolean; };
 }
 
 /**

@@ -9,7 +9,7 @@ Name | Type
 `authorizationUrl` | string
 `extraQueryParameters` | { [key: string]: string; }
 `clientId` | string
-`scopes` | Array&lt;string&gt;
+`scopes` | { [key: string]: boolean; }
 
 ## Example
 
