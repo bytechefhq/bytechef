@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.webflow.util.WebflowUtils;
 import com.google.auto.service.AutoService;
@@ -42,7 +43,9 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
     public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
 
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
-            if (Objects.equals(modifiableActionDefinition.getName(), "getCollectionItem")) {
+            String name = modifiableActionDefinition.getName();
+
+            if (Objects.equals(name, "getCollectionItem")) {
                 Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
 
                 List<Property> properties = new ArrayList<>(propertiesOptional.orElse(List.of()));
@@ -54,6 +57,11 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
                         .required(false));
 
                 modifiableActionDefinition.properties(properties);
+                modifiableActionDefinition.help(
+                    "", "https://docs.bytechef.io/reference/components/webflow_v1#get-collection-item");
+            } else if (Objects.equals(name, "fulfillOrder")) {
+                modifiableActionDefinition.help(
+                    "", "https://docs.bytechef.io/reference/components/webflow_v1#fulfill-order");
             }
         }
 
@@ -64,7 +72,18 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp("", "https://developers.webflow.com/data/reference/rest-introduction")
             .icon("path:assets/webflow.svg")
-            .categories(ComponentCategory.DEVELOPER_TOOLS);
+            .categories(ComponentCategory.DEVELOPER_TOOLS)
+            .version(1);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/webflow_v1#connection-setup")
+            .version(1);
     }
 }
