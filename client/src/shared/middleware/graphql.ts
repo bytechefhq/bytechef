@@ -752,6 +752,39 @@ export enum HttpMethod {
   Put = 'PUT'
 }
 
+export type IdentityProviderInput = {
+  autoProvision?: InputMaybe<Scalars['Boolean']['input']>;
+  clientId: Scalars['String']['input'];
+  clientSecret?: InputMaybe<Scalars['String']['input']>;
+  defaultAuthority?: InputMaybe<Scalars['String']['input']>;
+  domains: Array<Scalars['String']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  enforced?: InputMaybe<Scalars['Boolean']['input']>;
+  issuerUri: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  scopes?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type IdentityProviderType = {
+  __typename?: 'IdentityProviderType';
+  autoProvision: Scalars['Boolean']['output'];
+  clientId: Scalars['String']['output'];
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  defaultAuthority: Scalars['String']['output'];
+  domains: Array<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  enforced: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  issuerUri: Scalars['String']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  scopes: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+};
+
 export type ImportCsvInput = {
   csv: Scalars['String']['input'];
   environmentId: Scalars['ID']['input'];
@@ -1054,6 +1087,7 @@ export type Mutation = {
   createApiKey: Scalars['String']['output'];
   createApprovalTask?: Maybe<ApprovalTask>;
   createDataTable: Scalars['Boolean']['output'];
+  createIdentityProvider: IdentityProviderType;
   createKnowledgeBase?: Maybe<KnowledgeBase>;
   createMcpComponent?: Maybe<McpComponent>;
   createMcpComponentWithTools?: Maybe<McpComponent>;
@@ -1068,6 +1102,7 @@ export type Mutation = {
   deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
   deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
+  deleteIdentityProvider: Scalars['Boolean']['output'];
   deleteJobFileLogs: Scalars['Boolean']['output'];
   deleteKnowledgeBase?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
@@ -1111,6 +1146,7 @@ export type Mutation = {
   updateApprovalTask?: Maybe<ApprovalTask>;
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
+  updateIdentityProvider: IdentityProviderType;
   updateKnowledgeBase?: Maybe<KnowledgeBase>;
   updateKnowledgeBaseDocumentChunk?: Maybe<KnowledgeBaseDocumentChunk>;
   updateKnowledgeBaseDocumentTags: Scalars['Boolean']['output'];
@@ -1155,6 +1191,11 @@ export type MutationCreateApprovalTaskArgs = {
 
 export type MutationCreateDataTableArgs = {
   input: CreateDataTableInput;
+};
+
+
+export type MutationCreateIdentityProviderArgs = {
+  input: IdentityProviderInput;
 };
 
 
@@ -1228,6 +1269,11 @@ export type MutationDeleteCustomComponentArgs = {
 
 export type MutationDeleteDataTableRowArgs = {
   input: DeleteRowInput;
+};
+
+
+export type MutationDeleteIdentityProviderArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1473,6 +1519,12 @@ export type MutationUpdateDataTableRowArgs = {
 
 export type MutationUpdateDataTableTagsArgs = {
   input: UpdateDataTableTagsInput;
+};
+
+
+export type MutationUpdateIdentityProviderArgs = {
+  id: Scalars['ID']['input'];
+  input: IdentityProviderInput;
 };
 
 
@@ -1823,6 +1875,8 @@ export type Query = {
   environments?: Maybe<Array<Maybe<Environment>>>;
   exportDataTableCsv: Scalars['String']['output'];
   generationJobStatus?: Maybe<GenerationJobStatus>;
+  identityProvider?: Maybe<IdentityProviderType>;
+  identityProviders: Array<Maybe<IdentityProviderType>>;
   integration?: Maybe<Integration>;
   jobFileLogs: LogPage;
   jobFileLogsExist: Scalars['Boolean']['output'];
@@ -2099,6 +2153,11 @@ export type QueryExportDataTableCsvArgs = {
 
 export type QueryGenerationJobStatusArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type QueryIdentityProviderArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3518,12 +3577,38 @@ export type AuthoritiesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AuthoritiesQuery = { __typename?: 'Query', authorities: Array<string> };
 
+export type CreateIdentityProviderMutationVariables = Exact<{
+  input: IdentityProviderInput;
+}>;
+
+
+export type CreateIdentityProviderMutation = { __typename?: 'Mutation', createIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, name: string, scopes: string, type: string } };
+
+export type DeleteIdentityProviderMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteIdentityProviderMutation = { __typename?: 'Mutation', deleteIdentityProvider: boolean };
+
 export type DeleteUserMutationVariables = Exact<{
   login: Scalars['String']['input'];
 }>;
 
 
 export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: boolean };
+
+export type IdentityProviderQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type IdentityProviderQuery = { __typename?: 'Query', identityProvider?: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, name: string, scopes: string, type: string } | null };
+
+export type IdentityProvidersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type IdentityProvidersQuery = { __typename?: 'Query', identityProviders: Array<{ __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, name: string, scopes: string, type: string } | null> };
 
 export type InviteUserMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -3533,6 +3618,14 @@ export type InviteUserMutationVariables = Exact<{
 
 
 export type InviteUserMutation = { __typename?: 'Mutation', inviteUser: boolean };
+
+export type UpdateIdentityProviderMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: IdentityProviderInput;
+}>;
+
+
+export type UpdateIdentityProviderMutation = { __typename?: 'Mutation', updateIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, name: string, scopes: string, type: string } };
 
 export type UpdateUserMutationVariables = Exact<{
   login: Scalars['String']['input'];
@@ -6850,6 +6943,60 @@ export const useAuthoritiesQuery = <
   }
     )};
 
+export const CreateIdentityProviderDocument = `
+    mutation createIdentityProvider($input: IdentityProviderInput!) {
+  createIdentityProvider(input: $input) {
+    autoProvision
+    clientId
+    createdBy
+    createdDate
+    defaultAuthority
+    domains
+    enabled
+    enforced
+    id
+    issuerUri
+    lastModifiedBy
+    lastModifiedDate
+    name
+    scopes
+    type
+  }
+}
+    `;
+
+export const useCreateIdentityProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateIdentityProviderMutation, TError, CreateIdentityProviderMutationVariables, TContext>) => {
+    
+    return useMutation<CreateIdentityProviderMutation, TError, CreateIdentityProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['createIdentityProvider'],
+    mutationFn: (variables?: CreateIdentityProviderMutationVariables) => fetcher<CreateIdentityProviderMutation, CreateIdentityProviderMutationVariables>(CreateIdentityProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteIdentityProviderDocument = `
+    mutation deleteIdentityProvider($id: ID!) {
+  deleteIdentityProvider(id: $id)
+}
+    `;
+
+export const useDeleteIdentityProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteIdentityProviderMutation, TError, DeleteIdentityProviderMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteIdentityProviderMutation, TError, DeleteIdentityProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteIdentityProvider'],
+    mutationFn: (variables?: DeleteIdentityProviderMutationVariables) => fetcher<DeleteIdentityProviderMutation, DeleteIdentityProviderMutationVariables>(DeleteIdentityProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const DeleteUserDocument = `
     mutation deleteUser($login: String!) {
   deleteUser(login: $login)
@@ -6869,6 +7016,82 @@ export const useDeleteUserMutation = <
   }
     )};
 
+export const IdentityProviderDocument = `
+    query identityProvider($id: ID!) {
+  identityProvider(id: $id) {
+    autoProvision
+    clientId
+    createdBy
+    createdDate
+    defaultAuthority
+    domains
+    enabled
+    enforced
+    id
+    issuerUri
+    lastModifiedBy
+    lastModifiedDate
+    name
+    scopes
+    type
+  }
+}
+    `;
+
+export const useIdentityProviderQuery = <
+      TData = IdentityProviderQuery,
+      TError = unknown
+    >(
+      variables: IdentityProviderQueryVariables,
+      options?: Omit<UseQueryOptions<IdentityProviderQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IdentityProviderQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<IdentityProviderQuery, TError, TData>(
+      {
+    queryKey: ['identityProvider', variables],
+    queryFn: fetcher<IdentityProviderQuery, IdentityProviderQueryVariables>(IdentityProviderDocument, variables),
+    ...options
+  }
+    )};
+
+export const IdentityProvidersDocument = `
+    query identityProviders {
+  identityProviders {
+    autoProvision
+    clientId
+    createdBy
+    createdDate
+    defaultAuthority
+    domains
+    enabled
+    enforced
+    id
+    issuerUri
+    lastModifiedBy
+    lastModifiedDate
+    name
+    scopes
+    type
+  }
+}
+    `;
+
+export const useIdentityProvidersQuery = <
+      TData = IdentityProvidersQuery,
+      TError = unknown
+    >(
+      variables?: IdentityProvidersQueryVariables,
+      options?: Omit<UseQueryOptions<IdentityProvidersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IdentityProvidersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<IdentityProvidersQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['identityProviders'] : ['identityProviders', variables],
+    queryFn: fetcher<IdentityProvidersQuery, IdentityProvidersQueryVariables>(IdentityProvidersDocument, variables),
+    ...options
+  }
+    )};
+
 export const InviteUserDocument = `
     mutation inviteUser($email: String!, $password: String!, $role: String!) {
   inviteUser(email: $email, password: $password, role: $role)
@@ -6884,6 +7107,41 @@ export const useInviteUserMutation = <
       {
     mutationKey: ['inviteUser'],
     mutationFn: (variables?: InviteUserMutationVariables) => fetcher<InviteUserMutation, InviteUserMutationVariables>(InviteUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateIdentityProviderDocument = `
+    mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
+  updateIdentityProvider(id: $id, input: $input) {
+    autoProvision
+    clientId
+    createdBy
+    createdDate
+    defaultAuthority
+    domains
+    enabled
+    enforced
+    id
+    issuerUri
+    lastModifiedBy
+    lastModifiedDate
+    name
+    scopes
+    type
+  }
+}
+    `;
+
+export const useUpdateIdentityProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateIdentityProviderMutation, TError, UpdateIdentityProviderMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateIdentityProviderMutation, TError, UpdateIdentityProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['updateIdentityProvider'],
+    mutationFn: (variables?: UpdateIdentityProviderMutationVariables) => fetcher<UpdateIdentityProviderMutation, UpdateIdentityProviderMutationVariables>(UpdateIdentityProviderDocument, variables)(),
     ...options
   }
     )};

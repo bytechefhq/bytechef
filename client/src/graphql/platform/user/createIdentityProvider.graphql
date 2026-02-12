@@ -1,0 +1,19 @@
+mutation createIdentityProvider($input: IdentityProviderInput!) {
+    createIdentityProvider(input: $input) {
+        autoProvision
+        clientId
+        createdBy
+        createdDate
+        defaultAuthority
+        domains
+        enabled
+        enforced
+        id
+        issuerUri
+        lastModifiedBy
+        lastModifiedDate
+        name
+        scopes
+        type
+    }
+}

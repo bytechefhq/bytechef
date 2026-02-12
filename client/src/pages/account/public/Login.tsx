@@ -9,8 +9,8 @@ import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {EyeIcon, EyeOffIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {EyeIcon, EyeOffIcon, ShieldCheckIcon} from 'lucide-react';
+import {useCallback, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, Navigate, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {z} from 'zod';
@@ -25,8 +25,14 @@ const formSchema = z.object({
     rememberMe: z.boolean(),
 });
 
+interface SsoRedirectI {
+    providerName: string;
+    url: string;
+}
+
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [ssoRedirect, setSsoRedirect] = useState<SsoRedirectI | null>(null);
 
     const {authenticated, login, loginError, reset} = useAuthenticationStore(
         useShallow((state) => ({
@@ -68,6 +74,36 @@ const Login = () => {
             }
         });
     };
+
+    const handleEmailBlur = useCallback(async () => {
+        const email = form.getValues('email');
+
+        if (!email || !email.includes('@')) {
+            setSsoRedirect(null);
+
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/sso/discover', {
+                body: JSON.stringify({email}),
+                headers: {'Content-Type': 'application/json'},
+                method: 'POST',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                if (data.redirectUrl) {
+                    setSsoRedirect({providerName: data.providerName, url: data.redirectUrl});
+                } else {
+                    setSsoRedirect(null);
+                }
+            }
+        } catch {
+            setSsoRedirect(null);
+        }
+    }, [form]);
 
     const {from} = pageLocation.state || {from: {pathname: '/', search: pageLocation.search}};
 
@@ -162,6 +198,12 @@ const Login = () => {
                                                     id="email"
                                                     type="email"
                                                     {...field}
+                                                    onBlur={(event) => {
+                                                        field.onBlur();
+                                                        handleEmailBlur();
+
+                                                        return event;
+                                                    }}
                                                 />
                                             </FormControl>
 
@@ -169,6 +211,25 @@ const Login = () => {
                                         </FormItem>
                                     )}
                                 />
+
+                                {ssoRedirect && (
+                                    <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                                        <p className="mb-2 text-sm text-blue-800">
+                                            Your organization uses SSO for authentication.
+                                        </p>
+
+                                        <Button
+                                            className="w-full"
+                                            icon={<ShieldCheckIcon className="size-4" />}
+                                            label={`Continue with ${ssoRedirect.providerName}`}
+                                            onClick={() => {
+                                                window.location.href = ssoRedirect.url;
+                                            }}
+                                            size="lg"
+                                            variant="outline"
+                                        />
+                                    </div>
+                                )}
 
                                 <FormField
                                     control={form.control}
