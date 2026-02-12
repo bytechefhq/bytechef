@@ -1,0 +1,42 @@
+extend type Query {
+    identityProvider(id: ID!): IdentityProviderType
+    identityProviders: [IdentityProviderType]!
+}
+
+extend type Mutation {
+    createIdentityProvider(input: IdentityProviderInput!): IdentityProviderType!
+    deleteIdentityProvider(id: ID!): Boolean!
+    updateIdentityProvider(id: ID!, input: IdentityProviderInput!): IdentityProviderType!
+}
+
+type IdentityProviderType {
+    autoProvision: Boolean!
+    clientId: String!
+    createdBy: String
+    createdDate: Long
+    defaultAuthority: String!
+    domains: [String!]!
+    enabled: Boolean!
+    enforced: Boolean!
+    id: ID!
+    issuerUri: String!
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    name: String!
+    scopes: String!
+    type: String!
+}
+
+input IdentityProviderInput {
+    autoProvision: Boolean
+    clientId: String!
+    clientSecret: String
+    defaultAuthority: String
+    domains: [String!]!
+    enabled: Boolean
+    enforced: Boolean
+    issuerUri: String!
+    name: String!
+    scopes: String
+    type: String
+}
