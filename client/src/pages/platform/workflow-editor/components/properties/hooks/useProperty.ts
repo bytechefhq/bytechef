@@ -501,7 +501,7 @@ export const useProperty = ({
             return;
         }
 
-        const parentParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
+        const parentParameterValue = resolvePath(encodeParameters(currentComponent.parameters ?? {}), encodePath(path));
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -823,15 +823,15 @@ export const useProperty = ({
 
         const {parameters} = currentComponent;
 
+        const encodedParameters = encodeParameters(parameters);
+        const encodedPath = path ? encodePath(path) : undefined;
+
         if (Object.keys(parameters).length && (!propertyParameterValue || propertyParameterValue === defaultValue)) {
-            if (!path) {
+            if (!path || !encodedPath) {
                 setPropertyParameterValue(parameters[name]);
 
                 return;
             }
-
-            const encodedParameters = encodeParameters(parameters);
-            const encodedPath = encodePath(path);
 
             const valueFromDefinition = resolvePath(encodedParameters, encodedPath);
 
@@ -848,17 +848,17 @@ export const useProperty = ({
             }
         }
 
-        // save hidden property to definition on render
-        if (
+        const shouldSaveHiddenProperty =
             hidden &&
-            path &&
+            encodedPath &&
             (objectName === undefined || dynamicPropertySource === objectName) &&
             (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
-            resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
-        ) {
+            resolvePath(encodedParameters, encodedPath) !== defaultValue;
+
+        if (shouldSaveHiddenProperty) {
             const saveDefaultValue = () => {
                 saveProperty({
-                    path,
+                    path: path!,
                     type,
                     updateClusterElementParameterMutation,
                     updateWorkflowNodeParameterMutation,
