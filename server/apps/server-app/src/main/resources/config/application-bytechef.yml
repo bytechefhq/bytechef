@@ -83,11 +83,6 @@ bytechef:
 #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
   observability:
-    loki:
-      appender:
-        level: "ALL"
-        http:
-          url: http://localhost:3100/loki/api/v1/push
     enabled: false
   public-url:
   resources:
@@ -102,9 +97,6 @@ bytechef:
   # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single
-  tracing:
-    otlp:
-      endpoint: http://localhost:4318/v1/traces
   webhook-url:
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
