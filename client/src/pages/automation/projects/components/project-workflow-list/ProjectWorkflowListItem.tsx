@@ -43,6 +43,13 @@ import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link, useSearchParams} from 'react-router-dom';
 
+type TriggerDataType = {
+    componentName: string;
+    description: string;
+    iconSrc: string;
+    label: string;
+};
+
 const ProjectWorkflowListItem = ({
     filteredComponentNames,
     project,
@@ -80,7 +87,7 @@ const ProjectWorkflowListItem = ({
 
     const triggerVersionNumber = triggerType ? +triggerType.split('/')[1].replace('v', '') : 1;
 
-    const {data: fullTriggerComponentDefinition} = useGetComponentDefinitionQuery(
+    const {data: triggerComponentDefinition} = useGetComponentDefinitionQuery(
         {
             componentName: triggerComponentName || '',
             componentVersion: triggerVersionNumber,
@@ -88,7 +95,7 @@ const ProjectWorkflowListItem = ({
         !!triggerComponentName
     );
 
-    const triggerData = useMemo(() => {
+    const triggerData = useMemo<TriggerDataType | null>(() => {
         if (!triggerComponentName && !workflow.triggers?.[0]) {
             return null;
         }
@@ -96,19 +103,26 @@ const ProjectWorkflowListItem = ({
         const triggerFromWorkflow = workflow.triggers?.[0];
         const triggerDefinition = workflowComponentDefinitions[triggerComponentName || ''];
 
-        const triggerOperationName = triggerFromWorkflow?.type?.split('/')[2];
+        const matchedTrigger = triggerComponentDefinition?.triggers?.find(
+            (trigger) => trigger.name === triggerFromWorkflow?.type?.split('/')[2]
+        );
 
-        const matchedTrigger = triggerOperationName
-            ? fullTriggerComponentDefinition?.triggers?.find((trigger) => trigger.name === triggerOperationName)
-            : null;
+        if (!matchedTrigger && !triggerFromWorkflow) {
+            return null;
+        }
+
+        const description = matchedTrigger?.description || triggerFromWorkflow?.description || '';
+        const label = matchedTrigger?.title || triggerFromWorkflow?.label || '';
+        const componentName = triggerDefinition?.title || triggerComponentName || 'Unknown Trigger';
+        const iconSrc = triggerDefinition?.icon || '';
 
         return {
-            actionDescription: matchedTrigger?.description || triggerFromWorkflow?.description || null,
-            actionLabel: matchedTrigger?.title || triggerFromWorkflow?.label || null,
-            componentName: triggerDefinition?.title || triggerComponentName || 'Unknown Trigger',
-            iconSrc: triggerDefinition?.icon || null,
+            componentName,
+            description,
+            iconSrc,
+            label,
         };
-    }, [workflow, workflowComponentDefinitions, triggerComponentName, fullTriggerComponentDefinition]);
+    }, [workflow, workflowComponentDefinitions, triggerComponentName, triggerComponentDefinition]);
 
     const taskOnlyComponentNames = useMemo(() => {
         if (!filteredComponentNames) {
@@ -208,12 +222,12 @@ const ProjectWorkflowListItem = ({
                             <TooltipContent>{triggerData.componentName}</TooltipContent>
                         </Tooltip>
 
-                        {triggerData.actionDescription ? (
+                        {triggerData.description ? (
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <div className="shrink-0">
                                         <Badge
-                                            label={triggerData.actionLabel || triggerData.componentName}
+                                            label={triggerData.label || triggerData.componentName}
                                             styleType="outline-outline"
                                             weight="semibold"
                                         />
@@ -221,13 +235,13 @@ const ProjectWorkflowListItem = ({
                                 </TooltipTrigger>
 
                                 <TooltipContent className="max-w-xs text-sm" side="right">
-                                    {triggerData.actionDescription}
+                                    {triggerData.description}
                                 </TooltipContent>
                             </Tooltip>
                         ) : (
                             <div className="shrink-0">
                                 <Badge
-                                    label={triggerData.actionLabel || triggerData.componentName}
+                                    label={triggerData.label || triggerData.componentName}
                                     styleType="outline-outline"
                                     weight="semibold"
                                 />
