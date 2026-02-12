@@ -1812,7 +1812,7 @@
       "type": "INTEGER"
     }, {
       "advancedOption": null,
-      "controlType": "INTEGER",
+      "controlType": "SELECT",
       "defaultValue": null,
       "description": "Id of the pipeline this deal will be added to. By default, the deal will be added to the first stage of the specified pipeline. Please note that `pipeline_id` and `stage_id` should not be used together as `pipeline_id` will be ignored.",
       "displayCondition": null,
@@ -1827,7 +1827,10 @@
       "minValue": null,
       "name": "pipeline_id",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "placeholder": null,
       "required": false,
       "type": "INTEGER"
@@ -3051,7 +3054,7 @@
     "help": null,
     "metadata": {
       "method": "DELETE",
-      "path": "/deals/{id}"
+      "path": "/deals/{deal_id}"
     },
     "name": "deleteDeal",
     "outputDefinition": {
@@ -3198,7 +3201,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Id of the deal to delete.",
+      "description": "ID of the deal to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -3209,7 +3212,7 @@
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "deal_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -3233,7 +3236,7 @@
     "help": null,
     "metadata": {
       "method": "GET",
-      "path": "/deals/{id}"
+      "path": "/deals/{deal_id}"
     },
     "name": "getDealDetails",
     "outputDefinition": {
@@ -3971,13 +3974,13 @@
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Deal",
+      "label": "Deal ID",
       "maxValue": null,
       "metadata": {
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "deal_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -5152,7 +5155,7 @@
       "type": "INTEGER"
     }, {
       "advancedOption": null,
-      "controlType": "ARRAY_BUILDER",
+      "controlType": "MULTI_SELECT",
       "defaultValue": null,
       "description": "ID of the labels which will be associated with the lead.",
       "displayCondition": null,
@@ -5193,7 +5196,10 @@
       "multipleValues": null,
       "name": "label_ids",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "placeholder": "Add to Label Ids",
       "required": false,
       "type": "ARRAY"
@@ -5288,7 +5294,7 @@
         "type": "NUMBER"
       }, {
         "advancedOption": null,
-        "controlType": "TEXT",
+        "controlType": "SELECT",
         "defaultValue": null,
         "description": null,
         "displayCondition": null,
@@ -5302,7 +5308,10 @@
         "minLength": null,
         "name": "currency",
         "options": null,
-        "optionsDataSource": null,
+        "optionsDataSource": {
+          "options": { },
+          "optionsLookupDependsOn": null
+        },
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
@@ -5345,7 +5354,7 @@
     "help": null,
     "metadata": {
       "method": "DELETE",
-      "path": "/leads/{id}"
+      "path": "/leads/{lead_id}"
     },
     "name": "deleteLead",
     "outputDefinition": {
@@ -5498,7 +5507,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "The ID of the lead",
+      "description": "ID of the lead to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -5510,7 +5519,7 @@
         "type": "PATH"
       },
       "minLength": null,
-      "name": "id",
+      "name": "lead_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -5536,7 +5545,7 @@
     "help": null,
     "metadata": {
       "method": "GET",
-      "path": "/leads/{id}"
+      "path": "/leads/{lead_id}"
     },
     "name": "getLeadDetails",
     "outputDefinition": {
@@ -5977,7 +5986,7 @@
         "type": "PATH"
       },
       "minLength": null,
-      "name": "id",
+      "name": "lead_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -8265,7 +8274,7 @@
     "help": null,
     "metadata": {
       "method": "DELETE",
-      "path": "/organizations/{id}"
+      "path": "/organizations/{organization_id}"
     },
     "name": "deleteOrganization",
     "outputDefinition": {
@@ -8412,18 +8421,18 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Organization to delete",
+      "description": "ID of the organization to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Organization",
+      "label": "Organization ID",
       "maxValue": null,
       "metadata": {
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "organization_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -8447,7 +8456,7 @@
     "help": null,
     "metadata": {
       "method": "GET",
-      "path": "/organizations/{id}"
+      "path": "/organizations/{organization_id}"
     },
     "name": "getOrganizationDetails",
     "outputDefinition": {
@@ -8842,18 +8851,18 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Organization to get details.",
+      "description": "ID of the organization to get details.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Organizaton",
+      "label": "Organizaton ID",
       "maxValue": null,
       "metadata": {
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "organization_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -12563,7 +12572,7 @@
     "help": null,
     "metadata": {
       "method": "DELETE",
-      "path": "/persons/{id}"
+      "path": "/persons/{person_id}"
     },
     "name": "deletePerson",
     "outputDefinition": {
@@ -12710,18 +12719,18 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Person to delete",
+      "description": "ID of the person to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Person",
+      "label": "Person ID",
       "maxValue": null,
       "metadata": {
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "person_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -12745,7 +12754,7 @@
     "help": null,
     "metadata": {
       "method": "GET",
-      "path": "/persons/{id}"
+      "path": "/persons/{person_id}"
     },
     "name": "getPersonDetails",
     "outputDefinition": {
@@ -13742,18 +13751,18 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Person to get details",
+      "description": "ID of the person to get details.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Person",
+      "label": "Person ID",
       "maxValue": null,
       "metadata": {
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "person_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -15566,7 +15575,7 @@
       "type": "INTEGER"
     }, {
       "advancedOption": null,
-      "controlType": "INTEGER",
+      "controlType": "SELECT",
       "defaultValue": null,
       "description": "Id of the pipeline this deal will be added to. By default, the deal will be added to the first stage of the specified pipeline. Please note that `pipeline_id` and `stage_id` should not be used together as `pipeline_id` will be ignored.",
       "displayCondition": null,
@@ -15581,7 +15590,10 @@
       "minValue": null,
       "name": "pipeline_id",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "placeholder": null,
       "required": false,
       "type": "INTEGER"
@@ -16944,7 +16956,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Id of the deal to delete.",
+      "description": "ID of the deal to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -16955,7 +16967,7 @@
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "deal_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -17713,13 +17725,13 @@
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Deal",
+      "label": "Deal ID",
       "maxValue": null,
       "metadata": {
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "deal_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -18884,7 +18896,7 @@
       "type": "INTEGER"
     }, {
       "advancedOption": null,
-      "controlType": "ARRAY_BUILDER",
+      "controlType": "MULTI_SELECT",
       "defaultValue": null,
       "description": "ID of the labels which will be associated with the lead.",
       "displayCondition": null,
@@ -18925,7 +18937,10 @@
       "multipleValues": null,
       "name": "label_ids",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "placeholder": "Add to Label Ids",
       "required": false,
       "type": "ARRAY"
@@ -19020,7 +19035,7 @@
         "type": "NUMBER"
       }, {
         "advancedOption": null,
-        "controlType": "TEXT",
+        "controlType": "SELECT",
         "defaultValue": null,
         "description": null,
         "displayCondition": null,
@@ -19034,7 +19049,10 @@
         "minLength": null,
         "name": "currency",
         "options": null,
-        "optionsDataSource": null,
+        "optionsDataSource": {
+          "options": { },
+          "optionsLookupDependsOn": null
+        },
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
@@ -19226,7 +19244,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "The ID of the lead",
+      "description": "ID of the lead to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -19238,7 +19256,7 @@
         "type": "PATH"
       },
       "minLength": null,
-      "name": "id",
+      "name": "lead_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -19701,7 +19719,7 @@
         "type": "PATH"
       },
       "minLength": null,
-      "name": "id",
+      "name": "lead_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -22114,18 +22132,18 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Organization to delete",
+      "description": "ID of the organization to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Organization",
+      "label": "Organization ID",
       "maxValue": null,
       "metadata": {
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "organization_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -22540,18 +22558,18 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Organization to get details.",
+      "description": "ID of the organization to get details.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Organizaton",
+      "label": "Organizaton ID",
       "maxValue": null,
       "metadata": {
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "organization_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -26390,18 +26408,18 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Person to delete",
+      "description": "ID of the person to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Person",
+      "label": "Person ID",
       "maxValue": null,
       "metadata": {
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "person_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -27418,18 +27436,18 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Person to get details",
+      "description": "ID of the person to get details.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Person",
+      "label": "Person ID",
       "maxValue": null,
       "metadata": {
         "type": "PATH"
       },
       "minValue": null,
-      "name": "id",
+      "name": "person_id",
       "options": null,
       "optionsDataSource": {
         "options": { },
