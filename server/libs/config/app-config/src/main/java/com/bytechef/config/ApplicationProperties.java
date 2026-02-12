@@ -345,12 +345,87 @@ public class ApplicationProperties {
         /** Whether observability features are enabled */
         private boolean enabled;
 
+        /** Logging observability configuration */
+        private Logging logging = new Logging();
+
+        /** Metrics observability configuration */
+        private Metrics metrics = new Metrics();
+
+        /** Tracing observability configuration */
+        private Tracing tracing = new Tracing();
+
         public boolean isEnabled() {
             return enabled;
         }
 
+        public Logging getLogging() {
+            return logging;
+        }
+
+        public Metrics getMetrics() {
+            return metrics;
+        }
+
+        public Tracing getTracing() {
+            return tracing;
+        }
+
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+
+        public void setLogging(Logging logging) {
+            this.logging = logging;
+        }
+
+        public void setMetrics(Metrics metrics) {
+            this.metrics = metrics;
+        }
+
+        public void setTracing(Tracing tracing) {
+            this.tracing = tracing;
+        }
+
+        public static class Logging {
+
+            /** OTLP endpoint for logging export */
+            private String endpoint;
+
+            public String getEndpoint() {
+                return endpoint;
+            }
+
+            public void setEndpoint(String endpoint) {
+                this.endpoint = endpoint;
+            }
+        }
+
+        public static class Metrics {
+
+            /** OTLP endpoint for metrics export */
+            private String endpoint;
+
+            public String getEndpoint() {
+                return endpoint;
+            }
+
+            public void setEndpoint(String endpoint) {
+                this.endpoint = endpoint;
+            }
+        }
+
+        public static class Tracing {
+
+            /** OTLP endpoint for tracing export */
+            private String endpoint;
+
+            public String getEndpoint() {
+                return endpoint;
+            }
+
+            public void setEndpoint(String endpoint) {
+                this.endpoint = endpoint;
+            }
         }
     }
 
