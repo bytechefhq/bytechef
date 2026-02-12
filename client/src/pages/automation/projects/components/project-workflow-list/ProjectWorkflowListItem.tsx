@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -25,11 +26,21 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 import '@/shared/styles/dropdownMenu.css';
 import {useToast} from '@/hooks/use-toast';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
+import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Share2Icon, Trash2Icon} from 'lucide-react';
-import {useState} from 'react';
+import {
+    ComponentIcon,
+    CopyIcon,
+    DownloadIcon,
+    EditIcon,
+    EllipsisVerticalIcon,
+    Share2Icon,
+    Trash2Icon,
+} from 'lucide-react';
+import {useMemo, useState} from 'react';
+import InlineSVG from 'react-inlinesvg';
 import {Link, useSearchParams} from 'react-router-dom';
 
 const ProjectWorkflowListItem = ({
@@ -63,6 +74,51 @@ const ProjectWorkflowListItem = ({
     const queryClient = useQueryClient();
 
     const {toast} = useToast();
+
+    const triggerComponentName = workflow.workflowTriggerComponentNames?.[0];
+    const triggerType = workflow.triggers?.[0]?.type;
+
+    const triggerVersionNumber = triggerType ? +triggerType.split('/')[1].replace('v', '') : 1;
+
+    const {data: fullTriggerComponentDefinition} = useGetComponentDefinitionQuery(
+        {
+            componentName: triggerComponentName || '',
+            componentVersion: triggerVersionNumber,
+        },
+        !!triggerComponentName
+    );
+
+    const triggerData = useMemo(() => {
+        if (!triggerComponentName && !workflow.triggers?.[0]) {
+            return null;
+        }
+
+        const triggerFromWorkflow = workflow.triggers?.[0];
+        const triggerDefinition = workflowComponentDefinitions[triggerComponentName || ''];
+
+        const triggerOperationName = triggerFromWorkflow?.type?.split('/')[2];
+
+        const matchedTrigger = triggerOperationName
+            ? fullTriggerComponentDefinition?.triggers?.find((trigger) => trigger.name === triggerOperationName)
+            : null;
+
+        return {
+            actionDescription: matchedTrigger?.description || triggerFromWorkflow?.description || null,
+            actionLabel: matchedTrigger?.title || triggerFromWorkflow?.label || null,
+            componentName: triggerDefinition?.title || triggerComponentName || 'Unknown Trigger',
+            iconSrc: triggerDefinition?.icon || null,
+        };
+    }, [workflow, workflowComponentDefinitions, triggerComponentName, fullTriggerComponentDefinition]);
+
+    const taskOnlyComponentNames = useMemo(() => {
+        if (!filteredComponentNames) {
+            return [];
+        }
+
+        const triggerCount = workflow.workflowTriggerComponentNames?.length ?? 0;
+
+        return filteredComponentNames.slice(triggerCount);
+    }, [filteredComponentNames, workflow.workflowTriggerComponentNames]);
 
     const deleteWorkflowMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
@@ -119,11 +175,11 @@ const ProjectWorkflowListItem = ({
         >
             <Link
                 aria-label={`Link to workflow ${workflow.label}`}
-                className="flex flex-1 items-center"
+                className="flex flex-1 items-center gap-2"
                 data-testid={`${workflow.projectWorkflowId}-link`}
                 to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`}
             >
-                <div className="w-80 pr-1 text-sm font-semibold">
+                <div className="w-80 shrink-0 pr-1 text-sm font-semibold">
                     <Tooltip>
                         <TooltipTrigger className="line-clamp-1 text-start">{workflow.label}</TooltipTrigger>
 
@@ -131,8 +187,59 @@ const ProjectWorkflowListItem = ({
                     </Tooltip>
                 </div>
 
+                {triggerData && (
+                    <div className="flex shrink-0 items-center gap-1">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="flex shrink-0 items-center justify-center rounded-full border border-stroke-neutral-primary bg-surface-neutral-primary p-1">
+                                    {triggerData.iconSrc ? (
+                                        <InlineSVG
+                                            className="size-5"
+                                            loader={<ComponentIcon className="size-5 flex-none" />}
+                                            src={triggerData.iconSrc}
+                                            title={null}
+                                        />
+                                    ) : (
+                                        <ComponentIcon className="size-3 flex-none text-content-neutral-primary" />
+                                    )}
+                                </div>
+                            </TooltipTrigger>
+
+                            <TooltipContent>{triggerData.componentName}</TooltipContent>
+                        </Tooltip>
+
+                        {triggerData.actionDescription ? (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <div className="shrink-0">
+                                        <Badge
+                                            className="whitespace-nowrap"
+                                            label={triggerData.actionLabel || triggerData.componentName}
+                                            styleType="outline-outline"
+                                            weight="semibold"
+                                        />
+                                    </div>
+                                </TooltipTrigger>
+
+                                <TooltipContent className="max-w-xs text-sm" side="right">
+                                    {triggerData.actionDescription}
+                                </TooltipContent>
+                            </Tooltip>
+                        ) : (
+                            <div className="shrink-0">
+                                <Badge
+                                    className="whitespace-nowrap"
+                                    label={triggerData.actionLabel || triggerData.componentName}
+                                    styleType="outline-outline"
+                                    weight="semibold"
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 <WorkflowComponentsList
-                    filteredComponentNames={filteredComponentNames || []}
+                    filteredComponentNames={taskOnlyComponentNames}
                     workflowComponentDefinitions={workflowComponentDefinitions}
                     workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
                 />
