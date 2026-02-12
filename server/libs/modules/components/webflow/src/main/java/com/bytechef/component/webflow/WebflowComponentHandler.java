@@ -53,6 +53,7 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
                 properties.addFirst(
                     string(SITE_ID)
                         .label("Site ID")
+                        .description("Unique identifier for a site.")
                         .options((OptionsFunction<String>) WebflowUtils::getSiteIdOptions)
                         .required(false));
 

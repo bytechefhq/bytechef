@@ -16,6 +16,7 @@ paths:
       parameters:
         - name: "siteId"
           in: "path"
+          description: "Unique identifier for a site."
           required: true
           schema:
             type: "string"
@@ -23,6 +24,7 @@ paths:
             x-dynamic-options: true
         - name: "orderId"
           in: "path"
+          description: "Unique identifier for an order."
           required: true
           schema:
             type: "string"
@@ -53,7 +55,7 @@ paths:
       parameters:
         - name: "collectionId"
           in: "path"
-          description: ""
+          description: "Unique identifier for a collection."
           required: true
           schema:
             type: "string"
@@ -63,7 +65,7 @@ paths:
               - "siteId"
         - name: "itemId"
           in: "path"
-          description: ""
+          description: "Unique identifier for an item."
           required: true
           schema:
             type: "string"
