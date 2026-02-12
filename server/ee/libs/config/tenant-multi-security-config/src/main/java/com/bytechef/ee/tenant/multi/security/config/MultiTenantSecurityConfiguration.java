@@ -13,10 +13,13 @@ import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantAuthe
 import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantOAuth2AuthenticationFailureHandler;
 import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantOAuth2AuthenticationSuccessHandler;
 import com.bytechef.ee.tenant.multi.security.web.filter.MultiTenantInternalFilter;
+import com.bytechef.ee.tenant.multi.security.web.filter.SsoEnforcementFilter;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
 import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.security.web.oauth2.CustomOAuth2UserService;
+import com.bytechef.security.web.oauth2.CustomOidcUserService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -50,13 +53,21 @@ public class MultiTenantSecurityConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "bytechef.social-login", name = "enabled", havingValue = "true")
+    SsoEnforcementFilter ssoEnforcementFilter(IdentityProviderService identityProviderService) {
+        return new SsoEnforcementFilter(identityProviderService);
+    }
+
+    @Bean
     @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
     OAuth2LoginCustomizer multiTenantOAuth2LoginCustomizer(
-        CustomOAuth2UserService customOAuth2UserService, RememberMeServices rememberMeServices,
-        TenantService tenantService) {
+        CustomOAuth2UserService customOAuth2UserService, CustomOidcUserService customOidcUserService,
+        RememberMeServices rememberMeServices, TenantService tenantService) {
 
         return http -> http.oauth2Login(oauth2 -> oauth2
-            .userInfoEndpoint(endpoint -> endpoint.userService(customOAuth2UserService))
+            .userInfoEndpoint(endpoint -> endpoint
+                .userService(customOAuth2UserService)
+                .oidcUserService(customOidcUserService))
             .successHandler(new MultiTenantOAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService))
             .failureHandler(new MultiTenantOAuth2AuthenticationFailureHandler()));
     }
