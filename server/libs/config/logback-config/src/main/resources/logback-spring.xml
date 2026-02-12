@@ -4,7 +4,15 @@
 
     <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
 
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <SpringProfile name="dev">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    </SpringProfile>
+
+    <SpringProfile name="prod">
+        <include resource="org/springframework/boot/logging/logback/structured-console-appender.xml"/>
+    </SpringProfile>
 
     <appender name="OpenTelemetry"
               class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
