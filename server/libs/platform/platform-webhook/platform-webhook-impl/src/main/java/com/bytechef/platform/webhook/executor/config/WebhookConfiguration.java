@@ -20,9 +20,11 @@ import static com.bytechef.platform.job.sync.executor.JobSyncExecutor.MemoryMess
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -61,6 +63,8 @@ import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
+import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
+import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
@@ -77,15 +81,18 @@ public class WebhookConfiguration {
 
     @Bean
     WebhookWorkflowExecutor webhookExecutor(
-        ContextService contextService, CounterService counterService,
-        Environment environment, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
+        ContextService contextService, CounterService counterService, Environment environment, Evaluator evaluator,
+        ApplicationEventPublisher eventPublisher, JobFacade jobFacade,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
+        TaskExecutionService taskExecutionService,
+        TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
         WebhookWorkflowSyncExecutor triggerSyncExecutor, WorkflowService workflowService) {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
         TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage();
+
+        ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
 
         return new WebhookWorkflowExecutorImpl(
             eventPublisher, jobPrincipalAccessorRegistry,
@@ -93,12 +100,14 @@ public class WebhookConfiguration {
             new JobSyncExecutor(
                 contextService, evaluator, jobService, -1,
                 role -> (role == COORDINATOR) ? asyncMessageBroker : new AsyncMessageBroker(environment),
+                getAdditionalApplicationEventListeners(
+                    evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
-                    taskFileStorage),
+                    contextService, counterService, coordinatorEventPublisher, evaluator, jobFacade, jobService,
+                    taskExecutionService, taskFileStorage),
                 taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             triggerSyncExecutor, taskFileStorage);
     }
@@ -155,15 +164,24 @@ public class WebhookConfiguration {
             });
     }
 
-    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, Evaluator evaluator, JobService jobService,
-        AsyncMessageBroker asyncMessageBroker, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage) {
-
-        ApplicationEventPublisher eventPublisher = createEventPublisher(asyncMessageBroker);
+    private static List<ApplicationEventListener> getAdditionalApplicationEventListeners(
+        Evaluator evaluator, ApplicationEventPublisher coordinatorEventPublisher, JobService jobService,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         return List.of(
-            (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),
+            new SubflowJobStatusEventListener(
+                evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
+    }
+
+    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
+        ContextService contextService, CounterService counterService, ApplicationEventPublisher eventPublisher,
+        Evaluator evaluator, JobFacade jobFacade, JobService jobService, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage) {
+
+        return List.of(
+            (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade),
+            (taskDispatcher) -> new WaitForApprovalTaskDispatcher(
+                eventPublisher, jobService, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(

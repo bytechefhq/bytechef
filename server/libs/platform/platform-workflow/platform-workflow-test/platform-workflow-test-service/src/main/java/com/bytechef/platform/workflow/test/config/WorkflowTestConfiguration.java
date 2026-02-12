@@ -19,9 +19,12 @@ package com.bytechef.platform.workflow.test.config;
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
@@ -72,6 +75,8 @@ import com.bytechef.task.dispatcher.on.error.OnErrorTaskDispatcher;
 import com.bytechef.task.dispatcher.on.error.completition.OnErrorTaskCompletionHandler;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
+import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
+import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.bytechef.task.dispatcher.terminate.TerminateTaskDispatcher;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
@@ -106,20 +111,24 @@ public class WorkflowTestConfiguration {
 
         TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage();
 
+        ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
+
         return new TestWorkflowExecutorImpl(
             componentDefinitionService, contextService, evaluator,
             new JobSyncExecutor(
                 contextService, evaluator, jobService, 1000,
                 role -> (role == JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR)
                     ? asyncMessageBroker : new AsyncMessageBroker(environment),
+                getApplicationEventListeners(
+                    evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(
                     evaluator),
                 List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
-                    taskFileStorage),
+                    contextService, counterService, evaluator, coordinatorEventPublisher, jobService,
+                    taskExecutionService, taskFileStorage, workflowService),
                 taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, workflowService,
             workflowNodeOutputFacade, workflowTestConfigurationService);
@@ -180,12 +189,22 @@ public class WorkflowTestConfiguration {
             });
     }
 
-    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, Evaluator evaluator, JobService jobService,
-        AsyncMessageBroker asyncMessageBroker, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage) {
+    private static List<ApplicationEventListener> getApplicationEventListeners(
+        Evaluator evaluator, ApplicationEventPublisher coordinatorEventPublisher, JobService jobService,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
-        ApplicationEventPublisher eventPublisher = createEventPublisher(asyncMessageBroker);
+        return List.of(
+            new SubflowJobStatusEventListener(
+                evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
+    }
+
+    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
+        ContextService contextService, CounterService counterService, Evaluator evaluator,
+        ApplicationEventPublisher eventPublisher, JobService jobService, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+
+        JobFacade jobFacade = new JobFacadeImpl(
+            eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
 
         return List.of(
             (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),
@@ -211,6 +230,7 @@ public class WorkflowTestConfiguration {
             (taskDispatcher) -> new ParallelTaskDispatcher(
                 contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
+            (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade),
             (taskDispatcher) -> new TerminateTaskDispatcher(eventPublisher, taskExecutionService));
     }
 }

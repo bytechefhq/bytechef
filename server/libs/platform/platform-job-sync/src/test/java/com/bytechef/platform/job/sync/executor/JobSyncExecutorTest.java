@@ -90,8 +90,8 @@ class JobSyncExecutorTest {
 
         jobSyncExecutor = new JobSyncExecutor(
             contextService, evaluator, jobService, -1, (type) -> memoryMessageBroker, List.of(), List.of(), List.of(),
-            List.of(), taskExecutionService, new SyncTaskExecutor(), taskHandlerRegistry, taskFileStorage, 2L,
-            workflowService);
+            List.of(), List.of(), taskExecutionService, new SyncTaskExecutor(), taskHandlerRegistry, taskFileStorage,
+            2L, workflowService);
     }
 
     @Test

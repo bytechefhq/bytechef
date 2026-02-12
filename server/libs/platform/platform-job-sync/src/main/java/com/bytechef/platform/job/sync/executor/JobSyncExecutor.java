@@ -132,14 +132,15 @@ public class JobSyncExecutor {
 
         this(
             contextService, evaluator, jobService, maxTaskExecutions, memoryMessageFactory, List.of(), List.of(),
-            taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor, taskHandlerRegistry,
-            taskFileStorage, timeout, workflowService);
+            List.of(), taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor,
+            taskHandlerRegistry, taskFileStorage, timeout, workflowService);
     }
 
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
         ContextService contextService, Evaluator evaluator, JobService jobService, int maxTaskExecutions,
-        MemoryMessageFactory memoryMessageFactory, List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
+        MemoryMessageFactory memoryMessageFactory, List<ApplicationEventListener> coordinatorApplicationEventListeners,
+        List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
@@ -148,8 +149,8 @@ public class JobSyncExecutor {
 
         this.contextService = contextService;
 
-        MemoryMessageBroker coordinatorMemoryMessageBroker =
-            memoryMessageFactory.get(MemoryMessageFactory.Role.COORDINATOR);
+        MemoryMessageBroker coordinatorMemoryMessageBroker = memoryMessageFactory.get(
+            MemoryMessageFactory.Role.COORDINATOR);
 
         this.coordinatorEventPublisher = createEventPublisher(coordinatorMemoryMessageBroker);
 
@@ -226,9 +227,10 @@ public class JobSyncExecutor {
                 Stream.of(defaultTaskCompletionHandler)));
 
         TaskCoordinator taskCoordinator = new TaskCoordinator(
-            getCoordinatorApplicationEventListeners(taskExecutionService, jobService, taskDispatcherChain), List.of(),
-            coordinatorEventPublisher, jobExecutor, jobService, taskCompletionHandlerChain, taskDispatcherChain,
-            taskExecutionService);
+            getCoordinatorApplicationEventListeners(
+                coordinatorApplicationEventListeners, taskExecutionService, jobService, taskDispatcherChain),
+            List.of(), coordinatorEventPublisher, jobExecutor, jobService, taskCompletionHandlerChain,
+            taskDispatcherChain, taskExecutionService);
 
         receive(
             coordinatorMemoryMessageBroker, TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
@@ -658,10 +660,12 @@ public class JobSyncExecutor {
     }
 
     private List<ApplicationEventListener> getCoordinatorApplicationEventListeners(
-        TaskExecutionService taskExecutionService, JobService jobService,
-        TaskDispatcher<? super Task> taskDispatcher) {
+        List<ApplicationEventListener> applicationEventListeners, TaskExecutionService taskExecutionService,
+        JobService jobService, TaskDispatcher<? super Task> taskDispatcher) {
 
-        return List.of(new TaskStartedApplicationEventListener(taskExecutionService, taskDispatcher, jobService));
+        return CollectionUtils.concat(
+            applicationEventListeners,
+            List.of(new TaskStartedApplicationEventListener(taskExecutionService, taskDispatcher, jobService)));
     }
 
     private static String getKey(long jobId) {
