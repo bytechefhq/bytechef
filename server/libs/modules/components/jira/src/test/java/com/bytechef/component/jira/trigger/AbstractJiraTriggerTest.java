@@ -21,10 +21,7 @@ import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
-import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.jira.util.JiraUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,15 +34,10 @@ import org.mockito.MockedStatic;
 abstract class AbstractJiraTriggerTest {
 
     protected MockedStatic<JiraUtils> jiraUtilsMockedStatic;
-    protected Parameters mockedWebhookEnableOutput = mock(Parameters.class);
-    protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
-    protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);
-    protected WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     protected Object mockedObject = mock(Object.class);
     protected Parameters mockedParameters = mock(Parameters.class);
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    protected String workflowExecutionId = "testWorkflowExecutionId";
     protected ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =

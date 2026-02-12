@@ -45,7 +45,7 @@ class JiraUpdatedIssueTriggerTest extends AbstractJiraTriggerTest {
             .thenReturn(123);
 
         WebhookEnableOutput webhookEnableOutput = JiraUpdatedIssueTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+            mockedParameters, null, webhookUrl, null, mockedTriggerContext);
 
         WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, 123), null);
 
@@ -58,7 +58,7 @@ class JiraUpdatedIssueTriggerTest extends AbstractJiraTriggerTest {
     @Test
     void testWebhookDisable() {
         JiraUpdatedIssueTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+            null, null, mockedParameters, null, mockedTriggerContext);
 
         jiraUtilsMockedStatic
             .verify(() -> JiraUtils.unsubscribeWebhook(mockedParameters, mockedTriggerContext));
@@ -72,8 +72,8 @@ class JiraUpdatedIssueTriggerTest extends AbstractJiraTriggerTest {
             .thenReturn(issueMap);
 
         Object result = JiraUpdatedIssueTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            null, null, null, null, mockedWebhookBody,
+            null, null, null);
 
         assertEquals(mockedObject, result);
     }

@@ -22,56 +22,43 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Artur Wood
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class JiraAssignIssueActionTest {
 
-    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(ConfigurationBuilder.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ISSUE_ID, "xy", ACCOUNT_ID, "1"));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+    void testPerform(
+        Context mockedContext, Http.Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.put(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
-        Object result = JiraAssignIssueAction.perform(mockedParameters, null, mockedActionContext);
+        Object result = JiraAssignIssueAction.perform(mockedParameters, null, mockedContext);
 
         assertNull(result);
 

@@ -32,11 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
@@ -44,53 +43,40 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class JiraOptionsUtilsTest {
 
-    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
-        forClass(ActionContext.class);
-    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(ConfigurationBuilder.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final List<Option<String>> expectedOptions = List.of(option("abc", "123"));
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(PROJECT, "test"));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @BeforeEach
-    void beforeEach() {
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-
-                return value.apply(mockedHttp);
-            });
+    void beforeEach(Http.Executor mockedExecutor, Http mockedHttp) {
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
     }
 
     @Test
-    void testGetIssueIdOptions() {
+    void testGetIssueIdOptions(
+        Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
@@ -100,15 +86,15 @@ class JiraOptionsUtilsTest {
             jiraUtilsMockedStatic
                 .when(() -> JiraUtils.getProjectName(
                     parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture(),
-                    actionContextArgumentCaptor.capture()))
+                    contextArgumentCaptor.capture()))
                 .thenReturn("PROJECT");
 
             List<Option<String>> result = JiraOptionsUtils.getIssueIdOptions(
-                mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+                mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
             assertEquals(expectedOptions, result);
             assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
-            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals(List.of("/search/jql"), stringArgumentCaptor.getAllValues());
 
             Object[] objects = {
@@ -132,14 +118,18 @@ class JiraOptionsUtilsTest {
     }
 
     @Test
-    void testGetIssueTypesIdOptions() {
+    void testGetIssueTypesIdOptions(
+        Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of(NAME, "abc", ID, "123")));
 
         List<Option<String>> result = JiraOptionsUtils.getIssueTypesIdOptions(
-            mockedParameters, null, null, null, mockedActionContext);
+            mockedParameters, null, null, null, mockedContext);
 
         assertEquals(expectedOptions, result);
         assertEquals(List.of("/issuetype/project", "projectId", "test"), stringArgumentCaptor.getAllValues());
@@ -158,14 +148,18 @@ class JiraOptionsUtilsTest {
     }
 
     @Test
-    void testGetProjectIdOptions() {
+    void testGetProjectIdOptions(
+        Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("values", List.of(Map.of(NAME, "abc", ID, "123"))));
 
         List<Option<String>> result = JiraOptionsUtils.getProjectIdOptions(
-            mockedParameters, null, null, null, mockedActionContext);
+            mockedParameters, null, null, null, mockedContext);
 
         assertEquals(expectedOptions, result);
         assertEquals("/project/search", stringArgumentCaptor.getValue());
@@ -190,7 +184,10 @@ class JiraOptionsUtilsTest {
     }
 
     @Test
-    void testGetStatusIdOptions() {
+    void testGetStatusIdOptions(
+        Context mockedContext, Http.Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         Map<String, Object> transition = Map.of("id", "123", "to", Map.of("name", "In Progress"));
 
@@ -200,7 +197,7 @@ class JiraOptionsUtilsTest {
         Parameters parameters = MockParametersFactory.create(Map.of(ISSUE_ID, "testIssue"));
 
         List<Option<String>> result = JiraOptionsUtils.getStatusIdOptions(
-            parameters, null, Map.of(), "", mockedActionContext);
+            parameters, null, null, null, mockedContext);
 
         List<Option<String>> expected = List.of(option("In Progress", "123"));
         assertEquals(expected, result);
@@ -221,7 +218,11 @@ class JiraOptionsUtilsTest {
     }
 
     @Test
-    void testGetUserIdOptions() {
+    void testGetUserIdOptions(
+        Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
@@ -230,7 +231,7 @@ class JiraOptionsUtilsTest {
                 Map.of("displayName", "xyz", "accountId", "cde", "accountType", "apps")));
 
         List<Option<String>> result = JiraOptionsUtils.getUserIdOptions(
-            mockedParameters, null, null, null, mockedActionContext);
+            mockedParameters, null, null, null, mockedContext);
 
         assertEquals(expectedOptions, result);
         assertEquals("/users/search", stringArgumentCaptor.getValue());
@@ -255,12 +256,16 @@ class JiraOptionsUtilsTest {
     }
 
     @Test
-    void testPriorityIdOptions() {
+    void testPriorityIdOptions(
+        Context mockedContext, Http.Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of(NAME, "abc", ID, "123")));
 
         List<Option<String>> result = JiraOptionsUtils.getPriorityIdOptions(
-            mockedParameters, null, null, null, mockedActionContext);
+            mockedParameters, null, null, null, mockedContext);
 
         assertEquals(expectedOptions, result);
         assertEquals("/priority", stringArgumentCaptor.getValue());
