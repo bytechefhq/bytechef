@@ -20,6 +20,9 @@ import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender;
 import org.springframework.beans.factory.InitializingBean;
 
+/**
+ * @Matija Petanjek
+ */
 class InstallOpenTelemetryAppender implements InitializingBean {
 
     private final OpenTelemetry openTelemetry;

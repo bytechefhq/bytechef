@@ -20,6 +20,9 @@ import io.micrometer.tracing.Tracer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @Matija Petanjek
+ */
 @Configuration(proxyBeanMethods = false)
 public class FilterConfiguration {
 
@@ -32,5 +35,4 @@ public class FilterConfiguration {
     AddTraceIdFilter addTraceIdFilter(Tracer tracer) {
         return new AddTraceIdFilter(tracer);
     }
-
 }
