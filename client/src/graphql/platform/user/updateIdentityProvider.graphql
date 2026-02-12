@@ -1,0 +1,19 @@
+mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
+    updateIdentityProvider(id: $id, input: $input) {
+        autoProvision
+        clientId
+        createdBy
+        createdDate
+        defaultAuthority
+        domains
+        enabled
+        enforced
+        id
+        issuerUri
+        lastModifiedBy
+        lastModifiedDate
+        name
+        scopes
+        type
+    }
+}

@@ -1,0 +1,3 @@
+mutation deleteIdentityProvider($id: ID!) {
+    deleteIdentityProvider(id: $id)
+}

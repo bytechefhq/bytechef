@@ -71,6 +71,9 @@ const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-c
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
+const IdentityProvidersPage = lazy(
+    () => import('@/ee/pages/settings/platform/identity-providers/IdentityProvidersPage')
+);
 const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
 const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
 const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-components/CustomComponents'));
@@ -305,6 +308,18 @@ const platformSettingsRoutes = {
         },
         {
             element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <IdentityProvidersPage />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'identity-providers',
+        },
+        {
+            element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                     <EEVersion>
                         <LazyLoadWrapper>
@@ -343,6 +358,10 @@ const platformSettingsRoutes = {
         {
             href: 'notifications',
             title: 'Notifications',
+        },
+        {
+            href: 'identity-providers',
+            title: 'Identity Providers',
         },
         {
             href: 'admin-api-keys',
