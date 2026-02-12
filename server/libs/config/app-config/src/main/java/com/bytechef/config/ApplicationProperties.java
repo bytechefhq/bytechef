@@ -2645,6 +2645,9 @@ public class ApplicationProperties {
         /** Remember-me authentication configuration */
         private RememberMe rememberMe = new RememberMe();
 
+        /** Enterprise SSO (OIDC + SAML) configuration */
+        private Sso sso = new Sso();
+
         /** Social login (OAuth2) configuration */
         private SocialLogin socialLogin = new SocialLogin();
 
@@ -2668,6 +2671,14 @@ public class ApplicationProperties {
 
         public void setRememberMe(RememberMe rememberMe) {
             this.rememberMe = rememberMe;
+        }
+
+        public Sso getSso() {
+            return sso;
+        }
+
+        public void setSso(Sso sso) {
+            this.sso = sso;
         }
 
         public SocialLogin getSocialLogin() {
@@ -2708,6 +2719,23 @@ public class ApplicationProperties {
 
             public void setKey(String key) {
                 this.key = key;
+            }
+        }
+
+        /**
+         * Enterprise SSO (OIDC + SAML) configuration.
+         */
+        public static class Sso {
+
+            /** Whether enterprise SSO is enabled */
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
             }
         }
 

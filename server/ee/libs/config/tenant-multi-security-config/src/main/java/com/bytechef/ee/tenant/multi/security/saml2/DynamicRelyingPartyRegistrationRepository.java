@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnMultiTenant
-@ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
 public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRegistrationRepository {
 
     public static final String SAML_PREFIX = "saml-";

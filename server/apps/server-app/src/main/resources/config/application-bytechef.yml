@@ -106,6 +106,8 @@ bytechef:
     system:
       username: system_admin
       password:
+    sso:
+      enabled: false
     two-factor-authentication:
       enabled: false
   sign-up:

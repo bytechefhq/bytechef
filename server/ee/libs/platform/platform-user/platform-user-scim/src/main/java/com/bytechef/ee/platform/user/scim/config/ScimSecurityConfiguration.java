@@ -32,7 +32,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @Configuration
 @ConditionalOnEEVersion
 @ConditionalOnMultiTenant
-@ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
 class ScimSecurityConfiguration {
 
     @Bean

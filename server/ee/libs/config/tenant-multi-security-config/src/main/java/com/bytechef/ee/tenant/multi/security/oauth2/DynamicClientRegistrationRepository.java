@@ -12,6 +12,7 @@ import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -33,7 +34,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 @ConditionalOnMultiTenant
-@ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
 public class DynamicClientRegistrationRepository implements ClientRegistrationRepository {
 
     public static final String SSO_PREFIX = "sso-";
@@ -43,17 +44,21 @@ public class DynamicClientRegistrationRepository implements ClientRegistrationRe
 
     @SuppressFBWarnings("EI")
     public DynamicClientRegistrationRepository(
-        InMemoryClientRegistrationRepository staticRegistrations,
+        ObjectProvider<InMemoryClientRegistrationRepository> staticRegistrationsProvider,
         IdentityProviderService identityProviderService) {
 
         this.identityProviderService = identityProviderService;
-        this.staticRegistrations = staticRegistrations;
+        this.staticRegistrations = staticRegistrationsProvider.getIfAvailable();
     }
 
     @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
         if (registrationId != null && registrationId.startsWith(SSO_PREFIX)) {
             return buildDynamicRegistration(registrationId);
+        }
+
+        if (staticRegistrations == null) {
+            return null;
         }
 
         return staticRegistrations.findByRegistrationId(registrationId);

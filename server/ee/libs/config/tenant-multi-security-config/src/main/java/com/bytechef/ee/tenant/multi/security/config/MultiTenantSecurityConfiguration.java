@@ -31,6 +31,7 @@ import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,13 +66,13 @@ public class MultiTenantSecurityConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
     SsoEnforcementFilter ssoEnforcementFilter(IdentityProviderService identityProviderService) {
         return new SsoEnforcementFilter(identityProviderService);
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+    @ConditionalOnExpression("${bytechef.security.social-login.enabled:false} or ${bytechef.security.sso.enabled:false}")
     OAuth2LoginCustomizer multiTenantOAuth2LoginCustomizer(
         CustomOAuth2UserService customOAuth2UserService, CustomOidcUserService customOidcUserService,
         RememberMeServices rememberMeServices, TenantService tenantService) {
@@ -97,7 +98,7 @@ public class MultiTenantSecurityConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
     Saml2LoginCustomizer multiTenantSaml2LoginCustomizer(
         DynamicRelyingPartyRegistrationRepository dynamicRelyingPartyRegistrationRepository,
         RememberMeServices rememberMeServices, TenantService tenantService, UserService userService) {
