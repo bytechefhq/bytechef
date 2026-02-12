@@ -8,6 +8,7 @@ import {UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import {decodePath} from './encodingUtils';
 import {enqueueWorkflowMutation} from './workflowMutationQueue';
 
 export default function deleteProperty(
@@ -30,6 +31,8 @@ export default function deleteProperty(
     const currentNode = useWorkflowNodeDetailsPanelStore.getState().currentNode;
     const rootClusterElementNodeData = useWorkflowEditorStore.getState().rootClusterElementNodeData;
 
+    const decodedPath = decodePath(path);
+
     if (!currentComponent) {
         console.error('No current component found in the store');
 
@@ -50,7 +53,7 @@ export default function deleteProperty(
                     clusterElementType,
                     clusterElementWorkflowNodeName,
                     deleteClusterElementParameterRequest: {
-                        path,
+                        path: decodedPath,
                     },
                     environmentId: environmentStore.getState().currentEnvironmentId,
                     id: workflowId,
@@ -85,7 +88,7 @@ export default function deleteProperty(
         deleteWorkflowNodeParameterMutation.mutateAsync(
             {
                 deleteClusterElementParameterRequest: {
-                    path,
+                    path: decodedPath,
                 },
                 environmentId: environmentStore.getState().currentEnvironmentId,
                 id: workflowId,

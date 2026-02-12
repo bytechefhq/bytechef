@@ -49,7 +49,6 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
     const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
         (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
     );
-    const [parameterObject, setParameterObject] = useState<{[key: string]: unknown}>({});
 
     const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
     const workflow = useWorkflowDataStore((state) => state.workflow);
@@ -272,8 +271,8 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
                     defaultValue: parameterKeyValue,
                     displayCondition,
                     expressionEnabled: true,
-                    label: decodePath(parameterKey),
-                    name: parameterKey,
+                    label: parameterKey,
+                    name: encodePath(parameterKey),
                     type: parameterItemType as PropertyType,
                 } as PropertyAllType;
             }
@@ -283,15 +282,23 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
     // render individual object items with data gathered from parameters
     useEffect(() => {
-        if (
-            !name ||
-            !path ||
-            !currentComponent?.parameters ||
-            !properties ||
-            !parameterObject ||
-            !isObject(parameterObject)
-        ) {
+        if (!name || !path || !currentComponent?.parameters || !properties) {
             return;
+        }
+
+        const encodedParameters = encodeParameters(currentComponent.parameters);
+        const encodedPath = encodePath(path);
+
+        const resolvedParameterObject = resolvePath(encodedParameters, encodedPath);
+
+        const parameterObject: {[key: string]: unknown} = {};
+
+        if (resolvedParameterObject && isObject(resolvedParameterObject)) {
+            for (const encodedKey of Object.keys(resolvedParameterObject)) {
+                parameterObject[decodePath(encodedKey)] = (resolvedParameterObject as {[key: string]: unknown})[
+                    encodedKey
+                ];
+            }
         }
 
         const dynamicPropertyTypes = currentComponent?.metadata?.ui?.dynamicPropertyTypes;
@@ -379,7 +386,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        parameterObject,
+        currentComponent?.parameters,
         properties,
         path,
         currentComponent?.metadata?.ui?.dynamicPropertyTypes,
@@ -420,10 +427,12 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
                     return accumulator;
                 }
 
+                const decodedName = decodePath(name);
+
                 if (type === 'OBJECT' && properties) {
-                    accumulator[name] = buildObject(properties);
+                    accumulator[decodedName] = buildObject(properties);
                 } else {
-                    accumulator[name] = defaultValue;
+                    accumulator[decodedName] = defaultValue;
                 }
                 return accumulator;
             }, {});
@@ -451,17 +460,6 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             setSubProperties(properties as Array<PropertyAllType>);
         }
     }, [properties]);
-
-    // update parameterObject when workflowDefinition changes (encode keys to match encoded property names)
-    useEffect(() => {
-        if (workflow.definition && path) {
-            const resolvedParameterObject = resolvePath(currentComponent?.parameters ?? {}, path) as {
-                [key: string]: unknown;
-            };
-
-            setParameterObject(encodeParameters(resolvedParameterObject) as {[key: string]: unknown});
-        }
-    }, [workflow.definition, path, currentComponent?.parameters]);
 
     return {
         availablePropertyTypes,
