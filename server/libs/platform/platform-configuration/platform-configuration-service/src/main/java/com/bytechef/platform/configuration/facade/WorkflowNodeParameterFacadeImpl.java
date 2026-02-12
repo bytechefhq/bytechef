@@ -1276,20 +1276,42 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         if (type == null) {
             dynamicPropertyTypesMap.remove(path);
 
+            String childPrefixDot = path + ".";
+            String childPrefixBracket = path + "[";
+
+            for (String key : new HashSet<>(dynamicPropertyTypesMap.keySet())) {
+                if (key.startsWith(childPrefixDot) || key.startsWith(childPrefixBracket)) {
+                    dynamicPropertyTypesMap.remove(key);
+                }
+            }
+
             if (path.contains("[")) {
-                List<Integer> pathIndexes = extractIndexes(path);
-                String pathPrefix = path.substring(0, path.lastIndexOf("["));
+                int lastBracketStart = path.lastIndexOf("[");
+                int lastBracketEnd = path.indexOf("]", lastBracketStart);
+
+                int deletedIndex = Integer.parseInt(path.substring(lastBracketStart + 1, lastBracketEnd));
+
+                String pathPrefix = path.substring(0, lastBracketStart);
+
+                String siblingPrefix = pathPrefix + "[";
 
                 for (String key : new HashSet<>(dynamicPropertyTypesMap.keySet())) {
-                    List<Integer> keyIndexes = extractIndexes(key);
+                    if (!key.startsWith(siblingPrefix)) {
+                        continue;
+                    }
 
-                    if (key.startsWith(pathPrefix) && !keyIndexes.isEmpty() &&
-                        pathIndexes.getLast() < keyIndexes.getLast()) {
+                    String afterPrefix = key.substring(pathPrefix.length());
+                    Matcher siblingMatcher = ARRAY_INDEX_VALUE_PATTERN.matcher(afterPrefix);
 
-                        dynamicPropertyTypesMap.put(
-                            pathPrefix + "[" + (keyIndexes.getLast() - 1) +
-                                path.substring(path.lastIndexOf("[") + 2, path.lastIndexOf("]") + 1),
-                            dynamicPropertyTypesMap.remove(key));
+                    if (siblingMatcher.find() && siblingMatcher.start() == 0) {
+                        int siblingIndex = Integer.parseInt(siblingMatcher.group(1));
+
+                        if (siblingIndex > deletedIndex) {
+                            String newKey = pathPrefix + "[" + (siblingIndex - 1) + "]" +
+                                afterPrefix.substring(siblingMatcher.end());
+
+                            dynamicPropertyTypesMap.put(newKey, dynamicPropertyTypesMap.remove(key));
+                        }
                     }
                 }
             }
