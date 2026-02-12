@@ -63,6 +63,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
             useFilteredComponentDefinitions(componentDefinitions);
 
         const getFeatureFlag = useFeatureFlagsStore();
+
         const ff_797 = getFeatureFlag('ff-797');
         const ff_1652 = getFeatureFlag('ff-1652');
         const ff_3827 = getFeatureFlag('ff-3827');
@@ -70,7 +71,9 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const ff_4000 = getFeatureFlag('ff-4000');
 
         const filteredActionComponentDefinitions = useMemo(() => {
-            if (!componentsWithActions) return [];
+            if (!componentsWithActions) {
+                return [];
+            }
 
             let actionComponents = componentsWithActions
                 .filter(({actionsCount}) => actionsCount && actionsCount > 0)
@@ -97,7 +100,9 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         );
 
         const filteredTriggerComponentDefinitions = useMemo(() => {
-            if (!componentsWithActions) return [];
+            if (!componentsWithActions) {
+                return [];
+            }
 
             let triggerComponents = componentsWithActions
                 .filter(({triggersCount}) => triggersCount && triggersCount > 0)
@@ -113,7 +118,9 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         }, [componentsWithActions, clusterElementType, ff_3827]);
 
         const filteredClusterElementComponentDefinitions = useMemo(() => {
-            if (!componentsWithActions || !clusterElementType) return [];
+            if (!componentsWithActions || !clusterElementType) {
+                return [];
+            }
 
             return componentsWithActions
                 .filter((component) => hasClusterElementType(component, clusterElementType))
