@@ -3343,6 +3343,168 @@ public class WorkflowNodeParameterFacadeTest {
         }
     }
 
+    @Test
+    void testDeleteWorkflowNodeParameterRemovesChildDynamicPropertyTypes() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "value[0]";
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            List<Object> valueList = new ArrayList<>();
+            Map<String, Object> valueItem = new HashMap<>();
+
+            valueItem.put("arr", List.of(Map.of("arr1", List.of(Map.of("str 1", "hello")))));
+
+            valueList.add(valueItem);
+
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("type", "ARRAY");
+            parameters.put("value", valueList);
+
+            Map<String, Object> dynamicPropertyTypes = new HashMap<>();
+
+            dynamicPropertyTypes.put("value[0].arr", "ARRAY");
+            dynamicPropertyTypes.put("value[0].arr[0].arr1", "ARRAY");
+            dynamicPropertyTypes.put("value[0].arr[0].arr1[0].str 1", "STRING");
+
+            Map<String, Object> uiMetadata = new HashMap<>();
+
+            uiMetadata.put("dynamicPropertyTypes", dynamicPropertyTypes);
+
+            Map<String, Object> metadata = new HashMap<>();
+
+            metadata.put("ui", uiMetadata);
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", workflowNodeName);
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", metadata);
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getVersion()).thenReturn(1);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, 0);
+
+            // Then
+            assertNotNull(result);
+            assertTrue(dynamicPropertyTypes.isEmpty());
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testDeleteWorkflowNodeParameterReindexesSiblingChildDynamicPropertyTypes() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "value[0]";
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            List<Object> valueList = new ArrayList<>();
+
+            valueList.add(Map.of("field", "first"));
+            valueList.add(Map.of("field", "second"));
+
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("type", "ARRAY");
+            parameters.put("value", valueList);
+
+            Map<String, Object> dynamicPropertyTypes = new HashMap<>();
+
+            dynamicPropertyTypes.put("value[0].field", "STRING");
+            dynamicPropertyTypes.put("value[1].field", "STRING");
+            dynamicPropertyTypes.put("value[1].nested[0].sub", "NUMBER");
+
+            Map<String, Object> uiMetadata = new HashMap<>();
+
+            uiMetadata.put("dynamicPropertyTypes", dynamicPropertyTypes);
+
+            Map<String, Object> metadata = new HashMap<>();
+
+            metadata.put("ui", uiMetadata);
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", workflowNodeName);
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", metadata);
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getVersion()).thenReturn(1);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, 0);
+
+            // Then
+            assertNotNull(result);
+            assertEquals(2, dynamicPropertyTypes.size());
+            assertTrue(dynamicPropertyTypes.containsKey("value[0].field"));
+            assertTrue(dynamicPropertyTypes.containsKey("value[0].nested[0].sub"));
+            assertFalse(dynamicPropertyTypes.containsKey("value[1].field"));
+            assertFalse(dynamicPropertyTypes.containsKey("value[1].nested[0].sub"));
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
