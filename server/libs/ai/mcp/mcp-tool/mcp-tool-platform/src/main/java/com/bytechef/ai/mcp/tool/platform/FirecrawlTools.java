@@ -179,6 +179,79 @@ public class FirecrawlTools {
         }
     }
 
+    @Tool(
+        description = "Map and discover all URLs from a website. Returns a list of URLs found on the site with optional filtering and search. Use this to explore website structure or find specific pages.")
+    public FirecrawlMapResult websiteMap(
+        @ToolParam(description = "The base URL to start mapping from") String url,
+        @ToolParam(
+            required = false,
+            description = "Search query to order results by relevance (e.g., 'blog' finds URLs with 'blog')") String search,
+        @ToolParam(
+            required = false,
+            description = "Number of links to return (1-100000, default 5000)") Integer limit,
+        @ToolParam(
+            required = false,
+            description = "Include subdomains of the website (default: true)") Boolean includeSubdomains,
+        @ToolParam(
+            required = false,
+            description = "Exclude URLs with query parameters (default: true)") Boolean ignoreQueryParameters) {
+
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Mapping website URLs for: {}", url);
+            }
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("url", url);
+
+            if (search != null) {
+                requestBody.put("search", search);
+            }
+
+            if (limit != null) {
+                requestBody.put("limit", Math.min(Math.max(limit, 1), 100000));
+            }
+
+            if (includeSubdomains != null) {
+                requestBody.put("includeSubdomains", includeSubdomains);
+            }
+
+            if (ignoreQueryParameters != null) {
+                requestBody.put("ignoreQueryParameters", ignoreQueryParameters);
+            }
+
+            FirecrawlMapResponse response = restClient.post()
+                .uri("/map")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(requestBody)
+                .retrieve()
+                .body(FirecrawlMapResponse.class);
+
+            if (response == null || response.links() == null) {
+                return new FirecrawlMapResult(url, List.of());
+            }
+
+            List<MapResultItem> results = response.links()
+                .stream()
+                .map(link -> new MapResultItem(
+                    link.url() != null ? link.url() : "",
+                    link.title() != null ? link.title() : "",
+                    link.description() != null ? link.description() : ""))
+                .toList();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} URLs for website: {}", results.size(), url);
+            }
+
+            return new FirecrawlMapResult(url, results);
+
+        } catch (Exception e) {
+            logger.error("Failed to map website URLs for: {}", url, e);
+
+            throw new RuntimeException("Failed to map website: " + e.getMessage(), e);
+        }
+    }
+
     @SuppressFBWarnings("EI")
     public record FirecrawlSearchResult(
         @JsonProperty("query") @JsonPropertyDescription("The search query that was performed") String query,
@@ -198,6 +271,19 @@ public class FirecrawlTools {
         @JsonProperty("markdown") @JsonPropertyDescription("The page content in markdown format") String markdown,
         @JsonProperty("title") @JsonPropertyDescription("The page title") String title,
         @JsonProperty("description") @JsonPropertyDescription("The page description") String description) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record FirecrawlMapResult(
+        @JsonProperty("url") @JsonPropertyDescription("The base URL that was mapped") String url,
+        @JsonProperty("links") @JsonPropertyDescription("List of discovered URLs with title and description") List<MapResultItem> links) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record MapResultItem(
+        @JsonProperty("url") @JsonPropertyDescription("URL of the discovered page") String url,
+        @JsonProperty("title") @JsonPropertyDescription("Title of the page") String title,
+        @JsonProperty("description") @JsonPropertyDescription("Description of the page") String description) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -225,5 +311,13 @@ public class FirecrawlTools {
     @JsonIgnoreProperties(ignoreUnknown = true)
     record ScrapeMetadata(String title, String description, String language, String sourceURL, String keywords,
         Integer statusCode, String error) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record FirecrawlMapResponse(boolean success, List<MapLink> links) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record MapLink(String url, String title, String description) {
     }
 }
