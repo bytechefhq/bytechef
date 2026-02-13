@@ -80,6 +80,8 @@ public class SpotifyComponentHandler extends AbstractSpotifyComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        return modifiableConnectionDefinition.version(1);
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/spotify_v1#connection-setup")
+            .version(1);
     }
 }
