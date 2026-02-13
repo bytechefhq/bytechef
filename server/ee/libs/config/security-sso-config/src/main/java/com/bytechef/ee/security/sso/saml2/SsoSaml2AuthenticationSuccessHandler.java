@@ -9,6 +9,8 @@ package com.bytechef.ee.security.sso.saml2;
 
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
+import com.bytechef.platform.user.domain.IdentityProvider;
+import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
@@ -30,14 +32,17 @@ import org.springframework.security.web.authentication.RememberMeServices;
  */
 public class SsoSaml2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
+    private final IdentityProviderService identityProviderService;
     private final RememberMeServices rememberMeServices;
     private final TenantService tenantService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
     public SsoSaml2AuthenticationSuccessHandler(
-        RememberMeServices rememberMeServices, TenantService tenantService, UserService userService) {
+        IdentityProviderService identityProviderService, RememberMeServices rememberMeServices,
+        TenantService tenantService, UserService userService) {
 
+        this.identityProviderService = identityProviderService;
         this.rememberMeServices = rememberMeServices;
         this.tenantService = tenantService;
         this.userService = userService;
@@ -56,9 +61,25 @@ public class SsoSaml2AuthenticationSuccessHandler implements AuthenticationSucce
         String lastName = extractFirstAttribute(principal,
             "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname");
 
+        boolean autoProvision = true;
+        String defaultAuthority = AuthorityConstants.ADMIN;
+
+        String registrationId = principal.getRelyingPartyRegistrationId();
+
+        if (registrationId != null
+            && registrationId.startsWith(DynamicRelyingPartyRegistrationRepository.SAML_PREFIX)) {
+            long identityProviderId = Long.parseLong(
+                registrationId.substring(DynamicRelyingPartyRegistrationRepository.SAML_PREFIX.length()));
+
+            IdentityProvider identityProvider = identityProviderService.getIdentityProvider(identityProviderId);
+
+            autoProvision = identityProvider.isAutoProvision();
+            defaultAuthority = identityProvider.getDefaultAuthority();
+        }
+
         userService.findOrCreateSocialUser(
-            email, firstName, lastName, null, UserConstants.AUTH_PROVIDER_SAML, principal.getName(), true,
-            AuthorityConstants.ADMIN);
+            email, firstName, lastName, null, UserConstants.AUTH_PROVIDER_SAML, principal.getName(), autoProvision,
+            defaultAuthority);
 
         List<String> tenantIds = tenantService.getTenantIdsByUserEmail(email);
 
