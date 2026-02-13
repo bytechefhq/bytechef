@@ -9847,11 +9847,8 @@
       "tokenUrl": { },
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
-    "baseUri": { },
-    "help": {
-      "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/jira_v1#connection-setup"
-    },
+    "baseUri": null,
+    "help": null,
     "processErrorResponse": null,
     "properties": null,
     "test": null,
