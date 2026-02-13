@@ -44,12 +44,14 @@ public class WebflowFulfillOrderAction {
 
             ))
         .properties(string("siteId").label("Site ID")
+            .description("Unique identifier for a site.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<String>) WebflowUtils::getSiteIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
             string("orderId").label("Order ID")
+                .description("Unique identifier for an order.")
                 .required(true)
                 .options((ActionDefinition.OptionsFunction<String>) WebflowUtils::getOrderIdOptions)
                 .optionsLookupDependsOn("siteId")
