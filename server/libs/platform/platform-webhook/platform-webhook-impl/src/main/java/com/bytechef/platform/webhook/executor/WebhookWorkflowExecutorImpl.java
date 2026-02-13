@@ -16,18 +16,22 @@
 
 package com.bytechef.platform.webhook.executor;
 
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent.WebhookParameters;
@@ -39,6 +43,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -125,24 +131,54 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
             List<Map<String, ?>> outputsList = new ArrayList<>();
 
             for (Object triggerOutputValue : triggerOutputValues) {
+                AtomicReference<Object> collectedWebhookResponse = new AtomicReference<>();
+
                 Job job = jobSyncExecutor.execute(
                     createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutputValue),
                     jobParameters -> principalJobFacade.createSyncJob(
                         jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()),
-                    true);
+                    true,
+                    taskExecutionCompleteEvent -> collectWebhookResponse(
+                        taskExecutionCompleteEvent, collectedWebhookResponse));
+
+                Object webhookResponse = collectedWebhookResponse.get();
+
+                if (webhookResponse != null) {
+                    long jobId = Validate.notNull(job.getId(), "id");
+
+                    job.setOutputs(
+                        taskFileStorage.storeJobOutputs(
+                            jobId, Map.of(WebhookConstants.WEBHOOK_RESPONSE, webhookResponse)));
+                }
 
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
             }
 
             outputs = outputsList;
         } else {
+            AtomicReference<@Nullable Object> collectedWebhookResponse = new AtomicReference<>();
+
             Job job = jobSyncExecutor.execute(
                 createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutput.value()),
                 jobParameters -> principalJobFacade.createSyncJob(
                     jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()),
-                true);
+                true,
+                taskExecutionCompleteEvent -> collectWebhookResponse(
+                    taskExecutionCompleteEvent, collectedWebhookResponse));
 
-            outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());
+            Object webhookResponse = collectedWebhookResponse.get();
+
+            if (webhookResponse != null) {
+                long jobId = Validate.notNull(job.getId(), "id");
+
+                job.setOutputs(
+                    taskFileStorage.storeJobOutputs(
+                        jobId, Map.of(WebhookConstants.WEBHOOK_RESPONSE, webhookResponse)));
+
+                outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+            } else {
+                outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());
+            }
         }
 
         return outputs;
@@ -166,6 +202,26 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
         return webhookWorkflowSyncExecutor.validateOnEnable(workflowExecutionId, webhookRequest);
+    }
+
+    private void collectWebhookResponse(
+        TaskExecutionCompleteEvent taskExecutionCompleteEvent, AtomicReference<Object> collectedWebhookResponse) {
+
+        TaskExecution taskExecution = taskExecutionCompleteEvent.getTaskExecution();
+
+        if (taskExecution == null) {
+            return;
+        }
+
+        Map<String, ?> metadata = taskExecution.getMetadata();
+
+        if (metadata.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
+            FileEntry outputFileEntry = taskExecution.getOutput();
+
+            if (outputFileEntry != null) {
+                collectedWebhookResponse.set(taskFileStorage.readTaskExecutionOutput(outputFileEntry));
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

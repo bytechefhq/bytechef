@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.test.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
@@ -31,6 +32,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -65,6 +67,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -181,7 +184,20 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     private JobDTO await(long jobId) {
-        Job job = jobSyncExecutor.awaitJob(jobId, false);
+        AtomicReference<Object> collectedWebhookResponse = new AtomicReference<>();
+
+        Job job = jobSyncExecutor.awaitJob(
+            jobId, false,
+            taskExecutionCompleteEvent -> collectWebhookResponse(taskExecutionCompleteEvent, collectedWebhookResponse));
+
+        Object webhookResponse = collectedWebhookResponse.get();
+
+        if (webhookResponse != null) {
+            long id = Validate.notNull(job.getId(), "id");
+
+            job.setOutputs(
+                taskFileStorage.storeJobOutputs(id, Map.of(WebhookConstants.WEBHOOK_RESPONSE, webhookResponse)));
+        }
 
         try {
             return new JobDTO(
@@ -231,6 +247,27 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
             workflowNodeType.name(), workflowNodeType.version());
 
         return new DefinitionResult(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getIcon());
+    }
+
+    private void collectWebhookResponse(
+        TaskExecutionCompleteEvent taskExecutionCompleteEvent,
+        AtomicReference<Object> collectedWebhookResponse) {
+
+        TaskExecution taskExecution = taskExecutionCompleteEvent.getTaskExecution();
+
+        if (taskExecution == null) {
+            return;
+        }
+
+        Map<String, ?> metadata = taskExecution.getMetadata();
+
+        if (metadata.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
+            FileEntry outputFileEntry = taskExecution.getOutput();
+
+            if (outputFileEntry != null) {
+                collectedWebhookResponse.set(taskFileStorage.readTaskExecutionOutput(outputFileEntry));
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

@@ -71,7 +71,6 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker.Receiver;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
 import com.bytechef.platform.job.sync.exception.TaskExecutionErrorType;
-import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
@@ -376,7 +375,44 @@ public class JobSyncExecutor {
             checkForError(job);
         }
 
-        return checkForWebhookResponse(job);
+        return job;
+    }
+
+    /**
+     * Waits for the completion of a job identified by the specified job ID while invoking a callback for each completed
+     * task execution. Unlike {@link #awaitJob(long, boolean)}, this method does not check for webhook responses
+     * internally — the caller is expected to handle webhook response collection via the callback.
+     *
+     * @param jobId                         the unique identifier of the job to wait for completion
+     * @param checkForError                 a flag indicating whether to check for errors in the completed job
+     * @param taskExecutionCompleteCallback a callback invoked for each completed task execution during the job's
+     *                                      lifecycle
+     * @return the completed job after processing
+     */
+    public Job awaitJob(
+        long jobId, boolean checkForError, Consumer<TaskExecutionCompleteEvent> taskExecutionCompleteCallback) {
+
+        AutoCloseable listenerHandle = addTaskExecutionCompleteListener(jobId, taskExecutionCompleteCallback);
+
+        try {
+            waitForJobCompletion(jobId);
+        } finally {
+            try {
+                listenerHandle.close();
+            } catch (Exception exception) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(exception.getMessage(), exception);
+                }
+            }
+        }
+
+        Job job = jobService.getJob(jobId);
+
+        if (checkForError) {
+            checkForError(job);
+        }
+
+        return job;
     }
 
     /**
@@ -401,21 +437,26 @@ public class JobSyncExecutor {
     }
 
     /**
-     * Executes a job based on the provided job parameters, job factory function, and error check flag.
+     * Executes a job based on the provided job parameters, job factory function, and error check flag. Additionally
+     * registers a task execution completion callback that is invoked for each task that completes during the job
+     * execution.
      *
-     * @param jobParametersDTO   the job parameters used to configure and initiate the job
-     * @param jobFactoryFunction the function used to create an instance of the job
-     * @param checkForError      a flag indicating whether to check for errors during execution
+     * @param jobParametersDTO              the job parameters used to configure and initiate the job
+     * @param jobFactoryFunction            the function used to create an instance of the job
+     * @param checkForError                 a flag indicating whether to check for errors during execution
+     * @param taskExecutionCompleteCallback a callback invoked for each completed task execution during the job's
+     *                                      lifecycle
      * @return the executed job
      */
     public Job execute(
-        JobParametersDTO jobParametersDTO, JobFactoryFunction jobFactoryFunction, boolean checkForError) {
+        JobParametersDTO jobParametersDTO, JobFactoryFunction jobFactoryFunction, boolean checkForError,
+        Consumer<TaskExecutionCompleteEvent> taskExecutionCompleteCallback) {
 
         JobFacade jobFacade = new JobFacadeImpl(
             coordinatorEventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction), taskExecutionService,
             taskFileStorage, workflowService);
 
-        return execute(jobParametersDTO, jobFacade, checkForError);
+        return executeWithCallback(jobParametersDTO, jobFacade, checkForError, taskExecutionCompleteCallback);
     }
 
     /**
@@ -474,7 +515,16 @@ public class JobSyncExecutor {
             checkForError(job);
         }
 
-        return checkForWebhookResponse(job);
+        return job;
+    }
+
+    private Job executeWithCallback(
+        JobParametersDTO jobParametersDTO, JobFacade jobFacade, boolean checkForError,
+        Consumer<TaskExecutionCompleteEvent> taskExecutionCompleteCallback) {
+
+        long jobId = jobFacade.createJob(jobParametersDTO);
+
+        return awaitJob(jobId, checkForError, taskExecutionCompleteCallback);
     }
 
     private void handleCoordinatorApplicationEvent(
@@ -629,27 +679,6 @@ public class JobSyncExecutor {
 
             throw new ExecutionException(message, TaskExecutionErrorType.TASK_EXECUTION_FAILED);
         }
-    }
-
-    private Job checkForWebhookResponse(Job job) {
-        long jobId = Validate.notNull(job.getId(), "id");
-
-        return taskExecutionService.fetchLastJobTaskExecution(jobId)
-            .map(lastTaskExecution -> {
-                Map<String, ?> metadata = lastTaskExecution.getMetadata();
-
-                if (metadata.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
-                    job.setOutputs(
-                        taskFileStorage.storeJobOutputs(
-                            jobId,
-                            Map.of(
-                                WebhookConstants.WEBHOOK_RESPONSE,
-                                taskFileStorage.readTaskExecutionOutput(lastTaskExecution.getOutput()))));
-                }
-
-                return job;
-            })
-            .orElse(job);
     }
 
     private static <T> Cache<String, CopyOnWriteArrayList<T>> createCache() {

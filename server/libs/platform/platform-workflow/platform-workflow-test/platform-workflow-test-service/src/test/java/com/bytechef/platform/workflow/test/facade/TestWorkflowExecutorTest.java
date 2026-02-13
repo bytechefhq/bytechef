@@ -122,7 +122,7 @@ public class TestWorkflowExecutorTest {
         Job job = mock(Job.class);
 
         when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
-        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenReturn(job);
         when(job.getId()).thenReturn(1L);
 
         // When
@@ -205,7 +205,7 @@ public class TestWorkflowExecutorTest {
         Job job = mock(Job.class);
 
         when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
-        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenReturn(job);
         when(job.getId()).thenReturn(1L);
 
         // When inputs are empty, facade should build inputs from trigger sample
@@ -242,7 +242,7 @@ public class TestWorkflowExecutorTest {
         Job job = mock(Job.class);
 
         when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
-        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenReturn(job);
         when(job.getId()).thenReturn(1L);
 
         AutoCloseable mockHandle = mock(AutoCloseable.class);
@@ -303,7 +303,7 @@ public class TestWorkflowExecutorTest {
 
         when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
 
-        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class)))
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any()))
             .thenThrow(new RuntimeException("Execution failed"));
 
         AutoCloseable mockHandle = mock(AutoCloseable.class);
@@ -372,7 +372,7 @@ public class TestWorkflowExecutorTest {
         Job job = mock(Job.class);
 
         when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
-        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenReturn(job);
         when(job.getId()).thenReturn(1L);
 
         AutoCloseable mockHandle = mock(AutoCloseable.class);
@@ -430,7 +430,7 @@ public class TestWorkflowExecutorTest {
         Job job = mock(Job.class);
 
         when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
-        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenReturn(job);
         when(job.getId()).thenReturn(1L);
 
         AutoCloseable mockHandle = mock(AutoCloseable.class);
@@ -477,7 +477,7 @@ public class TestWorkflowExecutorTest {
         Job job = mock(Job.class);
 
         when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
-        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenReturn(job);
         when(job.getId()).thenReturn(1L);
 
         AutoCloseable mockHandle = mock(AutoCloseable.class);
