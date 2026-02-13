@@ -38,7 +38,7 @@ public class BinanceUtils {
     }
 
     public static List<Option<String>> getSymbolsOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("https://api.binance.com/api/v3/exchangeInfo"))

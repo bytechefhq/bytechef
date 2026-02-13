@@ -33,9 +33,12 @@ public class BinanceComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("binance")
         .title("Binance")
         .description("Binance is an online exchange where users can trade cryptocurrencies.")
+        .customAction(true)
+        .customActionHelp("", "https://developers.binance.com/docs/binance-spot-api-docs/CHANGELOG")
         .icon("path:assets/binance.svg")
         .categories(ComponentCategory.PAYMENT_PROCESSING)
-        .actions(BinanceFetchPairPriceAction.ACTION_DEFINITION);
+        .actions(BinanceFetchPairPriceAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
