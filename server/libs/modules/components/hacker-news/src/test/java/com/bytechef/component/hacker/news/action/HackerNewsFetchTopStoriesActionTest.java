@@ -45,11 +45,9 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class HackerNewsFetchTopStoriesActionTest {
 
-    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(NUMBER_OF_STORIES, 2));
-    private final Http.Response mockedTopStoriesResponse = mock(Http.Response.class);
-    private final Http.Response mockedItem1Response = mock(Http.Response.class);
-    private final Http.Response mockedItem2Response = mock(Http.Response.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
@@ -64,13 +62,11 @@ class HackerNewsFetchTopStoriesActionTest {
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
-            .thenReturn(mockedTopStoriesResponse, mockedItem1Response, mockedItem2Response);
-        when(mockedTopStoriesResponse.getBody(any(TypeReference.class)))
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(topStoryIds);
-        when(mockedItem1Response.getBody())
-            .thenReturn(item1);
-        when(mockedItem2Response.getBody())
-            .thenReturn(item2);
+        when(mockedResponse.getBody())
+            .thenReturn(item1, item2);
 
         Object result = HackerNewsFetchTopStoriesAction.perform(mockedParameters, null, mockedContext);
 

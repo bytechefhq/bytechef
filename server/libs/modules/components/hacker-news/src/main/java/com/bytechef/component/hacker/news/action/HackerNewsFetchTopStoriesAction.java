@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.hacker.news.constant.HackerNewsConstants.BASE_URL;
 import static com.bytechef.component.hacker.news.constant.HackerNewsConstants.NUMBER_OF_STORIES;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -30,7 +31,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.hacker.news.constant.HackerNewsConstants;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,7 +82,7 @@ public class HackerNewsFetchTopStoriesAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<String> storyIds = context
-            .http(http -> http.get(HackerNewsConstants.BASE_URL + "/topstories.json"))
+            .http(http -> http.get(BASE_URL + "/topstories.json"))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -100,7 +100,7 @@ public class HackerNewsFetchTopStoriesAction {
 
     private static Object fetchStory(Context context, String storyId) {
         return context
-            .http(http -> http.get(HackerNewsConstants.BASE_URL + "/item/" + storyId + ".json"))
+            .http(http -> http.get(BASE_URL + "/item/" + storyId + ".json"))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody();
