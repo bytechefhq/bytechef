@@ -1,5 +1,7 @@
 dependencies {
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))

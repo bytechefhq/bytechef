@@ -17,6 +17,8 @@
 package com.bytechef.platform.worker.config;
 
 import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
+import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.worker.task.SseStreamTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +29,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnWorker
 public class PlatformWorkerConfiguration {
+
+    @Bean
+    SseStreamTaskExecutionPostOutputProcessor sseStreamTaskExecutionPostOutputProcessor(MessageBroker messageBroker) {
+        return new SseStreamTaskExecutionPostOutputProcessor(messageBroker);
+    }
 
     @Bean
     WebhookResponseTaskExecutionPostOutputProcessor webhookResponseTaskExecutionPostOutputProcessor() {
