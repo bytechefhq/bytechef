@@ -18,7 +18,6 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SseStreamResponsePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.StreamPerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamResponsePerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
@@ -88,7 +87,6 @@ public class ActionDefinition {
             .orElse(false);
         this.sseStreamResponse = actionDefinition.getPerform()
             .map(perform -> perform instanceof StreamPerformFunction ||
-                perform instanceof SseStreamResponsePerformFunction ||
                 perform instanceof MultipleConnectionsStreamPerformFunction ||
                 perform instanceof MultipleConnectionsSseStreamResponsePerformFunction)
             .orElse(false);

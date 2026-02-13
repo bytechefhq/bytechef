@@ -35,11 +35,11 @@ public class SseStreamBridgeRegistry {
     private static final Logger logger = LoggerFactory.getLogger(SseStreamBridgeRegistry.class);
 
     private final Cache<Long, CopyOnWriteArrayList<SseStreamBridge>> bridges = Caffeine.newBuilder()
-        .expireAfterAccess(10, TimeUnit.MINUTES)
+        .expireAfterAccess(30, TimeUnit.MINUTES)
         .build();
 
     private final Cache<Long, CompletableFuture<Void>> completionFutures = Caffeine.newBuilder()
-        .expireAfterAccess(10, TimeUnit.MINUTES)
+        .expireAfterAccess(30, TimeUnit.MINUTES)
         .build();
 
     public void onSseStreamEvent(SseStreamEvent sseStreamEvent) {

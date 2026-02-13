@@ -492,27 +492,6 @@ public interface ActionDefinition {
     }
 
     /**
-     * A perform function variant that returns {@link SseEmitterHandler} used to stream events to clients during the
-     * action execution. The workflow engine will wait until the returned emitter signals completion before proceeding
-     * to the next task.
-     */
-    @FunctionalInterface
-    interface SseStreamResponsePerformFunction extends PerformFunction {
-
-        /**
-         * Execute the action and return an {@link SseEmitterHandler} used to stream events.
-         *
-         * @param inputParameters      the input parameters for the action
-         * @param connectionParameters the parameters related to the connection
-         * @param context              the context in which the action is executed
-         * @return the {@link SseEmitterHandler} that will stream events for the duration of this action
-         * @throws Exception if an error occurs during action execution or setup
-         */
-        SseEmitterHandler apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-            throws Exception;
-    }
-
-    /**
      * Represents a specialized functional interface within the ActionDefinition framework, used for defining
      * suspendable action implementations. This interface extends {@link BasePerformFunction} and provides a mechanism
      * for suspending actions during their execution.
