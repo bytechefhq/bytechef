@@ -81,6 +81,14 @@ publishing {
 repositories {
     mavenLocal()
     mavenCentral()
+
+    maven {
+        url = uri("https://build.shibboleth.net/maven/releases/")
+        content {
+            includeGroupByRegex("net\\.shibboleth.*")
+            includeGroupByRegex("org\\.opensaml.*")
+        }
+    }
 }
 
 spotbugs {

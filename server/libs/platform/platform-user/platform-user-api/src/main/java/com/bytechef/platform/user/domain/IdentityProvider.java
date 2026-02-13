@@ -70,6 +70,15 @@ public class IdentityProvider {
     @Column("issuer_uri")
     private String issuerUri;
 
+    @Column("metadata_uri")
+    private String metadataUri;
+
+    @Column("mfa_method")
+    private String mfaMethod;
+
+    @Column("mfa_required")
+    private boolean mfaRequired;
+
     @LastModifiedBy
     @Column("last_modified_by")
     private String lastModifiedBy;
@@ -81,8 +90,17 @@ public class IdentityProvider {
     @Column
     private String name;
 
+    @Column("name_id_format")
+    private String nameIdFormat;
+
+    @Column("scim_api_key")
+    private String scimApiKey;
+
     @Column
     private String scopes = "openid,profile,email";
+
+    @Column("signing_certificate")
+    private String signingCertificate;
 
     @Column
     private String type = "OIDC";
@@ -140,12 +158,36 @@ public class IdentityProvider {
         return lastModifiedDate;
     }
 
+    public String getMetadataUri() {
+        return metadataUri;
+    }
+
+    public String getMfaMethod() {
+        return mfaMethod;
+    }
+
+    public boolean isMfaRequired() {
+        return mfaRequired;
+    }
+
     public String getName() {
         return name;
     }
 
+    public String getNameIdFormat() {
+        return nameIdFormat;
+    }
+
+    public String getScimApiKey() {
+        return scimApiKey;
+    }
+
     public String getScopes() {
         return scopes;
+    }
+
+    public String getSigningCertificate() {
+        return signingCertificate;
     }
 
     public String getType() {
@@ -189,12 +231,36 @@ public class IdentityProvider {
         this.issuerUri = issuerUri;
     }
 
+    public void setMetadataUri(String metadataUri) {
+        this.metadataUri = metadataUri;
+    }
+
+    public void setMfaMethod(String mfaMethod) {
+        this.mfaMethod = mfaMethod;
+    }
+
+    public void setMfaRequired(boolean mfaRequired) {
+        this.mfaRequired = mfaRequired;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
+    public void setNameIdFormat(String nameIdFormat) {
+        this.nameIdFormat = nameIdFormat;
+    }
+
+    public void setScimApiKey(String scimApiKey) {
+        this.scimApiKey = scimApiKey;
+    }
+
     public void setScopes(String scopes) {
         this.scopes = scopes;
+    }
+
+    public void setSigningCertificate(String signingCertificate) {
+        this.signingCertificate = signingCertificate;
     }
 
     public void setType(String type) {

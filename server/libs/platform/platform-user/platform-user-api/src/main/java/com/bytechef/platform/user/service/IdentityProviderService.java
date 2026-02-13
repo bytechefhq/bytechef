@@ -31,6 +31,10 @@ public interface IdentityProviderService {
 
     Optional<IdentityProvider> fetchByDomain(String emailDomain);
 
+    Optional<IdentityProvider> fetchByName(String name);
+
+    Optional<IdentityProvider> fetchByScimApiKey(String scimApiKey);
+
     IdentityProvider getIdentityProvider(long id);
 
     List<IdentityProvider> getIdentityProviders();

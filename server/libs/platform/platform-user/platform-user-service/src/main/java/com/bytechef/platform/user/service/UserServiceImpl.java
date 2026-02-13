@@ -537,6 +537,22 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public void unlinkProvider(String login) {
+        Optional<User> userOptional = userRepository.findByLogin(login);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            user.setAuthProvider("LOCAL");
+            user.setProviderId(null);
+
+            userRepository.save(user);
+
+            clearUserCaches(user);
+        }
+    }
+
     /**
      * Not activated users should be automatically deleted after 3 days.
      * <p>

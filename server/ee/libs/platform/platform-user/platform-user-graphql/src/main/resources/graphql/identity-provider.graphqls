@@ -22,21 +22,31 @@ type IdentityProviderType {
     issuerUri: String!
     lastModifiedBy: String
     lastModifiedDate: Long
+    metadataUri: String
+    mfaMethod: String
+    mfaRequired: Boolean!
     name: String!
+    nameIdFormat: String
     scopes: String!
+    signingCertificate: String
     type: String!
 }
 
 input IdentityProviderInput {
     autoProvision: Boolean
-    clientId: String!
+    clientId: String
     clientSecret: String
     defaultAuthority: String
     domains: [String!]!
     enabled: Boolean
     enforced: Boolean
-    issuerUri: String!
+    issuerUri: String
+    metadataUri: String
+    mfaMethod: String
+    mfaRequired: Boolean
     name: String!
+    nameIdFormat: String
     scopes: String
+    signingCertificate: String
     type: String
 }

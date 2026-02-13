@@ -19,16 +19,19 @@ package com.bytechef.platform.user.web.rest;
 import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.IdentityProviderService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST controller for SSO discovery. Given an email address, returns the redirect URL for the matching OIDC identity
- * provider (if one is configured for the email's domain).
+ * REST controller for SSO discovery. Given an email address or company name, returns the redirect URL for the matching
+ * identity provider (if one is configured for the email's domain or company name).
  *
  * @author Ivica Cardic
  */
@@ -57,14 +60,54 @@ final class SsoDiscoveryController {
 
         String domain = email.substring(email.lastIndexOf('@') + 1);
 
-        return identityProviderService.fetchByDomain(domain)
-            .filter(IdentityProvider::isEnabled)
-            .map(
-                identityProvider -> ResponseEntity.ok(
-                    new SsoDiscoveryResponse(
-                        "/oauth2/authorization/sso-" + identityProvider.getId(),
-                        identityProvider.getName())))
-            .orElseGet(() -> ResponseEntity.ok(new SsoDiscoveryResponse(null, null)));
+        Optional<IdentityProvider> identityProvider = identityProviderService.fetchByDomain(domain);
+
+        if (identityProvider.isPresent() && identityProvider.get()
+            .isEnabled()) {
+            IdentityProvider idp = identityProvider.get();
+
+            String redirectUrl;
+
+            if ("SAML".equals(idp.getType())) {
+                redirectUrl = "/saml2/authenticate/saml-" + idp.getId();
+            } else {
+                redirectUrl = "/oauth2/authorization/sso-" + idp.getId();
+            }
+
+            return ResponseEntity.ok(new SsoDiscoveryResponse(redirectUrl, idp.getName()));
+        }
+
+        return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
+    }
+
+    @GetMapping("/sso/discover-by-name")
+    ResponseEntity<SsoDiscoveryResponse> discoverByName(@RequestParam String company) {
+        if (identityProviderService == null) {
+            return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
+        }
+
+        if (company == null || company.isBlank()) {
+            return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
+        }
+
+        Optional<IdentityProvider> identityProviderOptional = identityProviderService.fetchByName(company.trim());
+
+        if (identityProviderOptional.isPresent()) {
+            IdentityProvider identityProvider = identityProviderOptional.get();
+            if (identityProvider.isEnabled()) {
+                String redirectUrl;
+
+                if ("SAML".equals(identityProvider.getType())) {
+                    redirectUrl = "/saml2/authenticate/saml-" + identityProvider.getId();
+                } else {
+                    redirectUrl = "/oauth2/authorization/sso-" + identityProvider.getId();
+                }
+
+                return ResponseEntity.ok(new SsoDiscoveryResponse(redirectUrl, identityProvider.getName()));
+            }
+        }
+
+        return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
     }
 
     record SsoDiscoveryRequest(String email) {

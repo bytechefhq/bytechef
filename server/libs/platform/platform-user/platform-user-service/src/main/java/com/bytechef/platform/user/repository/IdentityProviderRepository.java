@@ -33,4 +33,12 @@ public interface IdentityProviderRepository extends ListCrudRepository<IdentityP
         "JOIN identity_provider_domain ipd ON ip.id = ipd.identity_provider_id " +
         "WHERE ipd.domain = :domain AND ip.enabled = true")
     Optional<IdentityProvider> findByDomain(@Param("domain") String domain);
+
+    @Query("SELECT ip.* FROM identity_provider ip " +
+        "WHERE LOWER(ip.name) = LOWER(:name) AND ip.enabled = true")
+    Optional<IdentityProvider> findByNameIgnoreCase(@Param("name") String name);
+
+    @Query("SELECT ip.* FROM identity_provider ip " +
+        "WHERE ip.scim_api_key = :scimApiKey")
+    Optional<IdentityProvider> findByScimApiKey(@Param("scimApiKey") String scimApiKey);
 }

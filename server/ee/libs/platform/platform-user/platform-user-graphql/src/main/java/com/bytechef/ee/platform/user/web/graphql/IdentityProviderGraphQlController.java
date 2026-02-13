@@ -115,8 +115,13 @@ public class IdentityProviderGraphQlController {
                 ? identityProvider.getLastModifiedDate()
                     .toEpochMilli()
                 : null,
+            identityProvider.getMetadataUri(),
+            identityProvider.getMfaMethod(),
+            identityProvider.isMfaRequired(),
             identityProvider.getName(),
+            identityProvider.getNameIdFormat(),
             identityProvider.getScopes(),
+            identityProvider.getSigningCertificate(),
             identityProvider.getType());
     }
 
@@ -151,11 +156,34 @@ public class IdentityProviderGraphQlController {
             identityProvider.setEnforced(input.enforced());
         }
 
-        identityProvider.setIssuerUri(input.issuerUri());
+        if (input.issuerUri() != null) {
+            identityProvider.setIssuerUri(input.issuerUri());
+        }
+
+        if (input.metadataUri() != null) {
+            identityProvider.setMetadataUri(input.metadataUri());
+        }
+
+        if (input.mfaMethod() != null) {
+            identityProvider.setMfaMethod(input.mfaMethod());
+        }
+
+        if (input.mfaRequired() != null) {
+            identityProvider.setMfaRequired(input.mfaRequired());
+        }
+
         identityProvider.setName(input.name());
+
+        if (input.nameIdFormat() != null) {
+            identityProvider.setNameIdFormat(input.nameIdFormat());
+        }
 
         if (input.scopes() != null) {
             identityProvider.setScopes(input.scopes());
+        }
+
+        if (input.signingCertificate() != null) {
+            identityProvider.setSigningCertificate(input.signingCertificate());
         }
 
         if (input.type() != null) {
@@ -169,11 +197,14 @@ public class IdentityProviderGraphQlController {
     record IdentityProviderDTO(
         boolean autoProvision, String clientId, String createdBy, Long createdDate, String defaultAuthority,
         List<String> domains, boolean enabled, boolean enforced, Long id, String issuerUri, String lastModifiedBy,
-        Long lastModifiedDate, String name, String scopes, String type) {
+        Long lastModifiedDate, String metadataUri, String mfaMethod, boolean mfaRequired, String name,
+        String nameIdFormat, String scopes, String signingCertificate, String type) {
     }
 
     record IdentityProviderInput(
         Boolean autoProvision, String clientId, String clientSecret, String defaultAuthority, List<String> domains,
-        Boolean enabled, Boolean enforced, String issuerUri, String name, String scopes, String type) {
+        Boolean enabled, Boolean enforced, String issuerUri, String metadataUri, String mfaMethod,
+        Boolean mfaRequired, String name, String nameIdFormat, String scopes, String signingCertificate,
+        String type) {
     }
 }

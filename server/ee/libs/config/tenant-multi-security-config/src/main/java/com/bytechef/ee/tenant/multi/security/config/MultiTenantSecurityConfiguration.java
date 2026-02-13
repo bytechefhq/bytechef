@@ -8,6 +8,9 @@
 package com.bytechef.ee.tenant.multi.security.config;
 
 import com.bytechef.ee.tenant.multi.security.MultiTenantUserDetailsService;
+import com.bytechef.ee.tenant.multi.security.saml2.DynamicRelyingPartyRegistrationRepository;
+import com.bytechef.ee.tenant.multi.security.saml2.MultiTenantSaml2AuthenticationFailureHandler;
+import com.bytechef.ee.tenant.multi.security.saml2.MultiTenantSaml2AuthenticationSuccessHandler;
 import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantAuthenticationFailureHandler;
 import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantAuthenticationSuccessHandler;
 import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantOAuth2AuthenticationFailureHandler;
@@ -16,8 +19,10 @@ import com.bytechef.ee.tenant.multi.security.web.filter.MultiTenantInternalFilte
 import com.bytechef.ee.tenant.multi.security.web.filter.SsoEnforcementFilter;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
+import com.bytechef.platform.security.web.config.Saml2LoginCustomizer;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.IdentityProviderService;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.security.web.oauth2.CustomOAuth2UserService;
 import com.bytechef.security.web.oauth2.CustomOidcUserService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
@@ -70,6 +75,19 @@ public class MultiTenantSecurityConfiguration {
                 .oidcUserService(customOidcUserService))
             .successHandler(new MultiTenantOAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService))
             .failureHandler(new MultiTenantOAuth2AuthenticationFailureHandler()));
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+    Saml2LoginCustomizer multiTenantSaml2LoginCustomizer(
+        DynamicRelyingPartyRegistrationRepository dynamicRelyingPartyRegistrationRepository,
+        RememberMeServices rememberMeServices, TenantService tenantService, UserService userService) {
+
+        return http -> http.saml2Login(saml2 -> saml2
+            .relyingPartyRegistrationRepository(dynamicRelyingPartyRegistrationRepository)
+            .successHandler(
+                new MultiTenantSaml2AuthenticationSuccessHandler(rememberMeServices, tenantService, userService))
+            .failureHandler(new MultiTenantSaml2AuthenticationFailureHandler()));
     }
 
     @Bean("userDetailsService")

@@ -24,6 +24,7 @@ import com.bytechef.config.ApplicationProperties.Security.RememberMe;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
+import com.bytechef.platform.security.web.config.Saml2LoginCustomizer;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
@@ -31,6 +32,7 @@ import com.bytechef.security.web.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -83,6 +85,7 @@ public class SecurityConfiguration {
     private final OAuth2LoginCustomizer oAuth2LoginCustomizer;
     private final PasswordEncoder passwordEncoder;
     private final RememberMeServices rememberMeServices;
+    private final Saml2LoginCustomizer saml2LoginCustomizer;
     private final Security security;
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
@@ -90,13 +93,14 @@ public class SecurityConfiguration {
         ApplicationProperties applicationProperties, AuthenticationFailureHandler authenticationFailureHandler,
         AuthenticationSuccessHandler authenticationSuccessHandler,
         ObjectProvider<OAuth2LoginCustomizer> oAuth2LoginCustomizerProvider, PasswordEncoder passwordEncoder,
-        RememberMeServices rememberMeServices) {
+        RememberMeServices rememberMeServices, ObjectProvider<Saml2LoginCustomizer> saml2LoginCustomizerProvider) {
 
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.oAuth2LoginCustomizer = oAuth2LoginCustomizerProvider.getIfAvailable();
         this.passwordEncoder = passwordEncoder;
         this.rememberMeServices = rememberMeServices;
+        this.saml2LoginCustomizer = saml2LoginCustomizerProvider.getIfAvailable();
         this.security = applicationProperties.getSecurity();
     }
 
@@ -172,8 +176,18 @@ public class SecurityConfiguration {
         List<SpaWebFilterContributor> spaWebFilterContributors)
         throws Exception {
 
-        if (oAuth2LoginCustomizer != null) {
-            http.securityMatcher("/api/**", "/graphql", "/oauth2/**", "/login/oauth2/**");
+        if (oAuth2LoginCustomizer != null || saml2LoginCustomizer != null) {
+            List<String> matchers = new ArrayList<>(List.of("/api/**", "/graphql"));
+
+            if (oAuth2LoginCustomizer != null) {
+                matchers.addAll(List.of("/oauth2/**", "/login/oauth2/**"));
+            }
+
+            if (saml2LoginCustomizer != null) {
+                matchers.addAll(List.of("/saml2/**", "/login/saml2/**"));
+            }
+
+            http.securityMatcher(matchers.toArray(new String[0]));
         } else {
             http.securityMatcher("/api/**", "/graphql");
         }
@@ -240,6 +254,10 @@ public class SecurityConfiguration {
 
         if (oAuth2LoginCustomizer != null) {
             oAuth2LoginCustomizer.customize(http);
+        }
+
+        if (saml2LoginCustomizer != null) {
+            saml2LoginCustomizer.customize(http);
         }
 
         for (SecurityConfigurerContributor securityConfigurerContributor : securityConfigurerContributors) {

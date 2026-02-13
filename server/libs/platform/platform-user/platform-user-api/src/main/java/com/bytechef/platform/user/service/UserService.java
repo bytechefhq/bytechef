@@ -71,6 +71,8 @@ public interface UserService {
 
     void save(User user);
 
+    void unlinkProvider(String login);
+
     Optional<User> update(AdminUserDTO userDTO);
 
     void update(String firstName, String lastName, String email, String langKey, String imageUrl);

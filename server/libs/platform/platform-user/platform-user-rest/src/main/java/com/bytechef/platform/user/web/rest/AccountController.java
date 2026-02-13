@@ -209,6 +209,37 @@ public class AccountController {
     }
 
     /**
+     * {@code GET /account/linked-accounts} : get the current user's linked provider information.
+     */
+    @GetMapping("/account/linked-accounts")
+    public LinkedAccountResponse getLinkedAccounts() {
+        User user = userService.fetchCurrentUser()
+            .orElseThrow(() -> new AccountResourceException(
+                "User could not be found", AccountErrorType.USER_NOT_FOUND));
+
+        return new LinkedAccountResponse(
+            user.getAuthProvider(), user.getProviderId(), user.getPassword() != null);
+    }
+
+    /**
+     * {@code DELETE /account/linked-accounts/{provider}} : unlink the current user from the specified provider.
+     */
+    @DeleteMapping("/account/linked-accounts/{provider}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void unlinkProvider(@PathVariable String provider) {
+        User user = userService.fetchCurrentUser()
+            .orElseThrow(() -> new AccountResourceException(
+                "User could not be found", AccountErrorType.USER_NOT_FOUND));
+
+        if (user.getPassword() == null) {
+            throw new AccountResourceException(
+                "Cannot unlink provider without a password set", AccountErrorType.USER_NOT_FOUND);
+        }
+
+        userService.unlinkProvider(user.getLogin());
+    }
+
+    /**
      * {@code POST  /account} : update the current user information.
      *
      * @param userDTO the current user information.
@@ -373,5 +404,8 @@ public class AccountController {
     private static boolean isEqualsIgnoreCase(Optional<User> existingUser, String userLogin) {
         return OptionalUtils.get(existingUser, User::getLogin)
             .equalsIgnoreCase(userLogin);
+    }
+
+    record LinkedAccountResponse(String authProvider, String providerId, boolean hasPassword) {
     }
 }

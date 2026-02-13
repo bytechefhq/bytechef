@@ -212,6 +212,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-impl"))
     implementation(project(":server:ee:libs:platform:platform-security-web:platform-security-web-impl"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-graphql"))
+    implementation(project(":server:ee:libs:platform:platform-user:platform-user-scim"))
 
     run {
         rootProject.subprojects

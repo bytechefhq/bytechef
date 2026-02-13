@@ -61,6 +61,18 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<IdentityProvider> fetchByName(String name) {
+        return identityProviderRepository.findByNameIgnoreCase(name);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<IdentityProvider> fetchByScimApiKey(String scimApiKey) {
+        return identityProviderRepository.findByScimApiKey(scimApiKey);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public IdentityProvider getIdentityProvider(long id) {
         return identityProviderRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Identity provider not found: " + id));
