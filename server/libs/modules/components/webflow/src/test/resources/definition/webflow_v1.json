@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates an order's status to fulfilled.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/webflow_v1#fulfill-order"
+    },
     "metadata": {
       "method": "POST",
       "path": "/sites/{siteId}/orders/{orderId}/fulfill"
@@ -166,7 +169,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "Unique identifier for a site.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -193,7 +196,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "Unique identifier for an order.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -228,7 +231,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get collection item in a collection.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/webflow_v1#get-collection-item"
+    },
     "metadata": {
       "method": "GET",
       "path": "/collections/{collectionId}/items/{itemId}"
@@ -472,7 +478,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "Unique identifier for a site.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -497,7 +503,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "",
+      "description": "Unique identifier for a collection.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -524,7 +530,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "",
+      "description": "Unique identifier for an item.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -711,7 +717,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "Unique identifier for a site.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -738,7 +744,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "Unique identifier for an order.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1013,7 +1019,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "Unique identifier for a site.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1038,7 +1044,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "",
+      "description": "Unique identifier for a collection.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1065,7 +1071,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "",
+      "description": "Unique identifier for an item.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1172,14 +1178,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/webflow_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.webflow.com/data/reference/rest-introduction"
+  },
   "description": "Webflow is a web design and development platform that allows users to build responsive websites visually without writing code.",
   "icon": "path:assets/webflow.svg",
   "metadata": null,

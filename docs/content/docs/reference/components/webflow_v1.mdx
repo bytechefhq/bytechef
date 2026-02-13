@@ -76,8 +76,8 @@ Name: fulfillOrder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| siteId | Site ID | STRING |  | true |
-| orderId | Order ID | STRING <details> <summary> Depends On </summary> siteId </details> |  | true |
+| siteId | Site ID | STRING | Unique identifier for a site. | true |
+| orderId | Order ID | STRING <details> <summary> Depends On </summary> siteId </details> | Unique identifier for an order. | true |
 
 #### Example JSON Structure
 ```json
@@ -117,6 +117,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Site ID and Order ID
+
+To find the Site ID, click [here](/reference/components/webflow_v1#how-to-find-the-site-id).
+
+To find the Order ID, click [here](/reference/components/webflow_v1#how-to-find-the-order-id).
+
+*Note: This action is only available with paid account.*
 
 
 
@@ -129,9 +136,9 @@ Name: getCollectionItem
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| siteId | Site ID | STRING |  | false |
-| collectionId | Collection ID | STRING <details> <summary> Depends On </summary> siteId </details> |  | true |
-| itemId | Item  ID | STRING <details> <summary> Depends On </summary> collectionId, siteId </details> |  | true |
+| siteId | Site ID | STRING | Unique identifier for a site. | false |
+| collectionId | Collection ID | STRING <details> <summary> Depends On </summary> siteId </details> | Unique identifier for a collection. | true |
+| itemId | Item  ID | STRING <details> <summary> Depends On </summary> collectionId, siteId </details> | Unique identifier for an item. | true |
 
 #### Example JSON Structure
 ```json
@@ -175,6 +182,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Site ID, Collection ID and Item ID
+
+To find the Site ID, click [here](/reference/components/webflow_v1#how-to-find-the-site-id).
+
+To find the Collection ID, click [here](/reference/components/webflow_v1#how-to-find-the-collection-id).
+
+To find the Item ID, click [here](/reference/components/webflow_v1#how-to-find-the-item-id).
 
 
 
@@ -186,3 +200,64 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find the Site ID
+
+The Site ID is a unique value that can be found in the Webflow UI or via the API.
+
+- **Method 1: Via API**
+
+Use the `GET /sites` endpoint to retrieve a list of all sites and their IDs.
+
+- **Method 2: In the Webflow UI**
+
+1. Go to your dashboard and open the site that you want to use.
+2. On the top of left bar click menu and select **Site settings**.
+3. Scroll down to **Overview** and there is your Site ID.
+
+### How to find the Order ID
+
+The Order ID is a site-scoped identifier for an order that can be found in the Webflow UI or via the API.
+
+- **Method 1: Via API**
+
+Use the `GET /sites/SITE_ID/orders` endpoint. List orders within a site to retrieve their IDs.
+
+- **Method 2: In the Webflow UI**
+
+1. Go to your dashboard and click **Ecommerce**.
+2. Click **Orders** and choose a specific order.
+
+### How to find the Collection ID
+
+The Collection ID is a site-scoped identifier for a collection that can be found in the Webflow UI or via the API.
+
+- **Method 1: Via API**
+
+Use the `GET /sites/SITE_ID/collections` endpoint. List collections within a site to retrieve their IDs.
+
+- **Method 2: In the Webflow UI**
+
+1. Go to your dashboard and open the site that you want to use.
+2. On the top bar click **CMS**.
+3. On the left bar find the collection that you want to use and click **Settings**.
+4. Under **Collection Settings** you will find Collection ID.
+
+### How to find the Item ID
+
+The Item ID is a collection-scoped identifier for an item that can be found in the Webflow UI or via the API.
+
+- **Method 1: Via API**
+
+Use the `GET /collections/COLLECTION_ID/items` endpoint. List items within a collection to retrieve their IDs.
+
+- **Method 2: In the Webflow UI**
+
+1. Go to your dashboard and open the site that you want to use.
+2. On the top bar click **CMS**.
+3. On the left bar click on the collection that you want to use.
+4. You will find list of items and click on the one that you want to use.
+5. Under **Item details** you will find Item ID.
