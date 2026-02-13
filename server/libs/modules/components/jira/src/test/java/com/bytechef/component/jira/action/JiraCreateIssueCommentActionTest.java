@@ -23,7 +23,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
@@ -31,7 +30,6 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
@@ -48,8 +46,8 @@ import org.mockito.ArgumentCaptor;
 class JiraCreateIssueCommentActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(ISSUE_ID, "xy", COMMENT, "This is a comment"));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(ISSUE_ID, "xy", COMMENT, "This is a comment"));
     private final Map<String, Object> responseMap = Map.of("key", "value");
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
@@ -63,7 +61,7 @@ class JiraCreateIssueCommentActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
         Object result = JiraCreateIssueCommentAction.perform(mockedParameters, null, mockedContext);

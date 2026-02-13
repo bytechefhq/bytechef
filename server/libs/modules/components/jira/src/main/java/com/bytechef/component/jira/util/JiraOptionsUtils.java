@@ -59,7 +59,7 @@ public class JiraOptionsUtils {
             Map<String, Object> body = context
                 .http(http -> http.get("/search/jql"))
                 .queryParameters(
-                    JQL, PROJECT + "=\"" + getProjectName(inputParameters, connectionParameters, context) + "\"",
+                    JQL, PROJECT + "=\"" + getProjectName(inputParameters, context) + "\"",
                     FIELDS, SUMMARY,
                     MAX_RESULTS, 5000,
                     NEXT_PAGE_TOKEN, nextPageToken)

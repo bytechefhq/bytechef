@@ -30,7 +30,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
@@ -38,7 +37,6 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
@@ -57,8 +55,8 @@ class JiraCreateIssueActionTest {
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(PROJECT, "1", ISSUETYPE, "1", SUMMARY, "summary", ASSIGNEE, "1", PRIORITY, "1",
             DESCRIPTION, "description"));
-    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Map<String, Object> responseMap = Map.of("key", "value");
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
@@ -70,7 +68,7 @@ class JiraCreateIssueActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
         Object result = JiraCreateIssueAction.perform(mockedParameters, null, mockedContext);
@@ -89,7 +87,8 @@ class JiraCreateIssueActionTest {
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         assertEquals("/issue", stringArgumentCaptor.getValue());
-        assertEquals(Http.Body.of(Map.of(FIELDS, getExpectedFieldsMap()), Http.BodyContentType.JSON),
+        assertEquals(
+            Http.Body.of(Map.of(FIELDS, getExpectedFieldsMap()), Http.BodyContentType.JSON),
             bodyArgumentCaptor.getValue());
     }
 

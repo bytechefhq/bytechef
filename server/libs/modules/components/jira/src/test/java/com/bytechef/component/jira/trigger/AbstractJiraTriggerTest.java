@@ -16,6 +16,7 @@
 
 package com.bytechef.component.jira.trigger;
 
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -38,10 +39,9 @@ abstract class AbstractJiraTriggerTest {
     protected Parameters mockedParameters = mock(Parameters.class);
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    protected ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
-        ArgumentCaptor.forClass(TriggerContext.class);
+    protected ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    protected ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor = forClass(TriggerContext.class);
 
     @BeforeEach
     void beforeEach() {

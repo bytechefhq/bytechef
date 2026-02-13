@@ -22,7 +22,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.ORDER_BY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
@@ -30,7 +29,6 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
@@ -59,7 +57,7 @@ class JiraListIssueCommentsActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(ORDER_BY, "+created", MAX_RESULTS, 50))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
         Object result = JiraListIssueCommentsAction.perform(mockedParameters, null, mockedContext);

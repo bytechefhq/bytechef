@@ -32,7 +32,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.jira.util.JiraOptionsUtils;
 
 /**
@@ -74,13 +73,12 @@ public class JiraListIssueCommentsAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.get("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/comment"))
+        return context.http(http -> http.get("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/comment"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .queryParameters(
                 ORDER_BY, inputParameters.getString(ORDER_BY),
                 MAX_RESULTS, inputParameters.getInteger(MAX_RESULTS))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

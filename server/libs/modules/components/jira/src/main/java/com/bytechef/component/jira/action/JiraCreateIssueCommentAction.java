@@ -31,7 +31,6 @@ import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.jira.util.JiraOptionsUtils;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +79,6 @@ public class JiraCreateIssueCommentAction {
                             "content", List.of(Map.of(TEXT, inputParameters.getRequiredString(COMMENT), TYPE, TEXT)),
                             TYPE, "paragraph")))))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
