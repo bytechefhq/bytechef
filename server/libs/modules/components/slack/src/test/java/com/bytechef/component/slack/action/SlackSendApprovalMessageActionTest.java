@@ -19,8 +19,10 @@ package com.bytechef.component.slack.action;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,8 @@ import org.junit.jupiter.api.Test;
  * @author Monika Kušter
  */
 class SlackSendApprovalMessageActionTest extends AbstractSlackActionTest {
+
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
 
     @Test
     void testPerform() {
@@ -42,14 +46,14 @@ class SlackSendApprovalMessageActionTest extends AbstractSlackActionTest {
 
         assertEquals(mockedObject, result);
         assertEquals(
-            List.of("abc", "%s%n%n Approve: ${approvalLink}%n%n Disapprove: ${disapprovalLink}".formatted("efg")),
+            List.of("channel", "%s%n%n Approve: ${approvalLink}%n%n Disapprove: ${disapprovalLink}".formatted("text")),
             stringArgumentCaptor.getAllValues());
-        assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+        assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
 
         List<Map<String, Object>> expectedBlocks = List.of(
             Map.of(
                 "type", "section", TEXT,
-                Map.of("type", "mrkdwn", TEXT, "efg")),
+                Map.of("type", "mrkdwn", TEXT, "text")),
             Map.of(
                 "type", "actions", "block_id", "actions", "elements",
                 List.of(

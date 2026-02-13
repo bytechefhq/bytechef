@@ -17,19 +17,17 @@
 package com.bytechef.component.slack.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
-import static com.bytechef.component.slack.constant.SlackConstants.ERROR;
 import static com.bytechef.component.slack.constant.SlackConstants.ID;
 import static com.bytechef.component.slack.constant.SlackConstants.NAME;
 import static com.bytechef.component.slack.constant.SlackConstants.OK;
-import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
@@ -38,12 +36,12 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.exception.ProviderException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Mario Cvjetojevic
@@ -79,60 +77,6 @@ class SlackUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-    }
-
-    @Test
-    void testSendMessage() {
-        when(mockedHttp.post(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("ok", true));
-
-        Object result = SlackUtils.sendMessage("general", "hello", null, mockedActionContext);
-
-        assertEquals(Map.of(OK, true), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/chat.postMessage", stringArgumentCaptor.getValue());
-        assertEquals(
-            Http.Body.of(Map.of(CHANNEL, "general", TEXT, "hello"), Http.BodyContentType.JSON),
-            bodyArgumentCaptor.getValue());
-    }
-
-    @Test
-    void testSendMessageError() {
-        when(mockedHttp.post(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(OK, false, ERROR, "some_error"));
-
-        ProviderException providerException = assertThrows(
-            ProviderException.class,
-            () -> SlackUtils.sendMessage("general", "hello", null, mockedActionContext));
-
-        assertEquals("some_error", providerException.getMessage());
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/chat.postMessage", stringArgumentCaptor.getValue());
-        assertEquals(
-            Http.Body.of(Map.of(CHANNEL, "general", TEXT, "hello"), Http.BodyContentType.JSON),
-            bodyArgumentCaptor.getValue());
     }
 
     @Test
@@ -233,5 +177,72 @@ class SlackUtilsTest {
 
         assertArrayEquals(expectedFirst, allCaptured.get(0));
         assertArrayEquals(expectedSecond, allCaptured.get(1));
+    }
+
+    @Test
+    void testGetSlackTimeZone() {
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of("user", Map.of("tz", "timezone")));
+
+        ArgumentCaptor<ActionContext> actionContextArgumentCaptor = forClass(ActionContext.class);
+
+        try (MockedStatic<SlackUtils> slackUtilsMockedStatic = mockStatic(SlackUtils.class, CALLS_REAL_METHODS)) {
+            slackUtilsMockedStatic.when(() -> SlackUtils.getUserId(actionContextArgumentCaptor.capture()))
+                .thenReturn("userId");
+
+            String result = SlackUtils.getSlackTimeZone(mockedActionContext);
+
+            assertEquals("timezone", result);
+
+            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            Http.Configuration.ConfigurationBuilder configurationBuilder =
+                configurationBuilderArgumentCaptor.getValue();
+            Http.Configuration configuration = configurationBuilder.build();
+            Http.ResponseType responseType = configuration.getResponseType();
+
+            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+            assertEquals("/users.info", stringArgumentCaptor.getValue());
+
+            Object[] queryParameters = objectsArgumentCaptor.getValue();
+
+            Object[] expectedQueryParameters = {
+                "user", "userId"
+            };
+
+            assertArrayEquals(expectedQueryParameters, queryParameters);
+            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+        }
+    }
+
+    @Test
+    void testGetUserId() {
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of("user_id", "userId"));
+
+        String result = SlackUtils.getUserId(mockedActionContext);
+
+        assertEquals("userId", result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/auth.test", stringArgumentCaptor.getValue());
     }
 }

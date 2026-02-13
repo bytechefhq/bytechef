@@ -16,17 +16,12 @@
 
 package com.bytechef.component.slack.action;
 
-import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
-import static com.bytechef.component.slack.constant.SlackConstants.POST_AT;
-import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.test.definition.MockParametersFactory;
-import java.time.LocalDateTime;
+import com.bytechef.component.definition.Context;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,31 +30,16 @@ import org.junit.jupiter.api.Test;
  */
 class SlackSendChannelMessageActionTest extends AbstractSlackActionTest {
 
+    private final Context mockedContext = mock(Context.class);
+
     @Test
     void testPerform() {
-        Object result = SlackSendChannelMessageAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = SlackSendChannelMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
-        assertEquals(List.of("abc", "efg"), stringArgumentCaptor.getAllValues());
+        assertEquals(List.of("channel", "text"), stringArgumentCaptor.getAllValues());
+        assertNull(localDateTimeArgumentCaptor.getValue());
         assertNull(listArgumentCaptor.getValue());
-        assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
-    }
-
-    @Test
-    void testPerformScheduledMessage() {
-
-        LocalDateTime schedule = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
-        Parameters scheduledMockedParameters =
-            MockParametersFactory.create(Map.of(CHANNEL, "abc", TEXT, "efg", POST_AT, schedule));
-
-        Object result = SlackSendChannelMessageAction.perform(scheduledMockedParameters, scheduledMockedParameters,
-            mockedActionContext);
-
-        assertEquals(mockedObject, result);
-
-        assertEquals(schedule, localDateTimeArgumentCaptor.getValue());
-        assertEquals(List.of("abc", "efg"), stringArgumentCaptor.getAllValues());
-        assertNull(listArgumentCaptor.getValue());
-        assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+        assertEquals(mockedContext, contextArgumentCaptor.getValue());
     }
 }
