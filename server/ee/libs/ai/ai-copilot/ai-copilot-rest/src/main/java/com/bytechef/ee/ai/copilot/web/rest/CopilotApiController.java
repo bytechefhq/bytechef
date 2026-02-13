@@ -7,10 +7,12 @@
 
 package com.bytechef.ee.ai.copilot.web.rest;
 
+import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
 import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.ai.copilot.util.Mode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -52,11 +54,16 @@ public class CopilotApiController {
         @NonNull @PathVariable("agentId") String agentId, @NonNull @RequestBody() AgUiParameters agUiParameters) {
 
         if (agentId.equals("workflow_editor")) {
-            switch ((String) agUiParameters.getState()
-                .getState()
-                .get("mode")) {
-                case "BUILD" -> agentId = "workflow_editor_build";
-                default -> agentId = "workflow_editor_ask";
+            State state = agUiParameters.getState();
+
+            Map<String, Object> stateMap = state.getState();
+
+            Object mode = stateMap.get("mode");
+
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "workflow_editor_build";
+            } else {
+                agentId = "workflow_editor_ask";
             }
         }
 

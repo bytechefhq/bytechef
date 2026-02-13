@@ -59,22 +59,22 @@ import org.springframework.web.servlet.function.ServerResponse;
 @ConditionalOnProperty(name = "bytechef.ai.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
 public class ManagementMcpServerConfiguration {
 
+    private final ComponentTools componentTools;
+    private final FirecrawlTools firecrawlTools;
     private final ProjectToolsImpl projectTools;
     private final ProjectWorkflowToolsImpl projectWorkflowTools;
     private final TaskTools taskTools;
-    private final ComponentTools componentTools;
-    private final FirecrawlTools firecrawlTools;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
-        ProjectToolsImpl projectTools, ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools,
-        ComponentTools componentTools, FirecrawlTools firecrawlTools) {
+        ComponentTools componentTools, FirecrawlTools firecrawlTools, ProjectToolsImpl projectTools,
+        ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools) {
 
+        this.componentTools = componentTools;
+        this.firecrawlTools = firecrawlTools;
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
         this.taskTools = taskTools;
-        this.componentTools = componentTools;
-        this.firecrawlTools = firecrawlTools;
     }
 
     @Bean
@@ -113,8 +113,9 @@ public class ManagementMcpServerConfiguration {
     ToolCallbackProvider toolCallbackProvider() {
         return ToolCallbackProvider.from(
             new ArrayList<>(
-                List.of(ToolCallbacks.from(projectTools, projectWorkflowTools, componentTools, taskTools,
-                    firecrawlTools))));
+                List.of(
+                    ToolCallbacks.from(
+                        projectTools, projectWorkflowTools, componentTools, taskTools, firecrawlTools))));
     }
 
     @Bean

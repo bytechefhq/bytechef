@@ -14,5 +14,5 @@ package com.bytechef.ee.ai.copilot.util;
  */
 public enum Mode {
 
-    CHAT, BUILD
+    ASK, BUILD
 }

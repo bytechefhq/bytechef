@@ -64,21 +64,25 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     @Override
     protected SystemMessage createSystemMessage(State state, List<Context> contexts) {
         String workflowId = (String) state.get("workflowId");
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
+
         contexts.add(new Context("Current Workflow Definition", workflow.getDefinition()));
 
         List<WorkflowNodeOutputDTO> previousWorkflowNodeOutputs =
             workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(workflowId, null, 0);
+
         contexts.add(new Context("Current Outputs", getSampleOutputs(previousWorkflowNodeOutputs)));
 
         List<String> contextStrings = contexts.stream()
             .map(Context::toString)
             .toList();
 
+        String resolvedMessage = Objects.nonNull(this.systemMessageProvider)
+            ? this.systemMessageProvider.apply(this) : this.systemMessage;
+
         String message = "%s%n%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
-            Objects.nonNull(this.systemMessageProvider)
-                ? this.systemMessageProvider.apply(this) : this.systemMessage,
-            ADDITIONAL_RULES, state, String.join("\n", contextStrings));
+            resolvedMessage, ADDITIONAL_RULES, state, String.join("\n", contextStrings));
 
         SystemMessage systemMessage = new SystemMessage();
 
@@ -90,12 +94,14 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
     private String getSampleOutputs(List<WorkflowNodeOutputDTO> previousWorkflowNodeOutputs) {
         StringBuilder stringBuilder = new StringBuilder("\n");
+
         for (WorkflowNodeOutputDTO previousWorkflowNodeOutput : previousWorkflowNodeOutputs) {
             stringBuilder.append(previousWorkflowNodeOutput.workflowNodeName())
                 .append(": ")
                 .append(previousWorkflowNodeOutput.getSampleOutput())
                 .append("\n");
         }
+
         return stringBuilder.toString();
     }
 
