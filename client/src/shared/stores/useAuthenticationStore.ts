@@ -13,6 +13,7 @@ export interface AuthenticationI {
     authenticated: boolean;
     loading: boolean;
     loginError: boolean;
+    mfaRequired: boolean;
     sessionHasBeenFetched: boolean;
     showLogin: boolean;
     clearAuthentication: () => void;
@@ -20,6 +21,7 @@ export interface AuthenticationI {
     login: (email: string, password: string, rememberMe: boolean) => Promise<UserI | undefined>;
     logout: () => void;
     reset: () => void;
+    verifyMfa: (code: string) => Promise<UserI | undefined>;
 }
 
 const initialState = {
@@ -27,6 +29,7 @@ const initialState = {
     authenticated: false,
     loading: false,
     loginError: false,
+    mfaRequired: false,
     sessionHasBeenFetched: false,
     showLogin: false,
 };
@@ -67,6 +70,7 @@ export const authenticationStore = createStore<AuthenticationI>()(
             authenticated: false,
             loading: false,
             loginError: false,
+            mfaRequired: false,
             sessionHasBeenFetched: false,
             showLogin: false,
 
@@ -74,6 +78,7 @@ export const authenticationStore = createStore<AuthenticationI>()(
                 set((state) => ({
                     ...state,
                     loading: false,
+                    mfaRequired: false,
                     showLogin: true,
                     authenticated: false,
                 }));
@@ -129,6 +134,13 @@ export const authenticationStore = createStore<AuthenticationI>()(
                         const {getAccount} = get();
 
                         return getAccount();
+                    } else if (response.status === 202) {
+                        set((state) => ({
+                            ...state,
+                            loginError: false,
+                            mfaRequired: true,
+                            showLogin: false,
+                        }));
                     } else {
                         set(() => ({
                             ...initialState,
@@ -153,6 +165,33 @@ export const authenticationStore = createStore<AuthenticationI>()(
 
                 // fetch new csrf token
                 getAccount();
+            },
+
+            verifyMfa: async (code: string): Promise<UserI | undefined> => {
+                const response = await fetch('/api/mfa/verify', {
+                    body: JSON.stringify({code}),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+                    },
+                    method: 'POST',
+                });
+
+                if (response.status === 200) {
+                    set((state) => ({
+                        ...state,
+                        mfaRequired: false,
+                    }));
+
+                    const {getAccount} = get();
+
+                    return getAccount();
+                } else {
+                    set((state) => ({
+                        ...state,
+                        loginError: true,
+                    }));
+                }
             },
 
             reset: () => {

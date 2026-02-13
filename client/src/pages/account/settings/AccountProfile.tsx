@@ -1,5 +1,6 @@
 import AccountProfileDetails from '@/pages/account/settings/AccountProfileDetails';
 import AccountProfileLinkedAccounts from '@/pages/account/settings/AccountProfileLinkedAccounts';
+import AccountProfileMfa from '@/pages/account/settings/AccountProfileMfa';
 import AccountProfilePassword from '@/pages/account/settings/AccountProfilePassword';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -16,6 +17,8 @@ const AccountProfile = () => {
                     <AccountProfileDetails />
 
                     <AccountProfilePassword />
+
+                    <AccountProfileMfa />
 
                     <AccountProfileLinkedAccounts />
                 </div>
