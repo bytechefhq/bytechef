@@ -35,12 +35,11 @@ import org.junit.jupiter.api.Test;
  */
 class ShopifyCreateProductActionTest extends AbstractShopifyActionTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(TITLE, "title",
-        PRODUCT_OPTIONS, List.of(Map.of(NAME, "name", VALUES, List.of("value")))));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(TITLE, "title", PRODUCT_OPTIONS, List.of(Map.of(NAME, "name", VALUES, List.of("value")))));
 
     @Test
     void testPerform() {
-
         shopifyUtilsMockedStatic
             .when(() -> ShopifyUtils.executeGraphQlOperation(
                 stringArgumentCaptor.capture(),
@@ -49,8 +48,7 @@ class ShopifyCreateProductActionTest extends AbstractShopifyActionTest {
                 stringArgumentCaptor.capture()))
             .thenReturn(Map.of());
 
-        Object result = ShopifyCreateProductAction.perform(
-            mockedParameters, null, mockedContext);
+        Object result = ShopifyCreateProductAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
 

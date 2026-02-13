@@ -35,7 +35,7 @@ import org.mockito.MockedStatic;
  */
 abstract class AbstractShopifyActionTest {
 
-    ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    protected final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     @SuppressWarnings("unchecked")
     protected final ArgumentCaptor<List<Object>> listArgumentCaptor = forClass(List.class);
     @SuppressWarnings("unchecked")

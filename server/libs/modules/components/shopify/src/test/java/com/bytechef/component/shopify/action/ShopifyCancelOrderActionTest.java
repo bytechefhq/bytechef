@@ -48,7 +48,6 @@ class ShopifyCancelOrderActionTest extends AbstractShopifyActionTest {
 
     @Test
     void testPerform() {
-
         shopifyUtilsMockedStatic
             .when(() -> ShopifyUtils.executeGraphQlOperation(
                 stringArgumentCaptor.capture(),
@@ -57,8 +56,7 @@ class ShopifyCancelOrderActionTest extends AbstractShopifyActionTest {
                 stringArgumentCaptor.capture()))
             .thenReturn(Map.of());
 
-        Object result = ShopifyCancelOrderAction.perform(
-            mockedParameters, null, mockedContext);
+        Object result = ShopifyCancelOrderAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
 

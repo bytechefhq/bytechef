@@ -139,36 +139,35 @@ public class ShopifyCreateProductAction {
             }
             """;
 
-        Map<String, Object> variables = Map.of(
-            "product", Map.of(
-                TITLE, inputParameters.getRequiredString(TITLE),
-                STATUS, "ACTIVE",
-                PRODUCT_OPTIONS, getProductOptionsList(
-                    inputParameters.getList(PRODUCT_OPTIONS, Object.class, List.of()))));
-
-        return executeGraphQlOperation(query, context, variables, "productCreate");
+        return executeGraphQlOperation(
+            query,
+            context,
+            Map.of(
+                "product", Map.of(
+                    TITLE, inputParameters.getRequiredString(TITLE),
+                    STATUS, "ACTIVE",
+                    PRODUCT_OPTIONS, getProductOptionsList(
+                        inputParameters.getList(PRODUCT_OPTIONS, Object.class, List.of())))),
+            "productCreate");
     }
 
-    private static List<Map<String, Object>> getProductOptionsList(List<Object> optionsList) {
-        return optionsList.stream()
-            .filter(option -> option instanceof Map<?, ?>)
-            .map(option -> (Map<?, ?>) option)
-            .map(option -> {
-                List<Map<String, String>> values = extractValues(option.get(VALUES));
-
-                return Map.of(
-                    NAME, option.get(NAME),
-                    VALUES, values);
-            })
+    private static List<Map<String, Object>> getProductOptionsList(List<Object> options) {
+        return options.stream()
+            .filter(Map.class::isInstance)
+            .map(Map.class::cast)
+            .map(option -> Map.of(
+                NAME, option.get(NAME),
+                VALUES, extractValues(option.get(VALUES))))
             .toList();
     }
 
     private static List<Map<String, String>> extractValues(Object valuesObject) {
         if (valuesObject instanceof List<?> values) {
             return values.stream()
-                .map((value) -> Map.of(NAME, value.toString()))
+                .map(value -> Map.of(NAME, String.valueOf(value)))
                 .toList();
         }
+
         return List.of();
     }
 }

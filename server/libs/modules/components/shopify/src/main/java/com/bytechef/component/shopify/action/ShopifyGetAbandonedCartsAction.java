@@ -93,52 +93,33 @@ public class ShopifyGetAbandonedCartsAction {
             }""";
 
         Map<String, Object> variables = new HashMap<>();
+
         variables.put("first", 100);
 
         List<Object> abandonedCarts = new ArrayList<>();
-        boolean hasNext = true;
+        Map<?, ?> queryResultMap;
 
-        while (hasNext) {
+        do {
             Object queryResult = executeGraphQlOperation(query, context, variables, "abandonedCheckouts");
 
-            if (queryResult instanceof Map<?, ?> queryResultMap && !queryResultMap.isEmpty()) {
-
-                Object nodes = queryResultMap.get("nodes");
-                if (nodes instanceof Collection<?>) {
-                    abandonedCarts.addAll((Collection<?>) nodes);
+            if (queryResult instanceof Map<?, ?> resultMap && !resultMap.isEmpty()) {
+                queryResultMap = resultMap;
+                if (resultMap.get("nodes") instanceof Collection<?> nodes) {
+                    abandonedCarts.addAll(nodes);
                 }
 
-                hasNext = checkHasNextPage(queryResultMap);
+                if (resultMap.get("pageInfo") instanceof Map<?, ?> pageInfo &&
+                    Boolean.TRUE.equals(pageInfo.get("hasNextPage"))) {
 
-                if (hasNext) {
-                    String endCursor = getEndCursor(queryResultMap);
-                    variables.put("after", endCursor);
+                    variables.put("after", pageInfo.get("endCursor"));
+                } else {
+                    queryResultMap = null;
                 }
             } else {
-                hasNext = false;
+                queryResultMap = null;
             }
-        }
+        } while (queryResultMap != null);
 
         return abandonedCarts;
-    }
-
-    private static boolean checkHasNextPage(Object queryResult) {
-        if (queryResult instanceof Map<?, ?> queryResultMap &&
-            queryResultMap.get("pageinfo") instanceof Map<?, ?> pageinfo) {
-
-            return (boolean) pageinfo.get("hasNextPage");
-        }
-
-        return false;
-    }
-
-    private static String getEndCursor(Object queryResult) {
-        if (queryResult instanceof Map<?, ?> queryResultMap &&
-            queryResultMap.get("pageinfo") instanceof Map<?, ?> pageinfo) {
-
-            return (String) pageinfo.get("endCursor");
-        }
-
-        return null;
     }
 }

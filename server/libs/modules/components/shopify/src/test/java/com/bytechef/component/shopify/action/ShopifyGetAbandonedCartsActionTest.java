@@ -30,19 +30,6 @@ class ShopifyGetAbandonedCartsActionTest extends AbstractShopifyActionTest {
 
     @Test
     void testPerform() {
-        shopifyUtilsMockedStatic
-            .when(() -> ShopifyUtils.executeGraphQlOperation(
-                stringArgumentCaptor.capture(),
-                contextArgumentCaptor.capture(),
-                mapArgumentCaptor.capture(),
-                stringArgumentCaptor.capture()))
-            .thenReturn(Map.of());
-
-        Object result = ShopifyGetAbandonedCartsAction.perform(
-            null, null, mockedContext);
-
-        assertEquals(List.of(), result);
-
         String expectedQuery = """
             query ListAbandonedCheckouts($first: Int, $after: String) {
               abandonedCheckouts(first: $first, after: $after) {
@@ -64,10 +51,28 @@ class ShopifyGetAbandonedCartsActionTest extends AbstractShopifyActionTest {
               }
             }""";
 
-        Map<String, Object> expectedVariables = Map.of("first", 100);
+        shopifyUtilsMockedStatic
+            .when(() -> ShopifyUtils.executeGraphQlOperation(
+                expectedQuery,
+                mockedContext,
+                Map.of("first", 100),
+                "abandonedCheckouts"))
+            .thenReturn(Map.of(
+                "nodes", List.of(Map.of("id", "cart1")),
+                "pageInfo", Map.of("hasNextPage", true, "endCursor", "cursor1")));
 
-        assertEquals(List.of(expectedQuery, "abandonedCheckouts"), stringArgumentCaptor.getAllValues());
-        assertEquals(expectedVariables, mapArgumentCaptor.getValue());
-        assertEquals(mockedContext, contextArgumentCaptor.getValue());
+        shopifyUtilsMockedStatic
+            .when(() -> ShopifyUtils.executeGraphQlOperation(
+                expectedQuery,
+                mockedContext,
+                Map.of("first", 100, "after", "cursor1"),
+                "abandonedCheckouts"))
+            .thenReturn(Map.of(
+                "nodes", List.of(Map.of("id", "cart2")),
+                "pageInfo", Map.of("hasNextPage", false)));
+
+        Object result = ShopifyGetAbandonedCartsAction.perform(null, null, mockedContext);
+
+        assertEquals(List.of(Map.of("id", "cart1"), Map.of("id", "cart2")), result);
     }
 }
