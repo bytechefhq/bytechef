@@ -2,7 +2,7 @@ extend type Query {
     clusterElementMissingRequiredProperties(
         workflowId: String!
         workflowNodeName: String!
-        clusterElementTypeName: String!
+        clusterElementType: String!
         clusterElementWorkflowNodeName: String!
     ): [String!]!
 

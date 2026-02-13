@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Set;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -32,17 +33,18 @@ public class WorkflowNodeParameterGraphQlController {
 
     private final WorkflowNodeParameterFacade workflowNodeParameterFacade;
 
+    @SuppressFBWarnings("EI")
     public WorkflowNodeParameterGraphQlController(WorkflowNodeParameterFacade workflowNodeParameterFacade) {
         this.workflowNodeParameterFacade = workflowNodeParameterFacade;
     }
 
     @QueryMapping
     public Set<String> clusterElementMissingRequiredProperties(
-        @Argument String workflowId, @Argument String workflowNodeName, @Argument String clusterElementTypeName,
+        @Argument String workflowId, @Argument String workflowNodeName, @Argument String clusterElementType,
         @Argument String clusterElementWorkflowNodeName) {
 
         return workflowNodeParameterFacade.getClusterElementMissingRequiredProperties(
-            workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName);
+            workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName);
     }
 
     @QueryMapping

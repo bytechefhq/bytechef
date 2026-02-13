@@ -23,6 +23,7 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.web.graphql.config.PlatformConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.platform.configuration.web.graphql.config.PlatformConfigurationGraphQlTestConfiguration;
 import java.util.Set;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -63,7 +64,7 @@ public class WorkflowNodeParameterGraphQlControllerIntTest {
                     clusterElementMissingRequiredProperties(
                         workflowId: "workflow-123"
                         workflowNodeName: "data-stream_1"
-                        clusterElementTypeName: "PROCESSOR"
+                        clusterElementType: "PROCESSOR"
                         clusterElementWorkflowNodeName: "script_1"
                     )
                 }
@@ -71,7 +72,8 @@ public class WorkflowNodeParameterGraphQlControllerIntTest {
             .execute()
             .path("clusterElementMissingRequiredProperties")
             .entityList(String.class)
-            .hasSize(2);
+            .satisfies(properties -> Assertions.assertThat(properties)
+                .containsExactlyInAnyOrder("fieldA", "fieldB"));
     }
 
     @Test
@@ -86,7 +88,7 @@ public class WorkflowNodeParameterGraphQlControllerIntTest {
                     clusterElementMissingRequiredProperties(
                         workflowId: "workflow-123"
                         workflowNodeName: "data-stream_1"
-                        clusterElementTypeName: "SOURCE"
+                        clusterElementType: "SOURCE"
                         clusterElementWorkflowNodeName: "csv-file_1"
                     )
                 }
@@ -114,7 +116,8 @@ public class WorkflowNodeParameterGraphQlControllerIntTest {
             .execute()
             .path("workflowNodeMissingRequiredProperties")
             .entityList(String.class)
-            .hasSize(2);
+            .satisfies(properties -> Assertions.assertThat(properties)
+                .containsExactlyInAnyOrder("requiredField1", "nested.requiredField2"));
     }
 
     @Test
