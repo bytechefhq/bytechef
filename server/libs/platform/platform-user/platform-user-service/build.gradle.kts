@@ -1,4 +1,5 @@
 dependencies {
+    implementation("dev.samstevens.totp:totp:1.7.1")
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.commons.validator)
     implementation("org.springframework:spring-context-support")

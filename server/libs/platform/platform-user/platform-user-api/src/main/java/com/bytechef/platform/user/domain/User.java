@@ -100,6 +100,12 @@ public class User {
     @Column("reset_key")
     private String resetKey;
 
+    @Column("totp_enabled")
+    private boolean totpEnabled;
+
+    @Column("totp_secret")
+    private String totpSecret;
+
     @Column("uuid")
     private UUID uuid;
 
@@ -196,6 +202,10 @@ public class User {
         return resetKey;
     }
 
+    public String getTotpSecret() {
+        return totpSecret;
+    }
+
     public UUID getUuid() {
         return uuid;
     }
@@ -206,6 +216,10 @@ public class User {
 
     public boolean isActivated() {
         return activated;
+    }
+
+    public boolean isTotpEnabled() {
+        return totpEnabled;
     }
 
     public void setAuthorityIds(List<Long> authorityIds) {
@@ -282,6 +296,14 @@ public class User {
 
     public void setResetDate(Instant resetDate) {
         this.resetDate = resetDate;
+    }
+
+    public void setTotpEnabled(boolean totpEnabled) {
+        this.totpEnabled = totpEnabled;
+    }
+
+    public void setTotpSecret(String totpSecret) {
+        this.totpSecret = totpSecret;
     }
 
     public void setUuid(String uuid) {

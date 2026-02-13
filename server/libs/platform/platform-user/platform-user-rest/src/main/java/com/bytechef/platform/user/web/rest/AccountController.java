@@ -40,17 +40,21 @@ import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
 import com.bytechef.platform.user.web.rest.webhook.SignUpWebhook;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
+import dev.samstevens.totp.qr.QrData;
+import dev.samstevens.totp.qr.ZxingPngQrGenerator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,6 +80,7 @@ public class AccountController {
     private final ApplicationProperties applicationProperties;
     private final AuthorityService authorityService;
     private final MailService mailService;
+    private final PasswordEncoder passwordEncoder;
     private final PersistentTokenService persistentTokenService;
     private final TenantService tenantService;
     private final UserService userService;
@@ -84,12 +89,13 @@ public class AccountController {
     @SuppressFBWarnings("EI")
     public AccountController(
         ApplicationProperties applicationProperties, AuthorityService authorityService, MailService mailService,
-        PersistentTokenService persistentTokenService, SignUpWebhook signUpWebhook, TenantService tenantService,
-        UserService userService) {
+        PasswordEncoder passwordEncoder, PersistentTokenService persistentTokenService, SignUpWebhook signUpWebhook,
+        TenantService tenantService, UserService userService) {
 
         this.applicationProperties = applicationProperties;
         this.authorityService = authorityService;
         this.mailService = mailService;
+        this.passwordEncoder = passwordEncoder;
         this.persistentTokenService = persistentTokenService;
         this.tenantService = tenantService;
         this.signUpWebhook = signUpWebhook;
@@ -243,6 +249,81 @@ public class AccountController {
         }
 
         userService.unlinkProvider(user.getLogin());
+    }
+
+    @PostMapping("/account/mfa/setup")
+    public MfaSetupResponse setupMfa() {
+        User user = userService.fetchCurrentUser()
+            .orElseThrow(() -> new AccountResourceException(
+                "User could not be found", AccountErrorType.USER_NOT_FOUND));
+
+        String secret = userService.generateTotpSecret(user.getLogin());
+
+        QrData qrData = new QrData.Builder()
+            .issuer("ByteChef")
+            .label(user.getEmail())
+            .secret(secret)
+            .build();
+
+        try {
+            ZxingPngQrGenerator qrGenerator = new ZxingPngQrGenerator();
+
+            byte[] imageData = qrGenerator.generate(qrData);
+
+            String qrCodeDataUrl =
+                "data:" + qrGenerator.getImageMimeType() + ";base64," +
+                    Base64.getEncoder()
+                        .encodeToString(imageData);
+
+            return new MfaSetupResponse(secret, qrCodeDataUrl);
+        } catch (Exception exception) {
+            throw new AccountResourceException("Failed to generate QR code", AccountErrorType.USER_NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/account/mfa/enable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void enableMfa(@RequestBody MfaVerifyRequest mfaVerifyRequest) {
+        User user = userService.fetchCurrentUser()
+            .orElseThrow(() -> new AccountResourceException(
+                "User could not be found", AccountErrorType.USER_NOT_FOUND));
+
+        boolean valid = userService.verifyTotpCode(user.getLogin(), mfaVerifyRequest.code());
+
+        if (!valid) {
+            throw new AccountResourceException("Invalid TOTP code", AccountErrorType.USER_NOT_FOUND);
+        }
+
+        userService.enableTotp(user.getLogin());
+    }
+
+    @PostMapping("/account/mfa/disable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void disableMfa(@RequestBody MfaDisableRequest mfaDisableRequest) {
+        User user = userService.fetchCurrentUser()
+            .orElseThrow(() -> new AccountResourceException(
+                "User could not be found", AccountErrorType.USER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(mfaDisableRequest.password(), user.getPassword())) {
+            throw new AccountResourceException("Invalid password", AccountErrorType.USER_NOT_FOUND);
+        }
+
+        boolean valid = userService.verifyTotpCode(user.getLogin(), mfaDisableRequest.code());
+
+        if (!valid) {
+            throw new AccountResourceException("Invalid TOTP code", AccountErrorType.USER_NOT_FOUND);
+        }
+
+        userService.disableTotp(user.getLogin());
+    }
+
+    @GetMapping("/account/mfa/status")
+    public MfaStatusResponse getMfaStatus() {
+        User user = userService.fetchCurrentUser()
+            .orElseThrow(() -> new AccountResourceException(
+                "User could not be found", AccountErrorType.USER_NOT_FOUND));
+
+        return new MfaStatusResponse(user.isTotpEnabled());
     }
 
     /**
@@ -413,5 +494,17 @@ public class AccountController {
     }
 
     record LinkedAccountResponse(String authProvider, String providerId, boolean hasPassword) {
+    }
+
+    record MfaDisableRequest(String code, String password) {
+    }
+
+    record MfaSetupResponse(String qrCodeDataUrl, String secret) {
+    }
+
+    record MfaStatusResponse(boolean totpEnabled) {
+    }
+
+    record MfaVerifyRequest(String code) {
     }
 }

@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.tenant.multi.security.web.authentication;
 
+import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
+import com.bytechef.security.web.authentication.TwoFactorAuthentication;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -14,23 +16,32 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-public class MultiTenantAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public final class MultiTenantAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final TenantService tenantService;
+    private final ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider;
 
     @SuppressFBWarnings("EI")
-    public MultiTenantAuthenticationSuccessHandler(TenantService tenantService) {
+    public MultiTenantAuthenticationSuccessHandler(
+        TenantService tenantService,
+        ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider) {
+
         this.tenantService = tenantService;
+        this.twoFactorAuthenticationCustomizerProvider = twoFactorAuthenticationCustomizerProvider;
     }
 
     @Override
@@ -45,6 +56,21 @@ public class MultiTenantAuthenticationSuccessHandler implements AuthenticationSu
 
         session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantIds.getFirst());
 
-        response.setStatus(HttpStatus.OK.value());
+        TwoFactorAuthenticationCustomizer twoFactorAuthenticationCustomizer =
+            twoFactorAuthenticationCustomizerProvider.getIfAvailable();
+
+        if (twoFactorAuthenticationCustomizer != null &&
+            twoFactorAuthenticationCustomizer.isTotpEnabled(authentication)) {
+
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+
+            securityContext.setAuthentication(new TwoFactorAuthentication(authentication));
+
+            new HttpSessionSecurityContextRepository().saveContext(securityContext, request, response);
+
+            response.setStatus(HttpStatus.ACCEPTED.value());
+        } else {
+            response.setStatus(HttpStatus.OK.value());
+        }
     }
 }

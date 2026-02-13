@@ -54,6 +54,16 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
+    public void disableTotp(String login) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void enableTotp(String login) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Page<User> getAllActiveUsers(Pageable pageable) {
         throw new UnsupportedOperationException();
     }
@@ -107,6 +117,11 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
+    public String generateTotpSecret(String login) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public User registerUser(AdminUserDTO userDTO, String password) {
         throw new UnsupportedOperationException();
     }
@@ -143,6 +158,11 @@ public class RemoteUserServiceClient implements UserService {
 
     @Override
     public void update(String firstName, String lastName, String email, String langKey, String imageUrl) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean verifyTotpCode(String login, String code) {
         throw new UnsupportedOperationException();
     }
 }

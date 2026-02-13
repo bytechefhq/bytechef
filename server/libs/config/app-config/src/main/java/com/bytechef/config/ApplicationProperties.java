@@ -2651,6 +2651,9 @@ public class ApplicationProperties {
         /** System user credentials configuration */
         private System system = new System();
 
+        /** Two-factor authentication configuration */
+        private TwoFactorAuthentication twoFactorAuthentication = new TwoFactorAuthentication();
+
         public String getContentSecurityPolicy() {
             return contentSecurityPolicy;
         }
@@ -2681,6 +2684,14 @@ public class ApplicationProperties {
 
         public void setSystem(System system) {
             this.system = system;
+        }
+
+        public TwoFactorAuthentication getTwoFactorAuthentication() {
+            return twoFactorAuthentication;
+        }
+
+        public void setTwoFactorAuthentication(TwoFactorAuthentication twoFactorAuthentication) {
+            this.twoFactorAuthentication = twoFactorAuthentication;
         }
 
         /**

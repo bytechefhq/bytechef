@@ -21,6 +21,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
 import com.bytechef.platform.security.web.config.Saml2LoginCustomizer;
+import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.user.service.UserService;
@@ -29,6 +30,7 @@ import com.bytechef.security.web.oauth2.CustomOidcUserService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,8 +52,11 @@ public class MultiTenantSecurityConfiguration {
     }
 
     @Bean
-    MultiTenantAuthenticationSuccessHandler multiTenantAuthenticationSuccessHandler(TenantService tenantService) {
-        return new MultiTenantAuthenticationSuccessHandler(tenantService);
+    MultiTenantAuthenticationSuccessHandler multiTenantAuthenticationSuccessHandler(
+        TenantService tenantService,
+        ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider) {
+
+        return new MultiTenantAuthenticationSuccessHandler(tenantService, twoFactorAuthenticationCustomizerProvider);
     }
 
     @Bean

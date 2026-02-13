@@ -106,6 +106,8 @@ bytechef:
     system:
       username: system_admin
       password:
+    two-factor-authentication:
+      enabled: false
   sign-up:
     activation-required: false
   # Tenant support mode (single | multi - ee only) default: single
