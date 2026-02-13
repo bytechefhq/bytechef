@@ -2,7 +2,7 @@ import {act, renderHook} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {OAUTH_RESPONSE, OAUTH_STATE_KEY, OAUTH_STORAGE_KEY} from '../constants';
-import useOAuth2, {Oauth2Props} from '../useOAuth2';
+import useOAuth2, {UseOAuth2Props} from '../useOAuth2';
 
 // Mock BroadcastChannel
 class MockBroadcastChannel {
@@ -45,12 +45,12 @@ describe('useOAuth2', () => {
     const originalAddEventListener = window.addEventListener;
     const registeredListeners: Array<{type: string; listener: EventListener}> = [];
 
-    const defaultProps: Oauth2Props = {
+    const defaultProps: UseOAuth2Props = {
         authorizationUrl: 'https://auth.example.com/authorize',
         clientId: 'test-client-id',
         redirectUri: 'https://app.example.com/oauth',
         responseType: 'code',
-        scope: 'read write',
+        scopes: {read: true, write: true},
     };
 
     beforeEach(() => {
@@ -137,6 +137,78 @@ describe('useOAuth2', () => {
         expect(url.searchParams.get('state')).toBeTruthy();
     });
 
+    it('should only include selected scopes in the authorization URL', () => {
+        const props: UseOAuth2Props = {
+            ...defaultProps,
+            scopes: {admin: false, read: true, write: false},
+        };
+
+        const {result} = renderHook(() => useOAuth2(props));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        const openCall = vi.mocked(window.open).mock.calls[0];
+        const url = new URL(openCall[0] as string);
+
+        expect(url.searchParams.get('scope')).toBe('read');
+    });
+
+    it('should include all selected scopes in the authorization URL', () => {
+        const props: UseOAuth2Props = {
+            ...defaultProps,
+            scopes: {admin: true, read: true, write: true},
+        };
+
+        const {result} = renderHook(() => useOAuth2(props));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        const openCall = vi.mocked(window.open).mock.calls[0];
+        const url = new URL(openCall[0] as string);
+
+        expect(url.searchParams.get('scope')).toBe('admin read write');
+    });
+
+    it('should send empty scope when no scopes are selected', () => {
+        const props: UseOAuth2Props = {
+            ...defaultProps,
+            scopes: {read: false, write: false},
+        };
+
+        const {result} = renderHook(() => useOAuth2(props));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        const openCall = vi.mocked(window.open).mock.calls[0];
+        const url = new URL(openCall[0] as string);
+
+        expect(url.searchParams.get('scope')).toBe('');
+    });
+
+    it('should send empty scope when scopes is undefined', () => {
+        const props: UseOAuth2Props = {
+            ...defaultProps,
+            scopes: undefined,
+        };
+
+        const {result} = renderHook(() => useOAuth2(props));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        const openCall = vi.mocked(window.open).mock.calls[0];
+        const url = new URL(openCall[0] as string);
+
+        expect(url.searchParams.get('scope')).toBe('');
+    });
+
     it('should save state to sessionStorage', () => {
         const {result, unmount} = renderHook(() => useOAuth2(defaultProps));
 
@@ -154,7 +226,7 @@ describe('useOAuth2', () => {
 
     it('should handle successful code response via postMessage', () => {
         const onCodeSuccess = vi.fn();
-        const props: Oauth2Props = {
+        const props: UseOAuth2Props = {
             ...defaultProps,
             onCodeSuccess,
         };
@@ -192,7 +264,7 @@ describe('useOAuth2', () => {
 
     it('should handle successful token response via postMessage', () => {
         const onTokenSuccess = vi.fn();
-        const props: Oauth2Props = {
+        const props: UseOAuth2Props = {
             ...defaultProps,
             onTokenSuccess,
             responseType: 'token',
@@ -231,7 +303,7 @@ describe('useOAuth2', () => {
 
     it('should handle OAuth error via postMessage', () => {
         const onError = vi.fn();
-        const props: Oauth2Props = {
+        const props: UseOAuth2Props = {
             ...defaultProps,
             onError,
         };
@@ -264,7 +336,7 @@ describe('useOAuth2', () => {
 
     it('should handle state mismatch error', () => {
         const onError = vi.fn();
-        const props: Oauth2Props = {
+        const props: UseOAuth2Props = {
             ...defaultProps,
             onError,
         };
@@ -296,7 +368,7 @@ describe('useOAuth2', () => {
 
     it('should handle successful response via BroadcastChannel fallback', () => {
         const onCodeSuccess = vi.fn();
-        const props: Oauth2Props = {
+        const props: UseOAuth2Props = {
             ...defaultProps,
             onCodeSuccess,
         };
@@ -333,7 +405,7 @@ describe('useOAuth2', () => {
 
     it('should handle storage event for cross-tab communication', () => {
         const onCodeSuccess = vi.fn();
-        const props: Oauth2Props = {
+        const props: UseOAuth2Props = {
             ...defaultProps,
             onCodeSuccess,
         };
@@ -374,7 +446,7 @@ describe('useOAuth2', () => {
 
     it('should ignore storage events for other keys', () => {
         const onCodeSuccess = vi.fn();
-        const props: Oauth2Props = {
+        const props: UseOAuth2Props = {
             ...defaultProps,
             onCodeSuccess,
         };
@@ -423,7 +495,7 @@ describe('useOAuth2', () => {
 
     it('should ignore messages with different type', () => {
         const onCodeSuccess = vi.fn();
-        const props: Oauth2Props = {
+        const props: UseOAuth2Props = {
             ...defaultProps,
             onCodeSuccess,
         };
@@ -456,7 +528,7 @@ describe('useOAuth2', () => {
     });
 
     it('should include extra query parameters in authorization URL', () => {
-        const props: Oauth2Props = {
+        const props: UseOAuth2Props = {
             ...defaultProps,
             extraQueryParameters: {
                 audience: 'https://api.example.com',
@@ -522,7 +594,7 @@ describe('useOAuth2', () => {
         vi.useFakeTimers();
 
         const onCodeSuccess = vi.fn();
-        const props: Oauth2Props = {
+        const props: UseOAuth2Props = {
             ...defaultProps,
             onCodeSuccess,
         };
