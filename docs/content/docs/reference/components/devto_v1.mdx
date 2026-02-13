@@ -178,7 +178,7 @@ Name: getArticle
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| articleId | Article ID | INTEGER | The unique identifier of the article. | true |
+| articleId | Article ID | INTEGER | The unique identifier of the article. Only your articles are listed in the options. See documentation for instructions on how to find ID of any article. | true |
 
 #### Example JSON Structure
 ```json
@@ -261,6 +261,9 @@ Type: OBJECT
 }
 ```
 
+#### Find article ID
+
+To find article ID, click [here](/reference/components/devto_v1#how-to-find-article-id)
 
 
 
@@ -273,8 +276,8 @@ Name: updateArticle
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| articleId | Article ID | INTEGER | The unique identifier of the article. | true |
-| article | Article | OBJECT <details> <summary> Properties </summary> &#123;STRING\(title), STRING\(body_markdown), BOOLEAN\(published), STRING\(description)&#125; </details> |  | true |
+| articleId | Article ID | INTEGER | The unique identifier of the article. You can update only your own articles. | true |
+| article | Article | OBJECT <details> <summary> Properties </summary> &#123;STRING\(title), STRING\(body_markdown), BOOLEAN\(published), STRING\(description)&#125; </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -363,6 +366,9 @@ Type: OBJECT
 }
 ```
 
+#### Find article ID
+
+To find article ID, click [here](/reference/components/devto_v1#how-to-find-article-id)
 
 
 
@@ -374,3 +380,13 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find article ID
+
+1. Open article for which you want to find the ID.
+2. Right click on page and select **View page source**.
+3. Search (Ctrl + F) for `article_id`.
+4. Number after '=' is ID of the article.
