@@ -66,12 +66,13 @@ public class OneSimpleAPIWebPageInformationAction {
                                 string("image"),
                                 string(DESCRIPTION),
                                 string("type")))))
+        .help("", "https://docs.bytechef.io/reference/components/one-simple-api_v1#web-page-information")
         .perform(OneSimpleAPIWebPageInformationAction::perform);
 
     private OneSimpleAPIWebPageInformationAction() {
     }
 
-    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.get("/page_info"))
             .queryParameters(URL, inputParameters.getRequiredString(URL))
             .configuration(responseType(ResponseType.JSON))

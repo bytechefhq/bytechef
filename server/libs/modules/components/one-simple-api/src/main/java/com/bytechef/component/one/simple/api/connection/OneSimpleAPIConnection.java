@@ -44,7 +44,9 @@ public class OneSimpleAPIConnection {
                 .apply((connectionParameters, context) -> ApplyResponse.ofQueryParameters(
                     Map.of(
                         TOKEN, List.of(connectionParameters.getRequiredString(TOKEN)),
-                        "output", List.of("json")))));
+                        "output", List.of("json")))))
+        .help("", "https://docs.bytechef.io/reference/components/one-simple-api_v1#connection-setup")
+        .version(1);
 
     private OneSimpleAPIConnection() {
     }

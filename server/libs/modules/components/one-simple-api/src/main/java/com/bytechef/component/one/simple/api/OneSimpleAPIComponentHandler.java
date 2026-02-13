@@ -17,6 +17,7 @@
 package com.bytechef.component.one.simple.api;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -42,12 +43,20 @@ public class OneSimpleAPIComponentHandler implements ComponentHandler {
             "Email Validation, QR codes, and much more!")
         .categories(ComponentCategory.DEVELOPER_TOOLS)
         .connection(OneSimpleAPIConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp("One Simple API documentation", "https://onesimpleapi.com/docs")
         .actions(
             OneSimpleAPIAddScreenshotAction.ACTION_DEFINITION,
             OneSimpleAPICurrencyConverterAction.ACTION_DEFINITION,
             OneSimpleAPIUrlShortenerAction.ACTION_DEFINITION,
             OneSimpleAPIWebPageInformationAction.ACTION_DEFINITION)
-        .icon("path:assets/one-simple-api.svg");
+        .clusterElements(
+            tool(OneSimpleAPIAddScreenshotAction.ACTION_DEFINITION),
+            tool(OneSimpleAPICurrencyConverterAction.ACTION_DEFINITION),
+            tool(OneSimpleAPIUrlShortenerAction.ACTION_DEFINITION),
+            tool(OneSimpleAPIWebPageInformationAction.ACTION_DEFINITION))
+        .icon("path:assets/one-simple-api.svg")
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

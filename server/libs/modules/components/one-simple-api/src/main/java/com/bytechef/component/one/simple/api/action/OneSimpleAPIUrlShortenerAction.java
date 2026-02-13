@@ -52,12 +52,13 @@ public class OneSimpleAPIUrlShortenerAction {
                         string("temporary_redirect"),
                         string("forward_params"),
                         string("short_url"))))
+        .help("", "https://docs.bytechef.io/reference/components/one-simple-api_v1#url-shortener")
         .perform(OneSimpleAPIUrlShortenerAction::perform);
 
     private OneSimpleAPIUrlShortenerAction() {
     }
 
-    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.get("/shortener/new"))
             .queryParameters(URL, inputParameters.getRequiredString(URL))
             .configuration(responseType(ResponseType.JSON))
