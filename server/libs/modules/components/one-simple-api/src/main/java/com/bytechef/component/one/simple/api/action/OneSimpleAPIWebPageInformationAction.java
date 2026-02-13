@@ -71,9 +71,7 @@ public class OneSimpleAPIWebPageInformationAction {
     private OneSimpleAPIWebPageInformationAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.get("/page_info"))
             .queryParameters(URL, inputParameters.getRequiredString(URL))
             .configuration(responseType(ResponseType.JSON))
