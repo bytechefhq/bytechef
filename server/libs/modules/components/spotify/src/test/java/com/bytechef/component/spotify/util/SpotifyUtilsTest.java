@@ -22,6 +22,7 @@ import static com.bytechef.component.spotify.constant.SpotifyConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
@@ -33,7 +34,6 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,7 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class SpotifyUtilsTest {
 
-    private final Parameters parameters = MockParametersFactory.create(Map.of());
+    private final Parameters mockedParameters = mock(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
@@ -56,10 +56,10 @@ class SpotifyUtilsTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(ID, "abc"));
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(ID, "abc"));
 
         String result = SpotifyUtils.getCurrentUserId(mockedContext);
 
@@ -84,13 +84,13 @@ class SpotifyUtilsTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("items", List.of(Map.of(NAME, "name", ID, "uri"))));
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("items", List.of(Map.of(NAME, "name", ID, "uri"))));
 
         List<Option<String>> result = SpotifyUtils.getPlaylistIdOptions(
-            parameters, parameters, Map.of(), "", mockedContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
@@ -119,7 +119,7 @@ class SpotifyUtilsTest {
             .thenReturn(mockedExecutor);
 
         List<Option<String>> result = SpotifyUtils.getDeviceIdOptions(
-            parameters, parameters, Map.of(), "", mockedContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
