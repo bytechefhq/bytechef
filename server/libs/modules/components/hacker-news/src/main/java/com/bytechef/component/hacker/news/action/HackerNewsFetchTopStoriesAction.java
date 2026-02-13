@@ -42,6 +42,7 @@ public class HackerNewsFetchTopStoriesAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("fetchTopStories")
         .title("Fetch Top Stories")
         .description("Fetch top stories from Hacker News.")
+        .help("", "https://docs.bytechef.io/reference/components/hacker-news_v1#fetch-top-stories")
         .properties(
             integer(NUMBER_OF_STORIES)
                 .label("Number Of Stories")
