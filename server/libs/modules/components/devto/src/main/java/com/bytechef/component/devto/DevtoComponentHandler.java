@@ -92,6 +92,7 @@ public class DevtoComponentHandler extends AbstractDevtoComponentHandler {
         }
 
         return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/devto_v1#connection-setup")
             .version(1);
     }
 }
