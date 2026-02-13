@@ -10,7 +10,7 @@ import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {EyeIcon, EyeOffIcon, ShieldCheckIcon} from 'lucide-react';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, Navigate, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {z} from 'zod';
@@ -33,6 +33,8 @@ interface SsoRedirectI {
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [ssoRedirect, setSsoRedirect] = useState<SsoRedirectI | null>(null);
+    const lastCheckedEmailRef = useRef<string>('');
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     const {authenticated, login, loginError, reset} = useAuthenticationStore(
         useShallow((state) => ({
@@ -77,18 +79,32 @@ const Login = () => {
 
     const handleEmailBlur = useCallback(async () => {
         const email = form.getValues('email');
+        const atIndex = email?.indexOf('@') ?? -1;
 
-        if (!email || !email.includes('@')) {
+        if (!email || atIndex < 1 || atIndex >= email.length - 1) {
             setSsoRedirect(null);
 
             return;
         }
+
+        if (email === lastCheckedEmailRef.current) {
+            return;
+        }
+
+        lastCheckedEmailRef.current = email;
+
+        abortControllerRef.current?.abort();
+
+        const abortController = new AbortController();
+
+        abortControllerRef.current = abortController;
 
         try {
             const response = await fetch('/api/sso/discover', {
                 body: JSON.stringify({email}),
                 headers: {'Content-Type': 'application/json'},
                 method: 'POST',
+                signal: AbortSignal.any([abortController.signal, AbortSignal.timeout(5000)]),
             });
 
             if (response.ok) {
@@ -99,6 +115,8 @@ const Login = () => {
                 } else {
                     setSsoRedirect(null);
                 }
+            } else {
+                setSsoRedirect(null);
             }
         } catch {
             setSsoRedirect(null);
@@ -198,11 +216,9 @@ const Login = () => {
                                                     id="email"
                                                     type="email"
                                                     {...field}
-                                                    onBlur={(event) => {
+                                                    onBlur={() => {
                                                         field.onBlur();
                                                         handleEmailBlur();
-
-                                                        return event;
                                                     }}
                                                 />
                                             </FormControl>

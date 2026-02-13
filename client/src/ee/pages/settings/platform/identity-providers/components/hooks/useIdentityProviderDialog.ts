@@ -1,4 +1,5 @@
 import {useIdentityProviderDialogStore} from '@/ee/pages/settings/platform/identity-providers/stores/useIdentityProviderDialogStore';
+import {useToast} from '@/hooks/use-toast';
 import {
     IdentityProviderInput,
     IdentityProviderType,
@@ -57,8 +58,12 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
     const [isEnabled, setIsEnabled] = useState(true);
 
     const queryClient = useQueryClient();
+    const {toast} = useToast();
 
     const createMutation = useCreateIdentityProviderMutation({
+        onError: () => {
+            toast({description: 'Failed to create identity provider. Please try again.', variant: 'destructive'});
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['identityProviders']});
             handleClose();
@@ -66,6 +71,9 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
     });
 
     const updateMutation = useUpdateIdentityProviderMutation({
+        onError: () => {
+            toast({description: 'Failed to update identity provider. Please try again.', variant: 'destructive'});
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['identityProviders']});
             handleClose();

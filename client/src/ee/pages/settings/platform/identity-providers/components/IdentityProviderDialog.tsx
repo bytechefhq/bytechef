@@ -48,7 +48,7 @@ const IdentityProviderDialog = () => {
         setScopes,
     } = useIdentityProviderDialog();
 
-    const saveDisabled = !name || !issuerUri || !clientId || domains.length === 0;
+    const saveDisabled = !name || !issuerUri || !clientId || (!isEditing && !clientSecret) || domains.length === 0;
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
