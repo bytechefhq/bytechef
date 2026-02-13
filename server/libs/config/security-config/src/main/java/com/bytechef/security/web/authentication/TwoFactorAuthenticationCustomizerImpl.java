@@ -17,6 +17,7 @@
 package com.bytechef.security.web.authentication;
 
 import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
+import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.Authentication;
@@ -42,7 +43,7 @@ class TwoFactorAuthenticationCustomizerImpl implements TwoFactorAuthenticationCu
 
         if (principal instanceof UserDetails userDetails) {
             return userService.fetchUserByLogin(userDetails.getUsername())
-                .map(user -> user.isTotpEnabled())
+                .map(User::isTotpEnabled)
                 .orElse(false);
         }
 

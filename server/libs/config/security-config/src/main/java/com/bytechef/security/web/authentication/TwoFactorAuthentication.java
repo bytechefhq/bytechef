@@ -57,4 +57,14 @@ public class TwoFactorAuthentication extends AbstractAuthenticationToken {
     public boolean isAuthenticated() {
         return false;
     }
+
+    @Override
+    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+        if (isAuthenticated) {
+            throw new IllegalArgumentException(
+                "Cannot set this token to trusted — use the primary authentication instead");
+        }
+
+        super.setAuthenticated(false);
+    }
 }

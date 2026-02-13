@@ -72,6 +72,8 @@ public class UserServiceImpl implements UserService {
     private final CacheManager cacheManager;
     private final PasswordEncoder passwordEncoder;
     private final PersistentTokenRepository persistentTokenRepository;
+    private final SecretGenerator totpSecretGenerator = new DefaultSecretGenerator();
+    private final DefaultCodeVerifier totpCodeVerifier;
     private final UserRepository userRepository;
 
     public UserServiceImpl(
@@ -83,6 +85,10 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
         this.persistentTokenRepository = persistentTokenRepository;
         this.userRepository = userRepository;
+
+        totpCodeVerifier = new DefaultCodeVerifier(new DefaultCodeGenerator(), new SystemTimeProvider());
+
+        totpCodeVerifier.setAllowedTimePeriodDiscrepancy(1);
     }
 
     @Override
@@ -226,6 +232,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void disableTotp(String login) {
         userRepository.findByLogin(login)
             .ifPresent(user -> {
@@ -239,6 +246,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void enableTotp(String login) {
         userRepository.findByLogin(login)
             .ifPresent(user -> {
@@ -356,19 +364,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String generateTotpSecret(String login) {
-        SecretGenerator secretGenerator = new DefaultSecretGenerator();
+        Optional<User> optionalUser = userRepository.findByLogin(login);
 
-        String secret = secretGenerator.generate();
+        if (optionalUser.isEmpty()) {
+            return totpSecretGenerator.generate();
+        }
 
-        userRepository.findByLogin(login)
-            .ifPresent(user -> {
-                user.setTotpSecret(secret);
+        User user = optionalUser.get();
 
-                userRepository.save(user);
+        String existingSecret = user.getTotpSecret();
 
-                clearUserCaches(user);
-            });
+        if (existingSecret != null && user.isTotpEnabled()) {
+            return existingSecret;
+        }
+
+        String secret = totpSecretGenerator.generate();
+
+        user.setTotpSecret(secret);
+
+        userRepository.save(user);
+
+        clearUserCaches(user);
 
         return secret;
     }
@@ -601,6 +619,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public boolean verifyTotpCode(String login, String code) {
+        if (code == null || code.isBlank()) {
+            return false;
+        }
+
         return userRepository.findByLogin(login)
             .map(user -> {
                 String secret = user.getTotpSecret();
@@ -609,12 +631,7 @@ public class UserServiceImpl implements UserService {
                     return false;
                 }
 
-                DefaultCodeVerifier codeVerifier =
-                    new DefaultCodeVerifier(new DefaultCodeGenerator(), new SystemTimeProvider());
-
-                codeVerifier.setAllowedTimePeriodDiscrepancy(1);
-
-                return codeVerifier.isValidCode(secret, code);
+                return totpCodeVerifier.isValidCode(secret, code);
             })
             .orElse(false);
     }
