@@ -43,6 +43,7 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
+import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutorImpl;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowSyncExecutor;
@@ -80,12 +81,17 @@ import org.springframework.core.task.TaskExecutor;
 public class WebhookConfiguration {
 
     @Bean
+    SseStreamBridgeRegistry sseStreamBridgeRegistry() {
+        return new SseStreamBridgeRegistry();
+    }
+
+    @Bean
     WebhookWorkflowExecutor webhookExecutor(
         ContextService contextService, CounterService counterService, Environment environment, Evaluator evaluator,
         ApplicationEventPublisher eventPublisher, JobFacade jobFacade,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        TaskExecutionService taskExecutionService,
+        SseStreamBridgeRegistry sseStreamBridgeRegistry, TaskExecutionService taskExecutionService,
         TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
         WebhookWorkflowSyncExecutor triggerSyncExecutor, WorkflowService workflowService) {
 
@@ -96,7 +102,6 @@ public class WebhookConfiguration {
 
         return new WebhookWorkflowExecutorImpl(
             eventPublisher, jobPrincipalAccessorRegistry,
-            principalJobFacade,
             new JobSyncExecutor(
                 contextService, evaluator, jobService, -1,
                 role -> (role == COORDINATOR) ? asyncMessageBroker : new AsyncMessageBroker(environment),
@@ -109,7 +114,7 @@ public class WebhookConfiguration {
                     contextService, counterService, coordinatorEventPublisher, evaluator, jobFacade, jobService,
                     taskExecutionService, taskFileStorage),
                 taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
-            triggerSyncExecutor, taskFileStorage);
+            principalJobFacade, sseStreamBridgeRegistry, triggerSyncExecutor, taskFileStorage);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {

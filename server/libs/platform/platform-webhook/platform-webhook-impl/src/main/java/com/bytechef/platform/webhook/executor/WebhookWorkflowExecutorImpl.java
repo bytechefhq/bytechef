@@ -31,6 +31,7 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
@@ -55,23 +56,26 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
-    private final PrincipalJobFacade principalJobFacade;
     private final JobSyncExecutor jobSyncExecutor;
-    private final WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor;
+    private final PrincipalJobFacade principalJobFacade;
+    private final SseStreamBridgeRegistry sseStreamBridgeRegistry;
     private final TaskFileStorage taskFileStorage;
+    private final WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor;
 
     @SuppressFBWarnings("EI")
     public WebhookWorkflowExecutorImpl(
         ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        PrincipalJobFacade principalJobFacade, JobSyncExecutor jobSyncExecutor,
-        WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor, TaskFileStorage taskFileStorage) {
+        JobSyncExecutor jobSyncExecutor, PrincipalJobFacade principalJobFacade,
+        SseStreamBridgeRegistry sseStreamBridgeRegistry, WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor,
+        TaskFileStorage taskFileStorage) {
 
-        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
-        this.principalJobFacade = principalJobFacade;
-        this.jobSyncExecutor = jobSyncExecutor;
         this.eventPublisher = eventPublisher;
-        this.webhookWorkflowSyncExecutor = webhookWorkflowSyncExecutor;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+        this.jobSyncExecutor = jobSyncExecutor;
+        this.principalJobFacade = principalJobFacade;
+        this.sseStreamBridgeRegistry = sseStreamBridgeRegistry;
         this.taskFileStorage = taskFileStorage;
+        this.webhookWorkflowSyncExecutor = webhookWorkflowSyncExecutor;
     }
 
     @Override
@@ -98,24 +102,16 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         inputs.put(workflowExecutionId.getTriggerName(), triggerOutput.value());
 
         long jobId = TenantContext.callWithTenantId(
-            workflowExecutionId.getTenantId(), () -> jobSyncExecutor.startJob(
-                new JobParametersDTO(workflowId, inputs),
-                jobParameters -> principalJobFacade.createSyncJob(
-                    jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType())));
+            workflowExecutionId.getTenantId(),
+            () -> principalJobFacade.createJob(
+                new JobParametersDTO(workflowId, inputs), workflowExecutionId.getJobPrincipalId(),
+                workflowExecutionId.getType()));
 
-        return CompletableFuture.runAsync(() -> {
-            AutoCloseable handle = jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge);
+        Registration registration = sseStreamBridgeRegistry.register(jobId, sseStreamBridge);
 
-            sseStreamBridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", String.valueOf(jobId))));
+        sseStreamBridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", String.valueOf(jobId))));
 
-            TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
-                try {
-                    jobSyncExecutor.awaitJob(jobId, false);
-                } finally {
-                    handle.close();
-                }
-            });
-        });
+        return registration.completion();
     }
 
     @Override
