@@ -111,7 +111,16 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
         sseStreamBridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", String.valueOf(jobId))));
 
-        return registration.completion();
+        CompletableFuture<Void> completion = registration.completion();
+
+        return completion.whenComplete((result, throwable) -> {
+            try {
+                registration.handle()
+                    .close();
+            } catch (Exception exception) {
+                // Ignore exceptions during cleanup to avoid masking the original completion outcome
+            }
+        });
     }
 
     @Override
