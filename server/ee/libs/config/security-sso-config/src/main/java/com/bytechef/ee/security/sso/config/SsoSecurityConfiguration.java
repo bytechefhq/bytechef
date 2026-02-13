@@ -68,11 +68,14 @@ class SsoSecurityConfiguration {
     @Bean
     Saml2LoginCustomizer ssoSaml2LoginCustomizer(
         DynamicRelyingPartyRegistrationRepository dynamicRelyingPartyRegistrationRepository,
-        RememberMeServices rememberMeServices, TenantService tenantService, UserService userService) {
+        IdentityProviderService identityProviderService, RememberMeServices rememberMeServices,
+        TenantService tenantService, UserService userService) {
 
         return http -> http.saml2Login(saml2 -> saml2
             .relyingPartyRegistrationRepository(dynamicRelyingPartyRegistrationRepository)
-            .successHandler(new SsoSaml2AuthenticationSuccessHandler(rememberMeServices, tenantService, userService))
+            .successHandler(
+                new SsoSaml2AuthenticationSuccessHandler(
+                    identityProviderService, rememberMeServices, tenantService, userService))
             .failureHandler(new SsoSaml2AuthenticationFailureHandler()));
     }
 
