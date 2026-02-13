@@ -44,7 +44,7 @@ public class WebflowGetCollectionItemAction {
 
             ))
         .properties(string("collectionId").label("Collection ID")
-            .description("")
+            .description("Unique identifier for a collection.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<String>) WebflowUtils::getCollectionIdOptions)
             .optionsLookupDependsOn("siteId")
@@ -52,7 +52,7 @@ public class WebflowGetCollectionItemAction {
                 Map.of(
                     "type", PropertyType.PATH)),
             string("itemId").label("Item  ID")
-                .description("")
+                .description("Unique identifier for an item.")
                 .required(true)
                 .options((ActionDefinition.OptionsFunction<String>) WebflowUtils::getItemIdOptions)
                 .optionsLookupDependsOn("collectionId", "siteId")
