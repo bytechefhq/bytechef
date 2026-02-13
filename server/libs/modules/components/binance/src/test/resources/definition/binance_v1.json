@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Fetch the price of a crypto pair from Binance.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/binance_v1#fetch-pair-price"
+    },
     "metadata": null,
     "name": "fetchPairPrice",
     "outputDefinition": {
@@ -186,8 +189,11 @@
     "label": "Payment Processing"
   } ],
   "connection": null,
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.binance.com/docs/binance-spot-api-docs/CHANGELOG"
+  },
   "description": "Binance is an online exchange where users can trade cryptocurrencies.",
   "icon": "path:assets/binance.svg",
   "metadata": null,
