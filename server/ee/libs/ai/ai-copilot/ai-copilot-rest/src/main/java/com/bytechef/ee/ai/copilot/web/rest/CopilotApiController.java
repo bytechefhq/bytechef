@@ -51,6 +51,13 @@ public class CopilotApiController {
     public SseEmitter chat(
         @NonNull @PathVariable("agentId") String agentId, @NonNull @RequestBody() AgUiParameters agUiParameters) {
 
+        if(agentId.equals("workflow_editor")) {
+            switch ((String) agUiParameters.getState().getState().get("mode")) {
+                case "BUILD" -> agentId = "workflow_editor_build";
+                default -> agentId = "workflow_editor_ask";
+            }
+        }
+
         LocalAgent localAgent = localAgentMap.get(agentId);
 
         return this.agUiService.runAgent(localAgent, agUiParameters);
