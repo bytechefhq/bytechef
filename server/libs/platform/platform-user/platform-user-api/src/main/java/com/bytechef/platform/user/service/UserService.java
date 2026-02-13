@@ -39,6 +39,10 @@ public interface UserService {
 
     void delete(String login);
 
+    void disableTotp(String login);
+
+    void enableTotp(String login);
+
     Optional<User> fetchCurrentUser();
 
     Optional<User> fetchUser(long id);
@@ -52,6 +56,8 @@ public interface UserService {
     User findOrCreateSocialUser(
         String email, String firstName, String lastName, String imageUrl, String authProvider, String providerId,
         boolean autoProvision, String defaultAuthority);
+
+    String generateTotpSecret(String login);
 
     Page<User> getAllActiveUsers(Pageable pageable);
 
@@ -76,4 +82,6 @@ public interface UserService {
     Optional<User> update(AdminUserDTO userDTO);
 
     void update(String firstName, String lastName, String email, String langKey, String imageUrl);
+
+    boolean verifyTotpCode(String login, String code);
 }

@@ -1,6 +1,7 @@
 dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
+    implementation("dev.samstevens.totp:totp:1.7.1")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("org.apache.commons:commons-lang3")

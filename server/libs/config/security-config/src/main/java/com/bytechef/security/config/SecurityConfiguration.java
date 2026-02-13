@@ -29,6 +29,7 @@ import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
+import com.bytechef.security.web.filter.TwoFactorVerificationFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -87,13 +88,15 @@ public class SecurityConfiguration {
     private final RememberMeServices rememberMeServices;
     private final Saml2LoginCustomizer saml2LoginCustomizer;
     private final Security security;
+    private final ObjectProvider<TwoFactorVerificationFilter> twoFactorVerificationFilterProvider;
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public SecurityConfiguration(
         ApplicationProperties applicationProperties, AuthenticationFailureHandler authenticationFailureHandler,
         AuthenticationSuccessHandler authenticationSuccessHandler,
         ObjectProvider<OAuth2LoginCustomizer> oAuth2LoginCustomizerProvider, PasswordEncoder passwordEncoder,
-        RememberMeServices rememberMeServices, ObjectProvider<Saml2LoginCustomizer> saml2LoginCustomizerProvider) {
+        RememberMeServices rememberMeServices, ObjectProvider<Saml2LoginCustomizer> saml2LoginCustomizerProvider,
+        ObjectProvider<TwoFactorVerificationFilter> twoFactorVerificationFilterProvider) {
 
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
@@ -102,6 +105,7 @@ public class SecurityConfiguration {
         this.rememberMeServices = rememberMeServices;
         this.saml2LoginCustomizer = saml2LoginCustomizerProvider.getIfAvailable();
         this.security = applicationProperties.getSecurity();
+        this.twoFactorVerificationFilterProvider = twoFactorVerificationFilterProvider;
     }
 
     /**
@@ -203,11 +207,18 @@ public class SecurityConfiguration {
                     .ignoringRequestMatchers(request -> Objects.equals(request.getMethod(), "OPTIONS"))
                     // For internal calls from the swagger UI in the dev profile
                     .ignoringRequestMatchers(request -> environment.acceptsProfiles(Profiles.of("dev")) &&
-                        StringUtils.contains(request.getHeader("Referer"), "/swagger-ui/"));
+                        Strings.CS.contains(request.getHeader("Referer"), "/swagger-ui/"));
             });
 
         http.addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
             .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class);
+
+        TwoFactorVerificationFilter twoFactorVerificationFilter =
+            twoFactorVerificationFilterProvider.getIfAvailable();
+
+        if (twoFactorVerificationFilter != null) {
+            http.addFilterAfter(twoFactorVerificationFilter, BasicAuthenticationFilter.class);
+        }
 
         http
             .headers(headers -> headers

@@ -33,6 +33,11 @@ import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import dev.samstevens.totp.code.DefaultCodeGenerator;
+import dev.samstevens.totp.code.DefaultCodeVerifier;
+import dev.samstevens.totp.secret.DefaultSecretGenerator;
+import dev.samstevens.totp.secret.SecretGenerator;
+import dev.samstevens.totp.time.SystemTimeProvider;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -221,6 +226,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void disableTotp(String login) {
+        userRepository.findByLogin(login)
+            .ifPresent(user -> {
+                user.setTotpEnabled(false);
+                user.setTotpSecret(null);
+
+                userRepository.save(user);
+
+                clearUserCaches(user);
+            });
+    }
+
+    @Override
+    public void enableTotp(String login) {
+        userRepository.findByLogin(login)
+            .ifPresent(user -> {
+                user.setTotpEnabled(true);
+
+                userRepository.save(user);
+
+                clearUserCaches(user);
+            });
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<User> fetchCurrentUser() {
         return SecurityUtils.fetchCurrentUserLogin()
@@ -323,6 +353,24 @@ public class UserServiceImpl implements UserService {
         logger.debug("Created social login user: {}", newUser);
 
         return newUser;
+    }
+
+    @Override
+    public String generateTotpSecret(String login) {
+        SecretGenerator secretGenerator = new DefaultSecretGenerator();
+
+        String secret = secretGenerator.generate();
+
+        userRepository.findByLogin(login)
+            .ifPresent(user -> {
+                user.setTotpSecret(secret);
+
+                userRepository.save(user);
+
+                clearUserCaches(user);
+            });
+
+        return secret;
     }
 
     @Override
@@ -548,6 +596,27 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         clearUserCaches(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean verifyTotpCode(String login, String code) {
+        return userRepository.findByLogin(login)
+            .map(user -> {
+                String secret = user.getTotpSecret();
+
+                if (secret == null) {
+                    return false;
+                }
+
+                DefaultCodeVerifier codeVerifier =
+                    new DefaultCodeVerifier(new DefaultCodeGenerator(), new SystemTimeProvider());
+
+                codeVerifier.setAllowedTimePeriodDiscrepancy(1);
+
+                return codeVerifier.isValidCode(secret, code);
+            })
+            .orElse(false);
     }
 
     /**
