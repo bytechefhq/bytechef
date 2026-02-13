@@ -13,8 +13,8 @@ import com.bytechef.ai.mcp.tool.automation.api.ReadProjectTools;
 import com.bytechef.ai.mcp.tool.automation.api.ReadProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
-import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
+import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
@@ -36,6 +36,7 @@ import java.util.List;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.anthropic.api.AnthropicApi;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -48,6 +49,7 @@ import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.retry.RetryUtils;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -209,11 +211,17 @@ public class CopilotConfiguration {
     }
 
     @Bean
+    QuestionAnswerAdvisor questionAnswerAdvisor(VectorStore aiCopilotPgVectorStore) {
+        return QuestionAnswerAdvisor.builder(aiCopilotPgVectorStore)
+            .build();
+    }
+
+    @Bean
     WorkflowEditorSpringAIAgent workflowEditorAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
         FirecrawlTools firecrawlTools, WorkflowService workflowService,
-        WorkflowNodeOutputFacade workflowNodeOutputFacade)
+        WorkflowNodeOutputFacade workflowNodeOutputFacade, QuestionAnswerAdvisor questionAnswerAdvisor)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR_ASK.name();
@@ -225,6 +233,7 @@ public class CopilotConfiguration {
             .systemMessage(getSystemPrompt(systemPromptAskResource))
             .state(state)
             .tools(List.of(readProjectTools, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools))
+            .advisor(questionAnswerAdvisor)
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .build();

@@ -48,7 +48,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
 
     protected WorkflowEditorSpringAIAgent(final Builder builder, final WorkflowService workflowService,
-                                          final WorkflowNodeOutputFacade workflowNodeOutputFacade)
+        final WorkflowNodeOutputFacade workflowNodeOutputFacade)
         throws AGUIException {
 
         super(builder);
