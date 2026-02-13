@@ -18,4 +18,10 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20260209000000-2" author="Ivica Cardic">
+        <createIndex indexName="ix_identity_provider_scim_api_key" tableName="identity_provider">
+            <column name="scim_api_key"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

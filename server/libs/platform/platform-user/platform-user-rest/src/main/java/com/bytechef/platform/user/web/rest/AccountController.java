@@ -231,9 +231,15 @@ public class AccountController {
             .orElseThrow(() -> new AccountResourceException(
                 "User could not be found", AccountErrorType.USER_NOT_FOUND));
 
+        if (!provider.equals(user.getAuthProvider())) {
+            throw new AccountResourceException(
+                "Provider does not match the user's current auth provider",
+                AccountErrorType.PROVIDER_UNLINK_NOT_ALLOWED);
+        }
+
         if (user.getPassword() == null) {
             throw new AccountResourceException(
-                "Cannot unlink provider without a password set", AccountErrorType.USER_NOT_FOUND);
+                "Cannot unlink provider without a password set", AccountErrorType.PROVIDER_UNLINK_NOT_ALLOWED);
         }
 
         userService.unlinkProvider(user.getLogin());

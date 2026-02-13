@@ -45,4 +45,9 @@ public class RemoteAuthorityServiceClient implements AuthorityService {
     public boolean exists(String name) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public Authority update(Authority authority) {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.user.web.rest;
 
+import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.IdentityProviderService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -68,7 +69,7 @@ final class SsoDiscoveryController {
 
             String redirectUrl;
 
-            if ("SAML".equals(idp.getType())) {
+            if (UserConstants.AUTH_PROVIDER_SAML.equals(idp.getType())) {
                 redirectUrl = "/saml2/authenticate/saml-" + idp.getId();
             } else {
                 redirectUrl = "/oauth2/authorization/sso-" + idp.getId();
@@ -97,7 +98,7 @@ final class SsoDiscoveryController {
             if (identityProvider.isEnabled()) {
                 String redirectUrl;
 
-                if ("SAML".equals(identityProvider.getType())) {
+                if (UserConstants.AUTH_PROVIDER_SAML.equals(identityProvider.getType())) {
                     redirectUrl = "/saml2/authenticate/saml-" + identityProvider.getId();
                 } else {
                     redirectUrl = "/oauth2/authorization/sso-" + identityProvider.getId();
