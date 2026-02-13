@@ -132,6 +132,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 <header className="flex items-center gap-1 rounded-t-lg px-3 pt-3 text-center">
                     <Input
                         className="bg-white shadow-none"
+                        id="filter-components"
                         name="workflowNodeFilter"
                         onChange={(event) => setFilter(event.target.value)}
                         placeholder="Filter components"

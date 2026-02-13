@@ -47,6 +47,7 @@ const PublishPopover = ({
                         <Button
                             className="[&[data-state=open]]:border-stroke-brand-secondary [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary"
                             icon={<SendIcon />}
+                            id="publish-button"
                             label="Publish"
                             variant="outline"
                         />
@@ -56,7 +57,11 @@ const PublishPopover = ({
                 <TooltipContent>Publish the project</TooltipContent>
             </Tooltip>
 
-            <PopoverContent align="end" className="flex h-full w-96 flex-col justify-between space-y-4">
+            <PopoverContent
+                align="end"
+                className="flex h-full w-96 flex-col justify-between space-y-4"
+                id="publish-popover"
+            >
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(handlePublishProject)}>
                         <h3 className="font-semibold">Publish Project</h3>
