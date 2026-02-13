@@ -19,7 +19,9 @@ package com.bytechef.platform.component.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ActionDefinition.SseStreamResponsePerformFunction;
+import com.bytechef.component.definition.ActionDefinition.StreamPerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamResponsePerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -85,7 +87,9 @@ public class ActionDefinition {
             .map(perform -> perform instanceof PerformFunction)
             .orElse(false);
         this.sseStreamResponse = actionDefinition.getPerform()
-            .map(perform -> perform instanceof SseStreamResponsePerformFunction ||
+            .map(perform -> perform instanceof StreamPerformFunction ||
+                perform instanceof SseStreamResponsePerformFunction ||
+                perform instanceof MultipleConnectionsStreamPerformFunction ||
                 perform instanceof MultipleConnectionsSseStreamResponsePerformFunction)
             .orElse(false);
         this.title = Validate.notNull(getTitle(actionDefinition), "title");

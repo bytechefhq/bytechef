@@ -24,9 +24,10 @@ import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.util.concurrent.Flow.Publisher;
+import java.util.concurrent.Flow;
 
 /**
  * Streaming variant of the OpenAI chat action. Emits partial responses via SSE while the action is running.
@@ -45,9 +46,45 @@ public class OpenAiStreamChatAction {
     private OpenAiStreamChatAction() {
     }
 
-    public static Publisher<?> perform(
+    public static SseEmitterHandler perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return CHAT_MODEL.stream(inputParameters, connectionParameters, context);
+        Flow.Publisher<?> publisher = CHAT_MODEL.stream(inputParameters, connectionParameters, context);
+
+        return emitter -> publisher.subscribe(
+            new Flow.Subscriber<Object>() {
+
+                private Flow.Subscription subscription;
+
+                @Override
+                public void onSubscribe(Flow.Subscription subscription) {
+                    this.subscription = subscription;
+
+                    emitter.addTimeoutListener(subscription::cancel);
+
+                    subscription.request(Long.MAX_VALUE);
+                }
+
+                @Override
+                public void onNext(Object item) {
+                    try {
+                        emitter.send(item);
+                    } catch (Exception exception) {
+                        context.log(log -> log.trace(exception.getMessage(), exception));
+
+                        subscription.cancel();
+                    }
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    emitter.error(throwable);
+                }
+
+                @Override
+                public void onComplete() {
+                    emitter.complete();
+                }
+            });
     }
 }

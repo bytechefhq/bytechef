@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.chat.action.ChatResponseToRequestAction;
-import com.bytechef.component.chat.action.ChatStreamResponseToRequestAction;
 import com.bytechef.component.chat.trigger.ChatNewRequestTrigger;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -39,9 +38,7 @@ public class ChatComponentHandler implements ComponentHandler {
         .icon("path:assets/chat.svg")
         .categories(ComponentCategory.HELPERS)
         .triggers(ChatNewRequestTrigger.TRIGGER_DEFINITION)
-        .actions(
-            ChatResponseToRequestAction.ACTION_DEFINITION,
-            ChatStreamResponseToRequestAction.ACTION_DEFINITION);
+        .actions(ChatResponseToRequestAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

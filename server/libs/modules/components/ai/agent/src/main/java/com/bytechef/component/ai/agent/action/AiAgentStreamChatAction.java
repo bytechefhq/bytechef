@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
@@ -73,7 +74,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         }
     }
 
-    protected Flow.Publisher<?> perform(
+    protected SseEmitterHandler perform(
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters,
         Parameters extensions, ActionContext context) throws Exception {
 
@@ -87,10 +88,12 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             .advisors(simpleLoggerAdvisor)
             .stream();
 
+        Flow.Publisher<?> publisher;
+
         try {
             Flux<String> contentFlux = streamResponseSpec.content();
 
-            return FlowAdapters.toFlowPublisher(contentFlux);
+            publisher = FlowAdapters.toFlowPublisher(contentFlux);
         } catch (Throwable ignoredContent) {
             Flux<?> contentFlux = streamResponseSpec.chatResponse()
                 .map(chatResponse -> {
@@ -107,7 +110,45 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                     return payload;
                 });
 
-            return FlowAdapters.toFlowPublisher(contentFlux);
+            publisher = FlowAdapters.toFlowPublisher(contentFlux);
         }
+
+        Flow.Publisher<?> effectivePublisher = publisher;
+
+        return emitter -> effectivePublisher.subscribe(
+            new Flow.Subscriber<Object>() {
+
+                private Flow.Subscription subscription;
+
+                @Override
+                public void onSubscribe(Flow.Subscription subscription) {
+                    this.subscription = subscription;
+
+                    emitter.addTimeoutListener(subscription::cancel);
+
+                    subscription.request(Long.MAX_VALUE);
+                }
+
+                @Override
+                public void onNext(Object item) {
+                    try {
+                        emitter.send(item);
+                    } catch (Exception exception) {
+                        context.log(log -> log.trace(exception.getMessage(), exception));
+
+                        subscription.cancel();
+                    }
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    emitter.error(throwable);
+                }
+
+                @Override
+                public void onComplete() {
+                    emitter.complete();
+                }
+            });
     }
 }
