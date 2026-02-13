@@ -1,0 +1,7 @@
+mutation createApprovalTask($approvalTask: ApprovalTaskInput!) {
+    createApprovalTask(approvalTask: $approvalTask) {
+        description
+        id
+        name
+    }
+}

@@ -89,7 +89,7 @@ const automationNavigation: NavigationType[] = [
         name: 'Knowledge Base',
     },
     {href: '/automation/chat', icon: MessageCircleMoreIcon, name: 'Workflow Chat'},
-    {href: '/automation/tasks', icon: CircleIcon, name: 'Tasks'},
+    {href: '/automation/approval-tasks', icon: CircleIcon, name: 'Approval Tasks'},
 ];
 
 const embeddedNavigation: NavigationType[] = [
@@ -206,7 +206,7 @@ function App() {
             return ff_4000;
         }
 
-        if (navItem.href === '/automation/tasks') {
+        if (navItem.href === '/automation/approval-tasks') {
             return ff_732;
         }
 

@@ -1,0 +1,8 @@
+mutation updateApprovalTask($approvalTask: ApprovalTaskInput!) {
+    updateApprovalTask(approvalTask: $approvalTask) {
+        description
+        id
+        name
+        version
+    }
+}
