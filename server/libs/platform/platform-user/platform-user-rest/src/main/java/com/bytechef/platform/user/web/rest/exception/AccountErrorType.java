@@ -29,6 +29,8 @@ public class AccountErrorType extends AbstractErrorType {
     public static final AccountErrorType ORGANIZATION_ALREADY_EXISTS = new AccountErrorType(
         101, HttpStatus.BAD_REQUEST);
     public static final AccountErrorType SIGN_UP_DISABLED = new AccountErrorType(102, HttpStatus.BAD_REQUEST);
+    public static final AccountErrorType PROVIDER_UNLINK_NOT_ALLOWED = new AccountErrorType(
+        103, HttpStatus.BAD_REQUEST);
 
     private final HttpStatus status;
 

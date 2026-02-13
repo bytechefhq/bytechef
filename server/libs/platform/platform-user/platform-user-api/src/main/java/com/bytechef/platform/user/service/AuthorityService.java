@@ -34,4 +34,6 @@ public interface AuthorityService {
     Optional<Authority> fetchAuthority(long id);
 
     List<Authority> getAuthorities();
+
+    Authority update(Authority authority);
 }

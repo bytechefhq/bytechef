@@ -539,18 +539,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void unlinkProvider(String login) {
-        Optional<User> userOptional = userRepository.findByLogin(login);
+        User user = userRepository.findByLogin(login)
+            .orElseThrow(UserNotFoundException::new);
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
+        user.setAuthProvider(UserConstants.AUTH_PROVIDER_LOCAL);
+        user.setProviderId(null);
 
-            user.setAuthProvider("LOCAL");
-            user.setProviderId(null);
+        userRepository.save(user);
 
-            userRepository.save(user);
-
-            clearUserCaches(user);
-        }
+        clearUserCaches(user);
     }
 
     /**

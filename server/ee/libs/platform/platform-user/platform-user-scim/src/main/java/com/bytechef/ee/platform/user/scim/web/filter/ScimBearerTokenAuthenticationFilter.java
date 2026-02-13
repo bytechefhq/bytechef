@@ -11,6 +11,9 @@ import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,6 +36,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class ScimBearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String SCIM_PATH_PREFIX = "/api/scim/v2/";
 
     private final IdentityProviderService identityProviderService;
@@ -101,11 +105,18 @@ public class ScimBearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
     @SuppressFBWarnings("XSS_SERVLET")
     private void sendUnauthorized(HttpServletResponse response, String detail) throws IOException {
+        ObjectNode errorNode = OBJECT_MAPPER.createObjectNode();
+
+        ArrayNode schemasNode = errorNode.putArray("schemas");
+
+        schemasNode.add("urn:ietf:params:scim:api:messages:2.0:Error");
+
+        errorNode.put("detail", detail);
+        errorNode.put("status", "401");
+
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/scim+json");
         response.getWriter()
-            .write(
-                "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:Error\"]," +
-                    "\"detail\":\"" + detail + "\",\"status\":\"401\"}");
+            .write(OBJECT_MAPPER.writeValueAsString(errorNode));
     }
 }

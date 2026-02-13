@@ -7,10 +7,13 @@
 
 package com.bytechef.ee.tenant.multi.security.saml2;
 
+import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
@@ -32,6 +35,8 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
 
     public static final String SAML_PREFIX = "saml-";
 
+    private static final Logger logger = LoggerFactory.getLogger(DynamicRelyingPartyRegistrationRepository.class);
+
     private final IdentityProviderService identityProviderService;
 
     @SuppressFBWarnings("EI")
@@ -45,11 +50,27 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
             return null;
         }
 
-        long identityProviderId = Long.parseLong(registrationId.substring(SAML_PREFIX.length()));
+        long identityProviderId;
 
-        IdentityProvider identityProvider = identityProviderService.getIdentityProvider(identityProviderId);
+        try {
+            identityProviderId = Long.parseLong(registrationId.substring(SAML_PREFIX.length()));
+        } catch (NumberFormatException numberFormatException) {
+            logger.debug("Invalid SAML registration ID format: {}", registrationId);
 
-        if (!identityProvider.isEnabled() || !"SAML".equals(identityProvider.getType())) {
+            return null;
+        }
+
+        IdentityProvider identityProvider;
+
+        try {
+            identityProvider = identityProviderService.getIdentityProvider(identityProviderId);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            logger.debug("Identity provider not found for ID: {}", identityProviderId);
+
+            return null;
+        }
+
+        if (!identityProvider.isEnabled() || !UserConstants.AUTH_PROVIDER_SAML.equals(identityProvider.getType())) {
             return null;
         }
 

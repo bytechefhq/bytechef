@@ -120,21 +120,20 @@ class ScimGroupController {
 
         authority.setName(scimGroup.displayName());
 
-        Authority updatedAuthority = authorityService.create(authority);
+        Authority updatedAuthority = authorityService.update(authority);
 
         return ResponseEntity.ok(toScimGroup(updatedAuthority));
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     @PatchMapping("/{id}")
     ResponseEntity<Object> patchGroup(@PathVariable long id, @RequestBody ScimPatchRequest patchRequest) {
-        Optional<Authority> existingAuthority = authorityService.fetchAuthority(id);
-
-        if (existingAuthority.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(notFoundError("Group", String.valueOf(id)));
-        }
-
-        return ResponseEntity.ok(toScimGroup(existingAuthority.get()));
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
+            .body(
+                Map.of(
+                    "schemas", List.of("urn:ietf:params:scim:api:messages:2.0:Error"),
+                    "detail", "PATCH operation is not supported for Group resources",
+                    "status", "501"));
     }
 
     @DeleteMapping("/{id}")

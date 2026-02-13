@@ -8,6 +8,7 @@
 package com.bytechef.ee.tenant.multi.security.saml2;
 
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
@@ -56,7 +57,8 @@ public class MultiTenantSaml2AuthenticationSuccessHandler implements Authenticat
             "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname");
 
         userService.findOrCreateSocialUser(
-            email, firstName, lastName, null, "SAML", principal.getName(), true, AuthorityConstants.ADMIN);
+            email, firstName, lastName, null, UserConstants.AUTH_PROVIDER_SAML, principal.getName(), true,
+            AuthorityConstants.ADMIN);
 
         List<String> tenantIds = tenantService.getTenantIdsByUserEmail(email);
 

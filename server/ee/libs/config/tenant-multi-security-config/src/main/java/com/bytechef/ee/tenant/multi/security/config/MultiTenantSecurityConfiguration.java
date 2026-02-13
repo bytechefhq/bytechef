@@ -18,6 +18,7 @@ import com.bytechef.ee.tenant.multi.security.web.authentication.MultiTenantOAuth
 import com.bytechef.ee.tenant.multi.security.web.filter.MultiTenantInternalFilter;
 import com.bytechef.ee.tenant.multi.security.web.filter.SsoEnforcementFilter;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
 import com.bytechef.platform.security.web.config.Saml2LoginCustomizer;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -27,6 +28,7 @@ import com.bytechef.security.web.oauth2.CustomOAuth2UserService;
 import com.bytechef.security.web.oauth2.CustomOidcUserService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
+import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,6 +77,18 @@ public class MultiTenantSecurityConfiguration {
                 .oidcUserService(customOidcUserService))
             .successHandler(new MultiTenantOAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService))
             .failureHandler(new MultiTenantOAuth2AuthenticationFailureHandler()));
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+    AuthorizeHttpRequestContributor saml2MetadataAuthorizeHttpRequestContributor() {
+        return new AuthorizeHttpRequestContributor() {
+
+            @Override
+            public List<String> getApiPermitAllRequestMatcherPaths() {
+                return List.of("/saml2/metadata/**");
+            }
+        };
     }
 
     @Bean

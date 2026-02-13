@@ -21,11 +21,14 @@ package com.bytechef.platform.user.constant;
  */
 public final class UserConstants {
 
+    public static final String AUTH_PROVIDER_LOCAL = "LOCAL";
+    public static final String AUTH_PROVIDER_SAML = "SAML";
+
+    public static final String DEFAULT_LANGUAGE = "en";
+
     // Regex for acceptable logins
     public static final String LOGIN_REGEX =
         "^(?>[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)|(?>[_.@A-Za-z0-9-]+)$";
-
-    public static final String DEFAULT_LANGUAGE = "en";
 
     private UserConstants() {
     }

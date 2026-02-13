@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("/api/saml2/metadata")
+@RequestMapping("/saml2/metadata")
 @ConditionalOnEEVersion
 @ConditionalOnMultiTenant
 @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")

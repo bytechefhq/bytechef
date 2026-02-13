@@ -60,4 +60,9 @@ public class AuthorityServiceImpl implements AuthorityService {
     public List<Authority> getAuthorities() {
         return authorityRepository.findAll();
     }
+
+    @Override
+    public Authority update(Authority authority) {
+        return authorityRepository.save(authority);
+    }
 }
