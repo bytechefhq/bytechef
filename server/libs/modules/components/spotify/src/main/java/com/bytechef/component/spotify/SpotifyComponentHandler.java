@@ -22,6 +22,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.spotify.action.SpotifyCreatePlaylistAction;
 import com.google.auto.service.AutoService;
 import java.util.List;
@@ -73,5 +74,12 @@ public class SpotifyComponentHandler extends AbstractSpotifyComponentHandler {
                 "Spotify Web API documentation", "https://developer.spotify.com/documentation/web-api")
             .icon("path:assets/spotify.svg")
             .version(1);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition.version(1);
     }
 }

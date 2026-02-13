@@ -21,25 +21,22 @@ import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.spotify.constant.SpotifyConstants.COLLABORATIVE;
+import static com.bytechef.component.spotify.constant.SpotifyConstants.DESCRIPTION;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.ID;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.NAME;
+import static com.bytechef.component.spotify.constant.SpotifyConstants.PUBLIC;
 import static com.bytechef.component.spotify.util.SpotifyUtils.getCurrentUserId;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
-import java.util.Map;
 
 /**
  * @author Monika Kušter
  */
 public class SpotifyCreatePlaylistAction {
-
-    protected static final String DESCRIPTION = "description";
-    protected static final String PUBLIC = "public";
-    protected static final String COLLABORATIVE = "collaborative";
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPlaylist")
         .title("Create Playlist")
@@ -105,9 +102,7 @@ public class SpotifyCreatePlaylistAction {
     private SpotifyCreatePlaylistAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.post("/users/" + getCurrentUserId(context) + "/playlists"))
             .body(
@@ -118,6 +113,6 @@ public class SpotifyCreatePlaylistAction {
                     COLLABORATIVE, inputParameters.getRequiredBoolean(COLLABORATIVE)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

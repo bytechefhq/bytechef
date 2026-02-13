@@ -16,10 +16,10 @@
 
 package com.bytechef.component.spotify.action;
 
-import static com.bytechef.component.spotify.action.SpotifyCreatePlaylistAction.COLLABORATIVE;
-import static com.bytechef.component.spotify.action.SpotifyCreatePlaylistAction.DESCRIPTION;
-import static com.bytechef.component.spotify.action.SpotifyCreatePlaylistAction.PUBLIC;
+import static com.bytechef.component.spotify.constant.SpotifyConstants.COLLABORATIVE;
+import static com.bytechef.component.spotify.constant.SpotifyConstants.DESCRIPTION;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.NAME;
+import static com.bytechef.component.spotify.constant.SpotifyConstants.PUBLIC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -34,7 +34,6 @@ import com.bytechef.component.definition.Context.Http.Configuration.Configuratio
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.spotify.util.SpotifyUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -64,7 +63,7 @@ class SpotifyCreatePlaylistActionTest {
 
         Map<String, Object> map = Map.of(
             NAME, "name", DESCRIPTION, "desc", PUBLIC, true, COLLABORATIVE, true);
-        Parameters parameters = MockParametersFactory.create(map);
+        Parameters mockedParameters = MockParametersFactory.create(map);
 
         try (MockedStatic<SpotifyUtils> spotifyUtilsMockedStatic = mockStatic(SpotifyUtils.class)) {
             spotifyUtilsMockedStatic.when(() -> SpotifyUtils.getCurrentUserId(contextArgumentCaptor.capture()))
@@ -74,10 +73,10 @@ class SpotifyCreatePlaylistActionTest {
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.body(bodyArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-            when(mockedResponse.getBody(any(TypeReference.class)))
+            when(mockedResponse.getBody())
                 .thenReturn(Map.of());
 
-            Map<String, Object> result = SpotifyCreatePlaylistAction.perform(parameters, parameters, mockedContext);
+            Object result = SpotifyCreatePlaylistAction.perform(mockedParameters, any(Parameters.class), mockedContext);
 
             assertEquals(Map.of(), result);
 

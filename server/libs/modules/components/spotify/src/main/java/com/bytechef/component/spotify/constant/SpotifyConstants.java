@@ -21,9 +21,13 @@ package com.bytechef.component.spotify.constant;
  */
 public class SpotifyConstants {
 
+    public static final String COLLABORATIVE = "collaborative";
+    public static final String DESCRIPTION = "description";
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String PUBLIC = "public";
+
     private SpotifyConstants() {
     }
 
-    public static final String ID = "id";
-    public static final String NAME = "name";
 }
