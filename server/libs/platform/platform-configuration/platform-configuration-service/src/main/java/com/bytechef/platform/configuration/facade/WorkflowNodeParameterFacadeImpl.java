@@ -236,7 +236,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
             workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, definitionMap);
 
-        return workflowNodeStructure.missingRequiredProperties;
+        return Set.copyOf(workflowNodeStructure.missingRequiredProperties);
     }
 
     @Override
@@ -278,7 +278,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
             workflowNodeName, null, null, definitionMap);
 
-        return workflowNodeStructure.missingRequiredProperties;
+        return Set.copyOf(workflowNodeStructure.missingRequiredProperties);
     }
 
     @Override
