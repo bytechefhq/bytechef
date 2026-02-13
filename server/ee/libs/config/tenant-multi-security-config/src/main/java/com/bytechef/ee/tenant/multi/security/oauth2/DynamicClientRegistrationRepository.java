@@ -11,6 +11,7 @@ import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -69,12 +70,11 @@ public class DynamicClientRegistrationRepository implements ClientRegistrationRe
 
         String decryptedSecret = identityProviderService.getDecryptedClientSecret(identityProvider);
 
-        String[] scopes = identityProvider.getScopes()
-            .split(",");
-
-        for (int index = 0; index < scopes.length; index++) {
-            scopes[index] = scopes[index].trim();
-        }
+        String[] scopes = Arrays.stream(identityProvider.getScopes()
+            .split(","))
+            .map(String::trim)
+            .filter(scope -> !scope.isEmpty())
+            .toArray(String[]::new);
 
         return ClientRegistrations.fromIssuerLocation(identityProvider.getIssuerUri())
             .registrationId(registrationId)

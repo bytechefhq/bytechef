@@ -16,13 +16,17 @@
 
 package com.bytechef.security.web.oauth2;
 
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.Authority;
+import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
@@ -43,12 +47,22 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
 public class CustomOidcUserService extends OidcUserService {
 
+    private static final String SSO_PREFIX = "sso-";
+
     private final AuthorityService authorityService;
+    private final IdentityProviderService identityProviderService;
     private final UserService userService;
 
-    @SuppressFBWarnings("EI")
-    public CustomOidcUserService(AuthorityService authorityService, UserService userService) {
+    @SuppressFBWarnings({
+        "CT_CONSTRUCTOR_THROW", "EI"
+    })
+    public CustomOidcUserService(
+        AuthorityService authorityService,
+        ObjectProvider<IdentityProviderService> identityProviderServiceProvider,
+        UserService userService) {
+
         this.authorityService = authorityService;
+        this.identityProviderService = identityProviderServiceProvider.getIfAvailable();
         this.userService = userService;
     }
 
@@ -71,10 +85,22 @@ public class CustomOidcUserService extends OidcUserService {
 
         String registrationId = clientRegistration.getRegistrationId();
 
-        String authProvider = registrationId.startsWith("sso-") ? "SSO" : registrationId.toUpperCase();
+        String authProvider = registrationId.startsWith(SSO_PREFIX) ? "SSO" : registrationId.toUpperCase();
+
+        boolean autoProvision = true;
+        String defaultAuthority = AuthorityConstants.ADMIN;
+
+        if (registrationId.startsWith(SSO_PREFIX) && identityProviderService != null) {
+            long identityProviderId = Long.parseLong(registrationId.substring(SSO_PREFIX.length()));
+
+            IdentityProvider identityProvider = identityProviderService.getIdentityProvider(identityProviderId);
+
+            autoProvision = identityProvider.isAutoProvision();
+            defaultAuthority = identityProvider.getDefaultAuthority();
+        }
 
         User user = userService.findOrCreateSocialUser(
-            email, firstName, lastName, imageUrl, authProvider, providerId);
+            email, firstName, lastName, imageUrl, authProvider, providerId, autoProvision, defaultAuthority);
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
             .stream()

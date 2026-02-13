@@ -250,7 +250,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User findOrCreateSocialUser(
-        String email, String firstName, String lastName, String imageUrl, String authProvider, String providerId) {
+        String email, String firstName, String lastName, String imageUrl, String authProvider, String providerId,
+        boolean autoProvision, String defaultAuthority) {
 
         Optional<User> existingUser = userRepository.findByAuthProviderAndProviderId(authProvider, providerId);
 
@@ -291,6 +292,10 @@ public class UserServiceImpl implements UserService {
             return user;
         }
 
+        if (!autoProvision) {
+            throw new IllegalStateException("Auto-provisioning is disabled for this identity provider");
+        }
+
         User newUser = new User();
 
         newUser.setLogin(email.toLowerCase());
@@ -306,7 +311,7 @@ public class UserServiceImpl implements UserService {
 
         Set<Authority> authorities = new HashSet<>();
 
-        authorityRepository.findByName(AuthorityConstants.ADMIN)
+        authorityRepository.findByName(defaultAuthority)
             .ifPresent(authorities::add);
 
         newUser.setAuthorities(authorities);

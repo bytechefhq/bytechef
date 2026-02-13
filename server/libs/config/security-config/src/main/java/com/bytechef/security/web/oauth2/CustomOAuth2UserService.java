@@ -16,6 +16,7 @@
 
 package com.bytechef.security.web.oauth2;
 
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -92,7 +93,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         User user = userService.findOrCreateSocialUser(
-            email, firstName, lastName, imageUrl, registrationId, providerId);
+            email, firstName, lastName, imageUrl, registrationId, providerId, true, AuthorityConstants.ADMIN);
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
             .stream()

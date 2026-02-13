@@ -43,8 +43,7 @@ public class SsoEnforcementFilter extends OncePerRequestFilter {
             String username = request.getParameter("username");
 
             if (username != null && username.contains("@")) {
-                String domain = username.substring(username.indexOf('@') + 1)
-                    .toLowerCase();
+                String domain = username.substring(username.lastIndexOf('@') + 1);
 
                 Optional<IdentityProvider> identityProvider = identityProviderService.fetchByDomain(domain);
 

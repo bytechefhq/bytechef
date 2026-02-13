@@ -50,7 +50,8 @@ public interface UserService {
     Optional<User> fetchUserByLogin(String login);
 
     User findOrCreateSocialUser(
-        String email, String firstName, String lastName, String imageUrl, String authProvider, String providerId);
+        String email, String firstName, String lastName, String imageUrl, String authProvider, String providerId,
+        boolean autoProvision, String defaultAuthority);
 
     Page<User> getAllActiveUsers(Pageable pageable);
 
