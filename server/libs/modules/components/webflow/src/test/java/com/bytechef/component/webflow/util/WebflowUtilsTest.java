@@ -30,7 +30,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -55,8 +57,8 @@ class WebflowUtilsTest {
     @Test
     void testGetItemIdOptions(
         Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<Context.ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<Http.Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         mockedParameters = MockParametersFactory.create(Map.of(COLLECTION_ID, "1"));
 
@@ -70,11 +72,11 @@ class WebflowUtilsTest {
             WebflowUtils.getItemIdOptions(
                 mockedParameters, null, null, null, mockedContext));
 
-        Context.ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Http.Configuration configuration = configurationBuilder.build();
 
         Http.ResponseType responseType = configuration.getResponseType();
@@ -85,8 +87,8 @@ class WebflowUtilsTest {
     @Test
     void testGetCollectionIdOptions(
         Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<Context.ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<Http.Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         mockedParameters = MockParametersFactory.create(Map.of(SITE_ID, "1"));
 
@@ -100,11 +102,11 @@ class WebflowUtilsTest {
             WebflowUtils.getCollectionIdOptions(
                 mockedParameters, null, null, null, mockedContext));
 
-        Context.ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Http.Configuration configuration = configurationBuilder.build();
 
         Http.ResponseType responseType = configuration.getResponseType();
@@ -115,8 +117,8 @@ class WebflowUtilsTest {
     @Test
     void testGetOrderIdOptions(
         Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<Context.ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<Http.Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         mockedParameters = MockParametersFactory.create(Map.of(SITE_ID, "1"));
 
@@ -127,14 +129,13 @@ class WebflowUtilsTest {
 
         assertEquals(
             List.of(option("123", "123")),
-            WebflowUtils.getOrderIdOptions(
-                mockedParameters, null, null, null, mockedContext));
+            WebflowUtils.getOrderIdOptions(mockedParameters, null, null, null, mockedContext));
 
-        Context.ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Http.Configuration configuration = configurationBuilder.build();
 
         Http.ResponseType responseType = configuration.getResponseType();
@@ -145,8 +146,8 @@ class WebflowUtilsTest {
     @Test
     void testGetSiteIdOptions(
         Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<Context.ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<Http.Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         mockedParameters = mock(Parameters.class);
 
@@ -157,14 +158,13 @@ class WebflowUtilsTest {
 
         assertEquals(
             expectedOptions,
-            WebflowUtils.getSiteIdOptions(
-                mockedParameters, null, null, null, mockedContext));
+            WebflowUtils.getSiteIdOptions(mockedParameters, null, null, null, mockedContext));
 
-        Context.ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Http.Configuration configuration = configurationBuilder.build();
 
         Http.ResponseType responseType = configuration.getResponseType();
