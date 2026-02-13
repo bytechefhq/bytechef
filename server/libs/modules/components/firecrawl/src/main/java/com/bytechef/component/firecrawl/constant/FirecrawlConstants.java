@@ -47,9 +47,14 @@ public class FirecrawlConstants {
     public static final String BLOCK_ADS = "blockAds";
     public static final String PROXY = "proxy";
     public static final String PARSERS = "parsers";
-    public static final String ACTIONS = "actions";
     public static final String STORE_IN_CACHE = "storeInCache";
     public static final String ZERO_DATA_RETENTION = "zeroDataRetention";
+    public static final String SEARCH = "search";
+    public static final String SITEMAP = "sitemap";
+    public static final String INCLUDE_SUBDOMAINS = "includeSubdomains";
+    public static final String IGNORE_QUERY_PARAMETERS = "ignoreQueryParameters";
+    public static final String IGNORE_CACHE = "ignoreCache";
+    public static final String LANGUAGES = "languages";
 
     private FirecrawlConstants() {
     }

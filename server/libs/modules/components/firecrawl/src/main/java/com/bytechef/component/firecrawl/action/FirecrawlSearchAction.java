@@ -40,8 +40,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Marko Krišković
@@ -197,31 +195,21 @@ public class FirecrawlSearchAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, Object> body = createBody(inputParameters);
-
         return context
             .http(http -> http.post("/search"))
-            .body(Context.Http.Body.of(body))
+            .body(Context.Http.Body.of(
+                QUERY, inputParameters.getRequiredString(QUERY),
+                LIMIT, inputParameters.getInteger(LIMIT),
+                SOURCES, inputParameters.getList(SOURCES),
+                CATEGORIES, inputParameters.getList(CATEGORIES),
+                TBS, inputParameters.getString(TBS),
+                LOCATION, inputParameters.getString(LOCATION),
+                COUNTRY, inputParameters.getString(COUNTRY),
+                TIMEOUT, inputParameters.getInteger(TIMEOUT),
+                IGNORE_INVALID_URLS, inputParameters.getBoolean(IGNORE_INVALID_URLS),
+                SCRAPE_OPTIONS, inputParameters.get(SCRAPE_OPTIONS)))
             .configuration(Context.Http.responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }
-
-    private static Map<String, Object> createBody(Parameters inputParameters) {
-        Map<String, Object> body = new HashMap<>();
-
-        body.put(QUERY, inputParameters.getRequiredString(QUERY));
-        body.put(LIMIT, inputParameters.getInteger(LIMIT));
-        body.put(SOURCES, inputParameters.getList(SOURCES));
-        body.put(CATEGORIES, inputParameters.getList(CATEGORIES));
-        body.put(TBS, inputParameters.getString(TBS));
-        body.put(LOCATION, inputParameters.getString(LOCATION));
-        body.put(COUNTRY, inputParameters.getString(COUNTRY));
-        body.put(TIMEOUT, inputParameters.getInteger(TIMEOUT));
-        body.put(IGNORE_INVALID_URLS, inputParameters.getBoolean(IGNORE_INVALID_URLS));
-        body.put(SCRAPE_OPTIONS, inputParameters.get(SCRAPE_OPTIONS));
-
-        return body;
-    }
-
 }
