@@ -53,6 +53,83 @@ Version: 1
 ## Actions
 
 
+### Add Screenshot
+Name: addScreenshot
+
+`Turn a URL into a screenshot.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| source | Source | STRING <details> <summary> Options </summary> <span>URL</span>, <span>HTML</span> </details> | Provide either a URL to capture or raw HTML content. | true |
+| url | URL | STRING | Place the URL you want to turn into screenshot. | true |
+| html | HTML | STRING | Place the raw HTML to render. | true |
+| custom_css | Custom CSS | STRING | Custom CSS to inject into the page. | false |
+| wait | Wait | INTEGER | Time to wait before capturing (milliseconds). | false |
+| screen | Screen size | STRING <details> <summary> Options </summary> <span>default</span>, <span>phone</span>, <span>landscape-phone</span>, <span>tablet</span>, <span>landscape-tablet</span>, <span>retina</span>, <span>4k</span>, <span>8k</span>, <span>custom_size</span> </details> | Predefined screen size or custom dimensions. | false |
+| width | Width (px) | INTEGER |  | true |
+| height | Height (px) | INTEGER |  | true |
+| background | Transparent background | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Make the background transparent (PNG only). | false |
+| fullpage | Full Page Screenshot | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Capture the entire scrollable page. | false |
+| force | Force refresh | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Force a new screenshot even if cached. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Screenshot",
+  "name" : "addScreenshot",
+  "parameters" : {
+    "source" : "",
+    "url" : "",
+    "html" : "",
+    "custom_css" : "",
+    "wait" : 1,
+    "screen" : "",
+    "width" : 1,
+    "height" : 1,
+    "background" : false,
+    "fullpage" : false,
+    "force" : false
+  },
+  "type" : "oneSimpleAPI/v1/addScreenshot"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| width | INTEGER | Screenshot width. |
+| height | INTEGER | Screenshot height. |
+| fullpage | STRING | Whether the screenshot was captured as full page. |
+| url | STRING | The URL that was captured. |
+| elapsed | INTEGER | The total time taken to generate the screenshot. |
+
+
+
+
+#### Output Example
+```json
+{
+  "width" : 1,
+  "height" : 1,
+  "fullpage" : "",
+  "url" : "",
+  "elapsed" : 1
+}
+```
+
+
+
+
 ### Currency Converter
 Name: currencyConverter
 
@@ -239,4 +316,10 @@ Type: OBJECT
 
 
 
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
