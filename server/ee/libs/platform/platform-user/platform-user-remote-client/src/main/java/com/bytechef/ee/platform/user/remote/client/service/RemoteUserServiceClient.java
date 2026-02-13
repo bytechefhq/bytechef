@@ -132,6 +132,11 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
+    public void unlinkProvider(String login) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<User> update(AdminUserDTO userDTO) {
         throw new UnsupportedOperationException();
     }

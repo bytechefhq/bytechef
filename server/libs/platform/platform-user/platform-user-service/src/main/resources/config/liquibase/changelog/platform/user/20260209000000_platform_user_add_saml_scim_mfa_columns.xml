@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260209000000-1" author="Ivica Cardic">
+        <addColumn tableName="identity_provider">
+            <column name="metadata_uri" type="VARCHAR(1024)"/>
+            <column name="mfa_method" type="VARCHAR(20)"/>
+            <column name="mfa_required" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name_id_format" type="VARCHAR(255)"/>
+            <column name="scim_api_key" type="VARCHAR(512)"/>
+            <column name="signing_certificate" type="TEXT"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
