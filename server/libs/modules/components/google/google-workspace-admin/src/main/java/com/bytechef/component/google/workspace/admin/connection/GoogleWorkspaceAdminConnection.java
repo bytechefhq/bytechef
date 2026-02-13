@@ -18,7 +18,7 @@ package com.bytechef.component.google.workspace.admin.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -29,8 +29,8 @@ public class GoogleWorkspaceAdminConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        "", (connection, context) -> List.of(
-            "https://www.googleapis.com/auth/admin.directory.user",
-            "https://www.googleapis.com/auth/admin.directory.rolemanagement",
-            "https://www.googleapis.com/auth/apps.licensing"));
+        "", (connection, context) -> Map.of(
+            "https://www.googleapis.com/auth/admin.directory.user", true,
+            "https://www.googleapis.com/auth/admin.directory.rolemanagement", true,
+            "https://www.googleapis.com/auth/apps.licensing", true));
 }
