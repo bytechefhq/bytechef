@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Flow.Publisher;
 
 /**
  * @author Ivica Cardic
@@ -455,17 +454,17 @@ public interface ActionDefinition {
      * Functional interface that extends {@link PerformFunction} to support streaming operations that return
      * asynchronous event streams during action execution. <br/>
      * This interface is specifically designed for actions that need to stream multiple events or data chunks over time
-     * rather than returning a single result. It uses the Reactive Streams {@link Publisher} API to enable non-blocking,
-     * backpressure-aware streaming of events throughout the duration of the action execution. <br/>
-     * Implementations of this interface should return a {@link Publisher} that emits events asynchronously, allowing
-     * consumers to subscribe and receive streamed data as it becomes available. This is particularly useful for
-     * long-running operations, real-time data processing, or scenarios where results need to be delivered incrementally
-     * rather than all at once. <br/>
-     * The returned {@link Publisher} will continue to stream events for the entire duration of the action execution,
-     * completing when the action is finished or terminating with an error if the action fails.
+     * rather than returning a single result. It returns an {@link SseEmitterHandler} that bridges the action's
+     * streaming data to SSE events throughout the duration of the action execution. <br/>
+     * Implementations of this interface should return an {@link SseEmitterHandler} that bridges the action's streaming
+     * data to SSE events, allowing consumers to receive streamed data as it becomes available. This is particularly
+     * useful for long-running operations, real-time data processing, or scenarios where results need to be delivered
+     * incrementally rather than all at once. <br/>
+     * The returned {@link SseEmitterHandler} will continue to stream events for the entire duration of the action
+     * execution, completing when the action is finished or terminating with an error if the action fails.
      *
      * @see PerformFunction
-     * @see Publisher
+     * @see SseEmitterHandler
      * @see ActionContext
      * @see Parameters
      */
@@ -473,12 +472,11 @@ public interface ActionDefinition {
     interface StreamPerformFunction extends PerformFunction {
 
         /**
-         * Applies the streaming perform function to execute an action and returns a Publisher that streams events.
-         * <br/>
+         * Applies the streaming perform function to execute an action and returns an {@link SseEmitterHandler} used to
+         * stream events. <br/>
          * This method executes the action with the provided input and connection parameters within the given context,
-         * returning a Publisher that asynchronously emits events throughout the duration of the action execution. The
-         * Publisher enables non-blocking, backpressure-aware streaming of results, allowing consumers to receive data
-         * incrementally as it becomes available rather than waiting for a single complete result.
+         * returning an {@link SseEmitterHandler} that bridges the action's streaming data to SSE events sent to
+         * clients.
          *
          * @param inputParameters      the input parameters for the action execution, containing the data required to
          *                             perform the action
@@ -486,11 +484,10 @@ public interface ActionDefinition {
          *                             required to connect to external services
          * @param context              the action execution context providing access to runtime environment,
          *                             configuration, and utility services
-         * @return a Publisher that emits events asynchronously during action execution, completing when the action
-         *         finishes or terminating with an error if the action fails
+         * @return the {@link SseEmitterHandler} that will stream events for the duration of this action
          * @throws Exception if an error occurs during action execution or setup
          */
-        Publisher<?> apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        SseEmitterHandler apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
 

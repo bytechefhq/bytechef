@@ -18,10 +18,10 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import java.util.Map;
-import java.util.concurrent.Flow.Publisher;
 
 /**
  * @author Ivica Cardic
@@ -30,16 +30,16 @@ import java.util.concurrent.Flow.Publisher;
 public interface MultipleConnectionsStreamPerformFunction extends ActionDefinition.BasePerformFunction {
 
     /**
-     * Execute the action and return an {@link Publisher} used to stream events.
+     * Execute the action and return an {@link SseEmitterHandler} used to stream events.
      *
      * @param inputParameters      the input parameters for the action
      * @param componentConnections the parameters related to the connections
      * @param extensions           the parameters related to the extensions
      * @param context              the context in which the action is executed
-     * @return the {@link Publisher} that will stream events for the duration of this action
+     * @return the {@link SseEmitterHandler} that will stream events for the duration of this action
      * @throws Exception if an error occurs during the execution of the action
      */
-    Publisher<?> apply(
+    SseEmitterHandler apply(
         Parameters inputParameters, Map<String, ComponentConnection> componentConnections, Parameters extensions,
         ActionContext context) throws Exception;
 }
