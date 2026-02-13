@@ -1,0 +1,57 @@
+### How to find the Site ID
+
+The Site ID is a unique value that can be found in the Webflow UI or via the API.
+
+- **Method 1: Via API**
+
+Use the `GET /sites` endpoint to retrieve a list of all sites and their IDs.
+
+- **Method 2: In the Webflow UI**
+
+1. Go to your dashboard and open the site that you want to use.
+2. On the top of left bar click menu and select **Site settings**.
+3. Scroll down to **Overview** and there is your Site ID.
+
+### How to find the Order ID
+
+The Order ID is a site-scoped identifier for an order that can be found in the Webflow UI or via the API.
+
+- **Method 1: Via API**
+
+Use the `GET /sites/SITE_ID/orders` endpoint. List orders within a site to retrieve their IDs.
+
+- **Method 2: In the Webflow UI**
+
+1. Go to your dashboard and click **Ecommerce**.
+2. Click **Orders** and choose a specific order.
+
+### How to find the Collection ID
+
+The Collection ID is a site-scoped identifier for a collection that can be found in the Webflow UI or via the API.
+
+- **Method 1: Via API**
+
+Use the `GET /sites/SITE_ID/collections` endpoint. List collections within a site to retrieve their IDs.
+
+- **Method 2: In the Webflow UI**
+
+1. Go to your dashboard and open the site that you want to use.
+2. On the top bar click **CMS**.
+3. On the left bar find the collection that you want to use and click **Settings**.
+4. Under **Collection Settings** you will find Collection ID.
+
+### How to find the Item ID
+
+The Item ID is a collection-scoped identifier for an item that can be found in the Webflow UI or via the API.
+
+- **Method 1: Via API**
+
+Use the `GET /collections/COLLECTION_ID/items` endpoint. List items within a collection to retrieve their IDs.
+
+- **Method 2: In the Webflow UI**
+
+1. Go to your dashboard and open the site that you want to use.
+2. On the top bar click **CMS**.
+3. On the left bar click on the collection that you want to use.
+4. You will find list of items and click on the one that you want to use.
+5. Under **Item details** you will find Item ID.
