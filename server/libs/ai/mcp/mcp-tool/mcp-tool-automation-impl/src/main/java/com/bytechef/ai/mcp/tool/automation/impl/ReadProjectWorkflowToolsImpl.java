@@ -17,7 +17,6 @@
 package com.bytechef.ai.mcp.tool.automation.impl;
 
 import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
-import com.bytechef.ai.mcp.tool.automation.api.ReadProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowInfo;
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowValidationResult;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
@@ -35,7 +34,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnAiEnabled
-public class ReadProjectWorkflowToolsImpl implements ReadProjectWorkflowTools {
+public class ReadProjectWorkflowToolsImpl {
 
     private final ProjectWorkflowTools delegate;
 
@@ -44,7 +43,6 @@ public class ReadProjectWorkflowToolsImpl implements ReadProjectWorkflowTools {
         this.delegate = projectTools;
     }
 
-    @Override
     @Tool(
         description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
     public WorkflowInfo getWorkflow(
@@ -52,13 +50,11 @@ public class ReadProjectWorkflowToolsImpl implements ReadProjectWorkflowTools {
         return delegate.getWorkflow(workflowId);
     }
 
-    @Override
     @Tool(description = "Instructions for building workflows")
     public String getWorkflowBuildInstructions() {
         return delegate.getWorkflowBuildInstructions();
     }
 
-    @Override
     @Tool(
         description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description")
     public List<WorkflowInfo> listWorkflows(
@@ -66,7 +62,6 @@ public class ReadProjectWorkflowToolsImpl implements ReadProjectWorkflowTools {
         return delegate.listWorkflows(projectId);
     }
 
-    @Override
     @Tool(
         description = "Full-text search across workflows in projects. Returns a list of workflows matching the search query in name or description.")
     public List<WorkflowInfo> searchWorkflows(
@@ -75,7 +70,6 @@ public class ReadProjectWorkflowToolsImpl implements ReadProjectWorkflowTools {
         return delegate.searchWorkflows(query, projectId);
     }
 
-    @Override
     @Tool(
         description = "Validate a workflow configuration by checking its structure, properties and outputs against the task definitions. Returns validation results with any errors found")
     public WorkflowValidationResult validateWorkflow(

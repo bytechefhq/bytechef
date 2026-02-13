@@ -63,8 +63,8 @@ public class FirecrawlTools {
     }
 
     @Tool(
-        description = "Search the web using Firecrawl. Returns web search results with optional scraping of result pages. Use this to find information across the web.")
-    public FirecrawlSearchResult firecrawlSearch(
+        description = "Search the web. Returns web search results with optional scraping of result pages. Use this to find information across the web.")
+    public FirecrawlSearchResult webSearch(
         @ToolParam(description = "The search query (max 400 characters, 50 words)") String query,
         @ToolParam(required = false, description = "Number of results to return (1-100, default 5)") Integer limit,
         @ToolParam(
@@ -122,8 +122,8 @@ public class FirecrawlTools {
     }
 
     @Tool(
-        description = "Scrape a single URL and extract its content using Firecrawl. Returns the page content in markdown format. Use this to extract detailed information from a specific webpage.")
-    public FirecrawlScrapeResult firecrawlScrape(
+        description = "Scrape a single URL and extract its content. Returns the page content in markdown format. Use this to extract detailed information from a specific webpage.")
+    public FirecrawlScrapeResult webpageScrape(
         @ToolParam(description = "The URL to scrape") String url,
         @ToolParam(
             required = false,
