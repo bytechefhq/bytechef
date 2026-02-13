@@ -211,42 +211,16 @@ public class FirecrawlSearchAction {
         Map<String, Object> body = new HashMap<>();
 
         body.put(QUERY, inputParameters.getRequiredString(QUERY));
+        body.put(LIMIT, inputParameters.getInteger(LIMIT));
+        body.put(SOURCES, inputParameters.getList(SOURCES));
+        body.put(CATEGORIES, inputParameters.getList(CATEGORIES));
+        body.put(TBS, inputParameters.getString(TBS));
+        body.put(LOCATION, inputParameters.getString(LOCATION));
+        body.put(COUNTRY, inputParameters.getString(COUNTRY));
+        body.put(TIMEOUT, inputParameters.getInteger(TIMEOUT));
+        body.put(IGNORE_INVALID_URLS, inputParameters.getBoolean(IGNORE_INVALID_URLS));
+        body.put(SCRAPE_OPTIONS, inputParameters.get(SCRAPE_OPTIONS));
 
-        if (inputParameters.containsKey(LIMIT)) {
-            body.put(LIMIT, inputParameters.getInteger(LIMIT));
-        }
-
-        if (inputParameters.containsKey(SOURCES)) {
-            body.put(SOURCES, inputParameters.getList(SOURCES));
-        }
-
-        if (inputParameters.containsKey(CATEGORIES)) {
-            body.put(CATEGORIES, inputParameters.getList(CATEGORIES));
-        }
-
-        if (inputParameters.containsKey(TBS)) {
-            body.put(TBS, inputParameters.getString(TBS));
-        }
-
-        if (inputParameters.containsKey(LOCATION)) {
-            body.put(LOCATION, inputParameters.getString(LOCATION));
-        }
-
-        if (inputParameters.containsKey(COUNTRY)) {
-            body.put(COUNTRY, inputParameters.getString(COUNTRY));
-        }
-
-        if (inputParameters.containsKey(TIMEOUT)) {
-            body.put(TIMEOUT, inputParameters.getInteger(TIMEOUT));
-        }
-
-        if (inputParameters.containsKey(IGNORE_INVALID_URLS)) {
-            body.put(IGNORE_INVALID_URLS, inputParameters.getBoolean(IGNORE_INVALID_URLS));
-        }
-
-        if (inputParameters.containsKey(SCRAPE_OPTIONS)) {
-            body.put(SCRAPE_OPTIONS, inputParameters.get(SCRAPE_OPTIONS));
-        }
         return body;
     }
 
