@@ -39,6 +39,7 @@ public class BinanceFetchPairPriceAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("fetchPairPrice")
         .title("Fetch Pair Price")
         .description("Fetch the price of a crypto pair from Binance.")
+        .help("", "https://docs.bytechef.io/reference/components/binance_v1#fetch-pair-price")
         .properties(
             string(SYMBOL)
                 .label("Symbol")
