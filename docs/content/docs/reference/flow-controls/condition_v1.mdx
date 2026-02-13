@@ -1,13 +1,11 @@
 ---
-title: "Condition"
-description: "Directs a stream based on true/false results of comparisons."
+description: "Condition flow control. Direct workflow based on true/false results. Learn how to implement this in your ByteChef workflows."
+title: Condition
 ---
 
+The Condition flow control evaluates logical expressions and routes workflow execution to one of two paths: true or false. It's perfect for binary decisions like threshold checks, validation, or simple yes/no logic.
 
-
-Type: condition/v1
-
-<hr />
+**Type**: `condition/v1`
 
 
 ## Properties
@@ -18,7 +16,113 @@ Type: condition/v1
 | conditions | OR Conditions | ARRAY <details> <summary> Items </summary> [[&#123;STRING\(type), BOOLEAN\(value1), STRING\(operation), BOOLEAN\(value2)&#125;\($boolean), &#123;STRING\(type), DATE_TIME\(value1), STRING\(operation), DATE_TIME\(value2)&#125;\($dateTime), &#123;STRING\(type), NUMBER\(value1), STRING\(operation), NUMBER\(value2)&#125;\($number), &#123;STRING\(type), STRING\(value1), STRING\(operation), STRING\(value2), STRING\(value2)&#125;\($string)]] </details> | OR Condition array that contains AND Condition arrays | false |
 | expression | Expression | STRING | The raw expression. | true |
 
+## Usage
 
+To use the Condition flow control, follow these steps in the workflow UI editor:
 
+### Step 1: Add Condition to Your Workflow
+1. Select the **Condition** component from the **Flows** component panel
+2. The condition will create two paths: **True** and **False**
 
+### Step 2: Choose Expression Type
 
+Before moving forward, refer to this guide to learn more about [expressions](/reference/expressions). In the guide, you'll learn everything you need to know about the available operations and examples. 
+
+The **Raw Expression** toggle determines how you define your condition:
+#### If Raw Expression is **TRUE** (enabled):
+You write a direct expression in the **Expression** field:
+- Example: `${order_1.total} > 1000` (Ensure data expressions like `{order_1.total}` are referenced from the data pills)
+- Example: `${user_1.verified} == true && ${user_1.age} >= 18`
+
+Note that when working with certain expressions, you may need to refer to the data pills available in the workflow context. Data pills may be based on data generated from components or triggers or from a manually configured source in a component.
+
+#### If Raw Expression is **FALSE**:
+You use the visual condition builder with **OR Conditions** that contain **AND Condition** arrays:
+
+1. Click **Add OR Condition** to create a new OR group
+2. Within each OR group, click **Add AND Condition** to add conditions
+3. Select expression type for each condition:
+   - **Boolean Expression** - True/false comparisons
+   - **Date Time Expression** - Date/time comparisons
+   - **Number Expression** - Numeric comparisons
+   - **String Expression** - Text comparisons
+
+### Step 3: Configure Your Condition
+
+**Using Raw Expression (Raw Expression = TRUE):**
+```
+Example Expression: ${order_1.total} > 1000 && ${order_1.status} == "pending"
+```
+
+**Using Condition Builder (Raw Expression = FALSE):**
+
+**For Number Expression:**
+1. Select **Number Expression** as type
+2. **Value 1**:  Select the number value to compare with the second one.
+3. **Operation**: Select the operation type. In ByteChef,we have different operation types such as:
+   - Greater
+   - Less
+   - Equal to
+   - Not equals
+   - Greater or equals
+   - Less or equals
+   - Empty
+
+**For String Expression:**
+1. Select **String Expression** as type
+2. **Value 1**: Could be any string value based on an expression. For example:`${user_1.email}` - this is the string value to compare with the second one.
+3. **Operation**: Select operation to decide how to compare the values. In ByteChef, we have different operation types such as:
+   - Contains
+   - Starts with
+   - Ends with
+   - Equals
+   - Not equals
+   - Regex
+   - Not Contains
+   - Equals ignore case
+
+**For Boolean Expression:**
+1. Select **Boolean Expression** as type
+2. **Value 1**: Select `true` or `false` depending on your requirement
+3. **Operation**: Select `equals` or `not equals`
+4. **Value 2**: Also slect `true` or `false` based on the operation you selected
+
+**For Date & Time Expression:**
+1. Select **Date & Time Expression** as type
+2. **Value 1**: Select the date/time value to compare with the second one
+3. **Operation**: Select comparison operation where you want to map the data
+4. **Value 2**: Select the date/time value to compare with the first one
+
+### Step 4: Build True and False Paths
+1. Add components to the **True** path for when condition evaluates to true
+2. Add components to the **False** path for when it evaluates to false
+
+You can refer to this [json file](https://www.npoint.io/docs/73d362abb3b155274638) to see the Condition flow control in action.
+
+## Available Operations
+
+### String Operations
+- `equals` - Exact match
+- `not equals` - Not equal to
+- `equals ignore case` - Case-insensitive match
+- `regex` - Regular expression match
+- `contains` - Value 1 includes Value 2
+- `not contains` - Value 1 doesn't include Value 2
+- `starts with` - Value 1 begins with Value 2
+- `ends with` - Value 1 ends with Value 2
+
+### Number Operations
+- `equals` - Exactly equal
+- `not equals` - Not equal
+- `greater than` - Value 1 > Value 2
+- `less than` - Value 1 < Value 2
+- `greater than or equal` - Value 1 \>= Value 2
+- `less than or equal` - Value 1 \<= Value 2
+
+### Boolean Operations
+- `equals` - Value equals specified boolean
+- `not equals` - Value does not equal specified boolean
+
+### Date Time Operations
+- `after` - Value 1 is after Value 2
+- `before` - Value 1 is before Value 2
