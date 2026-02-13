@@ -49,7 +49,6 @@ public class FirecrawlTools {
     private static final String FIRECRAWL_API_URL = "https://api.firecrawl.dev/v2";
 
     private final RestClient restClient;
-    private final String apiKey;
 
     public FirecrawlTools(
         RestClient.Builder restClientBuilder,
@@ -59,7 +58,6 @@ public class FirecrawlTools {
             .baseUrl(FIRECRAWL_API_URL)
             .defaultHeader("Authorization", "Bearer " + apiKey)
             .build();
-        this.apiKey = apiKey;
     }
 
     @Tool(
@@ -77,6 +75,7 @@ public class FirecrawlTools {
             }
 
             Map<String, Object> requestBody = new HashMap<>();
+
             requestBody.put("query", query);
 
             if (limit != null) {
@@ -94,8 +93,13 @@ public class FirecrawlTools {
                 .retrieve()
                 .body(FirecrawlSearchResponse.class);
 
-            if (response == null || response.data() == null || response.data()
-                .web() == null) {
+            if (response == null) {
+                return new FirecrawlSearchResult(query, List.of());
+            }
+
+            SearchData data = response.data();
+
+            if (data == null || data.web() == null) {
                 return new FirecrawlSearchResult(query, List.of());
             }
 
@@ -135,6 +139,7 @@ public class FirecrawlTools {
             }
 
             Map<String, Object> requestBody = new HashMap<>();
+
             requestBody.put("url", url);
             requestBody.put("formats", List.of("markdown"));
 
@@ -155,23 +160,18 @@ public class FirecrawlTools {
 
             ScrapeData data = response.data();
             String markdown = data.markdown() != null ? data.markdown() : "";
-            String title = data.metadata() != null && data.metadata()
-                .title() != null
-                    ? data.metadata()
-                        .title()
-                    : null;
-            String description = data.metadata() != null && data.metadata()
-                .description() != null
-                    ? data.metadata()
-                        .description()
-                    : null;
+
+            ScrapeMetadata metadata = data.metadata();
+
+            String title = metadata != null && metadata.title() != null ? metadata.title() : null;
+
+            String description = metadata != null && metadata.description() != null ? metadata.description() : null;
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Successfully scraped URL: {}, content length: {}", url, markdown.length());
             }
 
             return new FirecrawlScrapeResult(url, markdown, title, description);
-
         } catch (Exception e) {
             logger.error("Failed to scrape URL with Firecrawl: {}", url, e);
 
@@ -202,6 +202,7 @@ public class FirecrawlTools {
             }
 
             Map<String, Object> requestBody = new HashMap<>();
+
             requestBody.put("url", url);
 
             if (search != null) {

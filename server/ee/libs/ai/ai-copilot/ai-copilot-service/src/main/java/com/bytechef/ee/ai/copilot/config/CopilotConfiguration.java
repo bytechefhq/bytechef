@@ -23,6 +23,7 @@ import com.bytechef.config.ApplicationProperties.Ai.OpenAi;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.model.SafeAnthropicChatModel;
+import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.github.mizosoft.methanol.Methanol;
@@ -224,7 +225,7 @@ public class CopilotConfiguration {
         WorkflowNodeOutputFacade workflowNodeOutputFacade, QuestionAnswerAdvisor questionAnswerAdvisor)
         throws AGUIException {
 
-        String name = Source.WORKFLOW_EDITOR_ASK.name();
+        String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.ASK.name();
 
         return WorkflowEditorSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -247,7 +248,7 @@ public class CopilotConfiguration {
         WorkflowNodeOutputFacade workflowNodeOutputFacade)
         throws AGUIException {
 
-        String name = Source.WORKFLOW_EDITOR_BUILD.name();
+        String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name();
 
         return WorkflowEditorSpringAIAgent.builder()
             .agentId(name.toLowerCase())
