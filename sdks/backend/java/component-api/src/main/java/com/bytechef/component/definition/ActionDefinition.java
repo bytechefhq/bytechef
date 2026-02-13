@@ -506,7 +506,7 @@ public interface ActionDefinition {
          * @param connectionParameters the parameters related to the connection
          * @param context              the context in which the action is executed
          * @return the {@link SseEmitterHandler} that will stream events for the duration of this action
-         * @throws Exception if an error occurs during the execution of the action
+         * @throws Exception if an error occurs during action execution or setup
          */
         SseEmitterHandler apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
