@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Fetch top stories from Hacker News.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hacker-news_v1#fetch-top-stories"
+    },
     "metadata": null,
     "name": "fetchTopStories",
     "outputDefinition": {
@@ -1077,9 +1080,12 @@
     "label": "Social Media"
   } ],
   "connection": null,
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Hacker News is a social news website focused on computer science, startups, and technology-related topics.",
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://github.com/HackerNews/API"
+  },
+  "description": "Hacker News is a social news website focused on computer science, startups and technology-related topics.",
   "icon": "path:assets/hacker-news.svg",
   "metadata": null,
   "name": "hackerNews",
