@@ -31,6 +31,10 @@ public class AccountErrorType extends AbstractErrorType {
     public static final AccountErrorType SIGN_UP_DISABLED = new AccountErrorType(102, HttpStatus.BAD_REQUEST);
     public static final AccountErrorType PROVIDER_UNLINK_NOT_ALLOWED = new AccountErrorType(
         103, HttpStatus.BAD_REQUEST);
+    public static final AccountErrorType INVALID_TOTP_CODE = new AccountErrorType(104, HttpStatus.BAD_REQUEST);
+    public static final AccountErrorType INVALID_PASSWORD = new AccountErrorType(105, HttpStatus.BAD_REQUEST);
+    public static final AccountErrorType QR_CODE_GENERATION_FAILED = new AccountErrorType(
+        106, HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final HttpStatus status;
 

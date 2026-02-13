@@ -275,9 +275,10 @@ public class AccountController {
                     Base64.getEncoder()
                         .encodeToString(imageData);
 
-            return new MfaSetupResponse(secret, qrCodeDataUrl);
+            return new MfaSetupResponse(qrCodeDataUrl, secret);
         } catch (Exception exception) {
-            throw new AccountResourceException("Failed to generate QR code", AccountErrorType.USER_NOT_FOUND);
+            throw new AccountResourceException(
+                "Failed to generate QR code", AccountErrorType.QR_CODE_GENERATION_FAILED);
         }
     }
 
@@ -291,7 +292,7 @@ public class AccountController {
         boolean valid = userService.verifyTotpCode(user.getLogin(), mfaVerifyRequest.code());
 
         if (!valid) {
-            throw new AccountResourceException("Invalid TOTP code", AccountErrorType.USER_NOT_FOUND);
+            throw new AccountResourceException("Invalid TOTP code", AccountErrorType.INVALID_TOTP_CODE);
         }
 
         userService.enableTotp(user.getLogin());
@@ -305,13 +306,13 @@ public class AccountController {
                 "User could not be found", AccountErrorType.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(mfaDisableRequest.password(), user.getPassword())) {
-            throw new AccountResourceException("Invalid password", AccountErrorType.USER_NOT_FOUND);
+            throw new AccountResourceException("Invalid password", AccountErrorType.INVALID_PASSWORD);
         }
 
         boolean valid = userService.verifyTotpCode(user.getLogin(), mfaDisableRequest.code());
 
         if (!valid) {
-            throw new AccountResourceException("Invalid TOTP code", AccountErrorType.USER_NOT_FOUND);
+            throw new AccountResourceException("Invalid TOTP code", AccountErrorType.INVALID_TOTP_CODE);
         }
 
         userService.disableTotp(user.getLogin());

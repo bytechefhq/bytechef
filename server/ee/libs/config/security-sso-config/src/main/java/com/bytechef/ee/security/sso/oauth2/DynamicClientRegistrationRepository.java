@@ -42,7 +42,7 @@ public class DynamicClientRegistrationRepository implements ClientRegistrationRe
     private final IdentityProviderService identityProviderService;
     private final InMemoryClientRegistrationRepository staticRegistrations;
 
-    @SuppressFBWarnings("EI")
+    @SuppressFBWarnings({"CT_CONSTRUCTOR_THROW", "EI"})
     public DynamicClientRegistrationRepository(
         ObjectProvider<InMemoryClientRegistrationRepository> staticRegistrationsProvider,
         IdentityProviderService identityProviderService) {
