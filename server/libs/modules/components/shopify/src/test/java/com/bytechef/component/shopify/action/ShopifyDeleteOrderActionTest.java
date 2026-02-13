@@ -43,8 +43,7 @@ class ShopifyDeleteOrderActionTest extends AbstractShopifyActionTest {
                 stringArgumentCaptor.capture()))
             .thenReturn(Map.of());
 
-        Object result = ShopifyDeleteOrderAction.perform(
-            mockedParameters, null, mockedContext);
+        Object result = ShopifyDeleteOrderAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
 
@@ -60,10 +59,8 @@ class ShopifyDeleteOrderActionTest extends AbstractShopifyActionTest {
               }
             }""";
 
-        Map<String, Object> expectedVariables = Map.of(ORDER_ID, "testOrderId");
-
         assertEquals(List.of(expectedQuery, "orderDelete"), stringArgumentCaptor.getAllValues());
-        assertEquals(expectedVariables, mapArgumentCaptor.getValue());
+        assertEquals(Map.of(ORDER_ID, "testOrderId"), mapArgumentCaptor.getValue());
         assertEquals(mockedContext, contextArgumentCaptor.getValue());
     }
 }

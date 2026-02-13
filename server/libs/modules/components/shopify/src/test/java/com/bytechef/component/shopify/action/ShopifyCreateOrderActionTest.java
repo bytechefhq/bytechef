@@ -55,8 +55,7 @@ class ShopifyCreateOrderActionTest extends AbstractShopifyActionTest {
                 contextArgumentCaptor.capture(), listArgumentCaptor.capture()))
             .thenReturn(List.of(Map.of(VARIANT_ID, "variantId", QUANTITY, 2)));
 
-        Object result = ShopifyCreateOrderAction.perform(
-            mockedParameters, null, mockedContext);
+        Object result = ShopifyCreateOrderAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
 
@@ -83,14 +82,12 @@ class ShopifyCreateOrderActionTest extends AbstractShopifyActionTest {
               }
             }""";
 
-        List<Object> expectedList = List.of(Map.of(PRODUCT_ID, "productId", QUANTITY, 2));
-
         Map<String, Object> expectedVariables = Map.of(
             ORDER, Map.of(LINE_ITEMS, List.of(Map.of(VARIANT_ID, "variantId", QUANTITY, 2))));
 
         assertEquals(List.of(expectedQuery, "orderCreate"), stringArgumentCaptor.getAllValues());
         assertEquals(expectedVariables, mapArgumentCaptor.getValue());
-        assertEquals(expectedList, listArgumentCaptor.getValue());
+        assertEquals(List.of(Map.of(PRODUCT_ID, "productId", QUANTITY, 2)), listArgumentCaptor.getValue());
         assertEquals(List.of(mockedContext, mockedContext), contextArgumentCaptor.getAllValues());
     }
 }

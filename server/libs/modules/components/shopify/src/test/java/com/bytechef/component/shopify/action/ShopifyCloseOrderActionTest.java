@@ -45,8 +45,7 @@ class ShopifyCloseOrderActionTest extends AbstractShopifyActionTest {
                 stringArgumentCaptor.capture()))
             .thenReturn(Map.of());
 
-        Object result = ShopifyCloseOrderAction.perform(
-            mockedParameters, null, mockedContext);
+        Object result = ShopifyCloseOrderAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
 
@@ -72,10 +71,8 @@ class ShopifyCloseOrderActionTest extends AbstractShopifyActionTest {
               }
             }""";
 
-        Map<String, Object> expectedVariables = Map.of(INPUT, Map.of(ID, "testOrderId"));
-
         assertEquals(List.of(expectedQuery, "orderClose"), stringArgumentCaptor.getAllValues());
-        assertEquals(expectedVariables, mapArgumentCaptor.getValue());
+        assertEquals(Map.of(INPUT, Map.of(ID, "testOrderId")), mapArgumentCaptor.getValue());
         assertEquals(mockedContext, contextArgumentCaptor.getValue());
     }
 }
