@@ -34,11 +34,14 @@ public class HackerNewsComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("hackerNews")
         .title("Hacker News")
         .description(
-            "Hacker News is a social news website focused on computer science, startups, and technology-related topics.")
+            "Hacker News is a social news website focused on computer science, startups and technology-related topics.")
+        .customAction(true)
+        .customActionHelp("", "https://github.com/HackerNews/API")
         .icon("path:assets/hacker-news.svg")
         .categories(ComponentCategory.SOCIAL_MEDIA)
         .actions(HackerNewsFetchTopStoriesAction.ACTION_DEFINITION)
-        .clusterElements(tool(HackerNewsFetchTopStoriesAction.ACTION_DEFINITION));
+        .clusterElements(tool(HackerNewsFetchTopStoriesAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
