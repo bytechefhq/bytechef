@@ -19,7 +19,6 @@ package com.bytechef.platform.user.web.rest;
 import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.IdentityProviderService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Optional;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,22 +55,16 @@ final class SsoDiscoveryController {
             return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
         }
 
-        String domain = email.substring(email.indexOf('@') + 1)
-            .toLowerCase();
+        String domain = email.substring(email.lastIndexOf('@') + 1);
 
-        Optional<IdentityProvider> identityProvider = identityProviderService.fetchByDomain(domain);
-
-        if (identityProvider.isPresent() && identityProvider.get()
-            .isEnabled()) {
-            IdentityProvider idp = identityProvider.get();
-
-            return ResponseEntity.ok(
-                new SsoDiscoveryResponse(
-                    "/oauth2/authorization/sso-" + idp.getId(),
-                    idp.getName()));
-        }
-
-        return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
+        return identityProviderService.fetchByDomain(domain)
+            .filter(IdentityProvider::isEnabled)
+            .map(
+                identityProvider -> ResponseEntity.ok(
+                    new SsoDiscoveryResponse(
+                        "/oauth2/authorization/sso-" + identityProvider.getId(),
+                        identityProvider.getName())))
+            .orElseGet(() -> ResponseEntity.ok(new SsoDiscoveryResponse(null, null)));
     }
 
     record SsoDiscoveryRequest(String email) {

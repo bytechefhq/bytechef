@@ -53,7 +53,7 @@ public class MultiTenantSecurityConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.social-login", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
     SsoEnforcementFilter ssoEnforcementFilter(IdentityProviderService identityProviderService) {
         return new SsoEnforcementFilter(identityProviderService);
     }

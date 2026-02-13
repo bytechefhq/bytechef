@@ -45,6 +45,11 @@ public class IdentityProviderGraphQlController {
     @MutationMapping(name = "createIdentityProvider")
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public IdentityProviderDTO createIdentityProvider(@Argument IdentityProviderInput input) {
+        if (input.clientSecret() == null || input.clientSecret()
+            .isEmpty()) {
+            throw new IllegalArgumentException("clientSecret is required when creating an identity provider");
+        }
+
         IdentityProvider identityProvider = toIdentityProvider(input);
 
         return toDTO(identityProviderService.create(identityProvider));
