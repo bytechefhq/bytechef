@@ -22,7 +22,7 @@ const WorkflowNodesTabContent = ({
     selectedComponentName,
     tabValue,
 }: WorkflowNodesTabContentProps) => (
-    <ScrollArea className="overflow-y-auto px-3">
+    <ScrollArea className="overflow-y-auto px-3" id="popover-components">
         <TabsContent className="mt-0 w-full flex-1" value={tabValue}>
             <ul className="space-y-2" role="list">
                 {(!items || items.length === 0) && (
