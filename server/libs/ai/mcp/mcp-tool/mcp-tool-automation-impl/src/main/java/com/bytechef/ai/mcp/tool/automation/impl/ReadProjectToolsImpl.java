@@ -20,7 +20,6 @@ import com.bytechef.ai.mcp.tool.automation.api.ProjectDetailInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectStatusInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectTools;
-import com.bytechef.ai.mcp.tool.automation.api.ReadProjectTools;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -35,7 +34,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnAiEnabled
-public class ReadProjectToolsImpl implements ReadProjectTools {
+public class ReadProjectToolsImpl {
 
     private final ProjectTools delegate;
 
@@ -44,14 +43,12 @@ public class ReadProjectToolsImpl implements ReadProjectTools {
         this.delegate = projectTools;
     }
 
-    @Override
     @Tool(
         description = "List all projects in ByteChef. Returns a list of projects with their basic information including id, name, description, and status.")
     public List<ProjectInfo> listProjects() {
         return delegate.listProjects();
     }
 
-    @Override
     @Tool(
         description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, versions, and metadata.")
     public ProjectDetailInfo getProject(
@@ -59,7 +56,6 @@ public class ReadProjectToolsImpl implements ReadProjectTools {
         return delegate.getProject(projectId);
     }
 
-    @Override
     @Tool(
         description = "Full-text search across all projects. Returns a list of projects matching the search query in name or description.")
     public List<ProjectInfo> searchProjects(
@@ -67,7 +63,6 @@ public class ReadProjectToolsImpl implements ReadProjectTools {
         return delegate.searchProjects(query);
     }
 
-    @Override
     @Tool(
         description = "Get project deployment and execution status. Returns detailed status information including deployment environments and their states.")
     public ProjectStatusInfo getProjectStatus(

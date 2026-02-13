@@ -9,6 +9,8 @@ package com.bytechef.ee.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.bytechef.ai.mcp.tool.automation.api.ReadProjectTools;
+import com.bytechef.ai.mcp.tool.automation.api.ReadProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
 import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
@@ -71,12 +73,15 @@ public class CopilotConfiguration {
     private final String openAiChatModel;
     private final Double openAiChatTemperature;
     private final String openAiEmbeddingModel;
-    private final Resource systemPromptResource;
+    private final Resource systemPromptAskResource;
+    private final Resource systemPromptBuildResource;
+    private final State state = new State();
 
     @SuppressFBWarnings("EI")
     public CopilotConfiguration(
         ApplicationProperties applicationProperties,
-        @Value("classpath:system_prompt.txt") Resource systemPromptResource) {
+        @Value("classpath:system_prompt_ask.txt") Resource systemPromptAskResource,
+        @Value("classpath:system_prompt_build.txt") Resource systemPromptBuildResource) {
 
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
@@ -111,7 +116,8 @@ public class CopilotConfiguration {
 
         this.openAiEmbeddingModel = openAiEmbeddingOptions.getModel();
 
-        this.systemPromptResource = systemPromptResource;
+        this.systemPromptAskResource = systemPromptAskResource;
+        this.systemPromptBuildResource = systemPromptBuildResource;
     }
 
     @Bean
@@ -203,22 +209,44 @@ public class CopilotConfiguration {
     }
 
     @Bean
-    WorkflowEditorSpringAIAgent workflowEditorSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectTools,
-        ProjectWorkflowToolsImpl projectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
+    WorkflowEditorSpringAIAgent workflowEditorAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
         FirecrawlTools firecrawlTools, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade)
         throws AGUIException {
 
-        String name = Source.WORKFLOW_EDITOR.name();
+        String name = Source.WORKFLOW_EDITOR_ASK.name();
 
         return WorkflowEditorSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
-            .systemMessage(getSystemPrompt(systemPromptResource))
-            .state(new State())
-            .tools(List.of(projectTools, projectWorkflowTools, componentTools, taskTools, firecrawlTools))
+            .systemMessage(getSystemPrompt(systemPromptAskResource))
+            .state(state)
+            .tools(List.of(readProjectTools, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools))
+            .workflowService(workflowService)
+            .workflowNodeOutputFacade(workflowNodeOutputFacade)
+            .build();
+    }
+
+    @Bean
+    WorkflowEditorSpringAIAgent workflowEditorBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectTools,
+        ProjectWorkflowToolsImpl projectWorkflowTools, ComponentTools componentTools,
+        TaskTools taskTools, WorkflowService workflowService,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade)
+        throws AGUIException {
+
+        String name = Source.WORKFLOW_EDITOR_BUILD.name();
+
+        return WorkflowEditorSpringAIAgent.builder()
+            .agentId(name.toLowerCase())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(systemPromptBuildResource))
+            .state(state)
+            .tools(List.of(projectTools, projectWorkflowTools, componentTools, taskTools))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .build();
