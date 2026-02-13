@@ -610,13 +610,14 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, Boolean> getDefaultScopes(Parameters connectionParameters) {
         Object scopes = MapUtils.get(connectionParameters, Authorization.SCOPES);
 
         return switch (scopes) {
             case null -> Collections.emptyMap();
-            case Map<?, ?> map -> (Map<String, Boolean>) scopes;
-            case List<?> objects -> ((List<String>) scopes).stream()
+            case Map<?, ?> map -> (Map<String, Boolean>) map;
+            case List<?> objects -> ((List<String>) objects).stream()
                 .collect(Collectors.toMap(scope -> scope, scope -> true));
             default -> Arrays.stream(((String) scopes).split(","))
                 .filter(Objects::nonNull)
