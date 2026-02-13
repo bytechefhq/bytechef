@@ -230,21 +230,6 @@ public class FirecrawlScrapeAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, Object> body = getObjectMap(inputParameters);
-
-        return context
-            .http(http -> http.post("/scrape"))
-            .body(Context.Http.Body.of(body))
-            .configuration(Context.Http.responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-    }
-
-    private static Map<String, Object> getObjectMap(Parameters inputParameters) {
-        Map<String, Object> body = new HashMap<>();
-
-        body.put(URL, inputParameters.getRequiredString(URL));
-
         List<?> formatsList = inputParameters.getList(FORMATS);
         Map<String, Object> formatMap = new HashMap<>();
         for (Object format : formatsList) {
@@ -256,26 +241,31 @@ public class FirecrawlScrapeAction {
             }
             formatMap.put(format.toString(), jsonSchemaMap);
         }
-        body.put(FORMATS, formatMap);
 
-        body.put(ONLY_MAIN_CONTENT, inputParameters.getBoolean(ONLY_MAIN_CONTENT));
-        body.put(INCLUDE_TAGS, inputParameters.getList(INCLUDE_TAGS));
-        body.put(EXCLUDE_TAGS, inputParameters.getList(EXCLUDE_TAGS));
-        body.put(MAX_AGE, inputParameters.getInteger(MAX_AGE));
-        body.put(HEADERS, inputParameters.get(HEADERS));
-        body.put(WAIT_FOR, inputParameters.getInteger(WAIT_FOR));
-        body.put(MOBILE, inputParameters.getBoolean(MOBILE));
-        body.put(SKIP_TLS_VERIFICATION, inputParameters.getBoolean(SKIP_TLS_VERIFICATION));
-        body.put(TIMEOUT, inputParameters.getInteger(TIMEOUT));
-        body.put(REMOVE_BASE64_IMAGES, inputParameters.getBoolean(REMOVE_BASE64_IMAGES));
-        body.put(BLOCK_ADS, inputParameters.getBoolean(BLOCK_ADS));
-        body.put(PROXY, inputParameters.getString(PROXY));
-        body.put(LOCATION, inputParameters.get(LOCATION));
-        body.put(PARSERS, inputParameters.getList(PARSERS));
-        body.put(STORE_IN_CACHE, inputParameters.getBoolean(STORE_IN_CACHE));
-        body.put(ZERO_DATA_RETENTION, inputParameters.getBoolean(ZERO_DATA_RETENTION));
-
-        return body;
+        return context
+            .http(http -> http.post("/scrape"))
+            .body(Context.Http.Body.of(
+                URL, inputParameters.getRequiredString(URL),
+                FORMATS, formatMap,
+                ONLY_MAIN_CONTENT, inputParameters.getBoolean(ONLY_MAIN_CONTENT),
+                INCLUDE_TAGS, inputParameters.getList(INCLUDE_TAGS),
+                EXCLUDE_TAGS, inputParameters.getList(EXCLUDE_TAGS),
+                MAX_AGE, inputParameters.getInteger(MAX_AGE),
+                HEADERS, inputParameters.get(HEADERS),
+                WAIT_FOR, inputParameters.getInteger(WAIT_FOR),
+                MOBILE, inputParameters.getBoolean(MOBILE),
+                SKIP_TLS_VERIFICATION, inputParameters.getBoolean(SKIP_TLS_VERIFICATION),
+                TIMEOUT, inputParameters.getInteger(TIMEOUT),
+                REMOVE_BASE64_IMAGES, inputParameters.getBoolean(REMOVE_BASE64_IMAGES),
+                BLOCK_ADS, inputParameters.getBoolean(BLOCK_ADS),
+                PROXY, inputParameters.getString(PROXY),
+                LOCATION, inputParameters.get(LOCATION),
+                PARSERS, inputParameters.getList(PARSERS),
+                STORE_IN_CACHE, inputParameters.getBoolean(STORE_IN_CACHE),
+                ZERO_DATA_RETENTION, inputParameters.getBoolean(ZERO_DATA_RETENTION)))
+            .configuration(Context.Http.responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 
     private static List<Option<String>> getFormatOptions() {
