@@ -85,7 +85,7 @@ class JiraOptionsUtilsTest {
         try (MockedStatic<JiraUtils> jiraUtilsMockedStatic = mockStatic(JiraUtils.class)) {
             jiraUtilsMockedStatic
                 .when(() -> JiraUtils.getProjectName(
-                    parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture(),
+                    parametersArgumentCaptor.capture(),
                     contextArgumentCaptor.capture()))
                 .thenReturn("PROJECT");
 
@@ -93,7 +93,7 @@ class JiraOptionsUtilsTest {
                 mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
             assertEquals(expectedOptions, result);
-            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals(List.of("/search/jql"), stringArgumentCaptor.getAllValues());
 

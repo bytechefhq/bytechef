@@ -32,10 +32,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -53,24 +54,23 @@ import org.mockito.ArgumentCaptor;
 class JiraUtilsTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
-    private final ArgumentCaptor<Http.Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(Http.Configuration.ConfigurationBuilder.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
     @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<Context.ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(Context.ContextFunction.class);
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http mockedHttp = mock(Http.class);
     private Parameters mockedParameters;
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final TriggerDefinition.WebhookBody mockedWebhookBody = mock(TriggerDefinition.WebhookBody.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testGetProjectName(
         Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<Context.ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<Http.Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         mockedParameters = MockParametersFactory.create(Map.of(PROJECT, "1"));
         Map<String, Object> valuesMap = Map.of(NAME, "name");
@@ -80,15 +80,15 @@ class JiraUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(valuesMap);
 
-        Object result = JiraUtils.getProjectName(mockedParameters, null, mockedContext);
+        Object result = JiraUtils.getProjectName(mockedParameters, mockedContext);
 
         assertEquals("name", result);
 
-        Context.ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
         Http.Configuration configuration = configurationBuilder.build();
 
@@ -104,7 +104,7 @@ class JiraUtilsTest {
 
         when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
-                Context.ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
 
                 return value.apply(mockedHttp);
             });
@@ -123,11 +123,11 @@ class JiraUtilsTest {
 
         assertEquals(123, result);
 
-        Context.ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
         Http.Configuration configuration = configurationBuilder.build();
 
@@ -155,7 +155,7 @@ class JiraUtilsTest {
 
         when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
-                Context.ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
 
                 return value.apply(mockedHttp);
             });
@@ -170,11 +170,11 @@ class JiraUtilsTest {
 
         JiraUtils.unsubscribeWebhook(mockedParameters, mockedTriggerContext);
 
-        Context.ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
         Http.Configuration configuration = configurationBuilder.build();
 

@@ -57,9 +57,7 @@ public class JiraUtils {
         }
     }
 
-    public static String getProjectName(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String getProjectName(Parameters inputParameters, Context context) {
         Map<String, Object> body = context
             .http(http -> http.get("/project/" + inputParameters.getRequiredString(PROJECT)))
             .configuration(Http.responseType(Http.ResponseType.JSON))

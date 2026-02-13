@@ -38,7 +38,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.jira.util.JiraOptionsUtils;
 import com.bytechef.component.jira.util.JiraUtils;
 import java.util.HashMap;
@@ -107,12 +106,11 @@ public class JiraCreateIssueAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.post("/issue"))
+        return context.http(http -> http.post("/issue"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(FIELDS, getIssueFieldsMap(inputParameters)))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 
     private static Map<String, Object> getIssueFieldsMap(Parameters inputParameters) {
