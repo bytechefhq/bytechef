@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.tenant.multi.security.web.authentication;
+package com.bytechef.ee.security.sso.oauth2;
 
 import com.bytechef.security.web.oauth2.CustomOAuth2User;
 import com.bytechef.tenant.constant.TenantConstants;
@@ -26,13 +26,13 @@ import org.springframework.security.web.authentication.RememberMeServices;
  *
  * @author Ivica Cardic
  */
-public class MultiTenantOAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class SsoOAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final RememberMeServices rememberMeServices;
     private final TenantService tenantService;
 
     @SuppressFBWarnings("EI")
-    public MultiTenantOAuth2AuthenticationSuccessHandler(
+    public SsoOAuth2AuthenticationSuccessHandler(
         RememberMeServices rememberMeServices, TenantService tenantService) {
 
         this.rememberMeServices = rememberMeServices;

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.tenant.multi.security.web.authentication;
+package com.bytechef.ee.security.sso.oauth2;
 
 import com.bytechef.tenant.constant.TenantConstants;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
  *
  * @author Ivica Cardic
  */
-public class MultiTenantOAuth2AuthenticationFailureHandler implements AuthenticationFailureHandler {
+public class SsoOAuth2AuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(

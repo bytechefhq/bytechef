@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.tenant.multi.security.web.filter;
+package com.bytechef.ee.security.sso.web.filter;
 
 import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.IdentityProviderService;

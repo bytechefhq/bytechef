@@ -83,10 +83,10 @@ public class SecurityConfiguration {
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
-    private final OAuth2LoginCustomizer oAuth2LoginCustomizer;
+    private final List<OAuth2LoginCustomizer> oAuth2LoginCustomizers;
     private final PasswordEncoder passwordEncoder;
     private final RememberMeServices rememberMeServices;
-    private final Saml2LoginCustomizer saml2LoginCustomizer;
+    private final List<Saml2LoginCustomizer> saml2LoginCustomizers;
     private final Security security;
     private final ObjectProvider<TwoFactorVerificationFilter> twoFactorVerificationFilterProvider;
 
@@ -94,16 +94,16 @@ public class SecurityConfiguration {
     public SecurityConfiguration(
         ApplicationProperties applicationProperties, AuthenticationFailureHandler authenticationFailureHandler,
         AuthenticationSuccessHandler authenticationSuccessHandler,
-        ObjectProvider<OAuth2LoginCustomizer> oAuth2LoginCustomizerProvider, PasswordEncoder passwordEncoder,
-        RememberMeServices rememberMeServices, ObjectProvider<Saml2LoginCustomizer> saml2LoginCustomizerProvider,
+        ObjectProvider<List<OAuth2LoginCustomizer>> oAuth2LoginCustomizersProvider, PasswordEncoder passwordEncoder,
+        RememberMeServices rememberMeServices, ObjectProvider<List<Saml2LoginCustomizer>> saml2LoginCustomizersProvider,
         ObjectProvider<TwoFactorVerificationFilter> twoFactorVerificationFilterProvider) {
 
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
-        this.oAuth2LoginCustomizer = oAuth2LoginCustomizerProvider.getIfAvailable();
+        this.oAuth2LoginCustomizers = oAuth2LoginCustomizersProvider.getIfAvailable(List::of);
         this.passwordEncoder = passwordEncoder;
         this.rememberMeServices = rememberMeServices;
-        this.saml2LoginCustomizer = saml2LoginCustomizerProvider.getIfAvailable();
+        this.saml2LoginCustomizers = saml2LoginCustomizersProvider.getIfAvailable(List::of);
         this.security = applicationProperties.getSecurity();
         this.twoFactorVerificationFilterProvider = twoFactorVerificationFilterProvider;
     }
@@ -180,14 +180,14 @@ public class SecurityConfiguration {
         List<SpaWebFilterContributor> spaWebFilterContributors)
         throws Exception {
 
-        if (oAuth2LoginCustomizer != null || saml2LoginCustomizer != null) {
+        if (!oAuth2LoginCustomizers.isEmpty() || !saml2LoginCustomizers.isEmpty()) {
             List<String> matchers = new ArrayList<>(List.of("/api/**", "/graphql"));
 
-            if (oAuth2LoginCustomizer != null) {
+            if (!oAuth2LoginCustomizers.isEmpty()) {
                 matchers.addAll(List.of("/oauth2/**", "/login/oauth2/**"));
             }
 
-            if (saml2LoginCustomizer != null) {
+            if (!saml2LoginCustomizers.isEmpty()) {
                 matchers.addAll(List.of("/saml2/**", "/login/saml2/**"));
             }
 
@@ -263,11 +263,11 @@ public class SecurityConfiguration {
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 .permitAll());
 
-        if (oAuth2LoginCustomizer != null) {
+        for (OAuth2LoginCustomizer oAuth2LoginCustomizer : oAuth2LoginCustomizers) {
             oAuth2LoginCustomizer.customize(http);
         }
 
-        if (saml2LoginCustomizer != null) {
+        for (Saml2LoginCustomizer saml2LoginCustomizer : saml2LoginCustomizers) {
             saml2LoginCustomizer.customize(http);
         }
 

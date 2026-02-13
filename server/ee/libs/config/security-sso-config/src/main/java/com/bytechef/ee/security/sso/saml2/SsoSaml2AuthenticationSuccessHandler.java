@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.tenant.multi.security.saml2;
+package com.bytechef.ee.security.sso.saml2;
 
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
@@ -28,14 +28,14 @@ import org.springframework.security.web.authentication.RememberMeServices;
  *
  * @author Ivica Cardic
  */
-public class MultiTenantSaml2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class SsoSaml2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final RememberMeServices rememberMeServices;
     private final TenantService tenantService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public MultiTenantSaml2AuthenticationSuccessHandler(
+    public SsoSaml2AuthenticationSuccessHandler(
         RememberMeServices rememberMeServices, TenantService tenantService, UserService userService) {
 
         this.rememberMeServices = rememberMeServices;
