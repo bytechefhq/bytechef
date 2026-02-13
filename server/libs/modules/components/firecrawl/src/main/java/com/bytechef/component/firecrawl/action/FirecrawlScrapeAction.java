@@ -245,84 +245,35 @@ public class FirecrawlScrapeAction {
 
         body.put(URL, inputParameters.getRequiredString(URL));
 
-        if (inputParameters.containsKey(FORMATS)) {
-            List<?> formatsList = inputParameters.getList(FORMATS);
-            Map<String, Object> formatMap = new HashMap<>();
-            for (Object format : formatsList) {
-                Map<String, Object> jsonSchemaMap = new HashMap<>();
-                jsonSchemaMap.put("type", format.toString());
-                if (formatsList.contains("json")) {
-                    jsonSchemaMap.put("schema", inputParameters.get(FORMATS_SCHEMA));
-                    jsonSchemaMap.put("prompt", inputParameters.get(FORMATS_PROMPT));
-                }
-                formatMap.put(format.toString(), jsonSchemaMap);
+        List<?> formatsList = inputParameters.getList(FORMATS);
+        Map<String, Object> formatMap = new HashMap<>();
+        for (Object format : formatsList) {
+            Map<String, Object> jsonSchemaMap = new HashMap<>();
+            jsonSchemaMap.put("type", format.toString());
+            if (formatsList.contains("json")) {
+                jsonSchemaMap.put("schema", inputParameters.get(FORMATS_SCHEMA));
+                jsonSchemaMap.put("prompt", inputParameters.get(FORMATS_PROMPT));
             }
-            body.put(FORMATS, formatMap);
+            formatMap.put(format.toString(), jsonSchemaMap);
         }
+        body.put(FORMATS, formatMap);
 
-        if (inputParameters.containsKey(ONLY_MAIN_CONTENT)) {
-            body.put(ONLY_MAIN_CONTENT, inputParameters.getBoolean(ONLY_MAIN_CONTENT));
-        }
-
-        if (inputParameters.containsKey(INCLUDE_TAGS)) {
-            body.put(INCLUDE_TAGS, inputParameters.getList(INCLUDE_TAGS));
-        }
-
-        if (inputParameters.containsKey(EXCLUDE_TAGS)) {
-            body.put(EXCLUDE_TAGS, inputParameters.getList(EXCLUDE_TAGS));
-        }
-
-        if (inputParameters.containsKey(MAX_AGE)) {
-            body.put(MAX_AGE, inputParameters.getInteger(MAX_AGE));
-        }
-
-        if (inputParameters.containsKey(HEADERS)) {
-            body.put(HEADERS, inputParameters.get(HEADERS));
-        }
-
-        if (inputParameters.containsKey(WAIT_FOR)) {
-            body.put(WAIT_FOR, inputParameters.getInteger(WAIT_FOR));
-        }
-
-        if (inputParameters.containsKey(MOBILE)) {
-            body.put(MOBILE, inputParameters.getBoolean(MOBILE));
-        }
-
-        if (inputParameters.containsKey(SKIP_TLS_VERIFICATION)) {
-            body.put(SKIP_TLS_VERIFICATION, inputParameters.getBoolean(SKIP_TLS_VERIFICATION));
-        }
-
-        if (inputParameters.containsKey(TIMEOUT)) {
-            body.put(TIMEOUT, inputParameters.getInteger(TIMEOUT));
-        }
-
-        if (inputParameters.containsKey(REMOVE_BASE64_IMAGES)) {
-            body.put(REMOVE_BASE64_IMAGES, inputParameters.getBoolean(REMOVE_BASE64_IMAGES));
-        }
-
-        if (inputParameters.containsKey(BLOCK_ADS)) {
-            body.put(BLOCK_ADS, inputParameters.getBoolean(BLOCK_ADS));
-        }
-
-        if (inputParameters.containsKey(PROXY)) {
-            body.put(PROXY, inputParameters.getString(PROXY));
-        }
-
-        if (inputParameters.containsKey(LOCATION)) {
-            body.put(LOCATION, inputParameters.get(LOCATION));
-        }
-
-        if (inputParameters.containsKey(PARSERS)) {
-            body.put(PARSERS, inputParameters.getList(PARSERS));
-        }
-
-        if (inputParameters.containsKey(STORE_IN_CACHE)) {
-            body.put(STORE_IN_CACHE, inputParameters.getBoolean(STORE_IN_CACHE));
-        }
-
-        if (inputParameters.containsKey(ZERO_DATA_RETENTION)) {
-            body.put(ZERO_DATA_RETENTION, inputParameters.getBoolean(ZERO_DATA_RETENTION));
-        }
+        body.put(ONLY_MAIN_CONTENT, inputParameters.getBoolean(ONLY_MAIN_CONTENT));
+        body.put(INCLUDE_TAGS, inputParameters.getList(INCLUDE_TAGS));
+        body.put(EXCLUDE_TAGS, inputParameters.getList(EXCLUDE_TAGS));
+        body.put(MAX_AGE, inputParameters.getInteger(MAX_AGE));
+        body.put(HEADERS, inputParameters.get(HEADERS));
+        body.put(WAIT_FOR, inputParameters.getInteger(WAIT_FOR));
+        body.put(MOBILE, inputParameters.getBoolean(MOBILE));
+        body.put(SKIP_TLS_VERIFICATION, inputParameters.getBoolean(SKIP_TLS_VERIFICATION));
+        body.put(TIMEOUT, inputParameters.getInteger(TIMEOUT));
+        body.put(REMOVE_BASE64_IMAGES, inputParameters.getBoolean(REMOVE_BASE64_IMAGES));
+        body.put(BLOCK_ADS, inputParameters.getBoolean(BLOCK_ADS));
+        body.put(PROXY, inputParameters.getString(PROXY));
+        body.put(LOCATION, inputParameters.get(LOCATION));
+        body.put(PARSERS, inputParameters.getList(PARSERS));
+        body.put(STORE_IN_CACHE, inputParameters.getBoolean(STORE_IN_CACHE));
+        body.put(ZERO_DATA_RETENTION, inputParameters.getBoolean(ZERO_DATA_RETENTION));
 
         return body;
     }
