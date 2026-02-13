@@ -19,47 +19,65 @@ package com.bytechef.component.binance.util;
 import static com.bytechef.component.binance.constant.BinanceConstants.SYMBOL;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class BinanceUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(
         option("ETHBTC", "ETHBTC"),
         option("LTCBTC", "LTCBTC"));
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testGetSymbolsOptions() {
-        when(mockedContext.http(any()))
+    void testGetSymbolsOptions(
+        Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("symbols", List.of(Map.of(SYMBOL, "ETHBTC"), Map.of(SYMBOL, "LTCBTC"))));
 
         List<Option<String>> result = BinanceUtils.getSymbolsOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            mockedParameters, null, null, null, mockedContext);
 
         assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals("https://api.binance.com/api/v3/exchangeInfo", stringArgumentCaptor.getValue());
     }
 }
