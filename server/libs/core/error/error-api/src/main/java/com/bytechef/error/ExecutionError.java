@@ -21,6 +21,7 @@ package com.bytechef.error;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Arik Cohen
@@ -47,7 +48,7 @@ public class ExecutionError {
      *
      * @return the detail message string of this {@code Error} instance (which may be {@code null}).
      */
-    public String getMessage() {
+    public @Nullable String getMessage() {
         return message;
     }
 
