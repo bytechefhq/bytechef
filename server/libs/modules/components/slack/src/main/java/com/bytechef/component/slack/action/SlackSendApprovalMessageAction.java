@@ -25,7 +25,7 @@ import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MES
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.TYPE;
-import static com.bytechef.component.slack.util.SlackUtils.sendMessage;
+import static com.bytechef.component.slack.util.SlackSendMessageUtils.sendMessage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval;
@@ -76,6 +76,6 @@ public class SlackSendApprovalMessageAction {
                         TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Disapprove"),
                         "style", "danger", "url", links.disapprovalLink()))));
 
-        return sendMessage(inputParameters.getRequiredString(CHANNEL), text, blocks, actionContext);
+        return sendMessage(inputParameters.getRequiredString(CHANNEL), text, null, blocks, actionContext);
     }
 }

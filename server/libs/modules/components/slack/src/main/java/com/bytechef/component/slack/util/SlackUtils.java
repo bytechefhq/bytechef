@@ -17,23 +17,17 @@
 package com.bytechef.component.slack.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.ERROR;
 import static com.bytechef.component.slack.constant.SlackConstants.ID;
 import static com.bytechef.component.slack.constant.SlackConstants.NAME;
 import static com.bytechef.component.slack.constant.SlackConstants.OK;
-import static com.bytechef.component.slack.constant.SlackConstants.POST_AT;
-import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +44,7 @@ public class SlackUtils {
 
     public static List<Option<String>> getChannelIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         List<Object> channels = getAll(
             context, "/conversations.list", "channels",
@@ -61,63 +55,15 @@ public class SlackUtils {
 
     public static List<Option<String>> getUserIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         List<Object> users = getAll(context, "/users.list", "members", "limit", 1000);
 
         return getOptions(users);
     }
 
-    public static Object sendMessage(
-        String channel, String text, List<Map<String, Object>> blocks, ActionContext actionContext) {
-
-        Map<String, Object> body = actionContext
-            .http(http -> http.post("/chat.postMessage"))
-            .body(
-                Http.Body.of(
-                    CHANNEL, channel,
-                    TEXT, text,
-                    "blocks", blocks))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        if ((boolean) body.get(OK)) {
-            return body;
-        } else {
-            throw new ProviderException((String) body.get(ERROR));
-        }
-    }
-
-    public static Object scheduleMessage(
-        String channel, String text, LocalDateTime schedule, List<Map<String, Object>> blocks,
-        ActionContext actionContext) {
-
-        String timeZone = getSlackTimeZone(actionContext);
-        ZonedDateTime zonedSchedule = schedule.atZone(ZoneId.of(timeZone));
-        long seconds = zonedSchedule.toEpochSecond();
-
-        Map<String, Object> body = actionContext
-            .http(http -> http.post("/chat.scheduleMessage"))
-            .body(
-                Http.Body.of(
-                    CHANNEL, channel,
-                    TEXT, text,
-                    POST_AT, seconds,
-                    "blocks", blocks))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        if ((boolean) body.get(OK)) {
-            return body;
-        } else {
-            throw new ProviderException((String) body.get(ERROR));
-        }
-    }
-
     private static List<Object> getAll(
-        ActionContext context, String endpoint, String listKey, Object... baseQueryParameters) {
+        Context context, String endpoint, String listKey, Object... baseQueryParameters) {
 
         String cursor = null;
         List<Object> items = new ArrayList<>();
@@ -163,30 +109,27 @@ public class SlackUtils {
         return options;
     }
 
-    private static String getSlackTimeZone(ActionContext actionContext) {
+    public static String getSlackTimeZone(Context context) {
+        String userID = getUserId(context);
 
-        String userID = getUserId(actionContext);
-
-        Map<String, Object> body = actionContext.http(http -> http.get("/users.info"))
+        Map<String, Object> body = context.http(http -> http.get("/users.info"))
             .queryParameters("user", userID)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         Map<String, Object> user = (Map<String, Object>) body.get("user");
-        return (String) user.get("tz");
 
+        return (String) user.get("tz");
     }
 
-    private static String getUserId(ActionContext actionContext) {
-
-        Map<String, Object> body = actionContext.http(http -> http
+    public static String getUserId(Context context) {
+        Map<String, Object> body = context.http(http -> http
             .get("/auth.test"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<Map<String, Object>>() {});
+            .getBody(new TypeReference<>() {});
 
         return (String) body.get("user_id");
     }
-
 }

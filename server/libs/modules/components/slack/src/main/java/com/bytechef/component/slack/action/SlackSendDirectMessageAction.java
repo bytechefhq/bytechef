@@ -26,14 +26,12 @@ import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MES
 import static com.bytechef.component.slack.constant.SlackConstants.POST_AT;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT_PROPERTY;
-import static com.bytechef.component.slack.util.SlackUtils.scheduleMessage;
-import static com.bytechef.component.slack.util.SlackUtils.sendMessage;
+import static com.bytechef.component.slack.util.SlackSendMessageUtils.sendMessage;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.slack.util.SlackUtils;
-import java.time.LocalDateTime;
 
 /**
  * @author Mario Cvjetojevic
@@ -63,18 +61,12 @@ public class SlackSendDirectMessageAction {
     private SlackSendDirectMessageAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        LocalDateTime schedule = inputParameters.getLocalDateTime(POST_AT);
-
-        if (schedule != null) {
-            return scheduleMessage(inputParameters.getRequiredString(CHANNEL),
-                inputParameters.getRequiredString(TEXT),
-                schedule, null, actionContext);
-        }
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return sendMessage(
-            inputParameters.getRequiredString(CHANNEL), inputParameters.getRequiredString(TEXT), null, actionContext);
+            inputParameters.getRequiredString(CHANNEL),
+            inputParameters.getRequiredString(TEXT),
+            inputParameters.getLocalDateTime(POST_AT),
+            null,
+            context);
     }
 }
