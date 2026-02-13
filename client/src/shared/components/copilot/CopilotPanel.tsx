@@ -115,7 +115,7 @@ const CopilotPanelContent = ({className, onClose}: Omit<CopilotPanelProps, 'open
 };
 
 const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => (
-    <CopilotPanelBoundary>
+    <CopilotPanelBoundary open={open}>
         {open && <CopilotPanelContent className={className} onClose={onClose} />}
     </CopilotPanelBoundary>
 );

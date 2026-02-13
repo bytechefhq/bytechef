@@ -45,14 +45,15 @@ vi.mock('../PropertyCodeEditorDialogRightPanel', () => ({
 }));
 
 vi.mock('@/shared/components/copilot/CopilotPanel', () => ({
-    default: ({onClose}: {onClose: () => void}) => (
-        <div data-testid="copilot-panel">
-            Copilot Panel
-            <button data-testid="copilot-close" onClick={onClose}>
-                Close
-            </button>
-        </div>
-    ),
+    default: ({onClose, open}: {onClose: () => void; open: boolean}) =>
+        open ? (
+            <div data-testid="copilot-panel">
+                Copilot Panel
+                <button data-testid="copilot-close" onClick={onClose}>
+                    Close
+                </button>
+            </div>
+        ) : null,
 }));
 
 vi.mock('@/components/UnsavedChangesAlertDialog', () => ({

@@ -393,6 +393,36 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
 
             expect(hoisted.mockSetCopilotPanelOpen).toHaveBeenCalledWith(true);
         });
+
+        it('should save conversation state, reset messages, and generate new conversation ID', async () => {
+            const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
+
+            act(() => {
+                result.current.handleCopilotClick();
+            });
+
+            expect(hoisted.mockSaveConversationState).toHaveBeenCalledOnce();
+            expect(hoisted.mockResetMessages).toHaveBeenCalledOnce();
+            expect(hoisted.mockGenerateConversationId).toHaveBeenCalledOnce();
+        });
+
+        it('should save conversation state before resetting messages', async () => {
+            const callOrder: string[] = [];
+
+            hoisted.mockSaveConversationState.mockImplementation(() => callOrder.push('save'));
+            hoisted.mockResetMessages.mockImplementation(() => callOrder.push('reset'));
+            hoisted.mockGenerateConversationId.mockImplementation(() => callOrder.push('generate'));
+
+            const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
+
+            act(() => {
+                result.current.handleCopilotClick();
+            });
+
+            expect(callOrder).toEqual(['save', 'reset', 'generate']);
+        });
     });
 
     describe('handleStopClick', () => {
