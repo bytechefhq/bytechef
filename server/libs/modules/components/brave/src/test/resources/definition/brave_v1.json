@@ -5319,8 +5319,8 @@
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "name": "marketing-automation",
-    "label": "Marketing Automation"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": {
     "authorizationRequired": null,
