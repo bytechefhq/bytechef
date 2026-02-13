@@ -30,7 +30,6 @@ import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConsta
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,7 +38,6 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -50,29 +48,23 @@ import org.mockito.ArgumentCaptor;
  */
 class OneSimpleAPIAddScreenshotActionTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            URL, "https://test.com",
-            HTML, "<html><body> test </body></html>",
-            CUSTOM_CSS, "test_css",
-            WAIT, 2,
-            FULL_PAGE, true,
-            FORCE_REFRESH, true,
-            TRANSPARENT_BACKGROUND, true,
-            SCREEN_SIZE, CUSTOM_SIZE,
-            WIDTH, 1920,
-            HEIGHT, 1080));
-    private final Context mockedContext = mock(Context.class);
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    private final Http mockedHttp = mock(Http.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
         forClass(ConfigurationBuilder.class);
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
+    private final Context mockedContext = mock(Context.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http mockedHttp = mock(Http.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(
+            URL, "https://test.com", HTML, "<html><body> test </body></html>", CUSTOM_CSS, "test_css",
+            WAIT, 2, FULL_PAGE, true, FORCE_REFRESH, true, TRANSPARENT_BACKGROUND, true,
+            SCREEN_SIZE, CUSTOM_SIZE, WIDTH, 1920, HEIGHT, 1080));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> responseMap = Map.of("key", "value");
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() {
@@ -87,26 +79,25 @@ class OneSimpleAPIAddScreenshotActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
 
-        Object result = OneSimpleAPIAddScreenshotAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
-        assertEquals(responseMap, result);
+        Object result = OneSimpleAPIAddScreenshotAction.perform(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(mockedObject, result);
 
         ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-        assertNotNull(capturedFunction);
 
+        assertNotNull(capturedFunction);
         assertEquals("/screenshot", stringArgumentCaptor.getValue());
 
-        Http.Configuration configuration = configurationBuilderArgumentCaptor.getValue()
-            .build();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
         Http.ResponseType responseType = configuration.getResponseType();
+
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-
-        assertEquals(Http.Body.of(getExpectedBody(), Http.BodyContentType.JSON),
-            bodyArgumentCaptor.getValue());
-
+        assertEquals(
+            Http.Body.of(getExpectedBody(), Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 
     private Map<String, Object> getExpectedBody() {

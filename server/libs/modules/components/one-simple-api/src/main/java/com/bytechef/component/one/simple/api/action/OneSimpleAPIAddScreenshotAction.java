@@ -43,9 +43,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Ivona Pavela
@@ -125,49 +122,32 @@ public class OneSimpleAPIAddScreenshotAction {
                             .description("The total time taken to generate the screenshot."))))
         .perform(OneSimpleAPIAddScreenshotAction::perform);
 
-    public static Object
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        Map<String, Object> body = getBody(inputParameters);
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post("/screenshot"))
-            .body(Http.Body.of(body))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .body(
+                Http.Body.of(
+                    URL, inputParameters.getString(URL),
+                    HTML, inputParameters.getString(HTML),
+                    CUSTOM_CSS, inputParameters.getString(CUSTOM_CSS),
+                    WAIT, inputParameters.getInteger(WAIT),
+                    TRANSPARENT_BACKGROUND, inputParameters.getBoolean(TRANSPARENT_BACKGROUND),
+                    FULL_PAGE, inputParameters.getBoolean(FULL_PAGE),
+                    FORCE_REFRESH, inputParameters.getBoolean(FORCE_REFRESH),
+                    SCREEN_SIZE, addScreenSize(inputParameters)))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 
-    private static Map<String, Object> getBody(Parameters inputParameters) {
-
-        Map<String, Object> body = new HashMap<>();
-
-        addFields(body, URL, inputParameters.getString(URL));
-        addFields(body, HTML, inputParameters.getString(HTML));
-        addFields(body, CUSTOM_CSS, inputParameters.getString(CUSTOM_CSS));
-        addFields(body, WAIT, inputParameters.getInteger(WAIT));
-        addScreenSize(body, inputParameters);
-        addFields(body, TRANSPARENT_BACKGROUND, inputParameters.getBoolean(TRANSPARENT_BACKGROUND));
-        addFields(body, FULL_PAGE, inputParameters.getBoolean(FULL_PAGE));
-        addFields(body, FORCE_REFRESH, inputParameters.getBoolean(FORCE_REFRESH));
-
-        return body;
-    }
-
-    private static void addFields(Map<String, Object> body, String fieldName, Object value) {
-        if (value != null) {
-            body.put(fieldName, value);
-        }
-    }
-
-    private static void addScreenSize(Map<String, Object> body, Parameters inputParameters) {
+    private static Object addScreenSize(Parameters inputParameters) {
         String screen = inputParameters.getString(SCREEN_SIZE);
 
         if (CUSTOM_SIZE.equals(screen)) {
-            body.put(SCREEN_SIZE,
-                inputParameters.getInteger(WIDTH) + "x" +
-                    inputParameters.getInteger(HEIGHT));
+            return inputParameters.getInteger(WIDTH) + "x" + inputParameters.getInteger(HEIGHT);
         } else if (!"default".equals(screen) && screen != null) {
-            body.put(SCREEN_SIZE, screen);
+            return screen;
+        } else {
+            return null;
         }
     }
 }
