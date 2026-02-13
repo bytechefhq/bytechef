@@ -63,7 +63,9 @@ public class ShopifyConnection {
                 .refreshUrl((connectionParameters, context) -> "https://%s/admin/oauth/access_token"
                     .formatted(connectionParameters.getRequiredString(SHOP_NAME)))
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
-                    Map.of("X-Shopify-Access-Token", List.of(connectionParameters.getRequiredString(ACCESS_TOKEN))))));
+                    Map.of("X-Shopify-Access-Token", List.of(connectionParameters.getRequiredString(ACCESS_TOKEN))))))
+        .help("", "https://docs.bytechef.io/reference/components/hopify_v1#connection-setup")
+        .version(1);
 
     private ShopifyConnection() {
     }
