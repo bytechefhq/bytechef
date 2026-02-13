@@ -55,7 +55,7 @@ import org.springframework.util.Assert;
 @Service
 public class DataTableRowServiceImpl implements DataTableRowService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataTableRowServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataTableRowServiceImpl.class);
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final JdbcTemplate jdbcTemplate;
@@ -184,8 +184,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         try {
             csvWriter.close();
         } catch (IOException exception) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(exception.getMessage());
+            if (logger.isTraceEnabled()) {
+                logger.trace(exception.getMessage());
             }
         }
 

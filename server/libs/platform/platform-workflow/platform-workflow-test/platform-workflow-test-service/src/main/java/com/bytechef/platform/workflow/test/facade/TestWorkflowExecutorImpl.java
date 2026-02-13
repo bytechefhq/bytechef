@@ -80,7 +80,7 @@ import tools.jackson.core.type.TypeReference;
  */
 public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestWorkflowExecutorImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestWorkflowExecutorImpl.class);
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
@@ -371,8 +371,8 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
         handles.add(
             jobSyncExecutor.addErrorListener(jobId, (event) -> {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Received error event for job {}: {}", jobId, event);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Received error event for job {}: {}", jobId, event);
                 }
             }));
 
@@ -387,8 +387,8 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
                 try {
                     handle.close();
                 } catch (Exception exception) {
-                    if (LOGGER.isTraceEnabled()) {
-                        LOGGER.trace(exception.getMessage(), exception);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(exception.getMessage(), exception);
                     }
                 }
             }

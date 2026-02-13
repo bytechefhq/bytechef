@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  */
 class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutputProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SseStreamTaskExecutionPostOutputProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(SseStreamTaskExecutionPostOutputProcessor.class);
 
     private final Cache<String, CopyOnWriteArrayList<com.bytechef.platform.job.sync.SseStreamBridge>> sseStreamBridges;
 
@@ -86,8 +86,8 @@ class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutp
                     try {
                         sseStreamBridge.onEvent(payload);
                     } catch (Exception exception) {
-                        if (LOGGER.isTraceEnabled()) {
-                            LOGGER.trace(exception.getMessage(), exception);
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -104,8 +104,8 @@ class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutp
                     try {
                         sseStreamBridge.onComplete();
                     } catch (Exception exception) {
-                        if (LOGGER.isTraceEnabled()) {
-                            LOGGER.trace(exception.getMessage(), exception);
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -122,8 +122,8 @@ class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutp
                     try {
                         sseStreamBridge.onError(throwable);
                     } catch (Exception exception) {
-                        if (LOGGER.isTraceEnabled()) {
-                            LOGGER.trace(exception.getMessage(), exception);
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -138,8 +138,8 @@ class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutp
                     try {
                         sseStreamBridge.onError(new TimeoutException("SSE stream timed out for job " + jobId));
                     } catch (Exception exception) {
-                        if (LOGGER.isTraceEnabled()) {
-                            LOGGER.trace(exception.getMessage(), exception);
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(exception.getMessage(), exception);
                         }
                     }
                 }
