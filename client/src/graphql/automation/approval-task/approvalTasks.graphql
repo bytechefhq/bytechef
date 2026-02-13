@@ -1,0 +1,12 @@
+query approvalTasks {
+    approvalTasks {
+        createdBy
+        createdDate
+        description
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        version
+    }
+}

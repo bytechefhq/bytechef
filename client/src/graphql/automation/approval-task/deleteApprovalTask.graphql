@@ -1,0 +1,3 @@
+mutation deleteApprovalTask($id: ID!) {
+    deleteApprovalTask(id: $id)
+}

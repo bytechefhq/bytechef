@@ -1,0 +1,12 @@
+query approvalTask($id: ID!) {
+    approvalTask(id: $id) {
+        createdBy
+        createdDate
+        description
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        version
+    }
+}
