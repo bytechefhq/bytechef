@@ -761,9 +761,9 @@ const ConnectionDialog = ({
                                 {wizardStep === 'configuration_step' && (
                                     <Button
                                         label="Next"
-                                    onClick={handleSubmit(() => {
-                                        setWizardStep('oauth_step');
-                                    })}
+                                        onClick={handleSubmit(() => {
+                                            setWizardStep('oauth_step');
+                                        })}
                                         type="submit"
                                     />
                                 )}
