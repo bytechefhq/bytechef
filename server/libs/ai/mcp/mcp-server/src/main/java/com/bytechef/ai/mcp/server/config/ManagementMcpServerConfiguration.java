@@ -19,7 +19,7 @@ package com.bytechef.ai.mcp.server.config;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
-import com.bytechef.ai.mcp.tool.platform.BraveSearchTools;
+import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.platform.configuration.service.PropertyService;
@@ -63,18 +63,18 @@ public class ManagementMcpServerConfiguration {
     private final ProjectWorkflowToolsImpl projectWorkflowTools;
     private final TaskTools taskTools;
     private final ComponentTools componentTools;
-    private final BraveSearchTools braveSearchTools;
+    private final FirecrawlTools firecrawlTools;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
         ProjectToolsImpl projectTools, ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools,
-        ComponentTools componentTools, BraveSearchTools braveSearchTools) {
+        ComponentTools componentTools, FirecrawlTools firecrawlTools) {
 
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
         this.taskTools = taskTools;
         this.componentTools = componentTools;
-        this.braveSearchTools = braveSearchTools;
+        this.firecrawlTools = firecrawlTools;
     }
 
     @Bean
@@ -114,7 +114,7 @@ public class ManagementMcpServerConfiguration {
         return ToolCallbackProvider.from(
             new ArrayList<>(
                 List.of(ToolCallbacks.from(projectTools, projectWorkflowTools, componentTools, taskTools,
-                    braveSearchTools))));
+                    firecrawlTools))));
     }
 
     @Bean

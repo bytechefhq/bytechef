@@ -11,7 +11,7 @@ import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
-import com.bytechef.ai.mcp.tool.platform.BraveSearchTools;
+import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
@@ -47,8 +46,6 @@ import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.retry.RetryUtils;
-import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.ai.tool.method.MethodToolCallback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -209,7 +206,7 @@ public class CopilotConfiguration {
     WorkflowEditorSpringAIAgent workflowEditorSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectTools,
         ProjectWorkflowToolsImpl projectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
-        BraveSearchTools braveSearchTools, WorkflowService workflowService,
+        FirecrawlTools firecrawlTools, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade)
         throws AGUIException {
 
@@ -221,7 +218,7 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(systemPromptResource))
             .state(new State())
-            .tools(List.of(projectTools, projectWorkflowTools, componentTools, taskTools, braveSearchTools))
+            .tools(List.of(projectTools, projectWorkflowTools, componentTools, taskTools, firecrawlTools))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .build();
