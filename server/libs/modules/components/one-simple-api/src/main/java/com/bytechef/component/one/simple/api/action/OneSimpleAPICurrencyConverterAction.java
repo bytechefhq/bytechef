@@ -67,12 +67,13 @@ public class OneSimpleAPICurrencyConverterAction {
                         string(TO_CURRENCY),
                         number("to_value"),
                         string("to_exchange_rate"))))
+        .help("", "https://docs.bytechef.io/reference/components/one-simple-api_v1#currency-converter")
         .perform(OneSimpleAPICurrencyConverterAction::perform);
 
     private OneSimpleAPICurrencyConverterAction() {
     }
 
-    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.get("/exchange_rate"))
             .queryParameters(
                 FROM_CURRENCY, inputParameters.getRequiredString(FROM_CURRENCY),

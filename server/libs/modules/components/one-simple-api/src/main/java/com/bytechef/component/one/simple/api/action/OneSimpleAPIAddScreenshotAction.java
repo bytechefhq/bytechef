@@ -120,6 +120,7 @@ public class OneSimpleAPIAddScreenshotAction {
                             .description("The URL that was captured."),
                         integer(ELAPSED)
                             .description("The total time taken to generate the screenshot."))))
+        .help("", "https://docs.bytechef.io/reference/components/one-simple-api_v1#add-screenshot")
         .perform(OneSimpleAPIAddScreenshotAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
