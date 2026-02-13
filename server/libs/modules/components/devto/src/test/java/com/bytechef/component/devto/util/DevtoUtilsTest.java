@@ -54,15 +54,14 @@ class DevtoUtilsTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of("id", 123, "title", "abc")), List.of());
-        when(mockedHttp.get(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
 
-        List<Option<Long>> result = DevtoUtils.getArticleIdOptions(
-            null, null, null, null, mockedContext);
+        List<Option<Long>> result = DevtoUtils.getArticleIdOptions(null, null, null, null, mockedContext);
 
         assertEquals(List.of(option("abc", 123L)), result);
         assertEquals(List.of("/articles/me/all", "/articles/me/all"), stringArgumentCaptor.getAllValues());

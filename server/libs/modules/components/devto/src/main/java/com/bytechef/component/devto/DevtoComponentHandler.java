@@ -91,6 +91,7 @@ public class DevtoComponentHandler extends AbstractDevtoComponentHandler {
                     "User-Agent", List.of("ByteChef"))));
         }
 
-        return modifiableConnectionDefinition;
+        return modifiableConnectionDefinition
+            .version(1);
     }
 }
