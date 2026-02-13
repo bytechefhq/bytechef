@@ -5,12 +5,12 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.tenant.multi.security.saml2;
+package com.bytechef.ee.security.sso.saml2;
 
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.IdentityProviderService;
-import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnMultiTenant
+@ConditionalOnEEVersion
 @ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
 public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRegistrationRepository {
 

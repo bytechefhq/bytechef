@@ -5,10 +5,9 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.tenant.multi.security.saml2;
+package com.bytechef.ee.security.sso.saml2;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
@@ -34,7 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/saml2/metadata")
 @ConditionalOnEEVersion
-@ConditionalOnMultiTenant
 @ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
 class Saml2MetadataController {
 

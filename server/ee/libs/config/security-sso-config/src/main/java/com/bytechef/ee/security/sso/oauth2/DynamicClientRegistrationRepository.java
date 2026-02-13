@@ -5,11 +5,11 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.tenant.multi.security.oauth2;
+package com.bytechef.ee.security.sso.oauth2;
 
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.IdentityProviderService;
-import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import org.springframework.beans.factory.ObjectProvider;
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Primary
-@ConditionalOnMultiTenant
+@ConditionalOnEEVersion
 @ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
 public class DynamicClientRegistrationRepository implements ClientRegistrationRepository {
 

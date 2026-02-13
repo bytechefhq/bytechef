@@ -497,6 +497,7 @@ include("server:ee:libs:config:observability-config")
 include("server:ee:libs:config:tenant-multi-data-config")
 include("server:ee:libs:config:tenant-multi-knowledge-base-config")
 include("server:ee:libs:config:tenant-multi-pgvector-config")
+include("server:ee:libs:config:security-sso-config")
 include("server:ee:libs:config:tenant-multi-security-config")
 
 include("server:ee:libs:core:cloud:cloud-aws")
