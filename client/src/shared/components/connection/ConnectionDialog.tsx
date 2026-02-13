@@ -395,6 +395,17 @@ const ConnectionDialog = ({
         [getValues, oAuth2Properties?.predefinedApps, setValue]
     );
 
+    // Initialize selectedScopes with required scopes pre-selected when OAuth2 parameters load
+    useEffect(() => {
+        if (oAuth2AuthorizationParameters?.scopes && wizardStep === 'oauth_step') {
+            const currentSelectedScopes = getValues('selectedScopes');
+
+            if (!currentSelectedScopes || Object.keys(currentSelectedScopes).length === 0) {
+                setValue('selectedScopes', {...oAuth2AuthorizationParameters.scopes});
+            }
+        }
+    }, [oAuth2AuthorizationParameters?.scopes, wizardStep, getValues, setValue]);
+
     useEffect(() => {
         setAuthorizationType(
             authorizationOptions && authorizationOptions.length > 0 ? authorizationOptions[0].value : undefined
@@ -750,13 +761,9 @@ const ConnectionDialog = ({
                                 {wizardStep === 'configuration_step' && (
                                     <Button
                                         label="Next"
-                                        onClick={handleSubmit(() => {
-                                            setValue('selectedScopes', {
-                                                ...(oAuth2AuthorizationParameters?.scopes ?? {}),
-                                            });
-
-                                            setWizardStep('oauth_step');
-                                        })}
+                                    onClick={handleSubmit(() => {
+                                        setWizardStep('oauth_step');
+                                    })}
                                         type="submit"
                                     />
                                 )}

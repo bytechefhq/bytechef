@@ -16,44 +16,10 @@ export interface CodePayloadI {
     [key: string]: string;
 }
 
-export interface Oauth2Props {
-    authorizationUrl: string;
-    clientId: string;
-    redirectUri: string;
-    responseType: 'code' | 'token';
-    scope?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    extraQueryParameters?: Record<string, any>;
-    onCodeSuccess?: (payload: CodePayloadI) => void;
-    onError?: (error: string) => void;
-    onTokenSuccess?: (payload: TokenPayloadI) => void;
-}
-
 const POPUP_HEIGHT = 800;
 const POPUP_WIDTH = 600;
 
 const POPUP_CLOSED_GRACE_PERIOD_MS = 120_000;
-
-const enhanceAuthorizationUrl = (
-    authorizeUrl: string,
-    clientId: string,
-    redirectUri: string,
-    scope: string,
-    state: string,
-    responseType: Oauth2Props['responseType'],
-    extraQueryParametersRef: MutableRefObject<Oauth2Props['extraQueryParameters']>
-) => {
-    const query = objectToQuery({
-        client_id: clientId,
-        redirect_uri: redirectUri,
-        response_type: responseType,
-        scope,
-        state,
-        ...extraQueryParametersRef.current,
-    });
-
-    return `${authorizeUrl}?${query}`;
-};
 
 // https://medium.com/@dazcyril/generating-cryptographic-random-state-in-javascript-in-the-browser-c538b3daae50
 const generateState = () => {
@@ -128,28 +94,42 @@ const cleanup = (
     }
 };
 
-const useOAuth2 = (props: Oauth2Props) => {
-    const {
-        authorizationUrl,
-        clientId,
-        extraQueryParameters,
-        onCodeSuccess,
-        onError,
-        onTokenSuccess,
-        redirectUri,
-        responseType,
-        scope = '',
-    } = props;
+type ResponseType = 'code' | 'token';
+
+export interface UseOAuth2Props {
+    authorizationUrl: string;
+    clientId: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    extraQueryParameters?: Record<string, any>;
+    onCodeSuccess?: (payload: CodePayloadI) => void;
+    onError?: (error: string) => void;
+    onTokenSuccess?: (payload: TokenPayloadI) => void;
+    redirectUri: string;
+    responseType: ResponseType;
+    scopes?: {[key: string]: boolean};
+}
+
+const useOAuth2 = ({
+    authorizationUrl,
+    clientId,
+    extraQueryParameters,
+    onCodeSuccess,
+    onError,
+    onTokenSuccess,
+    redirectUri,
+    responseType,
+    scopes,
+}: UseOAuth2Props) => {
+    const [{error, loading}, setUI] = useState<{
+        loading: boolean;
+        error: string | null;
+    }>({error: null, loading: false});
 
     const extraQueryParametersRef = useRef(extraQueryParameters);
     const popupRef = useRef<Window | null>();
     const curStateRef = useRef(undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const intervalRef = useRef<any>();
-    const [{error, loading}, setUI] = useState<{
-        loading: boolean;
-        error: string | null;
-    }>({error: null, loading: false});
 
     const getAuth = useCallback(() => {
         setUI({
@@ -163,17 +143,24 @@ const useOAuth2 = (props: Oauth2Props) => {
 
         saveState(state);
 
-        popupRef.current = openPopup(
-            enhanceAuthorizationUrl(
-                authorizationUrl,
-                clientId,
-                redirectUri,
-                scope,
-                state,
-                responseType,
-                extraQueryParametersRef
-            )
-        );
+        const selectedScopeKeys = Object.entries(scopes ?? {})
+            .filter(([, selected]) => selected)
+            .map(([key]) => key);
+
+        const selectedScopes = selectedScopeKeys.join(' ');
+
+        const authQuery = objectToQuery({
+            client_id: clientId,
+            redirect_uri: redirectUri,
+            response_type: responseType,
+            scope: selectedScopes,
+            state,
+            ...extraQueryParametersRef.current,
+        });
+
+        const popupUrl = `${authorizationUrl}?${authQuery}`;
+
+        popupRef.current = openPopup(popupUrl);
 
         let broadcastChannel: BroadcastChannel | undefined;
 
@@ -331,7 +318,7 @@ const useOAuth2 = (props: Oauth2Props) => {
         return () => {
             doCleanup();
         };
-    }, [authorizationUrl, clientId, redirectUri, scope, responseType, onCodeSuccess, onTokenSuccess, onError, setUI]);
+    }, [scopes, clientId, redirectUri, responseType, authorizationUrl, onError, onCodeSuccess, onTokenSuccess]);
 
     return {error, getAuth, loading};
 };
