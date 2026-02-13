@@ -17,7 +17,9 @@
 package com.bytechef.component.http.client.connection;
 
 import static com.bytechef.component.definition.Authorization.ADD_TO;
+import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION_URL;
+import static com.bytechef.component.definition.Authorization.ApplyResponse.ofHeaders;
 import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.Authorization.HEADER_PREFIX;
@@ -33,12 +35,18 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
+import static com.bytechef.component.definition.Context.Http.BodyContentType.FORM_URL_ENCODED;
+import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApiTokenLocation;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Property.ControlType;
+import java.util.List;
+import java.util.Map;
 
 public class HttpClientConnection {
 
@@ -131,6 +139,25 @@ public class HttpClientConnection {
                         .description("Optional comma-delimited list of scopes")
                         .controlType(ControlType.TEXT_AREA)),
             authorization(AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
+                .apply((connectionParameters, context) -> {
+
+                    Map<String, String> responseMap =
+                        context.http(http -> http.post(connectionParameters.getString(TOKEN_URL)))
+                            .body(
+                                Body.of(
+                                    Map.of(
+                                        "client_id", connectionParameters.getString(CLIENT_ID),
+                                        "client_secret", connectionParameters.getString(CLIENT_SECRET),
+                                        "grant_type", "client_credentials"),
+                                    FORM_URL_ENCODED))
+                            .configuration(responseType(ResponseType.JSON))
+                            .execute()
+                            .getBody(Map.class);
+
+                    return ofHeaders(
+                        Map.of(AUTHORIZATION,
+                            List.of(Authorization.BEARER + " " + responseMap.get("access_token"))));
+                })
                 .title("OAuth2 Client Credentials")
                 .properties(
                     string(TOKEN_URL)
