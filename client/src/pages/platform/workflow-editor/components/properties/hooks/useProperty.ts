@@ -161,7 +161,7 @@ export const useProperty = ({
 
         return property.defaultValue || '';
     });
-    const [isFormulaMode, setIsFormulaMode] = useState(false);
+    const [isFormulaMode, setIsFormulaModeInternal] = useState(property.controlType === 'FORMULA_MODE');
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<unknown> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(
@@ -722,6 +722,17 @@ export const useProperty = ({
         ]
     );
 
+    const setIsFormulaMode: Dispatch<SetStateAction<boolean>> = useCallback(
+        (value) => {
+            if (property.controlType === 'FORMULA_MODE') {
+                return;
+            }
+
+            setIsFormulaModeInternal(value);
+        },
+        [property.controlType]
+    );
+
     const isFromAi = useMemo(() => {
         if (!currentComponent?.metadata?.ui?.fromAi || !path) {
             return false;
@@ -1004,6 +1015,10 @@ export const useProperty = ({
         }
 
         if (controlType === 'NULL') {
+            setShowInputTypeSwitchButton(false);
+        }
+
+        if (controlType === 'FORMULA_MODE') {
             setShowInputTypeSwitchButton(false);
         }
     }, [controlType, expressionEnabled]);
