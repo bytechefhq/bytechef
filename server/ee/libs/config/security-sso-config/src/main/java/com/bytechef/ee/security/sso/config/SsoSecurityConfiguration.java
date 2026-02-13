@@ -12,11 +12,13 @@ import com.bytechef.ee.security.sso.oauth2.SsoOAuth2AuthenticationSuccessHandler
 import com.bytechef.ee.security.sso.saml2.DynamicRelyingPartyRegistrationRepository;
 import com.bytechef.ee.security.sso.saml2.SsoSaml2AuthenticationFailureHandler;
 import com.bytechef.ee.security.sso.saml2.SsoSaml2AuthenticationSuccessHandler;
+import com.bytechef.ee.security.sso.web.configurer.SsoEnforcementHttpConfigurer;
 import com.bytechef.ee.security.sso.web.filter.SsoEnforcementFilter;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
 import com.bytechef.platform.security.web.config.Saml2LoginCustomizer;
+import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.security.web.oauth2.CustomOAuth2UserService;
@@ -26,6 +28,8 @@ import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.RememberMeServices;
 
 /**
@@ -80,7 +84,18 @@ class SsoSecurityConfiguration {
     }
 
     @Bean
-    SsoEnforcementFilter ssoEnforcementFilter(IdentityProviderService identityProviderService) {
-        return new SsoEnforcementFilter(identityProviderService);
+    SecurityConfigurerContributor ssoEnforcementSecurityConfigurerContributor(
+        IdentityProviderService identityProviderService) {
+
+        return new SecurityConfigurerContributor() {
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>>
+                T getSecurityConfigurerAdapter() {
+
+                return (T) new SsoEnforcementHttpConfigurer(new SsoEnforcementFilter(identityProviderService));
+            }
+        };
     }
 }
