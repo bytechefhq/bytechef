@@ -69,7 +69,7 @@ import org.springframework.util.StringUtils;
  */
 public class MultiTenantPgVectorStore extends AbstractObservationVectorStore implements VectorStore {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiTenantPgVectorStore.class);
+    private static final Logger logger = LoggerFactory.getLogger(MultiTenantPgVectorStore.class);
 
     private static final Map<PgVectorStore.PgDistanceType, VectorStoreSimilarityMetric> SIMILARITY_TYPE_MAPPING =
         Map.of(COSINE_DISTANCE, COSINE, EUCLIDEAN_DISTANCE, EUCLIDEAN, NEGATIVE_INNER_PRODUCT, DOT);
@@ -101,7 +101,7 @@ public class MultiTenantPgVectorStore extends AbstractObservationVectorStore imp
 
         this.vectorTableName = vectorTable.isEmpty() ? PgVectorStore.DEFAULT_TABLE_NAME : vectorTable.trim();
 
-        LOGGER.info(
+        logger.info(
             "Using the vector table name: {}. Is empty: {}", this.vectorTableName, this.vectorTableName.isEmpty());
 
         this.idType = builder.idType;
@@ -250,7 +250,7 @@ public class MultiTenantPgVectorStore extends AbstractObservationVectorStore imp
                 return embeddingDimensions;
             }
         } catch (Exception e) {
-            LOGGER.warn("Failed to obtain the embedding dimensions from the embedding model and fall backs to default:"
+            logger.warn("Failed to obtain the embedding dimensions from the embedding model and fall backs to default:"
                 + PgVectorStore.OPENAI_EMBEDDING_DIMENSION_SIZE, e);
         }
         return PgVectorStore.OPENAI_EMBEDDING_DIMENSION_SIZE;

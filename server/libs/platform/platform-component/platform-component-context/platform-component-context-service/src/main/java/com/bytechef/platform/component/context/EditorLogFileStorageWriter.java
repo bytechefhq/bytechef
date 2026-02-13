@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EditorLogFileStorageWriter implements LogFileStorageWriter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EditorLogFileStorageWriter.class);
+    private static final Logger logger = LoggerFactory.getLogger(EditorLogFileStorageWriter.class);
 
     private static final String LOG_DIR_NAME = "bytechef_editor_logs";
 
@@ -74,7 +74,7 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
         try {
             Files.deleteIfExists(logFile);
         } catch (IOException exception) {
-            LOGGER.warn("Failed to delete editor log file: {}", logFile, exception);
+            logger.warn("Failed to delete editor log file: {}", logFile, exception);
         }
     }
 
@@ -95,7 +95,7 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
 
             Files.writeString(logFile, logLine, StandardOpenOption.APPEND);
         } catch (IOException exception) {
-            LOGGER.error("Failed to append log entry for job {}", jobId, exception);
+            logger.error("Failed to append log entry for job {}", jobId, exception);
         }
     }
 }
