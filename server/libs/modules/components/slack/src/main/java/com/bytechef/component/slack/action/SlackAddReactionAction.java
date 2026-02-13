@@ -29,8 +29,8 @@ import static com.bytechef.component.slack.constant.SlackConstants.NAME;
 import static com.bytechef.component.slack.constant.SlackConstants.OK;
 import static com.bytechef.component.slack.constant.SlackConstants.TIMESTAMP;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -77,10 +77,8 @@ public class SlackAddReactionAction {
     private SlackAddReactionAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        Map<String, Object> body = actionContext
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        Map<String, Object> body = context
             .http(http -> http.post("/reactions.add"))
             .body(
                 Http.Body.of(
