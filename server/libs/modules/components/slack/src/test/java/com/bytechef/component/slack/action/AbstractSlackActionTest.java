@@ -21,9 +21,9 @@ import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.slack.util.SlackUtils;
+import com.bytechef.component.slack.util.SlackSendMessageUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,33 +39,27 @@ import org.mockito.MockedStatic;
  */
 abstract class AbstractSlackActionTest {
 
-    protected ActionContext mockedActionContext = mock(ActionContext.class);
     protected Object mockedObject = mock(Object.class);
-    protected Parameters mockedParameters = MockParametersFactory.create(Map.of(CHANNEL, "abc", TEXT, "efg"));
+    protected Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(CHANNEL, "channel", TEXT, "text"));
     protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    protected ArgumentCaptor<ActionContext> actionContextArgumentCaptor = ArgumentCaptor.forClass(ActionContext.class);
+    protected ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     protected ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
     protected ArgumentCaptor<LocalDateTime> localDateTimeArgumentCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
-    protected MockedStatic<SlackUtils> slackUtilsMockedStatic;
+    protected MockedStatic<SlackSendMessageUtils> slackSendMessageUtilsMockedStatic;
 
     @BeforeEach
     void beforeEach() {
-        slackUtilsMockedStatic = mockStatic(SlackUtils.class);
+        slackSendMessageUtilsMockedStatic = mockStatic(SlackSendMessageUtils.class);
 
-        slackUtilsMockedStatic.when(
-            () -> SlackUtils.sendMessage(stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                listArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
-            .thenReturn(mockedObject);
-
-        slackUtilsMockedStatic.when(
-            () -> SlackUtils.scheduleMessage(stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                localDateTimeArgumentCaptor.capture(),
-                listArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
+        slackSendMessageUtilsMockedStatic.when(
+            () -> SlackSendMessageUtils.sendMessage(stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                localDateTimeArgumentCaptor.capture(), listArgumentCaptor.capture(), contextArgumentCaptor.capture()))
             .thenReturn(mockedObject);
     }
 
     @AfterEach
     void afterEach() {
-        slackUtilsMockedStatic.close();
+        slackSendMessageUtilsMockedStatic.close();
     }
 }
