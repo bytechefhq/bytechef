@@ -42,6 +42,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -126,7 +127,11 @@ public class TaskCoordinator {
             logger.debug("Job id={} resumed", resumeJobEvent.getJobId());
         }
 
-        jobExecutor.execute(job);
+        try {
+            jobExecutor.execute(job);
+        } catch (Exception exception) {
+            handleJobExecutionException(job, exception);
+        }
     }
 
     /**
@@ -146,7 +151,13 @@ public class TaskCoordinator {
             logger.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
         }
 
-        jobExecutor.execute(job);
+        try {
+            jobExecutor.execute(job);
+        } catch (Exception exception) {
+            handleJobExecutionException(job, exception);
+
+            return;
+        }
 
         eventPublisher.publishEvent(
             new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
@@ -208,6 +219,29 @@ public class TaskCoordinator {
             taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
             eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
+        }
+    }
+
+    private void handleJobExecutionException(Job job, Exception exception) {
+        long jobId = Validate.notNull(job.getId(), "id");
+
+        Optional<TaskExecution> taskExecutionOptional = taskExecutionService.fetchLastJobTaskExecution(jobId);
+
+        if (taskExecutionOptional.isPresent()) {
+            TaskExecution taskExecution = taskExecutionOptional.get();
+
+            taskExecution.setError(
+                new ExecutionError(
+                    exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
+
+            eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
+        } else {
+            job.setStatus(Job.Status.FAILED);
+            job.setEndDate(Instant.now());
+
+            jobService.update(job);
+
+            eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, Job.Status.FAILED));
         }
     }
 }
