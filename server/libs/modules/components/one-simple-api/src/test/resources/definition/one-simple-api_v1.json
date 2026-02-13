@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Turn a URL into a screenshot.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/one-simple-api_v1#add-screenshot"
+    },
     "metadata": null,
     "name": "addScreenshot",
     "outputDefinition": {
@@ -558,7 +561,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Convert currency from one to another.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/one-simple-api_v1#currency-converter"
+    },
     "metadata": null,
     "name": "currencyConverter",
     "outputDefinition": {
@@ -2191,7 +2197,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Shorten your desired URL",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/one-simple-api_v1#url-shortener"
+    },
     "metadata": null,
     "name": "urlShortener",
     "outputDefinition": {
@@ -2500,7 +2509,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get information about a certain webpage",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/one-simple-api_v1#web-page-information"
+    },
     "metadata": null,
     "name": "webInformation",
     "outputDefinition": {
@@ -3187,7 +3199,3190 @@
     "title": "Web Page Information",
     "workflowNodeDescription": null
   } ],
-  "clusterElements": null,
+  "clusterElements": [ {
+    "name": "addScreenshot",
+    "description": "Turn a URL into a screenshot.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Screenshot width.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "width",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Screenshot height.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "height",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "Whether the screenshot was captured as full page.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "fullpage",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The URL that was captured.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "url",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "The total time taken to generate the screenshot.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "elapsed",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Screenshot width.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "width",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Screenshot height.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "height",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Whether the screenshot was captured as full page.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "fullpage",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The URL that was captured.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "url",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "The total time taken to generate the screenshot.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "elapsed",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Provide either a URL to capture or raw HTML content.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Source",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "source",
+      "options": [ {
+        "description": null,
+        "label": "URL",
+        "value": "URL"
+      }, {
+        "description": null,
+        "label": "HTML",
+        "value": "HTML"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Place the URL you want to turn into screenshot.",
+      "displayCondition": "source == 'URL'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "URL",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "url",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Place the raw HTML to render.",
+      "displayCondition": "source == 'HTML'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "HTML",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "html",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Custom CSS to inject into the page.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Custom CSS",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "custom_css",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "Time to wait before capturing (milliseconds).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Wait",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "wait",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Predefined screen size or custom dimensions.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Screen size",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "screen",
+      "options": [ {
+        "description": null,
+        "label": "Default (1920x1080)",
+        "value": "default"
+      }, {
+        "description": null,
+        "label": "Phone (375x667)",
+        "value": "phone"
+      }, {
+        "description": null,
+        "label": "Phone Landscape (667x375)",
+        "value": "landscape-phone"
+      }, {
+        "description": null,
+        "label": "Tablet (768x1024)",
+        "value": "tablet"
+      }, {
+        "description": null,
+        "label": "Tablet Landscape (1024x768)",
+        "value": "landscape-tablet"
+      }, {
+        "description": null,
+        "label": "Retina (2880x1800)",
+        "value": "retina"
+      }, {
+        "description": null,
+        "label": "4K (3840x2160)",
+        "value": "4k"
+      }, {
+        "description": null,
+        "label": "8K (7680x4320)",
+        "value": "8k"
+      }, {
+        "description": null,
+        "label": "Custom Size",
+        "value": "custom_size"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": "Default (1920x1080)",
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": null,
+      "displayCondition": "screen == 'custom_size'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Width (px)",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "width",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": "1920",
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": null,
+      "displayCondition": "screen == 'custom_size'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Height (px)",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "height",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": "1080",
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Make the background transparent (PNG only).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Transparent background",
+      "metadata": { },
+      "name": "background",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Capture the entire scrollable page.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Full Page Screenshot",
+      "metadata": { },
+      "name": "fullpage",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Force a new screenshot even if cached.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Force refresh",
+      "metadata": { },
+      "name": "force",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    } ],
+    "title": "Add Screenshot",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "currencyConverter",
+    "description": "Convert currency from one to another.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "from_currency",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "from_value",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "to_currency",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "NUMBER",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxNumberPrecision": null,
+            "maxValue": null,
+            "metadata": { },
+            "minNumberPrecision": null,
+            "minValue": null,
+            "name": "to_value",
+            "numberPrecision": null,
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "NUMBER"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "to_exchange_rate",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "from_currency",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "from_value",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "to_currency",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "NUMBER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxNumberPrecision": null,
+          "maxValue": null,
+          "metadata": { },
+          "minNumberPrecision": null,
+          "minValue": null,
+          "name": "to_value",
+          "numberPrecision": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "NUMBER"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "to_exchange_rate",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Currency from which you want to convert.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "From Currency",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "from_currency",
+      "options": [ {
+        "description": null,
+        "label": "UAE Dirham",
+        "value": "AED"
+      }, {
+        "description": null,
+        "label": "Afghan Afghani",
+        "value": "AFN"
+      }, {
+        "description": null,
+        "label": "Albanian Lek",
+        "value": "ALL"
+      }, {
+        "description": null,
+        "label": "Armenian Dram",
+        "value": "AMD"
+      }, {
+        "description": null,
+        "label": "Netherlands Antillean Guilder",
+        "value": "ANG"
+      }, {
+        "description": null,
+        "label": "Angolan Kwanza",
+        "value": "AOA"
+      }, {
+        "description": null,
+        "label": "Argentine Peso",
+        "value": "ARS"
+      }, {
+        "description": null,
+        "label": "Australian Dollar",
+        "value": "AUD"
+      }, {
+        "description": null,
+        "label": "Aruban Florin",
+        "value": "AWG"
+      }, {
+        "description": null,
+        "label": "Azerbaijani Manat",
+        "value": "AZN"
+      }, {
+        "description": null,
+        "label": "Bosnia and Herzegovina Mark",
+        "value": "BAM"
+      }, {
+        "description": null,
+        "label": "Barbados Dollar",
+        "value": "BBD"
+      }, {
+        "description": null,
+        "label": "Bangladeshi Taka",
+        "value": "BDT"
+      }, {
+        "description": null,
+        "label": "Bulgarian Lev",
+        "value": "BGN"
+      }, {
+        "description": null,
+        "label": "Bahraini Dinar",
+        "value": "BHD"
+      }, {
+        "description": null,
+        "label": "Burundian Franc",
+        "value": "BIF"
+      }, {
+        "description": null,
+        "label": "Bermudian Dollar",
+        "value": "BMD"
+      }, {
+        "description": null,
+        "label": "Brunei Dollar",
+        "value": "BND"
+      }, {
+        "description": null,
+        "label": "Bolivian Boliviano",
+        "value": "BOB"
+      }, {
+        "description": null,
+        "label": "Brazilian Real",
+        "value": "BRL"
+      }, {
+        "description": null,
+        "label": "Bahamian Dollar",
+        "value": "BSD"
+      }, {
+        "description": null,
+        "label": "Bhutanese Ngultrum",
+        "value": "BTN"
+      }, {
+        "description": null,
+        "label": "Botswana Pula",
+        "value": "BWP"
+      }, {
+        "description": null,
+        "label": "Belarusian Ruble",
+        "value": "BYN"
+      }, {
+        "description": null,
+        "label": "Belize Dollar",
+        "value": "BZD"
+      }, {
+        "description": null,
+        "label": "Canadian Dollar",
+        "value": "CAD"
+      }, {
+        "description": null,
+        "label": "Congolese Franc",
+        "value": "CDF"
+      }, {
+        "description": null,
+        "label": "Swiss Franc",
+        "value": "CHF"
+      }, {
+        "description": null,
+        "label": "Chilean Peso",
+        "value": "CLP"
+      }, {
+        "description": null,
+        "label": "Chinese Renminbi",
+        "value": "CNY"
+      }, {
+        "description": null,
+        "label": "Colombian Peso",
+        "value": "COP"
+      }, {
+        "description": null,
+        "label": "Costa Rican Colon",
+        "value": "CRC"
+      }, {
+        "description": null,
+        "label": "Cuban Convertible Peso",
+        "value": "CUC"
+      }, {
+        "description": null,
+        "label": "Cuban Peso",
+        "value": "CUP"
+      }, {
+        "description": null,
+        "label": "Cape Verdean Escudo",
+        "value": "CVE"
+      }, {
+        "description": null,
+        "label": "Czech Koruna",
+        "value": "CZK"
+      }, {
+        "description": null,
+        "label": "Djiboutian Franc",
+        "value": "DJF"
+      }, {
+        "description": null,
+        "label": "Danish Krone",
+        "value": "DKK"
+      }, {
+        "description": null,
+        "label": "Dominican Peso",
+        "value": "DOP"
+      }, {
+        "description": null,
+        "label": "Algerian Dinar",
+        "value": "DZD"
+      }, {
+        "description": null,
+        "label": "Egyptian Pound",
+        "value": "EGP"
+      }, {
+        "description": null,
+        "label": "Eritrean Nakfa",
+        "value": "ERN"
+      }, {
+        "description": null,
+        "label": "Ethiopian Birr",
+        "value": "ETB"
+      }, {
+        "description": null,
+        "label": "Euro",
+        "value": "EUR"
+      }, {
+        "description": null,
+        "label": "Fiji Dollar",
+        "value": "FJD"
+      }, {
+        "description": null,
+        "label": "Falkland Islands Pound",
+        "value": "FKP"
+      }, {
+        "description": null,
+        "label": "Faroese Króna",
+        "value": "FOK"
+      }, {
+        "description": null,
+        "label": "Pound Sterling",
+        "value": "GBP"
+      }, {
+        "description": null,
+        "label": "Georgian Lari",
+        "value": "GEL"
+      }, {
+        "description": null,
+        "label": "Guernsey Pound",
+        "value": "GGP"
+      }, {
+        "description": null,
+        "label": "Ghanaian Cedi",
+        "value": "GHS"
+      }, {
+        "description": null,
+        "label": "Gibraltar Pound",
+        "value": "GIP"
+      }, {
+        "description": null,
+        "label": "Gambian Dalasi",
+        "value": "GMD"
+      }, {
+        "description": null,
+        "label": "Guinean Franc",
+        "value": "GNF"
+      }, {
+        "description": null,
+        "label": "Guatemalan Quetzal",
+        "value": "GTQ"
+      }, {
+        "description": null,
+        "label": "Guyanese Dollar",
+        "value": "GYD"
+      }, {
+        "description": null,
+        "label": "Hong Kong Dollar",
+        "value": "HKD"
+      }, {
+        "description": null,
+        "label": "Honduran Lempira",
+        "value": "HNL"
+      }, {
+        "description": null,
+        "label": "Croatin Kuna",
+        "value": "HRK"
+      }, {
+        "description": null,
+        "label": "Haitian Gourde",
+        "value": "HTG"
+      }, {
+        "description": null,
+        "label": "Hungarian Forint",
+        "value": "HUF"
+      }, {
+        "description": null,
+        "label": "Indonesian Rupiah",
+        "value": "IDR"
+      }, {
+        "description": null,
+        "label": "Israeli New Shekel",
+        "value": "ILS"
+      }, {
+        "description": null,
+        "label": "Manx Pound",
+        "value": "IMP"
+      }, {
+        "description": null,
+        "label": "Indian Rupee",
+        "value": "INR"
+      }, {
+        "description": null,
+        "label": "Iraqi Dinar",
+        "value": "IQD"
+      }, {
+        "description": null,
+        "label": "Iranian Rial",
+        "value": "IRR"
+      }, {
+        "description": null,
+        "label": "Icelandic Króna",
+        "value": "ISK"
+      }, {
+        "description": null,
+        "label": "Jamaican Dollar",
+        "value": "JMD"
+      }, {
+        "description": null,
+        "label": "Jordanian Dinar",
+        "value": "JOD"
+      }, {
+        "description": null,
+        "label": "Japanese Yen",
+        "value": "JPY"
+      }, {
+        "description": null,
+        "label": "Kenyan Shilling",
+        "value": "KES"
+      }, {
+        "description": null,
+        "label": "Kyrgyzstani Som",
+        "value": "KGS"
+      }, {
+        "description": null,
+        "label": "Cambodian Riel",
+        "value": "KHR"
+      }, {
+        "description": null,
+        "label": "Kiribati Dollar",
+        "value": "KID"
+      }, {
+        "description": null,
+        "label": "Comorian Franc",
+        "value": "KMF"
+      }, {
+        "description": null,
+        "label": "South Korean Won",
+        "value": "KRW"
+      }, {
+        "description": null,
+        "label": "Kuwaiti Dinar",
+        "value": "KWD"
+      }, {
+        "description": null,
+        "label": "Cayman Islands Dollar",
+        "value": "KYD"
+      }, {
+        "description": null,
+        "label": "Kazakhstani Tenge",
+        "value": "KZT"
+      }, {
+        "description": null,
+        "label": "Lao Kip",
+        "value": "LAK"
+      }, {
+        "description": null,
+        "label": "Lebanese Pound",
+        "value": "LBP"
+      }, {
+        "description": null,
+        "label": "Sri Lanka Rupee",
+        "value": "LKR"
+      }, {
+        "description": null,
+        "label": "Liberian Dollar",
+        "value": "LRD"
+      }, {
+        "description": null,
+        "label": "Lesotho Loti",
+        "value": "LSL"
+      }, {
+        "description": null,
+        "label": "Libyan Dinar",
+        "value": "LYD"
+      }, {
+        "description": null,
+        "label": "Moroccan Dirham",
+        "value": "MAD"
+      }, {
+        "description": null,
+        "label": "Moldovan Leu",
+        "value": "MDL"
+      }, {
+        "description": null,
+        "label": "Malagasy Ariary",
+        "value": "MGA"
+      }, {
+        "description": null,
+        "label": "Macedonian Denar",
+        "value": "MKD"
+      }, {
+        "description": null,
+        "label": "Burmese Kyat",
+        "value": "MMK"
+      }, {
+        "description": null,
+        "label": "Mongolian Tögrög",
+        "value": "MNT"
+      }, {
+        "description": null,
+        "label": "Macanese Pataca",
+        "value": "MOP"
+      }, {
+        "description": null,
+        "label": "Mauritanian Ouguiya",
+        "value": "MRU"
+      }, {
+        "description": null,
+        "label": "Mauritian Rupee",
+        "value": "MUR"
+      }, {
+        "description": null,
+        "label": "Maldivian Rufiyaa",
+        "value": "MVR"
+      }, {
+        "description": null,
+        "label": "Malawian Kwacha",
+        "value": "MWK"
+      }, {
+        "description": null,
+        "label": "Mexican Peso",
+        "value": "MXN"
+      }, {
+        "description": null,
+        "label": "Malaysian Ringgit",
+        "value": "MYR"
+      }, {
+        "description": null,
+        "label": "Mozambican Metical",
+        "value": "MZN"
+      }, {
+        "description": null,
+        "label": "Namibian Dollar",
+        "value": "NAD"
+      }, {
+        "description": null,
+        "label": "Nigerian Naira",
+        "value": "NGN"
+      }, {
+        "description": null,
+        "label": "Nicaraguan Córdoba",
+        "value": "NIO"
+      }, {
+        "description": null,
+        "label": "Norwegian Krone",
+        "value": "NOK"
+      }, {
+        "description": null,
+        "label": "Nepalese Rupee",
+        "value": "NPR"
+      }, {
+        "description": null,
+        "label": "New Zealand Dollar",
+        "value": "NZD"
+      }, {
+        "description": null,
+        "label": "Omani Rial",
+        "value": "OMR"
+      }, {
+        "description": null,
+        "label": "Panamanian Balboa",
+        "value": "PAB"
+      }, {
+        "description": null,
+        "label": "Peruvian Sol",
+        "value": "PEN"
+      }, {
+        "description": null,
+        "label": "Papua New Guinean Kina",
+        "value": "PGK"
+      }, {
+        "description": null,
+        "label": "Philippine Peso",
+        "value": "PHP"
+      }, {
+        "description": null,
+        "label": "Pakistani Rupee",
+        "value": "PKR"
+      }, {
+        "description": null,
+        "label": "Polish Zloty",
+        "value": "PLN"
+      }, {
+        "description": null,
+        "label": "Paraguayan Guaraní",
+        "value": "PYG"
+      }, {
+        "description": null,
+        "label": "Qatari Riyal",
+        "value": "QAR"
+      }, {
+        "description": null,
+        "label": "Romanian Leu",
+        "value": "RON"
+      }, {
+        "description": null,
+        "label": "Serbian Dinar",
+        "value": "RSD"
+      }, {
+        "description": null,
+        "label": "Russian Ruble",
+        "value": "RUB"
+      }, {
+        "description": null,
+        "label": "Rwandan Franc",
+        "value": "RWF"
+      }, {
+        "description": null,
+        "label": "Saudi Riyal",
+        "value": "SAR"
+      }, {
+        "description": null,
+        "label": "Solomon Islands Dollar",
+        "value": "SBD"
+      }, {
+        "description": null,
+        "label": "Seychellois Rupee",
+        "value": "SCR"
+      }, {
+        "description": null,
+        "label": "Sudanese Pound",
+        "value": "SDG"
+      }, {
+        "description": null,
+        "label": "Swedish Krona",
+        "value": "SEK"
+      }, {
+        "description": null,
+        "label": "Singapore Dollar",
+        "value": "SGD"
+      }, {
+        "description": null,
+        "label": "Saint Helena Pound",
+        "value": "SHP"
+      }, {
+        "description": null,
+        "label": "Sierra Leonean Leone",
+        "value": "SLL"
+      }, {
+        "description": null,
+        "label": "Somali Shilling",
+        "value": "SOS"
+      }, {
+        "description": null,
+        "label": "Surinamese Dollar",
+        "value": "SRD"
+      }, {
+        "description": null,
+        "label": "South Sudanese Pound",
+        "value": "SSP"
+      }, {
+        "description": null,
+        "label": "São Tomé and Príncipe Dobra",
+        "value": "STN"
+      }, {
+        "description": null,
+        "label": "Syrian Pound",
+        "value": "SYP"
+      }, {
+        "description": null,
+        "label": "Eswatini Lilangeni",
+        "value": "SZL"
+      }, {
+        "description": null,
+        "label": "Thai Baht",
+        "value": "THB"
+      }, {
+        "description": null,
+        "label": "Tajikistani Somoni",
+        "value": "TJS"
+      }, {
+        "description": null,
+        "label": "Turkmenistan Manat",
+        "value": "TMT"
+      }, {
+        "description": null,
+        "label": "Tunisian Dinar",
+        "value": "TND"
+      }, {
+        "description": null,
+        "label": "Tongan Paʻanga",
+        "value": "TOP"
+      }, {
+        "description": null,
+        "label": "Turkish Lira",
+        "value": "TRY"
+      }, {
+        "description": null,
+        "label": "Trinidad and Tobago Dollar",
+        "value": "TTD"
+      }, {
+        "description": null,
+        "label": "Tuvaluan Dollar",
+        "value": "TVD"
+      }, {
+        "description": null,
+        "label": "New Taiwan Dollar",
+        "value": "TWD"
+      }, {
+        "description": null,
+        "label": "Tanzanian Shilling",
+        "value": "TZS"
+      }, {
+        "description": null,
+        "label": "Ukrainian Hryvnia",
+        "value": "UAH"
+      }, {
+        "description": null,
+        "label": "Ugandan Shilling",
+        "value": "UGX"
+      }, {
+        "description": null,
+        "label": "United States Dollar",
+        "value": "USD"
+      }, {
+        "description": null,
+        "label": "Uruguayan Peso",
+        "value": "UYU"
+      }, {
+        "description": null,
+        "label": "Uzbekistani So'm",
+        "value": "UZS"
+      }, {
+        "description": null,
+        "label": "Venezuelan Bolívar Soberano",
+        "value": "VES"
+      }, {
+        "description": null,
+        "label": "Vietnamese Đồng",
+        "value": "VND"
+      }, {
+        "description": null,
+        "label": "Vanuatu Vatu",
+        "value": "VUV"
+      }, {
+        "description": null,
+        "label": "Samoan Tālā",
+        "value": "WST"
+      }, {
+        "description": null,
+        "label": "Central African CFA Franc",
+        "value": "XAF"
+      }, {
+        "description": null,
+        "label": "East Caribbean Dollar",
+        "value": "XCD"
+      }, {
+        "description": null,
+        "label": "Special Drawing Rights",
+        "value": "XDR"
+      }, {
+        "description": null,
+        "label": "West African CFA Franc",
+        "value": "XOF"
+      }, {
+        "description": null,
+        "label": "CFP Franc",
+        "value": "XPF"
+      }, {
+        "description": null,
+        "label": "Yemeni Rial",
+        "value": "YER"
+      }, {
+        "description": null,
+        "label": "South African Rand",
+        "value": "ZAR"
+      }, {
+        "description": null,
+        "label": "Zambian Kwacha",
+        "value": "ZMW"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Currency to which you want to convert.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "To Currency",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "to_currency",
+      "options": [ {
+        "description": null,
+        "label": "UAE Dirham",
+        "value": "AED"
+      }, {
+        "description": null,
+        "label": "Afghan Afghani",
+        "value": "AFN"
+      }, {
+        "description": null,
+        "label": "Albanian Lek",
+        "value": "ALL"
+      }, {
+        "description": null,
+        "label": "Armenian Dram",
+        "value": "AMD"
+      }, {
+        "description": null,
+        "label": "Netherlands Antillean Guilder",
+        "value": "ANG"
+      }, {
+        "description": null,
+        "label": "Angolan Kwanza",
+        "value": "AOA"
+      }, {
+        "description": null,
+        "label": "Argentine Peso",
+        "value": "ARS"
+      }, {
+        "description": null,
+        "label": "Australian Dollar",
+        "value": "AUD"
+      }, {
+        "description": null,
+        "label": "Aruban Florin",
+        "value": "AWG"
+      }, {
+        "description": null,
+        "label": "Azerbaijani Manat",
+        "value": "AZN"
+      }, {
+        "description": null,
+        "label": "Bosnia and Herzegovina Mark",
+        "value": "BAM"
+      }, {
+        "description": null,
+        "label": "Barbados Dollar",
+        "value": "BBD"
+      }, {
+        "description": null,
+        "label": "Bangladeshi Taka",
+        "value": "BDT"
+      }, {
+        "description": null,
+        "label": "Bulgarian Lev",
+        "value": "BGN"
+      }, {
+        "description": null,
+        "label": "Bahraini Dinar",
+        "value": "BHD"
+      }, {
+        "description": null,
+        "label": "Burundian Franc",
+        "value": "BIF"
+      }, {
+        "description": null,
+        "label": "Bermudian Dollar",
+        "value": "BMD"
+      }, {
+        "description": null,
+        "label": "Brunei Dollar",
+        "value": "BND"
+      }, {
+        "description": null,
+        "label": "Bolivian Boliviano",
+        "value": "BOB"
+      }, {
+        "description": null,
+        "label": "Brazilian Real",
+        "value": "BRL"
+      }, {
+        "description": null,
+        "label": "Bahamian Dollar",
+        "value": "BSD"
+      }, {
+        "description": null,
+        "label": "Bhutanese Ngultrum",
+        "value": "BTN"
+      }, {
+        "description": null,
+        "label": "Botswana Pula",
+        "value": "BWP"
+      }, {
+        "description": null,
+        "label": "Belarusian Ruble",
+        "value": "BYN"
+      }, {
+        "description": null,
+        "label": "Belize Dollar",
+        "value": "BZD"
+      }, {
+        "description": null,
+        "label": "Canadian Dollar",
+        "value": "CAD"
+      }, {
+        "description": null,
+        "label": "Congolese Franc",
+        "value": "CDF"
+      }, {
+        "description": null,
+        "label": "Swiss Franc",
+        "value": "CHF"
+      }, {
+        "description": null,
+        "label": "Chilean Peso",
+        "value": "CLP"
+      }, {
+        "description": null,
+        "label": "Chinese Renminbi",
+        "value": "CNY"
+      }, {
+        "description": null,
+        "label": "Colombian Peso",
+        "value": "COP"
+      }, {
+        "description": null,
+        "label": "Costa Rican Colon",
+        "value": "CRC"
+      }, {
+        "description": null,
+        "label": "Cuban Convertible Peso",
+        "value": "CUC"
+      }, {
+        "description": null,
+        "label": "Cuban Peso",
+        "value": "CUP"
+      }, {
+        "description": null,
+        "label": "Cape Verdean Escudo",
+        "value": "CVE"
+      }, {
+        "description": null,
+        "label": "Czech Koruna",
+        "value": "CZK"
+      }, {
+        "description": null,
+        "label": "Djiboutian Franc",
+        "value": "DJF"
+      }, {
+        "description": null,
+        "label": "Danish Krone",
+        "value": "DKK"
+      }, {
+        "description": null,
+        "label": "Dominican Peso",
+        "value": "DOP"
+      }, {
+        "description": null,
+        "label": "Algerian Dinar",
+        "value": "DZD"
+      }, {
+        "description": null,
+        "label": "Egyptian Pound",
+        "value": "EGP"
+      }, {
+        "description": null,
+        "label": "Eritrean Nakfa",
+        "value": "ERN"
+      }, {
+        "description": null,
+        "label": "Ethiopian Birr",
+        "value": "ETB"
+      }, {
+        "description": null,
+        "label": "Euro",
+        "value": "EUR"
+      }, {
+        "description": null,
+        "label": "Fiji Dollar",
+        "value": "FJD"
+      }, {
+        "description": null,
+        "label": "Falkland Islands Pound",
+        "value": "FKP"
+      }, {
+        "description": null,
+        "label": "Faroese Króna",
+        "value": "FOK"
+      }, {
+        "description": null,
+        "label": "Pound Sterling",
+        "value": "GBP"
+      }, {
+        "description": null,
+        "label": "Georgian Lari",
+        "value": "GEL"
+      }, {
+        "description": null,
+        "label": "Guernsey Pound",
+        "value": "GGP"
+      }, {
+        "description": null,
+        "label": "Ghanaian Cedi",
+        "value": "GHS"
+      }, {
+        "description": null,
+        "label": "Gibraltar Pound",
+        "value": "GIP"
+      }, {
+        "description": null,
+        "label": "Gambian Dalasi",
+        "value": "GMD"
+      }, {
+        "description": null,
+        "label": "Guinean Franc",
+        "value": "GNF"
+      }, {
+        "description": null,
+        "label": "Guatemalan Quetzal",
+        "value": "GTQ"
+      }, {
+        "description": null,
+        "label": "Guyanese Dollar",
+        "value": "GYD"
+      }, {
+        "description": null,
+        "label": "Hong Kong Dollar",
+        "value": "HKD"
+      }, {
+        "description": null,
+        "label": "Honduran Lempira",
+        "value": "HNL"
+      }, {
+        "description": null,
+        "label": "Croatin Kuna",
+        "value": "HRK"
+      }, {
+        "description": null,
+        "label": "Haitian Gourde",
+        "value": "HTG"
+      }, {
+        "description": null,
+        "label": "Hungarian Forint",
+        "value": "HUF"
+      }, {
+        "description": null,
+        "label": "Indonesian Rupiah",
+        "value": "IDR"
+      }, {
+        "description": null,
+        "label": "Israeli New Shekel",
+        "value": "ILS"
+      }, {
+        "description": null,
+        "label": "Manx Pound",
+        "value": "IMP"
+      }, {
+        "description": null,
+        "label": "Indian Rupee",
+        "value": "INR"
+      }, {
+        "description": null,
+        "label": "Iraqi Dinar",
+        "value": "IQD"
+      }, {
+        "description": null,
+        "label": "Iranian Rial",
+        "value": "IRR"
+      }, {
+        "description": null,
+        "label": "Icelandic Króna",
+        "value": "ISK"
+      }, {
+        "description": null,
+        "label": "Jamaican Dollar",
+        "value": "JMD"
+      }, {
+        "description": null,
+        "label": "Jordanian Dinar",
+        "value": "JOD"
+      }, {
+        "description": null,
+        "label": "Japanese Yen",
+        "value": "JPY"
+      }, {
+        "description": null,
+        "label": "Kenyan Shilling",
+        "value": "KES"
+      }, {
+        "description": null,
+        "label": "Kyrgyzstani Som",
+        "value": "KGS"
+      }, {
+        "description": null,
+        "label": "Cambodian Riel",
+        "value": "KHR"
+      }, {
+        "description": null,
+        "label": "Kiribati Dollar",
+        "value": "KID"
+      }, {
+        "description": null,
+        "label": "Comorian Franc",
+        "value": "KMF"
+      }, {
+        "description": null,
+        "label": "South Korean Won",
+        "value": "KRW"
+      }, {
+        "description": null,
+        "label": "Kuwaiti Dinar",
+        "value": "KWD"
+      }, {
+        "description": null,
+        "label": "Cayman Islands Dollar",
+        "value": "KYD"
+      }, {
+        "description": null,
+        "label": "Kazakhstani Tenge",
+        "value": "KZT"
+      }, {
+        "description": null,
+        "label": "Lao Kip",
+        "value": "LAK"
+      }, {
+        "description": null,
+        "label": "Lebanese Pound",
+        "value": "LBP"
+      }, {
+        "description": null,
+        "label": "Sri Lanka Rupee",
+        "value": "LKR"
+      }, {
+        "description": null,
+        "label": "Liberian Dollar",
+        "value": "LRD"
+      }, {
+        "description": null,
+        "label": "Lesotho Loti",
+        "value": "LSL"
+      }, {
+        "description": null,
+        "label": "Libyan Dinar",
+        "value": "LYD"
+      }, {
+        "description": null,
+        "label": "Moroccan Dirham",
+        "value": "MAD"
+      }, {
+        "description": null,
+        "label": "Moldovan Leu",
+        "value": "MDL"
+      }, {
+        "description": null,
+        "label": "Malagasy Ariary",
+        "value": "MGA"
+      }, {
+        "description": null,
+        "label": "Macedonian Denar",
+        "value": "MKD"
+      }, {
+        "description": null,
+        "label": "Burmese Kyat",
+        "value": "MMK"
+      }, {
+        "description": null,
+        "label": "Mongolian Tögrög",
+        "value": "MNT"
+      }, {
+        "description": null,
+        "label": "Macanese Pataca",
+        "value": "MOP"
+      }, {
+        "description": null,
+        "label": "Mauritanian Ouguiya",
+        "value": "MRU"
+      }, {
+        "description": null,
+        "label": "Mauritian Rupee",
+        "value": "MUR"
+      }, {
+        "description": null,
+        "label": "Maldivian Rufiyaa",
+        "value": "MVR"
+      }, {
+        "description": null,
+        "label": "Malawian Kwacha",
+        "value": "MWK"
+      }, {
+        "description": null,
+        "label": "Mexican Peso",
+        "value": "MXN"
+      }, {
+        "description": null,
+        "label": "Malaysian Ringgit",
+        "value": "MYR"
+      }, {
+        "description": null,
+        "label": "Mozambican Metical",
+        "value": "MZN"
+      }, {
+        "description": null,
+        "label": "Namibian Dollar",
+        "value": "NAD"
+      }, {
+        "description": null,
+        "label": "Nigerian Naira",
+        "value": "NGN"
+      }, {
+        "description": null,
+        "label": "Nicaraguan Córdoba",
+        "value": "NIO"
+      }, {
+        "description": null,
+        "label": "Norwegian Krone",
+        "value": "NOK"
+      }, {
+        "description": null,
+        "label": "Nepalese Rupee",
+        "value": "NPR"
+      }, {
+        "description": null,
+        "label": "New Zealand Dollar",
+        "value": "NZD"
+      }, {
+        "description": null,
+        "label": "Omani Rial",
+        "value": "OMR"
+      }, {
+        "description": null,
+        "label": "Panamanian Balboa",
+        "value": "PAB"
+      }, {
+        "description": null,
+        "label": "Peruvian Sol",
+        "value": "PEN"
+      }, {
+        "description": null,
+        "label": "Papua New Guinean Kina",
+        "value": "PGK"
+      }, {
+        "description": null,
+        "label": "Philippine Peso",
+        "value": "PHP"
+      }, {
+        "description": null,
+        "label": "Pakistani Rupee",
+        "value": "PKR"
+      }, {
+        "description": null,
+        "label": "Polish Zloty",
+        "value": "PLN"
+      }, {
+        "description": null,
+        "label": "Paraguayan Guaraní",
+        "value": "PYG"
+      }, {
+        "description": null,
+        "label": "Qatari Riyal",
+        "value": "QAR"
+      }, {
+        "description": null,
+        "label": "Romanian Leu",
+        "value": "RON"
+      }, {
+        "description": null,
+        "label": "Serbian Dinar",
+        "value": "RSD"
+      }, {
+        "description": null,
+        "label": "Russian Ruble",
+        "value": "RUB"
+      }, {
+        "description": null,
+        "label": "Rwandan Franc",
+        "value": "RWF"
+      }, {
+        "description": null,
+        "label": "Saudi Riyal",
+        "value": "SAR"
+      }, {
+        "description": null,
+        "label": "Solomon Islands Dollar",
+        "value": "SBD"
+      }, {
+        "description": null,
+        "label": "Seychellois Rupee",
+        "value": "SCR"
+      }, {
+        "description": null,
+        "label": "Sudanese Pound",
+        "value": "SDG"
+      }, {
+        "description": null,
+        "label": "Swedish Krona",
+        "value": "SEK"
+      }, {
+        "description": null,
+        "label": "Singapore Dollar",
+        "value": "SGD"
+      }, {
+        "description": null,
+        "label": "Saint Helena Pound",
+        "value": "SHP"
+      }, {
+        "description": null,
+        "label": "Sierra Leonean Leone",
+        "value": "SLL"
+      }, {
+        "description": null,
+        "label": "Somali Shilling",
+        "value": "SOS"
+      }, {
+        "description": null,
+        "label": "Surinamese Dollar",
+        "value": "SRD"
+      }, {
+        "description": null,
+        "label": "South Sudanese Pound",
+        "value": "SSP"
+      }, {
+        "description": null,
+        "label": "São Tomé and Príncipe Dobra",
+        "value": "STN"
+      }, {
+        "description": null,
+        "label": "Syrian Pound",
+        "value": "SYP"
+      }, {
+        "description": null,
+        "label": "Eswatini Lilangeni",
+        "value": "SZL"
+      }, {
+        "description": null,
+        "label": "Thai Baht",
+        "value": "THB"
+      }, {
+        "description": null,
+        "label": "Tajikistani Somoni",
+        "value": "TJS"
+      }, {
+        "description": null,
+        "label": "Turkmenistan Manat",
+        "value": "TMT"
+      }, {
+        "description": null,
+        "label": "Tunisian Dinar",
+        "value": "TND"
+      }, {
+        "description": null,
+        "label": "Tongan Paʻanga",
+        "value": "TOP"
+      }, {
+        "description": null,
+        "label": "Turkish Lira",
+        "value": "TRY"
+      }, {
+        "description": null,
+        "label": "Trinidad and Tobago Dollar",
+        "value": "TTD"
+      }, {
+        "description": null,
+        "label": "Tuvaluan Dollar",
+        "value": "TVD"
+      }, {
+        "description": null,
+        "label": "New Taiwan Dollar",
+        "value": "TWD"
+      }, {
+        "description": null,
+        "label": "Tanzanian Shilling",
+        "value": "TZS"
+      }, {
+        "description": null,
+        "label": "Ukrainian Hryvnia",
+        "value": "UAH"
+      }, {
+        "description": null,
+        "label": "Ugandan Shilling",
+        "value": "UGX"
+      }, {
+        "description": null,
+        "label": "United States Dollar",
+        "value": "USD"
+      }, {
+        "description": null,
+        "label": "Uruguayan Peso",
+        "value": "UYU"
+      }, {
+        "description": null,
+        "label": "Uzbekistani So'm",
+        "value": "UZS"
+      }, {
+        "description": null,
+        "label": "Venezuelan Bolívar Soberano",
+        "value": "VES"
+      }, {
+        "description": null,
+        "label": "Vietnamese Đồng",
+        "value": "VND"
+      }, {
+        "description": null,
+        "label": "Vanuatu Vatu",
+        "value": "VUV"
+      }, {
+        "description": null,
+        "label": "Samoan Tālā",
+        "value": "WST"
+      }, {
+        "description": null,
+        "label": "Central African CFA Franc",
+        "value": "XAF"
+      }, {
+        "description": null,
+        "label": "East Caribbean Dollar",
+        "value": "XCD"
+      }, {
+        "description": null,
+        "label": "Special Drawing Rights",
+        "value": "XDR"
+      }, {
+        "description": null,
+        "label": "West African CFA Franc",
+        "value": "XOF"
+      }, {
+        "description": null,
+        "label": "CFP Franc",
+        "value": "XPF"
+      }, {
+        "description": null,
+        "label": "Yemeni Rial",
+        "value": "YER"
+      }, {
+        "description": null,
+        "label": "South African Rand",
+        "value": "ZAR"
+      }, {
+        "description": null,
+        "label": "Zambian Kwacha",
+        "value": "ZMW"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "NUMBER",
+      "defaultValue": 1.0,
+      "description": "Value to convert.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Value",
+      "maxNumberPrecision": null,
+      "maxValue": null,
+      "metadata": { },
+      "minNumberPrecision": null,
+      "minValue": null,
+      "name": "from_value",
+      "numberPrecision": null,
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "NUMBER"
+    } ],
+    "title": "Currency Converter",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "urlShortener",
+    "description": "Shorten your desired URL",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "url",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "single_use",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "temporary_redirect",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "forward_params",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "short_url",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "url",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "single_use",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "temporary_redirect",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "forward_params",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "short_url",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Place the URL you want to shorten",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "URL",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "url",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "URL Shortener",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "webInformation",
+    "description": "Get information about a certain webpage",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "additionalProperties": null,
+            "advancedOption": null,
+            "controlType": "OBJECT_BUILDER",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "multipleValues": null,
+            "name": "general",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "properties": [ {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "title",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "description",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "canonical",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            } ],
+            "required": null,
+            "type": "OBJECT"
+          }, {
+            "additionalProperties": null,
+            "advancedOption": null,
+            "controlType": "OBJECT_BUILDER",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "multipleValues": null,
+            "name": "twitter",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "properties": [ {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "site",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "title",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "description",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            } ],
+            "required": null,
+            "type": "OBJECT"
+          }, {
+            "additionalProperties": null,
+            "advancedOption": null,
+            "controlType": "OBJECT_BUILDER",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "multipleValues": null,
+            "name": "og",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "properties": [ {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "title",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "url",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "image",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "description",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "type",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            } ],
+            "required": null,
+            "type": "OBJECT"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": "general",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "title",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "description",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "canonical",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        }, {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": "twitter",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "site",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "title",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "description",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        }, {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": "og",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "title",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "url",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "image",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "description",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "type",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Place the web page url you want to get info from",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "URL",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "url",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Web Page Information",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  } ],
   "componentCategories": [ {
     "name": "developer-tools",
     "label": "Developer Tools"
@@ -3239,14 +6434,20 @@
       "type": "CUSTOM"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/one-simple-api_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "One Simple API documentation",
+    "learnMoreUrl": "https://onesimpleapi.com/docs"
+  },
   "description": "A toolbox with all the things you need to get your project to success:  Image resize and CDN, PDF and Screenshots generation, Currency Exchange and Discounts, Email Validation, QR codes, and much more!",
   "icon": "path:assets/one-simple-api.svg",
   "metadata": null,
