@@ -150,7 +150,9 @@ public class HttpClientConnection {
                                         "client_secret", connectionParameters.getString(CLIENT_SECRET),
                                         "grant_type", "client_credentials"),
                                     FORM_URL_ENCODED))
-                            .configuration(responseType(ResponseType.JSON))
+                            .configuration(
+                                responseType(ResponseType.JSON)
+                                    .disableAuthorization(true))
                             .execute()
                             .getBody(Map.class);
 
