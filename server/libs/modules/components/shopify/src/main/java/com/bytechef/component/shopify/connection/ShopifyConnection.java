@@ -166,7 +166,7 @@ public class ShopifyConnection {
                     .formatted(connectionParameters.getRequiredString(SHOP_NAME)))
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
                     Map.of("X-Shopify-Access-Token", List.of(connectionParameters.getRequiredString(ACCESS_TOKEN))))))
-        .help("", "https://docs.bytechef.io/reference/components/hopify_v1#connection-setup")
+        .help("", "https://docs.bytechef.io/reference/components/shopify_v1#connection-setup")
         .version(1);
 
     private ShopifyConnection() {
