@@ -1,4 +1,4 @@
-import {EDGE_STYLES, FINAL_PLACEHOLDER_NODE_ID, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {EDGE_STYLES, FINAL_PLACEHOLDER_NODE_ID, LayoutDirectionType, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
@@ -8,10 +8,12 @@ import {WIDTHS} from '@/shared/theme/constants';
 import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import animateNodePositions from '../utils/animateNodePositions';
 import createBranchEdges from '../utils/createBranchEdges';
 import createBranchNode from '../utils/createBranchNode';
 import createConditionEdges, {hasTaskInConditionBranches} from '../utils/createConditionEdges';
@@ -34,18 +36,25 @@ import {
 } from '../utils/layoutUtils';
 
 interface UseLayoutProps {
+    canvasHeight?: number;
     canvasWidth: number;
     componentDefinitions: Array<ComponentDefinitionBasic>;
+    direction?: LayoutDirectionType;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasic>;
 }
 
 export default function useLayout({
+    canvasHeight,
     canvasWidth,
     componentDefinitions,
+    direction: directionProp,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: UseLayoutProps) {
+    const storeDirection = useLayoutDirectionStore((state) => state.layoutDirection);
+    const layoutDirection = directionProp || storeDirection;
+
     let workflow = useWorkflowDataStore((state) => state.workflow);
     const isWorkflowLoaded = useWorkflowDataStore((state) => state.isWorkflowLoaded);
 
@@ -55,13 +64,19 @@ export default function useLayout({
 
     const {tasks, triggers} = workflow;
 
-    const {initializeWithCanvasWidth, setEdges, setNodes} = useWorkflowDataStore(
+    const {initializeWithCanvasWidth, setEdges, setNodes, setSavedPositionCrossAxisShift} = useWorkflowDataStore(
         useShallow((state) => ({
             initializeWithCanvasWidth: state.initializeWithCanvasWidth,
             setEdges: state.setEdges,
             setNodes: state.setNodes,
+            setSavedPositionCrossAxisShift: state.setSavedPositionCrossAxisShift,
         }))
     );
+
+    const cancelAnimationRef = useRef<(() => void) | null>(null);
+    const isInitialLayoutRef = useRef(true);
+    const initialCanvasCrossDimRef = useRef<number | undefined>(undefined);
+    const initialDirectionRef = useRef<LayoutDirectionType | undefined>(undefined);
 
     const triggerComponentName = useMemo(() => triggers?.[0]?.type.split('/')[0], [triggers]);
 
@@ -330,13 +345,17 @@ export default function useLayout({
                 });
 
                 if (edgeFromTaskDispatcherBottomGhost) {
-                    taskEdges.push(edgeFromTaskDispatcherBottomGhost);
+                    const isDuplicate = taskEdges.some((edge) => edge.id === edgeFromTaskDispatcherBottomGhost.id);
 
-                    if (
-                        edgeFromTaskDispatcherBottomGhost.target === FINAL_PLACEHOLDER_NODE_ID &&
-                        !allNodes.some((node) => node.id === FINAL_PLACEHOLDER_NODE_ID)
-                    ) {
-                        allNodes.push(finalPlaceholderNode);
+                    if (!isDuplicate) {
+                        taskEdges.push(edgeFromTaskDispatcherBottomGhost);
+
+                        if (
+                            edgeFromTaskDispatcherBottomGhost.target === FINAL_PLACEHOLDER_NODE_ID &&
+                            !allNodes.some((node) => node.id === FINAL_PLACEHOLDER_NODE_ID)
+                        ) {
+                            allNodes.push(finalPlaceholderNode);
+                        }
                     }
                 }
 
@@ -399,10 +418,18 @@ export default function useLayout({
         }
     });
 
+    const layoutResetCounter = useWorkflowDataStore((state) => state.layoutResetCounter);
+
     useEffect(() => {
+        if (useWorkflowDataStore.getState().isNodeDragging) {
+            return;
+        }
+
         if (!isWorkflowLoaded && !readOnlyWorkflow) {
             return;
         }
+
+        let isCancelled = false;
 
         let layoutNodes = allNodes;
         let edges: Edge[] = taskEdges;
@@ -439,30 +466,89 @@ export default function useLayout({
             }
         }
 
-        getLayoutedElements({canvasWidth, edges, nodes: layoutNodes}).then((elements) => {
+        const canvasCrossDimension = layoutDirection === 'LR' && canvasHeight ? canvasHeight : canvasWidth;
+        let savedPositionCrossAxisShift = 0;
+
+        if (initialCanvasCrossDimRef.current !== undefined && initialDirectionRef.current === layoutDirection) {
+            savedPositionCrossAxisShift = (canvasCrossDimension - initialCanvasCrossDimRef.current) / 2;
+        }
+
+        if (initialCanvasCrossDimRef.current === undefined || initialDirectionRef.current !== layoutDirection) {
+            initialCanvasCrossDimRef.current = canvasCrossDimension;
+            initialDirectionRef.current = layoutDirection;
+        }
+
+        setSavedPositionCrossAxisShift(savedPositionCrossAxisShift);
+
+        const preLayoutNodes = useWorkflowDataStore.getState().nodes;
+
+        getLayoutedElements({
+            canvasHeight,
+            canvasWidth,
+            direction: layoutDirection,
+            edges,
+            nodes: layoutNodes,
+            savedPositionCrossAxisShift,
+        }).then((elements) => {
+            if (isCancelled) {
+                return;
+            }
+
+            let targetNodes: Node[];
+
             if (readOnlyWorkflow) {
                 const SHEET_WIDTH = WIDTHS.WORKFLOW_READ_ONLY_SHEET_WIDTH;
 
                 const centeringOffsetX = (canvasWidth - SHEET_WIDTH) / 2;
 
-                const centeredNodes = elements.nodes.map((node) => ({
+                targetNodes = elements.nodes.map((node) => ({
                     ...node,
                     position: {
                         x: node.position.x - centeringOffsetX,
                         y: node.position.y,
                     },
                 }));
-
-                setNodes(centeredNodes);
             } else {
-                setNodes(elements.nodes);
+                targetNodes = elements.nodes;
             }
 
-            setEdges(elements.edges);
+            if (cancelAnimationRef.current) {
+                cancelAnimationRef.current();
+            }
+
+            if (isInitialLayoutRef.current || readOnlyWorkflow) {
+                setNodes(targetNodes);
+                setEdges(elements.edges);
+                isInitialLayoutRef.current = false;
+            } else {
+                const previousPositionMap = new Map(preLayoutNodes.map((node) => [node.id, node.position]));
+
+                // Place surviving nodes at their current positions so they can animate to targets
+                const nodesWithCurrentPositions = targetNodes.map((targetNode) => {
+                    const previousPosition = previousPositionMap.get(targetNode.id);
+
+                    return previousPosition ? {...targetNode, position: previousPosition} : targetNode;
+                });
+
+                // Set final nodes (at old positions) and final edges immediately —
+                // deleted nodes and their edges vanish, surviving nodes then animate to new positions
+                setNodes(nodesWithCurrentPositions);
+                setEdges(elements.edges);
+
+                cancelAnimationRef.current = animateNodePositions(preLayoutNodes, targetNodes, setNodes);
+            }
         });
 
+        return () => {
+            isCancelled = true;
+
+            if (cancelAnimationRef.current) {
+                cancelAnimationRef.current();
+            }
+        };
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canvasWidth, tasks, triggers, isWorkflowLoaded]);
+    }, [canvasHeight, canvasWidth, layoutDirection, layoutResetCounter, tasks, triggers, isWorkflowLoaded]);
 
     useEffect(() => {
         if (canvasWidth > 0) {
