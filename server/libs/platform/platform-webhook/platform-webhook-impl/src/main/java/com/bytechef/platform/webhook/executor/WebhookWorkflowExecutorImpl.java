@@ -47,12 +47,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
  */
 public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebhookWorkflowExecutorImpl.class);
 
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
@@ -115,10 +119,13 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
         return completion.whenComplete((result, throwable) -> {
             try {
-                registration.handle()
-                    .close();
+                AutoCloseable handle = registration.handle();
+
+                handle.close();
             } catch (Exception exception) {
-                // Ignore exceptions during cleanup to avoid masking the original completion outcome
+                if (logger.isTraceEnabled()) {
+                    logger.trace(exception.getMessage(), exception);
+                }
             }
         });
     }

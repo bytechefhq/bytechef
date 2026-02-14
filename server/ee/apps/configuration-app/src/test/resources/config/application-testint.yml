@@ -19,6 +19,8 @@ bytechef:
   encryption:
     provider: filesystem
   edition: EE
+  worker:
+    enabled: false
   file-storage:
     provider: jdbc
   workflow:
