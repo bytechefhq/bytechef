@@ -20,6 +20,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.util.CustomActionUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,11 +36,11 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
     public ComponentDefinitionWrapper(
         ComponentDefinition componentDefinition, List<ActionDefinition> actionDefinitions) {
 
-        Optional<List<ClusterElementDefinition<?>>> elementElementsOptional = componentDefinition.getClusterElements();
-
-        this(componentDefinition, actionDefinitions, elementElementsOptional.orElse(null));
+        this(componentDefinition, actionDefinitions, componentDefinition.getClusterElements()
+            .orElse(null));
     }
 
+    @SuppressFBWarnings("EI")
     public ComponentDefinitionWrapper(
         ComponentDefinition componentDefinition, List<ActionDefinition> actionDefinitions,
         List<ClusterElementDefinition<?>> clusterElementDefinitions) {

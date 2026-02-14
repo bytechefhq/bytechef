@@ -33,7 +33,8 @@ public class DefaultComponentHandlerLoader extends AbstractComponentHandlerLoade
     public static final BiFunction<ComponentHandler, ActionDefinition, PerformFunction> PERFORM_FUNCTION_FUNCTION =
         (componentHandler, actionDefinition) -> {
             ActionHandlerFunction actionHandlerFunction = componentHandler.getActionHandler()
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalStateException(
+                    "ActionHandler must be present for ComponentHandler"));
 
             return (inputParameters, connectionParameters, context) -> actionHandlerFunction.apply(
                 actionDefinition.getName(), inputParameters, context);
