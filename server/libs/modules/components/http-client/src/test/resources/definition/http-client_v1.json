@@ -5031,7 +5031,7 @@
       "type": "OAUTH2_IMPLICIT_CODE"
     }, {
       "acquire": null,
-      "apply": null,
+      "apply": { },
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
