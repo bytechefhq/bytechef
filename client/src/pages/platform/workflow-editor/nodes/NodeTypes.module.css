@@ -7,7 +7,6 @@
 }
 
 .handleVisible {
-    @apply left-node-handle-placement;
     @apply -z-10;
     @apply h-2;
     @apply w-2;

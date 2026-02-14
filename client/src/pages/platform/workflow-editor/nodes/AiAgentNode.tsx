@@ -8,7 +8,7 @@ import {NodeDataType} from '@/shared/types';
 import {HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {ComponentIcon, TrashIcon} from 'lucide-react';
+import {ComponentIcon, PinOffIcon, TrashIcon} from 'lucide-react';
 import {memo, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import sanitize from 'sanitize-html';
@@ -18,15 +18,19 @@ import {useShallow} from 'zustand/react/shallow';
 import {extractClusterElementIcons} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useNodeClickHandler from '../hooks/useNodeClick';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import {mapHandlePosition} from '../utils/directionUtils';
 import {getTask} from '../utils/getTask';
 import handleDeleteTask from '../utils/handleDeleteTask';
+import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
 import styles from './NodeTypes.module.css';
 
 const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
+    const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const [hasIcons, setHasIcons] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -35,7 +39,12 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             currentNode: state.currentNode,
         }))
     );
-    const workflow = useWorkflowDataStore((state) => state.workflow);
+    const {incrementLayoutResetCounter, workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            incrementLayoutResetCounter: state.incrementLayoutResetCounter,
+            workflow: state.workflow,
+        }))
+    );
     const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
     const queryClient = useQueryClient();
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
@@ -91,6 +100,8 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
+    const hasSavedNodePosition = data.metadata?.ui?.nodePosition;
+
     const handleDeleteNodeClick = (data: NodeDataType) => {
         if (data) {
             handleDeleteTask({
@@ -104,6 +115,15 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         }
     };
 
+    const handleRemoveNodePosition = (nodeName: string) => {
+        removeWorkflowNodePosition({
+            incrementLayoutResetCounter,
+            invalidateWorkflowQueries: invalidateWorkflowQueries!,
+            nodeName,
+            updateWorkflowMutation: updateWorkflowMutation!,
+        });
+    };
+
     useEffect(() => {
         if (memoizedIconsList.iconsToShow.length > 0) {
             setHasIcons(true);
@@ -112,21 +132,38 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         }
     }, [memoizedIconsList.iconsToShow]);
 
+    const isHorizontal = layoutDirection === 'LR';
+
     return (
         <div
-            className="nodrag group relative flex min-w-60 cursor-pointer items-center justify-center"
+            className={twMerge(
+                'group relative flex min-w-60 cursor-pointer items-center justify-center',
+                isHorizontal && !hasIcons && 'min-w-0'
+            )}
             data-nodetype="aiAgentNode"
             key={id}
         >
-            <div className="invisible absolute left-workflow-node-popover-hover pr-4 group-hover:visible">
-                <Button
-                    className="opacity-100"
-                    icon={<TrashIcon />}
-                    onClick={() => handleDeleteNodeClick(data)}
-                    size="iconSm"
-                    title="Delete a node"
-                    variant="destructiveGhost"
-                />
+            <div className="invisible absolute left-workflow-node-popover-hover top-0 pr-4 group-hover:visible">
+                <div className="flex flex-col gap-1">
+                    <Button
+                        className="opacity-100"
+                        icon={<TrashIcon />}
+                        onClick={() => handleDeleteNodeClick(data)}
+                        size="iconSm"
+                        title="Delete a node"
+                        variant="destructiveGhost"
+                    />
+
+                    {hasSavedNodePosition && (
+                        <Button
+                            icon={<PinOffIcon />}
+                            onClick={() => handleRemoveNodePosition(data.name)}
+                            size="iconSm"
+                            title="Remove saved node position"
+                            variant="ghost"
+                        />
+                    )}
+                </div>
             </div>
 
             <HoverCard
@@ -234,27 +271,46 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 )}
             </HoverCard>
 
-            <div className="ml-2 flex w-full min-w-max flex-col items-start">
-                <span className="font-semibold">{data.title || data.label}</span>
+            <div
+                className={twMerge(
+                    'ml-2 flex w-full min-w-max flex-col items-start',
+                    isHorizontal && 'absolute top-full ml-0 w-auto min-w-0 max-w-[150px] items-center text-center'
+                )}
+            >
+                <span className={twMerge('font-semibold', isHorizontal && 'w-full truncate')}>
+                    {data.title || data.label}
+                </span>
 
-                {data.operationName && <pre className="text-sm">{data.operationName}</pre>}
+                {data.operationName && (
+                    <pre className={twMerge('text-sm', isHorizontal && 'w-full truncate')}>{data.operationName}</pre>
+                )}
 
-                <span className="text-sm text-content-neutral-secondary">{data.workflowNodeName}</span>
+                <span className={twMerge('text-sm text-content-neutral-secondary', isHorizontal && 'w-full truncate')}>
+                    {data.workflowNodeName}
+                </span>
             </div>
 
             <Handle
-                className={twMerge(styles.handleVisible, '-top-[1px] rounded-b-none rounded-t-xs')}
+                className={twMerge(
+                    styles.handleVisible,
+                    layoutDirection === 'LR'
+                        ? '-left-[1px] rounded-l-xs rounded-r-none'
+                        : '-top-[1px] rounded-b-none rounded-t-xs'
+                )}
                 isConnectable={false}
-                position={Position.Top}
-                style={hasIcons ? {left: '120px'} : {left: '36px'}}
+                position={mapHandlePosition(Position.Top, layoutDirection)}
+                style={layoutDirection === 'TB' ? (hasIcons ? {left: '120px'} : {left: '36px'}) : undefined}
                 type="target"
             />
 
             <Handle
-                className={twMerge(styles.handleVisible, 'rounded-b-xs rounded-t-none')}
+                className={twMerge(
+                    styles.handleVisible,
+                    layoutDirection === 'LR' ? 'rounded-l-none rounded-r-xs' : 'rounded-b-xs rounded-t-none'
+                )}
                 isConnectable={false}
-                position={Position.Bottom}
-                style={hasIcons ? {left: '120px'} : {left: '36px'}}
+                position={mapHandlePosition(Position.Bottom, layoutDirection)}
+                style={layoutDirection === 'TB' ? (hasIcons ? {left: '120px'} : {left: '36px'}) : undefined}
                 type="source"
             />
         </div>
