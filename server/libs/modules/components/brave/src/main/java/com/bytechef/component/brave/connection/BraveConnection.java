@@ -30,14 +30,16 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public class BraveConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api.search.brave.com/res/v1/")
+        .baseUri((connectionParameters, context) -> "https://api.search.brave.com/res/v1")
         .authorizations(
             authorization(AuthorizationType.API_KEY)
                 .title("API Key")
                 .properties(
                     string(API_TOKEN)
                         .label("API token")
-                        .required(true)));
+                        .required(true)))
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/brave_v1#connection-setup");
 
     private BraveConnection() {
     }

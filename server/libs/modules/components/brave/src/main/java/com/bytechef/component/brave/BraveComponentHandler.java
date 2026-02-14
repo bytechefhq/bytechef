@@ -20,7 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.brave.action.BraveSearchAction;
+import com.bytechef.component.brave.action.BraveWebSearchAction;
 import com.bytechef.component.brave.connection.BraveConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -35,14 +35,16 @@ public class BraveComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("brave")
         .title("Brave")
         .description(
-            "Brave gives you access to the same powerful, independent search index that powers the privacy-first search engine trusted by millions")
+            "Brave gives you access to the same powerful, independent search index that powers the privacy-first " +
+                "search engine trusted by millions")
         .icon("path:assets/brave.svg")
         .categories(ComponentCategory.HELPERS)
         .connection(BraveConnection.CONNECTION_DEFINITION)
-        .actions(
-            BraveSearchAction.ACTION_DEFINITION)
-        .clusterElements(
-            tool(BraveSearchAction.ACTION_DEFINITION));
+        .actions(BraveWebSearchAction.ACTION_DEFINITION)
+        .clusterElements(tool(BraveWebSearchAction.ACTION_DEFINITION))
+        .customAction(true)
+        .customActionHelp("Brave Search API", "https://brave.com/search/api/")
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -41,30 +41,32 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Marko Krišković
  */
-public class BraveSearchAction {
+public class BraveWebSearchAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("braveSearch")
-        .title("Search")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("webSearch")
+        .title("Web Search")
         .description("Search the web for relevant content.")
         .properties(
             string(Q)
                 .label("Search Query")
                 .description(
-                    "The user’s search query term. Query can not be empty. Maximum of 400 characters and 50 words in the query.")
+                    "The user’s search query term. Query can not be empty. Maximum of 400 characters and 50 words " +
+                        "in the query.")
                 .minLength(1)
                 .maxLength(400)
                 .required(true),
             integer(COUNT)
                 .label("Count")
                 .description(
-                    "The number of search results returned in response. The maximum is 20. The actual number delivered may be less than requested. Combine this parameter with offset to paginate search results.")
+                    "The number of search results returned in response. The maximum is 20. The actual number " +
+                        "delivered may be less than requested. Combine this parameter with offset to paginate " +
+                        "search results.")
                 .minValue(1)
                 .maxValue(20)
                 .advancedOption(true)
@@ -72,7 +74,8 @@ public class BraveSearchAction {
             integer(OFFSET)
                 .label("Offset")
                 .description(
-                    "The zero based offset that indicates number of search result pages (count) to skip before returning the result. The actual number delivered may be less than requested.")
+                    "The zero based offset that indicates number of search result pages (count) to skip " +
+                        "before returning the result. The actual number delivered may be less than requested.")
                 .minValue(0)
                 .maxValue(9)
                 .advancedOption(true)
@@ -109,7 +112,7 @@ public class BraveSearchAction {
                 .required(false),
             bool(OPERATORS)
                 .label("Operators")
-                .description("Whether to apply search operators")
+                .description("Whether to apply search operators.")
                 .advancedOption(true)
                 .required(false),
             string(COUNTRY)
@@ -221,58 +224,79 @@ public class BraveSearchAction {
                             .properties(string("original")),
                         object("discussions")
                             .properties(
-                                array("results").items(
-                                    object().properties(
-                                        string("title"),
-                                        string("url"),
-                                        string("description")))),
+                                array("results")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string("title"),
+                                                string("url"),
+                                                string("description")))),
                         object("faq")
-                            .properties(array("results").items(
-                                object().properties(
-                                    string("question"),
-                                    string("answer"),
-                                    string("url"),
-                                    string("title")))),
+                            .properties(
+                                array("results")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string("question"),
+                                                string("answer"),
+                                                string("url"),
+                                                string("title")))),
                         object("infobox")
-                            .properties(array("results").items(
-                                object().properties(
-                                    string("title"),
-                                    string("url"),
-                                    string("description")))),
+                            .properties(
+                                array("results")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string("title"),
+                                                string("url"),
+                                                string("description")))),
                         object("locations")
-                            .properties(array("results").items(
-                                object().properties(
-                                    string("title"),
-                                    string("url"),
-                                    string("description")))),
+                            .properties(
+                                array("results")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string("title"),
+                                                string("url"),
+                                                string("description")))),
                         object("news")
-                            .properties(array("results").items(
-                                object().properties(
-                                    string("title"),
-                                    string("url"),
-                                    string("description")))),
+                            .properties(
+                                array("results")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string("title"),
+                                                string("url"),
+                                                string("description")))),
                         object("videos")
-                            .properties(array("results").items(
-                                object().properties(
-                                    string("title"),
-                                    string("url"),
-                                    string("description")))),
+                            .properties(
+                                array("results")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string("title"),
+                                                string("url"),
+                                                string("description")))),
                         object("web")
-                            .properties(array("results").items(
-                                object().properties(
-                                    string("title"),
-                                    string("url"),
-                                    string("description")))),
+                            .properties(
+                                array("results")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string("title"),
+                                                string("url"),
+                                                string("description")))),
                         object("summarizer")
                             .properties(string("key")))))
-        .perform(BraveSearchAction::perform);
+        .help("", "https://docs.bytechef.io/reference/components/brave_v1#web-search")
+        .perform(BraveWebSearchAction::perform);
 
-    private BraveSearchAction() {
+    private BraveWebSearchAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
-            .http(http -> http.get("https://api.search.brave.com/res/v1/web/search"))
+            .http(http -> http.get("/web/search"))
             .headers(
                 Map.of("Accept", List.of("application/json"),
                     "Accept-Encoding", List.of("gzip"),
@@ -290,6 +314,6 @@ public class BraveSearchAction {
                 SEARCH_LANG, inputParameters.getString(SEARCH_LANG))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
