@@ -6,12 +6,13 @@ import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {BranchCaseType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
-import {WorkflowDataType} from '../stores/useWorkflowDataStore';
+import useWorkflowDataStore, {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import findAndRemoveClusterElement from './findAndRemoveClusterElement';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
+import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface HandleDeleteTaskProps {
     rootClusterElementNodeData?: NodeDataType;
@@ -263,23 +264,53 @@ export default function handleDeleteTask({
         updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
     }
 
+    const updatedDefinition = JSON.stringify(
+        {
+            ...workflowDefinition,
+            tasks: updatedTasks,
+        },
+        null,
+        SPACE
+    );
+
+    const previousWorkflow = workflow;
+
+    // Optimistic UI: close panel and update store immediately so layout recomputes once
+    if (currentNode?.name === data.name && !currentNode?.clusterElementType) {
+        useWorkflowNodeDetailsPanelStore.getState().reset();
+        useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
+    }
+
+    useWorkflowDataStore.getState().setWorkflow({
+        ...workflow,
+        definition: updatedDefinition,
+        tasks: (workflow.tasks || []).filter((task) => task.name !== data.name),
+    });
+
+    if (isWorkflowMutating()) {
+        return;
+    }
+
+    setWorkflowMutating(true);
+
     updateWorkflowMutation.mutate(
         {
             id: workflow.id!,
             workflow: {
-                definition: JSON.stringify(
-                    {
-                        ...workflowDefinition,
-                        tasks: updatedTasks,
-                    },
-                    null,
-                    SPACE
-                ),
+                definition: updatedDefinition,
                 version: workflow.version,
             },
         },
         {
-            onSuccess: () => {
+            onError: () => {
+                // Rollback optimistic update on failure
+                useWorkflowDataStore.getState().setWorkflow(previousWorkflow);
+
+                invalidateWorkflowQueries();
+            },
+            onSettled: () => {
+                setWorkflowMutating(false);
+
                 queryClient.invalidateQueries({
                     queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
                         environmentId: environmentStore.getState().currentEnvironmentId,
@@ -289,11 +320,6 @@ export default function handleDeleteTask({
                 });
 
                 invalidateWorkflowQueries();
-
-                if (currentNode?.name === data.name && !currentNode?.clusterElementType) {
-                    useWorkflowNodeDetailsPanelStore.getState().reset();
-                    useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
-                }
             },
         }
     );
