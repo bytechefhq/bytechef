@@ -264,6 +264,10 @@ export default function handleDeleteTask({
         updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
     }
 
+    if (isWorkflowMutating()) {
+        return;
+    }
+
     const updatedDefinition = JSON.stringify(
         {
             ...workflowDefinition,
@@ -286,10 +290,6 @@ export default function handleDeleteTask({
         definition: updatedDefinition,
         tasks: (workflow.tasks || []).filter((task) => task.name !== data.name),
     });
-
-    if (isWorkflowMutating()) {
-        return;
-    }
 
     setWorkflowMutating(true);
 
