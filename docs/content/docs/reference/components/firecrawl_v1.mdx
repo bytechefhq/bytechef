@@ -1,0 +1,362 @@
+---
+title: "Firecrawl"
+description: "Firecrawl allows you to turn entire websites into LLM-ready markdown"
+---
+
+
+Categories: Helpers, Artificial Intelligence
+
+
+Type: firecrawl/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | API Token | STRING |  | true |
+
+
+
+## Connection Setup
+
+1. Go to https://www.firecrawl.dev/app/api-keys
+2. Log in to your account.
+3. Copy the API key. Use these credentials to create a connection in ByteChef.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Map
+Name: map
+
+`Map multiple URLs from a website based on specified options.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The base URL to start mapping from. | true |
+| search | Search | STRING | Specify a search query to order the results by relevance. Example: 'blog' will return URLs that contain the word 'blog' in the URL ordered by relevance. | false |
+| sitemap | Sitemap | STRING <details> <summary> Options </summary> <span>include</span>, <span>skip</span>, <span>only</span> </details> | Sitemap mode when mapping. If you set it to 'skip', the sitemap won't be used to find URLs. If you set it to 'only', only URLs that are in the sitemap will be returned. By default ('include'), the sitemap and other methods will be used together to find URLs. | false |
+| includeSubdomains | Include Subdomains | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Include subdomains of the website. | false |
+| ignoreQueryParameters | Ignore Query Parameters | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Do not return URLs with query parameters. | false |
+| ignoreCache | Ignore Cache | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Bypass the sitemap cache to retrieve fresh URLs. Sitemap data is cached for up to 7 days; use this parameter when your sitemap has been recently updated. | false |
+| limit | Limit | INTEGER | Maximum number of links to return (1-100000). | false |
+| timeout | Timeout | INTEGER | Timeout in milliseconds. There is no timeout by default. | false |
+| location | Location | OBJECT <details> <summary> Properties </summary> &#123;STRING\(country), [STRING]\(languages)&#125; </details> | Location settings for the request. When specified, this will use an appropriate proxy if available and emulate the corresponding language and timezone settings. Defaults to 'US' if not specified. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Map",
+  "name" : "map",
+  "parameters" : {
+    "url" : "",
+    "search" : "",
+    "sitemap" : "",
+    "includeSubdomains" : false,
+    "ignoreQueryParameters" : false,
+    "ignoreCache" : false,
+    "limit" : 1,
+    "timeout" : 1,
+    "location" : {
+      "country" : "",
+      "languages" : [ "" ]
+    }
+  },
+  "type" : "firecrawl/v1/map"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+| links | ARRAY <details> <summary> Items </summary> [&#123;STRING\(url), STRING\(title), STRING\(description)&#125;] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "links" : [ {
+    "url" : "",
+    "title" : "",
+    "description" : ""
+  } ]
+}
+```
+
+
+
+
+### Scrape URL
+Name: scrape
+
+`Scrape a single URL and extract content in various formats.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The URL to scrape. | true |
+| formats | Formats | ARRAY <details> <summary> Items </summary> [STRING] </details> | Output formats to include in the response (e.g., markdown, html, json). | false |
+| formatsSchema | JSON Schema | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The schema to use for the JSON output. Must conform to JSON Schema. | false |
+| formatsPrompt | JSON Prompt | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The prompt to use for the JSON output | false |
+| onlyMainContent | Only Main Content | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Only return the main content excluding headers, navs, footers, etc. | false |
+| includeTags | Include Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | HTML tags to include in the output. | false |
+| excludeTags | Exclude Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | HTML tags to exclude from the output. | false |
+| maxAge | Max Age | INTEGER | Returns a cached version if younger than this age in milliseconds. Speeds up scrapes by up to 500%. Default is 2 days (172800000ms). | false |
+| headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom headers to send with the request (e.g., cookies, user-agent). | false |
+| waitFor | Wait For | INTEGER | Delay in milliseconds before fetching content, allowing the page to load. This is in addition to Firecrawl's smart wait feature. | false |
+| mobile | Mobile | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Emulate scraping from a mobile device. Useful for responsive pages and mobile screenshots. | false |
+| skipTlsVerification | Skip TLS Verification | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Skip TLS certificate verification when making requests. | false |
+| timeout | Timeout | INTEGER | Timeout in milliseconds for the request. Default is 30000 (30 seconds). Maximum is 300000 (5 minutes). | false |
+| removeBase64Images | Remove Base64 Images | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Removes all base64 images from output. Image alt text remains but URL is replaced with placeholder. | false |
+| blockAds | Block Ads | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enables ad-blocking and cookie popup blocking. | false |
+| proxy | Proxy | STRING <details> <summary> Options </summary> <span>auto</span>, <span>basic</span>, <span>enhanced</span> </details> | Proxy type: 'basic' (fast, basic anti-bot), 'enhanced' (slower, advanced anti-bot, costs up to 5 credits), 'auto' (retries with enhanced if basic fails). | false |
+| location | Location | OBJECT <details> <summary> Properties </summary> &#123;STRING\(country), [STRING]\(languages)&#125; </details> | Location settings for the request. Uses appropriate proxy and emulates language/timezone. | false |
+| parsers | Parsers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), INTEGER\(maxPages)&#125;] </details> | Controls how files are processed. When 'pdf' is included (default), PDF content is extracted and converted to markdown (1 credit per page). Empty array returns PDF in base64 (1 credit flat). | false |
+| storeInCache | Store in Cache | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, page will be stored in Firecrawl index and cache. Set to false for data protection concerns. | false |
+| zeroDataRetention | Zero Data Retention | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enable zero data retention for this scrape. Contact help@firecrawl.dev to enable this feature. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Scrape URL",
+  "name" : "scrape",
+  "parameters" : {
+    "url" : "",
+    "formats" : [ "" ],
+    "formatsSchema" : { },
+    "formatsPrompt" : { },
+    "onlyMainContent" : false,
+    "includeTags" : [ "" ],
+    "excludeTags" : [ "" ],
+    "maxAge" : 1,
+    "headers" : { },
+    "waitFor" : 1,
+    "mobile" : false,
+    "skipTlsVerification" : false,
+    "timeout" : 1,
+    "removeBase64Images" : false,
+    "blockAds" : false,
+    "proxy" : "",
+    "location" : {
+      "country" : "",
+      "languages" : [ "" ]
+    },
+    "parsers" : [ {
+      "type" : "",
+      "maxPages" : 1
+    } ],
+    "storeInCache" : false,
+    "zeroDataRetention" : false
+  },
+  "type" : "firecrawl/v1/scrape"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(markdown), STRING\(summary), STRING\(html), STRING\(rawHtml), STRING\(screenshot), [STRING]\(links), &#123;STRING\(title), STRING\(description), STRING\(language), STRING\(sourceURL), STRING\(keywords), INTEGER\(statusCode), STRING\(error)&#125;\(metadata), STRING\(warning)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "data" : {
+    "markdown" : "",
+    "summary" : "",
+    "html" : "",
+    "rawHtml" : "",
+    "screenshot" : "",
+    "links" : [ "" ],
+    "metadata" : {
+      "title" : "",
+      "description" : "",
+      "language" : "",
+      "sourceURL" : "",
+      "keywords" : "",
+      "statusCode" : 1,
+      "error" : ""
+    },
+    "warning" : ""
+  }
+}
+```
+
+
+
+
+### Search
+Name: search
+
+`Search the web and optionally scrape search results using Firecrawl.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Search Query | STRING | The search query string. | true |
+| limit | Limit | INTEGER | Maximum number of results to return (1-100). | false |
+| sources | Sources | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type)&#125;] </details> | Sources to search. Determines the arrays available in the response. | false |
+| categories | Categories | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type)&#125;] </details> | Categories to filter results by (github, research, pdf). | false |
+| tbs | Time-Based Search | STRING <details> <summary> Options </summary> <span>qdr:h</span>, <span>qdr:d</span>, <span>qdr:w</span>, <span>qdr:m</span>, <span>qdr:y</span> </details> | Filter results by time periods. | false |
+| location | Location | STRING | Location parameter for geo-targeted search results (e.g., 'San Francisco,California,United States'). | false |
+| country | Country | STRING | ISO country code for geo-targeting search results (e.g., 'US', 'DE', 'FR', 'JP'). | false |
+| timeout | Timeout | INTEGER | Timeout in milliseconds. | false |
+| ignoreInvalidURLs | Ignore Invalid URLs | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Excludes URLs from search results that are invalid for other Firecrawl endpoints. Useful when piping data to other Firecrawl API endpoints. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search",
+  "name" : "search",
+  "parameters" : {
+    "query" : "",
+    "limit" : 1,
+    "sources" : [ {
+      "type" : ""
+    } ],
+    "categories" : [ {
+      "type" : ""
+    } ],
+    "tbs" : "",
+    "location" : "",
+    "country" : "",
+    "timeout" : 1,
+    "ignoreInvalidURLs" : false
+  },
+  "type" : "firecrawl/v1/search"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+| data | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(title), STRING\(description), STRING\(url), STRING\(markdown), STRING\(html), STRING\(rawHtml), [STRING]\(links), STRING\(screenshot), &#123;STRING\(title), STRING\(description), STRING\(sourceURL), INTEGER\(statusCode), STRING\(error)&#125;\(metadata)&#125;]\(web), [&#123;STRING\(title), STRING\(imageUrl), INTEGER\(imageWidth), INTEGER\(imageHeight), STRING\(url), INTEGER\(position)&#125;]\(images), [&#123;STRING\(title), STRING\(snippet), STRING\(url), STRING\(date), STRING\(imageUrl), INTEGER\(position), STRING\(markdown), STRING\(html), STRING\(rawHtml), [STRING]\(links), STRING\(screenshot), &#123;STRING\(title), STRING\(description), STRING\(sourceURL), INTEGER\(statusCode), STRING\(error)&#125;\(metadata)&#125;]\(news)&#125; </details> |  |
+| warning | STRING |  |
+| id | STRING |  |
+| creditsUsed | INTEGER |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "data" : {
+    "web" : [ {
+      "title" : "",
+      "description" : "",
+      "url" : "",
+      "markdown" : "",
+      "html" : "",
+      "rawHtml" : "",
+      "links" : [ "" ],
+      "screenshot" : "",
+      "metadata" : {
+        "title" : "",
+        "description" : "",
+        "sourceURL" : "",
+        "statusCode" : 1,
+        "error" : ""
+      }
+    } ],
+    "images" : [ {
+      "title" : "",
+      "imageUrl" : "",
+      "imageWidth" : 1,
+      "imageHeight" : 1,
+      "url" : "",
+      "position" : 1
+    } ],
+    "news" : [ {
+      "title" : "",
+      "snippet" : "",
+      "url" : "",
+      "date" : "",
+      "imageUrl" : "",
+      "position" : 1,
+      "markdown" : "",
+      "html" : "",
+      "rawHtml" : "",
+      "links" : [ "" ],
+      "screenshot" : "",
+      "metadata" : {
+        "title" : "",
+        "description" : "",
+        "sourceURL" : "",
+        "statusCode" : 1,
+        "error" : ""
+      }
+    } ]
+  },
+  "warning" : "",
+  "id" : "",
+  "creditsUsed" : 1
+}
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+

@@ -6,9 +6,12 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Map multiple URLs from a website based on specified options.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/firecrawl_v1#map"
+    },
     "metadata": null,
-    "name": "firecrawlMap",
+    "name": "map",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -608,7 +611,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Scrape a single URL and extract content in various formats.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/firecrawl_v1#scrape"
+    },
     "metadata": null,
     "name": "scrape",
     "outputDefinition": {
@@ -2128,9 +2134,12 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Search the web and optionally scrape search results using Firecrawl.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/firecrawl_v1#search"
+    },
     "metadata": null,
-    "name": "firecrawlSearch",
+    "name": "search",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4638,7 +4647,7 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
-    "name": "firecrawlMap",
+    "name": "map",
     "description": "Map multiple URLs from a website based on specified options.",
     "element": { },
     "help": null,
@@ -6758,7 +6767,7 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "firecrawlSearch",
+    "name": "search",
     "description": "Search the web and optionally scrape search results using Firecrawl.",
     "element": { },
     "help": null,
@@ -9326,14 +9335,20 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/firecrawl_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "Firecrawl API",
+    "learnMoreUrl": "https://docs.firecrawl.dev/api-reference/introduction"
+  },
   "description": "Firecrawl allows you to turn entire websites into LLM-ready markdown",
   "icon": "path:assets/firecrawl.svg",
   "metadata": null,
