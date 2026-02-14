@@ -5,11 +5,15 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import {mapHandlePosition} from '../utils/directionUtils';
 import styles from './NodeTypes.module.css';
 
 const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [isDropzoneActive, setDropzoneActive] = useState(false);
+
+    const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
     const {nodes} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -20,6 +24,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const nodeIndex = nodes.findIndex((node) => node.id === id);
     const isClusterElement = !!data.clusterElementType;
     const rootClusterElementId = id.split('-')[0];
+    const effectiveDirection = isClusterElement ? 'TB' : layoutDirection;
 
     return (
         <WorkflowNodesPopoverMenu
@@ -35,7 +40,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         >
             <div
                 className={twMerge(
-                    'nodrag mx-[22px] flex cursor-pointer items-center justify-center rounded-md text-lg text-gray-500 shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',
+                    'relative mx-[22px] flex cursor-pointer items-center justify-center rounded-md text-lg text-gray-500 shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',
                     isDropzoneActive
                         ? 'absolute ml-2 size-16 scale-150 cursor-pointer bg-blue-100'
                         : 'size-7 bg-gray-300',
@@ -49,9 +54,17 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
             >
                 {data.label}
 
-                <Handle className={styles.handle} position={Position.Top} type="target" />
+                <Handle
+                    className={styles.handle}
+                    position={mapHandlePosition(Position.Top, effectiveDirection)}
+                    type="target"
+                />
 
-                <Handle className={styles.handle} position={Position.Bottom} type="source" />
+                <Handle
+                    className={styles.handle}
+                    position={mapHandlePosition(Position.Bottom, effectiveDirection)}
+                    type="source"
+                />
             </div>
         </WorkflowNodesPopoverMenu>
     );

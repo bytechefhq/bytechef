@@ -23,16 +23,21 @@ import {
     getHandlePosition,
 } from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useNodeClickHandler from '../hooks/useNodeClick';
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import {mapHandlePosition} from '../utils/directionUtils';
 import handleDeleteTask from '../utils/handleDeleteTask';
+import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
 import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPosition';
 import styles from './NodeTypes.module.css';
 
 const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
+    const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
+    const isHorizontal = layoutDirection === 'LR';
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
@@ -41,8 +46,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
         }))
     );
-    const {workflow} = useWorkflowDataStore(
+    const {incrementLayoutResetCounter, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
+            incrementLayoutResetCounter: state.incrementLayoutResetCounter,
             workflow: state.workflow,
         }))
     );
@@ -71,8 +77,12 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const isMainRootClusterElement = !!data.clusterRoot && !data.isNestedClusterRoot;
     const isClusterElement = data.clusterElementType;
     const isNestedClusterRoot = data.isNestedClusterRoot;
+    const isRegularNode = !isClusterElement && !isMainRootClusterElement && !isNestedClusterRoot;
+    const isClusterCanvasNode = !isRegularNode;
+    const effectiveDirection = isClusterCanvasNode ? 'TB' : layoutDirection;
     const parentClusterRootId = data.parentClusterRootId;
     const hasSavedClusterElementPosition = data.metadata?.ui?.nodePosition;
+    const hasSavedNodePosition = isRegularNode && !data.trigger && data.metadata?.ui?.nodePosition;
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
@@ -167,6 +177,15 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         });
     };
 
+    const handleRemoveNodePosition = (nodeName: string) => {
+        removeWorkflowNodePosition({
+            incrementLayoutResetCounter,
+            invalidateWorkflowQueries: invalidateWorkflowQueries!,
+            nodeName,
+            updateWorkflowMutation: updateWorkflowMutation!,
+        });
+    };
+
     const nodeDescription =
         workflowNodeDescription?.description && !data.clusterElementType
             ? workflowNodeDescription.description
@@ -177,14 +196,15 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             className={twMerge(
                 'group relative flex min-w-60 cursor-pointer justify-center',
                 !data.taskDispatcher && 'items-center',
-                !isClusterElement && !isMainRootClusterElement && 'nodrag',
-                isClusterElement && !isNestedClusterRoot && 'w-[72px] min-w-[72px] flex-col items-center gap-1'
+                (data.trigger || isMainRootClusterElement) && 'nodrag',
+                isClusterElement && !isNestedClusterRoot && 'w-[72px] min-w-[72px] flex-col items-center gap-1',
+                isHorizontal && isRegularNode && 'min-w-0'
             )}
             data-nodetype={data.trigger ? 'trigger' : 'task'}
             key={id}
         >
             {!isMainRootClusterElement && !isClusterElement && (
-                <div className="invisible absolute left-workflow-node-popover-hover pr-4 group-hover:visible">
+                <div className="invisible absolute left-workflow-node-popover-hover top-0 pr-4 group-hover:visible">
                     {data.trigger ? (
                         <WorkflowNodesPopoverMenu
                             hideActionComponents
@@ -200,14 +220,26 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             />
                         </WorkflowNodesPopoverMenu>
                     ) : (
-                        <Button
-                            className="opacity-100"
-                            icon={<TrashIcon />}
-                            onClick={() => handleDeleteNodeClick(data)}
-                            size="iconSm"
-                            title="Delete a node"
-                            variant="destructiveGhost"
-                        />
+                        <div className="flex flex-col gap-1">
+                            <Button
+                                className="opacity-100"
+                                icon={<TrashIcon />}
+                                onClick={() => handleDeleteNodeClick(data)}
+                                size="iconSm"
+                                title="Delete a node"
+                                variant="destructiveGhost"
+                            />
+
+                            {hasSavedNodePosition && (
+                                <Button
+                                    icon={<PinOffIcon />}
+                                    onClick={() => handleRemoveNodePosition(data.name)}
+                                    size="iconSm"
+                                    title="Remove saved node position"
+                                    variant="ghost"
+                                />
+                            )}
+                        </div>
                     )}
                 </div>
             )}
@@ -259,7 +291,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 onClick={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
                                 size="iconSm"
                                 title="Remove saved node position"
-                                variant="outline"
+                                variant="ghost"
                             />
                         )}
                     </div>
@@ -346,18 +378,41 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 <div
                     className={twMerge(
                         'ml-2 flex w-full min-w-max flex-col items-start',
-                        isClusterElement && !isNestedClusterRoot && 'absolute top-full ml-0 items-center text-center'
+                        ((isClusterElement && !isNestedClusterRoot) || (isHorizontal && isRegularNode)) &&
+                            'absolute top-full ml-0 items-center text-center',
+                        isHorizontal && isRegularNode && 'w-auto min-w-0 max-w-[150px]'
                     )}
                 >
-                    <span className={twMerge('font-semibold', isClusterElement && 'text-sm')}>
+                    <span
+                        className={twMerge(
+                            'font-semibold',
+                            isClusterElement && 'text-sm',
+                            isHorizontal && isRegularNode && 'w-full truncate'
+                        )}
+                    >
                         {data.title || data.label}
                     </span>
 
                     {data.operationName && (
-                        <pre className={twMerge('text-sm', isClusterElement && 'text-xs')}>{data.operationName}</pre>
+                        <pre
+                            className={twMerge(
+                                'text-sm',
+                                isClusterElement && 'text-xs',
+                                isHorizontal && isRegularNode && 'w-full truncate'
+                            )}
+                        >
+                            {data.operationName}
+                        </pre>
                     )}
 
-                    <span className="text-sm text-content-neutral-secondary">{data.workflowNodeName}</span>
+                    <span
+                        className={twMerge(
+                            'text-sm text-content-neutral-secondary',
+                            isHorizontal && isRegularNode && 'w-full truncate'
+                        )}
+                    >
+                        {data.workflowNodeName}
+                    </span>
                 </div>
             )}
 
@@ -367,7 +422,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         <Handle
                             className={twMerge(`left-${nodeWidth / 2}px`, styles.handleVisible)}
                             isConnectable={false}
-                            position={Position.Top}
+                            position={mapHandlePosition(Position.Top, effectiveDirection)}
                             type="target"
                         />
                     )}
@@ -378,7 +433,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             id={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
                             isConnectable={false}
                             key={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
-                            position={Position.Bottom}
+                            position={mapHandlePosition(Position.Bottom, effectiveDirection)}
                             style={{
                                 left: `${getHandlePosition({
                                     handlesCount: clusterElementTypesCount,
@@ -395,29 +450,44 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 <>
                     <Handle
                         className={twMerge(
-                            '-top-[1px] rounded-b-none rounded-t-xs',
                             styles.handleVisible,
+                            effectiveDirection === 'LR'
+                                ? '-left-[1px] rounded-l-xs rounded-r-none'
+                                : '-top-[1px] rounded-b-none rounded-t-xs',
                             data.trigger && 'hidden'
                         )}
                         isConnectable={false}
-                        position={Position.Top}
+                        position={mapHandlePosition(Position.Top, effectiveDirection)}
+                        style={effectiveDirection === 'TB' ? {left: '36px'} : undefined}
                         type="target"
                     />
 
                     <Handle
-                        className={twMerge(styles.handleVisible, 'rounded-b-xs rounded-t-none')}
+                        className={twMerge(
+                            styles.handleVisible,
+                            effectiveDirection === 'LR' ? 'rounded-l-none rounded-r-xs' : 'rounded-b-xs rounded-t-none'
+                        )}
                         isConnectable={false}
-                        position={Position.Bottom}
+                        position={mapHandlePosition(Position.Bottom, effectiveDirection)}
+                        style={effectiveDirection === 'TB' ? {left: '36px'} : undefined}
                         type="source"
                     />
                 </>
             )}
 
-            {data.name.includes('condition') && (
+            {data.name.includes('condition') && effectiveDirection === 'TB' && (
                 <div className="absolute bottom-0 left-0 font-bold text-muted-foreground">
                     <span className="absolute -bottom-10 -left-16">TRUE</span>
 
                     <span className="absolute -bottom-10 left-24">FALSE</span>
+                </div>
+            )}
+
+            {data.name.includes('condition') && effectiveDirection === 'LR' && (
+                <div className="absolute right-0 top-0 font-bold text-muted-foreground">
+                    <span className="absolute -right-16 -top-8">TRUE</span>
+
+                    <span className="absolute -right-16 top-20">FALSE</span>
                 </div>
             )}
         </div>
