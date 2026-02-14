@@ -1,0 +1,185 @@
+---
+title: "Brave"
+description: "Brave gives you access to the same powerful, independent search index that powers the privacy-first search engine trusted by millions"
+---
+
+
+Categories: Helpers
+
+
+Type: brave/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| api_token | API token | STRING |  | true |
+
+
+
+## Connection Setup
+
+1. Go to https://api-dashboard.search.brave.com/app/keys
+2. Log in to your account.
+3. Subscribe into a plan.
+4. Click on Generate a new API key and name it.
+5. Copy the API key. Use these credentials to create a connection in ByteChef.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Web Search
+Name: webSearch
+
+`Search the web for relevant content.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| q | Search Query | STRING | The user’s search query term. Query can not be empty. Maximum of 400 characters and 50 words in the query. | true |
+| count | Count | INTEGER | The number of search results returned in response. The maximum is 20. The actual number delivered may be less than requested. Combine this parameter with offset to paginate search results. | false |
+| offset | Offset | INTEGER | The zero based offset that indicates number of search result pages (count) to skip before returning the result. The actual number delivered may be less than requested. | false |
+| safesearch | Safe Search | STRING <details> <summary> Options </summary> <span>off</span>, <span>moderate</span>, <span>strict</span> </details> | The level of safe search filtering applied to the query. | false |
+| freshness | Freshness | STRING <details> <summary> Options </summary> <span>pd</span>, <span>pw</span>, <span>pm</span>, <span>py</span> </details> | Filters search results by when they were discovered. | false |
+| result_filter | Result Filter | STRING | A comma delimited string of result types to include in the search response. | false |
+| summary | Summary | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | This parameter enables summary key generation in web search results. | false |
+| operators | Operators | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to apply search operators. | false |
+| country | Country | STRING <details> <summary> Options </summary> <span>ALL</span>, <span>US</span>, <span>GB</span>, <span>AR</span>, <span>AT</span>, <span>BE</span>, <span>BR</span>, <span>CA</span>, <span>CL</span>, <span>DK</span>, <span>FI</span>, <span>FR</span>, <span>DE</span>, <span>GR</span>, <span>HK</span>, <span>IN</span>, <span>ID</span>, <span>IT</span>, <span>JP</span>, <span>KR</span>, <span>MY</span>, <span>MX</span>, <span>NL</span>, <span>NZ</span>, <span>NO</span>, <span>CN</span>, <span>PL</span>, <span>PT</span>, <span>PH</span>, <span>RU</span>, <span>SA</span>, <span>ZA</span>, <span>ES</span>, <span>SE</span>, <span>CH</span>, <span>TW</span>, <span>TR</span> </details> | The 2 character country code where the search results come from. | false |
+| search_lang | Search Language | STRING <details> <summary> Options </summary> <span>en</span>, <span>en-gb</span>, <span>eu</span>, <span>ar</span>, <span>bn</span>, <span>bg</span>, <span>ca</span>, <span>zh-hans</span>, <span>zh-hant</span>, <span>hr</span>, <span>cs</span>, <span>da</span>, <span>nl</span>, <span>et</span>, <span>fi</span>, <span>fr</span>, <span>gl</span>, <span>de</span>, <span>el</span>, <span>gu</span>, <span>ge</span>, <span>he</span>, <span>hi</span>, <span>hu</span>, <span>is</span>, <span>it</span>, <span>jp</span>, <span>kn</span>, <span>ko</span>, <span>lv</span>, <span>lt</span>, <span>ms</span>, <span>ml</span>, <span>mr</span>, <span>nb</span>, <span>pl</span>, <span>pt-br</span>, <span>pt-pt</span>, <span>pa</span>, <span>ro</span>, <span>ur</span>, <span>sr</span>, <span>sk</span>, <span>sl</span>, <span>es</span>, <span>sv</span>, <span>ta</span>, <span>te</span>, <span>th</span>, <span>tr</span>, <span>uk</span>, <span>vi</span> </details> | The 2 or more character language code for which the search results are provided. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Web Search",
+  "name" : "webSearch",
+  "parameters" : {
+    "q" : "",
+    "count" : 1,
+    "offset" : 1,
+    "safesearch" : "",
+    "freshness" : "",
+    "result_filter" : "",
+    "summary" : false,
+    "operators" : false,
+    "country" : "",
+    "search_lang" : ""
+  },
+  "type" : "brave/v1/webSearch"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| query | OBJECT <details> <summary> Properties </summary> &#123;STRING\(original)&#125; </details> |  |
+| discussions | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(title), STRING\(url), STRING\(description)&#125;]\(results)&#125; </details> |  |
+| faq | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(question), STRING\(answer), STRING\(url), STRING\(title)&#125;]\(results)&#125; </details> |  |
+| infobox | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(title), STRING\(url), STRING\(description)&#125;]\(results)&#125; </details> |  |
+| locations | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(title), STRING\(url), STRING\(description)&#125;]\(results)&#125; </details> |  |
+| news | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(title), STRING\(url), STRING\(description)&#125;]\(results)&#125; </details> |  |
+| videos | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(title), STRING\(url), STRING\(description)&#125;]\(results)&#125; </details> |  |
+| web | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(title), STRING\(url), STRING\(description)&#125;]\(results)&#125; </details> |  |
+| summarizer | OBJECT <details> <summary> Properties </summary> &#123;STRING\(key)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "query" : {
+    "original" : ""
+  },
+  "discussions" : {
+    "results" : [ {
+      "title" : "",
+      "url" : "",
+      "description" : ""
+    } ]
+  },
+  "faq" : {
+    "results" : [ {
+      "question" : "",
+      "answer" : "",
+      "url" : "",
+      "title" : ""
+    } ]
+  },
+  "infobox" : {
+    "results" : [ {
+      "title" : "",
+      "url" : "",
+      "description" : ""
+    } ]
+  },
+  "locations" : {
+    "results" : [ {
+      "title" : "",
+      "url" : "",
+      "description" : ""
+    } ]
+  },
+  "news" : {
+    "results" : [ {
+      "title" : "",
+      "url" : "",
+      "description" : ""
+    } ]
+  },
+  "videos" : {
+    "results" : [ {
+      "title" : "",
+      "url" : "",
+      "description" : ""
+    } ]
+  },
+  "web" : {
+    "results" : [ {
+      "title" : "",
+      "url" : "",
+      "description" : ""
+    } ]
+  },
+  "summarizer" : {
+    "key" : ""
+  }
+}
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+

@@ -6,9 +6,12 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Search the web for relevant content.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/brave_v1#web-search"
+    },
     "metadata": null,
-    "name": "braveSearch",
+    "name": "webSearch",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2233,7 +2236,7 @@
       "advancedOption": true,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Whether to apply search operators",
+      "description": "Whether to apply search operators.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2656,11 +2659,11 @@
     } ],
     "resumePerform": null,
     "suspendPerform": null,
-    "title": "Search",
+    "title": "Web Search",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
-    "name": "braveSearch",
+    "name": "webSearch",
     "description": "Search the web for relevant content.",
     "element": { },
     "help": null,
@@ -4887,7 +4890,7 @@
       "advancedOption": true,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Whether to apply search operators",
+      "description": "Whether to apply search operators.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -5308,7 +5311,7 @@
       "required": false,
       "type": "STRING"
     } ],
-    "title": "Search",
+    "title": "Web Search",
     "type": {
       "name": "TOOLS",
       "key": "tools",
@@ -5369,14 +5372,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/brave_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "Brave Search API",
+    "learnMoreUrl": "https://brave.com/search/api/"
+  },
   "description": "Brave gives you access to the same powerful, independent search index that powers the privacy-first search engine trusted by millions",
   "icon": "path:assets/brave.svg",
   "metadata": null,
