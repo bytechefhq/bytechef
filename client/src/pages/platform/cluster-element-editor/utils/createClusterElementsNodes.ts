@@ -59,6 +59,7 @@ export default function createClusterElementNodes({
 
                     // Create the multiple element node
                     const multipleElementsNode = createMultipleElementsNode({
+                        clusterElementTypeIndex,
                         clusterElementTypeName,
                         clusterRootId,
                         currentNestedRootElementTypesCount: element.clusterElements
@@ -66,6 +67,7 @@ export default function createClusterElementNodes({
                             : undefined,
                         element,
                         isMultipleClusterElementsNode,
+                        parentClusterRootElementsTypeCount,
                     });
 
                     // Set root parent/child relationship
@@ -118,12 +120,14 @@ export default function createClusterElementNodes({
                 // Create the single element node
                 const singleElementNode = createSingleElementsNode({
                     clusterElementItem: clusterElementValue,
+                    clusterElementTypeIndex,
                     clusterElementTypeLabel,
                     clusterElementTypeName,
                     clusterRootId,
                     currentNestedRootElementTypesCount: clusterElementValue.clusterElements
                         ? filteredClusterElementTypes.length
                         : undefined,
+                    parentClusterRootElementsTypeCount,
                 });
 
                 // Set root parent/child relationship
