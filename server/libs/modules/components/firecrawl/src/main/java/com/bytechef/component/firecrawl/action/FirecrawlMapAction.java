@@ -38,16 +38,16 @@ import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.URL;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Marko Krišković
  */
 public class FirecrawlMapAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("firecrawlMap")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("map")
         .title("Map")
         .description("Map multiple URLs from a website based on specified options.")
         .properties(
@@ -58,12 +58,15 @@ public class FirecrawlMapAction {
             string(SEARCH)
                 .label("Search")
                 .description(
-                    "Specify a search query to order the results by relevance. Example: 'blog' will return URLs that contain the word 'blog' in the URL ordered by relevance.")
+                    "Specify a search query to order the results by relevance. Example: 'blog' will return URLs " +
+                        "that contain the word 'blog' in the URL ordered by relevance.")
                 .required(false),
             string(SITEMAP)
                 .label("Sitemap")
                 .description(
-                    "Sitemap mode when mapping. If you set it to 'skip', the sitemap won't be used to find URLs. If you set it to 'only', only URLs that are in the sitemap will be returned. By default ('include'), the sitemap and other methods will be used together to find URLs.")
+                    "Sitemap mode when mapping. If you set it to 'skip', the sitemap won't be used to find URLs. " +
+                        "If you set it to 'only', only URLs that are in the sitemap will be returned. By default " +
+                        "('include'), the sitemap and other methods will be used together to find URLs.")
                 .options(
                     option("Include", "include"),
                     option("Skip", "skip"),
@@ -83,7 +86,8 @@ public class FirecrawlMapAction {
             bool(IGNORE_CACHE)
                 .label("Ignore Cache")
                 .description(
-                    "Bypass the sitemap cache to retrieve fresh URLs. Sitemap data is cached for up to 7 days; use this parameter when your sitemap has been recently updated.")
+                    "Bypass the sitemap cache to retrieve fresh URLs. Sitemap data is cached for up to 7 days; " +
+                        "use this parameter when your sitemap has been recently updated.")
                 .advancedOption(true)
                 .required(false),
             integer(LIMIT)
@@ -101,7 +105,9 @@ public class FirecrawlMapAction {
             object(LOCATION)
                 .label("Location")
                 .description(
-                    "Location settings for the request. When specified, this will use an appropriate proxy if available and emulate the corresponding language and timezone settings. Defaults to 'US' if not specified.")
+                    "Location settings for the request. When specified, this will use an appropriate proxy if " +
+                        "available and emulate the corresponding language and timezone settings. Defaults to 'US' " +
+                        "if not specified.")
                 .properties(
                     string(COUNTRY)
                         .label("Country")
@@ -110,7 +116,8 @@ public class FirecrawlMapAction {
                     array(LANGUAGES)
                         .label("Languages")
                         .description(
-                            "Preferred languages and locales for the request in order of priority. Defaults to the language of the specified location.")
+                            "Preferred languages and locales for the request in order of priority. Defaults to the " +
+                                "language of the specified location.")
                         .items(string())
                         .required(false))
                 .advancedOption(true)
@@ -127,6 +134,7 @@ public class FirecrawlMapAction {
                                         string("url"),
                                         string("title"),
                                         string("description"))))))
+        .help("", "https://docs.bytechef.io/reference/components/firecrawl_v1#map")
         .perform(FirecrawlMapAction::perform);
 
     private FirecrawlMapAction() {
@@ -135,18 +143,19 @@ public class FirecrawlMapAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.post("/map"))
-            .body(Context.Http.Body.of(
-                URL, inputParameters.getRequiredString(URL),
-                SEARCH, inputParameters.getString(SEARCH),
-                SITEMAP, inputParameters.getString(SITEMAP),
-                INCLUDE_SUBDOMAINS, inputParameters.getBoolean(INCLUDE_SUBDOMAINS),
-                IGNORE_QUERY_PARAMETERS, inputParameters.getBoolean(IGNORE_QUERY_PARAMETERS),
-                IGNORE_CACHE, inputParameters.getBoolean(IGNORE_CACHE),
-                LIMIT, inputParameters.getInteger(LIMIT),
-                TIMEOUT, inputParameters.getInteger(TIMEOUT),
-                LOCATION, inputParameters.get(LOCATION)))
-            .configuration(Context.Http.responseType(ResponseType.JSON))
+            .body(
+                Http.Body.of(
+                    URL, inputParameters.getRequiredString(URL),
+                    SEARCH, inputParameters.getString(SEARCH),
+                    SITEMAP, inputParameters.getString(SITEMAP),
+                    INCLUDE_SUBDOMAINS, inputParameters.getBoolean(INCLUDE_SUBDOMAINS),
+                    IGNORE_QUERY_PARAMETERS, inputParameters.getBoolean(IGNORE_QUERY_PARAMETERS),
+                    IGNORE_CACHE, inputParameters.getBoolean(IGNORE_CACHE),
+                    LIMIT, inputParameters.getInteger(LIMIT),
+                    TIMEOUT, inputParameters.getInteger(TIMEOUT),
+                    LOCATION, inputParameters.get(LOCATION)))
+            .configuration(Http.responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

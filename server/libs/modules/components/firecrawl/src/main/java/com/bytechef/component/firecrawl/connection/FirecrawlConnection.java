@@ -37,7 +37,9 @@ public class FirecrawlConnection {
                 .properties(
                     string(TOKEN)
                         .label("API Token")
-                        .required(true)));
+                        .required(true)))
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/firecrawl_v1#connection-setup");
 
     private FirecrawlConnection() {
     }

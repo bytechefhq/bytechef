@@ -47,10 +47,9 @@ import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.ZERO_
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +71,15 @@ public class FirecrawlScrapeAction {
                 .label("Formats")
                 .description("Output formats to include in the response (e.g., markdown, html, json).")
                 .items(string())
-                .options(getFormatOptions())
+                .options(List.of(
+                    option("Markdown", "markdown"),
+                    option("Summary", "summary"),
+                    option("HTML", "html"),
+                    option("Raw HTML", "rawHtml"),
+                    option("Images", "images"),
+                    option("Links", "links"),
+                    option("JSON", "json"),
+                    option("Branding", "branding")))
                 .required(false),
             object(FORMATS_SCHEMA)
                 .label("JSON Schema")
@@ -104,7 +111,8 @@ public class FirecrawlScrapeAction {
             integer(MAX_AGE)
                 .label("Max Age")
                 .description(
-                    "Returns a cached version if younger than this age in milliseconds. Speeds up scrapes by up to 500%. Default is 2 days (172800000ms).")
+                    "Returns a cached version if younger than this age in milliseconds. Speeds up scrapes by up " +
+                        "to 500%. Default is 2 days (172800000ms).")
                 .advancedOption(true)
                 .required(false),
             object(HEADERS)
@@ -115,7 +123,8 @@ public class FirecrawlScrapeAction {
             integer(WAIT_FOR)
                 .label("Wait For")
                 .description(
-                    "Delay in milliseconds before fetching content, allowing the page to load. This is in addition to Firecrawl's smart wait feature.")
+                    "Delay in milliseconds before fetching content, allowing the page to load. This is in addition " +
+                        "to Firecrawl's smart wait feature.")
                 .advancedOption(true)
                 .required(false),
             bool(MOBILE)
@@ -132,14 +141,16 @@ public class FirecrawlScrapeAction {
             integer(TIMEOUT)
                 .label("Timeout")
                 .description(
-                    "Timeout in milliseconds for the request. Default is 30000 (30 seconds). Maximum is 300000 (5 minutes).")
+                    "Timeout in milliseconds for the request. Default is 30000 (30 seconds). Maximum is " +
+                        "300000 (5 minutes).")
                 .maxValue(300000)
                 .advancedOption(true)
                 .required(false),
             bool(REMOVE_BASE64_IMAGES)
                 .label("Remove Base64 Images")
                 .description(
-                    "Removes all base64 images from output. Image alt text remains but URL is replaced with placeholder.")
+                    "Removes all base64 images from output. Image alt text remains but URL is replaced " +
+                        "with placeholder.")
                 .advancedOption(true)
                 .required(false),
             bool(BLOCK_ADS)
@@ -150,7 +161,8 @@ public class FirecrawlScrapeAction {
             string(PROXY)
                 .label("Proxy")
                 .description(
-                    "Proxy type: 'basic' (fast, basic anti-bot), 'enhanced' (slower, advanced anti-bot, costs up to 5 credits), 'auto' (retries with enhanced if basic fails).")
+                    "Proxy type: 'basic' (fast, basic anti-bot), 'enhanced' (slower, advanced anti-bot, costs up " +
+                        "to 5 credits), 'auto' (retries with enhanced if basic fails).")
                 .options(
                     option("Auto", "auto"),
                     option("Basic", "basic"),
@@ -174,7 +186,9 @@ public class FirecrawlScrapeAction {
             array(PARSERS)
                 .label("Parsers")
                 .description(
-                    "Controls how files are processed. When 'pdf' is included (default), PDF content is extracted and converted to markdown (1 credit per page). Empty array returns PDF in base64 (1 credit flat).")
+                    "Controls how files are processed. When 'pdf' is included (default), PDF content is extracted " +
+                        "and converted to markdown (1 credit per page). Empty array returns PDF in base64 " +
+                        "(1 credit flat).")
                 .items(
                     object()
                         .properties(
@@ -191,7 +205,8 @@ public class FirecrawlScrapeAction {
             bool(STORE_IN_CACHE)
                 .label("Store in Cache")
                 .description(
-                    "If true, page will be stored in Firecrawl index and cache. Set to false for data protection concerns.")
+                    "If true, page will be stored in Firecrawl index and cache. Set to false for data " +
+                        "protection concerns.")
                 .advancedOption(true)
                 .required(false),
             bool(ZERO_DATA_RETENTION)
@@ -224,6 +239,7 @@ public class FirecrawlScrapeAction {
                                         integer("statusCode"),
                                         string("error")),
                                 string("warning")))))
+        .help("", "https://docs.bytechef.io/reference/components/firecrawl_v1#scrape")
         .perform(FirecrawlScrapeAction::perform);
 
     private FirecrawlScrapeAction() {
@@ -232,50 +248,43 @@ public class FirecrawlScrapeAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<?> formatsList = inputParameters.getList(FORMATS);
         Map<String, Object> formatMap = new HashMap<>();
+
         for (Object format : formatsList) {
             Map<String, Object> jsonSchemaMap = new HashMap<>();
             jsonSchemaMap.put("type", format.toString());
+
             if (formatsList.contains("json")) {
                 jsonSchemaMap.put("schema", inputParameters.get(FORMATS_SCHEMA));
                 jsonSchemaMap.put("prompt", inputParameters.get(FORMATS_PROMPT));
             }
+
             formatMap.put(format.toString(), jsonSchemaMap);
         }
 
         return context
             .http(http -> http.post("/scrape"))
-            .body(Context.Http.Body.of(
-                URL, inputParameters.getRequiredString(URL),
-                FORMATS, formatMap,
-                ONLY_MAIN_CONTENT, inputParameters.getBoolean(ONLY_MAIN_CONTENT),
-                INCLUDE_TAGS, inputParameters.getList(INCLUDE_TAGS),
-                EXCLUDE_TAGS, inputParameters.getList(EXCLUDE_TAGS),
-                MAX_AGE, inputParameters.getInteger(MAX_AGE),
-                HEADERS, inputParameters.get(HEADERS),
-                WAIT_FOR, inputParameters.getInteger(WAIT_FOR),
-                MOBILE, inputParameters.getBoolean(MOBILE),
-                SKIP_TLS_VERIFICATION, inputParameters.getBoolean(SKIP_TLS_VERIFICATION),
-                TIMEOUT, inputParameters.getInteger(TIMEOUT),
-                REMOVE_BASE64_IMAGES, inputParameters.getBoolean(REMOVE_BASE64_IMAGES),
-                BLOCK_ADS, inputParameters.getBoolean(BLOCK_ADS),
-                PROXY, inputParameters.getString(PROXY),
-                LOCATION, inputParameters.get(LOCATION),
-                PARSERS, inputParameters.getList(PARSERS),
-                STORE_IN_CACHE, inputParameters.getBoolean(STORE_IN_CACHE),
-                ZERO_DATA_RETENTION, inputParameters.getBoolean(ZERO_DATA_RETENTION)))
-            .configuration(Context.Http.responseType(ResponseType.JSON))
+            .body(
+                Http.Body.of(
+                    URL, inputParameters.getRequiredString(URL),
+                    FORMATS, formatMap,
+                    ONLY_MAIN_CONTENT, inputParameters.getBoolean(ONLY_MAIN_CONTENT),
+                    INCLUDE_TAGS, inputParameters.getList(INCLUDE_TAGS),
+                    EXCLUDE_TAGS, inputParameters.getList(EXCLUDE_TAGS),
+                    MAX_AGE, inputParameters.getInteger(MAX_AGE),
+                    HEADERS, inputParameters.get(HEADERS),
+                    WAIT_FOR, inputParameters.getInteger(WAIT_FOR),
+                    MOBILE, inputParameters.getBoolean(MOBILE),
+                    SKIP_TLS_VERIFICATION, inputParameters.getBoolean(SKIP_TLS_VERIFICATION),
+                    TIMEOUT, inputParameters.getInteger(TIMEOUT),
+                    REMOVE_BASE64_IMAGES, inputParameters.getBoolean(REMOVE_BASE64_IMAGES),
+                    BLOCK_ADS, inputParameters.getBoolean(BLOCK_ADS),
+                    PROXY, inputParameters.getString(PROXY),
+                    LOCATION, inputParameters.get(LOCATION),
+                    PARSERS, inputParameters.getList(PARSERS),
+                    STORE_IN_CACHE, inputParameters.getBoolean(STORE_IN_CACHE),
+                    ZERO_DATA_RETENTION, inputParameters.getBoolean(ZERO_DATA_RETENTION)))
+            .configuration(Http.responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
-    }
-
-    private static List<Option<String>> getFormatOptions() {
-        return List.of(option("Markdown", "markdown"),
-            option("Summary", "summary"),
-            option("HTML", "html"),
-            option("Raw HTML", "rawHtml"),
-            option("Images", "images"),
-            option("Links", "links"),
-            option("JSON", "json"),
-            option("Branding", "branding"));
+            .getBody();
     }
 }

@@ -37,16 +37,17 @@ import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.TIMEO
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Marko Krišković
  */
 public class FirecrawlSearchAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("firecrawlSearch")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("search")
         .title("Search")
         .description("Search the web and optionally scrape search results using Firecrawl.")
         .properties(
@@ -107,7 +108,8 @@ public class FirecrawlSearchAction {
             string(LOCATION)
                 .label("Location")
                 .description(
-                    "Location parameter for geo-targeted search results (e.g., 'San Francisco,California,United States').")
+                    "Location parameter for geo-targeted search results " +
+                        "(e.g., 'San Francisco,California,United States').")
                 .advancedOption(true)
                 .required(false),
             string(COUNTRY)
@@ -123,7 +125,8 @@ public class FirecrawlSearchAction {
             bool(IGNORE_INVALID_URLS)
                 .label("Ignore Invalid URLs")
                 .description(
-                    "Excludes URLs from search results that are invalid for other Firecrawl endpoints. Useful when piping data to other Firecrawl API endpoints.")
+                    "Excludes URLs from search results that are invalid for other Firecrawl endpoints. Useful " +
+                        "when piping data to other Firecrawl API endpoints.")
                 .advancedOption(true)
                 .required(false))
         .output(
@@ -189,6 +192,7 @@ public class FirecrawlSearchAction {
                         string("warning"),
                         string("id"),
                         integer("creditsUsed"))))
+        .help("", "https://docs.bytechef.io/reference/components/firecrawl_v1#search")
         .perform(FirecrawlSearchAction::perform);
 
     private FirecrawlSearchAction() {
@@ -197,19 +201,20 @@ public class FirecrawlSearchAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.post("/search"))
-            .body(Context.Http.Body.of(
-                QUERY, inputParameters.getRequiredString(QUERY),
-                LIMIT, inputParameters.getInteger(LIMIT),
-                SOURCES, inputParameters.getList(SOURCES),
-                CATEGORIES, inputParameters.getList(CATEGORIES),
-                TBS, inputParameters.getString(TBS),
-                LOCATION, inputParameters.getString(LOCATION),
-                COUNTRY, inputParameters.getString(COUNTRY),
-                TIMEOUT, inputParameters.getInteger(TIMEOUT),
-                IGNORE_INVALID_URLS, inputParameters.getBoolean(IGNORE_INVALID_URLS),
-                SCRAPE_OPTIONS, inputParameters.get(SCRAPE_OPTIONS)))
-            .configuration(Context.Http.responseType(ResponseType.JSON))
+            .body(
+                Body.of(
+                    QUERY, inputParameters.getRequiredString(QUERY),
+                    LIMIT, inputParameters.getInteger(LIMIT),
+                    SOURCES, inputParameters.getList(SOURCES),
+                    CATEGORIES, inputParameters.getList(CATEGORIES),
+                    TBS, inputParameters.getString(TBS),
+                    LOCATION, inputParameters.getString(LOCATION),
+                    COUNTRY, inputParameters.getString(COUNTRY),
+                    TIMEOUT, inputParameters.getInteger(TIMEOUT),
+                    IGNORE_INVALID_URLS, inputParameters.getBoolean(IGNORE_INVALID_URLS),
+                    SCRAPE_OPTIONS, inputParameters.get(SCRAPE_OPTIONS)))
+            .configuration(Http.responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
