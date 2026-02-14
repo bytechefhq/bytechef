@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.apiconnector.configuration.service;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
  */
 @Service("firecrawlWebScrapeService")
 @ConditionalOnEEVersion
-@ConditionalOnProperty(name = "bytechef.ai.api-connector.scrape.firecrawl.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "bytechef.ai.firecrawl.enabled", havingValue = "true")
 public class FirecrawlWebScrapeService implements WebScrapeService {
 
     private static final Logger logger = LoggerFactory.getLogger(FirecrawlWebScrapeService.class);
@@ -51,13 +51,12 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public FirecrawlWebScrapeService(
-        @Value("${bytechef.ai.api-connector.scrape.firecrawl.api-key:}") String apiKey,
-        @Value("${bytechef.ai.api-connector.scrape.firecrawl.base-url:https://api.firecrawl.dev}") String baseUrl,
-        ObjectMapper objectMapper) {
+    public FirecrawlWebScrapeService(ApplicationProperties applicationProperties, ObjectMapper objectMapper) {
+        ApplicationProperties.Ai.Firecrawl firecrawl = applicationProperties.getAi()
+            .getFirecrawl();
 
-        this.apiKey = apiKey;
-        this.baseUrl = baseUrl;
+        this.apiKey = firecrawl.getApiKey();
+        this.baseUrl = firecrawl.getBaseUrl();
         this.objectMapper = objectMapper;
         this.httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
@@ -73,7 +72,7 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
             requestBody.put("url", url);
             requestBody.put("formats", List.of("markdown"));
 
-            String responseBody = sendRequest("/v1/scrape", requestBody);
+            String responseBody = sendRequest("/scrape", requestBody);
 
             JsonNode response = objectMapper.readTree(responseBody);
 
@@ -110,7 +109,7 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
                 requestBody.put("includePaths", includePatterns);
             }
 
-            String responseBody = sendRequest("/v1/crawl", requestBody);
+            String responseBody = sendRequest("/crawl", requestBody);
 
             JsonNode response = objectMapper.readTree(responseBody);
 
@@ -148,7 +147,7 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
     private CrawlResult pollCrawlStatus(String crawlId) throws IOException, InterruptedException {
         for (int attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/v1/crawl/" + crawlId))
+                .uri(URI.create(baseUrl + "/crawl/" + crawlId))
                 .header("Authorization", "Bearer " + apiKey)
                 .header("Content-Type", "application/json")
                 .GET()

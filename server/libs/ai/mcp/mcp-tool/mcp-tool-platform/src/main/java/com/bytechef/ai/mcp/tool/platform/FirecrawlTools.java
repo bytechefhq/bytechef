@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.tool.platform;
 
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
+import com.bytechef.config.ApplicationProperties;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -28,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -41,22 +41,20 @@ import org.springframework.web.client.RestClient;
  */
 @Component
 @ConditionalOnAiEnabled
-@ConditionalOnProperty(name = "firecrawl.api-key")
+@ConditionalOnProperty(name = "bytechef.ai.firecrawl.enabled")
 public class FirecrawlTools {
 
     private static final Logger logger = LoggerFactory.getLogger(FirecrawlTools.class);
 
-    private static final String FIRECRAWL_API_URL = "https://api.firecrawl.dev/v2";
-
     private final RestClient restClient;
 
-    public FirecrawlTools(
-        RestClient.Builder restClientBuilder,
-        @Value("${firecrawl.api-key}") String apiKey) {
+    public FirecrawlTools(ApplicationProperties applicationProperties, RestClient.Builder restClientBuilder) {
+        ApplicationProperties.Ai.Firecrawl firecrawl = applicationProperties.getAi()
+            .getFirecrawl();
 
         this.restClient = restClientBuilder
-            .baseUrl(FIRECRAWL_API_URL)
-            .defaultHeader("Authorization", "Bearer " + apiKey)
+            .baseUrl(firecrawl.getBaseUrl())
+            .defaultHeader("Authorization", "Bearer " + firecrawl.getApiKey())
             .build();
     }
 

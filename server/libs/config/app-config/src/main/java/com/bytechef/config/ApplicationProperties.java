@@ -436,6 +436,7 @@ public class ApplicationProperties {
 
         private Anthropic anthropic = new Anthropic();
         private Copilot copilot = new Copilot();
+        private Firecrawl firecrawl = new Firecrawl();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
         private Mcp mcp = new Mcp();
         private OpenAi openAi = new OpenAi();
@@ -448,6 +449,10 @@ public class ApplicationProperties {
 
         public Copilot getCopilot() {
             return copilot;
+        }
+
+        public Firecrawl getFirecrawl() {
+            return firecrawl;
         }
 
         public KnowledgeBase getKnowledgeBase() {
@@ -476,6 +481,10 @@ public class ApplicationProperties {
 
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
+        }
+
+        public void setFirecrawl(Firecrawl firecrawl) {
+            this.firecrawl = firecrawl;
         }
 
         public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
@@ -715,6 +724,45 @@ public class ApplicationProperties {
                 public void setProvider(Ai.Vectorstore.Provider provider) {
                     this.provider = provider;
                 }
+            }
+        }
+
+        /**
+         * Firecrawl web scraping service configuration.
+         */
+        public static class Firecrawl {
+
+            /** Firecrawl API key */
+            private String apiKey;
+
+            /** Firecrawl API base URL */
+            private String baseUrl = "https://api.firecrawl.dev/v2";
+
+            /** Whether Firecrawl is enabled */
+            private boolean enabled;
+
+            public String getApiKey() {
+                return apiKey;
+            }
+
+            public void setApiKey(String apiKey) {
+                this.apiKey = apiKey;
+            }
+
+            public String getBaseUrl() {
+                return baseUrl;
+            }
+
+            public void setBaseUrl(String baseUrl) {
+                this.baseUrl = baseUrl;
+            }
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
             }
         }
 
