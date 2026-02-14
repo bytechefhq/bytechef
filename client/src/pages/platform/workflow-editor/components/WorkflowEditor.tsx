@@ -61,18 +61,6 @@ type ConditionalWorkflowEditorPropsType =
           readOnlyWorkflow?: never;
       };
 
-/**
- * Node types that are synthetic layout constructs (ghost nodes, placeholders) with no
- * corresponding WorkflowTask in the definition. Dragging these nodes should not trigger
- * a position save mutation since they are recreated on every layout pass.
- */
-export const NON_PERSISTED_NODE_TYPES = new Set([
-    'placeholder',
-    'taskDispatcherBottomGhostNode',
-    'taskDispatcherLeftGhostNode',
-    'taskDispatcherTopGhostNode',
-]);
-
 type WorkflowEditorPropsType = {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
@@ -420,7 +408,7 @@ const WorkflowEditor = ({
         (_event: React.MouseEvent, draggedNode: Node) => {
             setIsNodeDragging(false);
 
-            if (!NON_PERSISTED_NODE_TYPES.has(draggedNode.type!) && !isWorkflowMutating(workflow.id!)) {
+            if (!isWorkflowMutating(workflow.id!)) {
                 // Pre-compensate positions for the current cross-axis shift so that
                 // when useLayout re-runs and applySavedPositions adds the shift back,
                 // nodes end up at the correct screen position.
