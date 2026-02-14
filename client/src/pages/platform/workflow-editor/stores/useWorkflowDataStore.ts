@@ -25,8 +25,17 @@ interface WorkflowDataStateI {
     setEdges: (edges: Edge[]) => void;
     onEdgesChange: OnEdgesChange;
 
+    isNodeDragging: boolean;
+    setIsNodeDragging: (dragging: boolean) => void;
+
+    savedPositionCrossAxisShift: number;
+    setSavedPositionCrossAxisShift: (shift: number) => void;
+
     isWorkflowLoaded: boolean;
     setIsWorkflowLoaded: (loaded: boolean) => void;
+
+    layoutResetCounter: number;
+    incrementLayoutResetCounter: () => void;
 
     latestComponentDefinition: ComponentDefinitionBasic | null;
     setLatestComponentDefinition: (latestComponentDefinition: ComponentDefinitionBasic | null) => void;
@@ -66,8 +75,17 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                 });
             },
 
+            isNodeDragging: false,
+            setIsNodeDragging: (dragging) => set({isNodeDragging: dragging}),
+
+            savedPositionCrossAxisShift: 0,
+            setSavedPositionCrossAxisShift: (shift) => set({savedPositionCrossAxisShift: shift}),
+
             isWorkflowLoaded: false,
             setIsWorkflowLoaded: (loaded) => set({isWorkflowLoaded: loaded}),
+
+            layoutResetCounter: 0,
+            incrementLayoutResetCounter: () => set((state) => ({layoutResetCounter: state.layoutResetCounter + 1})),
 
             latestComponentDefinition: null,
             setLatestComponentDefinition: (latestComponentDefinition) =>
