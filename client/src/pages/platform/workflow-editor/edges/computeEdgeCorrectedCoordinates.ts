@@ -1,7 +1,7 @@
 import {ALIGNED_SIDE_CASE_THRESHOLD} from '@/shared/constants';
 import {Position} from '@xyflow/react';
 
-interface EdgeCorrectionParams {
+interface EdgeCorrectionProps {
     isHorizontal: boolean;
     isMiddleCaseEdge: boolean;
     sourceNodeType?: string;
@@ -14,7 +14,7 @@ interface EdgeCorrectionParams {
     targetY: number;
 }
 
-interface EdgeCorrectionResult {
+interface EdgeCorrectionResultI {
     correctedSourcePosition: Position;
     correctedSourceX: number;
     correctedSourceY: number;
@@ -46,15 +46,21 @@ export default function computeEdgeCorrectedCoordinates({
     targetPosition,
     targetX,
     targetY,
-}: EdgeCorrectionParams): EdgeCorrectionResult {
+}: EdgeCorrectionProps): EdgeCorrectionResultI {
     const isSourceTopGhost = sourceNodeType === 'taskDispatcherTopGhostNode';
     const isTargetBottomGhost = targetNodeType === 'taskDispatcherBottomGhostNode';
 
     const isAlignedSideCaseFromGhost =
-        isHorizontal && !isMiddleCaseEdge && isSourceTopGhost && Math.abs(sourceY - targetY) <= ALIGNED_SIDE_CASE_THRESHOLD;
+        isHorizontal &&
+        !isMiddleCaseEdge &&
+        isSourceTopGhost &&
+        Math.abs(sourceY - targetY) <= ALIGNED_SIDE_CASE_THRESHOLD;
 
     const isAlignedSideCaseToGhost =
-        isHorizontal && !isMiddleCaseEdge && isTargetBottomGhost && Math.abs(sourceY - targetY) <= ALIGNED_SIDE_CASE_THRESHOLD;
+        isHorizontal &&
+        !isMiddleCaseEdge &&
+        isTargetBottomGhost &&
+        Math.abs(sourceY - targetY) <= ALIGNED_SIDE_CASE_THRESHOLD;
 
     const correctedSourceX = !isHorizontal && isMiddleCaseEdge && isSourceTopGhost ? targetX : sourceX;
     const correctedTargetX = !isHorizontal && isMiddleCaseEdge && isTargetBottomGhost ? sourceX : targetX;

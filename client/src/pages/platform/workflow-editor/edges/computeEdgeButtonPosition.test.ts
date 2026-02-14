@@ -124,9 +124,9 @@ describe('computeEdgeButtonPosition', () => {
                 })
             );
 
-            // LR mode: posX = midpoint, posY = correctedTargetY + 15 (branch top ghost to workflow)
-            expect(result.x).toBe(200 + (400 - 200) * 0.5);
-            expect(result.y).toBe(400 + 15);
+            // LR mode: posX = midpoint + 15 (horizontal offset), posY = correctedTargetY (on the edge)
+            expect(result.x).toBe(200 + (400 - 200) * 0.5 + 15);
+            expect(result.y).toBe(400);
         });
     });
 

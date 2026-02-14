@@ -51,7 +51,7 @@ export default function computeEdgeButtonPosition({
             posY = correctedTargetY;
 
             if (targetNodeType === 'workflow' && isEdgeFromBranchTopGhostNode) {
-                posY += 15;
+                posX += 15;
             }
         } else if (targetNodeType === 'taskDispatcherBottomGhostNode') {
             posY = correctedSourceY;
