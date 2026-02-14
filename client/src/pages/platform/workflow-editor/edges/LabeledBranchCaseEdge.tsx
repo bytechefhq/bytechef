@@ -4,6 +4,7 @@ import {useShallow} from 'zustand/react/shallow';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import BranchCaseLabel from './BranchCaseLabel';
+import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
 
 export default function LabeledBranchCaseEdge({
     data,
@@ -26,21 +27,32 @@ export default function LabeledBranchCaseEdge({
     const isHorizontal = layoutDirection === 'LR';
     const isMiddleCaseEdge = !!(data as Record<string, unknown>)?.isMiddleCase;
 
-    const correctedSourceX = !isHorizontal && isMiddleCaseEdge ? targetX : sourceX;
-    const correctedSourceY = isHorizontal && isMiddleCaseEdge ? targetY : sourceY;
+    const sourceNodeId = id.split('=>')[0];
+    const targetNodeId = id.split('=>')[1];
+
+    const sourceNode = nodes.find((node) => node.id === sourceNodeId);
+    const targetNode = nodes.find((node) => node.id === targetNodeId);
+
+    const {correctedSourcePosition, correctedSourceX, correctedSourceY} = computeEdgeCorrectedCoordinates({
+        isHorizontal,
+        isMiddleCaseEdge,
+        sourceNodeType: sourceNode?.type,
+        sourcePosition,
+        sourceX,
+        sourceY,
+        targetPosition,
+        targetX,
+        targetY,
+    });
 
     const [edgePath] = getSmoothStepPath({
-        sourcePosition,
+        sourcePosition: correctedSourcePosition,
         sourceX: correctedSourceX,
         sourceY: correctedSourceY,
         targetPosition,
         targetX,
         targetY,
     });
-
-    const targetNodeId = id.split('=>')[1];
-
-    const targetNode = nodes.find((node) => node.id === targetNodeId);
 
     const caseKey = targetNode?.data?.caseKey as string | number | undefined;
 
