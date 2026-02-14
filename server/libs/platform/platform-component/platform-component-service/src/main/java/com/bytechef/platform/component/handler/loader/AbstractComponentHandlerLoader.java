@@ -19,6 +19,7 @@ package com.bytechef.platform.component.handler.loader;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.ComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ComponentHandlerWrapper;
@@ -33,13 +34,16 @@ import java.util.function.BiFunction;
 public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler> implements ComponentHandlerLoader {
 
     private final BiFunction<T, ActionDefinition, ActionDefinition> actionDefinitionMapperFunction;
+    private final BiFunction<T, ClusterElementDefinition<?>, ClusterElementDefinition<?>> clusterElementDefinitionMapperFunction;
     private final Class<T> serviceClass;
 
     public AbstractComponentHandlerLoader(
         BiFunction<T, ActionDefinition, ActionDefinition> actionDefinitionMapperFunction,
+        BiFunction<T, ClusterElementDefinition<?>, ClusterElementDefinition<?>> clusterElementDefinitionMapperFunction,
         Class<T> serviceClass) {
 
         this.actionDefinitionMapperFunction = actionDefinitionMapperFunction;
+        this.clusterElementDefinitionMapperFunction = clusterElementDefinitionMapperFunction;
         this.serviceClass = serviceClass;
     }
 
@@ -53,7 +57,9 @@ public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler>
                 new ComponentHandlerEntry(
                     new ComponentHandlerWrapper(
                         new ComponentDefinitionWrapper(
-                            componentDefinition, mapActionDefinitions(componentHandler, componentDefinition))),
+                            componentDefinition,
+                            mapActionDefinitions(componentHandler, componentDefinition),
+                            mapClusterElementDefinitions(componentHandler, componentDefinition))),
                     getComponentTaskHandlerFunction(componentHandler)));
         }
 
@@ -64,10 +70,27 @@ public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler>
 
     private List<ActionDefinition> mapActionDefinitions(T componentHandler, ComponentDefinition componentDefinition) {
         return componentDefinition.getActions()
-            .map(
-                actionDefinitions -> CollectionUtils.map(
-                    actionDefinitions,
-                    actionDefinition -> actionDefinitionMapperFunction.apply(componentHandler, actionDefinition)))
+            .map(actionDefinitions -> CollectionUtils.map(
+                actionDefinitions,
+                actionDefinition -> actionDefinitionMapperFunction.apply(componentHandler, actionDefinition)))
             .orElse(List.of());
+    }
+
+    private List<ClusterElementDefinition<?>> mapClusterElementDefinitions(
+        T componentHandler, ComponentDefinition componentDefinition) {
+
+        return componentDefinition.getClusterElements()
+            .map(clusterElementDefinitions -> {
+                List<ClusterElementDefinition<?>> mappedClusterElementDefinitions = new ArrayList<>();
+
+                for (ClusterElementDefinition<?> clusterElementDefinition : clusterElementDefinitions) {
+                    mappedClusterElementDefinitions.add(
+                        clusterElementDefinitionMapperFunction.apply(
+                            componentHandler, clusterElementDefinition));
+                }
+
+                return mappedClusterElementDefinitions;
+            })
+            .orElse(null);
     }
 }
