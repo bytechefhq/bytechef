@@ -1,18 +1,18 @@
 import PageLoader from '@/components/PageLoader';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
-import {DEFAULT_CANVAS_WIDTH} from '@/shared/constants';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {ReactFlowProvider} from '@xyflow/react';
-import {lazy, useEffect, useRef, useState} from 'react';
+import {lazy} from 'react';
+
+import useWorkflowExecutionSheetWorkflowPanel from '../../hooks/useWorkflowExecutionSheetWorkflowPanel';
 
 const WorkflowEditor = lazy(() => import('@/pages/platform/workflow-editor/components/WorkflowEditor'));
 
 const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecution}) => {
     const {workflow} = workflowExecution;
-    const [canvasWidth, setCanvasWidth] = useState(DEFAULT_CANVAS_WIDTH);
 
-    const rootDivRef = useRef<HTMLDivElement>(null);
+    const {canvasWidth, rootDivRef} = useWorkflowExecutionSheetWorkflowPanel();
 
     const {
         componentDefinitions,
@@ -27,26 +27,6 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
         workflow!.id as string,
         !!workflow?.id
     );
-
-    useEffect(() => {
-        if (!rootDivRef.current) {
-            return;
-        }
-
-        const updateWidth = () => {
-            if (rootDivRef.current) {
-                setCanvasWidth(rootDivRef.current.clientWidth);
-            }
-        };
-
-        updateWidth();
-
-        const resizeObserver = new ResizeObserver(updateWidth);
-
-        resizeObserver.observe(rootDivRef.current);
-
-        return () => resizeObserver.disconnect();
-    }, []);
 
     return (
         <div className="flex size-full flex-col" ref={rootDivRef}>
