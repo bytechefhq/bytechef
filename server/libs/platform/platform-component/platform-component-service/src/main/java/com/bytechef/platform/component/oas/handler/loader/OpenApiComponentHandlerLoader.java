@@ -18,6 +18,7 @@ package com.bytechef.platform.component.oas.handler.loader;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
@@ -51,7 +52,7 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
     public OpenApiComponentHandlerLoader() {
         super(
             (componentHandler, actionDefinition) -> {
-                Optional<? extends ActionDefinition.BasePerformFunction> perform = actionDefinition.getPerform();
+                Optional<? extends BasePerformFunction> perform = actionDefinition.getPerform();
 
                 if (perform.isPresent()) {
                     return actionDefinition;
@@ -77,8 +78,13 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
                     return clusterElementDefinition;
                 }
 
+                Optional<? extends BasePerformFunction> performOptional = actionDefinition.getPerform();
+
                 return ComponentDsl.tool(
-                    new ActionDefinitionWrapper(actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(actionDefinition)));
+                    performOptional.isPresent()
+                        ? actionDefinition
+                        : new ActionDefinitionWrapper(
+                            actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(actionDefinition)));
             },
             OpenApiComponentHandler.class);
     }

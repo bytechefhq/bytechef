@@ -80,17 +80,11 @@ public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler>
         T componentHandler, ComponentDefinition componentDefinition) {
 
         return componentDefinition.getClusterElements()
-            .map(clusterElementDefinitions -> {
-                List<ClusterElementDefinition<?>> mappedClusterElementDefinitions = new ArrayList<>();
-
-                for (ClusterElementDefinition<?> clusterElementDefinition : clusterElementDefinitions) {
-                    mappedClusterElementDefinitions.add(
-                        clusterElementDefinitionMapperFunction.apply(
-                            componentHandler, clusterElementDefinition));
-                }
-
-                return mappedClusterElementDefinitions;
-            })
-            .orElse(null);
+            .map(clusterElementDefinitions -> CollectionUtils
+                .<ClusterElementDefinition<?>, ClusterElementDefinition<?>>map(
+                    clusterElementDefinitions,
+                    clusterElementDefinition -> clusterElementDefinitionMapperFunction.apply(
+                        componentHandler, clusterElementDefinition)))
+            .orElse(List.of());
     }
 }
