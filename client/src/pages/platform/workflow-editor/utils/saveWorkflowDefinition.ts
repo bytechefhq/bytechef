@@ -6,6 +6,7 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
+import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 const SPACE = 4;
 
@@ -258,6 +259,12 @@ function executeWorkflowMutation({
     workflow,
     workflowDefinition,
 }: ExecuteWorkflowMutationProps) {
+    if (isWorkflowMutating()) {
+        return;
+    }
+
+    setWorkflowMutating(true);
+
     updateWorkflowMutation.mutate(
         {
             id: workflow.id!,
@@ -274,6 +281,9 @@ function executeWorkflowMutation({
             },
         },
         {
+            onSettled: () => {
+                setWorkflowMutating(false);
+            },
             onSuccess: () => {
                 if (onSuccess) {
                     onSuccess();

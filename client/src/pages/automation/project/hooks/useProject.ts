@@ -174,19 +174,8 @@ export const useProject = () => {
 
     const invalidateWorkflowQueries = () => {
         const queryKey = ProjectWorkflowKeys.projectWorkflows(+projectId!);
-        const queryState = queryClient.getQueryState(queryKey);
 
-        if (queryState) {
-            const isInvalidated = queryState.isInvalidated;
-
-            const isFetching = queryState.status === 'pending' || queryState.fetchStatus === 'fetching';
-
-            if (isInvalidated || isFetching) {
-                return;
-            }
-        }
-
-        queryClient.invalidateQueries({
+        return queryClient.invalidateQueries({
             queryKey,
         });
     };
