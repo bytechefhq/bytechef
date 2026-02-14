@@ -54,18 +54,22 @@ export function createPlaceholderNode({
 
 interface CreateSingleElementsNodeProps {
     clusterElementItem: ClusterElementItemType;
+    clusterElementTypeIndex: number;
     clusterRootId: string;
     clusterElementTypeLabel: string;
     clusterElementTypeName: string;
     currentNestedRootElementTypesCount?: number;
+    parentClusterRootElementsTypeCount: number;
 }
 
 export function createSingleElementsNode({
     clusterElementItem,
+    clusterElementTypeIndex,
     clusterElementTypeLabel,
     clusterElementTypeName,
     clusterRootId,
     currentNestedRootElementTypesCount,
+    parentClusterRootElementsTypeCount,
 }: CreateSingleElementsNodeProps): Node {
     const {label, metadata, name, parameters, type} = clusterElementItem;
     const typeSegments = type.split('/');
@@ -86,6 +90,7 @@ export function createSingleElementsNode({
             clusterElementLabel: clusterElementTypeLabel,
             clusterElementName: typeSegments[2],
             clusterElementType: clusterElementTypeName,
+            clusterElementTypeIndex,
             clusterElementTypesCount: currentNestedRootElementTypesCount,
             componentName: typeSegments[0],
             icon: (
@@ -100,6 +105,7 @@ export function createSingleElementsNode({
             name,
             operationName: typeSegments[2],
             parameters,
+            parentClusterRootElementsTypeCount,
             type,
             version: parseInt(typeSegments[1].replace(/^v/, '')),
             workflowNodeName: name,
@@ -112,19 +118,23 @@ export function createSingleElementsNode({
 }
 
 interface CreateMultipleElementsNodeProps {
+    clusterElementTypeIndex: number;
     clusterElementTypeName: string;
     clusterRootId: string;
     currentNestedRootElementTypesCount?: number;
     element: ClusterElementItemType;
     isMultipleClusterElementsNode: boolean;
+    parentClusterRootElementsTypeCount: number;
 }
 
 export function createMultipleElementsNode({
+    clusterElementTypeIndex,
     clusterElementTypeName,
     clusterRootId,
     currentNestedRootElementTypesCount,
     element,
     isMultipleClusterElementsNode,
+    parentClusterRootElementsTypeCount,
 }: CreateMultipleElementsNodeProps): Node {
     const {label, metadata, name, parameters, type} = element;
     const typeSegments = type.split('/');
@@ -144,6 +154,7 @@ export function createMultipleElementsNode({
             ...element,
             clusterElementName: typeSegments[2],
             clusterElementType: clusterElementTypeName,
+            clusterElementTypeIndex,
             clusterElementTypesCount: currentNestedRootElementTypesCount,
             componentName: typeSegments[0],
             icon: (
@@ -159,6 +170,7 @@ export function createMultipleElementsNode({
             name,
             operationName: typeSegments[2],
             parameters,
+            parentClusterRootElementsTypeCount,
             type,
             version: parseInt(typeSegments[1].replace(/^v/, '')),
             workflowNodeName: name,

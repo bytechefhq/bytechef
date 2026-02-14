@@ -1,6 +1,7 @@
 import {
     Background,
     BackgroundVariant,
+    ControlButton,
     Controls,
     Node,
     OnNodesChange,
@@ -10,13 +11,15 @@ import {
 
 import '@xyflow/react/dist/style.css';
 import {CANVAS_BACKGROUND_COLOR, DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
-import {useMemo, useRef} from 'react';
+import {BrushCleaningIcon} from 'lucide-react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import PlaceholderNode from '../../workflow-editor/nodes/PlaceholderNode';
 import WorkflowNode from '../../workflow-editor/nodes/WorkflowNode';
 import {useWorkflowEditor} from '../../workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
+import clearAllClusterElementPositions from '../../workflow-editor/utils/clearAllClusterElementPositions';
 import saveClusterElementNodesPosition from '../../workflow-editor/utils/saveClusterElementNodesPosition';
 import LabeledClusterElementsEdge from '../edges/LabeledClusterElementsEdge';
 import useClusterElementsLayout from '../hooks/useClusterElementsLayout';
@@ -82,14 +85,16 @@ const ClusterElementsWorkflowEditor = () => {
                     }
                 });
 
-                if (Object.keys(changedPositions).length > 0) {
+                if (Object.keys(changedPositions).length > 0 && !updateWorkflowMutation.isPending) {
                     setTimeout(() => {
-                        saveClusterElementNodesPosition({
-                            invalidateWorkflowQueries,
-                            movedClusterElementId: change.id,
-                            updateWorkflowMutation,
-                            workflow,
-                        });
+                        if (!updateWorkflowMutation.isPending) {
+                            saveClusterElementNodesPosition({
+                                invalidateWorkflowQueries,
+                                movedClusterElementId: change.id,
+                                updateWorkflowMutation,
+                                workflow,
+                            });
+                        }
                     }, 100);
                 }
 
@@ -106,6 +111,27 @@ const ClusterElementsWorkflowEditor = () => {
         placeholder: PlaceholderNode,
         workflow: WorkflowNode,
     };
+
+    const resetPendingRef = useRef(false);
+
+    useEffect(() => {
+        if (!updateWorkflowMutation.isPending) {
+            resetPendingRef.current = false;
+        }
+    }, [updateWorkflowMutation.isPending]);
+
+    const handleResetLayout = useCallback(() => {
+        if (resetPendingRef.current || updateWorkflowMutation.isPending) {
+            return;
+        }
+
+        resetPendingRef.current = true;
+
+        clearAllClusterElementPositions({
+            invalidateWorkflowQueries,
+            updateWorkflowMutation,
+        });
+    }, [invalidateWorkflowQueries, updateWorkflowMutation]);
 
     useClusterElementsLayout();
 
@@ -135,7 +161,11 @@ const ClusterElementsWorkflowEditor = () => {
                     <Controls
                         className="m-2 rounded-md border border-stroke-neutral-secondary bg-background"
                         showInteractive={false}
-                    />
+                    >
+                        <ControlButton onClick={handleResetLayout} title="Reset layout">
+                            <BrushCleaningIcon className="size-3" />
+                        </ControlButton>
+                    </Controls>
                 </ReactFlow>
             </ReactFlowProvider>
         </div>
