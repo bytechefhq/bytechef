@@ -15,6 +15,9 @@ bytechef:
       provider: openai
       vectorstore:
         provider: pgvector
+    firecrawl:
+      base-url: https://api.firecrawl.dev/v2
+      enabled: false
     knowledge-base:
       embedding:
         provider: openai

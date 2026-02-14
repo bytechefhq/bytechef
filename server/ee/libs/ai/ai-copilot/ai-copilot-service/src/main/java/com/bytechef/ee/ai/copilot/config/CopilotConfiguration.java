@@ -33,7 +33,9 @@ import java.io.InputStream;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.anthropic.api.AnthropicApi;
@@ -221,11 +223,16 @@ public class CopilotConfiguration {
     WorkflowEditorSpringAIAgent workflowEditorAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
-        FirecrawlTools firecrawlTools, WorkflowService workflowService,
+        Optional<FirecrawlTools> firecrawlTools, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, QuestionAnswerAdvisor questionAnswerAdvisor)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.ASK.name();
+
+        List<Object> tools = new ArrayList<>(
+            List.of(readProjectTools, readProjectWorkflowTools, componentTools, taskTools));
+
+        firecrawlTools.ifPresent(tools::add);
 
         return WorkflowEditorSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -233,7 +240,7 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(systemPromptAskResource))
             .state(state)
-            .tools(List.of(readProjectTools, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools))
+            .tools(tools)
             .advisor(questionAnswerAdvisor)
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
