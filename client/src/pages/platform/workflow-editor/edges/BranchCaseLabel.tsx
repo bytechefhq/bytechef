@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Input} from '@/components/ui/input';
+import {LayoutDirectionType} from '@/shared/constants';
 import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {EdgeLabelRenderer} from '@xyflow/react';
@@ -15,8 +16,11 @@ import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 interface BranchCaseLabelProps {
     caseKey: string | number;
     edgeId: string;
+    layoutDirection: LayoutDirectionType;
+    sourceX: number;
     sourceY: number;
     targetX: number;
+    targetY: number;
 }
 
 function parseCaseKeyValue(value: string): string | number {
@@ -33,7 +37,15 @@ function parseCaseKeyValue(value: string): string | number {
     return trimmedValue;
 }
 
-export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: BranchCaseLabelProps) {
+export default function BranchCaseLabel({
+    caseKey,
+    edgeId,
+    layoutDirection,
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+}: BranchCaseLabelProps) {
     const [isCaseKeyEditable, setIsCaseKeyEditable] = useState(false);
     const [isDeleteConfirmationVisible, setIsDeleteConfirmationVisible] = useState(false);
     const [caseKeyValue, setCaseKeyValue] = useState(String(caseKey));
@@ -194,7 +206,10 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
                 style={{
                     pointerEvents: 'all',
                     position: 'absolute',
-                    transform: `translate(${targetX}px, ${sourceY}px) translate(-50%, -50%)`,
+                    transform:
+                        layoutDirection === 'LR'
+                            ? `translate(${sourceX}px, ${targetY}px) translate(-50%, -50%)`
+                            : `translate(${targetX}px, ${sourceY}px) translate(-50%, -50%)`,
                 }}
             >
                 {isDefaultCase && <span className="p-1 text-xs">default</span>}
