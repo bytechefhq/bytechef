@@ -79,7 +79,7 @@ const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOut
     return (
         <div
             className={twMerge(
-                'absolute bottom-6 right-[536px] top-2 z-10 w-screen max-w-data-pill-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
+                'absolute bottom-6 right-[536px] top-2 z-10 w-screen max-w-data-pill-panel-width animate-[slideInFromRight_300ms_ease-out] overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
                 className
             )}
         >
