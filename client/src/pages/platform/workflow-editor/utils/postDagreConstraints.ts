@@ -366,20 +366,6 @@ export function centerNodesAfterBottomGhost(
 ): void {
     const {crossAxis, crossAxisSize, direction} = options;
 
-    const getClusterRootCrossOffset = (node: Node): number => {
-        const nodeHasValidClusterElements =
-            node.data.clusterElements &&
-            Object.entries(node.data.clusterElements as Record<string, unknown>).some(
-                ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
-            );
-
-        if (!nodeHasValidClusterElements || !node.data.clusterRoot) {
-            return 0;
-        }
-
-        return direction === 'TB' ? -85 : -23;
-    };
-
     edges.forEach((edge) => {
         const sourceNode = allNodes.find((node) => node.id === edge.source);
 
@@ -438,7 +424,7 @@ export function centerNodesAfterBottomGhost(
                 continue;
             }
 
-            const nodeTargetCross = targetCross + getClusterRootCrossOffset(currentNode);
+            const nodeTargetCross = targetCross + getClusterRootCrossOffset(currentNode, direction);
 
             if (currentData.taskDispatcher && currentData.taskDispatcherId) {
                 const shiftCross = nodeTargetCross - currentNode.position[crossAxis];

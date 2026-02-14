@@ -667,6 +667,84 @@ describe('centerNodesAfterBottomGhost', () => {
         expect(nextNode.position.x).toBe(300);
     });
 
+    it('should apply cluster root cross offset for AI Agent nodes via shared helper', () => {
+        const dispatcher: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 300, y: 100},
+            type: 'workflow',
+        };
+        const bottomGhost: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 300, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const aiAgentNode: Node = {
+            data: {
+                clusterElements: {tools: ['tool_1']},
+                clusterRoot: true,
+                componentName: 'aiAgent',
+            },
+            id: 'aiAgent_1',
+            position: {x: 500, y: 600},
+            type: 'aiAgentNode',
+        };
+        const allNodes = [dispatcher, bottomGhost, aiAgentNode];
+        const edges = [
+            {
+                id: 'condition_1-condition-bottom-ghost=>aiAgent_1',
+                source: 'condition_1-condition-bottom-ghost',
+                target: 'aiAgent_1',
+                type: 'workflow',
+            },
+        ];
+
+        centerNodesAfterBottomGhost(allNodes, edges, {crossAxis: 'x', crossAxisSize: NODE_WIDTH, direction: 'TB'});
+
+        // AI Agent cluster root offset is -85 in TB mode
+        expect(aiAgentNode.position.x).toBe(300 + -85);
+    });
+
+    it('should apply LR cluster root cross offset for AI Agent nodes', () => {
+        const dispatcher: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 100, y: 300},
+            type: 'workflow',
+        };
+        const bottomGhost: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 500, y: 300},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const aiAgentNode: Node = {
+            data: {
+                clusterElements: {tools: ['tool_1']},
+                clusterRoot: true,
+                componentName: 'aiAgent',
+            },
+            id: 'aiAgent_1',
+            position: {x: 600, y: 500},
+            type: 'aiAgentNode',
+        };
+        const allNodes = [dispatcher, bottomGhost, aiAgentNode];
+        const edges = [
+            {
+                id: 'condition_1-condition-bottom-ghost=>aiAgent_1',
+                source: 'condition_1-condition-bottom-ghost',
+                target: 'aiAgent_1',
+                type: 'workflow',
+            },
+        ];
+
+        centerNodesAfterBottomGhost(allNodes, edges, {crossAxis: 'y', crossAxisSize: NODE_WIDTH, direction: 'LR'});
+
+        // AI Agent cluster root offset is -23 in LR mode
+        expect(aiAgentNode.position.y).toBe(300 + -23);
+    });
+
     it('should skip centering when dispatcher has saved position', () => {
         const dispatcher: Node = {
             data: {
