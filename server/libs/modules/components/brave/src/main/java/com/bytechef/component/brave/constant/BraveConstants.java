@@ -21,16 +21,16 @@ package com.bytechef.component.brave.constant;
  */
 public class BraveConstants {
 
-    public static final String Q = "q";
     public static final String COUNT = "count";
-    public static final String OFFSET = "offset";
-    public static final String SAFESEARCH = "safesearch";
-    public static final String FRESHNESS = "freshness";
-    public static final String RESULT_FILTER = "result_filter";
-    public static final String SUMMARY = "summary";
-    public static final String OPERATORS = "operators";
     public static final String COUNTRY = "country";
+    public static final String FRESHNESS = "freshness";
+    public static final String OFFSET = "offset";
+    public static final String OPERATORS = "operators";
+    public static final String Q = "q";
+    public static final String RESULT_FILTER = "result_filter";
+    public static final String SAFESEARCH = "safesearch";
     public static final String SEARCH_LANG = "search_lang";
+    public static final String SUMMARY = "summary";
 
     private BraveConstants() {
     }
