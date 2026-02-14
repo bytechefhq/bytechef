@@ -484,7 +484,7 @@ const WorkflowEditor = ({
             childDragStartRef.current = new Map();
             draggingPlaceholderRef.current = null;
         },
-        [editorInvalidateWorkflowQueries, layoutDirection, setIsNodeDragging, updateWorkflowMutation]
+        [editorInvalidateWorkflowQueries, layoutDirection, setIsNodeDragging, updateWorkflowMutation, workflow.id]
     );
 
     let canvasWidth = window.innerWidth - 120;
@@ -517,7 +517,7 @@ const WorkflowEditor = ({
         if (!updateWorkflowMutation.isPending && !isWorkflowMutating(workflow.id!)) {
             resetPendingRef.current = false;
         }
-    }, [updateWorkflowMutation.isPending]);
+    }, [updateWorkflowMutation.isPending, workflow.id]);
 
     const handleResetLayout = useCallback(() => {
         if (resetPendingRef.current || isWorkflowMutating(workflow.id!)) {
@@ -532,7 +532,7 @@ const WorkflowEditor = ({
         });
 
         incrementLayoutResetCounter();
-    }, [editorInvalidateWorkflowQueries, incrementLayoutResetCounter, updateWorkflowMutation]);
+    }, [editorInvalidateWorkflowQueries, incrementLayoutResetCounter, updateWorkflowMutation, workflow.id]);
 
     useLayout({
         canvasHeight,
