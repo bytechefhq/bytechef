@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.handler.loader;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -64,11 +63,11 @@ public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler>
     protected abstract ComponentTaskHandlerFunction getComponentTaskHandlerFunction(T componentHandler);
 
     private List<ActionDefinition> mapActionDefinitions(T componentHandler, ComponentDefinition componentDefinition) {
-        return OptionalUtils.mapOrElse(
-            componentDefinition.getActions(),
-            actionDefinitions -> CollectionUtils.map(
-                actionDefinitions,
-                actionDefinition -> actionDefinitionMapperFunction.apply(componentHandler, actionDefinition)),
-            List.of());
+        return componentDefinition.getActions()
+            .map(
+                actionDefinitions -> CollectionUtils.map(
+                    actionDefinitions,
+                    actionDefinition -> actionDefinitionMapperFunction.apply(componentHandler, actionDefinition)))
+            .orElse(List.of());
     }
 }

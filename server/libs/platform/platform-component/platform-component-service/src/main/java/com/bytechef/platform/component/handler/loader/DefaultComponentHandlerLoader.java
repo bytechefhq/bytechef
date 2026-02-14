@@ -16,13 +16,13 @@
 
 package com.bytechef.platform.component.handler.loader;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ComponentHandler.ActionHandlerFunction;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandler;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 /**
@@ -32,7 +32,8 @@ public class DefaultComponentHandlerLoader extends AbstractComponentHandlerLoade
 
     public static final BiFunction<ComponentHandler, ActionDefinition, PerformFunction> PERFORM_FUNCTION_FUNCTION =
         (componentHandler, actionDefinition) -> {
-            ActionHandlerFunction actionHandlerFunction = OptionalUtils.get(componentHandler.getActionHandler());
+            ActionHandlerFunction actionHandlerFunction = componentHandler.getActionHandler()
+                .orElseThrow();
 
             return (inputParameters, connectionParameters, context) -> actionHandlerFunction.apply(
                 actionDefinition.getName(), inputParameters, context);
@@ -41,7 +42,9 @@ public class DefaultComponentHandlerLoader extends AbstractComponentHandlerLoade
     public DefaultComponentHandlerLoader() {
         super(
             (componentHandler, actionDefinition) -> {
-                if (OptionalUtils.isPresent(componentHandler.getActionHandler())) {
+                Optional<ActionHandlerFunction> actionHandlerOptional = componentHandler.getActionHandler();
+
+                if (actionHandlerOptional.isPresent()) {
                     return new ActionDefinitionWrapper(
                         actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(componentHandler, actionDefinition));
                 } else {
