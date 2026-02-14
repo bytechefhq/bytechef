@@ -36,8 +36,7 @@ public class FirecrawlComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("firecrawl")
         .title("Firecrawl")
-        .description(
-            "Firecrawl allows you to turn entire websites into LLM-ready markdown")
+        .description("Firecrawl allows you to turn entire websites into LLM-ready markdown")
         .icon("path:assets/firecrawl.svg")
         .categories(ComponentCategory.HELPERS, ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(FirecrawlConnection.CONNECTION_DEFINITION)
@@ -48,7 +47,10 @@ public class FirecrawlComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(FirecrawlMapAction.ACTION_DEFINITION),
             tool(FirecrawlScrapeAction.ACTION_DEFINITION),
-            tool(FirecrawlSearchAction.ACTION_DEFINITION));
+            tool(FirecrawlSearchAction.ACTION_DEFINITION))
+        .customAction(true)
+        .customActionHelp("Firecrawl API", "https://docs.firecrawl.dev/api-reference/introduction")
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
