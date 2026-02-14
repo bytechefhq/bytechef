@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.oas.handler.loader;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
@@ -26,6 +25,7 @@ import com.bytechef.platform.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.platform.component.util.OpenApiClientUtils;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -35,15 +35,23 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
 
     public static final Function<ActionDefinition, PerformFunction> PERFORM_FUNCTION_FUNCTION =
         actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils.execute(
-            inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
-            OptionalUtils.orElse(actionDefinition.getOutputDefinition(), null),
-            OptionalUtils.orElse(actionDefinition.getMetadata(), Map.of()),
-            OptionalUtils.orElse(actionDefinition.getProcessErrorResponse(), null), context);
+            inputParameters,
+            actionDefinition.getProperties()
+                .orElse(List.of()),
+            actionDefinition.getOutputDefinition()
+                .orElse(null),
+            actionDefinition.getMetadata()
+                .orElse(Map.of()),
+            actionDefinition.getProcessErrorResponse()
+                .orElse(null),
+            context);
 
     public OpenApiComponentHandlerLoader() {
         super(
             (componentHandler, actionDefinition) -> {
-                if (OptionalUtils.isPresent(actionDefinition.getPerform())) {
+                Optional<? extends ActionDefinition.BasePerformFunction> perform = actionDefinition.getPerform();
+
+                if (perform.isPresent()) {
                     return actionDefinition;
                 } else {
                     return new ActionDefinitionWrapper(
