@@ -248,18 +248,25 @@ public final class ComponentDsl {
         Optional<String> description = actionDefinition.getDescription();
         Optional<List<? extends Property>> properties = actionDefinition.getProperties();
         Optional<OutputDefinition> outputDefinition = actionDefinition.getOutputDefinition();
-        PerformFunction perform = (PerformFunction) actionDefinition.getPerform()
-            .map(f -> (PerformFunction) f)
-            .orElse((inputParameters, connectionParameters, context) -> null);
 
-        return ComponentDsl.<ToolFunction>clusterElement(actionDefinition.getName())
-            .title(title.orElse(null))
-            .description(description.orElse(null))
-            .type(TOOLS)
-            .properties(properties.orElse(List.of()))
-            .output(outputDefinition.orElse(null))
-            .object(() -> (inputParameters, connectionParameters, context) -> perform.apply(
-                inputParameters, connectionParameters, new ActionContextAdapater(context)));
+        ModifiableClusterElementDefinition<ToolFunction> clusterElementDefinition =
+            ComponentDsl.<ToolFunction>clusterElement(actionDefinition.getName())
+                .title(title.orElse(null))
+                .description(description.orElse(null))
+                .type(TOOLS)
+                .properties(properties.orElse(List.of()))
+                .output(outputDefinition.orElse(null));
+
+        actionDefinition.getPerform()
+            .ifPresent(basePerformFunction -> {
+                PerformFunction perform = (PerformFunction) basePerformFunction;
+
+                clusterElementDefinition.object(
+                    () -> (inputParameters, connectionParameters, context) -> perform.apply(
+                        inputParameters, connectionParameters, new ActionContextAdapater(context)));
+            });
+
+        return clusterElementDefinition;
     }
 
     public static ModifiableTriggerDefinition trigger(String name) {

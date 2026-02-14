@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.util.CustomActionUtils;
 import java.util.ArrayList;
@@ -29,9 +30,19 @@ import java.util.Optional;
 public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapper implements ComponentDefinition {
 
     private final List<ActionDefinition> actions;
+    private final List<ClusterElementDefinition<?>> clusterElements;
 
     public ComponentDefinitionWrapper(
         ComponentDefinition componentDefinition, List<ActionDefinition> actionDefinitions) {
+
+        Optional<List<ClusterElementDefinition<?>>> elementElementsOptional = componentDefinition.getClusterElements();
+
+        this(componentDefinition, actionDefinitions, elementElementsOptional.orElse(null));
+    }
+
+    public ComponentDefinitionWrapper(
+        ComponentDefinition componentDefinition, List<ActionDefinition> actionDefinitions,
+        List<ClusterElementDefinition<?>> clusterElementDefinitions) {
 
         super(componentDefinition);
 
@@ -47,11 +58,17 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
         }
 
         this.actions = actionDefinitions;
+        this.clusterElements = clusterElementDefinitions;
     }
 
     @Override
     public Optional<List<ActionDefinition>> getActions() {
         return Optional.ofNullable(actions == null ? null : new ArrayList<>(actions));
+    }
+
+    @Override
+    public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
+        return Optional.ofNullable(clusterElements == null ? null : new ArrayList<>(clusterElements));
     }
 
     @Override

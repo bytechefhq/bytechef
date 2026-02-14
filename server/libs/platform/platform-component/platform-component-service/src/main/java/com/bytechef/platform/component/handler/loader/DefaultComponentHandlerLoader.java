@@ -51,6 +51,7 @@ public class DefaultComponentHandlerLoader extends AbstractComponentHandlerLoade
                     return actionDefinition;
                 }
             },
+            (componentHandler, clusterElementDefinition) -> clusterElementDefinition,
             ComponentHandler.class);
     }
 
