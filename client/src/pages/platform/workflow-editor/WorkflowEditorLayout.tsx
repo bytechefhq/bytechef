@@ -8,12 +8,13 @@ import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/usePr
 import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
+import useWorkflowEditorLayout from '@/pages/platform/workflow-editor/hooks/useWorkflowEditorLayout';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {Suspense, lazy, useEffect, useMemo} from 'react';
+import {Suspense, lazy} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
@@ -45,16 +46,9 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
     const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
-    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore(
-        useShallow((state) => ({
-            currentComponent: state.currentComponent,
-            currentNode: state.currentNode,
-        }))
-    );
+    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
     const {
         clusterElementsCanvasOpen,
-        setClusterElementsCanvasOpen,
-        setRootClusterElementNodeData,
         setShowWorkflowCodeEditorSheet,
         setShowWorkflowInputsSheet,
         setShowWorkflowOutputsSheet,
@@ -64,8 +58,6 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
     } = useWorkflowEditorStore(
         useShallow((state) => ({
             clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
-            setClusterElementsCanvasOpen: state.setClusterElementsCanvasOpen,
-            setRootClusterElementNodeData: state.setRootClusterElementNodeData,
             setShowWorkflowCodeEditorSheet: state.setShowWorkflowCodeEditorSheet,
             setShowWorkflowInputsSheet: state.setShowWorkflowInputsSheet,
             setShowWorkflowOutputsSheet: state.setShowWorkflowOutputsSheet,
@@ -91,25 +83,7 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
     } = useWorkflowLayout(includeComponents);
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
-
-    const isMainRootClusterElement = useMemo(
-        () => currentNode?.clusterRoot && !currentNode?.isNestedClusterRoot,
-        [currentNode?.clusterRoot, currentNode?.isNestedClusterRoot]
-    );
-
-    const handleClusterElementsCanvasOpenChange = (open: boolean) => {
-        setClusterElementsCanvasOpen(open);
-
-        if (!open) {
-            setRootClusterElementNodeData(undefined);
-        }
-    };
-
-    useEffect(() => {
-        if (isMainRootClusterElement) {
-            setRootClusterElementNodeData(currentNode);
-        }
-    }, [isMainRootClusterElement, setRootClusterElementNodeData, currentNode]);
+    const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     return (
         <ReactFlowProvider>
