@@ -1,12 +1,11 @@
 import {
     CLUSTER_ELEMENT_NODE_WIDTH,
-    CLUSTER_ELEMENT_PLACEHOLDER_WIDTH,
     CONDITION_CASE_FALSE,
     CONDITION_CASE_TRUE,
     DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM,
-    DIRECTION,
     EDGE_STYLES,
     FINAL_PLACEHOLDER_NODE_ID,
+    LayoutDirectionType,
     NODE_HEIGHT,
     NODE_WIDTH,
     PLACEHOLDER_NODE_HEIGHT,
@@ -32,9 +31,26 @@ import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon, PlayIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
-import {calculateNodeWidth} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import {calculateNodeWidth, getHandlePosition} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {getConditionBranchSide} from './createConditionEdges';
 import {getForkJoinBranchSide} from './createForkJoinEdges';
+import {getCrossAxis, getCrossAxisNodeSize} from './directionUtils';
+import {
+    adjustBottomGhostForMovedChildren,
+    alignBranchCaseChildren,
+    alignChainNodesCrossAxis,
+    alignDispatcherGhostsCrossAxis,
+    alignTrailingPlaceholder,
+    applySavedPositions,
+    centerLRSmallNodes,
+    centerNodesAfterBottomGhost,
+    constrainBranchGhostsCrossAxis,
+    constrainConditionGhostsCrossAxis,
+    constrainLeftGhostPositions,
+    containsNodePosition,
+    positionConditionCasePlaceholders,
+    shiftConditionBranchContent,
+} from './postDagreConstraints';
 import {TASK_DISPATCHER_CONFIG, getParentTaskDispatcherTask} from './taskDispatcherConfig';
 
 let dagre: typeof import('@dagrejs/dagre') | null = null;
@@ -73,6 +89,37 @@ export const calculateNodeHeight = (node: Node) => {
     return height;
 };
 
+/**
+ * Returns the approximate rendered main-axis size (width in LR mode) for a node.
+ * Dagre reports center coordinates; subtracting half this value converts to the
+ * top-left position that ReactFlow expects.
+ */
+function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): number {
+    if (direction !== 'LR') {
+        return 0;
+    }
+
+    if (node.type === 'taskDispatcherLeftGhostNode') {
+        return 16;
+    }
+
+    if (node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode') {
+        return 2;
+    }
+
+    if (node.type === 'aiAgentNode') {
+        const hasClusterElements =
+            node.data.clusterElements &&
+            Object.entries(node.data.clusterElements).some(
+                ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+            );
+
+        return hasClusterElements ? 240 : 72;
+    }
+
+    return 72;
+}
+
 export const convertTaskToNode = (
     task: WorkflowTask,
     taskDefinition: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic,
@@ -106,43 +153,317 @@ export const convertTaskToNode = (
 };
 
 interface GetLayoutedElementsProps {
+    canvasHeight?: number;
     canvasWidth: number;
+    direction?: LayoutDirectionType;
     edges: Edge[];
     isClusterElementsCanvas?: boolean;
     nodes: Node[];
+    savedPositionCrossAxisShift?: number;
 }
 
 export const getLayoutedElements = async ({
+    canvasHeight,
     canvasWidth,
+    direction = 'TB',
     edges,
     isClusterElementsCanvas,
     nodes,
+    savedPositionCrossAxisShift = 0,
 }: GetLayoutedElementsProps) => {
+    if (isClusterElementsCanvas) {
+        const mainRootNode = nodes.find((node) => node.data.clusterElements && !node.parentId);
+
+        if (!mainRootNode) {
+            console.error('Main root node not found');
+
+            return {edges, nodes};
+        }
+
+        const placeholderNodes = nodes.filter((node) => node.type === 'placeholder');
+        const workflowNodes = nodes.filter((node) => node.type !== 'placeholder');
+
+        if (workflowNodes.length === 0) {
+            console.error('Cluster element workflow nodes not found');
+
+            return {edges, nodes: placeholderNodes};
+        }
+
+        const mainRootTypesCount = (mainRootNode.data.clusterElementTypesCount as number) || 1;
+        const mainRootWidth = calculateNodeWidth(mainRootTypesCount) || ROOT_CLUSTER_WIDTH;
+        const canvasCenterX = canvasWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM / 2;
+
+        const positionedNodes: Node[] = [];
+
+        positionedNodes.push({
+            ...mainRootNode,
+            position: {
+                x: canvasCenterX - mainRootWidth / 2,
+                y: NODE_HEIGHT,
+            },
+        });
+
+        const placeholderY = 140;
+        const childBaseY = placeholderY + PLACEHOLDER_NODE_HEIGHT + NODE_HEIGHT / 4;
+        const horizontalGap = CLUSTER_ELEMENT_NODE_WIDTH + 80;
+
+        const overlapPadding = 20;
+
+        // Labels rendered below node circles extend ~40-60px beyond NODE_HEIGHT.
+        // Include this overhang in extent calculations so stacked cluster roots
+        // don't overlap labels from sibling subtrees.
+        const labelOverhang = 40;
+
+        // Returns the maximum Y extent of the subtree (relative to the parent)
+        const positionChildrenOfParent = (parentId: string): number => {
+            const children = workflowNodes.filter((node) => node.parentId === parentId && node.id !== parentId);
+
+            if (children.length === 0) {
+                return NODE_HEIGHT + labelOverhang;
+            }
+
+            const parentTypesCount = (children[0].data.parentClusterRootElementsTypeCount as number) || 1;
+            const parentWidth = calculateNodeWidth(parentTypesCount) || ROOT_CLUSTER_WIDTH;
+            const parentCenterX = parentWidth / 2;
+
+            const typeGroups = new Map<string, Node[]>();
+
+            for (const child of children) {
+                const childType = child.data.clusterElementType as string;
+
+                if (!typeGroups.has(childType)) {
+                    typeGroups.set(childType, []);
+                }
+
+                typeGroups.get(childType)!.push(child);
+            }
+
+            let maxExtentY = NODE_HEIGHT;
+
+            // First pass: position regular (non-cluster-root) children
+            for (const [, typeChildren] of typeGroups) {
+                const typeIndex = (typeChildren[0].data.clusterElementTypeIndex as number) || 0;
+
+                const handleX = getHandlePosition({
+                    handlesCount: parentTypesCount,
+                    index: typeIndex,
+                    nodeWidth: parentWidth,
+                });
+
+                const isRightSide = handleX >= parentCenterX;
+
+                const regularChildren = typeChildren.filter((child) => !child.data.isNestedClusterRoot);
+
+                for (let childIndex = 0; childIndex < regularChildren.length; childIndex++) {
+                    const child = regularChildren[childIndex];
+
+                    if (containsNodePosition(child.data.metadata)) {
+                        positionedNodes.push({...child, position: child.data.metadata.ui.nodePosition});
+                    } else {
+                        const firstChildX = handleX - CLUSTER_ELEMENT_NODE_WIDTH / 2;
+                        let childX: number;
+
+                        if (childIndex === 0) {
+                            childX = firstChildX;
+                        } else if (isRightSide) {
+                            childX = firstChildX + childIndex * horizontalGap;
+                        } else {
+                            childX = firstChildX - childIndex * horizontalGap;
+                        }
+
+                        positionedNodes.push({...child, position: {x: childX, y: childBaseY}});
+                    }
+
+                    const childExtent = positionChildrenOfParent(child.id);
+
+                    maxExtentY = Math.max(maxExtentY, childBaseY + childExtent);
+                }
+            }
+
+            // Second pass: position cluster root children below all regular children
+            const hasRegularChildren = [...typeGroups.values()].some((typeChildren) =>
+                typeChildren.some((child) => !child.data.isNestedClusterRoot)
+            );
+
+            let clusterRootY = hasRegularChildren
+                ? Math.max(childBaseY + NODE_HEIGHT * 1.5, maxExtentY + overlapPadding)
+                : childBaseY;
+
+            for (const [, typeChildren] of typeGroups) {
+                const typeIndex = (typeChildren[0].data.clusterElementTypeIndex as number) || 0;
+
+                const handleX = getHandlePosition({
+                    handlesCount: parentTypesCount,
+                    index: typeIndex,
+                    nodeWidth: parentWidth,
+                });
+
+                const isRightSide = handleX >= parentCenterX;
+
+                const clusterRootChildren = typeChildren.filter((child) => child.data.isNestedClusterRoot);
+                const multipleClusterRootChildren = clusterRootChildren.filter(
+                    (child) => child.data.multipleClusterElementsNode
+                );
+                const singleClusterRootChildren = clusterRootChildren.filter(
+                    (child) => !child.data.multipleClusterElementsNode
+                );
+
+                // Position multiple-instance cluster root children horizontally
+                for (let childIndex = 0; childIndex < multipleClusterRootChildren.length; childIndex++) {
+                    const child = multipleClusterRootChildren[childIndex];
+                    const childTypesCount = (child.data.clusterElementTypesCount as number) || 1;
+                    const childWidth = calculateNodeWidth(childTypesCount) || ROOT_CLUSTER_WIDTH;
+                    const clusterRootHorizontalGap = childWidth + 80;
+
+                    if (containsNodePosition(child.data.metadata)) {
+                        positionedNodes.push({...child, position: child.data.metadata.ui.nodePosition});
+                    } else {
+                        const firstChildX = handleX - childWidth / 2;
+                        let childX: number;
+
+                        if (childIndex === 0) {
+                            childX = firstChildX;
+                        } else if (isRightSide) {
+                            childX = firstChildX + childIndex * clusterRootHorizontalGap;
+                        } else {
+                            childX = firstChildX - childIndex * clusterRootHorizontalGap;
+                        }
+
+                        positionedNodes.push({...child, position: {x: childX, y: clusterRootY}});
+                    }
+
+                    const childExtent = positionChildrenOfParent(child.id);
+
+                    maxExtentY = Math.max(maxExtentY, clusterRootY + childExtent);
+                }
+
+                // Position single-instance cluster root children vertically
+                let singleClusterRootY = clusterRootY;
+
+                for (const child of singleClusterRootChildren) {
+                    const childTypesCount = (child.data.clusterElementTypesCount as number) || 1;
+                    const childWidth = calculateNodeWidth(childTypesCount) || ROOT_CLUSTER_WIDTH;
+
+                    if (containsNodePosition(child.data.metadata)) {
+                        positionedNodes.push({...child, position: child.data.metadata.ui.nodePosition});
+                    } else {
+                        const childX = handleX - childWidth / 2;
+
+                        positionedNodes.push({...child, position: {x: childX, y: singleClusterRootY}});
+                    }
+
+                    const childExtent = positionChildrenOfParent(child.id);
+
+                    singleClusterRootY = Math.max(
+                        singleClusterRootY + childBaseY,
+                        singleClusterRootY + childExtent + overlapPadding
+                    );
+
+                    maxExtentY = Math.max(maxExtentY, singleClusterRootY);
+                }
+
+                clusterRootY = Math.max(clusterRootY, singleClusterRootY);
+            }
+
+            return maxExtentY;
+        };
+
+        positionChildrenOfParent(mainRootNode.id);
+
+        // Resolve horizontal overlaps among sibling nodes
+        const siblingGroups = new Map<string, Node[]>();
+
+        for (const node of positionedNodes) {
+            const parentId = node.parentId || '';
+
+            if (!siblingGroups.has(parentId)) {
+                siblingGroups.set(parentId, []);
+            }
+
+            siblingGroups.get(parentId)!.push(node);
+        }
+
+        for (const [, siblings] of siblingGroups) {
+            if (siblings.length < 2) {
+                continue;
+            }
+
+            siblings.sort((nodeA, nodeB) => nodeA.position.x - nodeB.position.x);
+
+            for (let i = 0; i < siblings.length; i++) {
+                const nodeA = siblings[i];
+                const isClusterRootA = !!nodeA.data.clusterElementTypesCount;
+                const widthA = isClusterRootA
+                    ? calculateNodeWidth(nodeA.data.clusterElementTypesCount as number) || ROOT_CLUSTER_WIDTH
+                    : CLUSTER_ELEMENT_NODE_WIDTH;
+
+                for (let j = i + 1; j < siblings.length; j++) {
+                    const nodeB = siblings[j];
+
+                    if (containsNodePosition(nodeB.data.metadata)) {
+                        continue;
+                    }
+
+                    const isClusterRootB = !!nodeB.data.clusterElementTypesCount;
+
+                    // Small circle nodes (72px) have labels that extend ~40px
+                    // beyond each side; account for this to prevent label overlap
+                    const labelPaddingA = isClusterRootA ? 0 : 40;
+                    const labelPaddingB = isClusterRootB ? 0 : 40;
+
+                    const verticalOverlap = Math.abs(nodeA.position.y - nodeB.position.y) < NODE_HEIGHT + labelOverhang;
+                    const minX = nodeA.position.x + widthA + labelPaddingA + labelPaddingB + overlapPadding;
+
+                    if (verticalOverlap && nodeB.position.x < minX) {
+                        nodeB.position = {...nodeB.position, x: minX};
+                    }
+                }
+            }
+        }
+
+        return {
+            edges,
+            nodes: [...positionedNodes, ...placeholderNodes],
+        };
+    }
+
     const dagreModule = await loadDagre();
 
     const dagreGraph = new dagreModule.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
-    const horizontalGap = isClusterElementsCanvas ? CLUSTER_ELEMENT_NODE_WIDTH * 2 : 50;
+    const effectiveDirection = direction;
 
     dagreGraph.setGraph({
-        nodesep: horizontalGap,
-        rankdir: DIRECTION,
+        nodesep: 50,
+        rankdir: effectiveDirection,
     });
 
     nodes.forEach((node) => {
-        let height = NODE_HEIGHT;
+        let height = calculateNodeHeight(node);
         let width = NODE_WIDTH;
 
-        if (isClusterElementsCanvas) {
-            if (node.id.includes('placeholder')) {
-                width = CLUSTER_ELEMENT_PLACEHOLDER_WIDTH;
-            } else if (node.data.isNestedClusterRoot || node.data.clusterRoot) {
-                width = calculateNodeWidth(node.data.clusterElementTypesCount as number) || ROOT_CLUSTER_WIDTH;
+        const isGhostNode =
+            node.type === 'taskDispatcherTopGhostNode' ||
+            node.type === 'taskDispatcherBottomGhostNode' ||
+            node.type === 'taskDispatcherLeftGhostNode';
+
+        if (effectiveDirection === 'LR') {
+            if (isGhostNode || node.type === 'placeholder') {
+                width = height;
+            } else if (node.type === 'aiAgentNode') {
+                const nodeHasClusterElements =
+                    node.data.clusterElements &&
+                    Object.entries(node.data.clusterElements).some(
+                        ([, value]) =>
+                            value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+                    );
+
+                width = nodeHasClusterElements ? 292 : 120;
             } else {
-                width = CLUSTER_ELEMENT_NODE_WIDTH;
+                width = 120;
             }
-        } else {
-            height = calculateNodeHeight(node);
+
+            height = NODE_WIDTH;
         }
 
         dagreGraph.setNode(node.id, {height, width});
@@ -151,6 +472,8 @@ export const getLayoutedElements = async ({
     edges.forEach((edge) => {
         if (edge.target.includes('bottom-ghost')) {
             dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
+        } else if (edge.target.includes('top-ghost')) {
+            dagreGraph.setEdge(edge.source, edge.target, {minlen: 1});
         } else {
             const sourceNode = nodes.find((node) => node.id === edge.source);
 
@@ -163,9 +486,7 @@ export const getLayoutedElements = async ({
 
             let edgeLength = 1;
 
-            if (isClusterElementsCanvas) {
-                edgeLength = 1.5;
-            } else if (hasValidClusterElements) {
+            if (hasValidClusterElements && effectiveDirection !== 'LR') {
                 edgeLength = 2;
             }
 
@@ -175,125 +496,18 @@ export const getLayoutedElements = async ({
 
     dagreModule.layout(dagreGraph, {disableOptimalOrderHeuristic: true});
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const containsNodePosition = (metadata: any): metadata is {ui: {nodePosition: {x: number; y: number}}} =>
-        metadata?.ui?.nodePosition !== undefined;
+    const crossAxis = getCrossAxis(direction);
+    const crossAxisSize = getCrossAxisNodeSize(direction);
 
-    const calculateClusterElementsCenteringOffsets = (
-        graphWidth: number,
-        canvasWidth: number,
-        mainRootDagreNode: {x: number; width: number; y: number}
-    ) => {
-        const canvasCenterX = canvasWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM / 2;
-        const graphCenterX = graphWidth / 2;
-        const mainRootCenterX = mainRootDagreNode.x + mainRootDagreNode.width / 2;
+    const canvasCrossDimension = direction === 'LR' && canvasHeight ? canvasHeight : canvasWidth;
 
-        const rootOffsetX = graphCenterX - mainRootCenterX;
-        const canvasOffsetX = canvasCenterX - graphCenterX;
+    const triggerCrossHalf = direction === 'LR' ? NODE_WIDTH / 2 : 72 / 2;
 
-        return {canvasOffsetX, rootOffsetX};
-    };
-
-    if (isClusterElementsCanvas) {
-        const mainRootNode = nodes.find((node) => node.data.clusterElements && !node.parentId);
-
-        if (!mainRootNode) {
-            console.error('Main root node not found');
-
-            return {edges, nodes};
-        }
-
-        const placeholderNodes = nodes.filter((node) => node.type === 'placeholder');
-        const clusterElementWorkflowNodes = nodes.filter((node) => node.type !== 'placeholder');
-
-        if (clusterElementWorkflowNodes.length === 0) {
-            console.error('Cluster element workflow nodes not found');
-
-            return {edges, nodes: placeholderNodes};
-        }
-
-        const graphWidth = dagreGraph.graph().width || 0;
-        const mainRootDagreNode = dagreGraph.node(mainRootNode.id);
-
-        const offsets = calculateClusterElementsCenteringOffsets(graphWidth, canvasWidth, mainRootDagreNode);
-
-        const positionedClusterElementNodes = clusterElementWorkflowNodes.map((clusterElementNode) => {
-            if (clusterElementNode.id === mainRootNode.id) {
-                const defaultPosition = {
-                    x: mainRootDagreNode.x + offsets.rootOffsetX + offsets.canvasOffsetX,
-                    y: NODE_HEIGHT,
-                };
-
-                return {
-                    ...clusterElementNode,
-                    position: defaultPosition,
-                };
-            }
-
-            const childDagreNode = dagreGraph.node(clusterElementNode.id);
-
-            if (clusterElementNode.parentId === mainRootNode.id) {
-                const childNodeLeftEdge = childDagreNode.x - childDagreNode.width / 2;
-                let mainRootLeftEdge = mainRootDagreNode.x - mainRootDagreNode.width / 2;
-
-                if (mainRootNode.data.clusterElements && Object.keys(mainRootNode.data.clusterElements).length > 1) {
-                    mainRootLeftEdge += offsets.rootOffsetX;
-                }
-
-                const topLevelChildRelativeX = childNodeLeftEdge - mainRootLeftEdge;
-                const topLevelChildRelativeY = childDagreNode.y - mainRootDagreNode.y;
-
-                const defaultPosition = {
-                    x: topLevelChildRelativeX,
-                    y: topLevelChildRelativeY,
-                };
-
-                return {
-                    ...clusterElementNode,
-                    position: containsNodePosition(clusterElementNode.data.metadata)
-                        ? clusterElementNode.data.metadata.ui.nodePosition
-                        : defaultPosition,
-                };
-            }
-
-            const parentRootNode = nodes.find((node) => node.id === clusterElementNode.parentId);
-            if (!parentRootNode) {
-                console.error('Parent root node not found');
-
-                return clusterElementNode;
-            }
-
-            const parentRootDagreNode = dagreGraph.node(parentRootNode.id);
-
-            const childNodeLeftEdge = childDagreNode.x - childDagreNode.width / 2;
-            const parentNestedRootLeftEdge = parentRootDagreNode.x - parentRootDagreNode.width / 2;
-
-            const nestedChildRelativeX = childNodeLeftEdge - parentNestedRootLeftEdge;
-            const nestedChildRelativeY = childDagreNode.y - parentRootDagreNode.y;
-
-            const defaultPosition = {
-                x: nestedChildRelativeX,
-                y: nestedChildRelativeY,
-            };
-
-            return {
-                ...clusterElementNode,
-                position: containsNodePosition(clusterElementNode.data.metadata)
-                    ? clusterElementNode.data.metadata.ui.nodePosition
-                    : defaultPosition,
-            };
-        });
-
-        const positionedNodes = [...positionedClusterElementNodes, ...placeholderNodes];
-
-        return {
-            edges,
-            nodes: positionedNodes,
-        };
-    }
+    const canvasCenteringOffset = canvasCrossDimension / 2 - dagreGraph.node(nodes[0].id)[crossAxis] - triggerCrossHalf;
 
     const allNodes = nodes.map((node) => {
-        let positionX = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
+        const dagreNode = dagreGraph.node(node.id);
+        let crossAxisPosition = dagreNode[crossAxis] + canvasCenteringOffset;
 
         const hasValidClusterElements =
             node.data.clusterElements &&
@@ -301,18 +515,53 @@ export const getLayoutedElements = async ({
                 ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
             );
 
-        if (hasValidClusterElements && node.data.clusterRoot) {
-            positionX -= 85;
+        if (hasValidClusterElements && node.data.clusterRoot && direction === 'TB') {
+            crossAxisPosition -= 85;
+        }
+
+        const mainAxis = direction === 'TB' ? 'y' : 'x';
+        const mainAxisPosition = dagreNode[mainAxis] - getRenderedMainAxisSize(node, direction) / 2;
+
+        if (hasValidClusterElements && node.data.clusterRoot && direction === 'LR') {
+            crossAxisPosition -= 23;
         }
 
         return {
             ...node,
             position: {
-                x: positionX,
-                y: dagreGraph.node(node.id).y,
-            },
+                [crossAxis]: crossAxisPosition,
+                [mainAxis]: mainAxisPosition,
+            } as {x: number; y: number},
         };
     });
+
+    // Post-dagre constraint pipeline
+    const nodesep = 50;
+    const conditionCaseOffset = (crossAxisSize + nodesep) / 2;
+
+    constrainConditionGhostsCrossAxis(allNodes, crossAxis);
+    constrainBranchGhostsCrossAxis(allNodes, crossAxis);
+    alignBranchCaseChildren(allNodes, edges, crossAxis, crossAxisSize);
+    centerNodesAfterBottomGhost(allNodes, edges, {crossAxis, crossAxisSize, direction});
+    alignDispatcherGhostsCrossAxis(allNodes, crossAxis);
+    positionConditionCasePlaceholders(allNodes, {conditionCaseOffset, crossAxis});
+    shiftConditionBranchContent(allNodes, {crossAxis, nodesep});
+    constrainLeftGhostPositions(allNodes, {conditionCaseOffset, crossAxis, direction});
+
+    if (direction === 'LR') {
+        centerLRSmallNodes(allNodes, crossAxis);
+    }
+
+    const savedDispatcherDeltas = applySavedPositions(allNodes, crossAxis, savedPositionCrossAxisShift);
+
+    const mainAxis = direction === 'TB' ? 'y' : 'x';
+
+    adjustBottomGhostForMovedChildren(allNodes, edges, mainAxis, direction, savedDispatcherDeltas);
+
+    const chainDeltas = alignChainNodesCrossAxis(allNodes, edges, crossAxis, direction, savedDispatcherDeltas);
+    const allDispatcherDeltas = new Map([...savedDispatcherDeltas, ...chainDeltas]);
+
+    alignTrailingPlaceholder(allNodes, edges, crossAxis, direction, allDispatcherDeltas);
 
     const sourceEdgeMap = new Map<string, Edge[]>();
 
@@ -398,6 +647,11 @@ export const getLayoutedElements = async ({
         },
         {edges: [], map: new Map<string, boolean>()}
     ).edges;
+
+    // Remove edges that reference non-existent nodes
+    const nodeIds = new Set(allNodes.map((node) => node.id));
+
+    edges = edges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
 
     return {edges, nodes: allNodes};
 };
@@ -905,7 +1159,7 @@ export function getTaskAncestry({
     return {isNested, nestingData};
 }
 
-export const createDefaultNodes = (canvasWidth: number): Node[] => [
+export const createDefaultNodes = (canvasWidth: number, direction: LayoutDirectionType = 'TB'): Node[] => [
     {
         data: {
             componentName: 'manual',
@@ -919,13 +1173,13 @@ export const createDefaultNodes = (canvasWidth: number): Node[] => [
             workflowNodeName: 'trigger_1',
         },
         id: 'trigger_1',
-        position: {x: canvasWidth / 2 - 36, y: 50},
+        position: direction === 'LR' ? {x: 50, y: canvasWidth / 2 - 36} : {x: canvasWidth / 2 - 36, y: 50},
         type: 'workflow',
     },
     {
         data: {label: '+'},
         id: FINAL_PLACEHOLDER_NODE_ID,
-        position: {x: canvasWidth / 2 - 36, y: 150},
+        position: direction === 'LR' ? {x: 150, y: canvasWidth / 2 - 36} : {x: canvasWidth / 2 - 36, y: 150},
         type: 'placeholder',
     },
 ];
