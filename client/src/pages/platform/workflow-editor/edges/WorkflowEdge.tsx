@@ -9,6 +9,7 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import BranchCaseLabel from './BranchCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
+import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
 
 export default function WorkflowEdge({
     data,
@@ -37,20 +38,31 @@ export default function WorkflowEdge({
     const isMiddleCaseEdge = !!(data as Record<string, unknown>)?.isMiddleCase;
     const isHorizontal = layoutDirection === 'LR';
 
-    const correctedSourceX =
-        !isHorizontal && isMiddleCaseEdge && sourceNode?.type === 'taskDispatcherTopGhostNode' ? targetX : sourceX;
-    const correctedTargetX =
-        !isHorizontal && isMiddleCaseEdge && targetNode?.type === 'taskDispatcherBottomGhostNode' ? sourceX : targetX;
-    const correctedSourceY =
-        isHorizontal && isMiddleCaseEdge && sourceNode?.type === 'taskDispatcherTopGhostNode' ? targetY : sourceY;
-    const correctedTargetY =
-        isHorizontal && isMiddleCaseEdge && targetNode?.type === 'taskDispatcherBottomGhostNode' ? sourceY : targetY;
+    const {
+        correctedSourcePosition,
+        correctedSourceX,
+        correctedSourceY,
+        correctedTargetPosition,
+        correctedTargetX,
+        correctedTargetY,
+    } = computeEdgeCorrectedCoordinates({
+        isHorizontal,
+        isMiddleCaseEdge,
+        sourceNodeType: sourceNode?.type,
+        sourcePosition,
+        sourceX,
+        sourceY,
+        targetNodeType: targetNode?.type,
+        targetPosition,
+        targetX,
+        targetY,
+    });
 
     const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({
-        sourcePosition,
+        sourcePosition: correctedSourcePosition,
         sourceX: correctedSourceX,
         sourceY: correctedSourceY,
-        targetPosition,
+        targetPosition: correctedTargetPosition,
         targetX: correctedTargetX,
         targetY: correctedTargetY,
     });
