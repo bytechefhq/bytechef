@@ -110,7 +110,6 @@ export const ROOT_CLUSTER_WIDTH = 280;
 export const ROOT_CLUSTER_HANDLE_STEP = 180;
 export type LayoutDirectionType = 'TB' | 'LR';
 export const DEFAULT_LAYOUT_DIRECTION: LayoutDirectionType = 'TB';
-export const DIRECTION = 'TB';
 export const DEFAULT_NODE_POSITION = {x: 0, y: 0};
 export const DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM = 0.9;
 
