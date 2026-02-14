@@ -264,7 +264,7 @@ export default function handleDeleteTask({
         updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
     }
 
-    if (isWorkflowMutating()) {
+    if (isWorkflowMutating(workflow.id!)) {
         return;
     }
 
@@ -291,7 +291,7 @@ export default function handleDeleteTask({
         tasks: (workflow.tasks || []).filter((task) => task.name !== data.name),
     });
 
-    setWorkflowMutating(true);
+    setWorkflowMutating(workflow.id!, true);
 
     updateWorkflowMutation.mutate(
         {
@@ -309,7 +309,7 @@ export default function handleDeleteTask({
                 invalidateWorkflowQueries();
             },
             onSettled: () => {
-                setWorkflowMutating(false);
+                setWorkflowMutating(workflow.id!, false);
 
                 queryClient.invalidateQueries({
                     queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({

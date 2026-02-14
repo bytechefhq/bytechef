@@ -190,11 +190,11 @@ export default function saveWorkflowNodesPosition({
         workflowDefinition.tasks = updateTaskPositions(workflowDefinition.tasks, nodePositions, clearPositionNodeIds);
     }
 
-    if (isWorkflowMutating()) {
+    if (isWorkflowMutating(workflow.id!)) {
         return;
     }
 
-    setWorkflowMutating(true);
+    setWorkflowMutating(workflow.id!, true);
 
     updateWorkflowMutation.mutate(
         {
@@ -206,7 +206,7 @@ export default function saveWorkflowNodesPosition({
         },
         {
             onSettled: () => {
-                setWorkflowMutating(false);
+                setWorkflowMutating(workflow.id!, false);
             },
             onSuccess: () => {
                 invalidateWorkflowQueries();

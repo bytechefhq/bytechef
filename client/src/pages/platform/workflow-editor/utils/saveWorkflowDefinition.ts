@@ -259,11 +259,11 @@ function executeWorkflowMutation({
     workflow,
     workflowDefinition,
 }: ExecuteWorkflowMutationProps) {
-    if (isWorkflowMutating()) {
+    if (isWorkflowMutating(workflow.id!)) {
         return;
     }
 
-    setWorkflowMutating(true);
+    setWorkflowMutating(workflow.id!, true);
 
     updateWorkflowMutation.mutate(
         {
@@ -282,7 +282,7 @@ function executeWorkflowMutation({
         },
         {
             onSettled: () => {
-                setWorkflowMutating(false);
+                setWorkflowMutating(workflow.id!, false);
             },
             onSuccess: () => {
                 if (onSuccess) {

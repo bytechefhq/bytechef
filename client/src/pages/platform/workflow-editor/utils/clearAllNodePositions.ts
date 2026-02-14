@@ -145,11 +145,11 @@ export default function clearAllNodePositions({
         workflowDefinition.tasks = clearTaskPositions(workflowDefinition.tasks);
     }
 
-    if (isWorkflowMutating()) {
+    if (isWorkflowMutating(workflow.id!)) {
         return;
     }
 
-    setWorkflowMutating(true);
+    setWorkflowMutating(workflow.id!, true);
 
     updateWorkflowMutation.mutate(
         {
@@ -161,7 +161,7 @@ export default function clearAllNodePositions({
         },
         {
             onSettled: () => {
-                setWorkflowMutating(false);
+                setWorkflowMutating(workflow.id!, false);
             },
             onSuccess: () => {
                 invalidateWorkflowQueries();
