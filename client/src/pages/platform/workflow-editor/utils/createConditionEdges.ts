@@ -184,16 +184,18 @@ function connectSequentialTasks(branchSubtasks: WorkflowTask[]): Edge[] {
             const sourceTaskComponentName = task.name.split('_')[0];
 
             if (TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)) {
-                const edgeFromNestedConditionBottomGhostToNextSubtask = {
-                    id: `${sourceTaskNodeId}-condition-bottom-ghost=>${targetTaskNodeId}`,
-                    source: `${sourceTaskNodeId}-condition-bottom-ghost`,
-                    sourceHandle: `${sourceTaskNodeId}-condition-bottom-ghost-bottom`,
+                const nestedBottomGhostId = `${sourceTaskNodeId}-${sourceTaskComponentName}-bottom-ghost`;
+
+                const edgeFromNestedBottomGhostToNextSubtask = {
+                    id: `${nestedBottomGhostId}=>${targetTaskNodeId}`,
+                    source: nestedBottomGhostId,
+                    sourceHandle: `${nestedBottomGhostId}-bottom`,
                     style: EDGE_STYLES,
                     target: targetTaskNodeId,
                     type: 'workflow',
                 };
 
-                edges.push(edgeFromNestedConditionBottomGhostToNextSubtask);
+                edges.push(edgeFromNestedBottomGhostToNextSubtask);
 
                 return;
             }

@@ -38,8 +38,10 @@ function createEdgesForSingleCase(
 
     if (!caseTasks || caseTasks.length === 0) {
         const placeholderId = `${branchId}-branch-${caseKey}-placeholder-0`;
+        const isMiddle = handlePosition === 'middle';
 
         const edgeFromTopGhostToPlaceholder = {
+            ...(isMiddle ? {data: {isMiddleCase: true}} : {}),
             id: `${topGhostId}=>${placeholderId}`,
             source: topGhostId,
             sourceHandle: `${topGhostId}-${topGhostHandlePosition}`,
@@ -49,12 +51,13 @@ function createEdgesForSingleCase(
         };
 
         const edgeFromPlaceholderToBottomGhost = {
+            ...(isMiddle ? {data: {isMiddleCase: true}} : {}),
             id: `${placeholderId}=>${bottomGhostId}`,
             source: placeholderId,
             style: EDGE_STYLES,
             target: bottomGhostId,
             targetHandle: `${bottomGhostId}-${bottomGhostHandlePosition}`,
-            type: 'smoothstep',
+            type: isMiddle ? 'workflow' : 'smoothstep',
         };
 
         edges.push(edgeFromTopGhostToPlaceholder, edgeFromPlaceholderToBottomGhost);
@@ -63,8 +66,10 @@ function createEdgesForSingleCase(
     }
 
     const firstTaskId = caseTasks[0].name;
+    const isMiddle = handlePosition === 'middle';
 
     const edgeFromTopGhostToFirstTask = {
+        ...(isMiddle ? {data: {isMiddleCase: true}} : {}),
         id: `${topGhostId}=>${firstTaskId}`,
         source: topGhostId,
         sourceHandle: `${topGhostId}-${topGhostHandlePosition}`,
@@ -117,6 +122,7 @@ function createEdgesForSingleCase(
         const nestedBottomGhostId = `${lastTaskId}-${lastTaskComponentName}-bottom-ghost`;
 
         const edgeFromNestedGhostToBottomGhost = {
+            ...(isMiddle ? {data: {isMiddleCase: true}} : {}),
             id: `${nestedBottomGhostId}=>${bottomGhostId}`,
             source: nestedBottomGhostId,
             style: EDGE_STYLES,
@@ -128,6 +134,7 @@ function createEdgesForSingleCase(
         edges.push(edgeFromNestedGhostToBottomGhost);
     } else {
         const edgeFromLastTaskToBottomGhost = {
+            ...(isMiddle ? {data: {isMiddleCase: true}} : {}),
             id: `${lastTaskId}=>${bottomGhostId}`,
             source: lastTaskId,
             style: EDGE_STYLES,

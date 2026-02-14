@@ -1,16 +1,17 @@
-import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
 import {PlusIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
-import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import BranchCaseLabel from './BranchCaseLabel';
+import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 
 export default function WorkflowEdge({
+    data,
     id,
     markerEnd,
     sourcePosition,
@@ -21,22 +22,11 @@ export default function WorkflowEdge({
     targetX,
     targetY,
 }: EdgeProps) {
-    const {nodes} = useWorkflowDataStore(
-        useShallow((state) => ({
-            nodes: state.nodes,
-        }))
-    );
+    const nodes = useWorkflowDataStore((state) => state.nodes);
+
+    const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
     const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
-
-    const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({
-        sourcePosition,
-        sourceX,
-        sourceY,
-        targetPosition,
-        targetX,
-        targetY,
-    });
 
     const sourceNodeId = id.split('=>')[0];
     const targetNodeId = id.split('=>')[1];
@@ -44,62 +34,62 @@ export default function WorkflowEdge({
     const sourceNode = nodes.find((node) => node.id === sourceNodeId);
     const targetNode = nodes.find((node) => node.id === targetNodeId);
 
+    const isMiddleCaseEdge = !!(data as Record<string, unknown>)?.isMiddleCase;
+    const isHorizontal = layoutDirection === 'LR';
+
+    const correctedSourceX =
+        !isHorizontal && isMiddleCaseEdge && sourceNode?.type === 'taskDispatcherTopGhostNode' ? targetX : sourceX;
+    const correctedTargetX =
+        !isHorizontal && isMiddleCaseEdge && targetNode?.type === 'taskDispatcherBottomGhostNode' ? sourceX : targetX;
+    const correctedSourceY =
+        isHorizontal && isMiddleCaseEdge && sourceNode?.type === 'taskDispatcherTopGhostNode' ? targetY : sourceY;
+    const correctedTargetY =
+        isHorizontal && isMiddleCaseEdge && targetNode?.type === 'taskDispatcherBottomGhostNode' ? sourceY : targetY;
+
+    const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({
+        sourcePosition,
+        sourceX: correctedSourceX,
+        sourceY: correctedSourceY,
+        targetPosition,
+        targetX: correctedTargetX,
+        targetY: correctedTargetY,
+    });
+
     const caseKey = (targetNode?.data as NodeDataType)?.branchData?.caseKey;
 
     const sourceNodeComponentName = useMemo(() => (sourceNode?.data as NodeDataType)?.componentName, [sourceNode]);
 
     const isSourceTaskDispatcherTopGhostNode = sourceNode?.type === 'taskDispatcherTopGhostNode';
 
-    const buttonPosition = useMemo(() => {
-        const isVerticalEdge = Math.abs(sourceY - targetY) > Math.abs(sourceX - targetX);
-
-        const isEdgeFromBranchTopGhostNode =
-            sourceNode?.type === 'taskDispatcherTopGhostNode' &&
-            (sourceNode?.data as NodeDataType)?.taskDispatcherId?.startsWith('branch');
-
-        if (isVerticalEdge && !isEdgeFromBranchTopGhostNode) {
-            return {
-                x: edgeCenterX,
-                y: edgeCenterY,
-            };
-        }
-
-        let posX;
-        let posY;
-
-        if (sourceX < targetX) {
-            posY = Math.min(sourceY, targetY) + Math.abs(targetY - sourceY) * 0.5;
-        } else {
-            posY = Math.min(sourceY, targetY) + Math.abs(targetY - sourceY) * 0.5;
-        }
-
-        if (sourceNode?.type === 'taskDispatcherTopGhostNode') {
-            posX = targetX;
-
-            if (targetNode?.type === 'workflow' && isEdgeFromBranchTopGhostNode) {
-                posY += 15;
-            }
-        } else if (sourceNode?.type === 'taskDispatcherBottomGhostNode') {
-            posX = sourceX;
-        } else if (targetNode?.type === 'taskDispatcherBottomGhostNode') {
-            posX = sourceX;
-        } else if (sourceNodeComponentName && TASK_DISPATCHER_NAMES.includes(sourceNodeComponentName as string)) {
-            posX = targetX;
-        }
-
-        return {x: posX, y: posY};
-    }, [
-        sourceY,
-        targetY,
-        sourceX,
-        targetX,
-        sourceNode?.type,
-        sourceNode?.data,
-        targetNode?.type,
-        sourceNodeComponentName,
-        edgeCenterX,
-        edgeCenterY,
-    ]);
+    const buttonPosition = useMemo(
+        () =>
+            computeEdgeButtonPosition({
+                correctedSourceX,
+                correctedSourceY,
+                correctedTargetX,
+                correctedTargetY,
+                edgeCenterX,
+                edgeCenterY,
+                isHorizontal,
+                sourceNodeComponentName: sourceNodeComponentName as string | undefined,
+                sourceNodeTaskDispatcherId: (sourceNode?.data as NodeDataType)?.taskDispatcherId,
+                sourceNodeType: sourceNode?.type,
+                targetNodeType: targetNode?.type,
+            }),
+        [
+            isHorizontal,
+            correctedSourceX,
+            correctedSourceY,
+            correctedTargetX,
+            correctedTargetY,
+            sourceNode?.type,
+            sourceNode?.data,
+            targetNode?.type,
+            sourceNodeComponentName,
+            edgeCenterX,
+            edgeCenterY,
+        ]
+    );
 
     useEffect(() => {
         const handleGlobalDragEnd = () => {
@@ -126,7 +116,15 @@ export default function WorkflowEdge({
             />
 
             {caseKey && isSourceTaskDispatcherTopGhostNode && (
-                <BranchCaseLabel caseKey={caseKey} edgeId={id} sourceY={sourceY} targetX={targetX} />
+                <BranchCaseLabel
+                    caseKey={caseKey}
+                    edgeId={id}
+                    layoutDirection={layoutDirection}
+                    sourceX={sourceX}
+                    sourceY={sourceY}
+                    targetX={targetX}
+                    targetY={targetY}
+                />
             )}
 
             <EdgeLabelRenderer key={id}>
