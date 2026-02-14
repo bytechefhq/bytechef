@@ -56,14 +56,14 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
         long jobId = Validate.notNull(taskExecution.getJobId(), "jobId");
         String tenantId = TenantContext.getCurrentTenantId();
 
-        ActionDefinition.SseEmitterHandler.SseEmitter emitter = _createSseEmitter(jobId, tenantId);
+        ActionDefinition.SseEmitterHandler.SseEmitter emitter = createSseEmitter(jobId, tenantId);
         CountDownLatch latch = new CountDownLatch(1);
 
         addListeners(emitter, latch, jobId, tenantId);
 
         sseEmitterHandler.handle(emitter);
 
-        awaitCompletion(emitter, latch, jobId);
+        awaitCompletion(emitter, latch);
 
         return null;
     }
@@ -91,8 +91,7 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
         }
     }
 
-    private void awaitCompletion(
-        ActionDefinition.SseEmitterHandler.SseEmitter emitter, CountDownLatch latch, long jobId) {
+    private void awaitCompletion(ActionDefinition.SseEmitterHandler.SseEmitter emitter, CountDownLatch latch) {
 
         try {
             Long timeout = null;
@@ -117,7 +116,7 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
         }
     }
 
-    private ActionDefinition.SseEmitterHandler.SseEmitter _createSseEmitter(long jobId, String tenantId) {
+    private ActionDefinition.SseEmitterHandler.SseEmitter createSseEmitter(long jobId, String tenantId) {
         SseEmitterAdapter emitter = new SseEmitterAdapter();
 
         emitter.addEventListener(
