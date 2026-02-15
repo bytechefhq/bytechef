@@ -201,7 +201,7 @@ export const getClusterElementsLayoutElements = ({
         },
     });
 
-    const placeholderY = 140;
+    const placeholderY = 160;
     const childBaseY = placeholderY + PLACEHOLDER_NODE_HEIGHT + NODE_HEIGHT / 4;
     const horizontalGap = CLUSTER_ELEMENT_NODE_WIDTH + 80;
 
@@ -238,8 +238,16 @@ export const getClusterElementsLayoutElements = ({
 
         let maxExtentY = NODE_HEIGHT;
 
-        // First pass: position regular (non-cluster-root) children
-        for (const [, typeChildren] of typeGroups) {
+        // Position all children (regular and cluster root) in type order as
+        // defined by the parent cluster root handles. Overlap resolution will
+        // shift nodes right when they collide with siblings.
+        const sortedTypeGroups = [...typeGroups.values()].sort(
+            (groupA, groupB) =>
+                ((groupA[0].data.clusterElementTypeIndex as number) || 0) -
+                ((groupB[0].data.clusterElementTypeIndex as number) || 0)
+        );
+
+        for (const typeChildren of sortedTypeGroups) {
             const typeIndex = (typeChildren[0].data.clusterElementTypeIndex as number) || 0;
 
             const handleX = getHandlePosition({
@@ -251,6 +259,7 @@ export const getClusterElementsLayoutElements = ({
             const isRightSide = handleX >= parentCenterX;
 
             const regularChildren = typeChildren.filter((child) => !child.data.isNestedClusterRoot);
+            const clusterRootChildren = typeChildren.filter((child) => child.data.isNestedClusterRoot);
 
             for (let childIndex = 0; childIndex < regularChildren.length; childIndex++) {
                 const child = regularChildren[childIndex];
@@ -276,39 +285,9 @@ export const getClusterElementsLayoutElements = ({
 
                 maxExtentY = Math.max(maxExtentY, childBaseY + childExtent);
             }
-        }
 
-        // Second pass: position cluster root children below all regular children
-        const hasRegularChildren = [...typeGroups.values()].some((typeChildren) =>
-            typeChildren.some((child) => !child.data.isNestedClusterRoot)
-        );
-
-        let clusterRootY = hasRegularChildren
-            ? Math.max(childBaseY + NODE_HEIGHT * 1.5, maxExtentY + overlapPadding)
-            : childBaseY;
-
-        for (const [, typeChildren] of typeGroups) {
-            const typeIndex = (typeChildren[0].data.clusterElementTypeIndex as number) || 0;
-
-            const handleX = getHandlePosition({
-                handlesCount: parentTypesCount,
-                index: typeIndex,
-                nodeWidth: parentWidth,
-            });
-
-            const isRightSide = handleX >= parentCenterX;
-
-            const clusterRootChildren = typeChildren.filter((child) => child.data.isNestedClusterRoot);
-            const multipleClusterRootChildren = clusterRootChildren.filter(
-                (child) => child.data.multipleClusterElementsNode
-            );
-            const singleClusterRootChildren = clusterRootChildren.filter(
-                (child) => !child.data.multipleClusterElementsNode
-            );
-
-            // Position multiple-instance cluster root children horizontally
-            for (let childIndex = 0; childIndex < multipleClusterRootChildren.length; childIndex++) {
-                const child = multipleClusterRootChildren[childIndex];
+            for (let childIndex = 0; childIndex < clusterRootChildren.length; childIndex++) {
+                const child = clusterRootChildren[childIndex];
                 const childTypesCount = (child.data.clusterElementTypesCount as number) || 1;
                 const childWidth = calculateNodeWidth(childTypesCount) || ROOT_CLUSTER_WIDTH;
                 const clusterRootHorizontalGap = childWidth + 80;
@@ -327,40 +306,13 @@ export const getClusterElementsLayoutElements = ({
                         childX = firstChildX - childIndex * clusterRootHorizontalGap;
                     }
 
-                    positionedNodes.push({...child, position: {x: childX, y: clusterRootY}});
+                    positionedNodes.push({...child, position: {x: childX, y: childBaseY}});
                 }
 
                 const childExtent = positionChildrenOfParent(child.id);
 
-                maxExtentY = Math.max(maxExtentY, clusterRootY + childExtent);
+                maxExtentY = Math.max(maxExtentY, childBaseY + childExtent);
             }
-
-            // Position single-instance cluster root children vertically
-            let singleClusterRootY = clusterRootY;
-
-            for (const child of singleClusterRootChildren) {
-                const childTypesCount = (child.data.clusterElementTypesCount as number) || 1;
-                const childWidth = calculateNodeWidth(childTypesCount) || ROOT_CLUSTER_WIDTH;
-
-                if (containsNodePosition(child.data.metadata)) {
-                    positionedNodes.push({...child, position: child.data.metadata.ui.nodePosition});
-                } else {
-                    const childX = handleX - childWidth / 2;
-
-                    positionedNodes.push({...child, position: {x: childX, y: singleClusterRootY}});
-                }
-
-                const childExtent = positionChildrenOfParent(child.id);
-
-                singleClusterRootY = Math.max(
-                    singleClusterRootY + childBaseY,
-                    singleClusterRootY + childExtent + overlapPadding
-                );
-
-                maxExtentY = Math.max(maxExtentY, singleClusterRootY);
-            }
-
-            clusterRootY = Math.max(clusterRootY, singleClusterRootY);
         }
 
         return maxExtentY;
@@ -386,7 +338,18 @@ export const getClusterElementsLayoutElements = ({
             continue;
         }
 
-        siblings.sort((nodeA, nodeB) => nodeA.position.x - nodeB.position.x);
+        siblings.sort((nodeA, nodeB) => {
+            const typeIndexA = (nodeA.data.clusterElementTypeIndex as number) ?? 0;
+            const typeIndexB = (nodeB.data.clusterElementTypeIndex as number) ?? 0;
+
+            if (typeIndexA !== typeIndexB) {
+                return typeIndexA - typeIndexB;
+            }
+
+            return nodeA.position.x - nodeB.position.x;
+        });
+
+        const spanBefore = siblings[siblings.length - 1].position.x - siblings[0].position.x;
 
         for (let i = 0; i < siblings.length; i++) {
             const nodeA = siblings[i];
@@ -414,6 +377,21 @@ export const getClusterElementsLayoutElements = ({
 
                 if (verticalOverlap && nodeB.position.x < minX) {
                     nodeB.position = {...nodeB.position, x: minX};
+                }
+            }
+        }
+
+        // Redistribute expansion evenly so the group stays centered
+        // under the parent instead of only growing right.
+        const spanAfter = siblings[siblings.length - 1].position.x - siblings[0].position.x;
+        const expansion = spanAfter - spanBefore;
+
+        if (expansion > 0) {
+            const leftShift = expansion / 2;
+
+            for (const sibling of siblings) {
+                if (!containsNodePosition(sibling.data.metadata)) {
+                    sibling.position = {...sibling.position, x: sibling.position.x - leftShift};
                 }
             }
         }
