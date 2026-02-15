@@ -380,6 +380,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         'ml-2 flex w-full min-w-max flex-col items-start',
                         ((isClusterElement && !isNestedClusterRoot) || (isHorizontal && isRegularNode)) &&
                             'absolute top-full ml-0 items-center text-center',
+                        isClusterElement && !isNestedClusterRoot && 'w-auto min-w-0 max-w-[130px]',
                         isHorizontal && isRegularNode && 'w-auto min-w-0 max-w-[150px]'
                     )}
                 >
@@ -387,7 +388,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         className={twMerge(
                             'font-semibold',
                             isClusterElement && 'text-sm',
-                            isHorizontal && isRegularNode && 'w-full truncate'
+                            (isClusterElement || (isHorizontal && isRegularNode)) && 'w-full truncate'
                         )}
                     >
                         {data.title || data.label}
@@ -398,7 +399,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             className={twMerge(
                                 'text-sm',
                                 isClusterElement && 'text-xs',
-                                isHorizontal && isRegularNode && 'w-full truncate'
+                                (isClusterElement || (isHorizontal && isRegularNode)) && 'w-full truncate'
                             )}
                         >
                             {data.operationName}
@@ -408,7 +409,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     <span
                         className={twMerge(
                             'text-sm text-content-neutral-secondary',
-                            isHorizontal && isRegularNode && 'w-full truncate'
+                            (isClusterElement || (isHorizontal && isRegularNode)) && 'w-full truncate'
                         )}
                     >
                         {data.workflowNodeName}
