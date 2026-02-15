@@ -31,7 +31,7 @@ import {
     convertTaskToNode,
     createDefaultNodes,
     createEdgeFromTaskDispatcherBottomGhostNode,
-    getLayoutedElements,
+    getLayoutElements,
     getTaskAncestry,
 } from '../utils/layoutUtils';
 
@@ -482,7 +482,7 @@ export default function useLayout({
 
         const preLayoutNodes = useWorkflowDataStore.getState().nodes;
 
-        getLayoutedElements({
+        getLayoutElements({
             canvasHeight,
             canvasWidth,
             direction: layoutDirection,

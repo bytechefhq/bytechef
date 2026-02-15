@@ -15,7 +15,7 @@ import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataSt
 import useWorkflowEditorStore from '../../workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {getTask} from '../../workflow-editor/utils/getTask';
-import {getLayoutedElements} from '../../workflow-editor/utils/layoutUtils';
+import {getClusterElementsLayoutElements} from '../../workflow-editor/utils/layoutUtils';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 import {isPlainObject} from '../utils/clusterElementsUtils';
 import createClusterElementsEdges from '../utils/createClusterElementsEdges';
@@ -307,15 +307,14 @@ const useClusterElementsLayout = () => {
             return;
         }
 
-        getLayoutedElements({
+        const elements = getClusterElementsLayoutElements({
             canvasWidth,
             edges,
-            isClusterElementsCanvas: !!rootClusterElementNodeData,
             nodes: layoutNodes,
-        }).then((elements) => {
-            setNodes(elements.nodes);
-            setEdges(elements.edges);
         });
+
+        setNodes(elements.nodes);
+        setEdges(elements.edges);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [canvasWidth, rootClusterElementNodeData, allNodes]);
