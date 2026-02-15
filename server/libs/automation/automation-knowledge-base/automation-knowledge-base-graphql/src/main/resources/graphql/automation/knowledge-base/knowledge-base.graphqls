@@ -1,8 +1,8 @@
 extend type Query {
     knowledgeBases(workspaceId: ID!): [KnowledgeBase]
     knowledgeBase(id: ID!): KnowledgeBase
-    knowledgeBaseTags: [Tag!]!
-    knowledgeBaseTagsByKnowledgeBase: [KnowledgeBaseTagsEntry!]!
+    knowledgeBaseTags: [Tag!]
+    knowledgeBaseTagsByKnowledgeBase: [KnowledgeBaseTagsEntry!]
     searchKnowledgeBase(id: ID!, query: String!, metadataFilters: String): [KnowledgeBaseDocumentChunk]
 }
 

@@ -1,8 +1,8 @@
 extend type Query {
     knowledgeBaseDocument(id: ID!): KnowledgeBaseDocument
     knowledgeBaseDocumentStatus(id: ID!): DocumentStatusUpdate
-    knowledgeBaseDocumentTags: [Tag!]!
-    knowledgeBaseDocumentTagsByDocument: [KnowledgeBaseDocumentTagsEntry!]!
+    knowledgeBaseDocumentTags: [Tag!]
+    knowledgeBaseDocumentTagsByDocument: [KnowledgeBaseDocumentTagsEntry!]
 }
 
 extend type Mutation {
