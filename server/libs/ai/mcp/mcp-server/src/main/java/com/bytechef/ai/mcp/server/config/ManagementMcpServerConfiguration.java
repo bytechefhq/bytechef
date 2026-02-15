@@ -34,6 +34,7 @@ import io.modelcontextprotocol.server.transport.WebMvcStreamableServerTransportP
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.ArrayList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -60,14 +61,14 @@ import org.springframework.web.servlet.function.ServerResponse;
 public class ManagementMcpServerConfiguration {
 
     private final ComponentTools componentTools;
-    private final FirecrawlTools firecrawlTools;
+    private final @Nullable FirecrawlTools firecrawlTools;
     private final ProjectToolsImpl projectTools;
     private final ProjectWorkflowToolsImpl projectWorkflowTools;
     private final TaskTools taskTools;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
-        ComponentTools componentTools, FirecrawlTools firecrawlTools, ProjectToolsImpl projectTools,
+        ComponentTools componentTools, @Nullable FirecrawlTools firecrawlTools, ProjectToolsImpl projectTools,
         ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools) {
 
         this.componentTools = componentTools;
@@ -111,11 +112,14 @@ public class ManagementMcpServerConfiguration {
     @Bean
     @Primary
     ToolCallbackProvider toolCallbackProvider() {
+        List<Object> tools = new ArrayList<>(List.of(projectTools, projectWorkflowTools, componentTools, taskTools));
+
+        if (firecrawlTools != null) {
+            tools.add(firecrawlTools);
+        }
+
         return ToolCallbackProvider.from(
-            new ArrayList<>(
-                List.of(
-                    ToolCallbacks.from(
-                        projectTools, projectWorkflowTools, componentTools, taskTools, firecrawlTools))));
+            new ArrayList<>(List.of(ToolCallbacks.from(tools.toArray()))));
     }
 
     @Bean
