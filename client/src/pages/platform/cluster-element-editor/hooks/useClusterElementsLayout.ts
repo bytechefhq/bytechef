@@ -10,6 +10,7 @@ import {Edge, Node} from '@xyflow/react';
 import {useCallback, useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import {useClusterElementsCanvasDialogStore} from '../../workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
 import useDataPillPanelStore from '../../workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../workflow-editor/stores/useWorkflowEditorStore';
@@ -17,7 +18,7 @@ import useWorkflowNodeDetailsPanelStore from '../../workflow-editor/stores/useWo
 import {getTask} from '../../workflow-editor/utils/getTask';
 import {getClusterElementsLayoutElements} from '../../workflow-editor/utils/layoutUtils';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
-import {isPlainObject} from '../utils/clusterElementsUtils';
+import {getFilteredClusterElementTypes, isPlainObject} from '../utils/clusterElementsUtils';
 import createClusterElementsEdges from '../utils/createClusterElementsEdges';
 import createClusterElementsNodes from '../utils/createClusterElementsNodes';
 
@@ -58,6 +59,7 @@ const useClusterElementsLayout = () => {
             dataPillPanelOpen: state.dataPillPanelOpen,
         }))
     );
+    const copilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.copilotPanelOpen);
 
     const queryClient = useQueryClient();
 
@@ -87,7 +89,16 @@ const useClusterElementsLayout = () => {
         }))
     );
 
-    let canvasWidth = window.innerWidth;
+    // Dialog: left-16 (64px), w-[calc(100vw-80px)] → right edge at 100vw-16px.
+    // Fixed panels at right-0 extend 16px past the dialog's right edge,
+    // so only (panelWidth - 16) actually overlaps the visible canvas.
+    const dialogRightGap = 16;
+
+    let canvasWidth = window.innerWidth - 80;
+
+    if (copilotPanelOpen) {
+        canvasWidth -= 450;
+    }
 
     if (workflowNodeDetailsPanelOpen) {
         canvasWidth -= 460;
@@ -95,8 +106,10 @@ const useClusterElementsLayout = () => {
         if (dataPillPanelOpen) {
             canvasWidth -= 400;
         }
-    } else {
-        canvasWidth -= 80;
+    }
+
+    if (copilotPanelOpen || workflowNodeDetailsPanelOpen) {
+        canvasWidth += dialogRightGap;
     }
 
     const workflowDefinitionTasks = useMemo(() => {
@@ -131,8 +144,17 @@ const useClusterElementsLayout = () => {
             return {allNodes: nodes, taskEdges: edges};
         }
 
+        const mainRootFilteredTypes = getFilteredClusterElementTypes({
+            clusterRootComponentDefinition: mainClusterRootComponentDefinition,
+            isNestedClusterRoot: false,
+            operationName: rootClusterElementNodeData.operationName,
+        });
+
         const mainRootClusterElementNode = {
-            data: rootClusterElementNodeData,
+            data: {
+                ...rootClusterElementNodeData,
+                clusterElementTypesCount: mainRootFilteredTypes.length,
+            },
             id: rootClusterElementNodeData.workflowNodeName,
             position: DEFAULT_NODE_POSITION,
             type: 'workflow',
@@ -317,7 +339,7 @@ const useClusterElementsLayout = () => {
         setEdges(elements.edges);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canvasWidth, rootClusterElementNodeData, allNodes]);
+    }, [canvasWidth, copilotPanelOpen, rootClusterElementNodeData, allNodes]);
 };
 
 export default useClusterElementsLayout;
