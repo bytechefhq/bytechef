@@ -2857,7 +2857,7 @@
   "clusterElements": [ {
     "name": "createContact",
     "description": "Creates a new contact.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -4208,7 +4208,7 @@
   }, {
     "name": "createList",
     "description": "Creates a new list.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -4434,7 +4434,7 @@
   }, {
     "name": "unsubscribeContact",
     "description": "Unsubscribes a contact.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

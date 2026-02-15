@@ -562,7 +562,7 @@
   "clusterElements": [ {
     "name": "fulfillOrder",
     "description": "Updates an order's status to fulfilled.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -780,7 +780,7 @@
   }, {
     "name": "getCollectionItem",
     "description": "Get collection item in a collection.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

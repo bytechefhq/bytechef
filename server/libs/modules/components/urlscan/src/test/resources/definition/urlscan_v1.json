@@ -18710,7 +18710,7 @@
   "clusterElements": [ {
     "name": "scan",
     "description": "Submit a URL to be scanned and control options for how the scan should be performed.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -19069,7 +19069,7 @@
   }, {
     "name": "result",
     "description": "Using the Scan ID, you can use the Result API to poll for the scan.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -37135,7 +37135,7 @@
   }, {
     "name": "screenshot",
     "description": "Use the scan UUID to retrieve the screenshot for a scan once the scan has finished.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

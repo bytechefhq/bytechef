@@ -1171,7 +1171,7 @@
   "clusterElements": [ {
     "name": "createCompany",
     "description": "Creates a new company",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -1495,7 +1495,7 @@
   }, {
     "name": "createContact",
     "description": "Creates a new contact",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -1891,7 +1891,7 @@
   }, {
     "name": "createTicket",
     "description": "Creates a new ticket",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

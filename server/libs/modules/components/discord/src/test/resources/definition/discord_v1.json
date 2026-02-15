@@ -3980,7 +3980,7 @@
   "clusterElements": [ {
     "name": "sendChannelMessage",
     "description": "Post a new message to a specific #channel you choose.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -5532,7 +5532,7 @@
   }, {
     "name": "createChannel",
     "description": "Create a new channel",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

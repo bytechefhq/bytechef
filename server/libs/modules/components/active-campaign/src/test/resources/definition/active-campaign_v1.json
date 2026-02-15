@@ -1194,7 +1194,7 @@
   "clusterElements": [ {
     "name": "createAccount",
     "description": "Creates a new account.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -1508,7 +1508,7 @@
   }, {
     "name": "createContact",
     "description": "Creates a new contact.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -1954,7 +1954,7 @@
   }, {
     "name": "createTask",
     "description": "Creates a new task.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

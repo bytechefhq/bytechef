@@ -1192,7 +1192,7 @@
   "clusterElements": [ {
     "name": "createCustomer",
     "description": "Creates a new customer.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -2042,7 +2042,7 @@
   }, {
     "name": "createInvoice",
     "description": "Creates a new invoice.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

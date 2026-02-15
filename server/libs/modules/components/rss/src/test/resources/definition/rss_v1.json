@@ -761,7 +761,7 @@
   "clusterElements": [ {
     "name": "createFeed",
     "description": "Creates feed from website by using website URL.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

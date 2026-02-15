@@ -2590,7 +2590,7 @@
   "clusterElements": [ {
     "name": "sendMessage",
     "description": "Send message to a channel.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

@@ -268,7 +268,7 @@
   "clusterElements": [ {
     "name": "getLastRun",
     "description": "Get Apify Actor last run.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

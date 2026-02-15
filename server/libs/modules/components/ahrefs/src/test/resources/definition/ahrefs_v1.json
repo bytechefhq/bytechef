@@ -1414,7 +1414,7 @@
   "clusterElements": [ {
     "name": "getMetrics",
     "description": "Returns metrics from target.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -2030,7 +2030,7 @@
   }, {
     "name": "getSubscriptionInfo",
     "description": "Returns user subscription information.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -2430,7 +2430,7 @@
   }, {
     "name": "getPageContent",
     "description": "Returns the content of a page.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

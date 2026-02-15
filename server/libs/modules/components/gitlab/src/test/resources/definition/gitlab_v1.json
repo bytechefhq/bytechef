@@ -647,7 +647,7 @@
   "clusterElements": [ {
     "name": "createIssue",
     "description": "Creates a new project issue.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -1044,7 +1044,7 @@
   }, {
     "name": "createCommentOnIssue",
     "description": "Adds a comment to the specified issue.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

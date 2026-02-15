@@ -712,7 +712,7 @@
   "clusterElements": [ {
     "name": "getFullResult",
     "description": "Returns a full result of your query.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

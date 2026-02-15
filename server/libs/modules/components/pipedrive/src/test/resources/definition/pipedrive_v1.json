@@ -13780,7 +13780,7 @@
   "clusterElements": [ {
     "name": "getDeals",
     "description": "Returns all deals.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -14702,7 +14702,7 @@
   }, {
     "name": "addDeal",
     "description": "Adds a new deal.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -15741,7 +15741,7 @@
   }, {
     "name": "searchDeals",
     "description": "Searches all deals by title, notes and/or custom fields.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -16811,7 +16811,7 @@
   }, {
     "name": "deleteDeal",
     "description": "Marks a deal as deleted. After 30 days, the deal will be permanently deleted.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -16989,7 +16989,7 @@
   }, {
     "name": "getDealDetails",
     "description": "Returns the details of a specific deal.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -17753,7 +17753,7 @@
   }, {
     "name": "getLeads",
     "description": "Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -18423,7 +18423,7 @@
   }, {
     "name": "addLead",
     "description": "Creates a lead. A lead always has to be linked to a person or an organization or both.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -19093,7 +19093,7 @@
   }, {
     "name": "deleteLead",
     "description": "Deletes a specific lead.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -19280,7 +19280,7 @@
   }, {
     "name": "getLeadDetails",
     "description": "Returns details of a specific lead. ",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -19743,7 +19743,7 @@
   }, {
     "name": "searchLeads",
     "description": "Searches all leads by title, notes and/or custom fields.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -20423,7 +20423,7 @@
   }, {
     "name": "getOrganizations",
     "description": "Returns all organizations.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -20963,7 +20963,7 @@
   }, {
     "name": "addOrganization",
     "description": "Adds a new organization.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -21413,7 +21413,7 @@
   }, {
     "name": "searchOrganization",
     "description": "Searches all organizations by name, address, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -21987,7 +21987,7 @@
   }, {
     "name": "deleteOrganization",
     "description": "Marks an organization as deleted. After 30 days, the organization will be permanently deleted.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -22165,7 +22165,7 @@
   }, {
     "name": "getOrganizationDetails",
     "description": "Returns the details of an organization.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -22591,7 +22591,7 @@
   }, {
     "name": "getPersons",
     "description": "Returns all persons.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -23733,7 +23733,7 @@
   }, {
     "name": "addPerson",
     "description": "Adds a new person.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -25059,7 +25059,7 @@
   }, {
     "name": "searchPersons",
     "description": "Searches all persons by name, email, phone, notes and/or custom fields.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -26263,7 +26263,7 @@
   }, {
     "name": "deletePerson",
     "description": "Marks a person as deleted. After 30 days, the person will be permanently deleted.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -26441,7 +26441,7 @@
   }, {
     "name": "getPersonDetails",
     "description": "Returns the details of a person. This also returns some additional fields which are not present when asking for all persons.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
