@@ -404,10 +404,10 @@ export const getClusterElementsLayoutElements = ({
 
                 const isClusterRootB = !!nodeB.data.clusterElementTypesCount;
 
-                // Small circle nodes (72px) have labels that extend ~40px
-                // beyond each side; account for this to prevent label overlap
-                const labelPaddingA = isClusterRootA ? 0 : 40;
-                const labelPaddingB = isClusterRootB ? 0 : 40;
+                // Small circle nodes (72px) have labels that extend beyond
+                // each side; account for this to prevent label overlap
+                const labelPaddingA = isClusterRootA ? 0 : 20;
+                const labelPaddingB = isClusterRootB ? 0 : 20;
 
                 const verticalOverlap = Math.abs(nodeA.position.y - nodeB.position.y) < NODE_HEIGHT + labelOverhang;
                 const minX = nodeA.position.x + widthA + labelPaddingA + labelPaddingB + overlapPadding;
