@@ -383,7 +383,7 @@ const useWorkflowEditorCanvas = ({
         (_event: React.MouseEvent, draggedNode: Node) => {
             setIsNodeDragging(false);
 
-            if (!isWorkflowMutating(workflow.id!)) {
+            if (updateWorkflowMutation && !isWorkflowMutating(workflow.id!)) {
                 // Pre-compensate positions for the current cross-axis shift so that
                 // when useLayout re-runs and applySavedPositions adds the shift back,
                 // nodes end up at the correct screen position.
@@ -477,13 +477,13 @@ const useWorkflowEditorCanvas = ({
     const resetPendingRef = useRef(false);
 
     useEffect(() => {
-        if (!updateWorkflowMutation.isPending && !isWorkflowMutating(workflow.id!)) {
+        if (!updateWorkflowMutation?.isPending && !isWorkflowMutating(workflow.id!)) {
             resetPendingRef.current = false;
         }
-    }, [updateWorkflowMutation.isPending, workflow.id]);
+    }, [updateWorkflowMutation?.isPending, workflow.id]);
 
     const handleResetLayout = useCallback(() => {
-        if (resetPendingRef.current || isWorkflowMutating(workflow.id!)) {
+        if (!updateWorkflowMutation || resetPendingRef.current || isWorkflowMutating(workflow.id!)) {
             return;
         }
 
