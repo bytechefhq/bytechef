@@ -846,7 +846,7 @@
   "clusterElements": [ {
     "name": "getComments",
     "description": "Gets a list of comments left on the file.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -1376,7 +1376,7 @@
   }, {
     "name": "postComment",
     "description": "Posts a new comment on the file.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

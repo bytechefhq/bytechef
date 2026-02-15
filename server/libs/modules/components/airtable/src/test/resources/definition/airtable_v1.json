@@ -600,7 +600,7 @@
   "clusterElements": [ {
     "name": "createRecord",
     "description": "Adds a record into an Airtable table.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -693,7 +693,7 @@
   }, {
     "name": "updateRecord",
     "description": "Update an existing record in an Airtable table.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -813,7 +813,7 @@
   }, {
     "name": "deleteRecord",
     "description": "Deletes a single record from a table.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -1062,7 +1062,7 @@
   }, {
     "name": "getRecord",
     "description": "Retrieves a single record.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

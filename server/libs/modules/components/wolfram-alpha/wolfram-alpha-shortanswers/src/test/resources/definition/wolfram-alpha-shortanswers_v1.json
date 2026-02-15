@@ -143,7 +143,7 @@
   "clusterElements": [ {
     "name": "getShortAnswer",
     "description": "Returns a short answer for your query.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

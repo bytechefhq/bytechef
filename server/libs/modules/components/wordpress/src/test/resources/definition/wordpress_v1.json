@@ -16159,7 +16159,7 @@
   "clusterElements": [ {
     "name": "getPost",
     "description": "Get a post by post ID.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -19615,7 +19615,7 @@
   }, {
     "name": "updatePost",
     "description": "Update a post.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -24608,7 +24608,7 @@
   }, {
     "name": "createPost",
     "description": "Creates a new post.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -28565,7 +28565,7 @@
   }, {
     "name": "createPage",
     "description": "Creates a new page.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

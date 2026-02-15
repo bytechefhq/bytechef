@@ -2734,7 +2734,7 @@
   "clusterElements": [ {
     "name": "getContact",
     "description": "Get contact details.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -3185,7 +3185,7 @@
   }, {
     "name": "createContact",
     "description": "Create a contact with the given properties.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -3763,7 +3763,7 @@
   }, {
     "name": "deleteContact",
     "description": "Move Contact to the recycling bin.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": null,
     "processErrorResponse": null,
@@ -3807,7 +3807,7 @@
   }, {
     "name": "updateContact",
     "description": "Update Contact properties.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -4412,7 +4412,7 @@
   }, {
     "name": "createDeal",
     "description": "Creates a new deal.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -4984,7 +4984,7 @@
   }, {
     "name": "getTicket",
     "description": "Gets ticket details.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

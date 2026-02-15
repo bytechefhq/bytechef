@@ -3910,7 +3910,7 @@
   "clusterElements": [ {
     "name": "listDocs",
     "description": "Returns a list of docs accessible by the user, and which they have opened at least once.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -5709,7 +5709,7 @@
   }, {
     "name": "copyDoc",
     "description": "Copies an existing doc.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -7184,7 +7184,7 @@
   }, {
     "name": "updateRow",
     "description": "Updates the specified row in the table.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

@@ -3131,7 +3131,7 @@
   "clusterElements": [ {
     "name": "updateDeal",
     "description": "Updates the details of existing deals within your team's Apollo account.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -3882,7 +3882,7 @@
   }, {
     "name": "createDeal",
     "description": "Creates new deal for an Apollo account.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -4633,7 +4633,7 @@
   }, {
     "name": "enrichPerson",
     "description": "Enriches data for a person.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -5533,7 +5533,7 @@
   }, {
     "name": "enrichCompany",
     "description": "Enriches data for company.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

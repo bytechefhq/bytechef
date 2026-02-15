@@ -915,7 +915,7 @@
   "clusterElements": [ {
     "name": "createTask",
     "description": "Creates a new task.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -1317,7 +1317,7 @@
   }, {
     "name": "markTaskCompleted",
     "description": "Mark a tas as being completed.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": null,
     "processErrorResponse": null,
@@ -1361,7 +1361,7 @@
   }, {
     "name": "createProject",
     "description": "Creates a new project.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

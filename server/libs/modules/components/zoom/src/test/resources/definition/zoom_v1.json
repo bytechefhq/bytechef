@@ -3664,7 +3664,7 @@
   "clusterElements": [ {
     "name": "createMeeting",
     "description": "Creates a meeting.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -6207,7 +6207,7 @@
   }, {
     "name": "addMeetingRegistrant",
     "description": "Create and submit a user's registration to a meeting.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

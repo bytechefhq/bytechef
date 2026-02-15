@@ -498,7 +498,7 @@
   "clusterElements": [ {
     "name": "trackShipment",
     "description": "Retrieves the tracking information for shipments.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

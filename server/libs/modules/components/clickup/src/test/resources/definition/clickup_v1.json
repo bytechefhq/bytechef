@@ -1652,7 +1652,7 @@
   "clusterElements": [ {
     "name": "createList",
     "description": "Creates a new List in specified Folder.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -2173,7 +2173,7 @@
   }, {
     "name": "createTask",
     "description": "Create a new task in a ClickUp workspace and list.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -2915,7 +2915,7 @@
   }, {
     "name": "createFolder",
     "description": "Creates a new folder in a ClickUp workspace.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

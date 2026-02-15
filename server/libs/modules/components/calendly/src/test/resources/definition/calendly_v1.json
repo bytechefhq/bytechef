@@ -363,7 +363,7 @@
   "clusterElements": [ {
     "name": "cancelEvent",
     "description": "Cancels specified event.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

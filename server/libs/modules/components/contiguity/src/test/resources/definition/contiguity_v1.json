@@ -1021,7 +1021,7 @@
   "clusterElements": [ {
     "name": "sendSms",
     "description": "Send SMS.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -1479,7 +1479,7 @@
   }, {
     "name": "sendEmail",
     "description": "Send email.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,

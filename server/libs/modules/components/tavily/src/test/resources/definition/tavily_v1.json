@@ -1415,7 +1415,7 @@
   "clusterElements": [ {
     "name": "search",
     "description": "Execute a search query.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
@@ -2164,7 +2164,7 @@
   }, {
     "name": "extract",
     "description": "Extract web page content from one or more specified URLs.",
-    "element": { },
+    "element": null,
     "help": null,
     "outputDefinition": {
       "output": null,
