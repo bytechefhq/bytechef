@@ -1829,10 +1829,10 @@ export type Query = {
   knowledgeBase?: Maybe<KnowledgeBase>;
   knowledgeBaseDocument?: Maybe<KnowledgeBaseDocument>;
   knowledgeBaseDocumentStatus?: Maybe<DocumentStatusUpdate>;
-  knowledgeBaseDocumentTags: Array<Tag>;
-  knowledgeBaseDocumentTagsByDocument: Array<KnowledgeBaseDocumentTagsEntry>;
-  knowledgeBaseTags: Array<Tag>;
-  knowledgeBaseTagsByKnowledgeBase: Array<KnowledgeBaseTagsEntry>;
+  knowledgeBaseDocumentTags?: Maybe<Array<Tag>>;
+  knowledgeBaseDocumentTagsByDocument?: Maybe<Array<KnowledgeBaseDocumentTagsEntry>>;
+  knowledgeBaseTags?: Maybe<Array<Tag>>;
+  knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpComponent?: Maybe<McpComponent>;
@@ -1952,7 +1952,7 @@ export type QueryClusterElementDefinitionsArgs = {
 
 
 export type QueryClusterElementMissingRequiredPropertiesArgs = {
-  clusterElementTypeName: Scalars['String']['input'];
+  clusterElementType: Scalars['String']['input'];
   clusterElementWorkflowNodeName: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
@@ -3040,22 +3040,22 @@ export type KnowledgeBaseDocumentStatusQuery = { __typename?: 'Query', knowledge
 export type KnowledgeBaseDocumentTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type KnowledgeBaseDocumentTagsQuery = { __typename?: 'Query', knowledgeBaseDocumentTags: Array<{ __typename?: 'Tag', id: string, name: string }> };
+export type KnowledgeBaseDocumentTagsQuery = { __typename?: 'Query', knowledgeBaseDocumentTags?: Array<{ __typename?: 'Tag', id: string, name: string }> | null };
 
 export type KnowledgeBaseDocumentTagsByDocumentQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type KnowledgeBaseDocumentTagsByDocumentQuery = { __typename?: 'Query', knowledgeBaseDocumentTagsByDocument: Array<{ __typename?: 'KnowledgeBaseDocumentTagsEntry', knowledgeBaseDocumentId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> };
+export type KnowledgeBaseDocumentTagsByDocumentQuery = { __typename?: 'Query', knowledgeBaseDocumentTagsByDocument?: Array<{ __typename?: 'KnowledgeBaseDocumentTagsEntry', knowledgeBaseDocumentId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> | null };
 
 export type KnowledgeBaseTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type KnowledgeBaseTagsQuery = { __typename?: 'Query', knowledgeBaseTags: Array<{ __typename?: 'Tag', id: string, name: string }> };
+export type KnowledgeBaseTagsQuery = { __typename?: 'Query', knowledgeBaseTags?: Array<{ __typename?: 'Tag', id: string, name: string }> | null };
 
 export type KnowledgeBaseTagsByKnowledgeBaseQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type KnowledgeBaseTagsByKnowledgeBaseQuery = { __typename?: 'Query', knowledgeBaseTagsByKnowledgeBase: Array<{ __typename?: 'KnowledgeBaseTagsEntry', knowledgeBaseId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> };
+export type KnowledgeBaseTagsByKnowledgeBaseQuery = { __typename?: 'Query', knowledgeBaseTagsByKnowledgeBase?: Array<{ __typename?: 'KnowledgeBaseTagsEntry', knowledgeBaseId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> | null };
 
 export type KnowledgeBasesQueryVariables = Exact<{
   workspaceId: Scalars['ID']['input'];
