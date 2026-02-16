@@ -1057,7 +1057,10 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/dhl_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
