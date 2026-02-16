@@ -349,6 +349,103 @@ export function alignDispatcherGhostsCrossAxis(allNodes: Node[], crossAxis: 'x' 
     });
 }
 
+/**
+ * Separates overlapping frames for nested condition task-dispatcher children.
+ *
+ * When a condition inside another condition's branch has a task-dispatcher
+ * child, the child often lands at the same cross-axis level as the grandparent
+ * condition (because conditionCaseOffset is symmetric and cancels out across
+ * nesting levels). This creates overlapping frame boundaries and merged edge
+ * paths.
+ *
+ * This function detects such overlaps and pulls the child (plus all its
+ * descendants) closer to the parent condition, placing it at the midpoint
+ * between the parent and grandparent conditions.
+ */
+export function separateOverlappingConditionChildren(
+    allNodes: Node[],
+    edges: Edge[],
+    crossAxis: 'x' | 'y'
+): void {
+    allNodes.forEach((conditionNode) => {
+        const conditionData = conditionNode.data as NodeDataType;
+
+        if (conditionData.componentName !== 'condition') {
+            return;
+        }
+
+        // Only process conditions nested inside another condition
+        const parentConditionId = conditionData.conditionData?.conditionId;
+
+        if (!parentConditionId) {
+            return;
+        }
+
+        const parentCondition = allNodes.find((node) => node.id === parentConditionId);
+
+        if (!parentCondition) {
+            return;
+        }
+
+        const conditionId = conditionNode.id;
+        const topGhostId = `${conditionId}-condition-top-ghost`;
+        const conditionCross = conditionNode.position[crossAxis];
+        const parentCross = parentCondition.position[crossAxis];
+        const conditionToParent = parentCross - conditionCross;
+
+        for (const edge of edges) {
+            if (edge.source !== topGhostId || !edge.sourceHandle) {
+                continue;
+            }
+
+            const childNode = allNodes.find((node) => node.id === edge.target);
+
+            if (!childNode) {
+                continue;
+            }
+
+            const childData = childNode.data as NodeDataType;
+
+            if (!childData.taskDispatcher || !childData.taskDispatcherId) {
+                continue;
+            }
+
+            const childCross = childNode.position[crossAxis];
+            const conditionToChild = childCross - conditionCross;
+
+            // Check if the child is on the same side as the grandparent
+            // and at or beyond its cross-axis level
+            const sameDirection = conditionToParent * conditionToChild > 0;
+            const atOrBeyondParent = Math.abs(conditionToChild) >= Math.abs(conditionToParent) - 1;
+
+            if (!sameDirection || !atOrBeyondParent) {
+                continue;
+            }
+
+            const targetCross = conditionCross + conditionToParent * 0.5;
+            const shiftDelta = targetCross - childCross;
+
+            childNode.position = {
+                ...childNode.position,
+                [crossAxis]: targetCross,
+            };
+
+            const descendantIds = new Set<string>();
+
+            collectNestedDispatcherNodes(childData.taskDispatcherId, allNodes, descendantIds);
+
+            allNodes.forEach((descendantNode) => {
+                if (descendantIds.has(descendantNode.id) && descendantNode.id !== childNode.id) {
+                    descendantNode.position = {
+                        ...descendantNode.position,
+                        [crossAxis]: descendantNode.position[crossAxis] + shiftDelta,
+                    };
+                }
+            });
+        }
+    });
+}
+
 interface CenterNodesAfterBottomGhostI {
     crossAxis: 'x' | 'y';
     crossAxisSize: number;

@@ -49,6 +49,7 @@ import {
     constrainLeftGhostPositions,
     containsNodePosition,
     positionConditionCasePlaceholders,
+    separateOverlappingConditionChildren,
     shiftConditionBranchContent,
 } from './postDagreConstraints';
 import {TASK_DISPATCHER_CONFIG, getParentTaskDispatcherTask} from './taskDispatcherConfig';
@@ -528,6 +529,7 @@ export const getLayoutElements = async ({
     alignBranchCaseChildren(allNodes, edges, crossAxis, crossAxisSize);
     centerNodesAfterBottomGhost(allNodes, edges, {crossAxis, crossAxisSize, direction});
     alignDispatcherGhostsCrossAxis(allNodes, crossAxis);
+    separateOverlappingConditionChildren(allNodes, edges, crossAxis);
     positionConditionCasePlaceholders(allNodes, {conditionCaseOffset, crossAxis});
     shiftConditionBranchContent(allNodes, {crossAxis, nodesep});
     constrainLeftGhostPositions(allNodes, {conditionCaseOffset, crossAxis, direction});
