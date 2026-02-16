@@ -124,6 +124,11 @@ Type: OBJECT
 }
 ```
 
+#### Find Channel ID and Timestamp
+
+To find the Channel ID, click [here](/reference/components/slack_v1#how-to-find-the-channel-id)
+
+To find the Timestamp, click [here](/reference/components/slack_v1#how-to-find-the-timestamp)
 
 
 
@@ -194,6 +199,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Channel ID
+
+To find the Channel ID, click [here](/reference/components/slack_v1#how-to-find-the-channel-id)
 
 
 
@@ -264,6 +272,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Channel ID
+
+To find the Channel ID, click [here](/reference/components/slack_v1#how-to-find-the-channel-id)
 
 
 
@@ -334,6 +345,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Channel ID
+
+To find the Channel ID, click [here](/reference/components/slack_v1#how-to-find-the-channel-id)
 
 
 
@@ -361,6 +375,9 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "slack/v1/anyEvent"
 }
 ```
+#### How to set up trigger
+
+To find out how to set up trigger, click [here](/reference/components/slack_v1#enable-event-subscription).
 
 
 
@@ -375,6 +392,15 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+### How to find the Channel ID
+
+Open Slack and then channel (or person you want to send direct message to) you want fo find ID of. When you click on channel name you will see Channel details, and in **About** tab the lowest written value is the **Channel ID**.
+
+### How to find the Timestamp
+
+There is no other way to find the timestamp of a message than to use Slack API. So the best way to find timestamp is to use output of one of Bytechef's Slack actions.
+In the output of the Slack actions you will find `ts` property, that is timestamp that you need.
 
 ## Trigger Setup
 
