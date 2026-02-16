@@ -20,6 +20,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -42,5 +43,14 @@ public class DhlComponentHandler extends AbstractDhlComponentHandler {
     public ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
         return modifiableActionDefinition
             .help("", "https://docs.bytechef.io/reference/components/dhl_v1#track-shipment");
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/dhl_v1#connection-setup")
+            .version(1);
     }
 }
