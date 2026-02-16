@@ -124,10 +124,10 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
     const populateForm = (provider: IdentityProviderType) => {
         setProviderType(provider.type);
         setName(provider.name);
-        setIssuerUri(provider.issuerUri);
-        setClientId(provider.clientId);
+        setIssuerUri(provider.issuerUri || '');
+        setClientId(provider.clientId || '');
         setClientSecret('');
-        setScopes(provider.scopes);
+        setScopes(provider.scopes || 'openid,profile,email');
         setMetadataUri(provider.metadataUri || '');
         setSigningCertificate(provider.signingCertificate || '');
         setNameIdFormat(provider.nameIdFormat || '');

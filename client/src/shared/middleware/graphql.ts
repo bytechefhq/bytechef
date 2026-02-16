@@ -774,7 +774,7 @@ export type IdentityProviderInput = {
 export type IdentityProviderType = {
   __typename?: 'IdentityProviderType';
   autoProvision: Scalars['Boolean']['output'];
-  clientId: Scalars['String']['output'];
+  clientId?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
   defaultAuthority: Scalars['String']['output'];
@@ -782,7 +782,7 @@ export type IdentityProviderType = {
   enabled: Scalars['Boolean']['output'];
   enforced: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
-  issuerUri: Scalars['String']['output'];
+  issuerUri?: Maybe<Scalars['String']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   metadataUri?: Maybe<Scalars['String']['output']>;
@@ -790,7 +790,7 @@ export type IdentityProviderType = {
   mfaRequired: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
   nameIdFormat?: Maybe<Scalars['String']['output']>;
-  scopes: Scalars['String']['output'];
+  scopes?: Maybe<Scalars['String']['output']>;
   signingCertificate?: Maybe<Scalars['String']['output']>;
   type: Scalars['String']['output'];
 };

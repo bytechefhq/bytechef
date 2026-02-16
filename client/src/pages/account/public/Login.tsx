@@ -130,9 +130,13 @@ const Login = () => {
 
         if (company) {
             fetch(`/api/sso/discover-by-name?company=${encodeURIComponent(company)}`)
-                .then((response) => response.json())
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
                 .then((data) => {
-                    if (data.redirectUrl) {
+                    if (data?.redirectUrl) {
                         window.location.href = data.redirectUrl;
                     }
                 })
