@@ -442,6 +442,51 @@ export function separateOverlappingConditionChildren(
                     };
                 }
             });
+
+            // Also shift nodes that follow this dispatcher in the condition branch
+            // chain. These nodes (e.g., loop_2 after loop_1) are not descendants of
+            // the shifted dispatcher but still need the same cross-axis adjustment.
+            const componentName = childData.componentName as string;
+            const bottomGhostId = `${childData.taskDispatcherId}-${componentName}-bottom-ghost`;
+            let chainNodeId = edges.find((chainEdge) => chainEdge.source === bottomGhostId)?.target || '';
+
+            while (chainNodeId) {
+                const chainNode = allNodes.find((node) => node.id === chainNodeId);
+
+                if (!chainNode || chainNode.type === 'taskDispatcherBottomGhostNode') {
+                    break;
+                }
+
+                chainNode.position = {
+                    ...chainNode.position,
+                    [crossAxis]: chainNode.position[crossAxis] + shiftDelta,
+                };
+
+                const chainNodeData = chainNode.data as NodeDataType;
+
+                if (chainNodeData.taskDispatcher && chainNodeData.taskDispatcherId) {
+                    const chainDescendantIds = new Set<string>();
+
+                    collectNestedDispatcherNodes(chainNodeData.taskDispatcherId, allNodes, chainDescendantIds);
+
+                    allNodes.forEach((descendantNode) => {
+                        if (chainDescendantIds.has(descendantNode.id) && descendantNode.id !== chainNodeId) {
+                            descendantNode.position = {
+                                ...descendantNode.position,
+                                [crossAxis]: descendantNode.position[crossAxis] + shiftDelta,
+                            };
+                        }
+                    });
+
+                    const chainComponentName = chainNodeData.componentName as string;
+                    const chainBottomGhostId = `${chainNodeData.taskDispatcherId}-${chainComponentName}-bottom-ghost`;
+
+                    chainNodeId =
+                        edges.find((chainEdge) => chainEdge.source === chainBottomGhostId)?.target || '';
+                } else {
+                    chainNodeId = edges.find((chainEdge) => chainEdge.source === chainNodeId)?.target || '';
+                }
+            }
         }
     });
 }

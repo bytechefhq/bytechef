@@ -3704,6 +3704,147 @@ describe('separateOverlappingConditionChildren', () => {
         // Top-level condition → no parent → loop_1 should not move
         expect(loopChild.position.y).toBe(555);
     });
+
+    it('should shift downstream chain nodes after the dispatcher bottom ghost (TB / crossAxis=x)', () => {
+        const {allNodes, child, edges, grandparent, parent} = buildNestedConditionNodes('x');
+
+        // Add loop_1's bottom ghost and loop_2 following it in the condition branch chain
+        const childBottomGhost: Node = {
+            data: {taskDispatcherId: 'loop_1'},
+            id: 'loop_1-loop-bottom-ghost',
+            position: {x: child.position.x, y: 300},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+
+        const chainDispatcher: Node = {
+            data: {
+                componentName: 'loop',
+                conditionData: {conditionId: 'condition_2'},
+                taskDispatcher: true,
+                taskDispatcherId: 'loop_2',
+            },
+            id: 'loop_2',
+            position: {x: child.position.x, y: 400},
+            type: 'workflow',
+        };
+
+        const chainDispatcherGhost: Node = {
+            data: {taskDispatcherId: 'loop_2'},
+            id: 'loop_2-loop-top-ghost',
+            position: {x: child.position.x + 30, y: 450},
+            type: 'taskDispatcherTopGhostNode',
+        };
+
+        allNodes.push(childBottomGhost, chainDispatcher, chainDispatcherGhost);
+
+        edges.push({
+            id: 'loop_1-bg=>loop_2',
+            source: 'loop_1-loop-bottom-ghost',
+            target: 'loop_2',
+        });
+
+        const originalChainX = chainDispatcher.position.x;
+        const originalChainGhostX = chainDispatcherGhost.position.x;
+
+        separateOverlappingConditionChildren(allNodes, edges, 'x');
+
+        const delta = child.position.x - grandparent.position.x;
+
+        expect(delta).not.toBe(0);
+        // loop_2 must shift by the same delta as loop_1
+        expect(chainDispatcher.position.x).toBe(originalChainX + delta);
+        // loop_2's internal descendant must also shift
+        expect(chainDispatcherGhost.position.x).toBe(originalChainGhostX + delta);
+    });
+
+    it('should shift downstream chain nodes after the dispatcher bottom ghost (LR / crossAxis=y)', () => {
+        const {allNodes, child, edges, grandparent, parent} = buildNestedConditionNodes('y');
+
+        // Add loop_1's bottom ghost and loop_2 following it in the condition branch chain
+        const childBottomGhost: Node = {
+            data: {taskDispatcherId: 'loop_1'},
+            id: 'loop_1-loop-bottom-ghost',
+            position: {x: 300, y: child.position.y},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+
+        const chainDispatcher: Node = {
+            data: {
+                componentName: 'loop',
+                conditionData: {conditionId: 'condition_2'},
+                taskDispatcher: true,
+                taskDispatcherId: 'loop_2',
+            },
+            id: 'loop_2',
+            position: {x: 400, y: child.position.y},
+            type: 'workflow',
+        };
+
+        const chainDispatcherGhost: Node = {
+            data: {taskDispatcherId: 'loop_2'},
+            id: 'loop_2-loop-top-ghost',
+            position: {x: 450, y: child.position.y + 30},
+            type: 'taskDispatcherTopGhostNode',
+        };
+
+        allNodes.push(childBottomGhost, chainDispatcher, chainDispatcherGhost);
+
+        edges.push({
+            id: 'loop_1-bg=>loop_2',
+            source: 'loop_1-loop-bottom-ghost',
+            target: 'loop_2',
+        });
+
+        const originalChainY = chainDispatcher.position.y;
+        const originalChainGhostY = chainDispatcherGhost.position.y;
+
+        separateOverlappingConditionChildren(allNodes, edges, 'y');
+
+        const delta = child.position.y - grandparent.position.y;
+
+        expect(delta).not.toBe(0);
+        // loop_2 must shift by the same delta as loop_1
+        expect(chainDispatcher.position.y).toBe(originalChainY + delta);
+        // loop_2's internal descendant must also shift
+        expect(chainDispatcherGhost.position.y).toBe(originalChainGhostY + delta);
+    });
+
+    it('should shift multiple chained nodes after the dispatcher bottom ghost', () => {
+        const {allNodes, child, edges, grandparent} = buildNestedConditionNodes('x');
+
+        // Build chain: loop_1 → loop_1-bottom-ghost → regularNode → loop_1-bottom condition ghost
+        const childBottomGhost: Node = {
+            data: {taskDispatcherId: 'loop_1'},
+            id: 'loop_1-loop-bottom-ghost',
+            position: {x: child.position.x, y: 300},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+
+        const regularChainNode: Node = {
+            data: {
+                componentName: 'accelo',
+                conditionData: {conditionId: 'condition_2'},
+            } as NodeDataType,
+            id: 'accelo_1',
+            position: {x: child.position.x, y: 400},
+            type: 'workflow',
+        };
+
+        allNodes.push(childBottomGhost, regularChainNode);
+
+        edges.push(
+            {id: 'loop_1-bg=>accelo_1', source: 'loop_1-loop-bottom-ghost', target: 'accelo_1'},
+        );
+
+        const originalRegularX = regularChainNode.position.x;
+
+        separateOverlappingConditionChildren(allNodes, edges, 'x');
+
+        const delta = child.position.x - grandparent.position.x;
+
+        expect(delta).not.toBe(0);
+        expect(regularChainNode.position.x).toBe(originalRegularX + delta);
+    });
 });
 
 describe('centerDispatcherPlaceholdersOnMainAxis', () => {
