@@ -1,0 +1,208 @@
+---
+title: "Microsoft Dynamics CRM"
+description: "Microsoft Dynamics CRM is a customer relationship management software that helps businesses manage customer interactions, sales, marketing, and customer service processes efficiently."
+---
+
+
+Categories: CRM
+
+
+Type: microsoftDynamicsCrm/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+| tenantId | Tenant Id | STRING |  | true |
+| hostUrl | Host URL | STRING | Host URL without trailing slash. For example **https://demo.crm.dynamics.com** | true |
+| proxyUrl | Proxy URL with Port | STRING | Only to use for establishing connections (only needed when proxying requests). For example **https://proxy.com:8080**. | false |
+
+
+
+## Connection Setup
+
+### Create OAuth 2.0 Application
+
+Creation of OAuth 2.0 application is documented [here](/reference/components/microsoft-graph-application-setup_v1).
+
+### Grant Necessary Permissions
+
+1. Open the Azure Portal: https://portal.azure.com/
+2. Click on **App registrations**.
+3. Click on **All applications**.
+4. Click on the application you want to connect to Microsoft Dynamics CRM.
+5. Click on **API permissions**.
+6. Select **Dynamics CRM**.
+7. Select **Delegated permissions**.
+8. Select the following scopes:
+    - `user_impersonation`
+9. After selecting all the scopes, click on **Update permissions**
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Record
+Name: createRecord
+
+`Creates a new record.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| entityType | Entity Type | STRING | Select or map the entity for which you want to create the record. | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> entityType </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Record",
+  "name" : "createRecord",
+  "parameters" : {
+    "entityType" : "",
+    "fields" : { }
+  },
+  "type" : "microsoftDynamicsCrm/v1/createRecord"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Delete Record
+Name: deleteRecord
+
+`Creates a new record.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| entityType | Entity Type | STRING | Select or map the entity name whose records you want to delete. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> entityType </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Record",
+  "name" : "deleteRecord",
+  "parameters" : {
+    "entityType" : "",
+    "recordId" : ""
+  },
+  "type" : "microsoftDynamicsCrm/v1/deleteRecord"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Get Record
+Name: getRecord
+
+`Retrieves an existing record.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| entityType | Entity Type | STRING | Select or map the entity name whose records you want to retrieve. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> entityType </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Record",
+  "name" : "getRecord",
+  "parameters" : {
+    "entityType" : "",
+    "recordId" : ""
+  },
+  "type" : "microsoftDynamicsCrm/v1/getRecord"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Update Record
+Name: updateRecord
+
+`Updates an existing record.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| entityType | Entity Type | STRING | Select or map the entity for which you want to update the record. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> entityType </details> |  | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> entityType </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Record",
+  "name" : "updateRecord",
+  "parameters" : {
+    "entityType" : "",
+    "recordId" : "",
+    "fields" : { }
+  },
+  "type" : "microsoftDynamicsCrm/v1/updateRecord"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
