@@ -12,8 +12,13 @@ mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
         issuerUri
         lastModifiedBy
         lastModifiedDate
+        metadataUri
+        mfaMethod
+        mfaRequired
         name
+        nameIdFormat
         scopes
+        signingCertificate
         type
     }
 }

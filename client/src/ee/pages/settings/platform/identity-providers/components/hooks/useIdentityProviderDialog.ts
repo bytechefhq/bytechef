@@ -15,6 +15,7 @@ interface UseIdentityProviderDialogI {
     defaultAuthority: string;
     domainInput: string;
     domains: string[];
+    editingProviderId: string | null;
     handleAddDomain: () => void;
     handleClose: () => void;
     handleOpenChange: (open: boolean) => void;
@@ -26,9 +27,14 @@ interface UseIdentityProviderDialogI {
     isEditing: boolean;
     isEnabled: boolean;
     isEnforced: boolean;
+    isMfaRequired: boolean;
     issuerUri: string;
+    metadataUri: string;
+    mfaMethod: string;
     name: string;
+    nameIdFormat: string;
     open: boolean;
+    providerType: string;
     scopes: string;
     setClientId: (value: string) => void;
     setClientSecret: (value: string) => void;
@@ -37,25 +43,38 @@ interface UseIdentityProviderDialogI {
     setIsAutoProvision: (value: boolean) => void;
     setIsEnabled: (value: boolean) => void;
     setIsEnforced: (value: boolean) => void;
+    setIsMfaRequired: (value: boolean) => void;
     setIssuerUri: (value: string) => void;
+    setMetadataUri: (value: string) => void;
+    setMfaMethod: (value: string) => void;
     setName: (value: string) => void;
+    setNameIdFormat: (value: string) => void;
+    setProviderType: (value: string) => void;
     setScopes: (value: string) => void;
+    setSigningCertificate: (value: string) => void;
+    signingCertificate: string;
 }
 
 export default function useIdentityProviderDialog(): UseIdentityProviderDialogI {
     const {identityProvider, open, reset, setIdentityProvider, setOpen} = useIdentityProviderDialogStore();
 
+    const [providerType, setProviderType] = useState('OIDC');
     const [name, setName] = useState('');
     const [issuerUri, setIssuerUri] = useState('');
     const [clientId, setClientId] = useState('');
     const [clientSecret, setClientSecret] = useState('');
     const [scopes, setScopes] = useState('openid,profile,email');
+    const [metadataUri, setMetadataUri] = useState('');
+    const [signingCertificate, setSigningCertificate] = useState('');
+    const [nameIdFormat, setNameIdFormat] = useState('');
     const [domains, setDomains] = useState<string[]>([]);
     const [domainInput, setDomainInput] = useState('');
     const [isAutoProvision, setIsAutoProvision] = useState(true);
     const [defaultAuthority, setDefaultAuthority] = useState('ROLE_USER');
     const [isEnforced, setIsEnforced] = useState(false);
     const [isEnabled, setIsEnabled] = useState(true);
+    const [isMfaRequired, setIsMfaRequired] = useState(false);
+    const [mfaMethod, setMfaMethod] = useState('TOTP');
 
     const queryClient = useQueryClient();
     const {toast} = useToast();
@@ -83,31 +102,43 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
     const isEditing = identityProvider !== null;
 
     const resetFormState = () => {
+        setProviderType('OIDC');
         setName('');
         setIssuerUri('');
         setClientId('');
         setClientSecret('');
         setScopes('openid,profile,email');
+        setMetadataUri('');
+        setSigningCertificate('');
+        setNameIdFormat('');
         setDomains([]);
         setDomainInput('');
         setIsAutoProvision(true);
         setDefaultAuthority('ROLE_USER');
         setIsEnforced(false);
         setIsEnabled(true);
+        setIsMfaRequired(false);
+        setMfaMethod('TOTP');
     };
 
     const populateForm = (provider: IdentityProviderType) => {
+        setProviderType(provider.type);
         setName(provider.name);
         setIssuerUri(provider.issuerUri);
         setClientId(provider.clientId);
         setClientSecret('');
         setScopes(provider.scopes);
+        setMetadataUri(provider.metadataUri || '');
+        setSigningCertificate(provider.signingCertificate || '');
+        setNameIdFormat(provider.nameIdFormat || '');
         setDomains([...provider.domains]);
         setDomainInput('');
         setIsAutoProvision(provider.autoProvision);
         setDefaultAuthority(provider.defaultAuthority);
         setIsEnforced(provider.enforced);
         setIsEnabled(provider.enabled);
+        setIsMfaRequired(provider.mfaRequired);
+        setMfaMethod(provider.mfaMethod || 'TOTP');
     };
 
     const handleClose = () => {
@@ -149,16 +180,21 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
     const handleSave = () => {
         const input: IdentityProviderInput = {
             autoProvision: isAutoProvision,
-            clientId,
-            clientSecret: clientSecret || undefined,
+            clientId: providerType === 'OIDC' ? clientId : undefined,
+            clientSecret: providerType === 'OIDC' ? clientSecret || undefined : undefined,
             defaultAuthority,
             domains,
             enabled: isEnabled,
             enforced: isEnforced,
-            issuerUri,
+            issuerUri: providerType === 'OIDC' ? issuerUri : undefined,
+            metadataUri: providerType === 'SAML' ? metadataUri : undefined,
+            mfaMethod: isMfaRequired ? mfaMethod : undefined,
+            mfaRequired: isMfaRequired,
             name,
-            scopes,
-            type: 'OIDC',
+            nameIdFormat: providerType === 'SAML' ? nameIdFormat || undefined : undefined,
+            scopes: providerType === 'OIDC' ? scopes : undefined,
+            signingCertificate: providerType === 'SAML' ? signingCertificate || undefined : undefined,
+            type: providerType,
         };
 
         if (isEditing && identityProvider) {
@@ -174,6 +210,7 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
         defaultAuthority,
         domainInput,
         domains,
+        editingProviderId: identityProvider?.id || null,
         handleAddDomain,
         handleClose,
         handleOpenChange,
@@ -185,9 +222,14 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
         isEditing,
         isEnabled,
         isEnforced,
+        isMfaRequired,
         issuerUri,
+        metadataUri,
+        mfaMethod,
         name,
+        nameIdFormat,
         open,
+        providerType,
         scopes,
         setClientId,
         setClientSecret,
@@ -196,8 +238,15 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
         setIsAutoProvision,
         setIsEnabled,
         setIsEnforced,
+        setIsMfaRequired,
         setIssuerUri,
+        setMetadataUri,
+        setMfaMethod,
         setName,
+        setNameIdFormat,
+        setProviderType,
         setScopes,
+        setSigningCertificate,
+        signingCertificate,
     };
 }
