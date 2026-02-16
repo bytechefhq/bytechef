@@ -40,6 +40,7 @@ public final class SlackComponentHandler implements ComponentHandler {
         .title("Slack")
         .description("Slack is a messaging platform for teams to communicate and collaborate.")
         .customAction(true)
+        .customActionHelp("Slack API documentation", "https://docs.slack.dev/")
         .icon("path:assets/slack.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.DEVELOPER_TOOLS)
         .connection(SlackConnection.CONNECTION_DEFINITION)
@@ -53,7 +54,8 @@ public final class SlackComponentHandler implements ComponentHandler {
             tool(SlackSendApprovalMessageAction.ACTION_DEFINITION),
             tool(SlackSendChannelMessageAction.ACTION_DEFINITION),
             tool(SlackSendDirectMessageAction.ACTION_DEFINITION))
-        .triggers(SlackAnyEventTrigger.TRIGGER_DEFINITION);
+        .triggers(SlackAnyEventTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
