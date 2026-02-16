@@ -73,7 +73,8 @@ public class GooglePhotosUploadMediaAction {
                 .minItems(1)
                 .required(true))
         .output(outputSchema(MEDIA_OUTPUT_PROPERTY))
-        .perform(GooglePhotosUploadMediaAction::perform);
+        .perform(GooglePhotosUploadMediaAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-photos_v1#upload-media");
 
     private GooglePhotosUploadMediaAction() {
     }

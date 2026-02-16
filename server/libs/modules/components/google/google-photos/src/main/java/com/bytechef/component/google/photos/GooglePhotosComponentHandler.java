@@ -40,6 +40,8 @@ public class GooglePhotosComponentHandler implements ComponentHandler {
         .icon("path:assets/google-photos.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(GooglePhotosConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp("", "https://developers.google.com/photos/library/reference/rest")
         .clusterElements(
             tool(GooglePhotosCreateAlbumAction.ACTION_DEFINITION),
             tool(GooglePhotosGetAlbumAction.ACTION_DEFINITION),
@@ -47,7 +49,8 @@ public class GooglePhotosComponentHandler implements ComponentHandler {
         .actions(
             GooglePhotosCreateAlbumAction.ACTION_DEFINITION,
             GooglePhotosGetAlbumAction.ACTION_DEFINITION,
-            GooglePhotosUploadMediaAction.ACTION_DEFINITION);
+            GooglePhotosUploadMediaAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

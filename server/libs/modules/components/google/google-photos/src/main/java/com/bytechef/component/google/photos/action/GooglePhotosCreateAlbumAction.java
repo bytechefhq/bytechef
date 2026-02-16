@@ -45,7 +45,8 @@ public class GooglePhotosCreateAlbumAction {
                 .required(true)
                 .maxLength(500))
         .output(outputSchema(ALBUM_OUTPUT_PROPERTY))
-        .perform(GooglePhotosCreateAlbumAction::perform);
+        .perform(GooglePhotosCreateAlbumAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-photos_v1#create-album");
 
     private GooglePhotosCreateAlbumAction() {
     }
