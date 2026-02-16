@@ -126,6 +126,23 @@ const Login = () => {
     const {from} = pageLocation.state || {from: {pathname: '/', search: pageLocation.search}};
 
     useEffect(() => {
+        const company = searchParams.get('company');
+
+        if (company) {
+            fetch(`/api/sso/discover-by-name?company=${encodeURIComponent(company)}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.redirectUrl) {
+                        window.location.href = data.redirectUrl;
+                    }
+                })
+                .catch(() => {
+                    // fall back to normal login
+                });
+        }
+    }, [searchParams]);
+
+    useEffect(() => {
         if (searchParams.get('error') === 'oauth2') {
             navigate('/account-error', {
                 state: {

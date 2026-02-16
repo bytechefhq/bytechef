@@ -34,7 +34,11 @@ const IdentityProvidersTable = () => {
                     </TableHead>
 
                     <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
-                        Issuer URI
+                        Type
+                    </TableHead>
+
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                        Issuer / Metadata URI
                     </TableHead>
 
                     <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
@@ -58,8 +62,14 @@ const IdentityProvidersTable = () => {
                     <TableRow className="cursor-pointer border-b-border/50" key={identityProvider.id}>
                         <TableCell className="whitespace-nowrap font-medium">{identityProvider.name}</TableCell>
 
+                        <TableCell className="whitespace-nowrap">
+                            <Badge variant="outline">{identityProvider.type}</Badge>
+                        </TableCell>
+
                         <TableCell className="max-w-xs truncate whitespace-nowrap">
-                            {identityProvider.issuerUri}
+                            {identityProvider.type === 'SAML'
+                                ? identityProvider.metadataUri
+                                : identityProvider.issuerUri}
                         </TableCell>
 
                         <TableCell className="whitespace-nowrap">
@@ -100,7 +110,7 @@ const IdentityProvidersTable = () => {
 
                 {identityProviders.length === 0 && (
                     <TableRow>
-                        <TableCell className="px-4 py-6 text-center text-muted-foreground" colSpan={6}>
+                        <TableCell className="px-4 py-6 text-center text-muted-foreground" colSpan={7}>
                             No identity providers configured.
                         </TableCell>
                     </TableRow>

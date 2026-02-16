@@ -14,7 +14,7 @@ export default function IdentityProvidersPage() {
             header={
                 <Header
                     centerTitle
-                    description="Configure OIDC identity providers for Single Sign-On."
+                    description="Configure OIDC and SAML identity providers for Single Sign-On."
                     position="main"
                     right={<PrimaryButton onClick={handleOpenCreate}>Add Identity Provider</PrimaryButton>}
                     title="Identity Providers"

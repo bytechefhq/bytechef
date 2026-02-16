@@ -12,7 +12,9 @@ import {
 } from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {XIcon} from 'lucide-react';
+import {Textarea} from '@/components/ui/textarea';
+import {DownloadIcon, XIcon} from 'lucide-react';
+import {useMemo} from 'react';
 
 import useIdentityProviderDialog from './hooks/useIdentityProviderDialog';
 
@@ -23,6 +25,7 @@ const IdentityProviderDialog = () => {
         defaultAuthority,
         domainInput,
         domains,
+        editingProviderId,
         handleAddDomain,
         handleClose,
         handleOpenChange,
@@ -32,9 +35,14 @@ const IdentityProviderDialog = () => {
         isEditing,
         isEnabled,
         isEnforced,
+        isMfaRequired,
         issuerUri,
+        metadataUri,
+        mfaMethod,
         name,
+        nameIdFormat,
         open,
+        providerType,
         scopes,
         setClientId,
         setClientSecret,
@@ -43,12 +51,29 @@ const IdentityProviderDialog = () => {
         setIsAutoProvision,
         setIsEnabled,
         setIsEnforced,
+        setIsMfaRequired,
         setIssuerUri,
+        setMetadataUri,
+        setMfaMethod,
         setName,
+        setNameIdFormat,
+        setProviderType,
         setScopes,
+        setSigningCertificate,
+        signingCertificate,
     } = useIdentityProviderDialog();
 
-    const saveDisabled = !name || !issuerUri || !clientId || (!isEditing && !clientSecret) || domains.length === 0;
+    const saveDisabled = useMemo(() => {
+        if (!name || domains.length === 0) {
+            return true;
+        }
+
+        if (providerType === 'OIDC') {
+            return !issuerUri || !clientId;
+        }
+
+        return !metadataUri;
+    }, [clientId, domains.length, issuerUri, metadataUri, name, providerType]);
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
@@ -61,10 +86,26 @@ const IdentityProviderDialog = () => {
                     </DialogHeader>
 
                     <p className="text-sm text-muted-foreground">
-                        Configure an OIDC identity provider for Single Sign-On.
+                        Configure an OIDC or SAML identity provider for Single Sign-On.
                     </p>
 
                     <div className="space-y-4">
+                        <fieldset className="space-y-2 border-0 p-0">
+                            <label className="text-sm font-medium">Type</label>
+
+                            <Select disabled={isEditing} onValueChange={setProviderType} value={providerType}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    <SelectItem value="OIDC">OIDC</SelectItem>
+
+                                    <SelectItem value="SAML">SAML</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </fieldset>
+
                         <fieldset className="space-y-2 border-0 p-0">
                             <label className="text-sm font-medium">Name</label>
 
@@ -75,51 +116,140 @@ const IdentityProviderDialog = () => {
                             />
                         </fieldset>
 
-                        <fieldset className="space-y-2 border-0 p-0">
-                            <label className="text-sm font-medium">Issuer URI</label>
+                        {providerType === 'OIDC' && (
+                            <>
+                                <fieldset className="space-y-2 border-0 p-0">
+                                    <label className="text-sm font-medium">Issuer URI</label>
 
-                            <Input
-                                onChange={(event) => setIssuerUri(event.target.value)}
-                                placeholder="https://accounts.google.com"
-                                value={issuerUri}
-                            />
+                                    <Input
+                                        onChange={(event) => setIssuerUri(event.target.value)}
+                                        placeholder="https://accounts.google.com"
+                                        value={issuerUri}
+                                    />
 
-                            <p className="text-xs text-muted-foreground">
-                                The OIDC issuer URI. Auto-discovery will fetch endpoints from
-                                .well-known/openid-configuration.
-                            </p>
-                        </fieldset>
+                                    <p className="text-xs text-muted-foreground">
+                                        The OIDC issuer URI. Auto-discovery will fetch endpoints from
+                                        .well-known/openid-configuration.
+                                    </p>
+                                </fieldset>
 
-                        <fieldset className="space-y-2 border-0 p-0">
-                            <label className="text-sm font-medium">Client ID</label>
+                                <fieldset className="space-y-2 border-0 p-0">
+                                    <label className="text-sm font-medium">Client ID</label>
 
-                            <Input
-                                onChange={(event) => setClientId(event.target.value)}
-                                placeholder="your-client-id"
-                                value={clientId}
-                            />
-                        </fieldset>
+                                    <Input
+                                        onChange={(event) => setClientId(event.target.value)}
+                                        placeholder="your-client-id"
+                                        value={clientId}
+                                    />
+                                </fieldset>
 
-                        <fieldset className="space-y-2 border-0 p-0">
-                            <label className="text-sm font-medium">Client Secret</label>
+                                <fieldset className="space-y-2 border-0 p-0">
+                                    <label className="text-sm font-medium">Client Secret</label>
 
-                            <Input
-                                onChange={(event) => setClientSecret(event.target.value)}
-                                placeholder={isEditing ? 'Leave blank to keep current secret' : 'your-client-secret'}
-                                type="password"
-                                value={clientSecret}
-                            />
-                        </fieldset>
+                                    <Input
+                                        onChange={(event) => setClientSecret(event.target.value)}
+                                        placeholder={
+                                            isEditing ? 'Leave blank to keep current secret' : 'your-client-secret'
+                                        }
+                                        type="password"
+                                        value={clientSecret}
+                                    />
+                                </fieldset>
 
-                        <fieldset className="space-y-2 border-0 p-0">
-                            <label className="text-sm font-medium">Scopes</label>
+                                <fieldset className="space-y-2 border-0 p-0">
+                                    <label className="text-sm font-medium">Scopes</label>
 
-                            <Input
-                                onChange={(event) => setScopes(event.target.value)}
-                                placeholder="openid,profile,email"
-                                value={scopes}
-                            />
-                        </fieldset>
+                                    <Input
+                                        onChange={(event) => setScopes(event.target.value)}
+                                        placeholder="openid,profile,email"
+                                        value={scopes}
+                                    />
+                                </fieldset>
+                            </>
+                        )}
+
+                        {providerType === 'SAML' && (
+                            <>
+                                <fieldset className="space-y-2 border-0 p-0">
+                                    <label className="text-sm font-medium">Metadata URI</label>
+
+                                    <Input
+                                        onChange={(event) => setMetadataUri(event.target.value)}
+                                        placeholder="https://idp.example.com/metadata"
+                                        value={metadataUri}
+                                    />
+
+                                    <p className="text-xs text-muted-foreground">
+                                        The SAML IdP metadata URL. Used to auto-configure SSO endpoints and
+                                        certificates.
+                                    </p>
+                                </fieldset>
+
+                                <fieldset className="space-y-2 border-0 p-0">
+                                    <label className="text-sm font-medium">Signing Certificate (optional)</label>
+
+                                    <Textarea
+                                        className="font-mono text-xs"
+                                        onChange={(event) => setSigningCertificate(event.target.value)}
+                                        placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"
+                                        rows={4}
+                                        value={signingCertificate}
+                                    />
+
+                                    <p className="text-xs text-muted-foreground">
+                                        PEM-encoded IdP signing certificate. Only needed if not included in the
+                                        metadata.
+                                    </p>
+                                </fieldset>
+
+                                <fieldset className="space-y-2 border-0 p-0">
+                                    <label className="text-sm font-medium">NameID Format (optional)</label>
+
+                                    <Select onValueChange={setNameIdFormat} value={nameIdFormat}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Default (from metadata)" />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            <SelectItem value="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">
+                                                Email Address
+                                            </SelectItem>
+
+                                            <SelectItem value="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">
+                                                Unspecified
+                                            </SelectItem>
+
+                                            <SelectItem value="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
+                                                Persistent
+                                            </SelectItem>
+
+                                            <SelectItem value="urn:oasis:names:tc:SAML:2.0:nameid-format:transient">
+                                                Transient
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </fieldset>
+
+                                {isEditing && (
+                                    <fieldset className="space-y-2 border-0 p-0">
+                                        <label className="text-sm font-medium">SP Metadata</label>
+
+                                        <Button
+                                            icon={<DownloadIcon className="size-4" />}
+                                            label="Download SP Metadata"
+                                            onClick={() => {
+                                                window.open(`/api/saml2/metadata/saml-${editingProviderId}`, '_blank');
+                                            }}
+                                            variant="outline"
+                                        />
+
+                                        <p className="text-xs text-muted-foreground">
+                                            Download the Service Provider metadata XML to configure your IdP.
+                                        </p>
+                                    </fieldset>
+                                )}
+                            </>
+                        )}
 
                         <fieldset className="space-y-2 border-0 p-0">
                             <label className="text-sm font-medium">Email Domains</label>
@@ -217,6 +347,41 @@ const IdentityProviderDialog = () => {
                                     Enabled
                                 </label>
                             </div>
+
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    checked={isMfaRequired}
+                                    id="mfaRequired"
+                                    onCheckedChange={(checked) => setIsMfaRequired(checked === true)}
+                                />
+
+                                <label className="text-sm font-normal" htmlFor="mfaRequired">
+                                    Require MFA (policy only)
+                                </label>
+                            </div>
+
+                            {isMfaRequired && (
+                                <fieldset className="space-y-2 border-0 p-0 pl-6">
+                                    <label className="text-sm font-medium">MFA Method</label>
+
+                                    <Select disabled onValueChange={setMfaMethod} value={mfaMethod}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select method" />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            <SelectItem value="TOTP">TOTP</SelectItem>
+
+                                            <SelectItem value="EMAIL">Email</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <p className="text-xs text-muted-foreground">
+                                        MFA enforcement is a policy flag only. Actual MFA implementation is planned for
+                                        a future release.
+                                    </p>
+                                </fieldset>
+                            )}
                         </div>
                     </div>
 

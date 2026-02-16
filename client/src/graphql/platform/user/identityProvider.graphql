@@ -12,8 +12,13 @@ query identityProvider($id: ID!) {
         issuerUri
         lastModifiedBy
         lastModifiedDate
+        metadataUri
+        mfaMethod
+        mfaRequired
         name
+        nameIdFormat
         scopes
+        signingCertificate
         type
     }
 }
