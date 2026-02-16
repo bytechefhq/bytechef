@@ -16,6 +16,7 @@ import {
     constrainConditionGhostsCrossAxis,
     constrainLeftGhostPositions,
     positionConditionCasePlaceholders,
+    separateOverlappingConditionChildren,
     shiftConditionBranchContent,
 } from './postDagreConstraints';
 
@@ -3504,5 +3505,202 @@ describe('adjustBottomGhostForMovedChildren', () => {
         expect(accelo5.position.x).toBe(2300 + 400);
         // trailing placeholder: no taskDispatcherId, but afterShiftedGhost → shifted
         expect(trailingPlaceholder.position.x).toBe(2400 + 400);
+    });
+});
+
+describe('separateOverlappingConditionChildren', () => {
+    // Helper to build the nested condition scenario:
+    //   condition_1 (grandparent)
+    //     └─ TRUE → condition_2 (parent, nested)
+    //         └─ FALSE → loop_1 (task-dispatcher child that overlaps grandparent)
+
+    function buildNestedConditionNodes(crossAxis: 'x' | 'y') {
+        const grandparentPos = crossAxis === 'x' ? {x: 200, y: 100} : {x: 100, y: 410};
+        const parentPos = crossAxis === 'x' ? {x: 350, y: 100} : {x: 100, y: 265};
+        // Child lands at grandparent's cross-axis level (symmetric offset cancellation)
+        const childPos = crossAxis === 'x' ? {x: 200, y: 100} : {x: 100, y: 410};
+
+        const grandparent: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: grandparentPos,
+            type: 'workflow',
+        };
+
+        const parent: Node = {
+            data: {
+                componentName: 'condition',
+                conditionData: {conditionId: 'condition_1'},
+                taskDispatcher: true,
+                taskDispatcherId: 'condition_2',
+            },
+            id: 'condition_2',
+            position: parentPos,
+            type: 'workflow',
+        };
+
+        const parentTopGhost: Node = {
+            data: {conditionId: 'condition_2', taskDispatcherId: 'condition_2'},
+            id: 'condition_2-condition-top-ghost',
+            position: parentPos,
+            type: 'taskDispatcherTopGhostNode',
+        };
+
+        const child: Node = {
+            data: {
+                componentName: 'loop',
+                loopData: {loopId: 'loop_1'},
+                taskDispatcher: true,
+                taskDispatcherId: 'loop_1',
+            },
+            id: 'loop_1',
+            position: childPos,
+            type: 'workflow',
+        };
+
+        const childInternalGhost: Node = {
+            data: {taskDispatcherId: 'loop_1'},
+            id: 'loop_1-loop-top-ghost',
+            position:
+                crossAxis === 'x'
+                    ? {x: grandparentPos.x + 50, y: 100}
+                    : {x: 100, y: grandparentPos.y + 50},
+            type: 'taskDispatcherTopGhostNode',
+        };
+
+        const childPlaceholder: Node = {
+            data: {taskDispatcherId: 'loop_1'},
+            id: 'loop_1-loop-placeholder-0',
+            position:
+                crossAxis === 'x'
+                    ? {x: grandparentPos.x + 100, y: 100}
+                    : {x: 100, y: grandparentPos.y + 167},
+            type: 'placeholder',
+        };
+
+        const edges: Edge[] = [
+            {
+                id: 'condition_2-tg=>loop_1',
+                source: 'condition_2-condition-top-ghost',
+                sourceHandle: 'condition_2-condition-top-ghost-right',
+                target: 'loop_1',
+            },
+        ];
+
+        const allNodes = [grandparent, parent, parentTopGhost, child, childInternalGhost, childPlaceholder];
+
+        return {allNodes, child, childInternalGhost, childPlaceholder, edges, grandparent, parent};
+    }
+
+    it('should pull overlapping task-dispatcher child to midpoint between parent and grandparent (TB / crossAxis=x)', () => {
+        const {allNodes, child, edges, grandparent, parent} = buildNestedConditionNodes('x');
+
+        // Before fix: child.x === grandparent.x === 200, parent.x === 350
+        expect(child.position.x).toBe(grandparent.position.x);
+
+        separateOverlappingConditionChildren(allNodes, edges, 'x');
+
+        // Midpoint: parent.x + (grandparent.x - parent.x) * 0.5 = 350 + (200-350)*0.5 = 275
+        const expectedMidpoint = parent.position.x + (grandparent.position.x - parent.position.x) * 0.5;
+
+        expect(child.position.x).toBe(expectedMidpoint);
+        expect(child.position.x).toBe(275);
+    });
+
+    it('should pull overlapping task-dispatcher child to midpoint between parent and grandparent (LR / crossAxis=y)', () => {
+        const {allNodes, child, edges, grandparent, parent} = buildNestedConditionNodes('y');
+
+        // Before fix: child.y === grandparent.y === 410, parent.y === 265
+        expect(child.position.y).toBe(grandparent.position.y);
+
+        separateOverlappingConditionChildren(allNodes, edges, 'y');
+
+        // Midpoint: parent.y + (grandparent.y - parent.y) * 0.5 = 265 + (410-265)*0.5 = 337.5
+        const expectedMidpoint = parent.position.y + (grandparent.position.y - parent.position.y) * 0.5;
+
+        expect(child.position.y).toBe(expectedMidpoint);
+        expect(child.position.y).toBe(337.5);
+    });
+
+    it('should shift all descendants of the moved child by the same delta', () => {
+        const {allNodes, child, childInternalGhost, childPlaceholder, edges} = buildNestedConditionNodes('y');
+
+        const originalChildY = child.position.y;
+        const originalGhostY = childInternalGhost.position.y;
+        const originalPlaceholderY = childPlaceholder.position.y;
+
+        separateOverlappingConditionChildren(allNodes, edges, 'y');
+
+        const delta = child.position.y - originalChildY;
+
+        expect(delta).not.toBe(0);
+        expect(childInternalGhost.position.y).toBe(originalGhostY + delta);
+        expect(childPlaceholder.position.y).toBe(originalPlaceholderY + delta);
+    });
+
+    it('should not move child that is on the opposite side of the grandparent', () => {
+        const {allNodes, child, edges, parent} = buildNestedConditionNodes('y');
+
+        // Place child on opposite side: parent at y=265, grandparent at y=410 (below),
+        // move child above parent instead of below
+        child.position.y = 120;
+
+        separateOverlappingConditionChildren(allNodes, edges, 'y');
+
+        // Child was not at or beyond grandparent level in same direction → no move
+        expect(child.position.y).toBe(120);
+    });
+
+    it('should not move non-taskDispatcher children', () => {
+        const {allNodes, edges} = buildNestedConditionNodes('y');
+
+        // Replace loop_1 with a regular workflow node (not a task dispatcher)
+        const regularChild = allNodes.find((node) => node.id === 'loop_1')!;
+
+        regularChild.data = {componentName: 'accelo'} as NodeDataType;
+        const originalY = regularChild.position.y;
+
+        separateOverlappingConditionChildren(allNodes, edges, 'y');
+
+        expect(regularChild.position.y).toBe(originalY);
+    });
+
+    it('should not process top-level conditions (no parent condition)', () => {
+        const grandparent: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 100, y: 410},
+            type: 'workflow',
+        };
+
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-top-ghost',
+            position: {x: 100, y: 410},
+            type: 'taskDispatcherTopGhostNode',
+        };
+
+        const loopChild: Node = {
+            data: {componentName: 'loop', taskDispatcher: true, taskDispatcherId: 'loop_1'},
+            id: 'loop_1',
+            position: {x: 100, y: 555},
+            type: 'workflow',
+        };
+
+        const edges: Edge[] = [
+            {
+                id: 'c1tg=>loop_1',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-right',
+                target: 'loop_1',
+            },
+        ];
+
+        const allNodes = [grandparent, topGhost, loopChild];
+
+        separateOverlappingConditionChildren(allNodes, edges, 'y');
+
+        // Top-level condition → no parent → loop_1 should not move
+        expect(loopChild.position.y).toBe(555);
     });
 });
