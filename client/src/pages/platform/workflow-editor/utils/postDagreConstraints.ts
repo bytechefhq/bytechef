@@ -362,11 +362,7 @@ export function alignDispatcherGhostsCrossAxis(allNodes: Node[], crossAxis: 'x' 
  * descendants) closer to the parent condition, placing it at the midpoint
  * between the parent and grandparent conditions.
  */
-export function separateOverlappingConditionChildren(
-    allNodes: Node[],
-    edges: Edge[],
-    crossAxis: 'x' | 'y'
-): void {
+export function separateOverlappingConditionChildren(allNodes: Node[], edges: Edge[], crossAxis: 'x' | 'y'): void {
     allNodes.forEach((conditionNode) => {
         const conditionData = conditionNode.data as NodeDataType;
 
@@ -481,8 +477,7 @@ export function separateOverlappingConditionChildren(
                     const chainComponentName = chainNodeData.componentName as string;
                     const chainBottomGhostId = `${chainNodeData.taskDispatcherId}-${chainComponentName}-bottom-ghost`;
 
-                    chainNodeId =
-                        edges.find((chainEdge) => chainEdge.source === chainBottomGhostId)?.target || '';
+                    chainNodeId = edges.find((chainEdge) => chainEdge.source === chainBottomGhostId)?.target || '';
                 } else {
                     chainNodeId = edges.find((chainEdge) => chainEdge.source === chainNodeId)?.target || '';
                 }
@@ -521,11 +516,7 @@ function getGhostOrPlaceholderMainAxisSize(nodeType: string | undefined, mainAxi
  * fork-join, parallel) because they all follow the same edge pattern:
  *   sourceGhost → placeholder → targetGhost
  */
-export function centerDispatcherPlaceholdersOnMainAxis(
-    allNodes: Node[],
-    edges: Edge[],
-    mainAxis: 'x' | 'y'
-): void {
+export function centerDispatcherPlaceholdersOnMainAxis(allNodes: Node[], edges: Edge[], mainAxis: 'x' | 'y'): void {
     allNodes.forEach((node) => {
         if (node.type !== 'placeholder') {
             return;

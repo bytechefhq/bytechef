@@ -348,21 +348,13 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                     )}
                                 >
                                     <span
-                                        className={twMerge(
-                                            'font-semibold',
-                                            isNestedClusterRoot && 'w-full truncate'
-                                        )}
+                                        className={twMerge('font-semibold', isNestedClusterRoot && 'w-full truncate')}
                                     >
                                         {data.title || data.label}
                                     </span>
 
                                     {data.operationName && (
-                                        <pre
-                                            className={twMerge(
-                                                'text-sm',
-                                                isNestedClusterRoot && 'w-full truncate'
-                                            )}
-                                        >
+                                        <pre className={twMerge('text-sm', isNestedClusterRoot && 'w-full truncate')}>
                                             {data.operationName}
                                         </pre>
                                     )}
