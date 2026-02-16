@@ -319,12 +319,17 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 'border-stroke-brand-primary shadow-none hover:border-stroke-brand-primary',
                             isMainRootClusterElement && 'nodrag',
                             (isMainRootClusterElement || isNestedClusterRoot) && `min-w-[${ROOT_CLUSTER_WIDTH}px] `,
+                            isNestedClusterRoot && 'overflow-hidden',
                             isClusterElement && !isMainRootClusterElement && 'rounded-full',
                             isClusterElement && !hasSavedClusterElementPosition && 'border-dashed'
                         )}
                         onClick={() => handleNodeClick()}
                         style={
-                            isMainRootClusterElement || isNestedClusterRoot ? {minWidth: `${nodeWidth}px`} : undefined
+                            isMainRootClusterElement
+                                ? {minWidth: `${nodeWidth}px`}
+                                : isNestedClusterRoot
+                                  ? {width: `${nodeWidth}px`}
+                                  : undefined
                         }
                     >
                         <div
@@ -335,13 +340,35 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             {data.icon ? data.icon : <ComponentIcon className="size-9 text-content-neutral-primary" />}
 
                             {(isMainRootClusterElement || isNestedClusterRoot) && (
-                                <div className="flex w-full min-w-max flex-col items-start">
-                                    <span className="font-semibold">{data.title || data.label}</span>
+                                <div
+                                    className={twMerge(
+                                        'flex w-full flex-col items-start',
+                                        isMainRootClusterElement && 'min-w-max',
+                                        isNestedClusterRoot && 'min-w-0 overflow-hidden'
+                                    )}
+                                >
+                                    <span
+                                        className={twMerge(
+                                            'font-semibold',
+                                            isNestedClusterRoot && 'w-full truncate'
+                                        )}
+                                    >
+                                        {data.title || data.label}
+                                    </span>
 
-                                    {data.operationName && <pre className="text-sm">{data.operationName}</pre>}
+                                    {data.operationName && (
+                                        <pre
+                                            className={twMerge(
+                                                'text-sm',
+                                                isNestedClusterRoot && 'w-full truncate'
+                                            )}
+                                        >
+                                            {data.operationName}
+                                        </pre>
+                                    )}
 
                                     {isNestedClusterRoot && (
-                                        <span className="text-xs text-content-neutral-secondary">
+                                        <span className="w-full truncate text-xs text-content-neutral-secondary">
                                             {data.workflowNodeName}
                                         </span>
                                     )}
