@@ -2,14 +2,14 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
-import {PropertyAllType} from '@/shared/types';
+import {ComponentType, DataPillDragPayloadType, PropertyAllType} from '@/shared/types';
 import {Editor} from '@tiptap/react';
-import resolvePath from 'object-resolve-path';
-import {MouseEvent} from 'react';
+import {DragEvent, MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-import {encodePath, transformPathForObjectAccess} from '../../utils/encodingUtils';
+import useDataPillPanelStore from '../../stores/useDataPillPanelStore';
+import {canInsertMentionForProperty, transformPathForObjectAccess} from '../../utils/encodingUtils';
 
 interface HandleDataPillClickProps {
     workflowNodeName: string;
@@ -50,6 +50,45 @@ const DataPillSampleValue = ({sampleOutput}: {sampleOutput: string | number | bo
     return <span className="flex-1 text-xs text-muted-foreground">{sampleOutputString}</span>;
 };
 
+const buildMentionId = ({
+    parentPropertyName,
+    path,
+    propertyName,
+    workflowNodeName,
+}: HandleDataPillClickProps): string => {
+    const dataPillName = parentPropertyName
+        ? `${parentPropertyName}.${propertyName}`
+        : `${propertyName || workflowNodeName}`;
+
+    let value = workflowNodeName;
+
+    if (propertyName) {
+        value = `${workflowNodeName}.${path || dataPillName}`;
+    }
+
+    if (value.includes('/')) {
+        value = value.replaceAll('/', '.').replaceAll('.[index]', '[0]');
+    }
+
+    return transformPathForObjectAccess(value);
+};
+
+const canInsertDataPill = (mentionInput: Editor | null, currentComponent?: ComponentType): boolean => {
+    if (!mentionInput) {
+        return false;
+    }
+
+    const parameters = currentComponent?.parameters || {};
+
+    if (!Object.keys(parameters).length) {
+        return true;
+    }
+
+    const attributes = mentionInput.view.props.attributes as {[name: string]: string};
+
+    return canInsertMentionForProperty(attributes.type, parameters, attributes.path);
+};
+
 const DataPill = ({
     componentIcon,
     parentProperty,
@@ -65,6 +104,8 @@ const DataPill = ({
             focusedInput: state.focusedInput,
         }))
     );
+
+    const setIsDraggingDataPill = useDataPillPanelStore((state) => state.setIsDraggingDataPill);
 
     const mentionInput: Editor | null = focusedInput;
 
@@ -84,47 +125,44 @@ const DataPill = ({
             return;
         }
 
-        const dataPillName = parentPropertyName
-            ? `${parentPropertyName}.${propertyName}`
-            : `${propertyName || workflowNodeName}`;
-
-        let value = workflowNodeName;
-
-        if (propertyName) {
-            value = `${workflowNodeName}.${path || dataPillName}`;
+        if (!canInsertDataPill(mentionInput, currentComponent)) {
+            return;
         }
 
-        if (value.includes('/')) {
-            value = value.replaceAll('/', '.').replaceAll('.[index]', '[0]');
-        }
-
-        const parameters = currentComponent?.parameters || {};
-
-        // Prevents adding a 2nd datapill to a non-string property
-        if (Object.keys(parameters).length) {
-            const attributes = mentionInput.view.props.attributes as {[name: string]: string};
-
-            const encodedPath = encodePath(attributes.path);
-
-            const path = transformPathForObjectAccess(encodedPath);
-
-            const paramValue = resolvePath(parameters, path);
-
-            if (attributes.type !== 'STRING' && paramValue && !paramValue.startsWith('=')) {
-                return;
-            }
-        }
+        const mentionId = buildMentionId({
+            parentPropertyName,
+            path,
+            propertyName,
+            workflowNodeName,
+        });
 
         mentionInput
             .chain()
             .focus()
             .insertContent({
                 attrs: {
-                    id: transformPathForObjectAccess(value),
+                    id: mentionId,
                 },
                 type: 'mention',
             })
             .run();
+    };
+
+    const handleDragStart = (event: DragEvent<HTMLDivElement>, props: HandleDataPillClickProps) => {
+        const mentionId = buildMentionId(props);
+
+        const payload: DataPillDragPayloadType = {
+            mentionId,
+        };
+
+        event.dataTransfer.setData('application/bytechef-datapill', JSON.stringify(payload));
+        event.dataTransfer.effectAllowed = 'copy';
+
+        setIsDraggingDataPill(true);
+    };
+
+    const handleDragEnd = () => {
+        setIsDraggingDataPill(false);
     };
 
     const getSubPropertyPath = (subPropertyName = '[index]') =>
@@ -140,6 +178,8 @@ const DataPill = ({
                     )}
                     draggable
                     onClick={() => handleDataPillClick({workflowNodeName})}
+                    onDragEnd={handleDragEnd}
+                    onDragStart={(event) => handleDragStart(event, {workflowNodeName})}
                 >
                     <span className="mr-2" title={property?.type}>
                         {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
@@ -180,7 +220,15 @@ const DataPill = ({
                                 workflowNodeName,
                             })
                         }
-                        onDragStart={(event) => event.dataTransfer.setData('name', property?.name || workflowNodeName)}
+                        onDragEnd={handleDragEnd}
+                        onDragStart={(event) =>
+                            handleDragStart(event, {
+                                parentPropertyName: parentProperty?.name,
+                                path,
+                                propertyName: property?.name || '[index]',
+                                workflowNodeName,
+                            })
+                        }
                     >
                         {property?.name && (
                             <span className="mr-2" title={property?.type}>
