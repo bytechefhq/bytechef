@@ -161,15 +161,13 @@ public class HttpClientConnection {
                         .description("Optional comma-delimited list of scopes")
                         .controlType(ControlType.TEXT_AREA))
                 .apply((Parameters connectionParameters, Context context) -> {
-                    String headerPrefix = connectionParameters.getString(HEADER_PREFIX, Authorization.BEARER);
-                    String scopes = connectionParameters.getString(SCOPES);
-                    String tokenUrl = connectionParameters.getRequiredString(TOKEN_URL);
-
                     Map<String, String> formParameters = new LinkedHashMap<>();
 
                     formParameters.put("client_id", connectionParameters.getRequiredString(CLIENT_ID));
                     formParameters.put("client_secret", connectionParameters.getRequiredString(CLIENT_SECRET));
                     formParameters.put("grant_type", "client_credentials");
+
+                    String scopes = connectionParameters.getString(SCOPES);
 
                     if (scopes != null && !scopes.isBlank()) {
                         scopes = scopes.replace(",", " ");
@@ -178,12 +176,13 @@ public class HttpClientConnection {
                     }
 
                     String accessToken = context.http(http -> {
-                        Context.Http.Response tokenResponse = http.post(tokenUrl)
-                            .body(Body.of(formParameters, FORM_URL_ENCODED))
-                            .configuration(
-                                responseType(JSON)
-                                    .disableAuthorization(true))
-                            .execute();
+                        Context.Http.Response tokenResponse =
+                            http.post(connectionParameters.getRequiredString(TOKEN_URL))
+                                .body(Body.of(formParameters, FORM_URL_ENCODED))
+                                .configuration(
+                                    responseType(JSON)
+                                        .disableAuthorization(true))
+                                .execute();
 
                         Map<String, Object> responseBody = tokenResponse.getBody(Map.class);
 
@@ -191,6 +190,7 @@ public class HttpClientConnection {
                     });
 
                     return Authorization.ApplyResponse.ofHeaders(
-                        Map.of(AUTHORIZATION, List.of(headerPrefix + " " + accessToken)));
+                        Map.of(AUTHORIZATION, List.of(
+                            connectionParameters.getString(HEADER_PREFIX, Authorization.BEARER) + " " + accessToken)));
                 }));
 }
