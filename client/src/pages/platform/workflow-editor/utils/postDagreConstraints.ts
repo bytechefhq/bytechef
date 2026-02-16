@@ -446,6 +446,58 @@ export function separateOverlappingConditionChildren(
     });
 }
 
+/**
+ * Centers task-dispatcher placeholder nodes on the main axis between their
+ * source ghost and target ghost.
+ *
+ * Dagre places placeholders at arbitrary main-axis positions (often near the
+ * bottom-ghost). This function repositions each placeholder to the midpoint
+ * of the edge span between the ghost that feeds it and the ghost it feeds,
+ * so the "+" circle appears visually centered on its connecting edge.
+ *
+ * Works uniformly for all dispatcher types (condition, loop, branch, each,
+ * fork-join, parallel) because they all follow the same edge pattern:
+ *   sourceGhost → placeholder → targetGhost
+ */
+export function centerDispatcherPlaceholdersOnMainAxis(
+    allNodes: Node[],
+    edges: Edge[],
+    mainAxis: 'x' | 'y'
+): void {
+    allNodes.forEach((node) => {
+        if (node.type !== 'placeholder') {
+            return;
+        }
+
+        const nodeData = node.data as NodeDataType;
+
+        if (!nodeData.taskDispatcherId) {
+            return;
+        }
+
+        const incomingEdge = edges.find((edge) => edge.target === node.id);
+        const outgoingEdge = edges.find((edge) => edge.source === node.id);
+
+        if (!incomingEdge || !outgoingEdge) {
+            return;
+        }
+
+        const sourceGhost = allNodes.find((ghostNode) => ghostNode.id === incomingEdge.source);
+        const targetGhost = allNodes.find((ghostNode) => ghostNode.id === outgoingEdge.target);
+
+        if (!sourceGhost || !targetGhost) {
+            return;
+        }
+
+        const midpoint = (sourceGhost.position[mainAxis] + targetGhost.position[mainAxis]) / 2;
+
+        node.position = {
+            ...node.position,
+            [mainAxis]: midpoint,
+        };
+    });
+}
+
 interface CenterNodesAfterBottomGhostI {
     crossAxis: 'x' | 'y';
     crossAxisSize: number;
