@@ -40,6 +40,10 @@ export type DataPillType = {
     value: string;
 };
 
+export type DataPillDragPayloadType = {
+    mentionId: string;
+};
+
 export type WorkflowNodeType = {
     name: string;
     version: number;

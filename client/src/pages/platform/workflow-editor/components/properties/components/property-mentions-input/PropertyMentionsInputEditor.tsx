@@ -6,6 +6,7 @@ import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/work
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {
+    canInsertMentionForProperty,
     encodeParameters,
     encodePath,
     escapeHtmlForParagraph,
@@ -20,7 +21,7 @@ import {
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {TYPE_ICONS} from '@/shared/typeIcons';
-import {ClusterElementItemType, DataPillType} from '@/shared/types';
+import {ClusterElementItemType, DataPillDragPayloadType, DataPillType} from '@/shared/types';
 import {Extension, mergeAttributes} from '@tiptap/core';
 import Document from '@tiptap/extension-document';
 import {Mention} from '@tiptap/extension-mention';
@@ -128,6 +129,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         );
 
         const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
+
         const {rootClusterElementNodeData} = useWorkflowEditorStore(
             useShallow((state) => ({
                 rootClusterElementNodeData: state.rootClusterElementNodeData,
@@ -485,6 +487,60 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     type: type ?? '',
                 },
                 handleClick: (view, pos) => moveCursorToEnd(view, pos),
+                handleDrop: (view: EditorView, event: DragEvent, _slice, moved: boolean) => {
+                    if (moved) {
+                        return false;
+                    }
+
+                    if (isFromAi) {
+                        return false;
+                    }
+
+                    const rawPayload = event.dataTransfer?.getData('application/bytechef-datapill');
+
+                    if (!rawPayload) {
+                        return false;
+                    }
+
+                    event.preventDefault();
+
+                    let payload: DataPillDragPayloadType;
+
+                    try {
+                        payload = JSON.parse(rawPayload);
+                    } catch {
+                        return false;
+                    }
+
+                    if (!payload?.mentionId) {
+                        return false;
+                    }
+
+                    const attributes = view.props.attributes as Record<string, string>;
+                    const parameters = currentComponent?.parameters || {};
+
+                    if (!canInsertMentionForProperty(attributes.type, parameters, attributes.path)) {
+                        return true;
+                    }
+
+                    const coordinates = view.posAtCoords({
+                        left: event.clientX,
+                        top: event.clientY,
+                    });
+
+                    const insertPosition = coordinates?.pos ?? view.state.doc.content.size;
+
+                    editor
+                        ?.chain()
+                        .insertContentAt(insertPosition, {
+                            attrs: {id: payload.mentionId},
+                            type: 'mention',
+                        })
+                        .focus()
+                        .run();
+
+                    return true;
+                },
                 handleKeyPress: (editor: EditorView, event: KeyboardEvent) => {
                     const isEditorEmpty = editor.state.doc.textContent.length === 0;
 
