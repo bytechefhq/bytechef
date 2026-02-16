@@ -10,6 +10,7 @@ import {
     alignDispatcherGhostsCrossAxis,
     alignTrailingPlaceholder,
     applySavedPositions,
+    centerDispatcherPlaceholdersOnMainAxis,
     centerLRSmallNodes,
     centerNodesAfterBottomGhost,
     constrainBranchGhostsCrossAxis,
@@ -3702,5 +3703,172 @@ describe('separateOverlappingConditionChildren', () => {
 
         // Top-level condition → no parent → loop_1 should not move
         expect(loopChild.position.y).toBe(555);
+    });
+});
+
+describe('centerDispatcherPlaceholdersOnMainAxis', () => {
+    it('should center condition right placeholder on y-axis (TB mode)', () => {
+        const topGhost: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-top-ghost',
+            position: {x: 504, y: 314},
+            type: 'taskDispatcherTopGhostNode',
+        };
+
+        const bottomGhost: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 504, y: 1298},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+
+        const placeholder: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-right-placeholder-0',
+            position: {x: 649, y: 1104},
+            type: 'placeholder',
+        };
+
+        const edges: Edge[] = [
+            {id: 'tg=>ph', source: 'condition_1-condition-top-ghost', target: 'condition_1-condition-right-placeholder-0'},
+            {id: 'ph=>bg', source: 'condition_1-condition-right-placeholder-0', target: 'condition_1-condition-bottom-ghost'},
+        ];
+
+        const allNodes = [topGhost, bottomGhost, placeholder];
+
+        centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'y');
+
+        // Midpoint: (314 + 1298) / 2 = 806
+        expect(placeholder.position.y).toBe(806);
+        // x should be unchanged
+        expect(placeholder.position.x).toBe(649);
+    });
+
+    it('should center condition left placeholder on y-axis (TB mode)', () => {
+        const topGhost: Node = {
+            data: {taskDispatcherId: 'condition_2'},
+            id: 'condition_2-condition-top-ghost',
+            position: {x: 359, y: 542},
+            type: 'taskDispatcherTopGhostNode',
+        };
+
+        const bottomGhost: Node = {
+            data: {taskDispatcherId: 'condition_2'},
+            id: 'condition_2-condition-bottom-ghost',
+            position: {x: 359, y: 1148},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+
+        const placeholder: Node = {
+            data: {taskDispatcherId: 'condition_2'},
+            id: 'condition_2-condition-left-placeholder-0',
+            position: {x: 214, y: 976},
+            type: 'placeholder',
+        };
+
+        const edges: Edge[] = [
+            {id: 'tg=>ph', source: 'condition_2-condition-top-ghost', target: 'condition_2-condition-left-placeholder-0'},
+            {id: 'ph=>bg', source: 'condition_2-condition-left-placeholder-0', target: 'condition_2-condition-bottom-ghost'},
+        ];
+
+        const allNodes = [topGhost, bottomGhost, placeholder];
+
+        centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'y');
+
+        // Midpoint: (542 + 1148) / 2 = 845
+        expect(placeholder.position.y).toBe(845);
+        expect(placeholder.position.x).toBe(214);
+    });
+
+    it('should center loop placeholder on x-axis (LR mode)', () => {
+        const topGhost: Node = {
+            data: {taskDispatcherId: 'loop_1'},
+            id: 'loop_1-loop-top-ghost',
+            position: {x: 849, y: 338},
+            type: 'taskDispatcherTopGhostNode',
+        };
+
+        const bottomGhost: Node = {
+            data: {taskDispatcherId: 'loop_1'},
+            id: 'loop_1-loop-bottom-ghost',
+            position: {x: 1055, y: 338},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+
+        const placeholder: Node = {
+            data: {taskDispatcherId: 'loop_1'},
+            id: 'loop_1-loop-placeholder-0',
+            position: {x: 892, y: 505},
+            type: 'placeholder',
+        };
+
+        const edges: Edge[] = [
+            {id: 'tg=>ph', source: 'loop_1-loop-top-ghost', target: 'loop_1-loop-placeholder-0'},
+            {id: 'ph=>bg', source: 'loop_1-loop-placeholder-0', target: 'loop_1-loop-bottom-ghost'},
+        ];
+
+        const allNodes = [topGhost, bottomGhost, placeholder];
+
+        centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'x');
+
+        // Midpoint: (849 + 1055) / 2 = 952
+        expect(placeholder.position.x).toBe(952);
+        // y should be unchanged
+        expect(placeholder.position.y).toBe(505);
+    });
+
+    it('should skip placeholders without taskDispatcherId', () => {
+        const placeholder: Node = {
+            data: {},
+            id: 'trailing-placeholder',
+            position: {x: 500, y: 800},
+            type: 'placeholder',
+        };
+
+        const edges: Edge[] = [
+            {id: 'a=>ph', source: 'some_node', target: 'trailing-placeholder'},
+        ];
+
+        const allNodes = [placeholder];
+
+        centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'y');
+
+        expect(placeholder.position.y).toBe(800);
+    });
+
+    it('should skip placeholders with no connecting edges', () => {
+        const placeholder: Node = {
+            data: {taskDispatcherId: 'loop_1'},
+            id: 'loop_1-loop-placeholder-0',
+            position: {x: 100, y: 200},
+            type: 'placeholder',
+        };
+
+        const edges: Edge[] = [];
+        const allNodes = [placeholder];
+
+        centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'y');
+
+        expect(placeholder.position.y).toBe(200);
+    });
+
+    it('should not affect non-placeholder nodes', () => {
+        const workflowNode: Node = {
+            data: {componentName: 'accelo', taskDispatcherId: 'condition_1'},
+            id: 'accelo_1',
+            position: {x: 300, y: 600},
+            type: 'workflow',
+        };
+
+        const edges: Edge[] = [
+            {id: 'a=>b', source: 'ghost', target: 'accelo_1'},
+            {id: 'b=>c', source: 'accelo_1', target: 'other_ghost'},
+        ];
+
+        const allNodes = [workflowNode];
+
+        centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'y');
+
+        expect(workflowNode.position.y).toBe(600);
     });
 });

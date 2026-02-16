@@ -42,6 +42,7 @@ import {
     alignDispatcherGhostsCrossAxis,
     alignTrailingPlaceholder,
     applySavedPositions,
+    centerDispatcherPlaceholdersOnMainAxis,
     centerLRSmallNodes,
     centerNodesAfterBottomGhost,
     constrainBranchGhostsCrossAxis,
@@ -538,9 +539,9 @@ export const getLayoutElements = async ({
         centerLRSmallNodes(allNodes, crossAxis);
     }
 
-    const savedDispatcherDeltas = applySavedPositions(allNodes, crossAxis, savedPositionCrossAxisShift);
-
     const mainAxis = direction === 'TB' ? 'y' : 'x';
+
+    const savedDispatcherDeltas = applySavedPositions(allNodes, crossAxis, savedPositionCrossAxisShift);
 
     adjustBottomGhostForMovedChildren(allNodes, edges, mainAxis, direction, savedDispatcherDeltas);
 
@@ -548,6 +549,8 @@ export const getLayoutElements = async ({
     const allDispatcherDeltas = new Map([...savedDispatcherDeltas, ...chainDeltas]);
 
     alignTrailingPlaceholder(allNodes, edges, crossAxis, direction, allDispatcherDeltas);
+
+    centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, mainAxis);
 
     const sourceEdgeMap = new Map<string, Edge[]>();
 
