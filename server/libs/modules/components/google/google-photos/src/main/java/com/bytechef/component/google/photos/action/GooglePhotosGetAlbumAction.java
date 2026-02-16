@@ -45,7 +45,8 @@ public class GooglePhotosGetAlbumAction {
                 .options((OptionsFunction<String>) GooglePhotosUtils::getAlbumIdOptions)
                 .required(true))
         .output(outputSchema(ALBUM_OUTPUT_PROPERTY))
-        .perform(GooglePhotosGetAlbumAction::perform);
+        .perform(GooglePhotosGetAlbumAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-photos_v1#get-album");
 
     private GooglePhotosGetAlbumAction() {
     }
