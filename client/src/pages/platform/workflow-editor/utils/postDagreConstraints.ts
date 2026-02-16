@@ -447,13 +447,30 @@ export function separateOverlappingConditionChildren(
 }
 
 /**
+ * Returns the rendered main-axis size for ghost and placeholder nodes.
+ *
+ * In LR mode the main axis is x (width): ghosts render at 2px, placeholders at 72px.
+ * In TB mode the main axis is y (height): ghosts render at 2px, placeholders at 28px.
+ */
+function getGhostOrPlaceholderMainAxisSize(nodeType: string | undefined, mainAxis: 'x' | 'y'): number {
+    const GHOST_RENDERED_THICKNESS = 2;
+
+    if (nodeType === 'taskDispatcherTopGhostNode' || nodeType === 'taskDispatcherBottomGhostNode') {
+        return GHOST_RENDERED_THICKNESS;
+    }
+
+    return mainAxis === 'x' ? CLUSTER_ELEMENT_NODE_WIDTH : PLACEHOLDER_NODE_HEIGHT;
+}
+
+/**
  * Centers task-dispatcher placeholder nodes on the main axis between their
  * source ghost and target ghost.
  *
  * Dagre places placeholders at arbitrary main-axis positions (often near the
- * bottom-ghost). This function repositions each placeholder to the midpoint
- * of the edge span between the ghost that feeds it and the ghost it feeds,
- * so the "+" circle appears visually centered on its connecting edge.
+ * bottom-ghost). This function repositions each placeholder so its visual
+ * center aligns with the midpoint between the visual centers of its source
+ * and target ghosts. This accounts for size differences between ghosts (2px)
+ * and placeholders (72px in LR, 28px in TB) to produce equal-length edges.
  *
  * Works uniformly for all dispatcher types (condition, loop, branch, each,
  * fork-join, parallel) because they all follow the same edge pattern:
@@ -489,11 +506,17 @@ export function centerDispatcherPlaceholdersOnMainAxis(
             return;
         }
 
-        const midpoint = (sourceGhost.position[mainAxis] + targetGhost.position[mainAxis]) / 2;
+        const sourceGhostSize = getGhostOrPlaceholderMainAxisSize(sourceGhost.type, mainAxis);
+        const targetGhostSize = getGhostOrPlaceholderMainAxisSize(targetGhost.type, mainAxis);
+        const placeholderSize = getGhostOrPlaceholderMainAxisSize(node.type, mainAxis);
+
+        const sourceGhostCenter = sourceGhost.position[mainAxis] + sourceGhostSize / 2;
+        const targetGhostCenter = targetGhost.position[mainAxis] + targetGhostSize / 2;
+        const midpointOfCenters = (sourceGhostCenter + targetGhostCenter) / 2;
 
         node.position = {
             ...node.position,
-            [mainAxis]: midpoint,
+            [mainAxis]: midpointOfCenters - placeholderSize / 2,
         };
     });
 }
