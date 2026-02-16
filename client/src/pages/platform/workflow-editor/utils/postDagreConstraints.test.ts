@@ -3738,8 +3738,10 @@ describe('centerDispatcherPlaceholdersOnMainAxis', () => {
 
         centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'y');
 
-        // Midpoint: (314 + 1298) / 2 = 806
-        expect(placeholder.position.y).toBe(806);
+        // Visual centers: topGhost=314+1=315, bottomGhost=1298+1=1299
+        // Midpoint of centers: (315+1299)/2 = 807
+        // Placeholder position: 807 - 28/2 = 793
+        expect(placeholder.position.y).toBe(793);
         // x should be unchanged
         expect(placeholder.position.x).toBe(649);
     });
@@ -3775,8 +3777,10 @@ describe('centerDispatcherPlaceholdersOnMainAxis', () => {
 
         centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'y');
 
-        // Midpoint: (542 + 1148) / 2 = 845
-        expect(placeholder.position.y).toBe(845);
+        // Visual centers: topGhost=542+1=543, bottomGhost=1148+1=1149
+        // Midpoint of centers: (543+1149)/2 = 846
+        // Placeholder position: 846 - 28/2 = 832
+        expect(placeholder.position.y).toBe(832);
         expect(placeholder.position.x).toBe(214);
     });
 
@@ -3811,8 +3815,10 @@ describe('centerDispatcherPlaceholdersOnMainAxis', () => {
 
         centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'x');
 
-        // Midpoint: (849 + 1055) / 2 = 952
-        expect(placeholder.position.x).toBe(952);
+        // Visual centers: topGhost=849+1=850, bottomGhost=1055+1=1056
+        // Midpoint of centers: (850+1056)/2 = 953
+        // Placeholder position: 953 - 72/2 = 917
+        expect(placeholder.position.x).toBe(917);
         // y should be unchanged
         expect(placeholder.position.y).toBe(505);
     });
