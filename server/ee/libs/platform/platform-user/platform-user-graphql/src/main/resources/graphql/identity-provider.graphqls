@@ -11,7 +11,7 @@ extend type Mutation {
 
 type IdentityProviderType {
     autoProvision: Boolean!
-    clientId: String!
+    clientId: String
     createdBy: String
     createdDate: Long
     defaultAuthority: String!
@@ -19,7 +19,7 @@ type IdentityProviderType {
     enabled: Boolean!
     enforced: Boolean!
     id: ID!
-    issuerUri: String!
+    issuerUri: String
     lastModifiedBy: String
     lastModifiedDate: Long
     metadataUri: String
@@ -27,7 +27,7 @@ type IdentityProviderType {
     mfaRequired: Boolean!
     name: String!
     nameIdFormat: String
-    scopes: String!
+    scopes: String
     signingCertificate: String
     type: String!
 }

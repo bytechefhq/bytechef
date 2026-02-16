@@ -26,14 +26,20 @@ const AccountProfileLinkedAccounts = () => {
     const {toast} = useToast();
 
     const fetchLinkedAccounts = useCallback(async () => {
-        const response = await fetch('/api/account/linked-accounts');
+        try {
+            const response = await fetch('/api/account/linked-accounts');
 
-        if (response.ok) {
-            const data = await response.json();
+            if (response.ok) {
+                const data = await response.json();
 
-            setLinkedAccount(data);
+                setLinkedAccount(data);
+            } else {
+                toast({description: 'Failed to fetch linked accounts.', variant: 'destructive'});
+            }
+        } catch {
+            toast({description: 'Failed to fetch linked accounts.', variant: 'destructive'});
         }
-    }, []);
+    }, [toast]);
 
     useEffect(() => {
         fetchLinkedAccounts();

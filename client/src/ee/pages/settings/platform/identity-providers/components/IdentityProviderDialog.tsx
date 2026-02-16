@@ -69,11 +69,11 @@ const IdentityProviderDialog = () => {
         }
 
         if (providerType === 'OIDC') {
-            return !issuerUri || !clientId;
+            return !issuerUri || !clientId || (!isEditing && !clientSecret);
         }
 
         return !metadataUri;
-    }, [clientId, domains.length, issuerUri, metadataUri, name, providerType]);
+    }, [clientId, clientSecret, domains.length, isEditing, issuerUri, metadataUri, name, providerType]);
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
@@ -205,12 +205,17 @@ const IdentityProviderDialog = () => {
                                 <fieldset className="space-y-2 border-0 p-0">
                                     <label className="text-sm font-medium">NameID Format (optional)</label>
 
-                                    <Select onValueChange={setNameIdFormat} value={nameIdFormat}>
+                                    <Select
+                                        onValueChange={(value) => setNameIdFormat(value === 'default' ? '' : value)}
+                                        value={nameIdFormat || 'default'}
+                                    >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Default (from metadata)" />
                                         </SelectTrigger>
 
                                         <SelectContent>
+                                            <SelectItem value="default">Default (from metadata)</SelectItem>
+
                                             <SelectItem value="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">
                                                 Email Address
                                             </SelectItem>
@@ -235,10 +240,16 @@ const IdentityProviderDialog = () => {
                                         <label className="text-sm font-medium">SP Metadata</label>
 
                                         <Button
+                                            disabled={!editingProviderId}
                                             icon={<DownloadIcon className="size-4" />}
                                             label="Download SP Metadata"
                                             onClick={() => {
-                                                window.open(`/api/saml2/metadata/saml-${editingProviderId}`, '_blank');
+                                                if (editingProviderId) {
+                                                    window.open(
+                                                        `/api/saml2/metadata/saml-${editingProviderId}`,
+                                                        '_blank'
+                                                    );
+                                                }
                                             }}
                                             variant="outline"
                                         />
