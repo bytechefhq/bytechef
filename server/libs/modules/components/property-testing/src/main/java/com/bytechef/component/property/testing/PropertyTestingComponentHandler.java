@@ -22,9 +22,11 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.property.testing.action.PropertyTestingAction;
-import com.google.auto.service.AutoService;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
-@AutoService(ComponentHandler.class)
+@Component
+@Profile("dev")
 public class PropertyTestingComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("propertyTesting")
