@@ -72,6 +72,7 @@ public class SlackAddReactionAction {
                             .properties(
                                 array("messages")
                                     .items(string())))))
+        .help("", "https://docs.bytechef.io/reference/components/slack_v1#add-reaction")
         .perform(SlackAddReactionAction::perform);
 
     private SlackAddReactionAction() {

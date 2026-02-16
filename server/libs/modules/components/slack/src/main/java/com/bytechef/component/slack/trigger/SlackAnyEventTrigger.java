@@ -43,7 +43,8 @@ public class SlackAnyEventTrigger {
         .type(TriggerType.STATIC_WEBHOOK)
         .output()
         .webhookRequest(SlackAnyEventTrigger::webhookRequest)
-        .webhookValidateOnEnable(SlackAnyEventTrigger::webhookValidateOnEnable);
+        .webhookValidateOnEnable(SlackAnyEventTrigger::webhookValidateOnEnable)
+        .help("", "https://docs.bytechef.io/reference/components/slack_v1#any-event");
 
     private SlackAnyEventTrigger() {
     }

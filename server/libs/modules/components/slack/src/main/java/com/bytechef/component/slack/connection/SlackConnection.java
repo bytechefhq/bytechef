@@ -176,7 +176,9 @@ public class SlackConnection {
 
                     return scopeMap;
                 })
-                .tokenUrl((connection, context) -> "https://slack.com/api/oauth.access"));
+                .tokenUrl((connection, context) -> "https://slack.com/api/oauth.access"))
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/slack_v1#connection-setup");
 
     private SlackConnection() {
     }

@@ -54,6 +54,7 @@ public class SlackSendChannelMessageAction {
                 .required(false),
             TEXT_PROPERTY)
         .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/slack_v1#send-channel-message")
         .perform(SlackSendChannelMessageAction::perform);
 
     private SlackSendChannelMessageAction() {
