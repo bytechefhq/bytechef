@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a reaction to a message.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/slack_v1#add-reaction"
+    },
     "metadata": null,
     "name": "addReaction",
     "outputDefinition": {
@@ -360,7 +363,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends approval message to a channel.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/slack_v1#send-approval-message"
+    },
     "metadata": null,
     "name": "sendApprovalMessage",
     "outputDefinition": {
@@ -1084,7 +1090,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a message to a public or private channel.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/slack_v1#send-channel-message"
+    },
     "metadata": null,
     "name": "sendChannelMessage",
     "outputDefinition": {
@@ -1825,7 +1834,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a direct message to another user in a workspace. If it hasn't already, a direct message conversation will be created.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/slack_v1#send-direct-message"
+    },
     "metadata": null,
     "name": "sendDirectMessage",
     "outputDefinition": {
@@ -5193,14 +5205,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/slack_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "Slack API documentation",
+    "learnMoreUrl": "https://docs.slack.dev/"
+  },
   "description": "Slack is a messaging platform for teams to communicate and collaborate.",
   "icon": "path:assets/slack.svg",
   "metadata": null,
@@ -5214,7 +5232,10 @@
     "deprecated": null,
     "description": "Triggers when any user subscribed event happens.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/slack_v1#any-event"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "anyEvent",
