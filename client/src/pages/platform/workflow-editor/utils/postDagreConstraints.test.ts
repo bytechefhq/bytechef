@@ -3562,20 +3562,14 @@ describe('separateOverlappingConditionChildren', () => {
         const childInternalGhost: Node = {
             data: {taskDispatcherId: 'loop_1'},
             id: 'loop_1-loop-top-ghost',
-            position:
-                crossAxis === 'x'
-                    ? {x: grandparentPos.x + 50, y: 100}
-                    : {x: 100, y: grandparentPos.y + 50},
+            position: crossAxis === 'x' ? {x: grandparentPos.x + 50, y: 100} : {x: 100, y: grandparentPos.y + 50},
             type: 'taskDispatcherTopGhostNode',
         };
 
         const childPlaceholder: Node = {
             data: {taskDispatcherId: 'loop_1'},
             id: 'loop_1-loop-placeholder-0',
-            position:
-                crossAxis === 'x'
-                    ? {x: grandparentPos.x + 100, y: 100}
-                    : {x: 100, y: grandparentPos.y + 167},
+            position: crossAxis === 'x' ? {x: grandparentPos.x + 100, y: 100} : {x: 100, y: grandparentPos.y + 167},
             type: 'placeholder',
         };
 
@@ -3640,7 +3634,7 @@ describe('separateOverlappingConditionChildren', () => {
     });
 
     it('should not move child that is on the opposite side of the grandparent', () => {
-        const {allNodes, child, edges, parent} = buildNestedConditionNodes('y');
+        const {allNodes, child, edges} = buildNestedConditionNodes('y');
 
         // Place child on opposite side: parent at y=265, grandparent at y=410 (below),
         // move child above parent instead of below
@@ -3706,7 +3700,7 @@ describe('separateOverlappingConditionChildren', () => {
     });
 
     it('should shift downstream chain nodes after the dispatcher bottom ghost (TB / crossAxis=x)', () => {
-        const {allNodes, child, edges, grandparent, parent} = buildNestedConditionNodes('x');
+        const {allNodes, child, edges, grandparent} = buildNestedConditionNodes('x');
 
         // Add loop_1's bottom ghost and loop_2 following it in the condition branch chain
         const childBottomGhost: Node = {
@@ -3758,7 +3752,7 @@ describe('separateOverlappingConditionChildren', () => {
     });
 
     it('should shift downstream chain nodes after the dispatcher bottom ghost (LR / crossAxis=y)', () => {
-        const {allNodes, child, edges, grandparent, parent} = buildNestedConditionNodes('y');
+        const {allNodes, child, edges, grandparent} = buildNestedConditionNodes('y');
 
         // Add loop_1's bottom ghost and loop_2 following it in the condition branch chain
         const childBottomGhost: Node = {
@@ -3832,9 +3826,7 @@ describe('separateOverlappingConditionChildren', () => {
 
         allNodes.push(childBottomGhost, regularChainNode);
 
-        edges.push(
-            {id: 'loop_1-bg=>accelo_1', source: 'loop_1-loop-bottom-ghost', target: 'accelo_1'},
-        );
+        edges.push({id: 'loop_1-bg=>accelo_1', source: 'loop_1-loop-bottom-ghost', target: 'accelo_1'});
 
         const originalRegularX = regularChainNode.position.x;
 
@@ -3871,8 +3863,16 @@ describe('centerDispatcherPlaceholdersOnMainAxis', () => {
         };
 
         const edges: Edge[] = [
-            {id: 'tg=>ph', source: 'condition_1-condition-top-ghost', target: 'condition_1-condition-right-placeholder-0'},
-            {id: 'ph=>bg', source: 'condition_1-condition-right-placeholder-0', target: 'condition_1-condition-bottom-ghost'},
+            {
+                id: 'tg=>ph',
+                source: 'condition_1-condition-top-ghost',
+                target: 'condition_1-condition-right-placeholder-0',
+            },
+            {
+                id: 'ph=>bg',
+                source: 'condition_1-condition-right-placeholder-0',
+                target: 'condition_1-condition-bottom-ghost',
+            },
         ];
 
         const allNodes = [topGhost, bottomGhost, placeholder];
@@ -3910,8 +3910,16 @@ describe('centerDispatcherPlaceholdersOnMainAxis', () => {
         };
 
         const edges: Edge[] = [
-            {id: 'tg=>ph', source: 'condition_2-condition-top-ghost', target: 'condition_2-condition-left-placeholder-0'},
-            {id: 'ph=>bg', source: 'condition_2-condition-left-placeholder-0', target: 'condition_2-condition-bottom-ghost'},
+            {
+                id: 'tg=>ph',
+                source: 'condition_2-condition-top-ghost',
+                target: 'condition_2-condition-left-placeholder-0',
+            },
+            {
+                id: 'ph=>bg',
+                source: 'condition_2-condition-left-placeholder-0',
+                target: 'condition_2-condition-bottom-ghost',
+            },
         ];
 
         const allNodes = [topGhost, bottomGhost, placeholder];
@@ -3972,9 +3980,7 @@ describe('centerDispatcherPlaceholdersOnMainAxis', () => {
             type: 'placeholder',
         };
 
-        const edges: Edge[] = [
-            {id: 'a=>ph', source: 'some_node', target: 'trailing-placeholder'},
-        ];
+        const edges: Edge[] = [{id: 'a=>ph', source: 'some_node', target: 'trailing-placeholder'}];
 
         const allNodes = [placeholder];
 
