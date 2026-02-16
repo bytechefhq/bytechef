@@ -20,6 +20,7 @@ import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
@@ -47,7 +48,7 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor = forClass(ConfigurationBuilder.class);
-        Context mockedContext = mock(Context.class);
+        ActionContext mockedContext = mock(ActionContext.class);
         Http.Executor mockedExecutor = mock(Http.Executor.class);
         Http.Response mockedResponse = mock(Http.Response.class);
         @SuppressWarnings("unchecked")
@@ -83,6 +84,7 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
         Type type = parameter.getParameterizedType();
 
         return parameter.getType() == Context.class ||
+            parameter.getType() == ActionContext.class ||
             parameter.getType() == Http.Response.class ||
             parameter.getType() == Http.Executor.class ||
             parameter.getType() == Http.class ||
@@ -102,7 +104,7 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
         Parameter parameter = parameterContext.getParameter();
         Type type = parameter.getParameterizedType();
 
-        if (parameter.getType() == Context.class) {
+        if (parameter.getType() == Context.class || parameter.getType() == ActionContext.class) {
             return extensionContextStore.get(Context.class);
         }
 
