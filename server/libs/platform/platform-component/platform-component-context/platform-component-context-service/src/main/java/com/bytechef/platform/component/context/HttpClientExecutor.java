@@ -252,7 +252,7 @@ class HttpClientExecutor {
             case ResponseType.Type.BINARY -> new ResponseImpl(
                 httpHeaders.map(),
                 storeBinaryResponseBody(configuration, httpHeaders.map(), (InputStream) httpResponseBody), statusCode);
-            case ResponseType.Type.JSON -> new ResponseImpl(
+            case ResponseType.Type.JSON, ResponseType.Type.JSON_TEXT -> new ResponseImpl(
                 httpHeaders.map(), JsonUtils.read(httpResponseBody.toString()), statusCode);
             case ResponseType.Type.XML -> new ResponseImpl(
                 httpHeaders.map(), XmlUtils.read(httpResponseBody.toString()), statusCode);
