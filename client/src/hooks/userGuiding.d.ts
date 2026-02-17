@@ -9,6 +9,7 @@ interface UserGuidingSdkI {
     track(eventName: string, properties?: Record<string, unknown>): void;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 interface Window {
     userGuiding?: UserGuidingSdkI;
     userGuidingLayer?: unknown[];
