@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import LoadingIcon from '@/components/LoadingIcon';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -12,6 +13,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {Input} from '@/components/ui/input';
 import {useToast} from '@/hooks/use-toast';
+import {getCookie} from '@/shared/util/cookie-utils';
 import {ShieldCheckIcon, ShieldOffIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 
@@ -29,6 +31,7 @@ type MfaStateType = 'disabled' | 'enabled' | 'setup';
 const AccountProfileMfa = () => {
     const [disableCode, setDisableCode] = useState('');
     const [disablePassword, setDisablePassword] = useState('');
+    const [loading, setLoading] = useState(false);
     const [mfaState, setMfaState] = useState<MfaStateType>('disabled');
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
     const [secret, setSecret] = useState('');
@@ -37,67 +40,106 @@ const AccountProfileMfa = () => {
     const {toast} = useToast();
 
     const fetchMfaStatus = useCallback(async () => {
-        const response = await fetch('/api/account/mfa/status');
+        try {
+            const response = await fetch('/api/account/mfa/status');
 
-        if (response.ok) {
-            const data: MfaStatusResponseI = await response.json();
+            if (response.ok) {
+                const data: MfaStatusResponseI = await response.json();
 
-            setMfaState(data.totpEnabled ? 'enabled' : 'disabled');
+                setMfaState(data.totpEnabled ? 'enabled' : 'disabled');
+            } else {
+                toast({description: 'Failed to load MFA status.', variant: 'destructive'});
+            }
+        } catch {
+            toast({description: 'Failed to load MFA status.', variant: 'destructive'});
         }
-    }, []);
+    }, [toast]);
 
     useEffect(() => {
         fetchMfaStatus();
     }, [fetchMfaStatus]);
 
     const handleSetup = async () => {
-        const response = await fetch('/api/account/mfa/setup', {method: 'POST'});
+        setLoading(true);
 
-        if (response.ok) {
-            const data: MfaSetupResponseI = await response.json();
+        try {
+            const response = await fetch('/api/account/mfa/setup', {
+                headers: {'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''},
+                method: 'POST',
+            });
 
-            setQrCodeDataUrl(data.qrCodeDataUrl);
-            setSecret(data.secret);
-            setMfaState('setup');
-        } else {
+            if (response.ok) {
+                const data: MfaSetupResponseI = await response.json();
+
+                setQrCodeDataUrl(data.qrCodeDataUrl);
+                setSecret(data.secret);
+                setMfaState('setup');
+            } else {
+                toast({description: 'Failed to start MFA setup.', variant: 'destructive'});
+            }
+        } catch {
             toast({description: 'Failed to start MFA setup.', variant: 'destructive'});
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleEnable = async () => {
-        const response = await fetch('/api/account/mfa/enable', {
-            body: JSON.stringify({code: verifyCode}),
-            headers: {'Content-Type': 'application/json'},
-            method: 'POST',
-        });
+        setLoading(true);
 
-        if (response.ok) {
-            toast({description: 'Two-factor authentication has been enabled.'});
+        try {
+            const response = await fetch('/api/account/mfa/enable', {
+                body: JSON.stringify({code: verifyCode}),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+                },
+                method: 'POST',
+            });
 
-            setVerifyCode('');
-            setQrCodeDataUrl('');
-            setSecret('');
-            setMfaState('enabled');
-        } else {
-            toast({description: 'Invalid verification code. Please try again.', variant: 'destructive'});
+            if (response.ok) {
+                toast({description: 'Two-factor authentication has been enabled.'});
+
+                setVerifyCode('');
+                setQrCodeDataUrl('');
+                setSecret('');
+                setMfaState('enabled');
+            } else {
+                toast({description: 'Invalid verification code. Please try again.', variant: 'destructive'});
+            }
+        } catch {
+            toast({description: 'Failed to enable two-factor authentication.', variant: 'destructive'});
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleDisable = async () => {
-        const response = await fetch('/api/account/mfa/disable', {
-            body: JSON.stringify({code: disableCode, password: disablePassword}),
-            headers: {'Content-Type': 'application/json'},
-            method: 'POST',
-        });
+        setLoading(true);
 
-        if (response.ok) {
-            toast({description: 'Two-factor authentication has been disabled.'});
+        try {
+            const response = await fetch('/api/account/mfa/disable', {
+                body: JSON.stringify({code: disableCode, password: disablePassword}),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+                },
+                method: 'POST',
+            });
 
-            setDisableCode('');
-            setDisablePassword('');
-            setMfaState('disabled');
-        } else {
-            toast({description: 'Failed to disable 2FA. Check your password and code.', variant: 'destructive'});
+            if (response.ok) {
+                toast({description: 'Two-factor authentication has been disabled.'});
+
+                setDisableCode('');
+                setDisablePassword('');
+                setMfaState('disabled');
+            } else {
+                toast({description: 'Failed to disable 2FA. Check your password and code.', variant: 'destructive'});
+            }
+        } catch {
+            toast({description: 'Failed to disable two-factor authentication.', variant: 'destructive'});
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -117,7 +159,15 @@ const AccountProfileMfa = () => {
             </p>
 
             <div className="mt-6">
-                {mfaState === 'disabled' && <Button label="Set up 2FA" onClick={handleSetup} variant="outline" />}
+                {mfaState === 'disabled' && (
+                    <Button
+                        disabled={loading}
+                        icon={loading ? <LoadingIcon /> : undefined}
+                        label="Set up 2FA"
+                        onClick={handleSetup}
+                        variant="outline"
+                    />
+                )}
 
                 {mfaState === 'setup' && (
                     <div className="space-y-4">
@@ -142,10 +192,13 @@ const AccountProfileMfa = () => {
                         </div>
 
                         <fieldset className="space-y-2 border-0 p-0">
-                            <label className="text-sm font-medium">Verification Code</label>
+                            <label className="text-sm font-medium" htmlFor="verifyCode">
+                                Verification Code
+                            </label>
 
                             <Input
                                 autoFocus
+                                id="verifyCode"
                                 inputMode="numeric"
                                 maxLength={6}
                                 onChange={(event) => setVerifyCode(event.target.value)}
@@ -156,9 +209,14 @@ const AccountProfileMfa = () => {
                         </fieldset>
 
                         <div className="flex gap-2">
-                            <Button disabled={verifyCode.length !== 6} label="Verify & Enable" onClick={handleEnable} />
+                            <Button
+                                disabled={verifyCode.length !== 6 || loading}
+                                icon={loading ? <LoadingIcon /> : undefined}
+                                label="Verify & Enable"
+                                onClick={handleEnable}
+                            />
 
-                            <Button label="Cancel" onClick={handleCancelSetup} variant="outline" />
+                            <Button disabled={loading} label="Cancel" onClick={handleCancelSetup} variant="outline" />
                         </div>
                     </div>
                 )}
@@ -192,9 +250,12 @@ const AccountProfileMfa = () => {
 
                                 <div className="space-y-3 py-2">
                                     <fieldset className="space-y-2 border-0 p-0">
-                                        <label className="text-sm font-medium">Password</label>
+                                        <label className="text-sm font-medium" htmlFor="disablePassword">
+                                            Password
+                                        </label>
 
                                         <Input
+                                            id="disablePassword"
                                             onChange={(event) => setDisablePassword(event.target.value)}
                                             placeholder="Enter your password"
                                             type="password"
@@ -203,9 +264,12 @@ const AccountProfileMfa = () => {
                                     </fieldset>
 
                                     <fieldset className="space-y-2 border-0 p-0">
-                                        <label className="text-sm font-medium">Authentication Code</label>
+                                        <label className="text-sm font-medium" htmlFor="disableCode">
+                                            Authentication Code
+                                        </label>
 
                                         <Input
+                                            id="disableCode"
                                             inputMode="numeric"
                                             maxLength={6}
                                             onChange={(event) => setDisableCode(event.target.value)}
@@ -227,7 +291,7 @@ const AccountProfileMfa = () => {
                                     </AlertDialogCancel>
 
                                     <AlertDialogAction
-                                        disabled={disableCode.length !== 6 || !disablePassword}
+                                        disabled={disableCode.length !== 6 || !disablePassword || loading}
                                         onClick={handleDisable}
                                     >
                                         Disable 2FA
