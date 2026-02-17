@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Runs a BigQuery SQL query synchronously and returns query results if the query completes within a specified timeout.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-bigquery_v1#query"
+    },
     "metadata": null,
     "name": "query",
     "outputDefinition": {
@@ -5230,8 +5233,11 @@
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "BigQuery API",
+    "learnMoreUrl": "https://docs.cloud.google.com/bigquery/docs/reference/rest"
+  },
   "description": "Google BigQuery is the autonomous data to AI platform, automating the entire data life cycle, from ingestion to AI-driven insights, so you can go from data to AI to action faster.",
   "icon": "path:assets/google-bigquery.svg",
   "metadata": null,
