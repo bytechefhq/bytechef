@@ -206,6 +206,11 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 List<Workflow> workflows = workflowService.getWorkflows(
                     CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
+                Map<Long, List<String>> projectWorkflowIdsMap = projects.stream()
+                    .collect(Collectors.toMap(
+                        project -> Validate.notNull(project.getId(), "id"),
+                        project -> projectWorkflowService.getProjectWorkflowIds(project.getId())));
+
                 List<WorkflowExecutionDTO> workflowExecutionDTOs = new ArrayList<>();
 
                 for (Job job : jobsPage) {
@@ -224,7 +229,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     Optional<Project> projectOptional = CollectionUtils.findFirst(
                         projects,
                         project -> CollectionUtils.contains(
-                            projectWorkflowService.getProjectWorkflowIds(project.getId()), job.getWorkflowId()));
+                            projectWorkflowIdsMap.get(project.getId()), job.getWorkflowId()));
 
                     if (projectOptional.isEmpty()) {
                         if (logger.isWarnEnabled()) {
@@ -236,19 +241,28 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                         continue;
                     }
 
+                    Optional<Long> jobDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
+                        job.getId(), PlatformType.AUTOMATION);
+
+                    ProjectDeployment jobProjectDeployment = jobDeploymentIdOptional
+                        .map(projectDeploymentService::getProjectDeployment)
+                        .orElse(null);
+
+                    TriggerExecution triggerExecution = jobDeploymentIdOptional.isPresent()
+                        ? triggerExecutionService.fetchJobTriggerExecution(
+                            Validate.notNull(job.getId(), "id"))
+                            .orElse(null)
+                        : null;
+
                     workflowExecutionDTOs.add(new WorkflowExecutionDTO(
                         Validate.notNull(job.getId(), "id"),
                         projectOptional.get(),
-                        principalJobService.fetchJobPrincipalId(job.getId(), PlatformType.AUTOMATION)
-                            .map(projectDeploymentService::getProjectDeployment)
-                            .orElse(null),
+                        jobProjectDeployment,
                         new JobDTO(job),
                         workflowOptional.get(),
                         getTriggerExecutionDTO(
-                            projectDeploymentId,
-                            triggerExecutionService.fetchJobTriggerExecution(
-                                Validate.notNull(job.getId(), "id"))
-                                .orElse(null),
+                            jobDeploymentIdOptional.orElse(null),
+                            triggerExecution,
                             job)));
                 }
 
