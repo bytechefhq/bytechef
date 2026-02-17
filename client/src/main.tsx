@@ -21,6 +21,7 @@ import YamlWorker from 'monaco-yaml/yaml.worker?worker';
 import {StrictMode} from 'react';
 import {RouterProvider} from 'react-router-dom';
 
+import {initUserGuiding} from './hooks/useUserGuiding';
 import {getRouter as getMainRouter} from './routes';
 
 window.MonacoEnvironment = {
@@ -72,6 +73,8 @@ async function renderApp() {
     if (applicationInfoStore.getState().helpHub.enabled && applicationInfoStore.getState().helpHub.commandBar.orgId) {
         init(applicationInfoStore.getState().helpHub.commandBar.orgId!);
     }
+
+    initUserGuiding('38U111210PF6ID');
 
     if (
         !isEmbeddedWorkflowBuilder &&

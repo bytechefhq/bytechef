@@ -1,5 +1,3 @@
-/* eslint-disable sort-keys */
-
 import {createStore, useStore} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -28,10 +26,10 @@ export interface ApplicationInfoI {
     } | null;
     featureFlags: Record<string, boolean>;
     helpHub: {
-        enabled: boolean;
         commandBar: {
             orgId: string | undefined;
         };
+        enabled: boolean;
     };
     loading: boolean;
     signUp: {
@@ -44,6 +42,10 @@ export interface ApplicationInfoI {
     templatesSubmissionForm: {
         projects: string;
         workflows: string;
+    };
+    userGuiding: {
+        containerId: string | undefined;
+        enabled: boolean;
     };
 
     getApplicationInfo: () => Promise<void>;
@@ -73,24 +75,6 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                 },
                 application: null,
                 featureFlags: {},
-                loading: false,
-                helpHub: {
-                    enabled: true,
-                    commandBar: {
-                        orgId: undefined,
-                    },
-                },
-                signUp: {
-                    activationRequired: false,
-                    enabled: true,
-                },
-                socialLogin: {
-                    enabled: false,
-                },
-                templatesSubmissionForm: {
-                    projects: undefined,
-                    workflow: undefined,
-                },
 
                 getApplicationInfo: async () => {
                     if (get().loading) {
@@ -121,8 +105,8 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             application: json.application,
                             featureFlags: json.featureFlags,
                             helpHub: {
-                                enabled: json.helpHub.enabled === 'true',
                                 commandBar: json.helpHub.commandBar,
+                                enabled: json.helpHub.enabled === 'true',
                             },
                             loading: false,
                             signUp: json.signUp,
@@ -130,8 +114,34 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 enabled: json.socialLogin?.enabled === 'true',
                             },
                             templatesSubmissionForm: json.templatesSubmissionForm,
+                            userGuiding: {
+                                containerId: json.userGuiding?.containerId,
+                                enabled: json.userGuiding?.enabled === 'true',
+                            },
                         }));
                     }
+                },
+                helpHub: {
+                    commandBar: {
+                        orgId: undefined,
+                    },
+                    enabled: true,
+                },
+                loading: false,
+                signUp: {
+                    activationRequired: false,
+                    enabled: true,
+                },
+                socialLogin: {
+                    enabled: false,
+                },
+                templatesSubmissionForm: {
+                    projects: undefined,
+                    workflow: undefined,
+                },
+                userGuiding: {
+                    containerId: undefined,
+                    enabled: false,
                 },
             };
         },
