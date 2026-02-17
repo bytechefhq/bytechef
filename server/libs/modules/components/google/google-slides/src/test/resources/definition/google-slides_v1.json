@@ -6,9 +6,12 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new presentation based on an existing one and can replace any placeholder variables found in your template presentation, like [[name]], [[email]], etc.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-slides_v1#create-presentation-from-template"
+    },
     "metadata": null,
-    "name": "createPresentationBasedOnTemplate",
+    "name": "createPresentationFromTemplate",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -44,6 +47,36 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "{{}}",
+      "description": "Choose the format of placeholders in your template.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Placeholder Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "placeholderFormat",
+      "options": [ {
+        "description": null,
+        "label": "Curly Braces {{}}",
+        "value": "{{}}"
+      }, {
+        "description": null,
+        "label": "Square Brackets [[]]",
+        "value": "[[]]"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "Name of the new presentation.",
@@ -51,7 +84,7 @@
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "New Presentation Name",
+      "label": "Title of New Presentation",
       "languageId": null,
       "maxLength": null,
       "metadata": { },
@@ -90,55 +123,79 @@
       "required": false,
       "type": "STRING"
     }, {
-      "additionalProperties": [ {
-        "advancedOption": null,
-        "controlType": "TEXT",
-        "defaultValue": null,
-        "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": null,
-        "options": null,
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": null,
-        "type": "STRING"
-      } ],
+      "name": "values",
       "advancedOption": null,
-      "controlType": "OBJECT_BUILDER",
+      "description": null,
+      "displayCondition": null,
+      "dynamicPropertiesDataSource": {
+        "properties": { },
+        "propertiesLookupDependsOn": [ "fileId", "placeholderFormat" ]
+      },
+      "expressionEnabled": null,
+      "header": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "type": "DYNAMIC_PROPERTIES"
+    } ],
+    "resumePerform": null,
+    "suspendPerform": null,
+    "title": "Create Presentation From Template",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Gets the latest version of the specified presentation.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-slides_v1#get-presentation"
+    },
+    "metadata": null,
+    "name": "getPresentation",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": { },
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Don't include the \"[[]]\", only the key name and its value.",
+      "description": "The ID of the presentation.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Values",
+      "label": "Presentation ID",
+      "languageId": null,
+      "maxLength": null,
       "metadata": { },
-      "multipleValues": null,
-      "name": "values",
+      "minLength": null,
+      "name": "fileId",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
       "placeholder": null,
-      "properties": null,
+      "regex": null,
       "required": true,
-      "type": "OBJECT"
+      "type": "STRING"
     } ],
     "resumePerform": null,
     "suspendPerform": null,
-    "title": "Create Presentation Based on Template",
+    "title": "Get Presentation",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
-    "name": "createPresentationBasedOnTemplate",
+    "name": "createPresentationFromTemplate",
     "description": "Creates a new presentation based on an existing one and can replace any placeholder variables found in your template presentation, like [[name]], [[email]], etc.",
     "element": { },
     "help": null,
@@ -176,6 +233,36 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "{{}}",
+      "description": "Choose the format of placeholders in your template.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Placeholder Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "placeholderFormat",
+      "options": [ {
+        "description": null,
+        "label": "Curly Braces {{}}",
+        "value": "{{}}"
+      }, {
+        "description": null,
+        "label": "Square Brackets [[]]",
+        "value": "[[]]"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "Name of the new presentation.",
@@ -183,7 +270,7 @@
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "New Presentation Name",
+      "label": "Title of New Presentation",
       "languageId": null,
       "maxLength": null,
       "metadata": { },
@@ -222,49 +309,69 @@
       "required": false,
       "type": "STRING"
     }, {
-      "additionalProperties": [ {
-        "advancedOption": null,
-        "controlType": "TEXT",
-        "defaultValue": null,
-        "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": null,
-        "options": null,
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": null,
-        "type": "STRING"
-      } ],
+      "name": "values",
       "advancedOption": null,
-      "controlType": "OBJECT_BUILDER",
+      "description": null,
+      "displayCondition": null,
+      "dynamicPropertiesDataSource": {
+        "properties": { },
+        "propertiesLookupDependsOn": [ "fileId", "placeholderFormat" ]
+      },
+      "expressionEnabled": null,
+      "header": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "type": "DYNAMIC_PROPERTIES"
+    } ],
+    "title": "Create Presentation From Template",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "getPresentation",
+    "description": "Gets the latest version of the specified presentation.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Don't include the \"[[]]\", only the key name and its value.",
+      "description": "The ID of the presentation.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Values",
+      "label": "Presentation ID",
+      "languageId": null,
+      "maxLength": null,
       "metadata": { },
-      "multipleValues": null,
-      "name": "values",
+      "minLength": null,
+      "name": "fileId",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
       "placeholder": null,
-      "properties": null,
+      "regex": null,
       "required": true,
-      "type": "OBJECT"
+      "type": "STRING"
     } ],
-    "title": "Create Presentation Based on Template",
+    "title": "Get Presentation",
     "type": {
       "name": "TOOLS",
       "key": "tools",
@@ -357,7 +464,10 @@
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.google.com/workspace/slides/api/reference/rest"
+  },
   "description": "Google Slides is a cloud-based presentation software that allows users to create, edit, and collaborate on presentations online in real-time.",
   "icon": "path:assets/google-slides.svg",
   "metadata": null,
