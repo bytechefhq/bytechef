@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates an album in a user's Google Photos library.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-photos_v1#create-album"
+    },
     "metadata": null,
     "name": "createAlbum",
     "outputDefinition": {
@@ -814,8 +817,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Returns the app created album based on the specified albumId.",
-    "help": null,
+    "description": "Returns the app created album based on the specified albumId. The albumId must be the ID of an album created by your app.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-photos_v1#get-album"
+    },
     "metadata": null,
     "name": "getAlbum",
     "outputDefinition": {
@@ -1594,7 +1600,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Identifier of the album to be requested.",
+      "description": "Identifier of the album to be requested. Only albums created by your app will be listed.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1627,7 +1633,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Upload media to an album in a user's Google Photos library.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-photos_v1#upload-media"
+    },
     "metadata": null,
     "name": "uploadMedia",
     "outputDefinition": {
@@ -3134,7 +3143,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Identifier of the album where the media items are added.",
+      "description": "Identifier of the album to be requested. Only albums created by your app will be listed.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4138,7 +4147,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "getAlbum",
-    "description": "Returns the app created album based on the specified albumId.",
+    "description": "Returns the app created album based on the specified albumId. The albumId must be the ID of an album created by your app.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -4916,7 +4925,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Identifier of the album to be requested.",
+      "description": "Identifier of the album to be requested. Only albums created by your app will be listed.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -6455,7 +6464,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Identifier of the album where the media items are added.",
+      "description": "Identifier of the album to be requested. Only albums created by your app will be listed.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -6736,8 +6745,11 @@
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.google.com/photos/library/reference/rest"
+  },
   "description": "Google Photos is a photo sharing and storage service.",
   "icon": "path:assets/google-photos.svg",
   "metadata": null,
