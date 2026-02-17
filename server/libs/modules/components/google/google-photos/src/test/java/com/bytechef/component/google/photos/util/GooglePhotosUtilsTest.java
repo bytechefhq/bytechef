@@ -32,48 +32,38 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class GooglePhotosUtilsTest {
 
-    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(ConfigurationBuilder.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testGetConferenceRecordsOptions() {
-        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+    void testGetConferenceRecordsOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(
                 Map.of(

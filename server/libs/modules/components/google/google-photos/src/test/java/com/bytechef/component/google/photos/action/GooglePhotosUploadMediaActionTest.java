@@ -29,45 +29,45 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.google.photos.action.GooglePhotosUploadMediaAction.Media;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class GooglePhotosUploadMediaActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
-    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(ConfigurationBuilder.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Executor.class);
-    private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Http mockedHttp = mock(Http.class);
-    private final Object mockedObject = mock(Object.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Response mockedResponse = mock(Response.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     @SuppressWarnings("unchecked")
     private final ArgumentCaptor<Map<String, List<String>>> mapArgumentCaptor = forClass(Map.class);
+    private final FileEntry mockedFileEntry = mock(FileEntry.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        GooglePhotosUploadMediaAction.Media media = new GooglePhotosUploadMediaAction.Media(
-            "name123", mockedFileEntry);
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedParameters.getRequiredList(MEDIA, GooglePhotosUploadMediaAction.Media.class))
+        Media media = new Media("name123", mockedFileEntry);
+
+        when(mockedParameters.getRequiredList(MEDIA, Media.class))
             .thenReturn(List.of(media));
         when(mockedParameters.getRequiredFileEntry("fileEntry"))
             .thenReturn(mockedFileEntry);
@@ -78,22 +78,12 @@ class GooglePhotosUploadMediaActionTest {
         when(mockedParameters.getRequiredString(ALBUM_ID))
             .thenReturn("abc");
 
-        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.post(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.headers(mapArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn("UPLOAD_TOKEN_123");
         when(mockedResponse.getBody())
@@ -112,16 +102,16 @@ class GooglePhotosUploadMediaActionTest {
 
         assertEquals(2, configurationBuilders.size());
         ConfigurationBuilder configurationBuilder = configurationBuilders.getFirst();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
+        ResponseType responseType = configuration.getResponseType();
 
-        assertEquals(Http.ResponseType.Type.TEXT, responseType.getType());
+        assertEquals(ResponseType.Type.TEXT, responseType.getType());
 
         ConfigurationBuilder configurationBuilder2 = configurationBuilders.getLast();
-        Http.Configuration configuration2 = configurationBuilder2.build();
-        Http.ResponseType responseType2 = configuration2.getResponseType();
+        Configuration configuration2 = configurationBuilder2.build();
+        ResponseType responseType2 = configuration2.getResponseType();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType2.getType());
+        assertEquals(ResponseType.Type.JSON, responseType2.getType());
         assertEquals(List.of("/uploads", "/mediaItems:batchCreate"), stringArgumentCaptor.getAllValues());
 
         assertEquals(
