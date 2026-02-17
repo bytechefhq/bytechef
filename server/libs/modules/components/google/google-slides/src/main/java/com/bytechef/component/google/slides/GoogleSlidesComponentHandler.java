@@ -38,11 +38,13 @@ public class GoogleSlidesComponentHandler implements ComponentHandler {
             "Google Slides is a cloud-based presentation software that allows users to create, edit, and " +
                 "collaborate on presentations online in real-time.")
         .customAction(true)
+        .customActionHelp("", "https://developers.google.com/workspace/slides/api/reference/rest")
         .icon("path:assets/google-slides.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(CONNECTION_DEFINITION)
         .actions(GoogleSlidesCreatePresentationBasedOnTemplateAction.ACTION_DEFINITION)
-        .clusterElements(tool(GoogleSlidesCreatePresentationBasedOnTemplateAction.ACTION_DEFINITION));
+        .clusterElements(tool(GoogleSlidesCreatePresentationBasedOnTemplateAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
