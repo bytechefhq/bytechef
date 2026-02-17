@@ -27,7 +27,10 @@ import java.util.Map;
 public class GoogleChatConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        "https://chat.googleapis.com/v1", (connection, context) -> {
+        "https://chat.googleapis.com/v1",
+        1,
+        "https://docs.bytechef.io/reference/components/google-chat_v1#connection-setup",
+        (connection, context) -> {
             Map<String, Boolean> map = new HashMap<>();
 
             map.put("https://www.googleapis.com/auth/chat.admin.delete", false);

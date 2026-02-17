@@ -29,7 +29,10 @@ public class GoogleSlidesConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        "https://slides.googleapis.com/v1", (connection, context) -> Map.of(
+        "https://slides.googleapis.com/v1",
+        1,
+        "https://docs.bytechef.io/reference/components/google-slides_v1#connection-setup",
+        (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/drive", true,
             "https://www.googleapis.com/auth/drive.file", false,
             "https://www.googleapis.com/auth/drive.readonly", false,

@@ -30,7 +30,10 @@ public class GoogleMailConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        null, (connection, context) -> {
+        null,
+        1,
+        "https://docs.bytechef.io/reference/components/google-mail_v1#connection-setup",
+        (connection, context) -> {
             Map<String, Boolean> map = new HashMap<>();
 
             map.put("https://mail.google.com/", true);

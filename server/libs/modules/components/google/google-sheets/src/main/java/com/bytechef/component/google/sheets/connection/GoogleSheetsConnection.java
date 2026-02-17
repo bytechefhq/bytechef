@@ -29,7 +29,10 @@ public class GoogleSheetsConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        null, (connection, context) -> Map.of(
+        null,
+        1,
+        "https://docs.bytechef.io/reference/components/google-sheets_v1#connection-setup",
+        (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/drive", true,
             "https://www.googleapis.com/auth/drive.file", false,
             "https://www.googleapis.com/auth/drive.readonly", true,

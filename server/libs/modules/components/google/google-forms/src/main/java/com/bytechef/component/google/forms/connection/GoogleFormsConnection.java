@@ -29,7 +29,10 @@ public class GoogleFormsConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        "https://forms.googleapis.com/v1", (connection, context) -> Map.of(
+        "https://forms.googleapis.com/v1",
+        1,
+        "https://docs.bytechef.io/reference/components/google-forms_v1#connection-setup",
+        (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/drive", false,
             "https://www.googleapis.com/auth/drive.file", false,
             "https://www.googleapis.com/auth/drive.readonly", true,
