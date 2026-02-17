@@ -1,6 +1,7 @@
 import GlobalSearchDialog from '@/components/GlobalSearch/GlobalSearchDialog';
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
+import {useUserGuiding} from '@/hooks/useUserGuiding';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
@@ -164,6 +165,7 @@ function App() {
     const helpHub = useHelpHub();
     const location = useLocation();
     const queryClient = useQueryClient();
+    const userGuiding = useUserGuiding();
 
     useFetchInterceptor();
 
@@ -240,8 +242,10 @@ function App() {
         if (account) {
             helpHub.boot(account);
             helpHub.addRouter();
+
+            userGuiding.identify(account);
         }
-    }, [account, helpHub]);
+    }, [account, helpHub, userGuiding]);
 
     useEffect(() => {
         document.title =
@@ -253,8 +257,13 @@ function App() {
     useEffect(() => {
         if (!authenticated) {
             analytics.reset();
+
             helpHub.shutdown();
+
+            userGuiding.shutdown();
+
             resetAuthentication();
+
             queryClient.resetQueries();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
