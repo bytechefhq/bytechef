@@ -86,6 +86,9 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Form ID
+
+To find the Form ID, click [here](/reference/components/google-forms_v1#how-to-find-form-id).
 
 
 
@@ -118,6 +121,9 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Form ID
+
+To find the Form ID, click [here](/reference/components/google-forms_v1#how-to-find-form-id).
 
 
 
@@ -152,6 +158,13 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Form ID
+
+To find the Form ID, click [here](/reference/components/google-forms_v1#how-to-find-form-id).
+
+#### Find response ID
+
+To find the response ID, click [here](/reference/components/google-forms_v1#how-to-find-response-id).
 
 
 
@@ -170,7 +183,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| formId | Form | STRING | Form to watch for new responses. | true |
+| formId | Form ID | STRING | ID of the form to watch for new responses. | true |
 
 
 #### Output
@@ -202,6 +215,14 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+### How to find form ID
+
+To find a Google Form ID, open the form in edit mode and look at the URL in your browser's address bar. The ID is the long string of letters, numbers, and hyphens located between /d/ and /edit. Example: https://docs.google.com/forms/d/1234567890abcdefghijklmnopqrstuvwxyz/edit.
+
+### How to find response ID
+
+To find a Google Form response ID, open the form in edit mode and open the responses tab. Look at the URL in your browser's address bar. The response ID is the long string of letters, numbers, and hyphens located after `response=`. Example: https://docs.google.com/forms/d/1y7BeYrN3vKgPkbGMT6UYRzAFCxtjaazfvGioEy7Jppw/edit#response=ACYDBNg3TC2BppQ1hidQeFGKW1nSMue5zxOAA4A-A_cUBQ7Hn05pIXAInZ9S6jF-qw
 
 ## Troubleshooting
 
