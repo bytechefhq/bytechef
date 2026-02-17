@@ -1695,7 +1695,10 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-search-console_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,

@@ -2157,7 +2157,10 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": ""
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,

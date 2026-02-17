@@ -439,8 +439,8 @@
         "placeholder": null,
         "sampleOutput": {
           "name": "new-file.txt",
-          "mimeType": "plain/text",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -554,8 +554,8 @@
       },
       "sampleOutput": {
         "name": "new-file.txt",
-        "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "plain/text"
       }
     },
     "perform": { },
@@ -737,8 +737,8 @@
         "placeholder": null,
         "sampleOutput": {
           "name": "new-file.txt",
-          "mimeType": "plain/text",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -852,8 +852,8 @@
       },
       "sampleOutput": {
         "name": "new-file.txt",
-        "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "plain/text"
       }
     },
     "perform": { },
@@ -2282,8 +2282,8 @@
         "placeholder": null,
         "sampleOutput": {
           "name": "new-file.txt",
-          "mimeType": "plain/text",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -2397,8 +2397,8 @@
       },
       "sampleOutput": {
         "name": "new-file.txt",
-        "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "plain/text"
       }
     },
     "perform": { },
@@ -2972,8 +2972,8 @@
         "placeholder": null,
         "sampleOutput": {
           "name": "new-file.txt",
-          "mimeType": "plain/text",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -3087,8 +3087,8 @@
       },
       "sampleOutput": {
         "name": "new-file.txt",
-        "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "plain/text"
       }
     },
     "processErrorResponse": null,
@@ -3269,8 +3269,8 @@
         "placeholder": null,
         "sampleOutput": {
           "name": "new-file.txt",
-          "mimeType": "plain/text",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -3384,8 +3384,8 @@
       },
       "sampleOutput": {
         "name": "new-file.txt",
-        "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "plain/text"
       }
     },
     "processErrorResponse": null,
@@ -4808,8 +4808,8 @@
         "placeholder": null,
         "sampleOutput": {
           "name": "new-file.txt",
-          "mimeType": "plain/text",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -4923,8 +4923,8 @@
       },
       "sampleOutput": {
         "name": "new-file.txt",
-        "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "plain/text"
       }
     },
     "processErrorResponse": null,
@@ -5141,7 +5141,10 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
