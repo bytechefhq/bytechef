@@ -63,7 +63,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -336,7 +335,8 @@ public class FirecrawlCrawlAction {
 
         if (scrapeOptionsObj instanceof Map<?, ?> scrapeOptions) {
             for (Map.Entry<?, ?> entry : scrapeOptions.entrySet()) {
-                scrapeOptionsMap.put(entry.getKey().toString(), entry.getValue());
+                scrapeOptionsMap.put(entry.getKey()
+                    .toString(), entry.getValue());
             }
         }
 
