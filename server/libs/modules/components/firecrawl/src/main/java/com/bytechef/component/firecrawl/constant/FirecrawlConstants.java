@@ -21,9 +21,14 @@ package com.bytechef.component.firecrawl.constant;
  */
 public class FirecrawlConstants {
 
+    public static final String ALLOW_EXTERNAL_LINKS = "allowExternalLinks";
+    public static final String ALLOW_SUBDOMAINS = "allowSubdomains";
     public static final String BLOCK_ADS = "blockAds";
     public static final String CATEGORIES = "categories";
     public static final String COUNTRY = "country";
+    public static final String CRAWL_ENTIRE_DOMAIN = "crawlEntireDomain";
+    public static final String DELAY = "delay";
+    public static final String EXCLUDE_PATHS = "excludePaths";
     public static final String EXCLUDE_TAGS = "excludeTags";
     public static final String FORMATS = "formats";
     public static final String FORMATS_PROMPT = "formatsPrompt";
@@ -32,17 +37,22 @@ public class FirecrawlConstants {
     public static final String IGNORE_CACHE = "ignoreCache";
     public static final String IGNORE_INVALID_URLS = "ignoreInvalidURLs";
     public static final String IGNORE_QUERY_PARAMETERS = "ignoreQueryParameters";
+    public static final String INCLUDE_PATHS = "includePaths";
     public static final String INCLUDE_SUBDOMAINS = "includeSubdomains";
     public static final String INCLUDE_TAGS = "includeTags";
     public static final String LANGUAGES = "languages";
     public static final String LIMIT = "limit";
+    public static final String MAX_CONCURRENCY = "maxConcurrency";
+    public static final String MAX_DISCOVERY_DEPTH = "maxDiscoveryDepth";
     public static final String LOCATION = "location";
     public static final String MAX_AGE = "maxAge";
     public static final String MOBILE = "mobile";
     public static final String ONLY_MAIN_CONTENT = "onlyMainContent";
     public static final String PARSERS = "parsers";
+    public static final String PROMPT = "prompt";
     public static final String PROXY = "proxy";
     public static final String QUERY = "query";
+    public static final String REGEX_ON_FULL_URL = "regexOnFullURL";
     public static final String REMOVE_BASE64_IMAGES = "removeBase64Images";
     public static final String SCRAPE_OPTIONS = "scrapeOptions";
     public static final String SEARCH = "search";
@@ -54,6 +64,7 @@ public class FirecrawlConstants {
     public static final String TIMEOUT = "timeout";
     public static final String URL = "url";
     public static final String WAIT_FOR = "waitFor";
+    public static final String WEBHOOK = "webhook";
     public static final String ZERO_DATA_RETENTION = "zeroDataRetention";
 
     private FirecrawlConstants() {
