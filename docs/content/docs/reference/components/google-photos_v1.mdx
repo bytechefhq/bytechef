@@ -133,13 +133,13 @@ Type: OBJECT
 ### Get Album
 Name: getAlbum
 
-`Returns the app created album based on the specified albumId.`
+`Returns the app created album based on the specified albumId. The albumId must be the ID of an album created by your app.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| albumId | Album ID | STRING | Identifier of the album to be requested. | true |
+| albumId | Album ID | STRING | Identifier of the album to be requested. Only albums created by your app will be listed. | true |
 
 #### Example JSON Structure
 ```json
@@ -200,6 +200,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Album ID
+
+To find the Album ID, click [here](/reference/components/google-photos_v1#how-to-find-album-id)
 
 
 
@@ -212,7 +215,7 @@ Name: uploadMedia
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| albumId | Album ID | STRING | Identifier of the album where the media items are added. | true |
+| albumId | Album ID | STRING | Identifier of the album to be requested. Only albums created by your app will be listed. | true |
 | media | Media | ARRAY <details> <summary> Items </summary> [&#123;FILE_ENTRY\(fileEntry), STRING\(fileName)&#125;] </details> | Media files to upload to album. Photos and videos are supported. | true |
 
 #### Example JSON Structure
@@ -297,14 +300,30 @@ Type: OBJECT
 }
 ```
 
+#### Find Album ID
+
+To find the Album ID, click [here](/reference/components/google-photos_v1#how-to-find-album-id)
 
 
 
 
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
 <hr />
 
 # Additional Instructions
+
+### How to find Album ID
+
+Your application can only access **Album IDs for albums that were created by your app**.
+
+To retrieve these Album IDs, use the **Google Photos Library API** `albums.list` method.
+Its endpoint is `GET https://photoslibrary.googleapis.com/v1/albums`.
 
 ## Troubleshooting
 
