@@ -34,6 +34,7 @@ public class FirecrawlConstants {
     public static final String FORMATS_PROMPT = "formatsPrompt";
     public static final String FORMATS_SCHEMA = "formatsSchema";
     public static final String HEADERS = "headers";
+    public static final String ID = "id";
     public static final String IGNORE_CACHE = "ignoreCache";
     public static final String IGNORE_INVALID_URLS = "ignoreInvalidURLs";
     public static final String IGNORE_QUERY_PARAMETERS = "ignoreQueryParameters";
