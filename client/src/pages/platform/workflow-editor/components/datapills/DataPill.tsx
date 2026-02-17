@@ -1,15 +1,16 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {encodePath, transformPathForObjectAccess} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {ComponentType, DataPillDragPayloadType, PropertyAllType} from '@/shared/types';
 import {Editor} from '@tiptap/react';
+import resolvePath from 'object-resolve-path';
 import {DragEvent, MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import useDataPillPanelStore from '../../stores/useDataPillPanelStore';
-import {canInsertMentionForProperty, transformPathForObjectAccess} from '../../utils/encodingUtils';
 
 interface HandleDataPillClickProps {
     workflowNodeName: string;
@@ -29,6 +30,25 @@ interface DataPillProps {
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     sampleOutput?: any;
 }
+
+export const canInsertMentionForProperty = (
+    propertyType: string,
+    parameters: Record<string, unknown>,
+    path: string
+): boolean => {
+    if (propertyType === 'STRING') {
+        return true;
+    }
+
+    try {
+        const resolvedPath = transformPathForObjectAccess(encodePath(path));
+        const existingValue = resolvePath(parameters, resolvedPath);
+
+        return !existingValue || String(existingValue).startsWith('=');
+    } catch {
+        return true;
+    }
+};
 
 const DataPillSampleValue = ({sampleOutput}: {sampleOutput: string | number | boolean | null}) => {
     const sampleOutputString = String(sampleOutput);
@@ -155,6 +175,21 @@ const DataPill = ({
             mentionId,
         };
 
+        const target = event.currentTarget;
+        const clone = target.cloneNode(true) as HTMLDivElement;
+
+        clone.style.position = 'absolute';
+        clone.style.top = '-9999px';
+        clone.style.left = '-9999px';
+
+        document.body.appendChild(clone);
+
+        event.dataTransfer.setDragImage(clone, clone.offsetWidth / 2, clone.offsetHeight / 2);
+
+        requestAnimationFrame(() => {
+            document.body.removeChild(clone);
+        });
+
         event.dataTransfer.setData('application/bytechef-datapill', JSON.stringify(payload));
         event.dataTransfer.effectAllowed = 'copy';
 
@@ -181,11 +216,11 @@ const DataPill = ({
                     onDragEnd={handleDragEnd}
                     onDragStart={(event) => handleDragStart(event, {workflowNodeName})}
                 >
-                    <span className="mr-2" title={property?.type}>
+                    <span className="pointer-events-none mr-2" title={property?.type}>
                         {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
                     </span>
 
-                    <span>{workflowNodeName}</span>
+                    <span className="pointer-events-none">{workflowNodeName}</span>
                 </div>
 
                 {sampleOutput !== undefined && typeof sampleOutput !== 'object' && (
@@ -207,7 +242,7 @@ const DataPill = ({
                 <TooltipTrigger asChild>
                     <div
                         className={twMerge(
-                            'mr-auto flex cursor-pointer items-center rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main',
+                            'mr-auto inline-flex cursor-pointer items-center rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main',
                             !mentionInput && 'cursor-not-allowed'
                         )}
                         data-name={property?.name || workflowNodeName}
@@ -231,18 +266,18 @@ const DataPill = ({
                         }
                     >
                         {property?.name && (
-                            <span className="mr-2" title={property?.type}>
+                            <span className="pointer-events-none mr-2" title={property?.type}>
                                 {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
                             </span>
                         )}
 
                         {!property?.name && (
-                            <span className="mr-2" title={property?.type}>
+                            <span className="pointer-events-none mr-2" title={property?.type}>
                                 {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
                             </span>
                         )}
 
-                        {property?.name || '[index]'}
+                        <span className="pointer-events-none">{property?.name || '[index]'}</span>
                     </div>
                 </TooltipTrigger>
 

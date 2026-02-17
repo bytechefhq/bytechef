@@ -10,7 +10,6 @@ import {
     PATH_UNICODE_REPLACEMENT_PREFIX,
 } from '@/shared/constants';
 import isObject from 'isobject';
-import resolvePath from 'object-resolve-path';
 
 interface EncodeParametersGenericProps {
     matchPattern: RegExp;
@@ -335,18 +334,3 @@ export function transformValueForObjectAccess(value: string): string {
 export function escapeHtmlForParagraph(line: string): string {
     return line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-
-export const canInsertMentionForProperty = (
-    propertyType: string,
-    parameters: Record<string, unknown>,
-    path: string
-): boolean => {
-    if (propertyType === 'STRING') {
-        return true;
-    }
-
-    const resolvedPath = transformPathForObjectAccess(encodePath(path));
-    const existingValue = resolvePath(parameters, resolvedPath);
-
-    return !existingValue || String(existingValue).startsWith('=');
-};
