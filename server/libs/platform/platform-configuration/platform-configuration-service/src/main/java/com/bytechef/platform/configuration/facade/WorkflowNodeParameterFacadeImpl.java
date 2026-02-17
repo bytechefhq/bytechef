@@ -49,6 +49,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -920,8 +921,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     private static void removeParameter(String parameterName, List<Integer> indexes, Map<?, ?> parameterMap) {
-        for (Map.Entry<?, ?> entry : parameterMap.entrySet()) {
-            String key = (String) entry.getKey();
+        for (Object keyObj : new HashSet<>(parameterMap.keySet())) {
+            String key = (String) keyObj;
 
             if (key.equals(parameterName)) {
                 parameterMap.remove(key);
@@ -956,8 +957,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
                 if (subParameterMap.isEmpty()) {
                     parameterMap.remove(key);
-
-                    return;
                 }
             }
         }
@@ -1372,8 +1371,35 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 if (nestedMap.isEmpty()) {
                     ((Map<String, Object>) parameterMap).remove(key);
                 }
-            } else if (value instanceof List<?> list && list.isEmpty()) {
-                ((Map<String, Object>) parameterMap).remove(key);
+            } else if (value instanceof List<?> list) {
+                removeEmptyCollectionsFromList((List<Object>) list);
+
+                if (list.isEmpty()) {
+                    ((Map<String, Object>) parameterMap).remove(key);
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void removeEmptyCollectionsFromList(List<Object> list) {
+        Iterator<Object> iterator = list.iterator();
+
+        while (iterator.hasNext()) {
+            Object element = iterator.next();
+
+            if (element instanceof Map<?, ?> nestedMap) {
+                removeEmptyCollections((Map<String, ?>) nestedMap);
+
+                if (nestedMap.isEmpty()) {
+                    iterator.remove();
+                }
+            } else if (element instanceof List<?> nestedList) {
+                removeEmptyCollectionsFromList((List<Object>) nestedList);
+
+                if (nestedList.isEmpty()) {
+                    iterator.remove();
+                }
             }
         }
     }
