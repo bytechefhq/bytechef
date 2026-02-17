@@ -183,7 +183,8 @@ public class GoogleBigQueryQueryAction {
                                     .description("tart time of this query, in milliseconds since the epoch."),
                                 string("endTime")
                                     .description("End time of this query, in milliseconds since the epoch.")))))
-        .perform(GoogleBigQueryQueryAction::perform);
+        .perform(GoogleBigQueryQueryAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-bigquery_v1#query");
 
     private GoogleBigQueryQueryAction() {
     }

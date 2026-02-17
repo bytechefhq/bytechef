@@ -38,10 +38,13 @@ public class GoogleBigQueryComponentHandler implements ComponentHandler {
             "Google BigQuery is the autonomous data to AI platform, automating the entire data life cycle, from " +
                 "ingestion to AI-driven insights, so you can go from data to AI to action faster.")
         .icon("path:assets/google-bigquery.svg")
+        .customAction(true)
+        .customActionHelp("BigQuery API", "https://docs.cloud.google.com/bigquery/docs/reference/rest")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(GoogleBigQueryConnection.CONNECTION_DEFINITION)
         .clusterElements(tool(GoogleBigQueryQueryAction.ACTION_DEFINITION))
-        .actions(GoogleBigQueryQueryAction.ACTION_DEFINITION);
+        .actions(GoogleBigQueryQueryAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
