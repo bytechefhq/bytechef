@@ -81,7 +81,8 @@ public class GoogleChatCreateMessageAction {
                         string("argumentText"),
                         string("formattedText"))))
         .perform(GoogleChatCreateMessageAction::perform)
-        .processErrorResponse(GoogleUtils::processErrorResponse);
+        .processErrorResponse(GoogleUtils::processErrorResponse)
+        .help("", "https://docs.bytechef.io/reference/components/google-chat_v1#create-message");
 
     private GoogleChatCreateMessageAction() {
     }
