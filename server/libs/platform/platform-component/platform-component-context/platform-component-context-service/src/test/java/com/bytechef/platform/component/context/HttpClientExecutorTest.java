@@ -827,7 +827,7 @@ public class HttpClientExecutorTest {
 
             TestHttpResponse testHttpResponse = new TestHttpResponse(
                 "{\"key\":\"value\"}",
-                HttpHeaders.of(Map.of("content-type", List.of("application/json; charset=utf-8")), (n, v) -> true),
+                HttpHeaders.of(Map.of("content-type", List.of("application/json;charset=utf-8")), (n, v) -> true),
                 200);
 
             Http.Response response = httpClientExecutor.handleResponse(testHttpResponse, configuration, context);
@@ -844,7 +844,24 @@ public class HttpClientExecutorTest {
 
             TestHttpResponse testHttpResponse = new TestHttpResponse(
                 "<root><key>value</key></root>",
-                HttpHeaders.of(Map.of("content-type", List.of("application/xml; charset=utf-8")), (n, v) -> true),
+                HttpHeaders.of(Map.of("content-type", List.of("application/xml;charset=utf-8")), (n, v) -> true),
+                200);
+
+            Http.Response response = httpClientExecutor.handleResponse(testHttpResponse, configuration, context);
+
+            assertNotNull(response.getBody());
+            assertEquals(Map.of("key", "value"), response.getBody());
+        }
+
+        @Test
+        @DisplayName("Should parse JSON Text with charset in content-type header")
+        void testJsonTextWithCharsetInContentType() {
+            Http.Configuration configuration = Http.responseType(Http.ResponseType.JSON_TEXT)
+                .build();
+
+            TestHttpResponse testHttpResponse = new TestHttpResponse(
+                "{\"key\":\"value\"}",
+                HttpHeaders.of(Map.of("content-type", List.of("text/json;charset=UTF-8")), (n, v) -> true),
                 200);
 
             Http.Response response = httpClientExecutor.handleResponse(testHttpResponse, configuration, context);
