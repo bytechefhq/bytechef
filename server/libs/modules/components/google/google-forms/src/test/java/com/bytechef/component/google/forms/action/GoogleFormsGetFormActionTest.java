@@ -18,6 +18,7 @@ package com.bytechef.component.google.forms.action;
 
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -37,8 +38,8 @@ import org.mockito.MockedStatic;
  */
 class GoogleFormsGetFormActionTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FORM_ID, "formId"));
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Map<String, Object> map = new HashMap<>();
@@ -50,8 +51,7 @@ class GoogleFormsGetFormActionTest {
                 .when(() -> GoogleFormsUtils.getForm(stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(map);
 
-            Map<String, Object> result =
-                GoogleFormsGetFormAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            Map<String, Object> result = GoogleFormsGetFormAction.perform(mockedParameters, null, mockedActionContext);
 
             assertEquals(map, result);
             assertEquals("formId", stringArgumentCaptor.getValue());
