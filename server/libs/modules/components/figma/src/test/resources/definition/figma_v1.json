@@ -1774,7 +1774,10 @@
     "deprecated": null,
     "description": "Triggers when new comment is posted.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/figma_v1#new-comment"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newComment",
