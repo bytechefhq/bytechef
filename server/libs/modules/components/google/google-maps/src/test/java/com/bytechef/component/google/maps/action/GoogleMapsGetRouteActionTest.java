@@ -30,55 +30,60 @@ import static com.bytechef.component.google.maps.constant.GoogleMapsConstants.RO
 import static com.bytechef.component.google.maps.constant.GoogleMapsConstants.TRAVEL_MODE;
 import static com.bytechef.component.google.maps.constant.GoogleMapsConstants.UNITS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.maps.util.GoogleMapsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class GoogleMapsGetRouteActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Http.Executor.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(ORIGIN, "origin", DESTINATION, "destination", TRAVEL_MODE, "DRIVE",
             ROUTING_PREFERENCE, "TRAFFIC_UNAWARE", COMPUTE_ALT_ROUTES, false, AVOID_TOLLS, false,
             AVOID_HIGHWAYS, false, AVOID_FERRIES, false, UNITS, "METRIC"));
-    private final Response mockedResponse = mock(Response.class);
     private final Map<String, Object> responseMap = Map.of();
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
@@ -94,7 +99,10 @@ class GoogleMapsGetRouteActionTest {
             assertEquals(responseMap, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals(
-                List.of("origin", "destination", "X-Goog-FieldMask", "*"), stringArgumentCaptor.getAllValues());
+                List.of(
+                    "origin", "destination", "https://routes.googleapis.com/directions/v2:computeRoutes",
+                    "X-Goog-FieldMask", "*"),
+                stringArgumentCaptor.getAllValues());
 
             Body body = bodyArgumentCaptor.getValue();
 
@@ -119,6 +127,16 @@ class GoogleMapsGetRouteActionTest {
                 UNITS, "METRIC");
 
             assertEquals(expectedBody, body.getContent());
+
+            ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+            ResponseType responseType = configuration.getResponseType();
+
+            assertEquals(ResponseType.Type.JSON, responseType.getType());
         }
     }
 }

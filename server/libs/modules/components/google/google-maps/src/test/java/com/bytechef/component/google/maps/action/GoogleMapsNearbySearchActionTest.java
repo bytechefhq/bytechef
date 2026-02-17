@@ -22,53 +22,58 @@ import static com.bytechef.component.google.maps.constant.GoogleMapsConstants.LA
 import static com.bytechef.component.google.maps.constant.GoogleMapsConstants.LONGITUDE;
 import static com.bytechef.component.google.maps.constant.GoogleMapsConstants.RADIUS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.maps.util.GoogleMapsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class GoogleMapsNearbySearchActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Http.Executor.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(INCLUDED_TYPES, List.of("keyword"), ADDRESS, "mockedAddress", RADIUS, 0.0));
-    private final Response mockedResponse = mock(Response.class);
     private final Map<String, Object> responseMap = Map.of();
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
@@ -83,7 +88,10 @@ class GoogleMapsNearbySearchActionTest {
 
             assertEquals(responseMap, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals(List.of("mockedAddress", "X-Goog-FieldMask", "*"), stringArgumentCaptor.getAllValues());
+            assertEquals(
+                List.of(
+                    "mockedAddress", "https://places.googleapis.com/v1/places:searchNearby", "X-Goog-FieldMask", "*"),
+                stringArgumentCaptor.getAllValues());
 
             Body body = bodyArgumentCaptor.getValue();
 
@@ -97,6 +105,16 @@ class GoogleMapsNearbySearchActionTest {
                         RADIUS, 0.0)));
 
             assertEquals(expectedBody, body.getContent());
+
+            ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+            ResponseType responseType = configuration.getResponseType();
+
+            assertEquals(ResponseType.Type.JSON, responseType.getType());
         }
     }
 }
