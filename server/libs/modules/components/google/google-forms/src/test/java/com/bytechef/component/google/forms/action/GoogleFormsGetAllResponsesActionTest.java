@@ -18,6 +18,7 @@ package com.bytechef.component.google.forms.action;
 
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -38,22 +39,22 @@ import org.mockito.MockedStatic;
  */
 class GoogleFormsGetAllResponsesActionTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final List<Map<String, Object>> list = new ArrayList<>();
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FORM_ID, "formId"));
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() {
         try (MockedStatic<GoogleFormsUtils> googleFormsUtilsMockedStatic = mockStatic(GoogleFormsUtils.class)) {
             googleFormsUtilsMockedStatic
-                .when(() -> GoogleFormsUtils.getCustomResponses(contextArgumentCaptor.capture(),
-                    stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .when(() -> GoogleFormsUtils.getCustomResponses(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(list);
 
-            List<Map<String, Object>> result =
-                GoogleFormsGetAllResponsesAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            List<Map<String, Object>> result = GoogleFormsGetAllResponsesAction.perform(
+                mockedParameters, null, mockedActionContext);
 
             List<String> expectedStringArgumentCaptors = new ArrayList<>();
 

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get all responses of a form.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-forms_v1#get-all-responses"
+    },
     "metadata": null,
     "name": "getAllResponses",
     "outputDefinition": {
@@ -54,7 +57,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the information about a form.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-forms_v1#get-form"
+    },
     "metadata": null,
     "name": "getForm",
     "outputDefinition": {
@@ -102,7 +108,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the response of a form.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-forms_v1#get-response"
+    },
     "metadata": null,
     "name": "getResponse",
     "outputDefinition": {
@@ -243,14 +252,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-forms_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "Google Forms API",
+    "learnMoreUrl": "https://developers.google.com/workspace/forms/api/reference/rest"
+  },
   "description": "Google Forms is a web-based application that allows users to create surveys, quizzes, and forms for data collection and analysis, with real-time collaboration and response tracking.",
   "icon": "path:assets/google-forms.svg",
   "metadata": null,
@@ -264,7 +279,10 @@
     "deprecated": null,
     "description": "Triggers when response is submitted to Google Form.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-forms_v1#new-response"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newResponse",
@@ -280,12 +298,12 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Form to watch for new responses.",
+      "description": "ID of the form to watch for new responses.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Form",
+      "label": "Form ID",
       "languageId": null,
       "maxLength": null,
       "metadata": { },
