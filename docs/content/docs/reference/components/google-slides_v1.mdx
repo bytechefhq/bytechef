@@ -57,8 +57,8 @@ Creation of OAuth 2.0 application is documented [here](/reference/components/goo
 ## Actions
 
 
-### Create Presentation Based on Template
-Name: createPresentationBasedOnTemplate
+### Create Presentation From Template
+Name: createPresentationFromTemplate
 
 `Creates a new presentation based on an existing one and can replace any placeholder variables found in your template presentation, like [[name]], [[email]], etc.`
 
@@ -67,22 +67,24 @@ Name: createPresentationBasedOnTemplate
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileId | Template Presentation ID | STRING | The ID of the template presentation from which the new presentation will be created. | true |
-| fileName | New Presentation Name | STRING | Name of the new presentation. | true |
+| placeholderFormat | Placeholder Format | STRING <details> <summary> Options </summary> <span>&#123;&#123;&#125;&#125;</span>, <span>[[]]</span> </details> | Choose the format of placeholders in your template. | true |
+| fileName | Title of New Presentation | STRING | Name of the new presentation. | true |
 | folderId | Folder ID | STRING | ID of the folder where the new presentation will be saved. If not provided, the new presentation will be saved in the same folder as the template presentation. | false |
-| values | Values | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Don't include the "[[]]", only the key name and its value. | true |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> fileId, placeholderFormat </details> |  | null |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Create Presentation Based on Template",
-  "name" : "createPresentationBasedOnTemplate",
+  "label" : "Create Presentation From Template",
+  "name" : "createPresentationFromTemplate",
   "parameters" : {
     "fileId" : "",
+    "placeholderFormat" : "",
     "fileName" : "",
     "folderId" : "",
     "values" : { }
   },
-  "type" : "googleSlides/v1/createPresentationBasedOnTemplate"
+  "type" : "googleSlides/v1/createPresentationFromTemplate"
 }
 ```
 
@@ -92,6 +94,48 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find presentation ID
+
+To find the Presentation ID, click [here](/reference/components/google-slides_v1#how-to-find-presentation-id).
+
+#### Find folder ID
+
+To find the Presentation ID, click [here](/reference/components/google-slides_v1#how-to-find-folder-id).
+
+
+
+### Get Presentation
+Name: getPresentation
+
+`Gets the latest version of the specified presentation.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileId | Presentation ID | STRING | The ID of the presentation. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Presentation",
+  "name" : "getPresentation",
+  "parameters" : {
+    "fileId" : ""
+  },
+  "type" : "googleSlides/v1/getPresentation"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+#### Find presentation ID
+
+To find the Presentation ID, click [here](/reference/components/google-slides_v1#how-to-find-presentation-id).
 
 
 
@@ -106,6 +150,14 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+### How to find presentation ID
+
+To find a Google Presentation ID, open the presentation in edit mode and look at the URL in your browser's address bar. The ID is the long string of letters, numbers, and hyphens located between /d/ and /edit. Example: `https://docs.google.com/presentation/d/1234567890abcdefghijklmnopqrstuvwxyz/edit?slide=id.p#slide=id.p`.
+
+### How to find folder ID
+
+To find a Google Drive folder ID, open the folder in a web browser and look at the URL. The folder ID is the long string of characters (letters, numbers, and symbols) that appears after folders/ in the address bar. Example: `https://drive.google.com/drive/folders/abcjhadjh213102398890r4`
 
 ## Troubleshooting
 
