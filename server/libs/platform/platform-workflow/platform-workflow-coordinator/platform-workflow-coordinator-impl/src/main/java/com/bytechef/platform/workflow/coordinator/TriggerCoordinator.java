@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
@@ -147,20 +148,28 @@ public class TriggerCoordinator {
         WorkflowExecutionId workflowExecutionId = triggerListenerEvent.getWorkflowExecutionId();
 
         TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
-            TriggerExecution triggerExecution = TriggerExecution.builder()
-                .startDate(triggerListenerEvent.getExecutionDate())
-                .endDate(triggerListenerEvent.getExecutionDate())
-                .workflowExecutionId(workflowExecutionId)
-                .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
-                .build();
+            try {
+                TriggerExecution triggerExecution = TriggerExecution.builder()
+                    .startDate(triggerListenerEvent.getExecutionDate())
+                    .endDate(triggerListenerEvent.getExecutionDate())
+                    .workflowExecutionId(workflowExecutionId)
+                    .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
+                    .build();
 
-            triggerExecution = triggerExecutionService.create(triggerExecution);
+                triggerExecution = triggerExecutionService.create(triggerExecution);
 
-            triggerExecution.setOutput(
-                triggerFileStorage.storeTriggerExecutionOutput(
-                    Validate.notNull(triggerExecution.getId(), "id"), triggerListenerEvent.getOutput()));
+                triggerExecution.setOutput(
+                    triggerFileStorage.storeTriggerExecutionOutput(
+                        Validate.notNull(triggerExecution.getId(), "id"), triggerListenerEvent.getOutput()));
 
-            handleTriggerExecutionCompletion(triggerExecution);
+                handleTriggerExecutionCompletion(triggerExecution);
+            } catch (IllegalArgumentException | ConfigurationException exception) {
+                logger.warn(
+                    "Cancelling orphaned schedule trigger for workflowExecutionId='{}': {}",
+                    workflowExecutionId, exception.getMessage());
+
+                triggerScheduler.cancelScheduleTrigger(workflowExecutionId.toString());
+            }
         });
     }
 
@@ -193,10 +202,10 @@ public class TriggerCoordinator {
                         triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
                         triggerExecution.getWorkflowExecutionId());
                 }
-            } catch (IllegalArgumentException illegalArgumentException) {
+            } catch (IllegalArgumentException | ConfigurationException exception) {
                 logger.warn(
                     "Cancelling orphaned polling trigger for workflowExecutionId='{}': {}",
-                    workflowExecutionId, illegalArgumentException.getMessage());
+                    workflowExecutionId, exception.getMessage());
 
                 triggerScheduler.cancelPollingTrigger(workflowExecutionId.toString());
             }
@@ -216,19 +225,27 @@ public class TriggerCoordinator {
         WorkflowExecutionId workflowExecutionId = triggerWebhookEvent.getWorkflowExecutionId();
 
         TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
-            TriggerExecution triggerExecution = TriggerExecution.builder()
-                .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, triggerWebhookEvent.getWebhookRequest()))
-                .workflowExecutionId(workflowExecutionId)
-                .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
-                .build();
+            try {
+                TriggerExecution triggerExecution = TriggerExecution.builder()
+                    .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, triggerWebhookEvent.getWebhookRequest()))
+                    .workflowExecutionId(workflowExecutionId)
+                    .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
+                    .build();
 
-            dispatch(triggerExecution);
+                dispatch(triggerExecution);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "Webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
-                    triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
-                    triggerExecution.getWorkflowExecutionId());
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                        "Webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
+                        triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
+                        triggerExecution.getWorkflowExecutionId());
+                }
+            } catch (IllegalArgumentException | ConfigurationException exception) {
+                logger.warn(
+                    "Cancelling orphaned dynamic webhook trigger refresh for workflowExecutionId='{}': {}",
+                    workflowExecutionId, exception.getMessage());
+
+                triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
             }
         });
     }
