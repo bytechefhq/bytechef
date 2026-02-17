@@ -37,11 +37,13 @@ public class GooglePhotosGetAlbumAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getAlbum")
         .title("Get Album")
-        .description("Returns the app created album based on the specified albumId.")
+        .description(
+            "Returns the app created album based on the specified albumId. The albumId must be the ID of an album " +
+                "created by your app.")
         .properties(
             string(ALBUM_ID)
                 .label("Album ID")
-                .description("Identifier of the album to be requested.")
+                .description("Identifier of the album to be requested. Only albums created by your app will be listed.")
                 .options((OptionsFunction<String>) GooglePhotosUtils::getAlbumIdOptions)
                 .required(true))
         .output(outputSchema(ALBUM_OUTPUT_PROPERTY))
