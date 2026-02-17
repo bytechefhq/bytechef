@@ -41,6 +41,7 @@ public class GoogleFormsGetResponseAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getResponse")
         .title("Get Response")
         .description("Get the response of a form.")
+        .help("", "https://docs.bytechef.io/reference/components/google-forms_v1#get-response")
         .properties(
             string(FORM_ID)
                 .label("Form ID")

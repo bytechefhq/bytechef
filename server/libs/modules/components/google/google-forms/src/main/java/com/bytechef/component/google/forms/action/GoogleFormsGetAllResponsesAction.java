@@ -37,6 +37,7 @@ public class GoogleFormsGetAllResponsesAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getAllResponses")
         .title("Get All Responses")
         .description("Get all responses of a form.")
+        .help("", "https://docs.bytechef.io/reference/components/google-forms_v1#get-all-responses")
         .properties(
             string(FORM_ID)
                 .label("Form ID")

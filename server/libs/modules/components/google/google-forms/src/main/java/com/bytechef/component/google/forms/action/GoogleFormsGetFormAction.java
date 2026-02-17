@@ -36,6 +36,7 @@ public class GoogleFormsGetFormAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getForm")
         .title("Get Form")
         .description("Get the information about a form.")
+        .help("", "https://docs.bytechef.io/reference/components/google-forms_v1#get-form")
         .properties(
             string(FORM_ID)
                 .label("Form ID")
