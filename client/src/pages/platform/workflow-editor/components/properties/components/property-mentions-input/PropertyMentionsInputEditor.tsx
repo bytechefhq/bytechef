@@ -1,12 +1,12 @@
 import Button from '@/components/Button/Button';
 import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
+import {canInsertMentionForProperty} from '@/pages/platform/workflow-editor/components/datapills/DataPill';
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {
-    canInsertMentionForProperty,
     encodeParameters,
     encodePath,
     escapeHtmlForParagraph,
@@ -466,6 +466,66 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
         }, []);
 
+        const editorRef = useRef<Editor | null>(null);
+
+        const handleDrop = useCallback(
+            (view: EditorView, event: DragEvent, _slice: unknown, moved: boolean): boolean => {
+                if (moved) {
+                    return false;
+                }
+
+                if (isFromAi) {
+                    return false;
+                }
+
+                const rawPayload = event.dataTransfer?.getData('application/bytechef-datapill');
+
+                if (!rawPayload) {
+                    return false;
+                }
+
+                event.preventDefault();
+
+                let payload: DataPillDragPayloadType;
+
+                try {
+                    payload = JSON.parse(rawPayload);
+                } catch {
+                    return false;
+                }
+
+                if (!payload?.mentionId) {
+                    return false;
+                }
+
+                const attributes = view.props.attributes as Record<string, string>;
+                const parameters = currentComponent?.parameters || {};
+
+                if (!canInsertMentionForProperty(attributes.type, parameters, attributes.path)) {
+                    return true;
+                }
+
+                const coordinates = view.posAtCoords({
+                    left: event.clientX,
+                    top: event.clientY,
+                });
+
+                const insertPosition = coordinates?.pos ?? view.state.doc.content.size;
+
+                editorRef.current
+                    ?.chain()
+                    .insertContentAt(insertPosition, {
+                        attrs: {id: payload.mentionId},
+                        type: 'mention',
+                    })
+                    .focus()
+                    .run();
+
+                return true;
+            },
+            [currentComponent?.parameters, isFromAi]
+        );
+
         const editor = useEditor({
             coreExtensionOptions: {
                 clipboardTextSerializer: {
@@ -487,60 +547,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     type: type ?? '',
                 },
                 handleClick: (view, pos) => moveCursorToEnd(view, pos),
-                handleDrop: (view: EditorView, event: DragEvent, _slice, moved: boolean) => {
-                    if (moved) {
-                        return false;
-                    }
-
-                    if (isFromAi) {
-                        return false;
-                    }
-
-                    const rawPayload = event.dataTransfer?.getData('application/bytechef-datapill');
-
-                    if (!rawPayload) {
-                        return false;
-                    }
-
-                    event.preventDefault();
-
-                    let payload: DataPillDragPayloadType;
-
-                    try {
-                        payload = JSON.parse(rawPayload);
-                    } catch {
-                        return false;
-                    }
-
-                    if (!payload?.mentionId) {
-                        return false;
-                    }
-
-                    const attributes = view.props.attributes as Record<string, string>;
-                    const parameters = currentComponent?.parameters || {};
-
-                    if (!canInsertMentionForProperty(attributes.type, parameters, attributes.path)) {
-                        return true;
-                    }
-
-                    const coordinates = view.posAtCoords({
-                        left: event.clientX,
-                        top: event.clientY,
-                    });
-
-                    const insertPosition = coordinates?.pos ?? view.state.doc.content.size;
-
-                    editor
-                        ?.chain()
-                        .insertContentAt(insertPosition, {
-                            attrs: {id: payload.mentionId},
-                            type: 'mention',
-                        })
-                        .focus()
-                        .run();
-
-                    return true;
-                },
+                handleDrop,
                 handleKeyPress: (editor: EditorView, event: KeyboardEvent) => {
                     const isEditorEmpty = editor.state.doc.textContent.length === 0;
 
@@ -577,6 +584,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         );
 
         // Sync ref when editor changes - handle both callback and object refs
+        useEffect(() => {
+            editorRef.current = editor;
+        }, [editor]);
+
         useEffect(() => {
             if (!ref) {
                 return;

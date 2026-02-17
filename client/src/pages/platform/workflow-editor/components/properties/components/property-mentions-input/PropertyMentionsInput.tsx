@@ -82,7 +82,6 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         ref: ForwardedRef<Editor>
     ) => {
         const [isFocused, setIsFocused] = useState(false);
-        const [isDragOver, setIsDragOver] = useState(false);
         const isInitialLoadRef = useRef(true);
         const localEditorRef = useRef<Editor | null>(null);
 
@@ -103,12 +102,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             }))
         );
 
-        const {isDraggingDataPill, setDataPillPanelOpen} = useDataPillPanelStore(
-            useShallow((state) => ({
-                isDraggingDataPill: state.isDraggingDataPill,
-                setDataPillPanelOpen: state.setDataPillPanelOpen,
-            }))
-        );
+        const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
 
         const onFocus = (editor: Editor) => {
             setFocusedInput(editor);
@@ -159,25 +153,13 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             if (event.dataTransfer.types.includes('application/bytechef-datapill')) {
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'copy';
-                setIsDragOver(true);
             }
         }, []);
 
         const handleDragEnter = useCallback((event: DragEvent<HTMLDivElement>) => {
             if (event.dataTransfer.types.includes('application/bytechef-datapill')) {
                 event.preventDefault();
-                setIsDragOver(true);
             }
-        }, []);
-
-        const handleDragLeave = useCallback((event: DragEvent<HTMLDivElement>) => {
-            if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-                setIsDragOver(false);
-            }
-        }, []);
-
-        const handleDrop = useCallback(() => {
-            setIsDragOver(false);
         }, []);
 
         // Ensure localEditorRef stays in sync with parent ref
@@ -209,8 +191,6 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                 isInitialLoadRef.current = false;
             }
         }, [value, defaultValue, setIsFormulaMode]);
-
-        const showDropHighlight = isDraggingDataPill && isDragOver;
 
         return (
             <fieldset className={twMerge('w-full', label && 'space-y-1')}>
@@ -273,14 +253,11 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                     className={twMerge(
                         'flex items-center rounded-md border-gray-200 shadow-sm transition-colors',
                         isFocused && 'ring-2 ring-blue-500',
-                        showDropHighlight && 'bg-success/10 ring-2 ring-success',
                         label && 'mt-1',
                         leadingIcon && 'relative rounded-md border'
                     )}
                     onDragEnter={handleDragEnter}
-                    onDragLeave={handleDragLeave}
                     onDragOver={handleDragOver}
-                    onDrop={handleDrop}
                     title={controlType}
                 >
                     {leadingIcon && (
