@@ -50,6 +50,8 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -247,7 +249,7 @@ public class FirecrawlScrapeAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<?> formatsList = inputParameters.getList(FORMATS);
-        Map<String, Object> formatMap = new HashMap<>();
+        List<Object> formatObjectList = new ArrayList<>();
 
         for (Object format : formatsList) {
             Map<String, Object> jsonSchemaMap = new HashMap<>();
@@ -258,7 +260,7 @@ public class FirecrawlScrapeAction {
                 jsonSchemaMap.put("prompt", inputParameters.get(FORMATS_PROMPT));
             }
 
-            formatMap.put(format.toString(), jsonSchemaMap);
+            formatObjectList.add(jsonSchemaMap);
         }
 
         return context
@@ -266,7 +268,7 @@ public class FirecrawlScrapeAction {
             .body(
                 Http.Body.of(
                     URL, inputParameters.getRequiredString(URL),
-                    FORMATS, formatMap,
+                    FORMATS, formatObjectList,
                     ONLY_MAIN_CONTENT, inputParameters.getBoolean(ONLY_MAIN_CONTENT),
                     INCLUDE_TAGS, inputParameters.getList(INCLUDE_TAGS),
                     EXCLUDE_TAGS, inputParameters.getList(EXCLUDE_TAGS),
