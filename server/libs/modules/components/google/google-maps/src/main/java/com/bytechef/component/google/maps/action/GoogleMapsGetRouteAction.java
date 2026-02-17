@@ -130,7 +130,8 @@ public class GoogleMapsGetRouteAction {
                             .items(ROUTE_PROPERTY),
                         FALLBACK_INFO_PROPERTY,
                         GEOCODING_RESULTS_PROPERTY)))
-        .perform(GoogleMapsGetRouteAction::perform);
+        .perform(GoogleMapsGetRouteAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-maps_v1#get-route");
 
     private GoogleMapsGetRouteAction() {
     }
