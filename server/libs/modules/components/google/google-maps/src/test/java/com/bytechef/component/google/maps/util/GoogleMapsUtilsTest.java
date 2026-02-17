@@ -20,42 +20,45 @@ import static com.bytechef.component.google.maps.constant.GoogleMapsConstants.AD
 import static com.bytechef.component.google.maps.constant.GoogleMapsConstants.LATITUDE;
 import static com.bytechef.component.google.maps.constant.GoogleMapsConstants.LONGITUDE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class GoogleMapsUtilsTest {
 
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Http.Executor.class);
-    private final Response mockedResponse = mock(Response.class);
     private final Map<String, Object> responseMap = Map.of(
         "results", List.of(Map.of("geometry", Map.of("location", Map.of("lat", 0.0, "lng", 0.0)))));
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void geocodeHttpRequest() {
-        when(mockedContext.http(any()))
+    void geocodeHttpRequest(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
@@ -64,21 +67,33 @@ class GoogleMapsUtilsTest {
         Map<String, Object> result = GoogleMapsUtils.geocodeHttpRequest(mockedContext, mockedKey, mockedValue);
 
         assertEquals(responseMap, result);
-        assertEquals(List.of(mockedKey, mockedValue), stringArgumentCaptor.getAllValues());
+        assertEquals(
+            List.of("https://maps.googleapis.com/maps/api/geocode/json", mockedKey, mockedValue),
+            stringArgumentCaptor.getAllValues());
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
     }
 
     @Test
-    void testGetAddressGeolocation() {
+    void testGetAddressGeolocation(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         String urlEncodedAddress = "urlEncodedAddress";
 
-        when(mockedContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
         when(mockedContext.encoder(any()))
@@ -88,6 +103,18 @@ class GoogleMapsUtilsTest {
         Map<String, Object> expected = Map.of(LATITUDE, 0.0, LONGITUDE, 0.0);
 
         assertEquals(expected, result);
-        assertEquals(List.of(ADDRESS, urlEncodedAddress), stringArgumentCaptor.getAllValues());
+        assertEquals(
+            List.of("https://maps.googleapis.com/maps/api/geocode/json", ADDRESS, urlEncodedAddress),
+            stringArgumentCaptor.getAllValues());
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
     }
 }
