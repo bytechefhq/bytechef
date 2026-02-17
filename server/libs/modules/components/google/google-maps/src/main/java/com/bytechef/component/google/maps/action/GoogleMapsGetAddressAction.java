@@ -47,7 +47,8 @@ public class GoogleMapsGetAddressAction {
                 .description("Longitude of the geolocation.")
                 .required(true))
         .output(outputSchema(GEOCODING_RESPONSE_PROPERTY))
-        .perform(GoogleMapsGetAddressAction::perform);
+        .perform(GoogleMapsGetAddressAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-maps_v1#get-address");
 
     private GoogleMapsGetAddressAction() {
     }

@@ -43,6 +43,9 @@ public class GoogleMapsComponentHandler implements ComponentHandler {
         .icon("path:assets/google-maps.svg")
         .categories(ComponentCategory.HELPERS)
         .connection(GoogleMapsConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp(
+            "Google Maps Platform Documentation", "https://developers.google.com/maps/documentation")
         .clusterElements(
             tool(GoogleMapsGetAddressAction.ACTION_DEFINITION),
             tool(GoogleMapsGetGeolocationAction.ACTION_DEFINITION),
@@ -52,7 +55,8 @@ public class GoogleMapsComponentHandler implements ComponentHandler {
             GoogleMapsGetAddressAction.ACTION_DEFINITION,
             GoogleMapsGetGeolocationAction.ACTION_DEFINITION,
             GoogleMapsGetRouteAction.ACTION_DEFINITION,
-            GoogleMapsNearbySearchAction.ACTION_DEFINITION);
+            GoogleMapsNearbySearchAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

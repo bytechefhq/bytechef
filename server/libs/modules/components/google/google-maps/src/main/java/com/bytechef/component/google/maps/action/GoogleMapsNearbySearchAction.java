@@ -68,7 +68,8 @@ public class GoogleMapsNearbySearchAction {
                 .maxValue(50000.0)
                 .required(true))
         .output()
-        .perform(GoogleMapsNearbySearchAction::perform);
+        .perform(GoogleMapsNearbySearchAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-maps_v1#nearby-search");
 
     private GoogleMapsNearbySearchAction() {
     }

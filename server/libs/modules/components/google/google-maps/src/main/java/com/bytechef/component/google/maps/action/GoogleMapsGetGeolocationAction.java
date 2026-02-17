@@ -42,7 +42,8 @@ public class GoogleMapsGetGeolocationAction {
                 .description("Specify address you want geolocation of.")
                 .required(true))
         .output(outputSchema(GEOCODING_RESPONSE_PROPERTY))
-        .perform(GoogleMapsGetGeolocationAction::perform);
+        .perform(GoogleMapsGetGeolocationAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-maps_v1#get-geolocation");
 
     private GoogleMapsGetGeolocationAction() {
     }
