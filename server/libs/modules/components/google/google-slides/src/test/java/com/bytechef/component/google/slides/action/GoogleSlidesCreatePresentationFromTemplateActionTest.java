@@ -41,7 +41,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Kušter
  */
-class GoogleSlidesCreatePresentationBasedOnTemplateActionTest {
+class GoogleSlidesCreatePresentationFromTemplateActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
@@ -67,13 +67,12 @@ class GoogleSlidesCreatePresentationBasedOnTemplateActionTest {
             .thenReturn(mockedObject);
 
         try (MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class)) {
-
             googleUtilsMockedStatic
                 .when(() -> GoogleUtils.copyFileOnGoogleDrive(
                     parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
                 .thenReturn(new File().setId("destinationFile"));
 
-            Object result = GoogleSlidesCreatePresentationBasedOnTemplateAction.perform(mockedParameters,
+            Object result = GoogleSlidesCreatePresentationFromTemplateAction.perform(mockedParameters,
                 mockedParameters, mockedActionContext);
 
             assertEquals(mockedObject, result);
