@@ -29,7 +29,10 @@ public class GoogleDocsConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        null, (connection, context) -> Map.of(
+        null,
+        1,
+        "https://docs.bytechef.io/reference/components/google-docs_v1#connection-setup",
+        (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/documents", true,
             "https://www.googleapis.com/auth/documents.readonly", false,
             "https://www.googleapis.com/auth/drive", true,

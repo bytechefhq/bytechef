@@ -30,7 +30,10 @@ public class GoogleCalendarConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        null, (connection, context) -> {
+        null,
+        1,
+        "https://docs.bytechef.io/reference/components/google-calendar_v1#connection-setup",
+        (connection, context) -> {
             Map<String, Boolean> map = new HashMap<>();
 
             map.put("https://www.googleapis.com/auth/calendar", false);

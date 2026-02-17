@@ -29,7 +29,10 @@ public class GoogleWorkspaceAdminConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        "", (connection, context) -> Map.of(
+        null,
+        1,
+        "https://docs.bytechef.io/reference/components/google-workspace-admin_v1#connection-setup",
+        (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/admin.directory.user", true,
             "https://www.googleapis.com/auth/admin.directory.rolemanagement", true,
             "https://www.googleapis.com/auth/apps.licensing", true));

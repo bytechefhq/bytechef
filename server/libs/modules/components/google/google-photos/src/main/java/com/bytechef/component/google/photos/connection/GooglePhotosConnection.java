@@ -26,7 +26,10 @@ import java.util.Map;
 public class GooglePhotosConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        "https://photoslibrary.googleapis.com/v1", (connection, context) -> Map.of(
+        "https://photoslibrary.googleapis.com/v1",
+        1,
+        "https://docs.bytechef.io/reference/components/google-photos_v1#connection-setup",
+        (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/photoslibrary", false,
             "https://www.googleapis.com/auth/photoslibrary.appendonly", true,
             "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata", true,

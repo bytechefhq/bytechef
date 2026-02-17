@@ -27,6 +27,8 @@ public class GoogleBigQueryConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         "https://bigquery.googleapis.com/bigquery/v2",
+        1,
+        "https://docs.bytechef.io/reference/components/google-bigquery_v1#connection-setup",
         (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/bigquery", true,
             "https://www.googleapis.com/auth/bigquery.insertdata", false,

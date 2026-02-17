@@ -36,6 +36,8 @@ public class GoogleSearchConsoleComponentHandler extends AbstractGoogleSearchCon
 
         return GoogleConnection.createConnection(
             "https://searchconsole.googleapis.com/webmasters/v3",
+            1,
+            "https://docs.bytechef.io/reference/components/google-search-console_v1#connection-setup",
             (connection, context) -> Map.of(
                 "https://www.googleapis.com/auth/webmasters", true,
                 "https://www.googleapis.com/auth/webmasters.readonly", false));

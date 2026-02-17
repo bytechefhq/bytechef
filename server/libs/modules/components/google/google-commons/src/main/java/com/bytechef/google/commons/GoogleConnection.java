@@ -22,8 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization.ScopesFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
 import java.util.Map;
@@ -33,9 +33,12 @@ import java.util.Map;
  */
 public class GoogleConnection {
 
-    public static ModifiableConnectionDefinition createConnection(String baseUri, Authorization.ScopesFunction scopes) {
+    public static ModifiableConnectionDefinition createConnection(
+        String baseUri, int version, String helpLink, ScopesFunction scopes) {
+
         return connection()
             .baseUri((connectionParameters, context) -> baseUri)
+            .help("", helpLink)
             .authorizations(
                 authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                     .title("OAuth2 Authorization Code")
@@ -52,6 +55,7 @@ public class GoogleConnection {
                     .refreshUrl((connectionParameters, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL)
                     .refreshOn(401, "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$")
                     .scopes(scopes)
-                    .tokenUrl((connection, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL));
+                    .tokenUrl((connection, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL))
+            .version(version);
     }
 }
