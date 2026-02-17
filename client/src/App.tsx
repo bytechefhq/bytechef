@@ -169,6 +169,7 @@ function App() {
 
     useFetchInterceptor();
 
+    const ff_298 = useFeatureFlagsStore()('ff-298');
     const ff_732 = useFeatureFlagsStore()('ff-732');
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
@@ -243,9 +244,11 @@ function App() {
             helpHub.boot(account);
             helpHub.addRouter();
 
-            userGuiding.identify(account);
+            if (ff_298) {
+                userGuiding.identify(account);
+            }
         }
-    }, [account, helpHub, userGuiding]);
+    }, [account, ff_298, helpHub, userGuiding]);
 
     useEffect(() => {
         document.title =
@@ -260,7 +263,9 @@ function App() {
 
             helpHub.shutdown();
 
-            userGuiding.shutdown();
+            if (ff_298) {
+                userGuiding.shutdown();
+            }
 
             resetAuthentication();
 
