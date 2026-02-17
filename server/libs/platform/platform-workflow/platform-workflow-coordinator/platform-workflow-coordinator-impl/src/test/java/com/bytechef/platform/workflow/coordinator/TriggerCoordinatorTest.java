@@ -160,6 +160,29 @@ class TriggerCoordinatorTest {
     }
 
     @Test
+    void testOnTriggerListenerEventCancelsOrphanedTriggerOnConfigurationException() {
+        TenantContext.setCurrentTenantId("test-tenant");
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
+
+        when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(PlatformType.AUTOMATION))
+            .thenReturn(jobPrincipalAccessor);
+        when(jobPrincipalAccessor.getWorkflowId(1L, "workflow-uuid"))
+            .thenReturn("workflow-id");
+        when(workflowService.getWorkflow("workflow-id"))
+            .thenThrow(new ConfigurationException("Workflow not found", WorkflowErrorType.WORKFLOW_NOT_FOUND));
+
+        TriggerListenerEvent triggerListenerEvent = new TriggerListenerEvent(
+            new TriggerListenerEvent.ListenerParameters(workflowExecutionId, Instant.now(), "output"));
+
+        triggerCoordinator.onTriggerListenerEvent(triggerListenerEvent);
+
+        verify(triggerScheduler).cancelScheduleTrigger(workflowExecutionId.toString());
+        verifyNoInteractions(triggerExecutionService);
+    }
+
+    @Test
     void testOnTriggerWebhookEventCancelsOrphanedTriggerOnIllegalArgumentException() {
         TenantContext.setCurrentTenantId("test-tenant");
 
@@ -170,6 +193,29 @@ class TriggerCoordinatorTest {
             .thenReturn(jobPrincipalAccessor);
         when(jobPrincipalAccessor.getWorkflowId(1L, "workflow-uuid"))
             .thenThrow(new IllegalArgumentException("ProjectWorkflow not found"));
+
+        TriggerWebhookEvent triggerWebhookEvent = new TriggerWebhookEvent(
+            new TriggerWebhookEvent.WebhookParameters(workflowExecutionId, webhookRequest));
+
+        triggerCoordinator.onTriggerWebhookEvent(triggerWebhookEvent);
+
+        verify(triggerScheduler).cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
+        verifyNoInteractions(triggerDispatcher);
+    }
+
+    @Test
+    void testOnTriggerWebhookEventCancelsOrphanedTriggerOnConfigurationException() {
+        TenantContext.setCurrentTenantId("test-tenant");
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
+
+        when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(PlatformType.AUTOMATION))
+            .thenReturn(jobPrincipalAccessor);
+        when(jobPrincipalAccessor.getWorkflowId(1L, "workflow-uuid"))
+            .thenReturn("workflow-id");
+        when(workflowService.getWorkflow("workflow-id"))
+            .thenThrow(new ConfigurationException("Workflow not found", WorkflowErrorType.WORKFLOW_NOT_FOUND));
 
         TriggerWebhookEvent triggerWebhookEvent = new TriggerWebhookEvent(
             new TriggerWebhookEvent.WebhookParameters(workflowExecutionId, webhookRequest));
