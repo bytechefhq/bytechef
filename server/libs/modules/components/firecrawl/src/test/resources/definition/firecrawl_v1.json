@@ -266,20 +266,12 @@
         "value": "markdown"
       }, {
         "description": null,
-        "label": "Summary",
-        "value": "summary"
-      }, {
-        "description": null,
         "label": "HTML",
         "value": "html"
       }, {
         "description": null,
         "label": "Raw HTML",
         "value": "rawHtml"
-      }, {
-        "description": null,
-        "label": "Images",
-        "value": "images"
       }, {
         "description": null,
         "label": "Links",
@@ -7344,20 +7336,12 @@
         "value": "markdown"
       }, {
         "description": null,
-        "label": "Summary",
-        "value": "summary"
-      }, {
-        "description": null,
         "label": "HTML",
         "value": "html"
       }, {
         "description": null,
         "label": "Raw HTML",
         "value": "rawHtml"
-      }, {
-        "description": null,
-        "label": "Images",
-        "value": "images"
       }, {
         "description": null,
         "label": "Links",

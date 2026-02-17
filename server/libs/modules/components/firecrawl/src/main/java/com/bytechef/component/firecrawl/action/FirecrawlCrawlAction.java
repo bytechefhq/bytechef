@@ -86,10 +86,8 @@ public class FirecrawlCrawlAction {
                 .items(string())
                 .options(List.of(
                     option("Markdown", "markdown"),
-                    option("Summary", "summary"),
                     option("HTML", "html"),
                     option("Raw HTML", "rawHtml"),
-                    option("Images", "images"),
                     option("Links", "links")))
                 .required(false),
             string(PROMPT)
