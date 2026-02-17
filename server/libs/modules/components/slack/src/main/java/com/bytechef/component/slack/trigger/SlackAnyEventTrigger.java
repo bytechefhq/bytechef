@@ -40,6 +40,7 @@ public class SlackAnyEventTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("anyEvent")
         .title("Any Event")
         .description("Triggers when any user subscribed event happens.")
+        .help("", "https://docs.bytechef.io/reference/components/slack_v1#any-event")
         .type(TriggerType.STATIC_WEBHOOK)
         .output()
         .webhookRequest(SlackAnyEventTrigger::webhookRequest)
