@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.firecrawl.action.FirecrawlCrawlAction;
 import com.bytechef.component.firecrawl.action.FirecrawlMapAction;
 import com.bytechef.component.firecrawl.action.FirecrawlScrapeAction;
 import com.bytechef.component.firecrawl.action.FirecrawlSearchAction;
@@ -41,10 +42,12 @@ public class FirecrawlComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.HELPERS, ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(FirecrawlConnection.CONNECTION_DEFINITION)
         .actions(
+            FirecrawlCrawlAction.ACTION_DEFINITION,
             FirecrawlMapAction.ACTION_DEFINITION,
             FirecrawlScrapeAction.ACTION_DEFINITION,
             FirecrawlSearchAction.ACTION_DEFINITION)
         .clusterElements(
+            tool(FirecrawlCrawlAction.ACTION_DEFINITION),
             tool(FirecrawlMapAction.ACTION_DEFINITION),
             tool(FirecrawlScrapeAction.ACTION_DEFINITION),
             tool(FirecrawlSearchAction.ACTION_DEFINITION))
