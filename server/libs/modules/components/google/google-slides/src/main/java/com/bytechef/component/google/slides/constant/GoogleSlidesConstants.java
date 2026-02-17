@@ -25,5 +25,6 @@ public class GoogleSlidesConstants {
     }
 
     public static final String NAME = "name";
+    public static final String PLACEHOLDER_FORMAT = "placeholderFormat";
     public static final String VALUES = "values";
 }

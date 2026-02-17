@@ -23,7 +23,7 @@ import static com.bytechef.component.google.slides.connection.GoogleSlidesConnec
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.google.slides.action.GoogleSlidesCreatePresentationBasedOnTemplateAction;
+import com.bytechef.component.google.slides.action.GoogleSlidesCreatePresentationFromTemplateAction;
 import com.google.auto.service.AutoService;
 
 /**
@@ -42,8 +42,8 @@ public class GoogleSlidesComponentHandler implements ComponentHandler {
         .icon("path:assets/google-slides.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(CONNECTION_DEFINITION)
-        .actions(GoogleSlidesCreatePresentationBasedOnTemplateAction.ACTION_DEFINITION)
-        .clusterElements(tool(GoogleSlidesCreatePresentationBasedOnTemplateAction.ACTION_DEFINITION))
+        .actions(GoogleSlidesCreatePresentationFromTemplateAction.ACTION_DEFINITION)
+        .clusterElements(tool(GoogleSlidesCreatePresentationFromTemplateAction.ACTION_DEFINITION))
         .version(1);
 
     @Override
