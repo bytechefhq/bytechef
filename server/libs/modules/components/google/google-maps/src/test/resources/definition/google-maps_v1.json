@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get address from inputted geolocation.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-maps_v1#get-address"
+    },
     "metadata": null,
     "name": "getAddress",
     "outputDefinition": {
@@ -1458,7 +1461,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get geolocation of address.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-maps_v1#get-geolocation"
+    },
     "metadata": null,
     "name": "getGeolocation",
     "outputDefinition": {
@@ -2887,7 +2893,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get route between inputted origin and destination.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-maps_v1#get-route"
+    },
     "metadata": null,
     "name": "getRoute",
     "outputDefinition": {
@@ -14238,7 +14247,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Action takes one or more place types, and returns a list of matching places within the specified area.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-maps_v1#nearby-search"
+    },
     "metadata": null,
     "name": "nearbySearch",
     "outputDefinition": {
@@ -28729,14 +28741,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-maps_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "Google Maps Platform Documentation",
+    "learnMoreUrl": "https://developers.google.com/maps/documentation"
+  },
   "description": "Google Maps is a widely used mapping service by Google, offering free and feature-rich navigation, location discovery, and real-time traffic updates accessible through web browsers and mobile apps.",
   "icon": "path:assets/google-maps.svg",
   "metadata": null,
