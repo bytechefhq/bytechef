@@ -92,6 +92,7 @@ const Login = () => {
         if (account) {
             analytics.identify(account);
         } else {
+            setMfaCode('');
             setMfaError(true);
         }
 
@@ -220,6 +221,7 @@ const Login = () => {
 
                         <fieldset className="space-y-2 border-0 p-0">
                             <Input
+                                aria-label="MFA verification code"
                                 autoFocus
                                 inputMode="numeric"
                                 maxLength={6}

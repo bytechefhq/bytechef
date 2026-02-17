@@ -168,29 +168,40 @@ export const authenticationStore = createStore<AuthenticationI>()(
             },
 
             verifyMfa: async (code: string): Promise<UserI | undefined> => {
-                const response = await fetch('/api/mfa/verify', {
-                    body: JSON.stringify({code}),
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
-                    },
-                    method: 'POST',
-                });
+                try {
+                    const response = await fetch('/api/mfa/verify', {
+                        body: JSON.stringify({code}),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+                        },
+                        method: 'POST',
+                    });
 
-                if (response.status === 200) {
-                    set((state) => ({
-                        ...state,
-                        mfaRequired: false,
-                    }));
+                    if (response.status === 200) {
+                        set((state) => ({
+                            ...state,
+                            mfaRequired: false,
+                        }));
 
-                    const {getAccount} = get();
+                        const {getAccount} = get();
 
-                    return getAccount();
-                } else {
+                        return getAccount();
+                    } else {
+                        set((state) => ({
+                            ...state,
+                            loginError: true,
+                        }));
+
+                        return undefined;
+                    }
+                } catch {
                     set((state) => ({
                         ...state,
                         loginError: true,
                     }));
+
+                    return undefined;
                 }
             },
 
