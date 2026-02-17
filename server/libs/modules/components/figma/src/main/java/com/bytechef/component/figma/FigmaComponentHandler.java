@@ -79,6 +79,7 @@ public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
+        modifiableConnectionDefinition.version(1);
         modifiableConnectionDefinition.help("",
             "https://docs.bytechef.io/reference/components/figma_v1#connection-setup");
 

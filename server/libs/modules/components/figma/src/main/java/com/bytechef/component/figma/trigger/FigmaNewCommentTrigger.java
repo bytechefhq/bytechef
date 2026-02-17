@@ -47,6 +47,7 @@ public class FigmaNewCommentTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newComment")
         .title("New Comment")
         .description("Triggers when new comment is posted.")
+        .help("", "https://docs.bytechef.io/reference/components/figma_v1#new-comment")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(TEAM_ID)
