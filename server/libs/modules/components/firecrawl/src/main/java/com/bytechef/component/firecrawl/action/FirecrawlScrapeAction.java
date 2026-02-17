@@ -50,7 +50,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
