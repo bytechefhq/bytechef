@@ -31,7 +31,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 public class GooglePhotosConstants {
 
     public static final String ALBUM_ID = "albumId";
-    public static final String FILE_BINARY = "fileBinary";
     public static final String MEDIA = "media";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String PAGE_SIZE = "pageSize";

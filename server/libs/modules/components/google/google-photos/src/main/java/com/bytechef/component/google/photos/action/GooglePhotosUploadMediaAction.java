@@ -51,7 +51,7 @@ public class GooglePhotosUploadMediaAction {
         .properties(
             string(ALBUM_ID)
                 .label("Album ID")
-                .description("Identifier of the album where the media items are added.")
+                .description("Identifier of the album to be requested. Only albums created by your app will be listed.")
                 .options((OptionsFunction<String>) GooglePhotosUtils::getAlbumIdOptions)
                 .required(true),
             array(MEDIA)
