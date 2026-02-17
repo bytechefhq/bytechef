@@ -78,6 +78,7 @@ public class GoogleFormsUtils {
         for (Map<?, ?> formResponse : formResponses) {
             customResponses.add(createCustomResponse(context, formId, formResponse));
         }
+
         return customResponses;
     }
 
@@ -96,6 +97,7 @@ public class GoogleFormsUtils {
         List<Option<String>> formResponses = new ArrayList<>();
         String nextToken = null;
         String formId = inputParameters.getRequiredString(FORM_ID);
+
         do {
             Map<String, Object> response = context
                 .http(http -> http.get("/forms/%s/responses".formatted(formId)))
@@ -110,7 +112,7 @@ public class GoogleFormsUtils {
                 for (Object o : list) {
                     if (o instanceof Map<?, ?> map) {
                         String responseId = (String) map.get(RESPONSE_ID);
-                        String respondentEmail = (String) map.get("respondentEmail");
+                        String respondentEmail = (String) map.get(RESPONDENT_EMAIL);
 
                         formResponses.add(
                             option(
@@ -152,6 +154,7 @@ public class GoogleFormsUtils {
                 .getBody(new TypeReference<>() {});
 
             extractResponses(response, formResponses);
+
             nextToken = (String) response.getOrDefault(NEXT_PAGE_TOKEN, null);
         } while (nextToken != null);
 

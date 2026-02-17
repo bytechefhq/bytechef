@@ -41,6 +41,7 @@ public class GoogleFormsComponentHandler implements ComponentHandler {
             "Google Forms is a web-based application that allows users to create surveys, quizzes, and forms for " +
                 "data collection and analysis, with real-time collaboration and response tracking.")
         .customAction(true)
+        .customActionHelp("Google Forms API", "https://developers.google.com/workspace/forms/api/reference/rest")
         .icon("path:assets/google-forms.svg")
         .categories(ComponentCategory.SURVEYS_AND_FEEDBACK)
         .connection(CONNECTION_DEFINITION)
@@ -48,7 +49,8 @@ public class GoogleFormsComponentHandler implements ComponentHandler {
             GoogleFormsGetAllResponsesAction.ACTION_DEFINITION,
             GoogleFormsGetFormAction.ACTION_DEFINITION,
             GoogleFormsGetResponseAction.ACTION_DEFINITION)
-        .triggers(GoogleFormsNewResponseTrigger.TRIGGER_DEFINITION);
+        .triggers(GoogleFormsNewResponseTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
