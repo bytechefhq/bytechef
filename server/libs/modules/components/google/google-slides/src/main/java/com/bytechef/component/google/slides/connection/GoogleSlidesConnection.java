@@ -37,7 +37,7 @@ public class GoogleSlidesConnection {
             "https://www.googleapis.com/auth/drive.file", false,
             "https://www.googleapis.com/auth/drive.readonly", false,
             "https://www.googleapis.com/auth/presentations", true,
-            "https://www.googleapis.com/auth/presentations.readonly", true,
-            "https://www.googleapis.com/auth/spreadsheets", true,
-            "https://www.googleapis.com/auth/spreadsheets.readonly", true));
+            "https://www.googleapis.com/auth/presentations.readonly", false,
+            "https://www.googleapis.com/auth/spreadsheets", false,
+            "https://www.googleapis.com/auth/spreadsheets.readonly", false));
 }
