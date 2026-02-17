@@ -57,19 +57,30 @@ public class GoogleChatCreateSpaceAction {
                             .description("Type of the space."),
                         string(DISPLAY_NAME)
                             .description("Name of the space that will be displayed."),
-                        string("spaceThreadingState"),
-                        string(SPACE_TYPE),
-                        string("spaceHistoryState"),
-                        string("createTime"),
-                        string("lastActiveTime"),
-                        object("membershipCount"),
+                        string("spaceThreadingState")
+                            .description("The threading state in the Chat space."),
+                        string(SPACE_TYPE)
+                            .description("The type of space."),
+                        string("spaceHistoryState")
+                            .description("The message history state for messages and threads in this space."),
+                        string("createTime")
+                            .description("For spaces created in Chat, the time the space was created."),
+                        string("lastActiveTime")
+                            .description("Timestamp of the last message in the space."),
+                        object("membershipCount")
+                            .description("The count of joined memberships grouped by member type."),
                         object("accessSettings")
+                            .description("Specifies the access setting of the space.")
                             .properties(
                                 string("accessSettings")
                                     .description("Access settings for the space.")),
-                        string("spaceUri"))))
+                        string("customer")
+                            .description("Customer that created the space."),
+                        string("spaceUri")
+                            .description("The URI for a user to access the space."))))
         .perform(GoogleChatCreateSpaceAction::perform)
-        .processErrorResponse(GoogleUtils::processErrorResponse);
+        .processErrorResponse(GoogleUtils::processErrorResponse)
+        .help("", "https://docs.bytechef.io/reference/components/google-chat_v1#create-space");
 
     private GoogleChatCreateSpaceAction() {
     }

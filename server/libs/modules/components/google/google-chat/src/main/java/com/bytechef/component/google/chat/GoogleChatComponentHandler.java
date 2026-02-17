@@ -37,6 +37,10 @@ public class GoogleChatComponentHandler implements ComponentHandler {
         .title("Google Chat")
         .description("Google Chat is an intelligent and secure communication and collaboration tool, built for teams.")
         .icon("path:assets/google-chat.svg")
+        .customAction(true)
+        .customActionHelp(
+            "Google Chat API documentation",
+            "https://developers.google.com/workspace/chat/api/reference/rest")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(GoogleChatConnection.CONNECTION_DEFINITION)
         .actions(
@@ -44,7 +48,8 @@ public class GoogleChatComponentHandler implements ComponentHandler {
             GoogleChatCreateSpaceAction.ACTION_DEFINITION)
         .clusterElements(
             tool(GoogleChatCreateMessageAction.ACTION_DEFINITION),
-            tool(GoogleChatCreateSpaceAction.ACTION_DEFINITION));
+            tool(GoogleChatCreateSpaceAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
