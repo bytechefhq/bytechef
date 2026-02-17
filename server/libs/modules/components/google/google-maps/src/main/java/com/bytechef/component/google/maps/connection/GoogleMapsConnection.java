@@ -42,7 +42,9 @@ public class GoogleMapsConnection {
                         .description("API key that can be found at Google Cloud Console.")
                         .required(true))
                 .apply((connectionParameters, context) -> ApplyResponse.ofQueryParameters(
-                    Map.of(KEY, List.of(connectionParameters.getRequiredString(API_TOKEN))))));
+                    Map.of(KEY, List.of(connectionParameters.getRequiredString(API_TOKEN))))))
+        .help("", "https://docs.bytechef.io/reference/components/google-maps_v1#connection-setup")
+        .version(1);
 
     private GoogleMapsConnection() {
     }
