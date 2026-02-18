@@ -388,10 +388,7 @@ public abstract class AbstractWebhookTriggerController {
                     }
 
                     currentMap.put(
-                        currentKey,
-                        values.isEmpty()
-                            ? null
-                            : values.size() == 1 ? values.getFirst() : values);
+                        currentKey, values.isEmpty() ? null : values.size() == 1 ? values.getFirst() : values);
                 } else {
                     // Otherwise, add a new map if one doesn't already exist
                     currentMap.putIfAbsent(currentKey, new HashMap<String, Object>());

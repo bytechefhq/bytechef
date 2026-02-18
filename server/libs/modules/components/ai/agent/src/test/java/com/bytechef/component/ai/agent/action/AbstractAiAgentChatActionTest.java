@@ -94,9 +94,8 @@ class AbstractAiAgentChatActionTest {
             modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
                 .thenReturn(List.of());
 
-            assertDoesNotThrow(
-                () -> action.getChatClientRequestSpec(inputParameters, connectionParameters, extensions,
-                    actionContext));
+            assertDoesNotThrow(() -> action.getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, actionContext));
         }
     }
 
