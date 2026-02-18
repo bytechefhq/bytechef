@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -157,9 +158,8 @@ class AiAgentTestApiController {
                 Map<String, ?> extensions = workflowTask.getExtensions();
 
                 Object result = actionDefinitionFacade.executePerform(
-                    workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
-                    null, null, null, workflowId, evaluatedParameters, connectionIds, extensions,
-                    environmentId, null, true, null, null);
+                    workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null,
+                    workflowId, evaluatedParameters, connectionIds, extensions, environmentId, null, true);
 
                 if (result instanceof ActionDefinition.SseEmitterHandler sseEmitterHandler) {
                     AiAgentSseEmitterBridge bridge = new AiAgentSseEmitterBridge(sseEmitter, testId);
@@ -173,8 +173,9 @@ class AiAgentTestApiController {
             } catch (Exception exception) {
                 logger.warn(
                     "AI agent test failed for workflow '{}', node '{}': {}",
-                    aiAgentTestRequest.workflowId(), aiAgentTestRequest.workflowNodeName(),
-                    exception.getMessage(), exception);
+                    StringUtils.sanitize(aiAgentTestRequest.workflowId()),
+                    StringUtils.sanitize(aiAgentTestRequest.workflowNodeName()),
+                    StringUtils.sanitize(exception.getMessage()), exception);
 
                 String errorMessage = exception.getMessage() != null
                     ? exception.getMessage()
