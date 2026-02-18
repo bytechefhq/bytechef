@@ -18,10 +18,10 @@ package com.bytechef.component.youtube.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.ID;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.ITEMS;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.SNIPPET;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.TITLE;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.ID;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.ITEMS;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.SNIPPET;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.TITLE;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * @author Nikolina Spehar
  */
-public class YoutubeUtils {
+public class YouTubeUtils {
 
     public static String getChannelId(String identifier, TriggerContext triggerContext) {
         String channelId = "";

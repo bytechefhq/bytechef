@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author Nikolina Spehar
  */
-public class YoutubeConnection {
+public class YouTubeConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         "https://www.googleapis.com/youtube/v3",
@@ -38,6 +38,6 @@ public class YoutubeConnection {
             "https://www.googleapis.com/auth/youtubepartner", false,
             "https://www.googleapis.com/auth/youtubepartner-channel-audit", false));
 
-    private YoutubeConnection() {
+    private YouTubeConnection() {
     }
 }

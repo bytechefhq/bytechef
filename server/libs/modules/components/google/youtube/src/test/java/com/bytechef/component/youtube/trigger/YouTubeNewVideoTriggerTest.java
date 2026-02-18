@@ -16,8 +16,8 @@
 
 package com.bytechef.component.youtube.trigger;
 
-import static com.bytechef.component.youtube.constant.YoutubeConstants.IDENTIFIER;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.LAST_TIME_CHECKED;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.IDENTIFIER;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -32,7 +32,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.bytechef.component.youtube.util.YoutubeUtils;
+import com.bytechef.component.youtube.util.YouTubeUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -46,7 +46,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Nikolina Spehar
  */
-class YoutubeNewVideoTriggerTest {
+class YouTubeNewVideoTriggerTest {
 
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
@@ -63,8 +63,8 @@ class YoutubeNewVideoTriggerTest {
 
     @Test
     void testPoll() {
-        try (MockedStatic<YoutubeUtils> youtubeUtilsMockedStatic = mockStatic(YoutubeUtils.class)) {
-            youtubeUtilsMockedStatic.when(() -> YoutubeUtils.getChannelId(
+        try (MockedStatic<YouTubeUtils> youtubeUtilsMockedStatic = mockStatic(YouTubeUtils.class)) {
+            youtubeUtilsMockedStatic.when(() -> YouTubeUtils.getChannelId(
                 stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()))
                 .thenReturn("channelId");
 
@@ -79,7 +79,7 @@ class YoutubeNewVideoTriggerTest {
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(responseMap);
 
-            PollOutput pollOutput = YoutubeNewVideoTrigger.poll(
+            PollOutput pollOutput = YouTubeNewVideoTrigger.poll(
                 mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
 
             assertEquals(List.of(Map.of()), pollOutput.records());
