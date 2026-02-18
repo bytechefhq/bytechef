@@ -34,6 +34,13 @@ import {
     ActionDefinitionBasicToJSON,
     ActionDefinitionBasicToJSONTyped,
 } from './ActionDefinitionBasic';
+import type { ClusterElementDefinitionBasic } from './ClusterElementDefinitionBasic';
+import {
+    ClusterElementDefinitionBasicFromJSON,
+    ClusterElementDefinitionBasicFromJSONTyped,
+    ClusterElementDefinitionBasicToJSON,
+    ClusterElementDefinitionBasicToJSONTyped,
+} from './ClusterElementDefinitionBasic';
 import type { TriggerDefinitionBasic } from './TriggerDefinitionBasic';
 import {
     TriggerDefinitionBasicFromJSON,
@@ -55,7 +62,13 @@ export interface WorkflowNodeOutput {
      */
     actionDefinition?: ActionDefinitionBasic;
     /**
-     * 
+     *
+     * @type {ClusterElementDefinitionBasic}
+     * @memberof WorkflowNodeOutput
+     */
+    clusterElementDefinition?: ClusterElementDefinitionBasic;
+    /**
+     *
      * @type {OutputResponse}
      * @memberof WorkflowNodeOutput
      */
@@ -111,6 +124,7 @@ export function WorkflowNodeOutputFromJSONTyped(json: any, ignoreDiscriminator: 
     return {
         
         'actionDefinition': json['actionDefinition'] == null ? undefined : ActionDefinitionBasicFromJSON(json['actionDefinition']),
+        'clusterElementDefinition': json['clusterElementDefinition'] == null ? undefined : ClusterElementDefinitionBasicFromJSON(json['clusterElementDefinition']),
         'outputResponse': json['outputResponse'] == null ? undefined : OutputResponseFromJSON(json['outputResponse']),
         'taskDispatcherDefinition': json['taskDispatcherDefinition'] == null ? undefined : TaskDispatcherDefinitionBasicFromJSON(json['taskDispatcherDefinition']),
         'testOutputResponse': json['testOutputResponse'] == null ? undefined : json['testOutputResponse'],
@@ -132,6 +146,7 @@ export function WorkflowNodeOutputToJSONTyped(value?: WorkflowNodeOutput | null,
     return {
         
         'actionDefinition': ActionDefinitionBasicToJSON(value['actionDefinition']),
+        'clusterElementDefinition': ClusterElementDefinitionBasicToJSON(value['clusterElementDefinition']),
         'outputResponse': OutputResponseToJSON(value['outputResponse']),
         'taskDispatcherDefinition': TaskDispatcherDefinitionBasicToJSON(value['taskDispatcherDefinition']),
         'testOutputResponse': value['testOutputResponse'],
