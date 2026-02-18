@@ -147,7 +147,8 @@ public class YouTubeUploadVideoAction {
                         string("publishTime")
                             .description("The date and time when the video was published."))))
         .perform(YouTubeUploadVideoAction::perform)
-        .processErrorResponse(GoogleUtils::processErrorResponse);
+        .processErrorResponse(GoogleUtils::processErrorResponse)
+        .help("", "https://docs.bytechef.io/reference/components/youtube_v1#upload-video");
 
     private YouTubeUploadVideoAction() {
     }
