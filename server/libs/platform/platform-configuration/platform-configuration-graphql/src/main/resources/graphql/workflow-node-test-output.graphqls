@@ -1,0 +1,16 @@
+extend type Mutation {
+    saveClusterElementTestOutput(
+        workflowId: String!
+        workflowNodeName: String!
+        clusterElementType: String!
+        clusterElementWorkflowNodeName: String!
+        environmentId: Long!
+        inputParameters: Map
+    ): WorkflowNodeTestOutputResult!
+}
+
+type WorkflowNodeTestOutputResult {
+    id: Long!
+    workflowId: String!
+    workflowNodeName: String!
+}
