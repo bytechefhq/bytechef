@@ -1,4 +1,4 @@
-import {EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {CHILDLESS_TASK_DISPATCHER_NAMES, EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
@@ -107,7 +107,10 @@ function createForkJoinTaskEdges(
 
         const sourceTaskComponentName = sourceTaskId.split('_')[0];
 
-        if (TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) && sourceTaskComponentName !== 'loopBreak') {
+        if (
+            TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) &&
+            !CHILDLESS_TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)
+        ) {
             const nestedBottomGhostId = `${sourceTaskId}-${sourceTaskComponentName}-bottom-ghost`;
 
             const edgeFromNestedGhostToNextTask = {
@@ -135,7 +138,10 @@ function createForkJoinTaskEdges(
     const lastTaskId = branch[branch.length - 1].name;
     let lastTaskComponentName = lastTaskId.split('_')[0];
 
-    if (TASK_DISPATCHER_NAMES.includes(lastTaskComponentName) && lastTaskComponentName !== 'loopBreak') {
+    if (
+        TASK_DISPATCHER_NAMES.includes(lastTaskComponentName) &&
+        !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)
+    ) {
         if (lastTaskComponentName === 'fork-join') {
             lastTaskComponentName = 'forkJoin';
         }

@@ -1,4 +1,4 @@
-import {EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {CHILDLESS_TASK_DISPATCHER_NAMES, EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
@@ -233,7 +233,7 @@ function createBranchExitEdge(
 
         const lastTaskComponentName = lastTaskNodeId.split('_')[0];
 
-        if (lastTaskNode?.data.taskDispatcher && lastTaskComponentName !== 'loopBreak') {
+        if (lastTaskNode?.data.taskDispatcher && !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)) {
             const nestedBottomGhostId = `${lastTaskNodeId}-${lastTaskComponentName}-bottom-ghost`;
 
             if (nestedBottomGhostId) {

@@ -50,6 +50,10 @@ export function buildGenericNodeData(
                 newNodeData.loopBreakData = {
                     loopBreakId: taskDispatcherId,
                 };
+            } else if (type === 'subflow') {
+                newNodeData.subflowData = {
+                    subflowId: taskDispatcherId,
+                };
             } else if (type === 'branch') {
                 newNodeData.branchData = {
                     branchId: taskDispatcherId,
@@ -481,6 +485,27 @@ export const TASK_DISPATCHER_CONFIG = {
                 tasks: updatedSubtasks,
             },
         }),
+    },
+    subflow: {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'subflow'),
+
+        contextIdentifier: 'subflowId',
+        dataKey: 'subflowData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const parts = placeholderId.split('-');
+            const index = parseInt(parts[parts.length - 1] || '-1');
+
+            return {index, taskDispatcherId: parts[0]};
+        },
+        getDispatcherId: (context: TaskDispatcherContextType) => context.subflowId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+        }),
+        getSubtasks: () => [],
+        getTask: getTaskDispatcherTask,
+        initializeParameters: () => ({}),
+        updateTaskParameters: ({task}: UpdateTaskParametersType): WorkflowTask => task,
     },
 };
 

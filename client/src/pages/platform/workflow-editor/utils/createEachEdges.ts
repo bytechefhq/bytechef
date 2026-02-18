@@ -1,4 +1,4 @@
-import {EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {CHILDLESS_TASK_DISPATCHER_NAMES, EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
@@ -79,7 +79,10 @@ function createEdgeSubtaskEdges(eachId: string, eachChildTask: WorkflowTask): Ed
     };
 
     // Check if the child task is itself a task dispatcher
-    if (TASK_DISPATCHER_NAMES.includes(childTaskComponentName) && childTaskComponentName !== 'loopBreak') {
+    if (
+        TASK_DISPATCHER_NAMES.includes(childTaskComponentName) &&
+        !CHILDLESS_TASK_DISPATCHER_NAMES.includes(childTaskComponentName)
+    ) {
         const nestedBottomGhostId = `${childTaskId}-${childTaskComponentName}-bottom-ghost`;
 
         const edgeFromNestedGhostToBottomGhost = {

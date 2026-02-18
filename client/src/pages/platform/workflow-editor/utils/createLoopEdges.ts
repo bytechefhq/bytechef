@@ -1,4 +1,4 @@
-import {EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {CHILDLESS_TASK_DISPATCHER_NAMES, EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
@@ -98,7 +98,7 @@ function createLoopSubtaskEdges(loopId: string, loopChildTasks: Array<WorkflowTa
         const sourceTaskComponentName = task.name.split('_')[0];
 
         const isTaskDispatcher = TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName);
-        const isLoopBreak = sourceTaskComponentName === 'loopBreak';
+        const isLeafTaskDispatcher = CHILDLESS_TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName);
         const isLastTask = index === loopChildTasks.length - 1;
 
         let targetId;
@@ -112,7 +112,7 @@ function createLoopSubtaskEdges(loopId: string, loopChildTasks: Array<WorkflowTa
             targetHandleId = undefined;
         }
 
-        if (!isTaskDispatcher || isLoopBreak) {
+        if (!isTaskDispatcher || isLeafTaskDispatcher) {
             const edgeBetweenSubtasks = {
                 id: `${sourceTaskName}=>${targetId}`,
                 source: sourceTaskName,

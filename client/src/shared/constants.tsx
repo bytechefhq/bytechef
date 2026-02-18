@@ -126,6 +126,8 @@ export const TASK_DISPATCHER_NAMES = [
     'subflow',
 ];
 
+export const CHILDLESS_TASK_DISPATCHER_NAMES = ['loopBreak', 'subflow'];
+
 export const SORT_OPTIONS = [
     {
         label: 'Last edited',
