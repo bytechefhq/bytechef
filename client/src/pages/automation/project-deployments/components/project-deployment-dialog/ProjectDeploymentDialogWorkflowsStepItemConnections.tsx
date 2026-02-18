@@ -2,15 +2,19 @@ import ProjectDeploymentDialogWorkflowsStepItemConnection from '@/pages/automati
 import {ComponentConnection, ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {Control} from 'react-hook-form';
 
+interface ProjectDeploymentDialogWorkflowsStepItemConnectionsProps {
+    componentConnections: ComponentConnection[];
+    control: Control<ProjectDeployment>;
+    workflowIndex: number;
+    workflowNodeLabelMap: Map<string, string>;
+}
+
 const ProjectDeploymentDialogWorkflowsStepItemConnections = ({
     componentConnections,
     control,
     workflowIndex,
-}: {
-    control: Control<ProjectDeployment>;
-    componentConnections: ComponentConnection[];
-    workflowIndex: number;
-}) => (
+    workflowNodeLabelMap,
+}: ProjectDeploymentDialogWorkflowsStepItemConnectionsProps) => (
     <>
         {!componentConnections.length && <p className="text-sm">No defined connections.</p>}
 
@@ -22,6 +26,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnections = ({
                     control={control}
                     key={`${componentConnectionIndex}_${componentConnection.key}`}
                     workflowIndex={workflowIndex}
+                    workflowNodeLabel={workflowNodeLabelMap.get(componentConnection.workflowNodeName)}
                 />
             ))}
         </ul>

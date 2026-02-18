@@ -23,6 +23,7 @@ export interface ProjectDeploymentDialogWorkflowsStepItemConnectionProps {
     componentConnection: ComponentConnection;
     componentConnectionIndex: number;
     workflowIndex: number;
+    workflowNodeLabel?: string;
 }
 
 const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
@@ -30,6 +31,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
     componentConnectionIndex,
     control,
     workflowIndex,
+    workflowNodeLabel,
 }: ProjectDeploymentDialogWorkflowsStepItemConnectionProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
@@ -63,7 +65,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                                 <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
                             )}
 
-                            <span>{componentDefinition?.title} Connection</span>
+                            <span>{workflowNodeLabel || `${componentDefinition?.title} Connection`}</span>
 
                             <span className="text-xs text-gray-500">({componentConnection.workflowNodeName})</span>
                         </FormLabel>
