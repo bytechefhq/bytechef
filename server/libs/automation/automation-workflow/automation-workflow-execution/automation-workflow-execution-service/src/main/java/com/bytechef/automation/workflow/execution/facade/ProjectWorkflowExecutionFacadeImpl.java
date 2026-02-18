@@ -35,7 +35,6 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -62,7 +61,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,6 +73,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecutionFacade {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowExecutionFacadeImpl.class);
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
@@ -122,23 +126,25 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     public WorkflowExecutionDTO getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
 
-        JobDTO jobDTO = new JobDTO(
-            job,
-            job.getOutputs() == null
-                ? null
-                : taskFileStorage.readJobOutputs(job.getOutputs()),
-            getJobTaskExecutions(id));
+        Map<String, ?> outputs = job.getOutputs() == null
+            ? null
+            : taskFileStorage.readJobOutputs(job.getOutputs());
+
+        JobDTO jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id));
+
         Optional<Long> projectDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
             Validate.notNull(job.getId(), ""), PlatformType.AUTOMATION);
 
         return new WorkflowExecutionDTO(
             jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
-            OptionalUtils.map(projectDeploymentIdOptional, projectDeploymentService::getProjectDeployment),
+            projectDeploymentIdOptional
+                .map(projectDeploymentService::getProjectDeployment)
+                .orElse(null),
             jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
-                OptionalUtils.orElse(projectDeploymentIdOptional, null),
-                OptionalUtils.orElse(
-                    triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")), null),
+                projectDeploymentIdOptional.orElse(null),
+                triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id"))
+                    .orElse(null),
                 job));
     }
 
@@ -200,24 +206,54 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 List<Workflow> workflows = workflowService.getWorkflows(
                     CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
-                workflowExecutionPage = jobsPage.map(job -> new WorkflowExecutionDTO(
-                    Validate.notNull(job.getId(), "id"),
-                    CollectionUtils.getFirst(
+                List<WorkflowExecutionDTO> workflowExecutionDTOs = new ArrayList<>();
+
+                for (Job job : jobsPage) {
+                    Optional<Workflow> workflowOptional = CollectionUtils.findFirst(
+                        workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()));
+
+                    if (workflowOptional.isEmpty()) {
+                        if (logger.isWarnEnabled()) {
+                            logger.warn(
+                                "Skipping job id={}: workflow '{}' not found", job.getId(), job.getWorkflowId());
+                        }
+
+                        continue;
+                    }
+
+                    Optional<Project> projectOptional = CollectionUtils.findFirst(
                         projects,
                         project -> CollectionUtils.contains(
-                            projectWorkflowService.getProjectWorkflowIds(project.getId()), job.getWorkflowId())),
-                    OptionalUtils.map(
-                        principalJobService.fetchJobPrincipalId(job.getId(), PlatformType.AUTOMATION),
-                        projectDeploymentService::getProjectDeployment),
-                    new JobDTO(job),
-                    CollectionUtils.getFirst(workflows,
-                        workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
-                    getTriggerExecutionDTO(
-                        projectDeploymentId,
-                        OptionalUtils.orElse(
-                            triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")),
-                            null),
-                        job)));
+                            projectWorkflowService.getProjectWorkflowIds(project.getId()), job.getWorkflowId()));
+
+                    if (projectOptional.isEmpty()) {
+                        if (logger.isWarnEnabled()) {
+                            logger.warn(
+                                "Skipping job id={}: no project found for workflow '{}'",
+                                job.getId(), job.getWorkflowId());
+                        }
+
+                        continue;
+                    }
+
+                    workflowExecutionDTOs.add(new WorkflowExecutionDTO(
+                        Validate.notNull(job.getId(), "id"),
+                        projectOptional.get(),
+                        principalJobService.fetchJobPrincipalId(job.getId(), PlatformType.AUTOMATION)
+                            .map(projectDeploymentService::getProjectDeployment)
+                            .orElse(null),
+                        new JobDTO(job),
+                        workflowOptional.get(),
+                        getTriggerExecutionDTO(
+                            projectDeploymentId,
+                            triggerExecutionService.fetchJobTriggerExecution(
+                                Validate.notNull(job.getId(), "id"))
+                                .orElse(null),
+                            job)));
+                }
+
+                workflowExecutionPage = new PageImpl<>(
+                    workflowExecutionDTOs, jobsPage.getPageable(), jobsPage.getTotalElements());
             }
         }
 
