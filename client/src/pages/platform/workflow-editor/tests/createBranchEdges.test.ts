@@ -5,7 +5,11 @@ import {describe, expect, it} from 'vitest';
 
 import createBranchEdges from '../utils/createBranchEdges';
 
-function createBranchNode(id: string, defaultTasks: Array<{name: string}> = [], cases: BranchCaseType[] = []): Node {
+function createBranchNode(
+    id: string,
+    defaultTasks: Array<{name: string; type?: string}> = [],
+    cases: BranchCaseType[] = []
+): Node {
     return {
         data: {
             componentName: 'branch',
@@ -83,8 +87,9 @@ describe('createBranchEdges', () => {
             expect(middleCaseEdges.length).toBe(0);
         });
 
-        it('should use workflow edge type for middle case placeholder-to-bottom-ghost edge', () => {
-            // 3 cases with empty middle case
+        it('should use smoothstep edge type for middle case placeholder-to-bottom-ghost edge', () => {
+            // 3 cases with empty middle case — placeholder edges should always use smoothstep
+            // to avoid rendering a redundant "+" button (the placeholder node itself is the add button)
             const branchNode = createBranchNode(
                 'branch_1',
                 [],
@@ -106,7 +111,7 @@ describe('createBranchEdges', () => {
             );
 
             expect(middlePlaceholderToBottomEdge).toBeDefined();
-            expect(middlePlaceholderToBottomEdge!.type).toBe('workflow');
+            expect(middlePlaceholderToBottomEdge!.type).toBe('smoothstep');
         });
 
         it('should use smoothstep edge type for non-middle case placeholder-to-bottom-ghost edges', () => {
@@ -226,8 +231,7 @@ describe('createBranchEdges', () => {
             const edges = createBranchEdges(branchNode);
 
             const nestedGhostEdge = edges.find(
-                (edge) =>
-                    edge.source === 'loop_1-loop-bottom-ghost' && edge.target === 'branch_1-branch-bottom-ghost'
+                (edge) => edge.source === 'loop_1-loop-bottom-ghost' && edge.target === 'branch_1-branch-bottom-ghost'
             );
 
             expect(nestedGhostEdge).toBeDefined();
@@ -236,16 +240,17 @@ describe('createBranchEdges', () => {
 
         it('should use -right handle when nested task dispatcher is in a right case', () => {
             // 2 cases (even): default=left, case_0=right (with branch)
-            const branchNode = createBranchNode('branch_1', [], [
-                {key: 'case_0', tasks: [{name: 'branch_2', type: 'branch/v1'}]},
-            ]);
+            const branchNode = createBranchNode(
+                'branch_1',
+                [],
+                [{key: 'case_0', tasks: [{name: 'branch_2', type: 'branch/v1'}]}]
+            );
 
             const edges = createBranchEdges(branchNode);
 
             const nestedGhostEdge = edges.find(
                 (edge) =>
-                    edge.source === 'branch_2-branch-bottom-ghost' &&
-                    edge.target === 'branch_1-branch-bottom-ghost'
+                    edge.source === 'branch_2-branch-bottom-ghost' && edge.target === 'branch_1-branch-bottom-ghost'
             );
 
             expect(nestedGhostEdge).toBeDefined();
