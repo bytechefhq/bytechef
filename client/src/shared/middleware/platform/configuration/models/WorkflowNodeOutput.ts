@@ -34,13 +34,6 @@ import {
     ActionDefinitionBasicToJSON,
     ActionDefinitionBasicToJSONTyped,
 } from './ActionDefinitionBasic';
-import type { ClusterElementDefinitionBasic } from './ClusterElementDefinitionBasic';
-import {
-    ClusterElementDefinitionBasicFromJSON,
-    ClusterElementDefinitionBasicFromJSONTyped,
-    ClusterElementDefinitionBasicToJSON,
-    ClusterElementDefinitionBasicToJSONTyped,
-} from './ClusterElementDefinitionBasic';
 import type { TriggerDefinitionBasic } from './TriggerDefinitionBasic';
 import {
     TriggerDefinitionBasicFromJSON,
@@ -62,13 +55,13 @@ export interface WorkflowNodeOutput {
      */
     actionDefinition?: ActionDefinitionBasic;
     /**
-     *
+     * 
      * @type {ClusterElementDefinitionBasic}
      * @memberof WorkflowNodeOutput
      */
     clusterElementDefinition?: ClusterElementDefinitionBasic;
     /**
-     *
+     * 
      * @type {OutputResponse}
      * @memberof WorkflowNodeOutput
      */

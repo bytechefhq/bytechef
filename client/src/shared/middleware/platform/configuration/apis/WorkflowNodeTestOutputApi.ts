@@ -32,15 +32,6 @@ export interface CheckWorkflowNodeTestOutputExistsRequest {
     createdDate?: Date;
 }
 
-export interface SaveClusterElementTestOutputRequest {
-    id: string;
-    workflowNodeName: string;
-    clusterElementWorkflowNodeName: string;
-    clusterElementType: string;
-    environmentId: number;
-    body?: object;
-}
-
 export interface DeleteWorkflowNodeTestOutputRequest {
     id: string;
     workflowNodeName: string;
@@ -182,85 +173,6 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
      */
     async deleteWorkflowNodeTestOutput(requestParameters: DeleteWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteWorkflowNodeTestOutputRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     * Create a new or update existing cluster element test output.
-     * Create a new or update existing cluster element test output
-     */
-    async saveClusterElementTestOutputRaw(requestParameters: SaveClusterElementTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeTestOutput>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling saveClusterElementTestOutput().'
-            );
-        }
-
-        if (requestParameters['workflowNodeName'] == null) {
-            throw new runtime.RequiredError(
-                'workflowNodeName',
-                'Required parameter "workflowNodeName" was null or undefined when calling saveClusterElementTestOutput().'
-            );
-        }
-
-        if (requestParameters['clusterElementWorkflowNodeName'] == null) {
-            throw new runtime.RequiredError(
-                'clusterElementWorkflowNodeName',
-                'Required parameter "clusterElementWorkflowNodeName" was null or undefined when calling saveClusterElementTestOutput().'
-            );
-        }
-
-        if (requestParameters['clusterElementType'] == null) {
-            throw new runtime.RequiredError(
-                'clusterElementType',
-                'Required parameter "clusterElementType" was null or undefined when calling saveClusterElementTestOutput().'
-            );
-        }
-
-        if (requestParameters['environmentId'] == null) {
-            throw new runtime.RequiredError(
-                'environmentId',
-                'Required parameter "environmentId" was null or undefined when calling saveClusterElementTestOutput().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        if (requestParameters['clusterElementType'] != null) {
-            queryParameters['clusterElementType'] = requestParameters['clusterElementType'];
-        }
-
-        if (requestParameters['environmentId'] != null) {
-            queryParameters['environmentId'] = requestParameters['environmentId'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementWorkflowNodeName}/test-outputs`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
-        urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
-
-        const response = await this.request({
-            path: urlPath,
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: requestParameters['body'] as any,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeTestOutputFromJSON(jsonValue));
-    }
-
-    /**
-     * Create a new or update existing cluster element test output.
-     * Create a new or update existing cluster element test output
-     */
-    async saveClusterElementTestOutput(requestParameters: SaveClusterElementTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowNodeTestOutput> {
-        const response = await this.saveClusterElementTestOutputRaw(requestParameters, initOverrides);
-        return await response.value();
     }
 
     /**
