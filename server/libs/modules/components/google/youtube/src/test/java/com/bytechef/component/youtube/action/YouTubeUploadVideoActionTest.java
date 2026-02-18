@@ -27,51 +27,52 @@ import static com.bytechef.component.youtube.constant.YouTubeConstants.TAGS;
 import static com.bytechef.component.youtube.constant.YouTubeConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class YouTubeUploadVideoActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FILE, mockedFileEntry, TITLE, "testTitle", DESCRIPTION, "testDescription", PRIVACY_STATUS,
+            "private", TAGS, List.of(), CATEGORY_ID, "2"));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
-    void testPerform() {
-        when(mockedParameters.getRequiredFileEntry(FILE))
-            .thenReturn(mockedFileEntry);
-        when(mockedParameters.getRequiredString(TITLE))
-            .thenReturn("testTitle");
-        when(mockedParameters.getRequiredString(DESCRIPTION))
-            .thenReturn("testDescription");
-        when(mockedParameters.getRequiredString(PRIVACY_STATUS))
-            .thenReturn("private");
-        when(mockedParameters.getList(TAGS, List.of()))
-            .thenReturn(List.of());
-        when(mockedParameters.getRequiredString(CATEGORY_ID))
-            .thenReturn("2");
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedContext.http(any()))
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedHttp.put(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -79,21 +80,20 @@ class YouTubeUploadVideoActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
         when(mockedResponse.getHeaders())
             .thenReturn(Map.of(LOCATION, List.of("url")));
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(SNIPPET, Map.of()));
 
         Object result = YouTubeUploadVideoAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of(), result);
-        assertEquals(
-            List.of("Content-Type", "application/octet-stream", "Content-Type", "application/octet-stream"),
-            stringArgumentCaptor.getAllValues());
+
+        List<String> expectedStrings = List.of(
+            "https://www.googleapis.com/upload/youtube/v3/videos", "Content-Type", "application/octet-stream", "url",
+            "Content-Type", "application/octet-stream");
+
+        assertEquals(expectedStrings, stringArgumentCaptor.getAllValues());
 
         Object[] queryArguments = queryArgumentCaptor.getValue();
         Object[] expectedQueryArguments = {
@@ -115,5 +115,15 @@ class YouTubeUploadVideoActionTest {
             .getContent());
         assertEquals(mockedFileEntry, bodies.get(1)
             .getContent());
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
     }
 }
