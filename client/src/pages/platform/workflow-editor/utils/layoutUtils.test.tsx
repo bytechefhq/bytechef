@@ -1,3 +1,4 @@
+import {CLUSTER_ELEMENT_NODE_WIDTH} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {
     BranchChildTasksType,
@@ -9,7 +10,12 @@ import {
 } from '@/shared/types';
 import {describe, expect, it} from 'vitest';
 
-import {collectTaskDispatcherData} from './layoutUtils';
+import {
+    CLUSTER_ELEMENT_GAP,
+    CLUSTER_ELEMENT_LABEL_PADDING,
+    CLUSTER_ELEMENT_OVERLAP_PADDING,
+    collectTaskDispatcherData,
+} from './layoutUtils';
 
 // Type for test tasks with potentially malformed parameters
 type TestTaskType = Omit<WorkflowTask, 'parameters'> & {
@@ -332,5 +338,21 @@ describe('collectTaskDispatcherData', () => {
         expect(loopChildTasks['test-loop'].iteratee).toEqual([]);
         expect(parallelChildTasks['test-parallel'].tasks).toEqual([]);
         expect(forkJoinChildTasks['test-fork-join'].branches).toEqual([]);
+    });
+});
+
+describe('cluster element spacing', () => {
+    it('should produce a horizontal gap that exceeds the overlap resolution threshold', () => {
+        const horizontalGap = CLUSTER_ELEMENT_NODE_WIDTH + CLUSTER_ELEMENT_GAP;
+        const overlapMinDistance =
+            CLUSTER_ELEMENT_NODE_WIDTH + CLUSTER_ELEMENT_LABEL_PADDING * 2 + CLUSTER_ELEMENT_OVERLAP_PADDING;
+
+        expect(horizontalGap).toBeGreaterThan(overlapMinDistance);
+    });
+
+    it('should have a gap of 142px center-to-center between cluster elements', () => {
+        const horizontalGap = CLUSTER_ELEMENT_NODE_WIDTH + CLUSTER_ELEMENT_GAP;
+
+        expect(horizontalGap).toBe(142);
     });
 });

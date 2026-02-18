@@ -55,6 +55,10 @@ import {
 } from './postDagreConstraints';
 import {TASK_DISPATCHER_CONFIG, getParentTaskDispatcherTask} from './taskDispatcherConfig';
 
+export const CLUSTER_ELEMENT_GAP = 70;
+export const CLUSTER_ELEMENT_LABEL_PADDING = 20;
+export const CLUSTER_ELEMENT_OVERLAP_PADDING = 20;
+
 let dagre: typeof import('@dagrejs/dagre') | null = null;
 
 const loadDagre = async () => {
@@ -205,9 +209,9 @@ export const getClusterElementsLayoutElements = ({
 
     const placeholderY = 160;
     const childBaseY = placeholderY + PLACEHOLDER_NODE_HEIGHT + NODE_HEIGHT / 4;
-    const horizontalGap = CLUSTER_ELEMENT_NODE_WIDTH + 80;
+    const horizontalGap = CLUSTER_ELEMENT_NODE_WIDTH + CLUSTER_ELEMENT_GAP;
 
-    const overlapPadding = 20;
+    const overlapPadding = CLUSTER_ELEMENT_OVERLAP_PADDING;
 
     // Labels rendered below node circles extend ~40-60px beyond NODE_HEIGHT.
     // Include this overhang in extent calculations so stacked cluster roots
@@ -371,8 +375,8 @@ export const getClusterElementsLayoutElements = ({
 
                 // Small circle nodes (72px) have labels that extend beyond
                 // each side; account for this to prevent label overlap
-                const labelPaddingA = isClusterRootA ? 0 : 20;
-                const labelPaddingB = isClusterRootB ? 0 : 20;
+                const labelPaddingA = isClusterRootA ? 0 : CLUSTER_ELEMENT_LABEL_PADDING;
+                const labelPaddingB = isClusterRootB ? 0 : CLUSTER_ELEMENT_LABEL_PADDING;
 
                 const verticalOverlap = Math.abs(nodeA.position.y - nodeB.position.y) < NODE_HEIGHT + labelOverhang;
                 const minX = nodeA.position.x + widthA + labelPaddingA + labelPaddingB + overlapPadding;
