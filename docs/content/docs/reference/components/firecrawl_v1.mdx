@@ -43,6 +43,197 @@ Version: 1
 ## Actions
 
 
+### Crawl
+Name: crawl
+
+`Crawl multiple URLs starting from a base URL and extract content.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The base URL to start crawling from. | true |
+| formats | Formats | ARRAY <details> <summary> Items </summary> [STRING] </details> | Output formats to include in the response for each crawled page. | false |
+| prompt | Prompt | STRING | A natural language prompt to generate crawler options. Explicitly set parameters will override the generated equivalents. | false |
+| excludePaths | Exclude Paths | ARRAY <details> <summary> Items </summary> [STRING] </details> | URL pathname regex patterns that exclude matching URLs from the crawl. | false |
+| includePaths | Include Paths | ARRAY <details> <summary> Items </summary> [STRING] </details> | URL pathname regex patterns that include matching URLs in the crawl. Only paths matching the specified patterns will be included. | false |
+| maxDiscoveryDepth | Max Discovery Depth | INTEGER | Maximum depth to crawl based on discovery order. The root site and sitemapped pages have a discovery depth of 0. | false |
+| sitemap | Sitemap | STRING <details> <summary> Options </summary> <span>include</span>, <span>skip</span>, <span>only</span> </details> | Sitemap mode: 'include' uses sitemap and other methods (default), 'skip' ignores the sitemap, 'only' crawls only sitemap URLs. | false |
+| limit | Limit | INTEGER | Maximum number of pages to crawl. Default limit is 10000. | false |
+| scrapeOptions | Scrape Options | OBJECT <details> <summary> Properties </summary> &#123;BOOLEAN\(onlyMainContent), [STRING]\(includeTags), [STRING]\(excludeTags), INTEGER\(maxAge), &#123;&#125;\(headers), INTEGER\(waitFor), BOOLEAN\(mobile), BOOLEAN\(skipTlsVerification), INTEGER\(timeout), BOOLEAN\(removeBase64Images), BOOLEAN\(blockAds), STRING\(proxy), &#123;STRING\(country), [STRING]\(languages)&#125;\(location), [&#123;STRING\(type), INTEGER\(maxPages)&#125;]\(parsers), BOOLEAN\(storeInCache)&#125; </details> | Options for scraping each page during the crawl. | false |
+| ignoreQueryParameters | Ignore Query Parameters | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Do not re-scrape the same path with different (or none) query parameters. | false |
+| regexOnFullURL | Regex on Full URL | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When true, includePaths and excludePaths patterns are matched against the full URL including query parameters. | false |
+| crawlEntireDomain | Crawl Entire Domain | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allows the crawler to follow internal links to sibling or parent URLs, not just child paths. | false |
+| allowExternalLinks | Allow External Links | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allows the crawler to follow links to external websites. | false |
+| allowSubdomains | Allow Subdomains | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allows the crawler to follow links to subdomains of the main domain. | false |
+| delay | Delay | INTEGER | Delay in seconds between scrapes. Helps respect website rate limits. | false |
+| maxConcurrency | Max Concurrency | INTEGER | Maximum number of concurrent scrapes. If not specified, adheres to your team's concurrency limit. | false |
+| webhook | Webhook | OBJECT <details> <summary> Properties </summary> &#123;STRING\(url), &#123;&#125;\(headers), &#123;&#125;\(metadata), [STRING]\(events)&#125; </details> | Webhook configuration to receive crawl status updates. | false |
+| zeroDataRetention | Zero Data Retention | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enable zero data retention for this crawl. Contact help@firecrawl.dev to enable this feature. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Crawl",
+  "name" : "crawl",
+  "parameters" : {
+    "url" : "",
+    "formats" : [ "" ],
+    "prompt" : "",
+    "excludePaths" : [ "" ],
+    "includePaths" : [ "" ],
+    "maxDiscoveryDepth" : 1,
+    "sitemap" : "",
+    "limit" : 1,
+    "scrapeOptions" : {
+      "onlyMainContent" : false,
+      "includeTags" : [ "" ],
+      "excludeTags" : [ "" ],
+      "maxAge" : 1,
+      "headers" : { },
+      "waitFor" : 1,
+      "mobile" : false,
+      "skipTlsVerification" : false,
+      "timeout" : 1,
+      "removeBase64Images" : false,
+      "blockAds" : false,
+      "proxy" : "",
+      "location" : {
+        "country" : "",
+        "languages" : [ "" ]
+      },
+      "parsers" : [ {
+        "type" : "",
+        "maxPages" : 1
+      } ],
+      "storeInCache" : false
+    },
+    "ignoreQueryParameters" : false,
+    "regexOnFullURL" : false,
+    "crawlEntireDomain" : false,
+    "allowExternalLinks" : false,
+    "allowSubdomains" : false,
+    "delay" : 1,
+    "maxConcurrency" : 1,
+    "webhook" : {
+      "url" : "",
+      "headers" : { },
+      "metadata" : { },
+      "events" : [ "" ]
+    },
+    "zeroDataRetention" : false
+  },
+  "type" : "firecrawl/v1/crawl"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+| id | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "id" : "",
+  "url" : ""
+}
+```
+
+
+
+
+### Get Crawl Status
+Name: getCrawlStatus
+
+`Get the status and results of a crawl job.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Crawl ID | STRING | The ID of the crawl job to retrieve status for. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Crawl Status",
+  "name" : "getCrawlStatus",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "firecrawl/v1/getCrawlStatus"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| status | STRING | The current status of the crawl: scraping, completed, or failed. |
+| total | INTEGER | The total number of pages that were attempted to be crawled. |
+| completed | INTEGER | The number of pages that have been successfully crawled. |
+| creditsUsed | INTEGER | The number of credits used for the crawl. |
+| expiresAt | STRING | The date and time when the crawl results will expire. |
+| next | STRING | URL to retrieve the next batch of data. Returned if the crawl is not completed or if the response exceeds 10MB. |
+| data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(markdown), STRING\(html), STRING\(rawHtml), [STRING]\(links), STRING\(screenshot), &#123;STRING\(title), STRING\(description), STRING\(language), STRING\(sourceURL), STRING\(keywords), [STRING]\(ogLocaleAlternate), INTEGER\(statusCode), STRING\(error)&#125;\(metadata)&#125;] </details> | The scraped data from each crawled page. |
+
+
+
+
+#### Output Example
+```json
+{
+  "status" : "",
+  "total" : 1,
+  "completed" : 1,
+  "creditsUsed" : 1,
+  "expiresAt" : "",
+  "next" : "",
+  "data" : [ {
+    "markdown" : "",
+    "html" : "",
+    "rawHtml" : "",
+    "links" : [ "" ],
+    "screenshot" : "",
+    "metadata" : {
+      "title" : "",
+      "description" : "",
+      "language" : "",
+      "sourceURL" : "",
+      "keywords" : "",
+      "ogLocaleAlternate" : [ "" ],
+      "statusCode" : 1,
+      "error" : ""
+    }
+  } ]
+}
+```
+
+
+
+
 ### Map
 Name: map
 
