@@ -25,15 +25,15 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.CATEGORY_ID;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.DESCRIPTION;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.FILE;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.LOCATION;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.PRIVACY_STATUS;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.SNIPPET;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.STATUS;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.TAGS;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.TITLE;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.CATEGORY_ID;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.DESCRIPTION;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.FILE;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.LOCATION;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.PRIVACY_STATUS;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.SNIPPET;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.STATUS;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.TAGS;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.TITLE;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -42,7 +42,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.youtube.util.YoutubeUtils;
+import com.bytechef.component.youtube.util.YouTubeUtils;
 import com.bytechef.google.commons.GoogleUtils;
 import java.util.List;
 import java.util.Map;
@@ -50,11 +50,11 @@ import java.util.Map;
 /**
  * @author Nikolina Spehar
  */
-public class YoutubeUploadVideoAction {
+public class YouTubeUploadVideoAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadVideo")
         .title("Upload Video")
-        .description("Uploads video to Youtube.")
+        .description("Uploads video to YouTube.")
         .properties(
             fileEntry(FILE)
                 .label("Video File")
@@ -84,7 +84,7 @@ public class YoutubeUploadVideoAction {
                     option("Unlisted", "unlisted")),
             string(CATEGORY_ID)
                 .label("Video Category ID")
-                .options((OptionsFunction<String>) YoutubeUtils::getVideoCategoryIdOptions)
+                .options((OptionsFunction<String>) YouTubeUtils::getVideoCategoryIdOptions)
                 .required(true))
         .output(
             outputSchema(
@@ -146,10 +146,10 @@ public class YoutubeUploadVideoAction {
                                     .description("Description of the video.")),
                         string("publishTime")
                             .description("The date and time when the video was published."))))
-        .perform(YoutubeUploadVideoAction::perform)
+        .perform(YouTubeUploadVideoAction::perform)
         .processErrorResponse(GoogleUtils::processErrorResponse);
 
-    private YoutubeUploadVideoAction() {
+    private YouTubeUploadVideoAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {

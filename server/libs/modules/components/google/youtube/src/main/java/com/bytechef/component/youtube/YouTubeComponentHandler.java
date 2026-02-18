@@ -22,28 +22,28 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.youtube.action.YoutubeUploadVideoAction;
-import com.bytechef.component.youtube.connection.YoutubeConnection;
-import com.bytechef.component.youtube.trigger.YoutubeNewVideoTrigger;
+import com.bytechef.component.youtube.action.YouTubeUploadVideoAction;
+import com.bytechef.component.youtube.connection.YouTubeConnection;
+import com.bytechef.component.youtube.trigger.YouTubeNewVideoTrigger;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Nikolina Spehar
  */
 @AutoService(ComponentHandler.class)
-public class YoutubeComponentHandler implements ComponentHandler {
+public class YouTubeComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("youtube")
-        .title("Youtube")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("youTube")
+        .title("YouTube")
         .description(
             "Enjoy the videos and music you love, upload original content, and share it all with friends, family, " +
                 "and the world on YouTube.")
         .icon("path:assets/youtube.svg")
         .categories(ComponentCategory.HELPERS)
-        .connection(YoutubeConnection.CONNECTION_DEFINITION)
-        .actions(YoutubeUploadVideoAction.ACTION_DEFINITION)
-        .clusterElements(tool(YoutubeUploadVideoAction.ACTION_DEFINITION))
-        .triggers(YoutubeNewVideoTrigger.TRIGGER_DEFINITION);
+        .connection(YouTubeConnection.CONNECTION_DEFINITION)
+        .actions(YouTubeUploadVideoAction.ACTION_DEFINITION)
+        .clusterElements(tool(YouTubeUploadVideoAction.ACTION_DEFINITION))
+        .triggers(YouTubeNewVideoTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
