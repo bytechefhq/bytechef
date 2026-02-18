@@ -987,6 +987,48 @@ describe('positionConditionCasePlaceholders', () => {
         expect(innerRightPlaceholder.position.x).toBe(445);
         expect(outerRightPlaceholder.position.x).toBe(645);
     });
+
+    it('should push parent left placeholder outward when nested branch default placeholder is close', () => {
+        const conditionNode: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_2'},
+            id: 'condition_2',
+            position: {x: 433, y: 100},
+            type: 'workflow',
+        };
+        const conditionLeftPlaceholder: Node = {
+            data: {taskDispatcherId: 'condition_2'},
+            id: 'condition_2-condition-left-placeholder-0',
+            position: {x: 0, y: 200},
+            type: 'placeholder',
+        };
+        const branchNode: Node = {
+            data: {
+                componentName: 'branch',
+                conditionData: {conditionCase: 'caseTrue', conditionId: 'condition_2', index: 0},
+                taskDispatcher: true,
+                taskDispatcherId: 'branch_1',
+            },
+            id: 'branch_1',
+            position: {x: 536, y: 300},
+            type: 'workflow',
+        };
+        const branchDefaultPlaceholder: Node = {
+            data: {taskDispatcherId: 'branch_1'},
+            id: 'branch_1-branch-default-placeholder-0',
+            position: {x: 313, y: 400},
+            type: 'placeholder',
+        };
+        const allNodes = [conditionNode, conditionLeftPlaceholder, branchNode, branchDefaultPlaceholder];
+
+        positionConditionCasePlaceholders(allNodes, {conditionCaseOffset: 145, crossAxis: 'x'});
+
+        // condition_2 left placeholder first pass: 433 - 145 = 288
+        // branch default placeholder at x=313
+        // 313 - 72.5 = 240.5 < 288 → push needed
+        const nestedFramePadding = 145 / 2;
+
+        expect(conditionLeftPlaceholder.position.x).toBe(313 - nestedFramePadding);
+    });
 });
 
 describe('shiftConditionBranchContent', () => {
