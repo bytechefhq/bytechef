@@ -26,6 +26,7 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
+import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.ApplicationEvent;
 import com.bytechef.platform.workflow.coordinator.event.ErrorEvent;
@@ -71,6 +72,7 @@ public class TriggerCoordinator {
     private final TriggerDispatcher triggerDispatcher;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerFileStorage triggerFileStorage;
+    private final TriggerScheduler triggerScheduler;
     private final TriggerStateService triggerStateService;
     private final WorkflowService workflowService;
 
@@ -80,8 +82,8 @@ public class TriggerCoordinator {
         Evaluator evaluator, ApplicationEventPublisher eventPublisher,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerCompletionHandler triggerCompletionHandler,
         TriggerDispatcher triggerDispatcher, TriggerExecutionService triggerExecutionService,
-        TriggerFileStorage triggerFileStorage, TriggerStateService triggerStateService,
-        WorkflowService workflowService) {
+        TriggerFileStorage triggerFileStorage, TriggerScheduler triggerScheduler,
+        TriggerStateService triggerStateService, WorkflowService workflowService) {
 
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;
@@ -92,6 +94,7 @@ public class TriggerCoordinator {
         this.triggerDispatcher = triggerDispatcher;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
+        this.triggerScheduler = triggerScheduler;
         this.triggerStateService = triggerStateService;
         this.workflowService = workflowService;
     }
@@ -176,18 +179,26 @@ public class TriggerCoordinator {
         WorkflowExecutionId workflowExecutionId = triggerPollEvent.getWorkflowExecutionId();
 
         TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
-            TriggerExecution triggerExecution = TriggerExecution.builder()
-                .workflowExecutionId(workflowExecutionId)
-                .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
-                .build();
+            try {
+                TriggerExecution triggerExecution = TriggerExecution.builder()
+                    .workflowExecutionId(workflowExecutionId)
+                    .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
+                    .build();
 
-            dispatch(triggerExecution);
+                dispatch(triggerExecution);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "Poll trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
-                    triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
-                    triggerExecution.getWorkflowExecutionId());
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                        "Poll trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
+                        triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
+                        triggerExecution.getWorkflowExecutionId());
+                }
+            } catch (IllegalArgumentException illegalArgumentException) {
+                logger.warn(
+                    "Cancelling orphaned polling trigger for workflowExecutionId='{}': {}",
+                    workflowExecutionId, illegalArgumentException.getMessage());
+
+                triggerScheduler.cancelPollingTrigger(workflowExecutionId.toString());
             }
         });
     }
