@@ -26,39 +26,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class GoogleTasksUtilsTest {
 
-    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(ConfigurationBuilder.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(LIST_ID, "abc"));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final List<Option<String>> expectedOptions = List.of(
         option("List 1", "list1"), option("List 2", "list2"));
     private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
@@ -70,47 +65,54 @@ class GoogleTasksUtilsTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @BeforeEach
-    void beforeEach() {
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+    void beforeEach(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap)
             .thenReturn(Map.of());
     }
 
     @Test
-    void getListsIdOptions() {
+    void getListsIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         List<Option<String>> result = GoogleTasksUtils.getListsIdOptions(
-            mockedParameters, null, null, null, mockedActionContext);
+            mockedParameters, null, null, null, mockedContext);
 
         assertEquals(expectedOptions, result);
 
-        performCommonAssertions("/users/@me/lists");
+        performCommonAssertions(
+            "/users/@me/lists", httpFunctionArgumentCaptor, configurationBuilderArgumentCaptor);
     }
 
     @Test
-    void getTasksIdOptions() {
+    void getTasksIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         List<Option<String>> result = GoogleTasksUtils.getTasksIdOptions(
-            mockedParameters, null, null, null, mockedActionContext);
+            mockedParameters, null, null, null, mockedContext);
 
         assertEquals(expectedOptions, result);
 
-        performCommonAssertions("/lists/abc/tasks");
+        performCommonAssertions(
+            "/lists/abc/tasks", httpFunctionArgumentCaptor, configurationBuilderArgumentCaptor);
     }
 
-    private void performCommonAssertions(String expectedUrl) {
+    private void performCommonAssertions(
+        String expectedUrl, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
