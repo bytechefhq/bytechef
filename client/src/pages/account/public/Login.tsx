@@ -18,6 +18,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import githubLogo from '../images/github-logo.svg';
 import googleLogo from '../images/google-logo.svg';
+import MfaVerification from './MfaVerification';
 
 const formSchema = z.object({
     email: z.string().min(5, {message: 'Email is required'}).max(254),
@@ -35,10 +36,6 @@ const Login = () => {
     const [ssoRedirect, setSsoRedirect] = useState<SsoRedirectI | null>(null);
     const lastCheckedEmailRef = useRef<string>('');
     const abortControllerRef = useRef<AbortController | null>(null);
-
-    const [mfaCode, setMfaCode] = useState('');
-    const [mfaError, setMfaError] = useState(false);
-    const [mfaSubmitting, setMfaSubmitting] = useState(false);
 
     const {authenticated, login, loginError, mfaRequired, reset, verifyMfa} = useAuthenticationStore(
         useShallow((state) => ({
@@ -83,26 +80,16 @@ const Login = () => {
         });
     };
 
-    const handleMfaSubmit = async () => {
-        setMfaSubmitting(true);
-        setMfaError(false);
-
-        const account = await verifyMfa(mfaCode);
+    const handleMfaVerify = async (code: string): Promise<boolean> => {
+        const account = await verifyMfa(code);
 
         if (account) {
             analytics.identify(account);
-        } else {
-            setMfaCode('');
-            setMfaError(true);
+
+            return true;
         }
 
-        setMfaSubmitting(false);
-    };
-
-    const handleMfaBack = () => {
-        setMfaCode('');
-        setMfaError(false);
-        reset();
+        return false;
     };
 
     const handleEmailBlur = useCallback(async () => {
@@ -203,66 +190,7 @@ const Login = () => {
     }
 
     if (mfaRequired) {
-        return (
-            <PublicLayoutContainer>
-                <Card className="mx-auto max-w-sm rounded-xl p-6 text-start shadow-none">
-                    <CardHeader className="p-0 pb-6">
-                        <CardTitle className="self-center text-xl font-semibold text-content-neutral-primary">
-                            Two-Factor Authentication
-                        </CardTitle>
-                    </CardHeader>
-
-                    <CardContent className="flex flex-col gap-4 p-0">
-                        <p className="text-sm text-content-neutral-secondary">
-                            Enter the 6-digit code from your authenticator app.
-                        </p>
-
-                        {mfaError && <p className="text-sm text-destructive">Invalid code. Please try again.</p>}
-
-                        <fieldset className="space-y-2 border-0 p-0">
-                            <Input
-                                aria-label="MFA verification code"
-                                autoFocus
-                                inputMode="numeric"
-                                maxLength={6}
-                                onChange={(event) => setMfaCode(event.target.value)}
-                                onKeyDown={(event) => {
-                                    if (event.key === 'Enter' && mfaCode.length === 6) {
-                                        handleMfaSubmit();
-                                    }
-                                }}
-                                pattern="[0-9]*"
-                                placeholder="Enter 6-digit code"
-                                value={mfaCode}
-                            />
-                        </fieldset>
-
-                        <Button
-                            className="w-full"
-                            disabled={mfaCode.length !== 6 || mfaSubmitting}
-                            icon={
-                                mfaSubmitting ? (
-                                    <div aria-label="loading icon">
-                                        <LoadingIcon />
-                                    </div>
-                                ) : undefined
-                            }
-                            label="Verify"
-                            onClick={handleMfaSubmit}
-                            size="lg"
-                        />
-
-                        <Button
-                            className="w-full"
-                            label="Back to login"
-                            onClick={handleMfaBack}
-                            size="lg"
-                            variant="link"
-                        />
-                    </CardContent>
-                </Card>
-            </PublicLayoutContainer>
-        );
+        return <MfaVerification onBack={reset} onVerify={handleMfaVerify} />;
     }
 
     return (
