@@ -57,7 +57,7 @@ function createEdgesForSingleCase(
             style: EDGE_STYLES,
             target: bottomGhostId,
             targetHandle: `${bottomGhostId}-${bottomGhostHandlePosition}`,
-            type: isMiddle ? 'workflow' : 'smoothstep',
+            type: 'smoothstep',
         };
 
         edges.push(edgeFromTopGhostToPlaceholder, edgeFromPlaceholderToBottomGhost);
