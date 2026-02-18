@@ -27,6 +27,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.dynamics.crm.util.MicrosoftDynamicsCrmUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Kušter
@@ -44,7 +45,8 @@ public class MicrosoftDynamicsCrmDeleteRecordAction {
                 .required(true),
             RECORD_ID_PROPERTY)
         .help("", "https://docs.bytechef.io/reference/components/microsoft-dynamics-crm_v1#delete-record")
-        .perform(MicrosoftDynamicsCrmDeleteRecordAction::perform);
+        .perform(MicrosoftDynamicsCrmDeleteRecordAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftDynamicsCrmDeleteRecordAction() {
     }

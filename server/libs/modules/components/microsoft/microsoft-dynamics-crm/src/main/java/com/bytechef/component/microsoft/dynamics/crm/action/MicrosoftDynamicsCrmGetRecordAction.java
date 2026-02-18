@@ -28,6 +28,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.dynamics.crm.util.MicrosoftDynamicsCrmUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Kušter
@@ -46,7 +47,8 @@ public class MicrosoftDynamicsCrmGetRecordAction {
             RECORD_ID_PROPERTY)
         .output()
         .help("", "https://docs.bytechef.io/reference/components/microsoft-dynamics-crm_v1#get-record")
-        .perform(MicrosoftDynamicsCrmGetRecordAction::perform);
+        .perform(MicrosoftDynamicsCrmGetRecordAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftDynamicsCrmGetRecordAction() {
     }
