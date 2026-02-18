@@ -125,6 +125,18 @@ public class ComponentDefinitionRegistry {
         this.dynamicComponentHandlerRegistries = dynamicComponentHandlerRegistries;
     }
 
+    public Optional<Authorization> fetchAuthorization(
+        String componentName, int connectionVersion, AuthorizationType authorizationType) {
+
+        return fetchConnectionDefinition(componentName, connectionVersion)
+            .flatMap(ConnectionDefinition::getAuthorizations)
+            .orElse(List.of())
+            .stream()
+            .filter(authorization -> authorization.getType() == authorizationType)
+            .map(authorization -> (Authorization) authorization)
+            .findFirst();
+    }
+
     public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
         ComponentDefinition componentDefinition = null;
 
@@ -155,6 +167,17 @@ public class ComponentDefinitionRegistry {
         }
 
         return Optional.ofNullable(componentDefinition);
+    }
+
+    public Optional<ConnectionDefinition> fetchConnectionDefinition(String componentName, int connectionVersion) {
+        List<ComponentDefinition> componentDefinitions = getComponentDefinitions(componentName);
+
+        return componentDefinitions.stream()
+            .filter(componentDefinition -> componentDefinition.getConnection()
+                .map(connectionDefinition -> connectionDefinition.getVersion() == connectionVersion)
+                .orElse(false))
+            .findFirst()
+            .flatMap(ComponentDefinition::getConnection);
     }
 
     public List<ComponentDefinition> getComponentDefinitions() {

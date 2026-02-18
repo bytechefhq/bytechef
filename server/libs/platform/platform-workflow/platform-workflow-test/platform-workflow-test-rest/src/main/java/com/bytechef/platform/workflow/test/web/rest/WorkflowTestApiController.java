@@ -17,11 +17,9 @@
 package com.bytechef.platform.workflow.test.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
-import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
@@ -30,7 +28,6 @@ import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +35,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,10 +60,6 @@ import tools.jackson.core.type.TypeReference;
 public class WorkflowTestApiController implements WorkflowTestApi {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkflowTestApiController.class);
-
-    private static final Pattern IMAGE_PATTERN = Pattern.compile("data:image/[^;]+;base64,([^\\s]+)");
-    private static final Pattern TEXT_PATTERN = Pattern.compile(
-        "<attachment[^>]*>(.*?)</attachment>", Pattern.DOTALL);
 
     private final Cache<String, SseEmitter> emitter = createCache();
     private final int maxPendingEvents;
@@ -227,7 +218,12 @@ public class WorkflowTestApiController implements WorkflowTestApi {
             Map<String, Object> trigger1 = MapUtils.getRequiredMap(inputs, "trigger_1", new TypeReference<>() {});
 
             if (trigger1.containsKey("attachments")) {
-                trigger1.put("attachments", getFileEntries(trigger1));
+                try {
+                    trigger1.put(
+                        "attachments", TestAttachmentUtils.getFileEntries(tempFileStorage, trigger1));
+                } catch (Exception exception) {
+                    throw new IllegalArgumentException("Failed to process test attachments", exception);
+                }
             } else {
                 trigger1.put("attachments", List.of());
             }
@@ -276,39 +272,6 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         return SseEmitter.event()
             .name(name)
             .data(data instanceof String ? JsonUtils.write(data) : data);
-    }
-
-    private List<FileEntry> getFileEntries(Map<String, Object> trigger1) {
-        List<Map<String, Object>> attachments = MapUtils.getRequiredList(
-            trigger1, "attachments", new TypeReference<>() {});
-
-        List<FileEntry> fileEntries = new ArrayList<>();
-
-        for (Map<String, Object> attachment : attachments) {
-            List<Map<String, String>> content = MapUtils.getRequiredList(
-                attachment, "content", new TypeReference<>() {});
-            String contentType = MapUtils.getString(attachment, "contentType");
-            String name = (String) attachment.get("name");
-
-            if (contentType.startsWith("text/")) {
-                Matcher matcher = TEXT_PATTERN.matcher(MapUtils.getString(content.getFirst(), "text"));
-
-                if (matcher.find()) {
-                    String text = matcher.group(1);
-
-                    fileEntries.add(tempFileStorage.storeFileContent(name, text));
-                }
-            } else {
-                Matcher matcher = IMAGE_PATTERN.matcher(MapUtils.getString(content.getFirst(), "image"));
-
-                if (matcher.find()) {
-                    fileEntries.add(tempFileStorage.storeFileContent(
-                        name, new ByteArrayInputStream(EncodingUtils.base64Decode(matcher.group(1)))));
-                }
-            }
-        }
-
-        return fileEntries;
     }
 
     private void registerEmitter(String key, SseEmitter emitter) {

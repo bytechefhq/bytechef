@@ -258,10 +258,19 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public List<Object> getAuthorizationRefreshOn(
         String componentName, int connectionVersion, AuthorizationType authorizationType) {
 
-        Authorization authorization = componentDefinitionRegistry.getAuthorization(
+        Optional<Authorization> authorizationOptional = componentDefinitionRegistry.fetchAuthorization(
             componentName, connectionVersion, authorizationType);
 
-        return authorization.getRefreshOn()
+        if (authorizationOptional.isEmpty()) {
+            logger.warn(
+                "Authorization not found for component '{}', version {}, type '{}'", componentName, connectionVersion,
+                authorizationType);
+
+            return List.of();
+        }
+
+        return authorizationOptional.get()
+            .getRefreshOn()
             .orElse(DEFAULT_REFRESH_ON);
     }
 
