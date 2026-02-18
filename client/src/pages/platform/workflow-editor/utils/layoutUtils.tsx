@@ -58,6 +58,7 @@ import {TASK_DISPATCHER_CONFIG, getParentTaskDispatcherTask} from './taskDispatc
 export const CLUSTER_ELEMENT_GAP = 70;
 export const CLUSTER_ELEMENT_LABEL_PADDING = 20;
 export const CLUSTER_ELEMENT_OVERLAP_PADDING = 20;
+export const CLUSTER_ROOT_GAP = 40;
 
 let dagre: typeof import('@dagrejs/dagre') | null = null;
 
@@ -296,7 +297,7 @@ export const getClusterElementsLayoutElements = ({
                 const child = clusterRootChildren[childIndex];
                 const childTypesCount = (child.data.clusterElementTypesCount as number) || 1;
                 const childWidth = calculateNodeWidth(childTypesCount) || ROOT_CLUSTER_WIDTH;
-                const clusterRootHorizontalGap = childWidth + 80;
+                const clusterRootHorizontalGap = childWidth + CLUSTER_ROOT_GAP;
 
                 if (containsNodePosition(child.data.metadata)) {
                     positionedNodes.push({...child, position: child.data.metadata.ui.nodePosition});
@@ -378,8 +379,13 @@ export const getClusterElementsLayoutElements = ({
                 const labelPaddingA = isClusterRootA ? 0 : CLUSTER_ELEMENT_LABEL_PADDING;
                 const labelPaddingB = isClusterRootB ? 0 : CLUSTER_ELEMENT_LABEL_PADDING;
 
+                // When both nodes are cluster roots, enforce the intended gap
+                // so overlap-resolution cascades don't compress spacing below
+                // the designed CLUSTER_ROOT_GAP.
+                const minGap = isClusterRootA && isClusterRootB ? CLUSTER_ROOT_GAP : overlapPadding;
+
                 const verticalOverlap = Math.abs(nodeA.position.y - nodeB.position.y) < NODE_HEIGHT + labelOverhang;
-                const minX = nodeA.position.x + widthA + labelPaddingA + labelPaddingB + overlapPadding;
+                const minX = nodeA.position.x + widthA + labelPaddingA + labelPaddingB + minGap;
 
                 if (verticalOverlap && nodeB.position.x < minX) {
                     nodeB.position = {...nodeB.position, x: minX};
