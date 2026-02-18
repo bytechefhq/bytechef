@@ -252,7 +252,7 @@ class HttpClientExecutor {
             case ResponseType.Type.BINARY -> new ResponseImpl(
                 httpHeaders.map(),
                 storeBinaryResponseBody(configuration, httpHeaders.map(), (InputStream) httpResponseBody), statusCode);
-            case ResponseType.Type.JSON, ResponseType.Type.JSON_TEXT -> new ResponseImpl(
+            case ResponseType.Type.JSON -> new ResponseImpl(
                 httpHeaders.map(), JsonUtils.read(httpResponseBody.toString()), statusCode);
             case ResponseType.Type.XML -> new ResponseImpl(
                 httpHeaders.map(), XmlUtils.read(httpResponseBody.toString()), statusCode);
@@ -512,6 +512,10 @@ class HttpClientExecutor {
         return contentTypeOptional
             .map(contentType -> {
                 String mediaType = contentType.split(";")[0].trim();
+
+                if (mediaType.equals("text/json")) {
+                    mediaType = "application/json";
+                }
 
                 return Strings.CI.equals(mediaType, responseType.getContentType()) ||
                     Strings.CI.equals(mediaType, String.valueOf(responseType.getType()));
