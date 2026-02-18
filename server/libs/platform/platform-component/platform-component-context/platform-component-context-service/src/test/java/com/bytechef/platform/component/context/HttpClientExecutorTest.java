@@ -856,7 +856,7 @@ public class HttpClientExecutorTest {
         @Test
         @DisplayName("Should parse JSON Text with charset in content-type header")
         void testJsonTextWithCharsetInContentType() {
-            Http.Configuration configuration = Http.responseType(Http.ResponseType.JSON_TEXT)
+            Http.Configuration configuration = Http.responseType(Http.ResponseType.JSON)
                 .build();
 
             TestHttpResponse testHttpResponse = new TestHttpResponse(

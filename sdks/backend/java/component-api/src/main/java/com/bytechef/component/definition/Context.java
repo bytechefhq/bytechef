@@ -299,14 +299,12 @@ public interface Context {
             public enum Type {
                 BINARY,
                 JSON,
-                JSON_TEXT,
                 TEXT,
                 XML
             }
 
             public static final ResponseType BINARY = new ResponseType("application/octet-stream", Type.BINARY);
             public static final ResponseType JSON = new ResponseType("application/json", Type.JSON);
-            public static final ResponseType JSON_TEXT = new ResponseType("text/json", Type.JSON_TEXT);
             public static final ResponseType TEXT = new ResponseType("text/plain", Type.TEXT);
             public static final ResponseType XML = new ResponseType("application/xml", Type.XML);
 
@@ -329,7 +327,6 @@ public interface Context {
                 return switch (string) {
                     case "BINARY" -> BINARY;
                     case "JSON" -> JSON;
-                    case "JSON_TEXT" -> JSON_TEXT;
                     case "TEXT" -> TEXT;
                     case "XML" -> XML;
                     default -> throw new IllegalArgumentException("Unsupported response type: " + string);
