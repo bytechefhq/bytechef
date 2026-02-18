@@ -35,6 +35,20 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
         .flatMap((task) => task.connections ?? [])
         .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 
+    const workflowNodeLabelMap = new Map<string, string>();
+
+    for (const task of workflow?.tasks ?? []) {
+        if (task.label) {
+            workflowNodeLabelMap.set(task.name, task.label);
+        }
+    }
+
+    for (const trigger of workflow?.triggers ?? []) {
+        if (trigger.label) {
+            workflowNodeLabelMap.set(trigger.name, trigger.label);
+        }
+    }
+
     return (
         <div>
             {!switchHidden && (
@@ -86,6 +100,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                             componentConnections={componentConnections}
                             control={control}
                             workflowIndex={workflowIndex}
+                            workflowNodeLabelMap={workflowNodeLabelMap}
                         />
                     </li>
                 </ul>
