@@ -16,15 +16,15 @@
 
 package com.bytechef.component.youtube.action;
 
-import static com.bytechef.component.youtube.constant.YoutubeConstants.CATEGORY_ID;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.DESCRIPTION;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.FILE;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.LOCATION;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.PRIVACY_STATUS;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.SNIPPET;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.STATUS;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.TAGS;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.TITLE;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.CATEGORY_ID;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.DESCRIPTION;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.FILE;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.LOCATION;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.PRIVACY_STATUS;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.SNIPPET;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.STATUS;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.TAGS;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,7 +45,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Nikolina Spehar
  */
-class YoutubeUploadVideoActionTest {
+class YouTubeUploadVideoActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
     private final Context mockedContext = mock(Context.class);
@@ -88,7 +88,7 @@ class YoutubeUploadVideoActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(SNIPPET, Map.of()));
 
-        Object result = YoutubeUploadVideoAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = YouTubeUploadVideoAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of(), result);
         assertEquals(

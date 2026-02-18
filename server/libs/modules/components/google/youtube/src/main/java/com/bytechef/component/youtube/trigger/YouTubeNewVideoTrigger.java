@@ -21,11 +21,11 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.IDENTIFIER;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.ITEMS;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.LAST_TIME_CHECKED;
-import static com.bytechef.component.youtube.constant.YoutubeConstants.SNIPPET;
-import static com.bytechef.component.youtube.util.YoutubeUtils.getChannelId;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.IDENTIFIER;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.ITEMS;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.LAST_TIME_CHECKED;
+import static com.bytechef.component.youtube.constant.YouTubeConstants.SNIPPET;
+import static com.bytechef.component.youtube.util.YouTubeUtils.getChannelId;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
@@ -47,7 +47,7 @@ import java.util.Map;
 /**
  * @author Nikolina Spehar
  */
-public class YoutubeNewVideoTrigger {
+public class YouTubeNewVideoTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newVideo")
         .title("New Video")
@@ -56,7 +56,7 @@ public class YoutubeNewVideoTrigger {
         .properties(
             string(IDENTIFIER)
                 .label("Username/Channel Handle")
-                .description("Youtube username or a channel handle (e.g. @Youtube).")
+                .description("YouTube username or a channel handle (e.g. @Youtube).")
                 .required(true))
         .output(
             outputSchema(
@@ -106,10 +106,10 @@ public class YoutubeNewVideoTrigger {
                             .description("Live broadcasting content."),
                         string("publishTime")
                             .description("The date and time when the video was published."))))
-        .poll(YoutubeNewVideoTrigger::poll)
+        .poll(YouTubeNewVideoTrigger::poll)
         .processErrorResponse(GoogleUtils::processErrorResponse);
 
-    private YoutubeNewVideoTrigger() {
+    private YouTubeNewVideoTrigger() {
     }
 
     protected static PollOutput poll(
