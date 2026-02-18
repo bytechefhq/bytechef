@@ -57,7 +57,8 @@ public class GoogleMeetCreateMeetingSpaceAction {
                 .required(false))
         .output(outputSchema(MEETING_SPACE_OUTPUT_PROPERTY))
         .perform(GoogleMeetCreateMeetingSpaceAction::perform)
-        .processErrorResponse(GoogleUtils::processErrorResponse);
+        .processErrorResponse(GoogleUtils::processErrorResponse)
+        .help("", "https://docs.bytechef.io/reference/components/google-meet_v1#create-meeting-space");
 
     private GoogleMeetCreateMeetingSpaceAction() {
     }
