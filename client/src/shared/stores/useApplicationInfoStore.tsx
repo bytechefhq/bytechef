@@ -31,6 +31,9 @@ export interface ApplicationInfoI {
         };
         enabled: boolean;
     };
+    knowledgeBase: {
+        enabled: boolean;
+    };
     loading: boolean;
     signUp: {
         activationRequired: boolean;
@@ -108,6 +111,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 commandBar: json.helpHub.commandBar,
                                 enabled: json.helpHub.enabled === 'true',
                             },
+                            knowledgeBase: {
+                                enabled: json.knowledgeBase?.enabled === 'true',
+                            },
                             loading: false,
                             signUp: json.signUp,
                             socialLogin: {
@@ -126,6 +132,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                         orgId: undefined,
                     },
                     enabled: true,
+                },
+                knowledgeBase: {
+                    enabled: false,
                 },
                 loading: false,
                 signUp: {
