@@ -748,6 +748,81 @@ export function positionConditionCasePlaceholders(allNodes: Node[], options: Con
             };
         }
     });
+
+    // Second pass: separate overlapping nested condition frame edges.
+    // When a nested condition shares the same cross-axis center as its ancestor,
+    // both right (or left) placeholders land at identical positions, causing
+    // their frame edges to visually overlap. This loop pushes each parent
+    // condition's placeholder outward until it clears all nested condition
+    // placeholders by at least nestedFramePadding pixels.
+    const nestedFramePadding = conditionCaseOffset / 2;
+
+    let frameChanged = true;
+
+    while (frameChanged) {
+        frameChanged = false;
+
+        allNodes.forEach((conditionNode) => {
+            const conditionData = conditionNode.data as NodeDataType;
+
+            if (conditionData.componentName !== 'condition') {
+                return;
+            }
+
+            const conditionId = conditionNode.id;
+            const rightPlaceholder = allNodes.find(
+                (node) => node.id === `${conditionId}-condition-right-placeholder-0`
+            );
+
+            const leftPlaceholder = allNodes.find(
+                (node) => node.id === `${conditionId}-condition-left-placeholder-0`
+            );
+
+            if (!rightPlaceholder && !leftPlaceholder) {
+                return;
+            }
+
+            const descendantIds = new Set<string>();
+
+            collectNestedDispatcherNodes(conditionId, allNodes, descendantIds);
+
+            allNodes.forEach((descendantNode) => {
+                if (
+                    !descendantIds.has(descendantNode.id) ||
+                    descendantNode.type !== 'placeholder' ||
+                    descendantNode.id.startsWith(`${conditionId}-condition-`)
+                ) {
+                    return;
+                }
+
+                if (rightPlaceholder && descendantNode.id.includes('-condition-right-placeholder-')) {
+                    const nestedRightCross = descendantNode.position[crossAxis];
+
+                    if (nestedRightCross + nestedFramePadding > rightPlaceholder.position[crossAxis]) {
+                        rightPlaceholder.position = {
+                            ...rightPlaceholder.position,
+                            [crossAxis]: nestedRightCross + nestedFramePadding,
+                        };
+
+                        frameChanged = true;
+                    }
+                }
+
+                if (leftPlaceholder && descendantNode.id.includes('-condition-left-placeholder-')) {
+                    const nestedLeftCross = descendantNode.position[crossAxis];
+
+                    if (nestedLeftCross - nestedFramePadding < leftPlaceholder.position[crossAxis]) {
+                        leftPlaceholder.position = {
+                            ...leftPlaceholder.position,
+                            [crossAxis]: nestedLeftCross - nestedFramePadding,
+                        };
+
+                        frameChanged = true;
+                    }
+                }
+            });
+        });
+    }
 }
 
 interface ShiftConditionBranchContentI {

@@ -862,6 +862,131 @@ describe('positionConditionCasePlaceholders', () => {
         // Result = Math.min(355, -45) = -45
         expect(leftPlaceholder.position.x).toBe(-45);
     });
+
+    it('should push parent right placeholder outward when nested condition right placeholder overlaps', () => {
+        const outerCondition: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 500, y: 100},
+            type: 'workflow',
+        };
+        const outerRightPlaceholder: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-right-placeholder-0',
+            position: {x: 0, y: 200},
+            type: 'placeholder',
+        };
+        const innerCondition: Node = {
+            data: {
+                componentName: 'condition',
+                conditionData: {conditionCase: 'caseTrue', conditionId: 'condition_1', index: 0},
+                taskDispatcher: true,
+                taskDispatcherId: 'condition_2',
+            },
+            id: 'condition_2',
+            position: {x: 500, y: 300},
+            type: 'workflow',
+        };
+        const innerRightPlaceholder: Node = {
+            data: {taskDispatcherId: 'condition_2'},
+            id: 'condition_2-condition-right-placeholder-0',
+            position: {x: 0, y: 400},
+            type: 'placeholder',
+        };
+        const allNodes = [outerCondition, outerRightPlaceholder, innerCondition, innerRightPlaceholder];
+
+        positionConditionCasePlaceholders(allNodes, {conditionCaseOffset: 145, crossAxis: 'x'});
+
+        // Both conditions at x=500, both right placeholders initially land at 500 + 145 = 645
+        // Second pass pushes outer right placeholder to inner right + conditionCaseOffset/2
+        const nestedFramePadding = 145 / 2;
+
+        expect(innerRightPlaceholder.position.x).toBe(645);
+        expect(outerRightPlaceholder.position.x).toBe(645 + nestedFramePadding);
+    });
+
+    it('should push parent left placeholder outward when nested condition left placeholder overlaps', () => {
+        const outerCondition: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 500, y: 100},
+            type: 'workflow',
+        };
+        const outerLeftPlaceholder: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-left-placeholder-0',
+            position: {x: 0, y: 200},
+            type: 'placeholder',
+        };
+        const innerCondition: Node = {
+            data: {
+                componentName: 'condition',
+                conditionData: {conditionCase: 'caseTrue', conditionId: 'condition_1', index: 0},
+                taskDispatcher: true,
+                taskDispatcherId: 'condition_2',
+            },
+            id: 'condition_2',
+            position: {x: 500, y: 300},
+            type: 'workflow',
+        };
+        const innerLeftPlaceholder: Node = {
+            data: {taskDispatcherId: 'condition_2'},
+            id: 'condition_2-condition-left-placeholder-0',
+            position: {x: 0, y: 400},
+            type: 'placeholder',
+        };
+        const allNodes = [outerCondition, outerLeftPlaceholder, innerCondition, innerLeftPlaceholder];
+
+        positionConditionCasePlaceholders(allNodes, {conditionCaseOffset: 145, crossAxis: 'x'});
+
+        // Both left placeholders initially land at 500 - 145 = 355
+        // Second pass pushes outer left placeholder to inner left - conditionCaseOffset/2
+        const nestedFramePadding = 145 / 2;
+
+        expect(innerLeftPlaceholder.position.x).toBe(355);
+        expect(outerLeftPlaceholder.position.x).toBe(355 - nestedFramePadding);
+    });
+
+    it('should not push parent placeholder when nested condition placeholder does not overlap', () => {
+        const outerCondition: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 500, y: 100},
+            type: 'workflow',
+        };
+        const outerRightPlaceholder: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-right-placeholder-0',
+            position: {x: 0, y: 200},
+            type: 'placeholder',
+        };
+        const innerCondition: Node = {
+            data: {
+                componentName: 'condition',
+                conditionData: {conditionCase: 'caseTrue', conditionId: 'condition_1', index: 0},
+                taskDispatcher: true,
+                taskDispatcherId: 'condition_2',
+            },
+            id: 'condition_2',
+            position: {x: 300, y: 300},
+            type: 'workflow',
+        };
+        const innerRightPlaceholder: Node = {
+            data: {taskDispatcherId: 'condition_2'},
+            id: 'condition_2-condition-right-placeholder-0',
+            position: {x: 0, y: 400},
+            type: 'placeholder',
+        };
+        const allNodes = [outerCondition, outerRightPlaceholder, innerCondition, innerRightPlaceholder];
+
+        positionConditionCasePlaceholders(allNodes, {conditionCaseOffset: 145, crossAxis: 'x'});
+
+        // Inner at x=300, inner right = 300 + 145 = 445
+        // Outer at x=500, outer right = 500 + 145 = 645
+        // 445 + 72.5 = 517.5 < 645 → no push needed
+        expect(innerRightPlaceholder.position.x).toBe(445);
+        expect(outerRightPlaceholder.position.x).toBe(645);
+    });
 });
 
 describe('shiftConditionBranchContent', () => {
