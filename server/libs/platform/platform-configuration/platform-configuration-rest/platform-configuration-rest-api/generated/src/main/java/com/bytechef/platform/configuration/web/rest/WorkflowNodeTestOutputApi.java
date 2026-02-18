@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-02-19T05:46:41.627972+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-02-19T05:53:32.886377+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
 @Validated
 @Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output Internal API")
 public interface WorkflowNodeTestOutputApi {
@@ -121,58 +121,6 @@ public interface WorkflowNodeTestOutputApi {
         @NotNull @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
     ) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    String PATH_SAVE_CLUSTER_ELEMENT_TEST_OUTPUT = "/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementWorkflowNodeName}/test-outputs";
-    /**
-     * PUT /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementWorkflowNodeName}/test-outputs : Create a new or update existing cluster element test output
-     * Create a new or update existing cluster element test output.
-     *
-     * @param id The id of a workflow. (required)
-     * @param workflowNodeName The name of the parent workflow node. (required)
-     * @param clusterElementWorkflowNodeName The name of the cluster element workflow node. (required)
-     * @param clusterElementType The type of the cluster element. (required)
-     * @param environmentId The id of an environment. (required)
-     * @param body  (optional)
-     * @return The workflow node test output object. (status code 200)
-     */
-    @Operation(
-        operationId = "saveClusterElementTestOutput",
-        summary = "Create a new or update existing cluster element test output",
-        description = "Create a new or update existing cluster element test output.",
-        tags = { "workflow-node-test-output" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The workflow node test output object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowNodeTestOutputModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.PUT,
-        value = WorkflowNodeTestOutputApi.PATH_SAVE_CLUSTER_ELEMENT_TEST_OUTPUT,
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<WorkflowNodeTestOutputModel> saveClusterElementTestOutput(
-        @NotNull @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
-        @NotNull @Parameter(name = "workflowNodeName", description = "The name of the parent workflow node.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
-        @NotNull @Parameter(name = "clusterElementWorkflowNodeName", description = "The name of the cluster element workflow node.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementWorkflowNodeName") String clusterElementWorkflowNodeName,
-        @NotNull @Parameter(name = "clusterElementType", description = "The type of the cluster element.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "clusterElementType", required = true) String clusterElementType,
-        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
-        @Parameter(name = "body", description = "") @Valid @RequestBody(required = false) @Nullable Object body
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"workflowNodeName\" : \"workflowNodeName\", \"id\" : 0, \"workflowId\" : \"workflowId\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

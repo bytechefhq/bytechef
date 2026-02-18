@@ -8,6 +8,7 @@ The workflow node output
 Name | Type
 ------------ | -------------
 `actionDefinition` | [ActionDefinitionBasic](ActionDefinitionBasic.md)
+`clusterElementDefinition` | [ClusterElementDefinitionBasic](ClusterElementDefinitionBasic.md)
 `outputResponse` | [OutputResponse](OutputResponse.md)
 `taskDispatcherDefinition` | [TaskDispatcherDefinitionBasic](TaskDispatcherDefinitionBasic.md)
 `testOutputResponse` | boolean
@@ -23,6 +24,7 @@ import type { WorkflowNodeOutput } from ''
 // TODO: Update the object below with actual values
 const example = {
   "actionDefinition": null,
+  "clusterElementDefinition": null,
   "outputResponse": null,
   "taskDispatcherDefinition": null,
   "testOutputResponse": null,
