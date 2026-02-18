@@ -63,7 +63,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import java.util.HashMap;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 
@@ -321,21 +321,13 @@ public class FirecrawlCrawlAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, Object> scrapeOptionsMap = new HashMap<>();
+        Map<String, Object> scrapeOptionsMap = inputParameters.getMap(
+            SCRAPE_OPTIONS, new TypeReference<>() {}, Map.of());
 
-        List<?> formatsList = inputParameters.getList(FORMATS);
+        List<String> formatsList = inputParameters.getList(FORMATS, String.class);
 
         if (formatsList != null) {
             scrapeOptionsMap.put(FORMATS, formatsList);
-        }
-
-        Object scrapeOptionsObj = inputParameters.get(SCRAPE_OPTIONS);
-
-        if (scrapeOptionsObj instanceof Map<?, ?> scrapeOptions) {
-            for (Map.Entry<?, ?> entry : scrapeOptions.entrySet()) {
-                scrapeOptionsMap.put(entry.getKey()
-                    .toString(), entry.getValue());
-            }
         }
 
         return context
