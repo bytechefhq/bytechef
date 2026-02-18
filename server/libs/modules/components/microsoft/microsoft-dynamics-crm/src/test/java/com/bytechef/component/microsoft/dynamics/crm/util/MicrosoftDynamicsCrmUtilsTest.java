@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
@@ -32,18 +34,25 @@ import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
@@ -81,11 +90,11 @@ class MicrosoftDynamicsCrmUtilsTest {
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
-        Http.Configuration configuration = configurationBuilder.build();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.ResponseType responseType = configuration.getResponseType();
+        ResponseType responseType = configuration.getResponseType();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
         assertEquals("/EntityDefinitions", stringArgumentCaptor.getValue());
 
         Object[] objects = {
@@ -131,11 +140,11 @@ class MicrosoftDynamicsCrmUtilsTest {
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
-        Http.Configuration configuration = configurationBuilder.build();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.ResponseType responseType = configuration.getResponseType();
+        ResponseType responseType = configuration.getResponseType();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
         assertEquals(List.of("/EntityDefinitions", "/account"), stringArgumentCaptor.getAllValues());
 
         List<Object[]> allQueryParams = objectsArgumentCaptor.getAllValues();
@@ -216,11 +225,11 @@ class MicrosoftDynamicsCrmUtilsTest {
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
-        Http.Configuration configuration = configurationBuilder.build();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.ResponseType responseType = configuration.getResponseType();
+        ResponseType responseType = configuration.getResponseType();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
         assertEquals(List.of("/EntityDefinitions", "/EntityDefinitions(LogicalName='account')/Attributes"),
             stringArgumentCaptor.getAllValues());
 
@@ -239,5 +248,51 @@ class MicrosoftDynamicsCrmUtilsTest {
 
         assertArrayEquals(queryParameters1, allQueryParams.get(0));
         assertArrayEquals(queryParameters2, allQueryParams.get(1));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testPoll(
+        TriggerContext mockedContext, Http mockedHttp, Http.Executor mockedExecutor, Http.Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        LocalDateTime fixedStart = LocalDateTime.of(2023, 1, 1, 0, 0);
+        LocalDateTime mockedNow = LocalDateTime.of(2023, 1, 1, 4, 0);
+        Parameters closureParameters = MockParametersFactory.create(Map.of("lastTimeChecked", fixedStart));
+        try (MockedStatic<LocalDateTime> mockedLocalDateTime = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+            mockedLocalDateTime.when(() -> LocalDateTime.now(any(ZoneId.class)))
+                .thenReturn(mockedNow);
+
+            when(mockedHttp.get(stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedResponse.getBody(any(TypeReference.class)))
+                .thenReturn(Map.of("value", List.of(Map.of("id", "1"), Map.of("id", "2"))));
+
+            PollOutput pollOutput = MicrosoftDynamicsCrmUtils.poll(closureParameters, mockedContext, "datemodified");
+
+            PollOutput expectedPollOutput = new PollOutput(
+                List.of(Map.of("id", "1"), Map.of("id", "2")), Map.of("lastTimeChecked", mockedNow), false);
+
+            assertEquals(expectedPollOutput, pollOutput);
+
+            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+            ResponseType responseType = configuration.getResponseType();
+
+            assertEquals(ResponseType.Type.JSON, responseType.getType());
+            assertEquals("/accounts", stringArgumentCaptor.getValue());
+
+            Object[] expectedQueryParams = {
+                "$filter", "datemodified ge 2023-01-01T00:00:00Z"
+            };
+            assertArrayEquals(expectedQueryParams, objectsArgumentCaptor.getValue());
+        }
     }
 }

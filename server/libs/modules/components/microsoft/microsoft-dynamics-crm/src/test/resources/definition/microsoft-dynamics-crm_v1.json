@@ -19,7 +19,7 @@
       "sampleOutput": null
     },
     "perform": { },
-    "processErrorResponse": null,
+    "processErrorResponse": { },
     "properties": [ {
       "advancedOption": null,
       "controlType": "SELECT",
@@ -80,7 +80,7 @@
     "name": "deleteRecord",
     "outputDefinition": null,
     "perform": { },
-    "processErrorResponse": null,
+    "processErrorResponse": { },
     "properties": [ {
       "advancedOption": null,
       "controlType": "SELECT",
@@ -156,7 +156,7 @@
       "sampleOutput": null
     },
     "perform": { },
-    "processErrorResponse": null,
+    "processErrorResponse": { },
     "properties": [ {
       "advancedOption": null,
       "controlType": "SELECT",
@@ -232,7 +232,7 @@
       "sampleOutput": null
     },
     "perform": { },
-    "processErrorResponse": null,
+    "processErrorResponse": { },
     "properties": [ {
       "advancedOption": null,
       "controlType": "SELECT",
@@ -753,7 +753,71 @@
   "resources": null,
   "tags": null,
   "title": "Microsoft Dynamics CRM",
-  "triggers": null,
+  "triggers": [ {
+    "batch": null,
+    "deduplicate": null,
+    "deprecated": null,
+    "description": "Triggers when new account is created.",
+    "dynamicWebhookRefresh": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-dynamics-crm_v1#new-account"
+    },
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "name": "newAccount",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "poll": { },
+    "processErrorResponse": { },
+    "properties": null,
+    "title": "New Account",
+    "type": "POLLING",
+    "webhookDisable": null,
+    "webhookEnable": null,
+    "webhookRawBody": null,
+    "webhookRequest": null,
+    "webhookValidate": null,
+    "webhookValidateOnEnable": null,
+    "workflowNodeDescription": null,
+    "workflowSyncExecution": null
+  }, {
+    "batch": null,
+    "deduplicate": null,
+    "deprecated": null,
+    "description": "Triggers when an account is updated.",
+    "dynamicWebhookRefresh": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-dynamics-crm_v1#updated-account"
+    },
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "name": "updatedAccount",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "poll": { },
+    "processErrorResponse": { },
+    "properties": null,
+    "title": "Updated Account",
+    "type": "POLLING",
+    "webhookDisable": null,
+    "webhookEnable": null,
+    "webhookRawBody": null,
+    "webhookRequest": null,
+    "webhookValidate": null,
+    "webhookValidateOnEnable": null,
+    "workflowNodeDescription": null,
+    "workflowSyncExecution": null
+  } ],
   "unifiedApi": null,
   "version": 1
 }
