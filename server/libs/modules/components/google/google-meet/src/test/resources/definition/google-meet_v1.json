@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a meeting space.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-meet_v1#create-meeting-space"
+    },
     "metadata": null,
     "name": "createMeetingSpace",
     "outputDefinition": {
@@ -371,7 +374,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets details about a meeting space.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-meet_v1#get-meeting-space"
+    },
     "metadata": null,
     "name": "getMeetingSpace",
     "outputDefinition": {
@@ -720,7 +726,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Lists the participants in a conference record. By default, ordered by join time and in descending order.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-meet_v1#list-participants"
+    },
     "metadata": null,
     "name": "listParticipants",
     "outputDefinition": {
@@ -2120,8 +2129,11 @@
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "Google Meet REST API documentation",
+    "learnMoreUrl": "https://developers.google.com/workspace/meet/api/guides/overview"
+  },
   "description": "Google Meet is a communication service designed to help you have interactions with your friends, family, colleagues and classmates.",
   "icon": "path:assets/google-meet.svg",
   "metadata": null,
