@@ -3,6 +3,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionBasicModel;
+import com.bytechef.platform.configuration.web.rest.model.ClusterElementDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.OutputResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
@@ -30,6 +31,8 @@ import jakarta.annotation.Generated;
 public class WorkflowNodeOutputModel {
 
   private @Nullable ActionDefinitionBasicModel actionDefinition;
+
+  private @Nullable ClusterElementDefinitionBasicModel clusterElementDefinition;
 
   private @Nullable OutputResponseModel outputResponse;
 
@@ -72,6 +75,26 @@ public class WorkflowNodeOutputModel {
 
   public void setActionDefinition(@Nullable ActionDefinitionBasicModel actionDefinition) {
     this.actionDefinition = actionDefinition;
+  }
+
+  public WorkflowNodeOutputModel clusterElementDefinition(@Nullable ClusterElementDefinitionBasicModel clusterElementDefinition) {
+    this.clusterElementDefinition = clusterElementDefinition;
+    return this;
+  }
+
+  /**
+   * Get clusterElementDefinition
+   * @return clusterElementDefinition
+   */
+  @Valid
+  @Schema(name = "clusterElementDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clusterElementDefinition")
+  public @Nullable ClusterElementDefinitionBasicModel getClusterElementDefinition() {
+    return clusterElementDefinition;
+  }
+
+  public void setClusterElementDefinition(@Nullable ClusterElementDefinitionBasicModel clusterElementDefinition) {
+    this.clusterElementDefinition = clusterElementDefinition;
   }
 
   public WorkflowNodeOutputModel outputResponse(@Nullable OutputResponseModel outputResponse) {
@@ -204,6 +227,7 @@ public class WorkflowNodeOutputModel {
     }
     WorkflowNodeOutputModel workflowNodeOutput = (WorkflowNodeOutputModel) o;
     return Objects.equals(this.actionDefinition, workflowNodeOutput.actionDefinition) &&
+        Objects.equals(this.clusterElementDefinition, workflowNodeOutput.clusterElementDefinition) &&
         Objects.equals(this.outputResponse, workflowNodeOutput.outputResponse) &&
         Objects.equals(this.taskDispatcherDefinition, workflowNodeOutput.taskDispatcherDefinition) &&
         Objects.equals(this.testOutputResponse, workflowNodeOutput.testOutputResponse) &&
@@ -214,7 +238,7 @@ public class WorkflowNodeOutputModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionDefinition, outputResponse, taskDispatcherDefinition, testOutputResponse, triggerDefinition, variableOutputResponse, workflowNodeName);
+    return Objects.hash(actionDefinition, clusterElementDefinition, outputResponse, taskDispatcherDefinition, testOutputResponse, triggerDefinition, variableOutputResponse, workflowNodeName);
   }
 
   @Override
@@ -222,6 +246,7 @@ public class WorkflowNodeOutputModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowNodeOutputModel {\n");
     sb.append("    actionDefinition: ").append(toIndentedString(actionDefinition)).append("\n");
+    sb.append("    clusterElementDefinition: ").append(toIndentedString(clusterElementDefinition)).append("\n");
     sb.append("    outputResponse: ").append(toIndentedString(outputResponse)).append("\n");
     sb.append("    taskDispatcherDefinition: ").append(toIndentedString(taskDispatcherDefinition)).append("\n");
     sb.append("    testOutputResponse: ").append(toIndentedString(testOutputResponse)).append("\n");
