@@ -1,4 +1,4 @@
-import {CLUSTER_ELEMENT_NODE_WIDTH} from '@/shared/constants';
+import {CLUSTER_ELEMENT_NODE_WIDTH, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {
     BranchChildTasksType,
@@ -14,6 +14,7 @@ import {
     CLUSTER_ELEMENT_GAP,
     CLUSTER_ELEMENT_LABEL_PADDING,
     CLUSTER_ELEMENT_OVERLAP_PADDING,
+    CLUSTER_ROOT_GAP,
     collectTaskDispatcherData,
 } from './layoutUtils';
 
@@ -354,5 +355,24 @@ describe('cluster element spacing', () => {
         const horizontalGap = CLUSTER_ELEMENT_NODE_WIDTH + CLUSTER_ELEMENT_GAP;
 
         expect(horizontalGap).toBe(142);
+    });
+});
+
+describe('cluster root spacing', () => {
+    it('should produce a uniform gap that exceeds the overlap resolution threshold', () => {
+        const clusterRootHorizontalGap = ROOT_CLUSTER_WIDTH + CLUSTER_ROOT_GAP;
+        const overlapMinDistance = ROOT_CLUSTER_WIDTH + CLUSTER_ELEMENT_OVERLAP_PADDING;
+
+        expect(clusterRootHorizontalGap).toBeGreaterThan(overlapMinDistance);
+    });
+
+    it('should have a gap of 320px center-to-center between cluster root children', () => {
+        const clusterRootHorizontalGap = ROOT_CLUSTER_WIDTH + CLUSTER_ROOT_GAP;
+
+        expect(clusterRootHorizontalGap).toBe(320);
+    });
+
+    it('should use CLUSTER_ROOT_GAP as overlap resolution minimum between cluster roots', () => {
+        expect(CLUSTER_ROOT_GAP).toBeGreaterThanOrEqual(CLUSTER_ELEMENT_OVERLAP_PADDING);
     });
 });
