@@ -42,6 +42,10 @@ public class GoogleMeetComponentHandler implements ComponentHandler {
         .icon("path:assets/google-meet.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(GoogleMeetConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp(
+            "Google Meet REST API documentation",
+            "https://developers.google.com/workspace/meet/api/guides/overview")
         .actions(
             GoogleMeetCreateMeetingSpaceAction.ACTION_DEFINITION,
             GoogleMeetGetMeetingSpaceAction.ACTION_DEFINITION,
@@ -49,7 +53,8 @@ public class GoogleMeetComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(GoogleMeetCreateMeetingSpaceAction.ACTION_DEFINITION),
             tool(GoogleMeetGetMeetingSpaceAction.ACTION_DEFINITION),
-            tool(GoogleMeetListParticipantsAction.ACTION_DEFINITION));
+            tool(GoogleMeetListParticipantsAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

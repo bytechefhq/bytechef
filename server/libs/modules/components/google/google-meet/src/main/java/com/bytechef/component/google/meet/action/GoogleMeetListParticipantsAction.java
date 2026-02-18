@@ -76,7 +76,8 @@ public class GoogleMeetListParticipantsAction {
                                         "Time when the participant left the meeting for the last time. This " +
                                             "can be null if it's an active meeting.")))))
         .perform(GoogleMeetListParticipantsAction::perform)
-        .processErrorResponse(GoogleUtils::processErrorResponse);
+        .processErrorResponse(GoogleUtils::processErrorResponse)
+        .help("", "https://docs.bytechef.io/reference/components/google-meet_v1#list-participants");
 
     private GoogleMeetListParticipantsAction() {
     }

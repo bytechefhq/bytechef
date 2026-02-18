@@ -32,7 +32,9 @@ public class GoogleMeetConnection {
         (connection, context) -> Map.of(
             "https://www.googleapis.com/auth/meetings.space.created", true,
             "https://www.googleapis.com/auth/meetings.space.readonly", false,
-            "https://www.googleapis.com/auth/meetings.space.settings", false));
+            "https://www.googleapis.com/auth/meetings.space.settings", false,
+            "https://www.googleapis.com/auth/drive.readonly", false,
+            "https://www.googleapis.com/auth/drive.meet.readonly", false));
 
     private GoogleMeetConnection() {
     }

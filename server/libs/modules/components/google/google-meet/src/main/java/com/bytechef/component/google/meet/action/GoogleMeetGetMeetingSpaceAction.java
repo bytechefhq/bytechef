@@ -44,7 +44,8 @@ public class GoogleMeetGetMeetingSpaceAction {
                 .required(true))
         .output(outputSchema(MEETING_SPACE_OUTPUT_PROPERTY))
         .perform(GoogleMeetGetMeetingSpaceAction::perform)
-        .processErrorResponse(GoogleUtils::processErrorResponse);
+        .processErrorResponse(GoogleUtils::processErrorResponse)
+        .help("", "https://docs.bytechef.io/reference/components/google-meet_v1#get-meeting-space");
 
     private GoogleMeetGetMeetingSpaceAction() {
     }
