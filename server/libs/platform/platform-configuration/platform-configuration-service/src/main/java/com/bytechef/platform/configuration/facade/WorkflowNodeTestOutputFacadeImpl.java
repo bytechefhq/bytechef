@@ -153,15 +153,15 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, Object> mergedParameters = MapUtils.concat(
             clusterElementTestContext.inputParameters(), Map.of("input", inputParameters));
 
+        ClusterElement clusterElement = clusterElementTestContext.clusterElement();
+
         Map<String, ?> extensions = evaluator.evaluate(
-            clusterElementTestContext.clusterElement()
-                .getExtensions(),
-            clusterElementTestContext.outputs());
+            clusterElement.getExtensions(), clusterElementTestContext.outputs());
+
+        Workflow workflow = clusterElementTestContext.workflow();
 
         return executeAndSaveTestOutput(
-            clusterElementTestContext.workflow()
-                .getId(),
-            clusterElementWorkflowNodeName,
+            workflow.getId(), clusterElementWorkflowNodeName,
             clusterElementTestContext.clusterElementWorkflowNodeType(), mergedParameters,
             clusterElementTestContext.connectionIds(), extensions, environmentId);
     }
