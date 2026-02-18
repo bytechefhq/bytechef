@@ -43,10 +43,10 @@ public class FirecrawlConstants {
     public static final String INCLUDE_TAGS = "includeTags";
     public static final String LANGUAGES = "languages";
     public static final String LIMIT = "limit";
-    public static final String MAX_CONCURRENCY = "maxConcurrency";
-    public static final String MAX_DISCOVERY_DEPTH = "maxDiscoveryDepth";
     public static final String LOCATION = "location";
     public static final String MAX_AGE = "maxAge";
+    public static final String MAX_CONCURRENCY = "maxConcurrency";
+    public static final String MAX_DISCOVERY_DEPTH = "maxDiscoveryDepth";
     public static final String MOBILE = "mobile";
     public static final String ONLY_MAIN_CONTENT = "onlyMainContent";
     public static final String PARSERS = "parsers";
