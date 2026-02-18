@@ -163,8 +163,6 @@ public class HttpClientConnection {
                 .apply((Parameters connectionParameters, Context context) -> {
                     Map<String, String> formParameters = new LinkedHashMap<>();
 
-                    formParameters.put("client_id", connectionParameters.getRequiredString(CLIENT_ID));
-                    formParameters.put("client_secret", connectionParameters.getRequiredString(CLIENT_SECRET));
                     formParameters.put("grant_type", "client_credentials");
 
                     String scopes = connectionParameters.getString(SCOPES);
@@ -175,10 +173,16 @@ public class HttpClientConnection {
                         formParameters.put("scope", scopes.trim());
                     }
 
+                    String base64Credentials = context.encoder(
+                        encoder -> encoder.base64Encode(
+                            connectionParameters.getString(CLIENT_ID), ":",
+                            connectionParameters.getString(CLIENT_SECRET)));
+
                     String accessToken = context.http(http -> {
                         Context.Http.Response tokenResponse =
                             http.post(connectionParameters.getRequiredString(TOKEN_URL))
                                 .body(Body.of(formParameters, FORM_URL_ENCODED))
+                                .header("Authorization", "Basic: " + base64Credentials)
                                 .configuration(
                                     responseType(JSON)
                                         .disableAuthorization(true))
