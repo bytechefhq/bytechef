@@ -1,5 +1,5 @@
 ---
-title: "Youtube"
+title: "YouTube"
 description: "Enjoy the videos and music you love, upload original content, and share it all with friends, family, and the world on YouTube."
 ---
 
@@ -7,7 +7,7 @@ description: "Enjoy the videos and music you love, upload original content, and 
 Categories: Helpers
 
 
-Type: youtube/v1
+Type: youTube/v1
 
 <hr />
 
@@ -60,7 +60,7 @@ Creation of OAuth 2.0 application is documented [here](/reference/components/goo
 ### Upload Video
 Name: uploadVideo
 
-`Uploads video to Youtube.`
+`Uploads video to YouTube.`
 
 #### Properties
 
@@ -91,7 +91,7 @@ Name: uploadVideo
     "privacyStatus" : "",
     "categoryId" : ""
   },
-  "type" : "youtube/v1/uploadVideo"
+  "type" : "youTube/v1/uploadVideo"
 }
 ```
 
@@ -157,6 +157,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Video Category ID
+
+To find Video Category ID, click [here](/reference/components/youtube_v1#how-to-find-video-category-id)
 
 
 
@@ -175,7 +178,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| identifier | Username/Channel Handle | STRING | Youtube username or a channel handle (e.g. @Youtube). | true |
+| identifier | Username/Channel Handle | STRING | YouTube username or a channel handle (e.g. @Youtube). | true |
 
 
 #### Output
@@ -209,7 +212,7 @@ Type: OBJECT
   "parameters" : {
     "identifier" : ""
   },
-  "type" : "youtube/v1/newVideo"
+  "type" : "youTube/v1/newVideo"
 }
 ```
 
@@ -217,9 +220,19 @@ Type: OBJECT
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
 <hr />
 
 # Additional Instructions
+
+### How to find Video Category ID
+
+You can only find Video Category ID by using Google YouTube Data API endpoint: `GET https://www.googleapis.com/youtube/v3/videoCategories`.
 
 ## Troubleshooting
 
