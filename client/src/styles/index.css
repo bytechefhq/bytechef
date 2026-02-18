@@ -17,3 +17,49 @@
         @apply h-full;
     }
 }
+
+/* Thread text size overrides — scales down all text in assistant-ui threads */
+
+.aui-thread-root {
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+}
+
+.aui-thread-root .aui-thread-welcome-message-motion-1,
+.aui-thread-root .aui-thread-welcome-message-motion-2 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.aui-thread-root .aui-assistant-message-content {
+    line-height: 1.5rem;
+}
+
+.aui-thread-root .aui-md-p {
+    line-height: 1.5rem;
+}
+
+.aui-thread-root .aui-md-h1 {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+
+.aui-thread-root .aui-md-h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.aui-thread-root .aui-md-h3 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.aui-thread-root .aui-md-h4 {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.aui-thread-root .aui-md-h5 {
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
