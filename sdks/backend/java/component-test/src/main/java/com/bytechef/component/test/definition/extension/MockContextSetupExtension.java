@@ -27,6 +27,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.TriggerContext;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -48,19 +49,18 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor = forClass(ConfigurationBuilder.class);
-        ActionContext mockedContext = mock(ActionContext.class);
         Http.Executor mockedExecutor = mock(Http.Executor.class);
         Http.Response mockedResponse = mock(Http.Response.class);
         @SuppressWarnings("unchecked")
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor = forClass(ContextFunction.class);
         Http mockedHttp = mock(Http.class);
 
-        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+        ActionContext mockedActionContext = mock(ActionContext.class);
+        TriggerContext mockedTriggerContext = mock(TriggerContext.class);
 
-                return value.apply(mockedHttp);
-            });
+        setupContext(mockedActionContext, mockedHttp, httpFunctionArgumentCaptor);
+        setupContext(mockedTriggerContext, mockedHttp, httpFunctionArgumentCaptor);
+
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
@@ -68,12 +68,24 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
 
         Store extensionContextStore = extensionContext.getStore(Namespace.create(MockContextSetupExtension.class));
 
-        extensionContextStore.put(Context.class, mockedContext);
+        extensionContextStore.put(ActionContext.class, mockedActionContext);
+        extensionContextStore.put(TriggerContext.class, mockedTriggerContext);
         extensionContextStore.put(Response.class, mockedResponse);
         extensionContextStore.put(Executor.class, mockedExecutor);
         extensionContextStore.put(Http.class, mockedHttp);
         extensionContextStore.put("httpFunctionArgumentCaptor", httpFunctionArgumentCaptor);
         extensionContextStore.put("configurationBuilderArgumentCaptor", configurationBuilderArgumentCaptor);
+    }
+
+    private void setupContext(
+        Context mockedContext, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
     }
 
     @Override
@@ -85,6 +97,7 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
 
         return parameter.getType() == Context.class ||
             parameter.getType() == ActionContext.class ||
+            parameter.getType() == TriggerContext.class ||
             parameter.getType() == Http.Response.class ||
             parameter.getType() == Http.Executor.class ||
             parameter.getType() == Http.class ||
@@ -104,23 +117,33 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
         Parameter parameter = parameterContext.getParameter();
         Type type = parameter.getParameterizedType();
 
-        if (parameter.getType() == Context.class || parameter.getType() == ActionContext.class) {
-            return extensionContextStore.get(Context.class);
+        Class<?> classType = parameter.getType();
+
+        if (classType == ActionContext.class) {
+            return extensionContextStore.get(ActionContext.class);
         }
 
-        if (parameter.getType() == Http.Response.class) {
+        if (classType == TriggerContext.class) {
+            return extensionContextStore.get(TriggerContext.class);
+        }
+
+        if (classType == Context.class) {
+            return extensionContextStore.get(ActionContext.class);
+        }
+
+        if (classType == Http.Response.class) {
             return extensionContextStore.get(Http.Response.class);
         }
 
-        if (parameter.getType() == Http.Executor.class) {
+        if (classType == Http.Executor.class) {
             return extensionContextStore.get(Http.Executor.class);
         }
 
-        if (parameter.getType() == Http.class) {
+        if (classType == Http.class) {
             return extensionContextStore.get(Http.class);
         }
 
-        if (parameter.getType() == ArgumentCaptor.class && type instanceof ParameterizedType pt) {
+        if (classType == ArgumentCaptor.class && type instanceof ParameterizedType pt) {
             Type actualTypeArgument = pt.getActualTypeArguments()[0];
 
             if (actualTypeArgument.equals(ConfigurationBuilder.class)) {
@@ -137,6 +160,6 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
         }
 
         throw new ParameterResolutionException(
-            "Unsupported parameter type: " + parameter.getType());
+            "Unsupported parameter type: " + classType);
     }
 }
