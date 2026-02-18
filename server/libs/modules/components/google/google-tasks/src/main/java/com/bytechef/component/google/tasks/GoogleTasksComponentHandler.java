@@ -18,7 +18,6 @@ package com.bytechef.component.google.tasks;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
-import static com.bytechef.component.google.tasks.connection.GoogleTasksConnection.CONNECTION_DEFINITION;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -26,6 +25,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.tasks.action.GoogleTasksCreateTaskAction;
 import com.bytechef.component.google.tasks.action.GoogleTasksListTasksAction;
 import com.bytechef.component.google.tasks.action.GoogleTasksUpdateTaskAction;
+import com.bytechef.component.google.tasks.connection.GoogleTasksConnection;
 import com.bytechef.component.google.tasks.trigger.GoogleTasksNewTaskTrigger;
 import com.google.auto.service.AutoService;
 
@@ -43,7 +43,11 @@ public class GoogleTasksComponentHandler implements ComponentHandler {
         .customAction(true)
         .icon("path:assets/google-tasks.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
-        .connection(CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp(
+            "Google Tasks API documentation",
+            "https://developers.google.com/workspace/tasks/reference/rest")
+        .connection(GoogleTasksConnection.CONNECTION_DEFINITION)
         .actions(
             GoogleTasksCreateTaskAction.ACTION_DEFINITION,
             GoogleTasksListTasksAction.ACTION_DEFINITION,
@@ -52,7 +56,8 @@ public class GoogleTasksComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(GoogleTasksCreateTaskAction.ACTION_DEFINITION),
             tool(GoogleTasksListTasksAction.ACTION_DEFINITION),
-            tool(GoogleTasksUpdateTaskAction.ACTION_DEFINITION));
+            tool(GoogleTasksUpdateTaskAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

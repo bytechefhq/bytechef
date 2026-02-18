@@ -75,7 +75,8 @@ public class GoogleTasksUpdateTaskAction {
                 .required(false))
         .output(outputSchema(TASK_OUTPUT_PROPERTY))
         .perform(GoogleTasksUpdateTaskAction::perform)
-        .processErrorResponse(GoogleUtils::processErrorResponse);
+        .processErrorResponse(GoogleUtils::processErrorResponse)
+        .help("", "https://docs.bytechef.io/reference/components/google-tasks_v1#update-task");
 
     private GoogleTasksUpdateTaskAction() {
     }

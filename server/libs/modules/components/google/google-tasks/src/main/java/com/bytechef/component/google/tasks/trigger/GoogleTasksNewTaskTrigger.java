@@ -64,7 +64,8 @@ public class GoogleTasksNewTaskTrigger {
                 .required(true))
         .output(outputSchema(TASK_OUTPUT_PROPERTY))
         .poll(GoogleTasksNewTaskTrigger::poll)
-        .processErrorResponse(GoogleUtils::processErrorResponse);
+        .processErrorResponse(GoogleUtils::processErrorResponse)
+        .help("", "https://docs.bytechef.io/reference/components/google-tasks_v1#new-task");
 
     private GoogleTasksNewTaskTrigger() {
     }

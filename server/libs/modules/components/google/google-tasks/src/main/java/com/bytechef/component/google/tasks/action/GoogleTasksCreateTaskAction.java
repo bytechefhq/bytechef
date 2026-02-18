@@ -69,7 +69,8 @@ public class GoogleTasksCreateTaskAction {
                 .required(false))
         .output(outputSchema(TASK_OUTPUT_PROPERTY))
         .perform(GoogleTasksCreateTaskAction::perform)
-        .processErrorResponse(GoogleUtils::processErrorResponse);
+        .processErrorResponse(GoogleUtils::processErrorResponse)
+        .help("", "https://docs.bytechef.io/reference/components/google-tasks_v1#create-task");
 
     private GoogleTasksCreateTaskAction() {
     }

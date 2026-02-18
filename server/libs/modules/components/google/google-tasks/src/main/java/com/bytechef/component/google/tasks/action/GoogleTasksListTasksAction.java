@@ -63,7 +63,8 @@ public class GoogleTasksListTasksAction {
                 .required(true))
         .output(outputSchema(array().items(TASK_OUTPUT_PROPERTY)))
         .perform(GoogleTasksListTasksAction::perform)
-        .processErrorResponse(GoogleUtils::processErrorResponse);
+        .processErrorResponse(GoogleUtils::processErrorResponse)
+        .help("", "https://docs.bytechef.io/reference/components/google-tasks_v1#list-tasks");
 
     private GoogleTasksListTasksAction() {
     }
