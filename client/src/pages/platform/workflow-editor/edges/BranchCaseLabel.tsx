@@ -12,10 +12,12 @@ import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import saveRootTaskDispatcher from '../utils/saveRootTaskDispatcher';
 import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
+import computeBranchCaseLabelPosition from './computeBranchCaseLabelPosition';
 
 interface BranchCaseLabelProps {
     caseKey: string | number;
     edgeId: string;
+    hasEdgeButton?: boolean;
     layoutDirection: LayoutDirectionType;
     sourceX: number;
     sourceY: number;
@@ -40,6 +42,7 @@ function parseCaseKeyValue(value: string): string | number {
 export default function BranchCaseLabel({
     caseKey,
     edgeId,
+    hasEdgeButton,
     layoutDirection,
     sourceX,
     sourceY,
@@ -51,6 +54,11 @@ export default function BranchCaseLabel({
     const [caseKeyValue, setCaseKeyValue] = useState(String(caseKey));
 
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const labelPosition = useMemo(
+        () => computeBranchCaseLabelPosition({hasEdgeButton, layoutDirection, sourceX, sourceY, targetX, targetY}),
+        [hasEdgeButton, layoutDirection, sourceX, sourceY, targetX, targetY]
+    );
 
     const {invalidateWorkflowQueries} = useWorkflowEditor();
 
@@ -206,10 +214,7 @@ export default function BranchCaseLabel({
                 style={{
                     pointerEvents: 'all',
                     position: 'absolute',
-                    transform:
-                        layoutDirection === 'LR'
-                            ? `translate(${sourceX}px, ${targetY}px) translate(-50%, -50%)`
-                            : `translate(${targetX}px, ${sourceY}px) translate(-50%, -50%)`,
+                    transform: `translate(${labelPosition.x}px, ${labelPosition.y}px) translate(-50%, -50%)`,
                 }}
             >
                 {isDefaultCase && <span className="p-1 text-xs">default</span>}

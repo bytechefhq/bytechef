@@ -775,9 +775,7 @@ export function positionConditionCasePlaceholders(allNodes: Node[], options: Con
                 (node) => node.id === `${conditionId}-condition-right-placeholder-0`
             );
 
-            const leftPlaceholder = allNodes.find(
-                (node) => node.id === `${conditionId}-condition-left-placeholder-0`
-            );
+            const leftPlaceholder = allNodes.find((node) => node.id === `${conditionId}-condition-left-placeholder-0`);
 
             if (!rightPlaceholder && !leftPlaceholder) {
                 return;
