@@ -109,7 +109,7 @@ public class MicrosoftOutlook365Utils {
                     "@odata.type", "#microsoft.graph.fileAttachment",
                     NAME, attachment.getName(),
                     CONTENT_TYPE, attachment.getMimeType(),
-                    CONTENT_BYTES, context.encoder(encoder -> encoder.base64EncodeToString(file1))));
+                    CONTENT_BYTES, context.encoder(encoder -> encoder.base64Encode(file1))));
         }
 
         return encodedAttachments;

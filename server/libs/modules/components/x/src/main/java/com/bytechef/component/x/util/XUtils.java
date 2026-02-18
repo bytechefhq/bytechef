@@ -63,7 +63,7 @@ public class XUtils {
 
     public static String uploadMedia(Context context, FileEntry fileEntry, String mediaCategory) {
         byte[] bytes = context.file(file -> file.readAllBytes(fileEntry));
-        String base64EncodedMedia = context.encoder(encoder -> encoder.base64EncodeToString(bytes));
+        String base64EncodedMedia = context.encoder(encoder -> encoder.base64Encode(bytes));
 
         Map<String, ?> body = context.http(http -> http.post("/media/upload"))
             .body(Http.Body.of(Map.of(MEDIA, base64EncodedMedia, "media_category", mediaCategory)))

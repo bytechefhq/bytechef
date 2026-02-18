@@ -61,7 +61,7 @@ public class ZendeskConnection {
                         connectionParameters.getRequiredString(API_TOKEN));
 
                     String base64EncodedToken = context.encoder(
-                        encoder -> encoder.base64EncodeToString(token.getBytes(StandardCharsets.UTF_8)));
+                        encoder -> encoder.base64Encode(token.getBytes(StandardCharsets.UTF_8)));
 
                     return ApplyResponse.ofHeaders(Map.of("Authorization", List.of("Basic " + base64EncodedToken)));
                 }));

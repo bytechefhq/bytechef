@@ -96,7 +96,7 @@ public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
                     String clientSecret = connectionParameters.getString(CLIENT_SECRET);
                     String valueToEncode = clientId + ":" + clientSecret;
                     String encode = context.encoder(
-                        encoder -> encoder.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)));
+                        encoder -> encoder.base64Encode(valueToEncode.getBytes(StandardCharsets.UTF_8)));
 
                     Http.Response response = context.http(http -> http.post("https://api.figma.com/v1/oauth/token"))
                         .headers(

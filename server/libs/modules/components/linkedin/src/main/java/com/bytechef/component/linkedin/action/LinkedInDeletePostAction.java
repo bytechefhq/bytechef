@@ -43,7 +43,7 @@ public class LinkedInDeletePostAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String urn = context.encoder(encoder -> encoder.urlEncode(inputParameters.getRequiredString(URN)));
+        String urn = context.encoder(encoder -> encoder.base64UrlEncode(inputParameters.getRequiredString(URN)));
 
         context.http(http -> http.delete("/rest/posts/" + urn))
             .execute();

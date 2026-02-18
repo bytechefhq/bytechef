@@ -51,7 +51,7 @@ public class GoogleMapsGetGeolocationAction {
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         String urlEncodedAddress = context.encoder(
-            encoder -> encoder.urlEncode(inputParameters.getRequiredString(ADDRESS)));
+            encoder -> encoder.base64UrlEncode(inputParameters.getRequiredString(ADDRESS)));
 
         return geocodeHttpRequest(context, ADDRESS, urlEncodedAddress);
     }

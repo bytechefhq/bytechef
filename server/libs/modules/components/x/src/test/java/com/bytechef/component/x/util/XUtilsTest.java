@@ -153,7 +153,7 @@ class XUtilsTest {
 
                 return value.apply(mockedEncoder);
             });
-        when(mockedEncoder.base64EncodeToString(bytesArgumentCaptor.capture()))
+        when(mockedEncoder.base64Encode(bytesArgumentCaptor.capture()))
             .thenReturn("def");
 
         when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))

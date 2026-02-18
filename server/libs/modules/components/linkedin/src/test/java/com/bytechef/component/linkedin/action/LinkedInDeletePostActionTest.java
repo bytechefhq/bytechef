@@ -68,7 +68,7 @@ class LinkedInDeletePostActionTest {
         when(mockedActionContext.encoder(encoderFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> encoderFunctionArgumentCaptor.getValue()
                 .apply(mockedEncoder));
-        when(mockedEncoder.urlEncode(stringArgumentCaptor.capture()))
+        when(mockedEncoder.base64UrlEncode(stringArgumentCaptor.capture()))
             .thenReturn("urn");
 
         when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))

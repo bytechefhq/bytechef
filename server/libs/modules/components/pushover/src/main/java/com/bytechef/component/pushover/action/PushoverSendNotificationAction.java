@@ -114,7 +114,7 @@ public class PushoverSendNotificationAction {
             byte[] fileContent =
                 actionContext.file(file -> file.readAllBytes(fileEntry));
 
-            attachmentBase64 = actionContext.encoder(encoder -> encoder.base64EncodeToString(fileContent));
+            attachmentBase64 = actionContext.encoder(encoder -> encoder.base64Encode(fileContent));
         }
 
         return actionContext

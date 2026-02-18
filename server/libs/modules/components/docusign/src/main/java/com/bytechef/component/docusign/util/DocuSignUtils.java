@@ -91,7 +91,7 @@ public class DocuSignUtils {
     private static String encodeFileEntry(FileEntry fileEntry, Context context) {
         byte[] fileContent = context.file(file -> file.readAllBytes(fileEntry));
 
-        return context.encoder(encoder -> encoder.base64EncodeToString(fileContent));
+        return context.encoder(encoder -> encoder.base64Encode(fileContent));
     }
 
     public static List<Option<String>> getEnvelopeIdOptions(

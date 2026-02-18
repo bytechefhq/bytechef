@@ -72,7 +72,7 @@ class ImageHelperImageToBase64ActionTest {
 
                 return function.apply(mockedContextEncoder);
             });
-        when(mockedContextEncoder.base64EncodeToString(fileContent))
+        when(mockedContextEncoder.base64Encode(fileContent))
             .thenReturn(encodeToString);
 
         String result = ImageHelperImageToBase64Action.perform(mockedParameters, any(Parameters.class), mockedContext);

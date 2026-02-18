@@ -86,7 +86,7 @@ public class RedditConnection {
                     String clientSecret = connectionParameters.getString(CLIENT_SECRET);
                     String valueToEncode = clientId + ":" + clientSecret;
                     String encoded = context.encoder(
-                        encoder -> encoder.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)));
+                        encoder -> encoder.base64Encode(valueToEncode.getBytes(StandardCharsets.UTF_8)));
 
                     Http.Response response =
                         context.http(http -> http.post("https://www.reddit.com/api/v1/access_token")

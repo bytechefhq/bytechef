@@ -45,6 +45,6 @@ public class ImageHelperImageToBase64Action {
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         byte[] fileContent = context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(IMAGE)));
 
-        return context.encoder(encoder -> encoder.base64EncodeToString(fileContent));
+        return context.encoder(encoder -> encoder.base64Encode(fileContent));
     }
 }

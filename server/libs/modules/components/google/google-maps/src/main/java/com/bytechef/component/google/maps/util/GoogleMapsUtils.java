@@ -45,7 +45,7 @@ public class GoogleMapsUtils {
 
         Map<String, Object> geocoderInformation = context.http(
             http -> http.get("https://maps.googleapis.com/maps/api/geocode/json"))
-            .queryParameter(ADDRESS, context.encoder(encoder -> encoder.urlEncode(address)))
+            .queryParameter(ADDRESS, context.encoder(encoder -> encoder.base64UrlEncode(address)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
