@@ -181,6 +181,8 @@ public interface Context {
          */
         byte[] base64Decode(String string);
 
+        String base64Encode(String... values);
+
         /**
          *
          * @param bytes
