@@ -31,6 +31,7 @@ import static com.bytechef.component.microsoft.dynamics.crm.constant.EntityAttri
 import static com.bytechef.component.microsoft.dynamics.crm.constant.EntityAttributeType.VIRTUAL;
 import static com.bytechef.component.microsoft.dynamics.crm.constant.EntityAttributeType.getEntityAttributeType;
 import static com.bytechef.component.microsoft.dynamics.crm.constant.MicrosoftDynamicsCrmConstants.ENTITY_TYPE;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.VALUE;
 
 import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.Context;
@@ -38,8 +39,13 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.dynamics.crm.constant.EntityAttributeType;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -289,5 +295,36 @@ public class MicrosoftDynamicsCrmUtils {
         }
 
         return options;
+    }
+
+    public static PollOutput poll(
+        Parameters closureParameters, TriggerContext context, String dateFieldName) {
+
+        ZoneId zoneId = ZoneId.systemDefault();
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(
+            "lastTimeChecked", context.isEditorEnvironment() ? now.minusHours(3) : now);
+
+        Map<String, Object> body = context.http(http -> http.get("/accounts"))
+            .queryParameters(
+                "$filter", "%s ge %s".formatted(
+                    dateFieldName, startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Map<?, ?>> accounts = new ArrayList<>();
+
+        if (body.get(VALUE) instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    accounts.add(map);
+                }
+            }
+        }
+
+        return new PollOutput(accounts, Map.of("lastTimeChecked", now), false);
     }
 }
