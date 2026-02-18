@@ -133,7 +133,7 @@ function createEdgesForSingleCase(
             source: nestedBottomGhostId,
             style: EDGE_STYLES,
             target: bottomGhostId,
-            targetHandle: `${bottomGhostId}-${handlePosition}`,
+            targetHandle: `${bottomGhostId}-${bottomGhostHandlePosition}`,
             type: 'workflow',
         };
 
