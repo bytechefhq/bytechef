@@ -381,18 +381,23 @@ class ContextImpl implements Context {
         }
 
         @Override
-        public String base64EncodeToString(byte[] bytes) {
+        public String base64Encode(byte[] bytes) {
             return EncodingUtils.base64EncodeToString(bytes);
         }
 
         @Override
-        public byte[] urlDecodeBase64FromString(String string) {
-            return EncodingUtils.urlDecodeBase64FromString(string);
+        public String base64Encode(String... values) {
+            return EncodingUtils.base64EncodeToString(values);
         }
 
         @Override
-        public String urlEncode(String string) {
-            return EncodingUtils.urlEncode(string);
+        public byte[] base64UrlDecode(String value) {
+            return EncodingUtils.urlDecodeBase64FromString(value);
+        }
+
+        @Override
+        public String base64UrlEncode(String value) {
+            return EncodingUtils.urlEncode(value);
         }
     }
 
