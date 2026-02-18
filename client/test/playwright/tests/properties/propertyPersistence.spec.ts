@@ -354,3 +354,71 @@ test.describe('Saving to Workflow Definition', () => {
         expectedPropertyLabel = 'Array property';
     });
 });
+
+test.describe('Type change and subproperty cleanup', () => {
+    test('should remove subproperty contents when type is changed from OBJECT to ARRAY', async ({
+        authenticatedPage,
+        project,
+        workflow,
+    }) => {
+        await test.step('Navigate to workflow editor and wait for load', async () => {
+            const workflowPage = new WorkflowPage(authenticatedPage);
+
+            await workflowPage.goToWorkflowEditor(project.id, workflow.workflowId);
+        });
+
+        await test.step('Open var_1 node configuration panel and switch to Properties tab', async () => {
+            const varNode = authenticatedPage.getByLabel('var_1 node');
+
+            const configurationPanel = authenticatedPage.getByLabel('var_1 component configuration panel');
+
+            await clickAndExpectToBeVisible({
+                target: configurationPanel,
+                trigger: varNode,
+            });
+
+            await openPropertiesTab(configurationPanel);
+        });
+
+        await test.step('Verify initial state is OBJECT with value object', async () => {
+            const configurationPanel = authenticatedPage.getByLabel('var_1 component configuration panel');
+
+            const valueProperty = configurationPanel.getByLabel('value property');
+
+            const valuePropertyList = valueProperty.getByRole('list', {name: 'value object properties'});
+
+            await expect(valuePropertyList).toBeVisible();
+        });
+
+        await test.step('Change type from OBJECT to ARRAY via type property select', async () => {
+            const configurationPanel = authenticatedPage.getByLabel('var_1 component configuration panel');
+
+            const typeProperty = configurationPanel.getByLabel('type property');
+
+            const typeSelect = typeProperty.getByLabel('Select options for property type');
+            const typeSelectOptions = authenticatedPage.getByLabel('Suggestions');
+
+            await clickAndExpectToBeVisible({
+                target: typeSelectOptions,
+                trigger: typeSelect,
+            });
+
+            await authenticatedPage.getByRole('option', {name: 'Array'}).click();
+        });
+
+        await test.step('Wait for debounced save', async () => {
+            await authenticatedPage.waitForTimeout(700);
+        });
+
+        await test.step('Verify workflow definition: type is ARRAY and value property is removed (old object subproperties cleared)', async () => {
+            const workflowDefinition = await getWorkflowDefinition(authenticatedPage, workflow.workflowId);
+
+            const parameters = workflowDefinition.tasks?.[0]?.parameters as
+                | {type?: string; value?: unknown}
+                | undefined;
+
+            expect(parameters?.type).toBe('ARRAY');
+            expect(parameters).not.toHaveProperty('value');
+        });
+    });
+});

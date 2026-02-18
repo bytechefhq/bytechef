@@ -363,7 +363,7 @@ const PropertyComboBox = ({
             )}
 
             <Popover modal onOpenChange={setOpen} open={open}>
-                <PopoverTrigger asChild onBlur={onBlur}>
+                <PopoverTrigger aria-label={`Select options for property ${label ?? name}`} asChild onBlur={onBlur}>
                     <Button
                         aria-expanded={open}
                         className={twMerge(
@@ -430,7 +430,12 @@ const PropertyComboBox = ({
                     </Button>
                 </PopoverTrigger>
 
-                <PopoverContent align="start" className="min-w-combo-box-popper-anchor-width p-0" side="bottom">
+                <PopoverContent
+                    align="start"
+                    // aria-label="Select options"
+                    className="min-w-combo-box-popper-anchor-width p-0"
+                    side="bottom"
+                >
                     <Command>
                         <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
 
