@@ -749,12 +749,13 @@ export function positionConditionCasePlaceholders(allNodes: Node[], options: Con
         }
     });
 
-    // Second pass: separate overlapping nested condition frame edges.
-    // When a nested condition shares the same cross-axis center as its ancestor,
-    // both right (or left) placeholders land at identical positions, causing
-    // their frame edges to visually overlap. This loop pushes each parent
-    // condition's placeholder outward until it clears all nested condition
-    // placeholders by at least nestedFramePadding pixels.
+    // Second pass: separate overlapping nested frame edges.
+    // When a nested dispatcher's placeholder lands close to or beyond the
+    // parent condition's frame boundary, the edges visually overlap. This
+    // loop pushes each parent condition's placeholder outward until it
+    // clears all nested placeholders by at least nestedFramePadding pixels.
+    // Uses position-based checks so it handles any placeholder type
+    // (condition, branch default, etc.) uniformly.
     const nestedFramePadding = conditionCaseOffset / 2;
 
     let frameChanged = true;
@@ -795,30 +796,24 @@ export function positionConditionCasePlaceholders(allNodes: Node[], options: Con
                     return;
                 }
 
-                if (rightPlaceholder && descendantNode.id.includes('-condition-right-placeholder-')) {
-                    const nestedRightCross = descendantNode.position[crossAxis];
+                const descendantCross = descendantNode.position[crossAxis];
 
-                    if (nestedRightCross + nestedFramePadding > rightPlaceholder.position[crossAxis]) {
-                        rightPlaceholder.position = {
-                            ...rightPlaceholder.position,
-                            [crossAxis]: nestedRightCross + nestedFramePadding,
-                        };
+                if (rightPlaceholder && descendantCross + nestedFramePadding > rightPlaceholder.position[crossAxis]) {
+                    rightPlaceholder.position = {
+                        ...rightPlaceholder.position,
+                        [crossAxis]: descendantCross + nestedFramePadding,
+                    };
 
-                        frameChanged = true;
-                    }
+                    frameChanged = true;
                 }
 
-                if (leftPlaceholder && descendantNode.id.includes('-condition-left-placeholder-')) {
-                    const nestedLeftCross = descendantNode.position[crossAxis];
+                if (leftPlaceholder && descendantCross - nestedFramePadding < leftPlaceholder.position[crossAxis]) {
+                    leftPlaceholder.position = {
+                        ...leftPlaceholder.position,
+                        [crossAxis]: descendantCross - nestedFramePadding,
+                    };
 
-                    if (nestedLeftCross - nestedFramePadding < leftPlaceholder.position[crossAxis]) {
-                        leftPlaceholder.position = {
-                            ...leftPlaceholder.position,
-                            [crossAxis]: nestedLeftCross - nestedFramePadding,
-                        };
-
-                        frameChanged = true;
-                    }
+                    frameChanged = true;
                 }
             });
         });
