@@ -20,6 +20,13 @@ import {
     TaskDispatcherDefinitionBasicToJSON,
     TaskDispatcherDefinitionBasicToJSONTyped,
 } from './TaskDispatcherDefinitionBasic';
+import type { ClusterElementDefinitionBasic } from './ClusterElementDefinitionBasic';
+import {
+    ClusterElementDefinitionBasicFromJSON,
+    ClusterElementDefinitionBasicFromJSONTyped,
+    ClusterElementDefinitionBasicToJSON,
+    ClusterElementDefinitionBasicToJSONTyped,
+} from './ClusterElementDefinitionBasic';
 import type { OutputResponse } from './OutputResponse';
 import {
     OutputResponseFromJSON,
