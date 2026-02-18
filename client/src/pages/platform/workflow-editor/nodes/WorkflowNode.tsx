@@ -319,9 +319,12 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 'border-stroke-brand-primary shadow-none hover:border-stroke-brand-primary',
                             isMainRootClusterElement && 'nodrag',
                             (isMainRootClusterElement || isNestedClusterRoot) && `min-w-[${ROOT_CLUSTER_WIDTH}px] `,
-                            isNestedClusterRoot && 'overflow-hidden',
+                            isNestedClusterRoot && 'overflow-hidden px-6',
                             isClusterElement && !isMainRootClusterElement && 'rounded-full',
-                            isClusterElement && !hasSavedClusterElementPosition && 'border-dashed'
+                            isClusterElement &&
+                                !isNestedClusterRoot &&
+                                !hasSavedClusterElementPosition &&
+                                'border-dashed'
                         )}
                         onClick={() => handleNodeClick()}
                         style={
@@ -334,7 +337,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     >
                         <div
                             className={twMerge(
-                                (isMainRootClusterElement || isNestedClusterRoot) && 'flex items-center gap-4'
+                                (isMainRootClusterElement || isNestedClusterRoot) && 'flex items-center gap-4',
+                                isNestedClusterRoot && 'min-w-0'
                             )}
                         >
                             {data.icon ? data.icon : <ComponentIcon className="size-9 text-content-neutral-primary" />}
