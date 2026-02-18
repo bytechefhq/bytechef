@@ -97,10 +97,23 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| kind | STRING | Type of the resource. |
 | id | STRING | Task identifier. |
-| title | STRING | Title of the task. |
+| etag | STRING | ETag of the resource. |
+| title | STRING | Title of the task. Maximum length allowed: 1024 characters. |
+| updated | STRING | Last modification time of the task (as a RFC 3339 timestamp). |
+| selfLink | STRING | URL pointing to this task. Used to retrieve, update, or delete this task. |
+| parent | STRING | Parent task identifier. |
+| position | STRING | String indicating the position of the task among its sibling tasks under the same parent task or at the top level. |
 | notes | STRING | Notes describing the task. |
 | status | STRING | Status of the task. |
+| due | STRING | Scheduled date for the task (as an RFC 3339 timestamp). |
+| completed | STRING | Completion date of the task (as a RFC 3339 timestamp). |
+| deleted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Flag indicating whether the task has been deleted. |
+| hidden | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Flag indicating whether the task is hidden. |
+| links | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(description), STRING\(link)&#125;] </details> | Collection of links. |
+| webViewLink | STRING | An absolute link to the task in the Google Tasks Web UI. |
+| assignmentInfo | OBJECT <details> <summary> Properties </summary> &#123;STRING\(linkToTask), STRING\(surfaceType), &#123;&#125;\(DriveResourceInfo), &#123;&#125;\(spaceInfo)&#125; </details> | Context information for assigned tasks. |
 
 
 
@@ -108,13 +121,38 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "kind" : "",
   "id" : "",
+  "etag" : "",
   "title" : "",
+  "updated" : "",
+  "selfLink" : "",
+  "parent" : "",
+  "position" : "",
   "notes" : "",
-  "status" : ""
+  "status" : "",
+  "due" : "",
+  "completed" : "",
+  "deleted" : false,
+  "hidden" : false,
+  "links" : [ {
+    "type" : "",
+    "description" : "",
+    "link" : ""
+  } ],
+  "webViewLink" : "",
+  "assignmentInfo" : {
+    "linkToTask" : "",
+    "surfaceType" : "",
+    "DriveResourceInfo" : { },
+    "spaceInfo" : { }
+  }
 }
 ```
 
+#### Find List ID
+
+To find List ID, click [here](/reference/components/google-tasks_v1#how-to-find-list-id)
 
 
 
@@ -156,10 +194,23 @@ Items Type: OBJECT
 #### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| kind | STRING | Type of the resource. |
 | id | STRING | Task identifier. |
-| title | STRING | Title of the task. |
+| etag | STRING | ETag of the resource. |
+| title | STRING | Title of the task. Maximum length allowed: 1024 characters. |
+| updated | STRING | Last modification time of the task (as a RFC 3339 timestamp). |
+| selfLink | STRING | URL pointing to this task. Used to retrieve, update, or delete this task. |
+| parent | STRING | Parent task identifier. |
+| position | STRING | String indicating the position of the task among its sibling tasks under the same parent task or at the top level. |
 | notes | STRING | Notes describing the task. |
 | status | STRING | Status of the task. |
+| due | STRING | Scheduled date for the task (as an RFC 3339 timestamp). |
+| completed | STRING | Completion date of the task (as a RFC 3339 timestamp). |
+| deleted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Flag indicating whether the task has been deleted. |
+| hidden | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Flag indicating whether the task is hidden. |
+| links | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(description), STRING\(link)&#125;] </details> | Collection of links. |
+| webViewLink | STRING | An absolute link to the task in the Google Tasks Web UI. |
+| assignmentInfo | OBJECT <details> <summary> Properties </summary> &#123;STRING\(linkToTask), STRING\(surfaceType), &#123;&#125;\(DriveResourceInfo), &#123;&#125;\(spaceInfo)&#125; </details> | Context information for assigned tasks. |
 
 
 
@@ -168,13 +219,38 @@ Items Type: OBJECT
 #### Output Example
 ```json
 [ {
+  "kind" : "",
   "id" : "",
+  "etag" : "",
   "title" : "",
+  "updated" : "",
+  "selfLink" : "",
+  "parent" : "",
+  "position" : "",
   "notes" : "",
-  "status" : ""
+  "status" : "",
+  "due" : "",
+  "completed" : "",
+  "deleted" : false,
+  "hidden" : false,
+  "links" : [ {
+    "type" : "",
+    "description" : "",
+    "link" : ""
+  } ],
+  "webViewLink" : "",
+  "assignmentInfo" : {
+    "linkToTask" : "",
+    "surfaceType" : "",
+    "DriveResourceInfo" : { },
+    "spaceInfo" : { }
+  }
 } ]
 ```
 
+#### Find List ID
+
+To find List ID, click [here](/reference/components/google-tasks_v1#how-to-find-list-id)
 
 
 
@@ -220,10 +296,23 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| kind | STRING | Type of the resource. |
 | id | STRING | Task identifier. |
-| title | STRING | Title of the task. |
+| etag | STRING | ETag of the resource. |
+| title | STRING | Title of the task. Maximum length allowed: 1024 characters. |
+| updated | STRING | Last modification time of the task (as a RFC 3339 timestamp). |
+| selfLink | STRING | URL pointing to this task. Used to retrieve, update, or delete this task. |
+| parent | STRING | Parent task identifier. |
+| position | STRING | String indicating the position of the task among its sibling tasks under the same parent task or at the top level. |
 | notes | STRING | Notes describing the task. |
 | status | STRING | Status of the task. |
+| due | STRING | Scheduled date for the task (as an RFC 3339 timestamp). |
+| completed | STRING | Completion date of the task (as a RFC 3339 timestamp). |
+| deleted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Flag indicating whether the task has been deleted. |
+| hidden | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Flag indicating whether the task is hidden. |
+| links | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(description), STRING\(link)&#125;] </details> | Collection of links. |
+| webViewLink | STRING | An absolute link to the task in the Google Tasks Web UI. |
+| assignmentInfo | OBJECT <details> <summary> Properties </summary> &#123;STRING\(linkToTask), STRING\(surfaceType), &#123;&#125;\(DriveResourceInfo), &#123;&#125;\(spaceInfo)&#125; </details> | Context information for assigned tasks. |
 
 
 
@@ -231,13 +320,42 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "kind" : "",
   "id" : "",
+  "etag" : "",
   "title" : "",
+  "updated" : "",
+  "selfLink" : "",
+  "parent" : "",
+  "position" : "",
   "notes" : "",
-  "status" : ""
+  "status" : "",
+  "due" : "",
+  "completed" : "",
+  "deleted" : false,
+  "hidden" : false,
+  "links" : [ {
+    "type" : "",
+    "description" : "",
+    "link" : ""
+  } ],
+  "webViewLink" : "",
+  "assignmentInfo" : {
+    "linkToTask" : "",
+    "surfaceType" : "",
+    "DriveResourceInfo" : { },
+    "spaceInfo" : { }
+  }
 }
 ```
 
+#### Find List ID
+
+To find List ID, click [here](/reference/components/google-tasks_v1#how-to-find-list-id)
+
+#### Find Task ID
+
+To find Task ID, click [here](/reference/components/google-tasks_v1#how-to-find-task-id)
 
 
 
@@ -270,10 +388,23 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| kind | STRING | Type of the resource. |
 | id | STRING | Task identifier. |
-| title | STRING | Title of the task. |
+| etag | STRING | ETag of the resource. |
+| title | STRING | Title of the task. Maximum length allowed: 1024 characters. |
+| updated | STRING | Last modification time of the task (as a RFC 3339 timestamp). |
+| selfLink | STRING | URL pointing to this task. Used to retrieve, update, or delete this task. |
+| parent | STRING | Parent task identifier. |
+| position | STRING | String indicating the position of the task among its sibling tasks under the same parent task or at the top level. |
 | notes | STRING | Notes describing the task. |
 | status | STRING | Status of the task. |
+| due | STRING | Scheduled date for the task (as an RFC 3339 timestamp). |
+| completed | STRING | Completion date of the task (as a RFC 3339 timestamp). |
+| deleted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Flag indicating whether the task has been deleted. |
+| hidden | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Flag indicating whether the task is hidden. |
+| links | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(description), STRING\(link)&#125;] </details> | Collection of links. |
+| webViewLink | STRING | An absolute link to the task in the Google Tasks Web UI. |
+| assignmentInfo | OBJECT <details> <summary> Properties </summary> &#123;STRING\(linkToTask), STRING\(surfaceType), &#123;&#125;\(DriveResourceInfo), &#123;&#125;\(spaceInfo)&#125; </details> | Context information for assigned tasks. |
 
 
 
@@ -289,6 +420,9 @@ Type: OBJECT
   "type" : "googleTasks/v1/newTask"
 }
 ```
+#### Find List ID
+
+To find List ID, click [here](/reference/components/google-tasks_v1#how-to-find-list-id)
 
 
 
@@ -303,6 +437,14 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+### How to find List ID
+
+You can only find List ID by using Google Tasks API endpoint: `GET https://tasks.googleapis.com/tasks/v1/users/@me/lists`.
+
+### How to find Task ID
+
+You can only find Task ID by using Google Tasks API endpoint: `GET https://tasks.googleapis.com/tasks/v1/lists/{tasklist}/tasks`.
 
 ## Troubleshooting
 
