@@ -3267,7 +3267,7 @@ public class WorkflowNodeParameterFacadeTest {
         String workflowId = "workflow1";
         String workflowNodeName = "task1";
         String parameterPath = "value.nestedproperty.childproperty";
-        Object value = new HashMap<>();
+        Object value = new HashMap<>(Map.of("innerKey", "innerValue"));
         String type = "OBJECT";
         boolean includeInMetadata = true;
 
@@ -3501,6 +3501,277 @@ public class WorkflowNodeParameterFacadeTest {
             assertTrue(dynamicPropertyTypes.containsKey("value[0].nested[0].sub"));
             assertFalse(dynamicPropertyTypes.containsKey("value[1].field"));
             assertFalse(dynamicPropertyTypes.containsKey("value[1].nested[0].sub"));
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testDeleteWorkflowNodeParameterRemovesEmptyParentMap() {
+        // Given: "config" has only "value"; deleting "config.value" should remove "config" entirely
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "config.value";
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> configMap = new HashMap<>();
+
+            configMap.put("value", "hello");
+
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("config", configMap);
+            parameters.put("otherParam", "keep");
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", workflowNodeName);
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getVersion()).thenReturn(1);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, 0);
+
+            // Then
+            assertNotNull(result);
+            assertFalse(result.parameters()
+                .containsKey("config"), "Empty parent map should be removed");
+            assertTrue(result.parameters()
+                .containsKey("otherParam"), "Non-empty parameters should be preserved");
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testDeleteWorkflowNodeParameterRemovesEmptyList() {
+        // Given: "tags" has one item; deleting "tags[0]" should remove the empty "tags" list
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "tags[0]";
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            List<Object> tagsList = new ArrayList<>();
+
+            tagsList.add("tag1");
+
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("tags", tagsList);
+            parameters.put("name", "test");
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", workflowNodeName);
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getVersion()).thenReturn(1);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, 0);
+
+            // Then
+            assertNotNull(result);
+            assertFalse(result.parameters()
+                .containsKey("tags"), "Empty list should be removed after last item deleted");
+            assertTrue(result.parameters()
+                .containsKey("name"), "Non-empty parameters should be preserved");
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testDeleteWorkflowNodeParameterRemovesNestedEmptyMaps() {
+        // Given: "config.nested.value" is the only leaf; deleting it should remove entire chain
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "config.nested.value";
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> nestedMap = new HashMap<>();
+
+            nestedMap.put("value", "deep");
+
+            Map<String, Object> configMap = new HashMap<>();
+
+            configMap.put("nested", nestedMap);
+
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("config", configMap);
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", workflowNodeName);
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getVersion()).thenReturn(1);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, 0);
+
+            // Then
+            assertNotNull(result);
+            assertFalse(
+                result.parameters()
+                    .containsKey("config"),
+                "Entire nested chain should be removed when all leaves are deleted");
+            assertTrue(result.parameters()
+                .isEmpty(), "Parameters should be empty after all values removed");
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterPreservesNonEmptyCollections() {
+        // Given: parameters have both empty and non-empty collections
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String parameterPath = "newParam";
+        Object value = "newValue";
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("emptyMap", new HashMap<>());
+            parameters.put("emptyList", new ArrayList<>());
+            parameters.put("nonEmptyMap", new HashMap<>(Map.of("key", "value")));
+            parameters.put("nonEmptyList", new ArrayList<>(List.of("item1")));
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", workflowNodeName);
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, "STRING", false, 0);
+
+            // Then
+            assertNotNull(result);
+
+            Map<String, ?> resultParameters = result.parameters();
+
+            assertFalse(resultParameters.containsKey("emptyMap"), "Empty map should be removed");
+            assertFalse(resultParameters.containsKey("emptyList"), "Empty list should be removed");
+            assertTrue(resultParameters.containsKey("nonEmptyMap"), "Non-empty map should be preserved");
+            assertTrue(resultParameters.containsKey("nonEmptyList"), "Non-empty list should be preserved");
+            assertEquals("newValue", resultParameters.get("newParam"));
             verify(workflowService).update(anyString(), anyString(), anyInt());
         }
     }

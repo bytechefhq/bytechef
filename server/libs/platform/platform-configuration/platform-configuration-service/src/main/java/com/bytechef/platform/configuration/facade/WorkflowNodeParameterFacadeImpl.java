@@ -142,6 +142,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
+        removeEmptyCollections(workflowNodeStructure.parameterMap);
+
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
@@ -185,6 +187,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             true, environmentId);
 
         setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
+
+        removeEmptyCollections(workflowNodeStructure.parameterMap);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -323,6 +327,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
         }
 
+        removeEmptyCollections(workflowNodeStructure.parameterMap);
+
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
@@ -368,6 +374,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         if (includeInMetadata) {
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
         }
+
+        removeEmptyCollections(workflowNodeStructure.parameterMap);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -945,6 +953,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 }
             } else if (parameterMap.get(key) instanceof Map<?, ?> subParameterMap) {
                 removeParameter(parameterName, indexes, subParameterMap);
+
+                if (subParameterMap.isEmpty()) {
+                    parameterMap.remove(key);
+
+                    return;
+                }
             }
         }
     }
@@ -1344,6 +1358,23 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             }
         } else {
             dynamicPropertyTypesMap.put(path, type);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void removeEmptyCollections(Map<String, ?> parameterMap) {
+        for (String key : new HashSet<>(parameterMap.keySet())) {
+            Object value = parameterMap.get(key);
+
+            if (value instanceof Map<?, ?> nestedMap) {
+                removeEmptyCollections((Map<String, ?>) nestedMap);
+
+                if (nestedMap.isEmpty()) {
+                    ((Map<String, Object>) parameterMap).remove(key);
+                }
+            } else if (value instanceof List<?> list && list.isEmpty()) {
+                ((Map<String, Object>) parameterMap).remove(key);
+            }
         }
     }
 
