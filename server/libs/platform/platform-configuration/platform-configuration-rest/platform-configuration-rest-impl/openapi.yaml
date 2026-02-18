@@ -3095,6 +3095,8 @@ components:
       properties:
         actionDefinition:
           $ref: '#/components/schemas/ActionDefinitionBasic'
+        clusterElementDefinition:
+          $ref: '#/components/schemas/ClusterElementDefinitionBasic'
         outputResponse:
           $ref: "#/components/schemas/OutputResponse"
         taskDispatcherDefinition:
