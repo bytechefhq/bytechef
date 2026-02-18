@@ -42,6 +42,17 @@ public class EncodingUtils {
         return new String(base64Decode(data), StandardCharsets.UTF_8);
     }
 
+    public static String base64EncodeToString(final String... data) {
+        var sb = new StringBuilder();
+
+        for (String value : data) {
+            sb.append(value);
+        }
+
+        return ENCODER.encodeToString(sb.toString()
+            .getBytes(StandardCharsets.UTF_8));
+    }
+
     public static byte[] base64Encode(final byte[] bytes) {
         return ENCODER.encode(bytes);
     }
