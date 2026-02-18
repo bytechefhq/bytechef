@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public interface Context {
 
@@ -181,6 +182,12 @@ public interface Context {
          */
         byte[] base64Decode(String string);
 
+        /**
+         * Encodes concatenated values as one Base64 encoded value
+         *
+         * @param values
+         * @return base64 encoded value
+         */
         String base64Encode(String... values);
 
         /**
@@ -188,21 +195,23 @@ public interface Context {
          * @param bytes
          * @return
          */
-        String base64EncodeToString(byte[] bytes);
+        String base64Encode(byte[] bytes);
 
         /**
+         * Decodes parameter value which is Base64 encoded URL encoded value
          *
-         * @param string
-         * @return
+         * @param value the base64 encoded value
+         * @return human understandable string value
          */
-        byte[] urlDecodeBase64FromString(String string);
+        byte[] base64UrlDecode(String value);
 
         /**
+         * Encodes parameter value in URL encoding and applies Base64 encoding to the final result.
          *
-         * @param string
-         * @return
+         * @param value the value to be encoded
+         * @return Base64 encoded value of URL encoded input
          */
-        String urlEncode(String string);
+        String base64UrlEncode(String value);
 
     }
 
