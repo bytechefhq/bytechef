@@ -5,17 +5,28 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+  pgvector:
+    image: pgvector/pgvector:pg16
+    platform: linux/amd64
+    ports:
+      - "5433:5432"
+    volumes:
+      - "pgvector:/var/lib/postgresql/data"
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_DB=bytechef_vectorstore"
   postgres:
     image: postgres:16-alpine
     platform: linux/amd64
     ports:
       - "5432:5432"
     volumes:
-      - db:/var/lib/postgresql/data
+      - "db:/var/lib/postgresql/data"
     environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=bytechef
+      - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_DB=bytechef"
 #  rabbitmq:
 #    image: rabbitmq:3.11-management-alpine
 #    ports:
@@ -39,6 +50,7 @@ services:
     container_name: bytechef-server
     depends_on:
       - postgres
+      - pgvector
 #      - rabbitmq
       - redis
     environment:
@@ -51,6 +63,9 @@ services:
 #      - SPRING_RABBITMQ_PORT=5672
       - SPRING_DATA_REDIS_HOST=redis
 #      - WORKFLOW_MESSAGE_BROKER_PROVIDER=amqp
+      - BYTECHEF_AI_VECTORSTORE_PGVECTOR_URL=jdbc:postgresql://pgvector:5432/bytechef_vectorstore
+      - BYTECHEF_AI_VECTORSTORE_PGVECTOR_USERNAME=postgres
+      - BYTECHEF_AI_VECTORSTORE_PGVECTOR_PASSWORD=postgres
     env_file:
       - local.env
     ports:
@@ -60,3 +75,5 @@ volumes:
     driver: local
   db:
     driver: local
+  pgvector:
+    driver: "local"
