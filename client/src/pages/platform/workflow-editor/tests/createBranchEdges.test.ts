@@ -191,6 +191,68 @@ describe('createBranchEdges', () => {
         });
     });
 
+    describe('targetHandle for nested task dispatcher in bottom ghost edges', () => {
+        it('should use -top handle when nested task dispatcher is in the middle case', () => {
+            // 3 cases: default=left, case_0=middle (with condition), case_1=right
+            const branchNode = createBranchNode(
+                'branch_1',
+                [],
+                [
+                    {key: 'case_0', tasks: [{name: 'condition_3', type: 'condition/v1'}]},
+                    {key: 'case_1', tasks: []},
+                ]
+            );
+
+            const edges = createBranchEdges(branchNode);
+
+            const nestedGhostEdge = edges.find(
+                (edge) =>
+                    edge.source === 'condition_3-condition-bottom-ghost' &&
+                    edge.target === 'branch_1-branch-bottom-ghost'
+            );
+
+            expect(nestedGhostEdge).toBeDefined();
+            expect(nestedGhostEdge!.targetHandle).toBe('branch_1-branch-bottom-ghost-top');
+        });
+
+        it('should use -left handle when nested task dispatcher is in a left case', () => {
+            // 2 cases (even): default=left, case_0=right
+            const branchNode = createBranchNode(
+                'branch_1',
+                [{name: 'loop_1', type: 'loop/v1'}],
+                [{key: 'case_0', tasks: []}]
+            );
+
+            const edges = createBranchEdges(branchNode);
+
+            const nestedGhostEdge = edges.find(
+                (edge) =>
+                    edge.source === 'loop_1-loop-bottom-ghost' && edge.target === 'branch_1-branch-bottom-ghost'
+            );
+
+            expect(nestedGhostEdge).toBeDefined();
+            expect(nestedGhostEdge!.targetHandle).toBe('branch_1-branch-bottom-ghost-left');
+        });
+
+        it('should use -right handle when nested task dispatcher is in a right case', () => {
+            // 2 cases (even): default=left, case_0=right (with branch)
+            const branchNode = createBranchNode('branch_1', [], [
+                {key: 'case_0', tasks: [{name: 'branch_2', type: 'branch/v1'}]},
+            ]);
+
+            const edges = createBranchEdges(branchNode);
+
+            const nestedGhostEdge = edges.find(
+                (edge) =>
+                    edge.source === 'branch_2-branch-bottom-ghost' &&
+                    edge.target === 'branch_1-branch-bottom-ghost'
+            );
+
+            expect(nestedGhostEdge).toBeDefined();
+            expect(nestedGhostEdge!.targetHandle).toBe('branch_1-branch-bottom-ghost-right');
+        });
+    });
+
     describe('base structure', () => {
         it('should create edge from branch node to top ghost', () => {
             const branchNode = createBranchNode('branch_1', [], [{key: 'case_0', tasks: []}]);
