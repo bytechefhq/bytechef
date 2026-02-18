@@ -41,9 +41,13 @@ public class YouTubeComponentHandler implements ComponentHandler {
         .icon("path:assets/youtube.svg")
         .categories(ComponentCategory.HELPERS)
         .connection(YouTubeConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp(
+            "YouTube Data API documentation", "https://developers.google.com/youtube/v3/docs")
         .actions(YouTubeUploadVideoAction.ACTION_DEFINITION)
         .clusterElements(tool(YouTubeUploadVideoAction.ACTION_DEFINITION))
-        .triggers(YouTubeNewVideoTrigger.TRIGGER_DEFINITION);
+        .triggers(YouTubeNewVideoTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
