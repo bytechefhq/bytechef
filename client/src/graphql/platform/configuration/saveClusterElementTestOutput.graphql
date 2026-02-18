@@ -1,0 +1,21 @@
+mutation saveClusterElementTestOutput(
+    $workflowId: String!
+    $workflowNodeName: String!
+    $clusterElementType: String!
+    $clusterElementWorkflowNodeName: String!
+    $environmentId: Long!
+    $inputParameters: Map
+) {
+    saveClusterElementTestOutput(
+        workflowId: $workflowId
+        workflowNodeName: $workflowNodeName
+        clusterElementType: $clusterElementType
+        clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+        environmentId: $environmentId
+        inputParameters: $inputParameters
+    ) {
+        id
+        workflowId
+        workflowNodeName
+    }
+}
