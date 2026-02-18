@@ -23,6 +23,8 @@ info:
   application:
     edition: ${bytechef.edition:}
   featureFlags: ${bytechef.feature-flags}
+  knowledgeBase:
+    enabled: ${bytechef.knowledge-base.enabled:false}
   helpHub:
     enabled: ${bytechef.help-hub.enabled}
     commandBar:
