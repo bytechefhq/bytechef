@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.dynamics.crm.util.MicrosoftDynamicsCrmUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.Map;
 
 /**
@@ -53,7 +54,8 @@ public class MicrosoftDynamicsCrmUpdateRecordAction {
                 .required(true))
         .output()
         .help("", "https://docs.bytechef.io/reference/components/microsoft-dynamics-crm_v1#update-record")
-        .perform(MicrosoftDynamicsCrmUpdateRecordAction::perform);
+        .perform(MicrosoftDynamicsCrmUpdateRecordAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftDynamicsCrmUpdateRecordAction() {
     }
