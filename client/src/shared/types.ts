@@ -126,6 +126,10 @@ type LoopBreakDataType = {
     loopBreakId: string;
 };
 
+type SubflowDataType = {
+    subflowId: string;
+};
+
 type ParallelDataType = {
     index: number;
     parallelId: string;
@@ -146,6 +150,7 @@ export type TaskDispatcherDataType = BranchDataType &
     EachDataType &
     LoopDataType &
     LoopBreakDataType &
+    SubflowDataType &
     ConditionDataType &
     ParallelDataType &
     ForkJoinDataType;
@@ -227,6 +232,7 @@ export type NodeDataType = {
         index: number;
     };
     parentClusterRootId?: string;
+    subflowData?: SubflowDataType;
     taskDispatcher?: boolean;
     taskDispatcherId?: string;
     title?: string;
@@ -346,6 +352,7 @@ export type TaskDispatcherContextType = {
     loopBreakId?: string;
     loopId?: string;
     parallelId?: string;
+    subflowId?: string;
     taskDispatcherId: string;
 };
 

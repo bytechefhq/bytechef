@@ -1,4 +1,4 @@
-import {EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {CHILDLESS_TASK_DISPATCHER_NAMES, EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
@@ -89,7 +89,10 @@ function createParallelTaskEdges(
 
     taskEdges.push(edgeFromTopGhostToTask);
 
-    if (TASK_DISPATCHER_NAMES.includes(taskComponentName) && taskComponentName !== 'loopBreak') {
+    if (
+        TASK_DISPATCHER_NAMES.includes(taskComponentName) &&
+        !CHILDLESS_TASK_DISPATCHER_NAMES.includes(taskComponentName)
+    ) {
         const nestedBottomGhostId = `${taskId}-${taskComponentName}-bottom-ghost`;
 
         const edgeFromNestedGhostToBottomGhost = {

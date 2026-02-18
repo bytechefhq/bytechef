@@ -1,4 +1,4 @@
-import {EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {CHILDLESS_TASK_DISPATCHER_NAMES, EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
@@ -90,7 +90,10 @@ function createEdgesForSingleCase(
 
         const sourceTaskComponentName = sourceTaskId.split('_')[0];
 
-        if (TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) && sourceTaskComponentName !== 'loopBreak') {
+        if (
+            TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) &&
+            !CHILDLESS_TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)
+        ) {
             const nestedBottomGhostId = `${sourceTaskId}-${sourceTaskComponentName}-bottom-ghost`;
 
             const edgeFromNestedGhostToNextTask = {
@@ -118,7 +121,10 @@ function createEdgesForSingleCase(
     const lastTaskId = caseTasks[caseTasks.length - 1].name;
     const lastTaskComponentName = lastTaskId.split('_')[0];
 
-    if (TASK_DISPATCHER_NAMES.includes(lastTaskComponentName) && lastTaskComponentName !== 'loopBreak') {
+    if (
+        TASK_DISPATCHER_NAMES.includes(lastTaskComponentName) &&
+        !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)
+    ) {
         const nestedBottomGhostId = `${lastTaskId}-${lastTaskComponentName}-bottom-ghost`;
 
         const edgeFromNestedGhostToBottomGhost = {
