@@ -182,7 +182,7 @@ public class HttpClientConnection {
                         Context.Http.Response tokenResponse =
                             http.post(connectionParameters.getRequiredString(TOKEN_URL))
                                 .body(Body.of(formParameters, FORM_URL_ENCODED))
-                                .header("Authorization", "Basic: " + base64Credentials)
+                                .header("Authorization", "Basic " + base64Credentials)
                                 .configuration(
                                     responseType(JSON)
                                         .disableAuthorization(true))
