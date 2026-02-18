@@ -26,22 +26,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -50,23 +52,19 @@ import org.mockito.Mockito;
  * @author Marija Horvat
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class GoogleTasksNewTaskTriggerTest {
 
-    private final ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(Configuration.ConfigurationBuilder.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<Object[]> objectArgumentCapture = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     @SuppressWarnings("unchecked")
-    void testPollForEditorEnvironment() {
+    void testPollForEditorEnvironment(
+        TriggerContext mockedContext, Http mockedHttp, Http.Executor mockedExecutor, Http.Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Instant startInstant = Instant.parse("2000-01-01T01:01:01Z");
         Instant endDate = Instant.parse("2000-01-02T00:00:00Z");
 
@@ -79,27 +77,18 @@ class GoogleTasksNewTaskTriggerTest {
             instantMockedStatic.when(Instant::now)
                 .thenReturn(endDate);
 
-            when(mockedTriggerContext.isEditorEnvironment())
+            when(mockedContext.isEditorEnvironment())
                 .thenReturn(true);
-            when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
-                .thenAnswer(inv -> {
-                    ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
 
-                    return value.apply(mockedHttp);
-                });
             when(mockedHttp.get(stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.queryParameters(objectArgumentCapture.capture()))
                 .thenReturn(mockedExecutor);
-            when(mockedExecutor.execute())
-                .thenReturn(mockedResponse);
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(Map.of("items", responseList));
 
             PollOutput pollOutput = GoogleTasksNewTaskTrigger.poll(
-                inputParameters, null, closureParameters, mockedTriggerContext);
+                inputParameters, null, closureParameters, mockedContext);
 
             assertEquals(
                 new PollOutput(
@@ -130,7 +119,11 @@ class GoogleTasksNewTaskTriggerTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void testPollForNonEditorInitialLoadWithPagination() {
+    void testPollForNonEditorInitialLoadWithPagination(
+        TriggerContext mockedContext, Http mockedHttp, Http.Executor mockedExecutor, Http.Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Instant now = Instant.parse("2025-01-01T00:00:00Z");
 
         Parameters inputParameters = MockParametersFactory.create(Map.of(LIST_ID, "list-1"));
@@ -140,29 +133,20 @@ class GoogleTasksNewTaskTriggerTest {
             instantMockedStatic.when(Instant::now)
                 .thenReturn(now);
 
-            when(mockedTriggerContext.isEditorEnvironment())
+            when(mockedContext.isEditorEnvironment())
                 .thenReturn(false);
 
-            when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
-                .thenAnswer(inv -> {
-                    ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-                    return value.apply(mockedHttp);
-                });
             when(mockedHttp.get(stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.queryParameters(objectArgumentCapture.capture()))
                 .thenReturn(mockedExecutor);
-            when(mockedExecutor.execute())
-                .thenReturn(mockedResponse);
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(
                     Map.of("items", List.of(Map.of("id", "abc")), "nextPageToken", "next-1"),
                     Map.of("items", List.of(Map.of("id", "xyz"))));
 
             PollOutput pollOutput = GoogleTasksNewTaskTrigger.poll(
-                inputParameters, null, closureParameters, mockedTriggerContext);
+                inputParameters, null, closureParameters, mockedContext);
 
             assertEquals(
                 new PollOutput(
@@ -204,7 +188,11 @@ class GoogleTasksNewTaskTriggerTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void testPollForNonEditorSubsequentPollWithUpdatedMin() {
+    void testPollForNonEditorSubsequentPollWithUpdatedMin(
+        TriggerContext mockedContext, Http mockedHttp, Http.Executor mockedExecutor, Http.Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Instant previous = Instant.parse("2024-12-31T23:59:00Z");
         Instant now = Instant.parse("2025-01-01T00:00:00Z");
 
@@ -216,27 +204,18 @@ class GoogleTasksNewTaskTriggerTest {
             instantMockedStatic.when(Instant::now)
                 .thenReturn(now);
 
-            when(mockedTriggerContext.isEditorEnvironment())
+            when(mockedContext.isEditorEnvironment())
                 .thenReturn(false);
 
-            when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
-                .thenAnswer(inv -> {
-                    ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-                    return value.apply(mockedHttp);
-                });
             when(mockedHttp.get(stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.queryParameters(objectArgumentCapture.capture()))
                 .thenReturn(mockedExecutor);
-            when(mockedExecutor.execute())
-                .thenReturn(mockedResponse);
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(Map.of("items", List.of(Map.of("id", "abc"), Map.of("id", "xyz"))));
 
             PollOutput pollOutput = GoogleTasksNewTaskTrigger.poll(
-                inputParameters, null, closureParameters, mockedTriggerContext);
+                inputParameters, null, closureParameters, mockedContext);
 
             assertEquals(
                 new PollOutput(
