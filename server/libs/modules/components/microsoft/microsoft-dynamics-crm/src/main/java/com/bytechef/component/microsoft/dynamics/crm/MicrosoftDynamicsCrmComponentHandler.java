@@ -27,6 +27,8 @@ import com.bytechef.component.microsoft.dynamics.crm.action.MicrosoftDynamicsCrm
 import com.bytechef.component.microsoft.dynamics.crm.action.MicrosoftDynamicsCrmGetRecordAction;
 import com.bytechef.component.microsoft.dynamics.crm.action.MicrosoftDynamicsCrmUpdateRecordAction;
 import com.bytechef.component.microsoft.dynamics.crm.connection.MicrosoftDynamicsCrmConnection;
+import com.bytechef.component.microsoft.dynamics.crm.trigger.MicrosoftDynamicsCrmNewAccountTrigger;
+import com.bytechef.component.microsoft.dynamics.crm.trigger.MicrosoftDynamicsCrmUpdatedAccountTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -55,6 +57,9 @@ public class MicrosoftDynamicsCrmComponentHandler implements ComponentHandler {
             tool(MicrosoftDynamicsCrmDeleteRecordAction.ACTION_DEFINITION),
             tool(MicrosoftDynamicsCrmGetRecordAction.ACTION_DEFINITION),
             tool(MicrosoftDynamicsCrmUpdateRecordAction.ACTION_DEFINITION))
+        .triggers(
+            MicrosoftDynamicsCrmNewAccountTrigger.TRIGGER_DEFINITION,
+            MicrosoftDynamicsCrmUpdatedAccountTrigger.TRIGGER_DEFINITION)
         .version(1);
 
     @Override
