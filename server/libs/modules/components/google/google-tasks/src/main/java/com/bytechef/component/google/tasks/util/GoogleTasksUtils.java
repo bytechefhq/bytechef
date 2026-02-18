@@ -23,7 +23,6 @@ import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.NEXT_PAGE_TOKEN;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.PAGE_TOKEN;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
@@ -51,12 +50,12 @@ public class GoogleTasksUtils {
 
     public static List<Option<String>> getTasksIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext actionContext) {
+        String searchText, Context context) {
 
         String url = "/lists/%s/tasks"
             .formatted(inputParameters.getRequiredString(LIST_ID));
 
-        return fetchOptions(actionContext, url);
+        return fetchOptions(context, url);
     }
 
     private static List<Option<String>> fetchOptions(Context context, String url) {
