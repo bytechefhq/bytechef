@@ -37,10 +37,10 @@ import com.google.api.services.gmail.model.Message;
 /**
  * @author Monika Kušter
  */
-public class GoogleMailGetMailAction {
+public class GoogleMailGetEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getMail")
-        .title("Get Mail")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getEmail")
+        .title("Get Email")
         .description("Gets the specified email message.")
         .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#get-mail")
         .properties(
@@ -51,9 +51,9 @@ public class GoogleMailGetMailAction {
             FORMAT_PROPERTY,
             METADATA_HEADERS_PROPERTY)
         .output(GoogleMailUtils::getMessageOutput)
-        .perform(GoogleMailGetMailAction::perform);
+        .perform(GoogleMailGetEmailAction::perform);
 
-    private GoogleMailGetMailAction() {
+    private GoogleMailGetEmailAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {

@@ -58,7 +58,7 @@ public class GoogleMailSearchEmailAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchEmail")
         .title("Search Email")
-        .description("Lists the messages in the user's mailbox.")
+        .description("Lists the email messages in the user's mailbox.")
         .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#search-email")
         .properties(
             number(MAX_RESULTS)

@@ -26,8 +26,8 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.mail.action.GoogleMailAddLabelsAction;
 import com.bytechef.component.google.mail.action.GoogleMailArchiveEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailCreateLabelAction;
-import com.bytechef.component.google.mail.action.GoogleMailDeleteMailAction;
-import com.bytechef.component.google.mail.action.GoogleMailGetMailAction;
+import com.bytechef.component.google.mail.action.GoogleMailDeleteEmailAction;
+import com.bytechef.component.google.mail.action.GoogleMailGetEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailGetThreadAction;
 import com.bytechef.component.google.mail.action.GoogleMailListLabelsAction;
 import com.bytechef.component.google.mail.action.GoogleMailRemoveLabelsAction;
@@ -58,8 +58,8 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             GoogleMailAddLabelsAction.ACTION_DEFINITION,
             GoogleMailArchiveEmailAction.ACTION_DEFINITION,
             GoogleMailCreateLabelAction.ACTION_DEFINITION,
-            GoogleMailDeleteMailAction.ACTION_DEFINITION,
-            GoogleMailGetMailAction.ACTION_DEFINITION,
+            GoogleMailDeleteEmailAction.ACTION_DEFINITION,
+            GoogleMailGetEmailAction.ACTION_DEFINITION,
             GoogleMailGetThreadAction.ACTION_DEFINITION,
             GoogleMailListLabelsAction.ACTION_DEFINITION,
             GoogleMailRemoveLabelsAction.ACTION_DEFINITION,
@@ -73,8 +73,8 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             tool(GoogleMailAddLabelsAction.ACTION_DEFINITION),
             tool(GoogleMailArchiveEmailAction.ACTION_DEFINITION),
             tool(GoogleMailCreateLabelAction.ACTION_DEFINITION),
-            tool(GoogleMailDeleteMailAction.ACTION_DEFINITION),
-            tool(GoogleMailGetMailAction.ACTION_DEFINITION),
+            tool(GoogleMailDeleteEmailAction.ACTION_DEFINITION),
+            tool(GoogleMailGetEmailAction.ACTION_DEFINITION),
             tool(GoogleMailGetThreadAction.ACTION_DEFINITION),
             tool(GoogleMailListLabelsAction.ACTION_DEFINITION),
             tool(GoogleMailRemoveLabelsAction.ACTION_DEFINITION),
