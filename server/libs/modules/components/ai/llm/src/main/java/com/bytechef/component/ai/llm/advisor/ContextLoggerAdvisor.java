@@ -17,12 +17,9 @@
 package com.bytechef.component.ai.llm.advisor;
 
 import com.bytechef.component.definition.ActionContext;
-import java.util.function.Function;
-import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.model.ChatResponse;
 
 /**
  * Advisor that logs LLM request and response through ByteChef's {@link ActionContext#log} infrastructure, making
@@ -34,25 +31,20 @@ public class ContextLoggerAdvisor extends SimpleLoggerAdvisor {
 
     private final ActionContext context;
 
-    // Duplicated from parent because SimpleLoggerAdvisor's fields are private
-    private final Function<@Nullable ChatClientRequest, String> requestToString;
-    private final Function<@Nullable ChatResponse, String> responseToString;
-
     public ContextLoggerAdvisor(ActionContext context) {
         super(DEFAULT_REQUEST_TO_STRING, DEFAULT_RESPONSE_TO_STRING, 0);
 
         this.context = context;
-        this.requestToString = DEFAULT_REQUEST_TO_STRING;
-        this.responseToString = DEFAULT_RESPONSE_TO_STRING;
     }
 
     @Override
     protected void logRequest(ChatClientRequest request) {
-        context.log(log -> log.debug("LLM request: {}", requestToString.apply(request)));
+        context.log(log -> log.debug("LLM request: {}", DEFAULT_REQUEST_TO_STRING.apply(request)));
     }
 
     @Override
     protected void logResponse(ChatClientResponse chatClientResponse) {
-        context.log(log -> log.debug("LLM response: {}", responseToString.apply(chatClientResponse.chatResponse())));
+        context.log(
+            log -> log.debug("LLM response: {}", DEFAULT_RESPONSE_TO_STRING.apply(chatClientResponse.chatResponse())));
     }
 }

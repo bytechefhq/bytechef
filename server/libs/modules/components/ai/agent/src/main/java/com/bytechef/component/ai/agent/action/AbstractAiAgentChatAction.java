@@ -41,6 +41,7 @@ import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.workflow.worker.ai.FromAiResult;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +101,7 @@ public abstract class AbstractAiAgentChatAction {
             .toolCallbacks(
                 getToolCallbacks(
                     clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                    context.isEditorEnvironment(), toolExecutionListener));
+                    context.isEditorEnvironment(), toolExecutionListener, context));
     }
 
     private List<Advisor> getAdvisors(
@@ -183,7 +184,7 @@ public abstract class AbstractAiAgentChatAction {
 
     private List<ToolCallback> getToolCallbacks(
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
-        boolean editorEnvironment, @Nullable ToolExecutionListener toolExecutionListener) {
+        boolean editorEnvironment, @Nullable ToolExecutionListener toolExecutionListener, ActionContext context) {
 
         List<ToolCallback> rawToolCallbacks = new ArrayList<>();
 
@@ -237,7 +238,7 @@ public abstract class AbstractAiAgentChatAction {
         List<ToolCallback> observableToolCallbacks = rawToolCallbacks.stream()
             .map(
                 toolCallback -> createObservableToolCallback(
-                    toolCallback, thinkingReference, toolExecutionListener))
+                    toolCallback, thinkingReference, toolExecutionListener, context))
             .toList();
 
         AugmentedToolCallbackProvider<AgentThinking> augmentedToolCallbackProvider =
@@ -248,12 +249,12 @@ public abstract class AbstractAiAgentChatAction {
                 .removeExtraArgumentsAfterProcessing(true)
                 .build();
 
-        return List.of(augmentedToolCallbackProvider.getToolCallbacks());
+        return Arrays.asList(augmentedToolCallbackProvider.getToolCallbacks());
     }
 
     private static ToolCallback createObservableToolCallback(
         ToolCallback delegate, AtomicReference<AgentThinking> thinkingReference,
-        ToolExecutionListener toolExecutionListener) {
+        ToolExecutionListener toolExecutionListener, ActionContext context) {
 
         return new ToolCallback() {
 
@@ -280,6 +281,11 @@ public abstract class AbstractAiAgentChatAction {
                 try {
                     inputs = JsonParser.fromJson(toolInput, new TypeReference<>() {});
                 } catch (Exception exception) {
+                    context.log(
+                        log -> log.debug(
+                            "Failed to parse tool input as JSON for '{}': {}", toolDefinition.name(),
+                            exception.getMessage()));
+
                     inputs = Map.of("rawInput", toolInput);
                 }
 
@@ -293,7 +299,11 @@ public abstract class AbstractAiAgentChatAction {
                             toolDefinition.name(), inputs, result,
                             agentThinking != null ? agentThinking.reasoning() : null,
                             agentThinking != null ? agentThinking.confidence() : null));
-                } catch (Exception ignored) {
+                } catch (Exception exception) {
+                    context.log(
+                        log -> log.debug(
+                            "Tool execution listener failed for '{}': {}", toolDefinition.name(),
+                            exception.getMessage(), exception));
                 }
 
                 return result;

@@ -32,6 +32,8 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicReference;
 import org.reactivestreams.FlowAdapters;
@@ -82,25 +84,24 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         Parameters extensions, ActionContext context) throws Exception {
 
         AtomicReference<SseEmitterHandler.SseEmitter> emitterReference = new AtomicReference<>();
+        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
 
         ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
+            Map<String, Object> eventData = new LinkedHashMap<>();
+
+            eventData.put("__eventType", "tool_execution");
+            eventData.put("confidence", toolExecutionEvent.confidence());
+            eventData.put("inputs", toolExecutionEvent.inputs());
+            eventData.put("output", toolExecutionEvent.output());
+            eventData.put("reasoning", toolExecutionEvent.reasoning());
+            eventData.put("toolName", toolExecutionEvent.toolName());
+
             SseEmitterHandler.SseEmitter sseEmitter = emitterReference.get();
 
             if (sseEmitter == null) {
-                context.log(log -> log.warn(
-                    "Tool execution event for '{}' dropped: SSE emitter not yet available",
-                    toolExecutionEvent.toolName()));
+                bufferedEvents.add(eventData);
             } else {
                 try {
-                    Map<String, Object> eventData = new LinkedHashMap<>();
-
-                    eventData.put("__eventType", "tool_execution");
-                    eventData.put("confidence", toolExecutionEvent.confidence());
-                    eventData.put("inputs", toolExecutionEvent.inputs());
-                    eventData.put("output", toolExecutionEvent.output());
-                    eventData.put("reasoning", toolExecutionEvent.reasoning());
-                    eventData.put("toolName", toolExecutionEvent.toolName());
-
                     sseEmitter.send(eventData);
                 } catch (Exception exception) {
                     context.log(log -> log.warn(
@@ -149,6 +150,17 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
         return emitter -> {
             emitterReference.set(emitter);
+
+            Map<String, Object> bufferedEvent;
+
+            while ((bufferedEvent = bufferedEvents.poll()) != null) {
+                try {
+                    emitter.send(bufferedEvent);
+                } catch (Exception exception) {
+                    context.log(log -> log.warn(
+                        "Failed to send buffered tool execution event: {}", exception.getMessage(), exception));
+                }
+            }
 
             effectivePublisher.subscribe(
                 new Flow.Subscriber<Object>() {
