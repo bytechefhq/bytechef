@@ -21,45 +21,54 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.Suspend;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+import java.time.Instant;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public class DelaySleepAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sleep")
-        .title("Sleep")
-        .description("Delay action execution.")
-        .properties(
-            integer(MILLIS)
-                .label("Millis")
-                .description("Time in milliseconds.")
-                .required(true)
-                .defaultValue(1))
-        .perform(DelaySleepAction::perform);
+    public static ModifiableActionDefinition of() {
+        DelaySleepAction delaySleepAction = new DelaySleepAction();
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-        throws InterruptedException {
-
-        if (inputParameters.containsKey(MILLIS)) {
-            sleep(inputParameters.getLong(MILLIS));
-        } else if (inputParameters.containsKey("duration")) {
-            Duration duration = inputParameters.getDuration("duration");
-
-            sleep(duration.toMillis());
-        } else {
-            sleep(1000);
-        }
-
-        return null;
+        return action("sleep")
+            .title("Sleep")
+            .description("Delay action execution.")
+            .properties(
+                integer(MILLIS)
+                    .label("Millis")
+                    .description("Time in milliseconds.")
+                    .required(true)
+                    .defaultValue(1))
+            .suspendPerform(delaySleepAction::suspendPerform)
+            .resumPerform(delaySleepAction::resumePerform);
     }
 
-    protected static void sleep(long millis) throws InterruptedException {
-        TimeUnit.MILLISECONDS.sleep(millis);
+    protected Suspend suspendPerform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        long millis = inputParameters.containsKey(MILLIS) ? inputParameters.getLong(MILLIS) : 1000;
+
+        Instant expiresAt = Instant.now()
+            .plusMillis(millis);
+
+        return new Suspend(Map.of("expiresAt", expiresAt.toEpochMilli(), "delayMillis", millis), expiresAt);
+    }
+
+    protected Object resumePerform(
+        Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters,
+        ActionContext context) {
+
+        long executeAtMillis = continueParameters.getLong("expiresAt");
+
+        Instant executeAt = Instant.ofEpochMilli(executeAtMillis);
+
+        long millis = continueParameters.getLong("delayMillis");
+
+        return Map.of("scheduledAt", executeAt, "delayMillis", millis);
     }
 }

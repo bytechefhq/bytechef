@@ -37,6 +37,7 @@ import org.springframework.context.ApplicationEventPublisher;
 /**
  * @author Ivica Cardic
  */
+@Deprecated
 public class WaitForApprovalTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(WaitForApprovalTaskDispatcher.class);
