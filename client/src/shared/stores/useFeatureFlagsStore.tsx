@@ -43,28 +43,25 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
         }))
     );
 
-    const loadingRef = useRef(false);
+    const loadingFlagsRef = useRef<Set<string>>(new Set());
 
     return (featureFlag: string): boolean => {
-        if (loadingRef.current) {
-            return false;
-        }
-
-        loadingRef.current = true;
-
         // First check local feature flags from server
         if (localFeatureFlags[featureFlag] !== undefined) {
-            loadingRef.current = false;
-
             return localFeatureFlags[featureFlag];
         }
 
         // Then check cached feature flags
         if (featureFlags[featureFlag] !== undefined) {
-            loadingRef.current = false;
-
             return featureFlags[featureFlag];
         }
+
+        // If already loading this specific flag, return current cached value
+        if (loadingFlagsRef.current.has(featureFlag)) {
+            return featureFlags[featureFlag] ?? false;
+        }
+
+        loadingFlagsRef.current.add(featureFlag);
 
         // Only try to use PostHog if analytics are enabled
         if (analytics.enabled && analytics.postHog.apiKey && analytics.postHog.host) {
@@ -78,20 +75,20 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
                             setTimeout(() => setFeatureFlag(featureFlag, false), 0);
                         }
 
-                        loadingRef.current = false;
+                        loadingFlagsRef.current.delete(featureFlag);
                     });
                 })
                 .catch(() => {
                     // If PostHog fails to load, default to false
                     setTimeout(() => setFeatureFlag(featureFlag, false), 0);
 
-                    loadingRef.current = false;
+                    loadingFlagsRef.current.delete(featureFlag);
                 });
         } else {
             // If analytics are disabled, default to false
             setTimeout(() => setFeatureFlag(featureFlag, false), 0);
 
-            loadingRef.current = false;
+            loadingFlagsRef.current.delete(featureFlag);
         }
 
         return featureFlags[featureFlag] ?? false;
