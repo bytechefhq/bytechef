@@ -19,6 +19,7 @@ package com.bytechef.component.google.mail.action;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -40,17 +41,17 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailDeleteEmailActionTest {
 
+    private final Parameters mockedConnectionParameters = mock(Parameters.class);
     private final Gmail.Users.Messages.Delete mockedDelete = mock(Gmail.Users.Messages.Delete.class);
     private final Gmail mockedGmail = mock(Gmail.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(ID, "123"));
     private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException {
-        Parameters parameters = MockParametersFactory.create(Map.of(ID, "123"));
-
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic.when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedGmail);
@@ -61,9 +62,10 @@ class GoogleMailDeleteEmailActionTest {
             when(mockedMessages.delete(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedDelete);
 
-            GoogleMailDeleteEmailAction.perform(parameters, parameters, mock(ActionContext.class));
+            GoogleMailDeleteEmailAction.perform(
+                mockedInputParameters, mockedConnectionParameters, mock(ActionContext.class));
 
-            assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedConnectionParameters, parametersArgumentCaptor.getValue());
             assertEquals(List.of(ME, "123"), stringArgumentCaptor.getAllValues());
         }
     }

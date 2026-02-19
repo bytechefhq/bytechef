@@ -44,6 +44,8 @@ import org.mockito.MockedStatic;
 class GoogleMailArchiveEmailActionTest {
 
     private final Gmail mockedGmail = mock(Gmail.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(ID, "1"));
+    private final Parameters mockedConnectionParameters = mock(Parameters.class);
     private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
     private final Message mockedMessage = mock(Message.class);
@@ -54,7 +56,6 @@ class GoogleMailArchiveEmailActionTest {
 
     @Test
     void testPerform() throws IOException {
-        Parameters parameters = MockParametersFactory.create(Map.of(ID, "1"));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic.when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
@@ -69,10 +70,11 @@ class GoogleMailArchiveEmailActionTest {
             when(mockedModify.execute())
                 .thenReturn(mockedMessage);
 
-            Message result = GoogleMailArchiveEmailAction.perform(parameters, parameters, mock(ActionContext.class));
+            Message result = GoogleMailArchiveEmailAction.perform(
+                mockedInputParameters, mockedConnectionParameters, mock(ActionContext.class));
 
             assertEquals(mockedMessage, result);
-            assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedConnectionParameters, parametersArgumentCaptor.getValue());
             assertEquals(List.of(ME, "1"), stringArgumentCaptor.getAllValues());
 
             ModifyMessageRequest expectedModifyMessageRequest = new ModifyMessageRequest()

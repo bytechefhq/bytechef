@@ -45,8 +45,10 @@ import org.mockito.MockedStatic;
 class GoogleMailCreateLabelActionTest {
 
     private final ArgumentCaptor<Label> labelArgumentCaptor = forClass(Label.class);
+    private final Parameters mockedConnectionParameters = mock(Parameters.class);
     private final Labels.Create mockedCreate = mock(Labels.Create.class);
     private final Gmail mockedGmail = mock(Gmail.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(NAME, "test"));
     private final Label mockedLabel = mock(Label.class);
     private final Labels mockedLabels = mock(Labels.class);
     private final Users mockedUsers = mock(Users.class);
@@ -55,8 +57,6 @@ class GoogleMailCreateLabelActionTest {
 
     @Test
     void testPerform() throws IOException {
-        Parameters parameters = MockParametersFactory.create(Map.of(NAME, "test"));
-
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic.when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedGmail);
@@ -70,10 +70,11 @@ class GoogleMailCreateLabelActionTest {
             when(mockedCreate.execute())
                 .thenReturn(mockedLabel);
 
-            Label result = GoogleMailCreateLabelAction.perform(parameters, parameters, mock(ActionContext.class));
+            Label result = GoogleMailCreateLabelAction.perform(mockedInputParameters, mockedConnectionParameters,
+                mock(ActionContext.class));
 
             assertEquals(mockedLabel, result);
-            assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedConnectionParameters, parametersArgumentCaptor.getValue());
             assertEquals(List.of(ME), stringArgumentCaptor.getAllValues());
 
             Label label = new Label().setName("test")

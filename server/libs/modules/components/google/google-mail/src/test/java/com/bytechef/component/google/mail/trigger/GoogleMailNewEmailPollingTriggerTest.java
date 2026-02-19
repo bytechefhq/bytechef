@@ -20,6 +20,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FO
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.trigger.GoogleMailNewEmailPollingTrigger.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -55,18 +56,19 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailNewEmailPollingTriggerTest {
 
-    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
-    private final ArgumentCaptor<Long> longArgumentCaptor = ArgumentCaptor.forClass(Long.class);
+    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = forClass(Calendar.class);
+    private final ArgumentCaptor<Long> longArgumentCaptor = forClass(Long.class);
     private final Gmail mockedGmail = mock(Gmail.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
     private final Get mockedGet = mock(Get.class);
     private final Users.Messages.List mockedList = mock(Users.Messages.List.class);
     private final Messages mockedMessages = mock(Messages.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Users mockedUsers = mock(Users.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<ZoneId> zoneIdArgumentCaptor = ArgumentCaptor.forClass(ZoneId.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<ZoneId> zoneIdArgumentCaptor = forClass(ZoneId.class);
 
     @Test
     void testPoll() throws IOException {
@@ -76,7 +78,8 @@ class GoogleMailNewEmailPollingTriggerTest {
         LocalDateTime startDate = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
         LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
 
-        Parameters parameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate, FORMAT, Format.FULL));
+        Parameters mockedClosureParameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
+        Parameters mockedInputParameters = MockParametersFactory.create(Map.of(FORMAT, Format.FULL));
 
         try (
             MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS);
@@ -123,7 +126,7 @@ class GoogleMailNewEmailPollingTriggerTest {
                 .thenReturn(endDate);
 
             PollOutput pollOutput = GoogleMailNewEmailPollingTrigger.poll(
-                parameters, parameters, parameters, mockedTriggerContext);
+                mockedInputParameters, mockedParameters, mockedClosureParameters, mockedTriggerContext);
 
             assertEquals(new PollOutput(messages, Map.of(LAST_TIME_CHECKED, endDate), false), pollOutput);
 
@@ -142,7 +145,7 @@ class GoogleMailNewEmailPollingTriggerTest {
 
             assertEquals(strings, stringArgumentCaptor.getAllValues());
             assertEquals(500L, longArgumentCaptor.getValue());
-            assertEquals(List.of(parameters, parameters), parametersArgumentCaptor.getAllValues());
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
             assertEquals(mockedCalendar, calendarArgumentCaptor.getValue());
             assertEquals(zoneId, zoneIdArgumentCaptor.getValue());
         }
@@ -154,7 +157,7 @@ class GoogleMailNewEmailPollingTriggerTest {
         LocalDateTime startDate = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
         LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
 
-        Parameters parameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
+        Parameters mockedClosureParameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
 
         try (
             MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS);
@@ -195,9 +198,25 @@ class GoogleMailNewEmailPollingTriggerTest {
                 .thenReturn(endDate);
 
             PollOutput pollOutput = GoogleMailNewEmailPollingTrigger.poll(
-                parameters, parameters, parameters, mockedTriggerContext);
+                mockedParameters, mockedParameters, mockedClosureParameters, mockedTriggerContext);
 
             assertEquals(new PollOutput(List.of(), Map.of(LAST_TIME_CHECKED, endDate), false), pollOutput);
+
+            ZoneId zoneId = ZoneId.of(timezone);
+
+            ZonedDateTime zonedDateTime = startDate.atZone(zoneId);
+
+            List<String> strings = new ArrayList<>();
+
+            strings.add(ME);
+            strings.add("is:unread after:" + zonedDateTime.toEpochSecond());
+            strings.add(null);
+
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
+            assertEquals(500L, longArgumentCaptor.getValue());
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
+            assertEquals(mockedCalendar, calendarArgumentCaptor.getValue());
+            assertEquals(zoneId, zoneIdArgumentCaptor.getValue());
         }
     }
 }

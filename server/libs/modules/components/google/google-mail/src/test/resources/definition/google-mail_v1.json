@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add labels to an email in your Gmail account.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#add-labels"
+    },
     "metadata": null,
     "name": "addLabels",
     "outputDefinition": {
@@ -239,7 +242,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "ID of the message to add labels",
+      "description": "ID of the message to add labels.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -261,7 +264,7 @@
       "advancedOption": null,
       "controlType": "MULTI_SELECT",
       "defaultValue": null,
-      "description": "Labels to add to this message. You can add up to 100 labels with each update.",
+      "description": "ID of the labels to add to message. You can add up to 100 labels with each update.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -289,7 +292,7 @@
         "required": null,
         "type": "STRING"
       } ],
-      "label": "Labels",
+      "label": "Labels IDs",
       "maxItems": 100,
       "metadata": { },
       "minItems": null,
@@ -314,8 +317,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Archive an Email message.",
-    "help": null,
+    "description": "Archive an email message.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#archive-email"
+    },
     "metadata": null,
     "name": "archiveEmail",
     "outputDefinition": {
@@ -578,7 +584,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new label.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#create-label"
+    },
     "metadata": null,
     "name": "createLabel",
     "outputDefinition": {
@@ -842,10 +851,13 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Delete an email from your Gmail account permanently via Id",
-    "help": null,
+    "description": "Deletes an email from your Gmail account immediately and permanently.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#delete-mail"
+    },
     "metadata": null,
-    "name": "deleteMail",
+    "name": "deleteEmail",
     "outputDefinition": null,
     "perform": { },
     "processErrorResponse": null,
@@ -874,7 +886,7 @@
     } ],
     "resumePerform": null,
     "suspendPerform": null,
-    "title": "Delete Mail",
+    "title": "Delete Email",
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -882,10 +894,13 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Get an email from your Gmail account via Id",
-    "help": null,
+    "description": "Gets the specified email message.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#get-mail"
+    },
     "metadata": null,
-    "name": "getMail",
+    "name": "getEmail",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
@@ -1004,7 +1019,7 @@
     } ],
     "resumePerform": null,
     "suspendPerform": null,
-    "title": "Get Mail",
+    "title": "Get Email",
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -1013,7 +1028,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets the specified thread.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#get-thread"
+    },
     "metadata": null,
     "name": "getThread",
     "outputDefinition": {
@@ -1142,8 +1160,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Lists labels that are connected to your Google Mail account.",
-    "help": null,
+    "description": "Lists all labels in your mailbox.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#list-labels"
+    },
     "metadata": null,
     "name": "listLabels",
     "outputDefinition": {
@@ -1471,8 +1492,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Remove labels from an email in your Gmail account.",
-    "help": null,
+    "description": "Removes labels on the specified message.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#remove-labels"
+    },
     "metadata": null,
     "name": "removeLabels",
     "outputDefinition": {
@@ -1705,7 +1729,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "ID of the message to add labels",
+      "description": "ID of the message to remove labels.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1727,7 +1751,7 @@
       "advancedOption": null,
       "controlType": "MULTI_SELECT",
       "defaultValue": null,
-      "description": "Labels to remove from this message.",
+      "description": "ID of the labels to remove from message.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1755,7 +1779,7 @@
         "required": null,
         "type": "STRING"
       } ],
-      "label": "Labels",
+      "label": "Labels IDs",
       "maxItems": 100,
       "metadata": { },
       "minItems": null,
@@ -1781,7 +1805,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a reply to an email message.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#reply-to-email"
+    },
     "metadata": null,
     "name": "replyToEmail",
     "outputDefinition": {
@@ -2371,8 +2398,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Lists the messages in the user's mailbox.",
-    "help": null,
+    "description": "Lists the email messages in the user's mailbox.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#search-email"
+    },
     "metadata": null,
     "name": "searchEmail",
     "outputDefinition": {
@@ -2926,8 +2956,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Sends the specified message to the recipients in the To, Cc, and Bcc headers.",
-    "help": null,
+    "description": "Creates and sends a new email message from your Gmail account.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#send-email"
+    },
     "metadata": null,
     "name": "sendEmail",
     "outputDefinition": {
@@ -3789,7 +3822,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "ID of the message to add labels",
+      "description": "ID of the message to add labels.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -3811,7 +3844,7 @@
       "advancedOption": null,
       "controlType": "MULTI_SELECT",
       "defaultValue": null,
-      "description": "Labels to add to this message. You can add up to 100 labels with each update.",
+      "description": "ID of the labels to add to message. You can add up to 100 labels with each update.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -3839,7 +3872,7 @@
         "required": null,
         "type": "STRING"
       } ],
-      "label": "Labels",
+      "label": "Labels IDs",
       "maxItems": 100,
       "metadata": { },
       "minItems": null,
@@ -3865,7 +3898,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "archiveEmail",
-    "description": "Archive an Email message.",
+    "description": "Archive an email message.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -4390,8 +4423,8 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "deleteMail",
-    "description": "Delete an email from your Gmail account permanently via Id",
+    "name": "deleteEmail",
+    "description": "Deletes an email from your Gmail account immediately and permanently.",
     "element": { },
     "help": null,
     "outputDefinition": null,
@@ -4419,7 +4452,7 @@
       "required": true,
       "type": "STRING"
     } ],
-    "title": "Delete Mail",
+    "title": "Delete Email",
     "type": {
       "name": "TOOLS",
       "key": "tools",
@@ -4429,8 +4462,8 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "getMail",
-    "description": "Get an email from your Gmail account via Id",
+    "name": "getEmail",
+    "description": "Gets the specified email message.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -4548,7 +4581,7 @@
       "required": false,
       "type": "ARRAY"
     } ],
-    "title": "Get Mail",
+    "title": "Get Email",
     "type": {
       "name": "TOOLS",
       "key": "tools",
@@ -4688,7 +4721,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "listLabels",
-    "description": "Lists labels that are connected to your Google Mail account.",
+    "description": "Lists all labels in your mailbox.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -5016,7 +5049,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "removeLabels",
-    "description": "Remove labels from an email in your Gmail account.",
+    "description": "Removes labels on the specified message.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -5248,7 +5281,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "ID of the message to add labels",
+      "description": "ID of the message to remove labels.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -5270,7 +5303,7 @@
       "advancedOption": null,
       "controlType": "MULTI_SELECT",
       "defaultValue": null,
-      "description": "Labels to remove from this message.",
+      "description": "ID of the labels to remove from message.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -5298,7 +5331,7 @@
         "required": null,
         "type": "STRING"
       } ],
-      "label": "Labels",
+      "label": "Labels IDs",
       "maxItems": 100,
       "metadata": { },
       "minItems": null,
@@ -5914,7 +5947,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "searchEmail",
-    "description": "Lists the messages in the user's mailbox.",
+    "description": "Lists the email messages in the user's mailbox.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -6468,7 +6501,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "sendEmail",
-    "description": "Sends the specified message to the recipients in the To, Cc, and Bcc headers.",
+    "description": "Creates and sends a new email message from your Gmail account.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -7183,7 +7216,10 @@
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.google.com/workspace/gmail/api/reference/rest"
+  },
   "description": "Gmail is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps.",
   "icon": "path:assets/google-mail.svg",
   "metadata": null,
@@ -7197,7 +7233,10 @@
     "deprecated": null,
     "description": "Triggers when new mail is found in your Gmail inbox.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#new-email"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newEmail",
@@ -7213,7 +7252,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Must be 3-255 characters, start with a letter, and contain only the following characters: letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or plus signs (+). Cannot start with goog.",
+      "description": "Name of your PubSub topic you want to subscribe to.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -7290,7 +7329,10 @@
     "deprecated": null,
     "description": "Periodically checks your Gmail inbox for any new incoming emails.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-mail_v1#new-email-polling"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newEmailPolling",

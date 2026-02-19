@@ -17,13 +17,13 @@
 package com.bytechef.component.google.mail.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
-import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
@@ -31,7 +31,6 @@ import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -41,19 +40,17 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailSendEmailActionTest {
 
-    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
-        ArgumentCaptor.forClass(ActionContext.class);
-    private final ArgumentCaptor<Gmail> gmailArgumentCaptor = ArgumentCaptor.forClass(Gmail.class);
-    private final ArgumentCaptor<Message> messageArgumentCaptor = ArgumentCaptor.forClass(Message.class);
+    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor = forClass(ActionContext.class);
+    private final ArgumentCaptor<Gmail> gmailArgumentCaptor = forClass(Gmail.class);
+    private final ArgumentCaptor<Message> messageArgumentCaptor = forClass(Message.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Gmail mockedGmail = mock(Gmail.class);
     private final Message mockedMessage = mock(Message.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException, MessagingException {
-        Parameters parameters = MockParametersFactory.create(Map.of());
-
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
             googleServicesMockedStatic
@@ -68,11 +65,11 @@ class GoogleMailSendEmailActionTest {
                 .when(() -> GoogleMailUtils.sendMail(gmailArgumentCaptor.capture(), messageArgumentCaptor.capture()))
                 .thenReturn(mockedMessage);
 
-            Message result = GoogleMailSendEmailAction.perform(parameters, parameters, mockedActionContext);
+            Message result = GoogleMailSendEmailAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(mockedMessage, result);
 
-            assertEquals(List.of(parameters, parameters), parametersArgumentCaptor.getAllValues());
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
             assertEquals(mockedGmail, gmailArgumentCaptor.getValue());
             assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
 

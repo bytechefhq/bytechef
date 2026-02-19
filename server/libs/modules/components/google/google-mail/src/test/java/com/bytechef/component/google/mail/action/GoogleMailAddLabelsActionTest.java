@@ -20,6 +20,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -43,21 +44,20 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailAddLabelsActionTest {
 
+    private final Parameters mockedConnectionParameters = mock(Parameters.class);
     private final Gmail mockedGmail = mock(Gmail.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(
+        Map.of(ID, "1", LABEL_IDS, List.of("1", "2", "3")));
     private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
     private final Message mockedMessage = mock(Message.class);
     private final Gmail.Users.Messages.Modify mockedModify = mock(Gmail.Users.Messages.Modify.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<ModifyMessageRequest> requestArgumentCaptor =
-        ArgumentCaptor.forClass(ModifyMessageRequest.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<ModifyMessageRequest> requestArgumentCaptor = forClass(ModifyMessageRequest.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException {
-        Parameters parameters =
-            MockParametersFactory.create(Map.of(ID, "1", LABEL_IDS, List.of("1", "2", "3")));
-
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic.when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedGmail);
@@ -71,11 +71,11 @@ class GoogleMailAddLabelsActionTest {
             when(mockedModify.execute())
                 .thenReturn(mockedMessage);
 
-            Message result = GoogleMailAddLabelsAction.perform(parameters, parameters, mock(ActionContext.class));
+            Message result = GoogleMailAddLabelsAction.perform(
+                mockedInputParameters, mockedConnectionParameters, mock(ActionContext.class));
 
             assertEquals(mockedMessage, result);
-            assertEquals(parameters, parametersArgumentCaptor.getValue());
-
+            assertEquals(mockedConnectionParameters, parametersArgumentCaptor.getValue());
             assertEquals(List.of(ME, "1"), stringArgumentCaptor.getAllValues());
 
             ModifyMessageRequest expectedModifyMessageRequest = new ModifyMessageRequest()

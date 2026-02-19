@@ -17,6 +17,7 @@
 package com.bytechef.component.google.mail.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -34,9 +35,8 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailListLabelsActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() {
@@ -52,7 +52,8 @@ class GoogleMailListLabelsActionTest {
             googleServicesMockedStatic.when(() -> GoogleMailUtils.getLabels(parametersArgumentCaptor.capture()))
                 .thenReturn(labels);
 
-            List<Label> result = GoogleMailListLabelsAction.perform(null, mockedParameters, mockedActionContext);
+            List<Label> result = GoogleMailListLabelsAction.perform(
+                mockedParameters, mockedParameters, mock(ActionContext.class));
 
             assertEquals(labels, result);
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
