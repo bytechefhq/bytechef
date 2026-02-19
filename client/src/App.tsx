@@ -190,7 +190,7 @@ function App() {
             return false;
         }
 
-        if (navItem.href === '/automation/api-platform/api-collections') {
+        if (navItem.href === '/automation/api-platform') {
             return ff_1023;
         }
 
