@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 
+import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -32,7 +33,8 @@ import org.jspecify.annotations.Nullable;
 import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.StreamResponseSpec;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.Generation;
 import reactor.core.publisher.Flux;
 
 /**
@@ -78,9 +80,7 @@ public interface ChatModel {
 
         ChatClient.CallResponseSpec callResponseSpec = chatClientRequestSpec
             .messages(messages)
-            .advisors(
-                SimpleLoggerAdvisor.builder()
-                    .build())
+            .advisors(new ContextLoggerAdvisor(context))
             .call();
 
         return ModelUtils.getChatResponse(callResponseSpec, inputParameters, responseFormatRequired, context);
@@ -98,12 +98,9 @@ public interface ChatModel {
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(
             chatModel, inputParameters, true, context);
 
-        SimpleLoggerAdvisor simpleLoggerAdvisor = SimpleLoggerAdvisor.builder()
-            .build();
-
         StreamResponseSpec streamResponseSpec = chatClientRequestSpec
             .messages(messages)
-            .advisors(simpleLoggerAdvisor)
+            .advisors(new ContextLoggerAdvisor(context))
             .stream();
 
         try {
@@ -115,9 +112,15 @@ public interface ChatModel {
                 .map(chatResponse -> {
                     Object payload = chatResponse;
 
-                    String text = chatResponse.getResult()
-                        .getOutput()
-                        .getText();
+                    Generation result = chatResponse.getResult();
+
+                    if (result == null) {
+                        return payload;
+                    }
+
+                    AssistantMessage output = result.getOutput();
+
+                    String text = output.getText();
 
                     if (text != null) {
                         payload = text;

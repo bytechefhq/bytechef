@@ -29,12 +29,15 @@ import com.bytechef.platform.component.definition.AbstractActionDefinitionWrappe
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Flow;
+import java.util.concurrent.atomic.AtomicReference;
 import org.reactivestreams.FlowAdapters;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.Generation;
 import reactor.core.publisher.Flux;
 
 /**
@@ -78,15 +81,38 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters,
         Parameters extensions, ActionContext context) throws Exception {
 
-        ChatClient.ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
-            inputParameters, connectionParameters, extensions, context);
+        AtomicReference<SseEmitterHandler.SseEmitter> emitterReference = new AtomicReference<>();
 
-        SimpleLoggerAdvisor simpleLoggerAdvisor = SimpleLoggerAdvisor.builder()
-            .build();
+        ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
+            SseEmitterHandler.SseEmitter sseEmitter = emitterReference.get();
 
-        var streamResponseSpec = chatClientRequestSpec
-            .advisors(simpleLoggerAdvisor)
-            .stream();
+            if (sseEmitter == null) {
+                context.log(log -> log.warn(
+                    "Tool execution event for '{}' dropped: SSE emitter not yet available",
+                    toolExecutionEvent.toolName()));
+            } else {
+                try {
+                    Map<String, Object> eventData = new LinkedHashMap<>();
+
+                    eventData.put("__eventType", "tool_execution");
+                    eventData.put("confidence", toolExecutionEvent.confidence());
+                    eventData.put("inputs", toolExecutionEvent.inputs());
+                    eventData.put("output", toolExecutionEvent.output());
+                    eventData.put("reasoning", toolExecutionEvent.reasoning());
+                    eventData.put("toolName", toolExecutionEvent.toolName());
+
+                    sseEmitter.send(eventData);
+                } catch (Exception exception) {
+                    context.log(log -> log.warn(
+                        "Failed to send tool execution event: {}", exception.getMessage(), exception));
+                }
+            }
+        };
+
+        ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
+            inputParameters, connectionParameters, extensions, toolExecutionListener, context);
+
+        var streamResponseSpec = chatClientRequestSpec.stream();
 
         Flow.Publisher<?> publisher;
 
@@ -99,9 +125,15 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                 .map(chatResponse -> {
                     Object payload = chatResponse;
 
-                    String text = chatResponse.getResult()
-                        .getOutput()
-                        .getText();
+                    Generation result = chatResponse.getResult();
+
+                    if (result == null) {
+                        return payload;
+                    }
+
+                    AssistantMessage output = result.getOutput();
+
+                    String text = output.getText();
 
                     if (text != null) {
                         payload = text;
@@ -115,40 +147,44 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
         Flow.Publisher<?> effectivePublisher = publisher;
 
-        return emitter -> effectivePublisher.subscribe(
-            new Flow.Subscriber<Object>() {
+        return emitter -> {
+            emitterReference.set(emitter);
 
-                private Flow.Subscription subscription;
+            effectivePublisher.subscribe(
+                new Flow.Subscriber<Object>() {
 
-                @Override
-                public void onSubscribe(Flow.Subscription subscription) {
-                    this.subscription = subscription;
+                    private Flow.Subscription subscription;
 
-                    emitter.addTimeoutListener(subscription::cancel);
+                    @Override
+                    public void onSubscribe(Flow.Subscription subscription) {
+                        this.subscription = subscription;
 
-                    subscription.request(Long.MAX_VALUE);
-                }
+                        emitter.addTimeoutListener(subscription::cancel);
 
-                @Override
-                public void onNext(Object item) {
-                    try {
-                        emitter.send(item);
-                    } catch (Exception exception) {
-                        context.log(log -> log.trace(exception.getMessage(), exception));
-
-                        subscription.cancel();
+                        subscription.request(Long.MAX_VALUE);
                     }
-                }
 
-                @Override
-                public void onError(Throwable throwable) {
-                    emitter.error(throwable);
-                }
+                    @Override
+                    public void onNext(Object item) {
+                        try {
+                            emitter.send(item);
+                        } catch (Exception exception) {
+                            context.log(log -> log.trace(exception.getMessage(), exception));
 
-                @Override
-                public void onComplete() {
-                    emitter.complete();
-                }
-            });
+                            subscription.cancel();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable throwable) {
+                        emitter.error(throwable);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        emitter.complete();
+                    }
+                });
+        };
     }
 }

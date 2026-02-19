@@ -29,6 +29,9 @@ import com.bytechef.platform.component.definition.AbstractActionDefinitionWrappe
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.ai.chat.client.ChatClient;
@@ -75,11 +78,51 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
         ActionContext context) throws Exception {
 
+        List<ToolExecutionEvent> toolExecutionEvents = new ArrayList<>();
+
+        ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
+            context.log(
+                log -> log.info(
+                    "Tool execution: {} | Reasoning: {} | Confidence: {} | Inputs: {} | Output: {}",
+                    toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
+                    toolExecutionEvent.inputs(), toolExecutionEvent.output()));
+
+            if (context.isEditorEnvironment()) {
+                toolExecutionEvents.add(toolExecutionEvent);
+            }
+        };
+
         ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
-            inputParameters, connectionParameters, extensions, context);
+            inputParameters, connectionParameters, extensions, toolExecutionListener, context);
 
         ChatClient.CallResponseSpec call = chatClientRequestSpec.call();
 
-        return ModelUtils.getChatResponse(call, inputParameters, context);
+        Object chatResponse = ModelUtils.getChatResponse(call, inputParameters, context);
+
+        if (context.isEditorEnvironment() && !toolExecutionEvents.isEmpty()) {
+            Map<String, Object> response = new LinkedHashMap<>();
+
+            response.put("response", chatResponse);
+
+            List<Map<String, Object>> toolExecutions = toolExecutionEvents.stream()
+                .map(toolExecutionEvent -> {
+                    Map<String, Object> eventData = new LinkedHashMap<>();
+
+                    eventData.put("confidence", toolExecutionEvent.confidence());
+                    eventData.put("inputs", toolExecutionEvent.inputs());
+                    eventData.put("output", toolExecutionEvent.output());
+                    eventData.put("reasoning", toolExecutionEvent.reasoning());
+                    eventData.put("toolName", toolExecutionEvent.toolName());
+
+                    return eventData;
+                })
+                .toList();
+
+            response.put("toolExecutions", toolExecutions);
+
+            return response;
+        }
+
+        return chatResponse;
     }
 }

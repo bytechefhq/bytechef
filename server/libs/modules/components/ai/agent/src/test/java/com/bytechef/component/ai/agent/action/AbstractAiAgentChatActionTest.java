@@ -95,7 +95,7 @@ class AbstractAiAgentChatActionTest {
                 .thenReturn(List.of());
 
             assertDoesNotThrow(() -> action.getChatClientRequestSpec(
-                inputParameters, connectionParameters, extensions, actionContext));
+                inputParameters, connectionParameters, extensions, null, actionContext));
         }
     }
 

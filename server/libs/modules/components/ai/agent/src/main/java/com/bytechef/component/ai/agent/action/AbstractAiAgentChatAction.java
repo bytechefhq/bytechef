@@ -23,6 +23,7 @@ import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RA
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.util.FromAiInputSchemaUtils;
+import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -38,20 +39,26 @@ import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.workflow.worker.ai.FromAiResult;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.ai.util.json.JsonParser;
 
 /**
  * @author Ivica Cardic
@@ -66,7 +73,7 @@ public abstract class AbstractAiAgentChatAction {
 
     protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
-        ActionContext context) throws Exception {
+        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context) throws Exception {
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
@@ -87,17 +94,18 @@ public abstract class AbstractAiAgentChatAction {
             .build();
 
         return chatClient.prompt()
-            .advisors(getAdvisors(clusterElementMap, connectionParameters))
+            .advisors(getAdvisors(clusterElementMap, connectionParameters, context))
             .advisors(getConversationAdvisor(inputParameters))
             .messages(ModelUtils.getMessages(inputParameters, context))
             .toolCallbacks(
                 getToolCallbacks(
                     clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                    context.isEditorEnvironment()));
+                    context.isEditorEnvironment(), toolExecutionListener));
     }
 
     private List<Advisor> getAdvisors(
-        ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters) {
+        ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
+        ActionContext context) {
 
         List<Advisor> advisors = new ArrayList<>();
 
@@ -115,7 +123,7 @@ public abstract class AbstractAiAgentChatAction {
 
         // logger
 
-        advisors.add(new SimpleLoggerAdvisor());
+        advisors.add(new ContextLoggerAdvisor(context));
 
         return advisors;
     }
@@ -175,9 +183,9 @@ public abstract class AbstractAiAgentChatAction {
 
     private List<ToolCallback> getToolCallbacks(
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
-        boolean editorEnvironment) {
+        boolean editorEnvironment, @Nullable ToolExecutionListener toolExecutionListener) {
 
-        List<ToolCallback> toolCallbacks = new ArrayList<>();
+        List<ToolCallback> rawToolCallbacks = new ArrayList<>();
 
         for (ClusterElement clusterElement : toolClusterElements) {
             ClusterElementDefinition clusterElementDefinition =
@@ -217,10 +225,80 @@ public abstract class AbstractAiAgentChatAction {
                 }
             }
 
-            toolCallbacks.add(builder.build());
+            rawToolCallbacks.add(builder.build());
         }
 
-        return toolCallbacks;
+        if (toolExecutionListener == null) {
+            return rawToolCallbacks;
+        }
+
+        AtomicReference<AgentThinking> thinkingReference = new AtomicReference<>();
+
+        List<ToolCallback> observableToolCallbacks = rawToolCallbacks.stream()
+            .map(
+                toolCallback -> createObservableToolCallback(
+                    toolCallback, thinkingReference, toolExecutionListener))
+            .toList();
+
+        AugmentedToolCallbackProvider<AgentThinking> augmentedToolCallbackProvider =
+            AugmentedToolCallbackProvider.<AgentThinking>builder()
+                .delegate(() -> observableToolCallbacks.toArray(ToolCallback[]::new))
+                .argumentType(AgentThinking.class)
+                .argumentConsumer(event -> thinkingReference.set(event.arguments()))
+                .removeExtraArgumentsAfterProcessing(true)
+                .build();
+
+        return List.of(augmentedToolCallbackProvider.getToolCallbacks());
+    }
+
+    private static ToolCallback createObservableToolCallback(
+        ToolCallback delegate, AtomicReference<AgentThinking> thinkingReference,
+        ToolExecutionListener toolExecutionListener) {
+
+        return new ToolCallback() {
+
+            private final ToolDefinition toolDefinition = delegate.getToolDefinition();
+
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return toolDefinition;
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return observeAndCall(toolInput, () -> delegate.call(toolInput));
+            }
+
+            @Override
+            public String call(String toolInput, @Nullable ToolContext toolContext) {
+                return observeAndCall(toolInput, () -> delegate.call(toolInput, toolContext));
+            }
+
+            private String observeAndCall(String toolInput, Supplier<String> execution) {
+                Map<String, Object> inputs;
+
+                try {
+                    inputs = JsonParser.fromJson(toolInput, new TypeReference<>() {});
+                } catch (Exception exception) {
+                    inputs = Map.of("rawInput", toolInput);
+                }
+
+                String result = execution.get();
+
+                AgentThinking agentThinking = thinkingReference.getAndSet(null);
+
+                try {
+                    toolExecutionListener.onToolExecution(
+                        new ToolExecutionEvent(
+                            toolDefinition.name(), inputs, result,
+                            agentThinking != null ? agentThinking.reasoning() : null,
+                            agentThinking != null ? agentThinking.confidence() : null));
+                } catch (Exception ignored) {
+                }
+
+                return result;
+            }
+        };
     }
 
     private static List<FromAiResult> extractFromAiResults(Map<String, ?> parameters) {
