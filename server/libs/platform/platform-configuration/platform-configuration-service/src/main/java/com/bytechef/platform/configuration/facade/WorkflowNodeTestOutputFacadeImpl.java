@@ -130,12 +130,21 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                 .getExtensions(),
             clusterElementTestContext.outputs());
 
+        ComponentConnection componentConnection = getClusterElementComponentConnection(
+            workflowId, workflowNodeName, clusterElementWorkflowNodeName, environmentId);
+
         return executeAndSaveTestOutput(
             clusterElementTestContext.workflow()
                 .getId(),
             clusterElementWorkflowNodeName,
             clusterElementTestContext.clusterElementWorkflowNodeType(), inputParameters,
-            clusterElementTestContext.connectionIds(), extensions, environmentId);
+            clusterElementTestContext.connectionIds(), extensions, environmentId,
+            (
+                workflowNodeType, curInputParameters, curConnectionIds, curExtensions,
+                curEnvironmentId) -> clusterElementDefinitionService.executeTool(
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    Objects.requireNonNull(workflowNodeType.operation()), curInputParameters, componentConnection,
+                    true));
     }
 
     @Override
@@ -144,8 +153,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     })
     public WorkflowNodeTestOutput saveClusterElementTestOutput(
         @WorkflowIdParam String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName, @EnvironmentIdParam long environmentId,
-        Map<String, Object> inputParameters) {
+        String clusterElementWorkflowNodeName, Map<String, Object> inputParameters,
+        @EnvironmentIdParam long environmentId) {
 
         ClusterElementTestContext context = getClusterElementTestContext(
             workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, environmentId);
@@ -158,9 +167,18 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         Workflow workflow = context.workflow();
 
+        ComponentConnection componentConnection = getClusterElementComponentConnection(
+            workflowId, workflowNodeName, clusterElementWorkflowNodeName, environmentId);
+
         return executeAndSaveTestOutput(
             workflow.getId(), clusterElementWorkflowNodeName, context.clusterElementWorkflowNodeType(),
-            mergedParameters, context.connectionIds(), extensions, environmentId);
+            mergedParameters, context.connectionIds(), extensions, environmentId,
+            (
+                workflowNodeType, curInputParameters, curConnectionIds, curExtensions,
+                curEnvironmentId) -> clusterElementDefinitionService.executeTool(
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    Objects.requireNonNull(workflowNodeType.operation()), curInputParameters, componentConnection,
+                    true));
     }
 
     @Override
@@ -215,13 +233,12 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                 workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
                     workflowId, workflowNodeName, environmentId);
 
-            return saveActionWorkflowNodeTestOutput(
-                workflowNodeName, workflow,
-                MapUtils.toMap(
-                    workflowTestConfigurationConnections,
-                    WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
-                    WorkflowTestConfigurationConnection::getConnectionId),
-                environmentId);
+            Map<String, Long> connectionIds = MapUtils.toMap(
+                workflowTestConfigurationConnections,
+                WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+                WorkflowTestConfigurationConnection::getConnectionId);
+
+            return saveActionWorkflowNodeTestOutput(workflowNodeName, workflow, connectionIds, environmentId);
         }
     }
 
@@ -231,8 +248,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     })
     @SuppressWarnings("unchecked")
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
-        @WorkflowIdParam String workflowId, String workflowNodeName, @EnvironmentIdParam long environmentId,
-        Map<String, Object> inputParameters) {
+        @WorkflowIdParam String workflowId, String workflowNodeName, Map<String, Object> inputParameters,
+        @EnvironmentIdParam long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -263,7 +280,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         return executeAndSaveTestOutput(
             workflow.getId(), workflowNodeName, workflowNodeType, mergedParameters, connectionIds, extensions,
-            environmentId);
+            environmentId, this::executeActionPerform);
     }
 
     @Override
@@ -312,13 +329,22 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         }
     }
 
-    private WorkflowNodeTestOutput executeAndSaveTestOutput(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
+    private Object executeActionPerform(
+        WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
         Map<String, Long> connectionIds, Map<String, ?> extensions, long environmentId) {
 
-        Object value = actionDefinitionFacade.executePerform(
+        return actionDefinitionFacade.executePerform(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null, null,
             null, inputParameters, connectionIds, extensions, environmentId, null, true, null, null);
+    }
+
+    private WorkflowNodeTestOutput executeAndSaveTestOutput(
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, ?> extensions, long environmentId,
+        TestPerformFunction performFunction) {
+
+        Object value = performFunction.execute(
+            workflowNodeType, inputParameters, connectionIds, extensions, environmentId);
 
         if (value == null) {
             return null;
@@ -334,6 +360,30 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         return workflowNodeTestOutputService.save(
             Validate.notNull(workflowId, "workflowId"), workflowNodeName, workflowNodeType, outputResponse,
             environmentId);
+    }
+
+    private ComponentConnection getClusterElementComponentConnection(
+        String workflowId, String workflowNodeName, String clusterElementWorkflowNodeName, long environmentId) {
+
+        List<WorkflowTestConfigurationConnection> connections =
+            workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+                workflowId, workflowNodeName, environmentId);
+
+        if (connections.isEmpty()) {
+            return null;
+        }
+
+        WorkflowTestConfigurationConnection workflowTestConfigurationConnection = connections.stream()
+            .filter(connection -> Objects.equals(connection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                "No connection found for workflow node " + clusterElementWorkflowNodeName));
+
+        Connection connection = connectionService.getConnection(workflowTestConfigurationConnection.getConnectionId());
+
+        return new ComponentConnection(
+            connection.getComponentName(), connection.getConnectionVersion(), connection.getId(),
+            connection.getParameters(), connection.getAuthorizationType());
     }
 
     @SuppressWarnings("unchecked")
@@ -385,26 +435,6 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             inputParameters, connectionIds, outputs);
     }
 
-    private ComponentConnection getComponentConnection(
-        String workflowId, String clusterElementWorkflowNodeName, long environmentId) {
-
-        List<WorkflowTestConfigurationConnection> connections =
-            workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                workflowId, clusterElementWorkflowNodeName, environmentId);
-
-        if (connections.isEmpty()) {
-            return null;
-        }
-
-        WorkflowTestConfigurationConnection testConnection = connections.getFirst();
-
-        Connection connection = connectionService.getConnection(testConnection.getConnectionId());
-
-        return new ComponentConnection(
-            connection.getComponentName(), connection.getConnectionVersion(), connection.getId(),
-            connection.getParameters(), connection.getAuthorizationType());
-    }
-
     private Map<String, Object> getScriptInputParametersFromSource(
         String workflowId, WorkflowNodeType workflowNodeType, ClusterElementMap clusterElementMap,
         Map<String, ?> outputs, long environmentId) {
@@ -428,8 +458,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         Map<String, ?> sourceInputParameters = evaluator.evaluate(sourceClusterElement.getParameters(), outputs);
 
-        ComponentConnection sourceComponentConnection = getComponentConnection(
-            workflowId, sourceClusterElement.getWorkflowNodeName(), environmentId);
+        ComponentConnection sourceComponentConnection = getClusterElementComponentConnection(
+            workflowId, workflowNodeType.name(), sourceClusterElement.getWorkflowNodeName(), environmentId);
 
         return codeEditorScriptInputProvider.getScriptInputParameters(
             workflowNodeType.version(), sourceClusterElement.getComponentName(),
@@ -457,7 +487,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         return executeAndSaveTestOutput(
             workflow.getId(), workflowNodeName, workflowNodeType, inputParameters, connectionIds, extensions,
-            environmentId);
+            environmentId, this::executeActionPerform);
     }
 
     private WorkflowNodeTestOutput saveTriggerWorkflowNodeTestOutput(
@@ -492,6 +522,14 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         return workflowNodeTestOutputService.save(
             workflowId, workflowNodeName, workflowNodeType, outputResponse, environmentId);
+    }
+
+    @FunctionalInterface
+    private interface TestPerformFunction {
+
+        Object execute(
+            WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
+            Map<String, Long> connectionIds, Map<String, ?> extensions, long environmentId);
     }
 
     private record ClusterElementTestContext(

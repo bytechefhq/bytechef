@@ -198,7 +198,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             } else {
                 workflowNodeTestOutput = workflowNodeTestOutputFacade.saveClusterElementTestOutput(
                     workflowId, workflowNodeName, clusterElementType.toUpperCase(),
-                    clusterElementWorkflowNodeName, environmentId, Map.of("input", inputParameters));
+                    clusterElementWorkflowNodeName, Map.of("input", inputParameters), environmentId);
             }
         } catch (Exception exception) {
             if (logger.isDebugEnabled()) {
@@ -230,7 +230,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
                     workflowId, workflowNodeName, environmentId);
             } else {
                 workflowNodeTestOutput = workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-                    workflowId, workflowNodeName, environmentId, Map.of("input", inputParameters));
+                    workflowId, workflowNodeName, Map.of("input", inputParameters), environmentId);
             }
         } catch (Exception exception) {
             if (logger.isDebugEnabled()) {
