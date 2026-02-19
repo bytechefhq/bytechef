@@ -1,14 +1,11 @@
 ---
-title: "Loop"
-description: "Loops sequentially over list of items."
+description: "Loop flow control. Iterate sequentially through list items. Learn how to implement this in your ByteChef workflows."
+title: Loop
 ---
 
+The Loop flow control repeats a set of actions either for each item in a list or continuously until stopped. This flow control is great for processing large amounts of data that can be processed in batches, or used for creating retry logic.
 
-
-Type: loop/v1
-
-<hr />
-
+**Type**: `loop/v1`
 
 ## Properties
 
@@ -17,7 +14,37 @@ Type: loop/v1
 | items | List of items | ARRAY <details> <summary> Items </summary> [] </details> | List of items to iterate over. | false |
 | loopForever | Loop Forever | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>true</span> </details> | Should loop iterate until condition set by 'Loop Break' statement is met. | false |
 
+## Usage
+
+To use the Loop flow control, follow these steps in the workflow UI editor:
+
+### Step 1: Add Loop to Your Workflow
+1. Select the **Loop** component from the **Flows** component panel
+2. Add it at the point where you need repeated execution
 
 
+### Step 2: Choose Loop Mode
+
+**Option A: Loop Forever (Continuous Execution)**
+1. In the **Properties** tab, set **Loop Forever** to `true`
+2. No expression needed - the loop runs continuously
+
+**Option B: Iterate Over List (Collection Processing)**
+1. In the **Properties** tab, set **Loop Forever** to `false`
+2. In the **List of Items to Iterate Over** field, select your data source based on your available data pills:
+   - Example: `${googleSheets_1.rows}` to iterate over spreadsheet rows
+   - Example: `${salesforce_1.accounts}` to process account records
+   - Example: `${webhook_1.orders}` to handle multiple orders
 
 
+### Step 3: Add Components Inside the Loop
+1. Click the **+** button inside the loop body
+2. Add the components you want to execute repeatedly
+3. When iterating over a list, reference the current item using `${item}`
+   - Access item properties via data pills based on configuration: `${item.email}`, `${item.status}`, etc.
+
+> **Warning**
+> 
+> When `loopForever` is set to `true`, ensure your workflow has proper exit logic to avoid infinite execution. Without completion conditions, the loop will continue indefinitely and may consume resources or exceed execution time limits.
+
+You can refer to this [json file](https://www.npoint.io/docs/73d362abb3b155274638) to see the Loop flow control in action.
