@@ -51,7 +51,10 @@ const WorkflowExecutionSheet = () => {
 
     return (
         <Sheet onOpenChange={handleOpenChange} open={workflowExecutionSheetOpen}>
-            <SheetContent className="flex h-full w-[90%] gap-0 p-0 sm:max-w-[90%]">
+            <SheetContent
+                className="flex h-full w-[90%] gap-0 p-0 sm:max-w-[90%]"
+                onPointerDownOutside={(event) => event.preventDefault()}
+            >
                 {workflowExecutionLoading ? (
                     <div className="flex size-full items-center justify-center">
                         <Spinner className="size-6" />
