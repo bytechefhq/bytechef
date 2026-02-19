@@ -68,7 +68,7 @@ class GoogleChatUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        List<Option<String>> result = GoogleChatUtils.getSpaceOptions(
+        List<Option<String>> result = GoogleChatUtils.getSpaceNameOptions(
             mockedParameters, mockedParameters, null, "", mockedContext);
 
         List<Option<String>> expected = List.of(option("testDisplayName", "testName"));

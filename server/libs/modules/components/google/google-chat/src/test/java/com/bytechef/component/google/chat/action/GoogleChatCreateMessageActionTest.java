@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.chat.action;
 
-import static com.bytechef.component.google.chat.constant.GoogleChatConstants.SPACE;
+import static com.bytechef.component.google.chat.constant.GoogleChatConstants.SPACE_NAME;
 import static com.bytechef.component.google.chat.constant.GoogleChatConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,7 +49,7 @@ class GoogleChatCreateMessageActionTest {
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final Map<String, Object> responseMap = Map.of();
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(TEXT, "testText", SPACE, "space"));
+        Map.of(TEXT, "testText", SPACE_NAME, "space"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test

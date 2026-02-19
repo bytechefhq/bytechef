@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.google.chat.constant.GoogleChatConstants.SPACE;
+import static com.bytechef.component.google.chat.constant.GoogleChatConstants.SPACE_NAME;
 import static com.bytechef.component.google.chat.constant.GoogleChatConstants.TEXT;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
@@ -44,10 +44,10 @@ public class GoogleChatCreateMessageAction {
         .title("Create Message")
         .description("Creates a new message in selected space.")
         .properties(
-            string(SPACE)
-                .label("Space")
-                .description("Space in which the message will be created.")
-                .options((OptionsFunction<String>) GoogleChatUtils::getSpaceOptions)
+            string(SPACE_NAME)
+                .label("Space Name")
+                .description("Space name of the space in which the message will be created.")
+                .options((OptionsFunction<String>) GoogleChatUtils::getSpaceNameOptions)
                 .required(true),
             string(TEXT)
                 .label("Message Text")
@@ -90,7 +90,7 @@ public class GoogleChatCreateMessageAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context.http(http -> http.post("/" + inputParameters.getRequiredString(SPACE) + "/messages"))
+        return context.http(http -> http.post("/" + inputParameters.getRequiredString(SPACE_NAME) + "/messages"))
             .configuration(responseType(Http.ResponseType.JSON))
             .body(
                 Body.of(

@@ -17,7 +17,6 @@
 package com.bytechef.component.google.chat.action;
 
 import static com.bytechef.component.google.chat.constant.GoogleChatConstants.DISPLAY_NAME;
-import static com.bytechef.component.google.chat.constant.GoogleChatConstants.SPACE;
 import static com.bytechef.component.google.chat.constant.GoogleChatConstants.SPACE_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -72,7 +71,7 @@ class GoogleChatCreateSpaceActionTest {
 
         Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(Map.of(SPACE_TYPE, SPACE, DISPLAY_NAME, "testDisplayName"), body.getContent());
+        assertEquals(Map.of(SPACE_TYPE, "SPACE", DISPLAY_NAME, "testDisplayName"), body.getContent());
 
         ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
