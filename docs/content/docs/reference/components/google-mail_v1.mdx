@@ -66,8 +66,8 @@ Name: addLabels
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Message ID | STRING | ID of the message to add labels | true |
-| labelIds | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | Labels to add to this message. You can add up to 100 labels with each update. | true |
+| id | Message ID | STRING | ID of the message to add labels. | true |
+| labelIds | Labels IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | ID of the labels to add to message. You can add up to 100 labels with each update. | true |
 
 #### Example JSON Structure
 ```json
@@ -109,13 +109,20 @@ Type: OBJECT
 }
 ```
 
+#### Find Message ID
+
+To find the Message ID, click [here](/reference/components/google-mail_v1#how-to-find-message-id).
+
+#### Find Label ID
+
+To find the Label ID, click [here](/reference/components/google-mail_v1#how-to-find-label-id).
 
 
 
 ### Archive Email
 Name: archiveEmail
 
-`Archive an Email message.`
+`Archive an email message.`
 
 #### Properties
 
@@ -162,6 +169,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Message ID
+
+To find the Message ID, click [here](/reference/components/google-mail_v1#how-to-find-message-id).
 
 
 
@@ -220,10 +230,10 @@ Type: OBJECT
 
 
 
-### Delete Mail
-Name: deleteMail
+### Delete Email
+Name: deleteEmail
 
-`Delete an email from your Gmail account permanently via Id`
+`Deletes an email from your Gmail account immediately and permanently.`
 
 #### Properties
 
@@ -234,12 +244,12 @@ Name: deleteMail
 #### Example JSON Structure
 ```json
 {
-  "label" : "Delete Mail",
-  "name" : "deleteMail",
+  "label" : "Delete Email",
+  "name" : "deleteEmail",
   "parameters" : {
     "id" : ""
   },
-  "type" : "googleMail/v1/deleteMail"
+  "type" : "googleMail/v1/deleteEmail"
 }
 ```
 
@@ -252,10 +262,10 @@ This action does not produce any output.
 
 
 
-### Get Mail
-Name: getMail
+### Get Email
+Name: getEmail
 
-`Get an email from your Gmail account via Id`
+`Gets the specified email message.`
 
 #### Properties
 
@@ -268,14 +278,14 @@ Name: getMail
 #### Example JSON Structure
 ```json
 {
-  "label" : "Get Mail",
-  "name" : "getMail",
+  "label" : "Get Email",
+  "name" : "getEmail",
   "parameters" : {
     "id" : "",
     "format" : "",
     "metadataHeaders" : [ "" ]
   },
-  "type" : "googleMail/v1/getMail"
+  "type" : "googleMail/v1/getEmail"
 }
 ```
 
@@ -321,13 +331,16 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Message ID
+
+To find the Thread ID, click [here](/reference/components/google-mail_v1#how-to-find-thread-id).
 
 
 
 ### List Labels
 Name: listLabels
 
-`Lists labels that are connected to your Google Mail account.`
+`Lists all labels in your mailbox.`
 
 #### Example JSON Structure
 ```json
@@ -378,14 +391,14 @@ Items Type: OBJECT
 ### Remove Labels
 Name: removeLabels
 
-`Remove labels from an email in your Gmail account.`
+`Removes labels on the specified message.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Message ID | STRING | ID of the message to add labels | true |
-| labelIds | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | Labels to remove from this message. | true |
+| id | Message ID | STRING | ID of the message to remove labels. | true |
+| labelIds | Labels IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | ID of the labels to remove from message. | true |
 
 #### Example JSON Structure
 ```json
@@ -427,6 +440,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Message ID
+
+To find the Message ID, click [here](/reference/components/google-mail_v1#how-to-find-message-id).
+
+#### Find Label ID
+
+To find the Label ID, click [here](/reference/components/google-mail_v1#how-to-find-label-id).
 
 
 
@@ -498,13 +518,16 @@ Type: OBJECT
 }
 ```
 
+#### Find Message ID
+
+To find the Message ID, click [here](/reference/components/google-mail_v1#how-to-find-message-id).
 
 
 
 ### Search Email
 Name: searchEmail
 
-`Lists the messages in the user's mailbox.`
+`Lists the email messages in the user's mailbox.`
 
 #### Properties
 
@@ -574,7 +597,7 @@ Type: OBJECT
 ### Send Email
 Name: sendEmail
 
-`Sends the specified message to the recipients in the To, Cc, and Bcc headers.`
+`Creates and sends a new email message from your Gmail account.`
 
 #### Properties
 
@@ -659,7 +682,7 @@ Type: STATIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| topicName | Topic Name | STRING | Must be 3-255 characters, start with a letter, and contain only the following characters: letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or plus signs (+). Cannot start with goog. | true |
+| topicName | Topic Name | STRING | Name of your PubSub topic you want to subscribe to. | true |
 | format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns only email message ID and labels; does not return the email headers, body, or payload.">MINIMAL</span>, <span title="Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">FULL</span>, <span title="Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">RAW</span>, <span title="Returns only email message ID, labels, and email headers.">metadata</span> </details> | The format to return the message in. | false |
 
 
@@ -683,9 +706,9 @@ The output for this action is dynamic and may vary depending on the input parame
 
 Setting up Pub/Sub service
 
-1. Deploy project that has **New Mail Trigger**.
+1. Deploy a project that has **New Mail Trigger**.
 2. Click this icon to copy the static webhook URL.
-3. In search bar enter "pub/sub".
+3. In the search bar enter `pub/sub`.
 4. Click on **Pub/Sub**.
 5. Click on **Create topic**.
 6. Enter your topic name.
@@ -694,13 +717,13 @@ Setting up Pub/Sub service
 9. Click on your automatically created subscription.
 10. Click on **Edit**.
 11. Select **Push**.
-12. Click on **Endpoint URL** and paste previously copied URL.
+12. Click on **Endpoint URL** and paste the previously copied URL.
 13. Select **Never expire**.
 14. Click on **Update**.
 15. Click on **Topics**.
 16. Click here.
 17. Click on **Add principal**.
-18. Add **gmail-api-push@system.gserviceaccount.com** as new principal.
+18. Add **gmail-api-push@system.gserviceaccount.com** as the new principal.
 19. Click here.
 20. Click on **Pub/Sub Publisher**.
 21. Click on **Save**.
@@ -772,6 +795,36 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+### How to find Message ID
+
+The best way to find a message ID is to use the output of one of the Gmail actions or triggers. In the output, you will find an `id` property, which represents the message ID.
+
+Some actions and triggers that return a message ID:
+* **Search Email**
+* **Get Mail**
+* **Send Email**
+* **New Email** trigger
+
+#### Via API
+* Use the `GET https://gmail.googleapis.com/gmail/v1/users/{userId}/messages` endpoint.
+* Lists the messages in the user's mailbox.
+
+### How to find Label ID
+
+The best way to find a label ID is to use the **List Labels** action. It returns a list of labels, each containing a `name` and an `id`.
+
+#### Via API
+* Use the `GET https://gmail.googleapis.com/gmail/v1/users/{userId}/labels` endpoint.
+* Lists all labels in the user's mailbox.
+
+### How to find Thread ID
+
+The best way to find a thread ID is to use the output of Gmail actions such as **Get Thread**, **Get Mail**, or **Search Email**. In the output, you will find a `threadId` property.
+
+#### Via API
+* Use the `GET https://gmail.googleapis.com/gmail/v1/users/{userId}/threads` endpoint.
+* Lists the threads in the user's mailbox.
 
 ## Troubleshooting
 
