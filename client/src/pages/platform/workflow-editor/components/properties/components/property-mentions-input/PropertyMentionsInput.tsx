@@ -25,9 +25,10 @@ import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/compon
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {ControlType} from '@/shared/middleware/platform/configuration';
 import {Editor} from '@tiptap/react';
-import {CircleQuestionMarkIcon, EqualIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon, EqualIcon, TriangleAlertIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -42,12 +43,15 @@ interface PropertyMentionsInputProps {
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
+    error?: boolean;
+    errorMessage?: string;
     handleFromAiClick?: (fromAi: boolean) => void;
     handleInputTypeSwitchButtonClick?: () => void;
     isFromAi?: boolean;
     isFormulaMode?: boolean;
     label?: string;
     leadingIcon?: ReactNode;
+    onValueChange?: (value: string | number) => void;
     path?: string;
     placeholder?: string;
     required?: boolean;
@@ -65,12 +69,15 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             defaultValue,
             deletePropertyButton,
             description,
+            error,
+            errorMessage,
             handleFromAiClick,
             handleInputTypeSwitchButtonClick,
             isFormulaMode,
             isFromAi,
             label,
             leadingIcon,
+            onValueChange,
             path,
             placeholder,
             required = false,
@@ -251,10 +258,11 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                 <div
                     className={twMerge(
-                        'flex items-center rounded-md border-gray-200 shadow-sm transition-colors',
+                        'relative flex items-center rounded-md border-gray-200 shadow-sm transition-colors',
+                        error && 'border-rose-300 text-rose-900 ring-rose-300 focus-within:ring-rose-300',
                         isFocused && 'ring-2 ring-blue-500',
                         label && 'mt-1',
-                        leadingIcon && 'relative rounded-md border'
+                        leadingIcon && 'rounded-md border'
                     )}
                     onDragEnter={handleDragEnter}
                     onDragOver={handleDragOver}
@@ -284,8 +292,9 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             isFormulaMode={isFormulaMode}
                             isFromAi={isFromAi}
                             labelId={labelId}
-                            onChange={(value) => handleEditorValueChange(value)}
+                            onChange={(editorValue) => handleEditorValueChange(editorValue)}
                             onFocus={onFocus}
+                            onValueChange={onValueChange}
                             path={path}
                             placeholder={placeholder}
                             ref={getPropertyMentionsInputEditorRef}
@@ -296,7 +305,19 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             workflow={workflow}
                         />
                     </div>
+
+                    {error && (
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <TriangleAlertIcon aria-hidden="true" className="size-5 text-rose-500" />
+                        </div>
+                    )}
                 </div>
+
+                {error && (
+                    <p className="mt-2 text-sm text-rose-600" role="alert">
+                        {errorMessage || ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED}
+                    </p>
+                )}
             </fieldset>
         );
     }

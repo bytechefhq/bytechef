@@ -83,6 +83,7 @@ const Property = ({
         handleInputChange,
         handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
+        handleMentionInputValueChange,
         handleMultiSelectChange,
         handleSelectChange,
         hasError,
@@ -187,12 +188,15 @@ const Property = ({
                     defaultValue={defaultValue}
                     deletePropertyButton={deletePropertyButton}
                     description={description}
+                    error={hasError}
+                    errorMessage={errorMessage}
                     handleFromAiClick={handleFromAiClick}
                     handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                     isFormulaMode={isFormulaMode}
                     isFromAi={isFromAi}
                     label={label || name}
                     leadingIcon={typeIcon}
+                    onValueChange={handleMentionInputValueChange}
                     path={calculatedPath}
                     placeholder={placeholder}
                     ref={editorRef}

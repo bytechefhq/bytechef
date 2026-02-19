@@ -8,6 +8,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import {decodePath, encodeParameters, encodePath} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
+import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {
     ControlType,
     GetClusterElementParameterDisplayConditions200Response,
@@ -77,6 +78,7 @@ type UsePropertyReturnType = {
     handleDeleteCustomPropertyClick: (path: string) => void;
     handleFromAiClick: (fromAi: boolean) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
+    handleMentionInputValueChange: (value: string | number) => void;
     handleInputTypeSwitchButtonClick: () => void;
     handleJsonSchemaBuilderChange: (value?: SchemaRecordType) => void;
     handleMultiSelectChange: (value: string[]) => void;
@@ -226,9 +228,19 @@ export const useProperty = ({
         placeholder = '',
         properties,
         propertiesDataSource,
+        regex,
         required = false,
         type,
     } = property;
+
+    const {
+        DECIMAL_POINTS_NOT_ALLOWED,
+        INCORRECT_VALUE,
+        MAX_DECIMAL_PLACES,
+        VALUE_DOES_NOT_MATCH_PATTERN,
+        VALUE_MUST_BE_VALID_INTEGER,
+        VALUE_MUST_BE_VALID_NUMBER,
+    } = ERROR_MESSAGES.PROPERTY;
 
     let {displayCondition} = property;
 
@@ -418,22 +430,22 @@ export const useProperty = ({
             if (valueTooLow || valueTooHigh) {
                 setHasError(true);
 
-                setErrorMessage('Incorrect value');
+                setErrorMessage(INCORRECT_VALUE);
             } else if (controlType === 'INTEGER' && !/^-?\d+$/.test(value)) {
                 setHasError(true);
 
-                setErrorMessage('Value must be a valid integer');
+                setErrorMessage(VALUE_MUST_BE_VALID_INTEGER);
             } else if (controlType === 'NUMBER' && !/^-?\d+(\.\d+)?$/.test(value)) {
                 setHasError(true);
 
-                setErrorMessage('Value must be a valid number');
+                setErrorMessage(VALUE_MUST_BE_VALID_NUMBER);
             } else if (exceedsDecimalPrecision) {
                 setHasError(true);
 
                 if (numberPrecision === 0) {
-                    setErrorMessage('Decimal points are not allowed');
+                    setErrorMessage(DECIMAL_POINTS_NOT_ALLOWED);
                 } else {
-                    setErrorMessage(`Maximum ${numberPrecision} decimal places allowed`);
+                    setErrorMessage(MAX_DECIMAL_PLACES(numberPrecision));
                 }
             } else {
                 setHasError(false);
@@ -452,9 +464,21 @@ export const useProperty = ({
             const valueTooShort = minLength && value.length < minLength;
             const valueTooLong = maxLength && value.length > maxLength;
 
-            setHasError(!!valueTooShort || !!valueTooLong);
+            let regexMismatch = false;
 
-            setErrorMessage('Incorrect value');
+            if (regex && value && !value.startsWith('=')) {
+                try {
+                    regexMismatch = new RegExp(regex).test(value);
+                } catch {
+                    // Invalid regex from backend; skip regex validation
+                }
+            }
+
+            const hasValidationError = !!valueTooShort || !!valueTooLong || regexMismatch;
+
+            setHasError(hasValidationError);
+
+            setErrorMessage(regexMismatch ? VALUE_DOES_NOT_MATCH_PATTERN : INCORRECT_VALUE);
 
             setInputValue(value);
 
@@ -463,6 +487,42 @@ export const useProperty = ({
 
         saveInputValue();
     };
+
+    const handleMentionInputValueChange = useCallback(
+        (value: string | number) => {
+            setMentionInputValue(typeof value === 'number' ? String(value) : value);
+
+            const stringValue = typeof value === 'string' ? value : '';
+            const isExpression = typeof value === 'string' && (value.startsWith('=') || value.startsWith('${'));
+
+            if (!stringValue || isExpression) {
+                setHasError(false);
+
+                return;
+            }
+
+            const valueTooShort = minLength && stringValue.length < minLength;
+            const valueTooLong = maxLength && stringValue.length > maxLength;
+
+            let regexMismatch = false;
+
+            if (regex) {
+                try {
+                    regexMismatch = new RegExp(regex).test(stringValue);
+                } catch {
+                    console.warn('Invalid regex provided: ', regex);
+                }
+            }
+
+            const hasValidationError = !!valueTooShort || !!valueTooLong || regexMismatch;
+
+            const errorMessage = regexMismatch ? VALUE_DOES_NOT_MATCH_PATTERN : INCORRECT_VALUE;
+
+            setHasError(hasValidationError);
+            setErrorMessage(errorMessage);
+        },
+        [INCORRECT_VALUE, maxLength, minLength, regex, VALUE_DOES_NOT_MATCH_PATTERN]
+    );
 
     const handleInputTypeSwitchButtonClick = () => {
         setMentionInput(!mentionInput);
@@ -886,6 +946,43 @@ export const useProperty = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // set error state for mention input
+    useEffect(() => {
+        if (!mentionInput) {
+            return;
+        }
+
+        const stringValue = typeof mentionInputValue === 'string' ? mentionInputValue : '';
+
+        const isExpression =
+            typeof mentionInputValue === 'string' &&
+            (mentionInputValue.startsWith('=') || mentionInputValue.startsWith('${'));
+
+        if (!stringValue || isExpression) {
+            setHasError(false);
+
+            return;
+        }
+
+        const valueTooShort = minLength && stringValue.length < minLength;
+        const valueTooLong = maxLength && stringValue.length > maxLength;
+
+        let regexMismatch = false;
+
+        if (regex) {
+            try {
+                regexMismatch = new RegExp(regex).test(stringValue);
+            } catch {
+                // Invalid regex from backend; skip regex validation
+            }
+        }
+
+        const hasValidationError = !!valueTooShort || !!valueTooLong || regexMismatch;
+
+        setHasError(hasValidationError);
+        setErrorMessage(regexMismatch ? VALUE_DOES_NOT_MATCH_PATTERN : INCORRECT_VALUE);
+    }, [INCORRECT_VALUE, mentionInput, mentionInputValue, maxLength, minLength, regex, VALUE_DOES_NOT_MATCH_PATTERN]);
+
     // set value to propertyParameterValue
     useEffect(() => {
         // Skip updating if a save operation is in progress
@@ -1113,6 +1210,7 @@ export const useProperty = ({
         handleInputChange,
         handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
+        handleMentionInputValueChange,
         handleMultiSelectChange,
         handleSelectChange,
         hasError,

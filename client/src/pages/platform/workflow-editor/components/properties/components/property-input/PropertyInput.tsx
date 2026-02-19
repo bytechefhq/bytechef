@@ -1,5 +1,6 @@
 import RequiredMark from '@/components/RequiredMark';
 import {Input} from '@/components/ui/input';
+import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
@@ -165,7 +166,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
 
                 {error && (
                     <p className="mt-2 text-sm text-rose-600" id={`${name}-error`} role="alert">
-                        {errorMessage || 'This field is required.'}
+                        {errorMessage || ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED}
                     </p>
                 )}
             </fieldset>

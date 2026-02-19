@@ -59,6 +59,7 @@ interface PropertyMentionsInputEditorProps {
     path?: string;
     onChange?: (value: string) => void;
     onFocus?: (editor: Editor) => void;
+    onValueChange?: (value: string | number) => void;
     placeholder?: string;
     setIsFormulaMode?: (isFormulaMode: boolean) => void;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
@@ -81,6 +82,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             labelId,
             onChange,
             onFocus,
+            onValueChange,
             path,
             placeholder,
             setIsFormulaMode,
@@ -398,11 +400,15 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     onChange(value);
                 }
 
+                if (onValueChange) {
+                    onValueChange(value);
+                }
+
                 const propertyMentions = value.match(/property-mention/g);
 
                 setMentionOccurences(propertyMentions?.length || 0);
             },
-            [editorValue, onChange, saveMentionInputValue]
+            [editorValue, onChange, onValueChange, saveMentionInputValue]
         );
 
         const getContent = useCallback(
