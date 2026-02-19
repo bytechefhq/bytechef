@@ -15,6 +15,7 @@
     "deployment/azures",
     "deployment/google-cloud",
     "deployment/digitalocean",
+    "deployment/mcp-server",
     "---Manage Insatance---",
     "configuration/configure-instance",
     "configuration/environment-variables",
