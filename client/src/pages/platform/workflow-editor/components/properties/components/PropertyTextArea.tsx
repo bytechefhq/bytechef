@@ -1,8 +1,8 @@
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
-import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
 import {ChangeEvent, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';

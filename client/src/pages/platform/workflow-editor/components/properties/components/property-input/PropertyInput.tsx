@@ -1,10 +1,10 @@
 import RequiredMark from '@/components/RequiredMark';
 import {Input} from '@/components/ui/input';
-import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
 import {ChangeEvent, InputHTMLAttributes, ReactNode, forwardRef, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';

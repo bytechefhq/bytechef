@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ArrayPropertyItem from '@/pages/platform/workflow-editor/components/properties/components/ArrayPropertyItem';
 import SubPropertyPopover from '@/pages/platform/workflow-editor/components/properties/components/SubPropertyPopover';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -8,7 +9,7 @@ import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/pla
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {PlusIcon} from 'lucide-react';
 import resolvePath from 'object-resolve-path';
-import {Fragment, useCallback, useEffect, useState} from 'react';
+import {Fragment, useCallback, useEffect, useMemo, useState} from 'react';
 
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import {decodePath, encodeParameters, encodePath} from '../../utils/encodingUtils';
@@ -38,9 +39,16 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
     const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
-    const {additionalProperties, name} = property;
+    const {additionalProperties, maxItems, name} = property;
 
     let items = property.items;
+
+    const isAddDisabled = maxItems != null && arrayItems.length >= maxItems;
+
+    const addButtonTooltip = useMemo(
+        () => (isAddDisabled && maxItems != null ? `Maximum number of items (${maxItems}) reached` : undefined),
+        [isAddDisabled, maxItems]
+    );
 
     if (!items?.length && parentArrayItems?.[0]?.items?.length) {
         items = parentArrayItems?.[0].items;
@@ -48,6 +56,10 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
     const handleAddItemClick = useCallback(() => {
         if (!currentComponent || !name) {
+            return;
+        }
+
+        if (maxItems != null && arrayItems.length >= maxItems) {
             return;
         }
 
@@ -105,6 +117,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         updateClusterElementParameterMutation,
         updateWorkflowNodeParameterMutation,
         workflow.id,
+        maxItems,
     ]);
 
     const handleDeleteClick = useCallback(
@@ -391,11 +404,31 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                     availablePropertyTypes={availablePropertyTypes}
                     buttonLabel={property.placeholder ?? parentArrayItems?.[0]?.placeholder}
                     condition={currentComponent?.componentName === 'condition'}
+                    disabled={isAddDisabled}
+                    disabledTooltip={addButtonTooltip}
                     handleClick={handleAddItemClick}
                     key={`${path}_${name}_subPropertyPopoverButton`}
                     newPropertyType={newPropertyType}
                     setNewPropertyType={setNewPropertyType}
                 />
+            ) : isAddDisabled && addButtonTooltip ? (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span className="inline-block">
+                            <Button
+                                className="mt-3 rounded-sm"
+                                disabled
+                                icon={<PlusIcon />}
+                                key={`${path}_${name}_addPropertyPopoverButton`}
+                                label={property.placeholder || 'Add array item'}
+                                size="sm"
+                                variant="secondary"
+                            />
+                        </span>
+                    </TooltipTrigger>
+
+                    <TooltipContent>{addButtonTooltip}</TooltipContent>
+                </Tooltip>
             ) : (
                 <Button
                     className="mt-3 rounded-sm"
