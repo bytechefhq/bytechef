@@ -6,7 +6,7 @@ import {InfoCircledIcon} from '@radix-ui/react-icons';
 
 const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string; onRefresh: () => void}) => {
     const codeSnippet1 = `{
-  mcpServers: {
+  "mcpServers": {
     "ByteChef": {
       "command": "npx",
       "args": [
@@ -20,9 +20,9 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 }`;
 
     const codeSnippet2 = `{
-  mcpServers: {
-    ByteChef: {
-      url: ${mcpServerUrl}
+  "mcpServers": {
+    "ByteChef": {
+      "url": "${mcpServerUrl}"
     }
   }
 }`;
