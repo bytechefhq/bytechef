@@ -9,6 +9,7 @@ export const ERROR_MESSAGES = {
         FIELD_REQUIRED: 'This field is required.',
         INCORRECT_VALUE: 'Incorrect value',
         MAX_DECIMAL_PLACES: (max: number): string => `Maximum ${max} decimal places allowed`,
+        MIN_DECIMAL_PLACES: (min: number): string => `At least ${min} decimal places required`,
         VALUE_DOES_NOT_MATCH_PATTERN: 'Value does not match the required pattern',
         VALUE_MUST_BE_VALID_INTEGER: 'Value must be a valid integer',
         VALUE_MUST_BE_VALID_NUMBER: 'Value must be a valid number',

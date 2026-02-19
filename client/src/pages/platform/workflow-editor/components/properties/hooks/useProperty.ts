@@ -219,8 +219,10 @@ export const useProperty = ({
         label,
         languageId,
         maxLength,
+        maxNumberPrecision,
         maxValue,
         minLength,
+        minNumberPrecision,
         minValue,
         name = property.name?.replace(/\s/g, '_'),
         numberPrecision,
@@ -238,6 +240,7 @@ export const useProperty = ({
         DECIMAL_POINTS_NOT_ALLOWED,
         INCORRECT_VALUE,
         MAX_DECIMAL_PLACES,
+        MIN_DECIMAL_PLACES,
         VALUE_DOES_NOT_MATCH_PATTERN,
         VALUE_MUST_BE_VALID_INTEGER,
         VALUE_MUST_BE_VALID_NUMBER,
@@ -363,6 +366,18 @@ export const useProperty = ({
                     }
                 }
 
+                if (value.includes('.')) {
+                    const decimalLength = value.split('.')[1]?.length ?? 0;
+
+                    if (minNumberPrecision != null && decimalLength < minNumberPrecision) {
+                        return false;
+                    }
+
+                    if (maxNumberPrecision != null && decimalLength > maxNumberPrecision) {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 
@@ -386,7 +401,18 @@ export const useProperty = ({
 
             return true;
         },
-        [controlType, maxLength, maxValue, minLength, minValue, numberPrecision, regex, type]
+        [
+            controlType,
+            maxLength,
+            maxNumberPrecision,
+            maxValue,
+            minLength,
+            minNumberPrecision,
+            minValue,
+            numberPrecision,
+            regex,
+            type,
+        ]
     );
 
     const saveInputValue = useDebouncedCallback(() => {
@@ -487,11 +513,17 @@ export const useProperty = ({
             const valueTooHigh = maxValue ? numericValue > maxValue : numericValue > Number.MAX_SAFE_INTEGER;
 
             const hasDecimalPoint = value.includes('.');
+            const decimalLength = hasDecimalPoint ? (value.split('.')[1]?.length ?? 0) : 0;
 
             const exceedsDecimalPrecision =
                 hasDecimalPoint &&
                 numberPrecision !== undefined &&
-                (numberPrecision === 0 || value.split('.')[1]?.length > numberPrecision);
+                (numberPrecision === 0 || decimalLength > numberPrecision);
+
+            const belowMinNumberPrecision =
+                hasDecimalPoint && minNumberPrecision != null && decimalLength < minNumberPrecision;
+            const aboveMaxNumberPrecision =
+                hasDecimalPoint && maxNumberPrecision != null && decimalLength > maxNumberPrecision;
 
             if (valueTooLow || valueTooHigh) {
                 setHasError(true);
@@ -513,6 +545,14 @@ export const useProperty = ({
                 } else {
                     setErrorMessage(MAX_DECIMAL_PLACES(numberPrecision));
                 }
+            } else if (belowMinNumberPrecision) {
+                setHasError(true);
+
+                setErrorMessage(MIN_DECIMAL_PLACES(minNumberPrecision!));
+            } else if (aboveMaxNumberPrecision) {
+                setHasError(true);
+
+                setErrorMessage(MAX_DECIMAL_PLACES(maxNumberPrecision!));
             } else {
                 setHasError(false);
             }
