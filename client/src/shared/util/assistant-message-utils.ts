@@ -60,7 +60,7 @@ export function setLastAssistantMessageContent(messages: ThreadMessageLike[], co
         if (message && message.role === 'assistant') {
             if (Array.isArray(message.content)) {
                 const contentArray = [...message.content] as ContentPartType[];
-                const textIndex = contentArray.findIndex((part) => part.type === 'text');
+                const textIndex = contentArray.findLastIndex((part) => part.type === 'text');
 
                 if (textIndex >= 0) {
                     contentArray[textIndex] = {...contentArray[textIndex], text: content};
