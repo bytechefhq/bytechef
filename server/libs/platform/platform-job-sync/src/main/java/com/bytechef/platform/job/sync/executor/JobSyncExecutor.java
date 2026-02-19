@@ -71,6 +71,7 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker.Receiver;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
 import com.bytechef.platform.job.sync.exception.TaskExecutionErrorType;
+import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
@@ -177,6 +178,7 @@ public class JobSyncExecutor {
             null, evaluator, coordinatorEventPublisher, jobSyncAsyncTaskExecutor, taskHandlerResolverChain,
             taskFileStorage,
             List.of(
+                new SuspendTaskExecutionPostOutputProcessor(null),
                 new WebhookResponseTaskExecutionPostOutputProcessor(),
                 new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges)));
 

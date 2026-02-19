@@ -82,7 +82,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        return taskExecution.getParentId() == null;
+        return taskExecution.getParentId() == null && !taskExecution.isHandled();
     }
 
     @Override

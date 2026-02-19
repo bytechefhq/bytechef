@@ -180,7 +180,7 @@ class ComponentToolsTest {
         verify(componentDefinitionService).getComponentDefinition(componentName, version);
         verify(actionDefinitionFacade, never()).executePerform(
             anyString(), anyInt(), anyString(), any(), any(), any(), anyString(), anyMap(), anyMap(), anyMap(), any(),
-            any(), anyBoolean());
+            any(), anyBoolean(), any(), any());
     }
 
     @Test
@@ -254,7 +254,7 @@ class ComponentToolsTest {
             actionDefinitionFacade
                 .executePerform(
                     eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(),
-                    anyMap(), isNull(), isNull(), isNull(), eq(true)))
+                    anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull()))
                         .thenReturn(performResult);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
@@ -264,7 +264,7 @@ class ComponentToolsTest {
             anyMap());
         verify(actionDefinitionFacade).executePerform(
             eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), anyMap(),
-            isNull(), isNull(), isNull(), eq(true));
+            isNull(), isNull(), isNull(), eq(true), isNull(), isNull());
     }
 
     @Test

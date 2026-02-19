@@ -27,6 +27,7 @@ public interface JobFacade {
 
     void deleteJob(long id);
 
+    @Deprecated
     void resumeApproval(long jobId, String uuid, boolean approved);
 
     void resumeJob(long id);

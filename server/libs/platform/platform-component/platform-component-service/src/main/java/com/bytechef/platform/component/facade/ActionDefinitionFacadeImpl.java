@@ -25,6 +25,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -85,12 +86,13 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     public Object executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
-        Map<String, ?> extensions, Long environmentId, PlatformType type, boolean editorEnvironment) {
+        Map<String, ?> extensions, Long environmentId, PlatformType type, boolean editorEnvironment,
+        Map<String, ?> continueParameters, Instant suspendExpiresAt) {
 
         return actionDefinitionService.executePerform(
             componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
             inputParameters, getComponentConnections(connectionIds), extensions, environmentId, editorEnvironment,
-            type);
+            type, continueParameters, suspendExpiresAt);
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

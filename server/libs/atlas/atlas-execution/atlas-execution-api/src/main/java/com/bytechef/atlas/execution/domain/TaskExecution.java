@@ -41,6 +41,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
@@ -160,6 +161,9 @@ public final class TaskExecution
 
     @Column("workflow_task")
     private WorkflowTask workflowTask;
+
+    @Transient
+    private transient boolean handled;
 
     public TaskExecution() {
     }
@@ -505,6 +509,14 @@ public final class TaskExecution
 
     public void setTaskNumber(int taskNumber) {
         this.taskNumber = taskNumber;
+    }
+
+    public boolean isHandled() {
+        return handled;
+    }
+
+    public void setHandled(boolean handled) {
+        this.handled = handled;
     }
 
     public void setWorkflowTask(WorkflowTask workflowTask) {
