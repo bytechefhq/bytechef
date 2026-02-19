@@ -48,10 +48,12 @@ services:
       context: ../
       dockerfile: ./server/apps/server-app/Dockerfile_dev
     container_name: bytechef-server
+    volumes:
+      - ~/.bytechef/key:/root/.bytechef/key:ro
     depends_on:
       - postgres
       - pgvector
-#      - rabbitmq
+      #      - rabbitmq
       - redis
     environment:
       - SERVER_PORT=9555
