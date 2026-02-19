@@ -68,10 +68,7 @@ public class GoogleMailNewEmailTrigger {
         .properties(
             string(TOPIC_NAME)
                 .label("Topic Name")
-                .description(
-                    "Must be 3-255 characters, start with a letter, and contain only the following characters: " +
-                        "letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or " +
-                        "plus signs (+). Cannot start with goog.")
+                .description("Name of your PubSub topic you want to subscribe to.")
                 .maxLength(255)
                 .minLength(3)
                 .required(true),
@@ -142,6 +139,7 @@ public class GoogleMailNewEmailTrigger {
                 .history()
                 .list(ME)
                 .setStartHistoryId(historyId)
+                .setHistoryTypes(List.of("messageAdded"))
                 .execute();
         } catch (IOException e) {
             throw translateGoogleIOException(e);
