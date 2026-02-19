@@ -40,7 +40,5 @@ public interface TriggerScheduler {
 
     void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId);
 
-    void scheduleOneTimeTask(
-        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
-        String taskExecutionId);
+    void scheduleOneTimeTask(Instant executeAt, Map<String, ?> output, long jobId);
 }

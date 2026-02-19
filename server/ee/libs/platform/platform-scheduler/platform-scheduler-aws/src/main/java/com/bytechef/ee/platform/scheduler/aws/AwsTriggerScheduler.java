@@ -127,20 +127,26 @@ public class AwsTriggerScheduler implements TriggerScheduler {
     }
 
     @Override
-    public void scheduleOneTimeTask(
-        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
-        String taskExecutionId) {
+    public void scheduleOneTimeTask(Instant executeAt, Map<String, ?> output, long jobId) {
+        String jobIdString = String.valueOf(jobId);
+
+        String input = "resume:" + jobIdString;
+
+        if (output != null && !output.isEmpty()) {
+            input = input + AwsTriggerSchedulerConstants.SPLITTER + JsonUtils.write(output);
+        }
+
+        String finalInput = input;
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
             .arn(sqsArn + ":" + SCHEDULER_ONE_TIME_TASK_QUEUE)
-            .input(workflowExecutionId.toString() + AwsTriggerSchedulerConstants.SPLITTER + taskExecutionId +
-                AwsTriggerSchedulerConstants.SPLITTER + JsonUtils.write(output))
+            .input(finalInput)
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken(taskExecutionId.substring(16))
+        schedulerClient.createSchedule(request -> request.clientToken(jobIdString)
             .groupName(ONE_TIME_TASK)
-            .name(ONE_TIME_TASK + taskExecutionId.substring(0, 16))
+            .name(ONE_TIME_TASK + "_resume_" + jobIdString)
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
             .startDate(executeAt));

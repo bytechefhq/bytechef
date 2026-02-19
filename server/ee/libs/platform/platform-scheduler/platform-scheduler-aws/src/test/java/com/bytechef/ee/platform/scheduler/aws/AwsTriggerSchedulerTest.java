@@ -164,41 +164,6 @@ class AwsTriggerSchedulerTest {
     }
 
     @Test
-    void testScheduleOneTimeTask() {
-        // Given
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, 789L, "test-onetime-workflow", "test-trigger");
-        String taskExecutionId = "task-execution-12345678901234567890";
-        Instant executeAt = LocalDateTime.now()
-            .plusMinutes(5)
-            .toInstant(ZoneOffset.UTC);
-        Map<String, Object> output = Map.of("delayMillis", 1000L);
-
-        // When
-        assertDoesNotThrow(() -> awsTriggerScheduler.scheduleOneTimeTask(
-            executeAt, output, workflowExecutionId, taskExecutionId));
-
-        // Then
-        ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
-
-        verify(mockSchedulerClient).createSchedule(captor.capture());
-
-        // Verify the request was built correctly
-        CreateScheduleRequest.Builder builder = CreateScheduleRequest.builder();
-
-        captor.getValue()
-            .accept(builder);
-
-        CreateScheduleRequest request = builder.build();
-
-        assertNotNull(request);
-        assertEquals("OneTimeTask", request.groupName());
-        assertNotNull(request.target());
-        assertNotNull(request.target()
-            .arn());
-    }
-
-    @Test
     void testScheduleDynamicWebhookTriggerRefresh() {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(

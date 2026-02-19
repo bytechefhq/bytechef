@@ -100,16 +100,13 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
-    public void scheduleOneTimeTask(
-        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
-        String taskExecutionId) {
-
+    public void scheduleOneTimeTask(Instant executeAt, Map<String, ?> output, long jobId) {
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(SCHEDULER_APP)
-                .path(TRIGGER_SCHEDULER + "/schedule-one-time-task")
+                .path(TRIGGER_SCHEDULER + "/schedule-one-time-task-resume")
                 .build(),
-            new OneTimeTaskRequest(workflowExecutionId, executeAt, output, taskExecutionId));
+            new ResumeOneTimeTaskRequest(executeAt, jobId, output));
     }
 
     @SuppressFBWarnings("EI")
@@ -119,9 +116,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
     }
 
     @SuppressFBWarnings("EI")
-    private record OneTimeTaskRequest(
-        WorkflowExecutionId workflowExecutionId, Instant executeAt, Map<String, Object> output,
-        String taskExecutionId) {
+    private record ResumeOneTimeTaskRequest(Instant executeAt, long jobId, Map<String, ?> continueParameters) {
     }
 
     @SuppressFBWarnings("EI")

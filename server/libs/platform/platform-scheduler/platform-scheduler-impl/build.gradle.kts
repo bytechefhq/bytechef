@@ -1,4 +1,5 @@
 dependencies {
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-api"))
 
     implementation("org.springframework:spring-context-support")
@@ -18,4 +19,5 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

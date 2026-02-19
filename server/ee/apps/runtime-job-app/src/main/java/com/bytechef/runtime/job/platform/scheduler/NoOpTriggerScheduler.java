@@ -47,8 +47,6 @@ public class NoOpTriggerScheduler implements TriggerScheduler {
     }
 
     @Override
-    public void scheduleOneTimeTask(
-        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
-        String taskExecutionId) {
+    public void scheduleOneTimeTask(Instant executeAt, Map<String, ?> output, long jobId) {
     }
 }
