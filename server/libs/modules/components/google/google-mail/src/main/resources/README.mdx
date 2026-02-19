@@ -1,3 +1,33 @@
+### How to find Message ID
+
+The best way to find a message ID is to use the output of one of the Gmail actions or triggers. In the output, you will find an `id` property, which represents the message ID.
+
+Some actions and triggers that return a message ID:
+* **Search Email**
+* **Get Mail**
+* **Send Email**
+* **New Email** trigger
+
+#### Via API
+* Use the `GET https://gmail.googleapis.com/gmail/v1/users/{userId}/messages` endpoint.
+* Lists the messages in the user's mailbox.
+
+### How to find Label ID
+
+The best way to find a label ID is to use the **List Labels** action. It returns a list of labels, each containing a `name` and an `id`.
+
+#### Via API
+* Use the `GET https://gmail.googleapis.com/gmail/v1/users/{userId}/labels` endpoint.
+* Lists all labels in the user's mailbox.
+
+### How to find Thread ID
+
+The best way to find a thread ID is to use the output of Gmail actions such as **Get Thread**, **Get Mail**, or **Search Email**. In the output, you will find a `threadId` property.
+
+#### Via API
+* Use the `GET https://gmail.googleapis.com/gmail/v1/users/{userId}/threads` endpoint.
+* Lists the threads in the user's mailbox.
+
 ## Troubleshooting
 
 ### Access Blocked: Verification Process Not Completed
