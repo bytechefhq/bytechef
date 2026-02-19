@@ -290,7 +290,7 @@ public class GoogleMailUtils {
         return mimeMessage;
     }
 
-    public static List<Option<String>> getLabelOptions(
+    public static List<Option<String>> getLabelIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 

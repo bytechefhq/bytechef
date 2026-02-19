@@ -101,7 +101,7 @@ public class GoogleMailSearchEmailAction {
                     "Only return messages with labels that match all of the specified label IDs. Messages in a " +
                         "thread might have labels that other messages in the same thread don't have.")
                 .items(string())
-                .options((OptionsFunction<String>) GoogleMailUtils::getLabelOptions)
+                .options((OptionsFunction<String>) GoogleMailUtils::getLabelIdOptions)
                 .required(false),
             bool(INCLUDE_SPAM_TRASH)
                 .label("Include Spam Trash")

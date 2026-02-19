@@ -44,7 +44,7 @@ public class GoogleMailArchiveEmailAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("archiveEmail")
         .title("Archive Email")
-        .description("Archive an Email message.")
+        .description("Archive an email message.")
         .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#archive-email")
         .properties(
             string(ID)

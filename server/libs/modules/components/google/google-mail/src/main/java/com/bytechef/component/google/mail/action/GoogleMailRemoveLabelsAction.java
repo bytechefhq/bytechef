@@ -45,18 +45,18 @@ public class GoogleMailRemoveLabelsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("removeLabels")
         .title("Remove Labels")
-        .description("Remove labels from an email in your Gmail account.")
+        .description("Removes labels on the specified message.")
         .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#remove-labels")
         .properties(
             string(ID)
                 .label("Message ID")
-                .description("ID of the message to add labels")
+                .description("ID of the message to remove labels.")
                 .required(true),
             array(LABEL_IDS)
-                .label("Labels")
-                .description("Labels to remove from this message.")
+                .label("Labels IDs")
+                .description("ID of the labels to remove from message.")
                 .items(string())
-                .options((OptionsFunction<String>) GoogleMailUtils::getLabelOptions)
+                .options((OptionsFunction<String>) GoogleMailUtils::getLabelIdOptions)
                 .maxItems(100)
                 .required(true))
         .output(

@@ -96,7 +96,7 @@ class GoogleMailUtilsTest {
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
-    void testGetLabelOptions() throws IOException {
+    void testGetLabelIdOptions() throws IOException {
         parameters = MockParametersFactory.create(Map.of(ACCESS_TOKEN, "id"));
 
         List<Label> labels = List.of(new Label().setName("label1")
@@ -117,7 +117,7 @@ class GoogleMailUtilsTest {
             when(mockedLabelsList.execute())
                 .thenReturn(new ListLabelsResponse().setLabels(labels));
 
-            List<Option<String>> result = GoogleMailUtils.getLabelOptions(
+            List<Option<String>> result = GoogleMailUtils.getLabelIdOptions(
                 parameters, parameters, Map.of(), anyString(), mockedActionContext);
 
             List<Option<String>> expectedOptions = List.of(option("label1", "label1"), option("label2", "label2"));
