@@ -21,6 +21,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HI
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TOPIC_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -81,10 +82,12 @@ class GoogleMailNewEmailTriggerTest {
     private final Watch mockedWatch = mock(Watch.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    private final ArgumentCaptor<BigInteger> bigIntegerArgumentCaptor = ArgumentCaptor.forClass(BigInteger.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<WatchRequest> watchRequestArgumentCaptor = ArgumentCaptor.forClass(WatchRequest.class);
+    private final ArgumentCaptor<BigInteger> bigIntegerArgumentCaptor = forClass(BigInteger.class);
+    @SuppressWarnings("rawtypes")
+    private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<WatchRequest> watchRequestArgumentCaptor = forClass(WatchRequest.class);
     private static final String workflowExecutionId = "testWorkflowExecutionId";
 
     @BeforeEach
@@ -162,6 +165,8 @@ class GoogleMailNewEmailTriggerTest {
             .thenReturn(mockedList);
         when(mockedList.setStartHistoryId(bigIntegerArgumentCaptor.capture()))
             .thenReturn(mockedList);
+        when(mockedList.setHistoryTypes(listArgumentCaptor.capture()))
+            .thenReturn(mockedList);
         when(mockedList.execute())
             .thenReturn(listHistoryResponse);
         when(mockedUsers.messages())
@@ -181,5 +186,6 @@ class GoogleMailNewEmailTriggerTest {
 
         assertEquals(List.of(ME, ME, "2", Format.FULL.getMapping()), stringArgumentCaptor.getAllValues());
         assertEquals(new BigInteger("123"), bigIntegerArgumentCaptor.getValue());
+        assertEquals(List.of("messageAdded"), listArgumentCaptor.getValue());
     }
 }

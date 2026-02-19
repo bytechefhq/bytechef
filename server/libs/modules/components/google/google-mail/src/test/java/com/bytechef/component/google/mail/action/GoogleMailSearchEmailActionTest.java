@@ -27,6 +27,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PA
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -49,28 +50,26 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailSearchEmailActionTest {
 
-    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
+    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = forClass(Boolean.class);
     @SuppressWarnings("rawtypes")
-    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
-    private final ArgumentCaptor<Long> longArgumentCaptor = ArgumentCaptor.forClass(Long.class);
+    private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
+    private final ArgumentCaptor<Long> longArgumentCaptor = forClass(Long.class);
+    private final Parameters mockedConnectionParameters = mock(Parameters.class);
     private final Gmail mockedGmail = mock(Gmail.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(
+        Map.of(FROM, "from@mail.com", TO, "to@mail.com", SUBJECT, "subject", BODY, "body", MAX_RESULTS, 1L,
+            PAGE_TOKEN, "pageToken", CATEGORY, "social", LABEL_IDS, List.of("id1", "id2"),
+            INCLUDE_SPAM_TRASH, true));
     private final Gmail.Users.Messages.List mockedList = mock(Gmail.Users.Messages.List.class);
     private final ListMessagesResponse mockedListMessagesResponse = mock(ListMessagesResponse.class);
     private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     @SuppressWarnings("unchecked")
     void testPerform() throws IOException {
-        List<String> labelIDs = List.of("id1", "id2");
-
-        Parameters parameters = MockParametersFactory.create(
-            Map.of(FROM, "from@mail.com", TO, "to@mail.com", SUBJECT, "subject", BODY, "body", MAX_RESULTS, 1L,
-                PAGE_TOKEN, "pageToken", CATEGORY, "social", LABEL_IDS, List.of("id1", "id2"),
-                INCLUDE_SPAM_TRASH, true));
-
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic
                 .when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
@@ -95,16 +94,15 @@ class GoogleMailSearchEmailActionTest {
                 .thenReturn(mockedListMessagesResponse);
 
             ListMessagesResponse response = GoogleMailSearchEmailAction.perform(
-                parameters, parameters, mock(ActionContext.class));
+                mockedInputParameters, mockedConnectionParameters, mock(ActionContext.class));
 
             assertEquals(mockedListMessagesResponse, response);
-
-            assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedConnectionParameters, parametersArgumentCaptor.getValue());
             assertEquals(
                 List.of(ME, "pageToken", " from:from@mail.com to:to@mail.com subject:subject category:social"),
                 stringArgumentCaptor.getAllValues());
             assertEquals(1, longArgumentCaptor.getValue());
-            assertEquals(labelIDs, listArgumentCaptor.getValue());
+            assertEquals(List.of("id1", "id2"), listArgumentCaptor.getValue());
             assertEquals(true, booleanArgumentCaptor.getValue());
         }
     }

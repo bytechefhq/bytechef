@@ -35,6 +35,7 @@ import static java.util.Base64.getUrlDecoder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -80,24 +81,24 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailUtilsTest {
 
-    private final ArgumentCaptor<Message> messageArgumentCaptor = ArgumentCaptor.forClass(Message.class);
+    private final ArgumentCaptor<Message> messageArgumentCaptor = forClass(Message.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Gmail mockedGmail = mock(Gmail.class);
     private final Gmail.Users.Labels mockedLabels = mock(Gmail.Users.Labels.class);
     private final Gmail.Users.Labels.List mockedLabelsList = mock(Gmail.Users.Labels.List.class);
-    private Parameters parameters;
+    private Parameters mockedInputParameters;
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
     private final Gmail.Users.Messages.Get mockedGet = mock(Gmail.Users.Messages.Get.class);
     private final Message mockedMessage = mock(Message.class);
     private final Gmail.Users.Messages.Send mockedSend = mock(Gmail.Users.Messages.Send.class);
     private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testGetLabelIdOptions() throws IOException {
-        parameters = MockParametersFactory.create(Map.of(ACCESS_TOKEN, "id"));
+        mockedInputParameters = MockParametersFactory.create(Map.of(ACCESS_TOKEN, "id"));
 
         List<Label> labels = List.of(new Label().setName("label1")
             .setId("label1"),
@@ -118,12 +119,12 @@ class GoogleMailUtilsTest {
                 .thenReturn(new ListLabelsResponse().setLabels(labels));
 
             List<Option<String>> result = GoogleMailUtils.getLabelIdOptions(
-                parameters, parameters, Map.of(), anyString(), mockedActionContext);
+                mockedInputParameters, mockedInputParameters, Map.of(), anyString(), mockedActionContext);
 
             List<Option<String>> expectedOptions = List.of(option("label1", "label1"), option("label2", "label2"));
 
             assertEquals(expectedOptions, result);
-            assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedInputParameters, parametersArgumentCaptor.getValue());
             assertEquals(ME, stringArgumentCaptor.getValue());
         }
     }
@@ -131,7 +132,7 @@ class GoogleMailUtilsTest {
     @Test
     @SuppressWarnings("unchecked")
     void testGetMessage() throws IOException {
-        parameters = MockParametersFactory.create(
+        mockedInputParameters = MockParametersFactory.create(
             Map.of(FORMAT, Format.FULL, ID, "id", METADATA_HEADERS, List.of("metadata")));
 
         Message message = new Message().setId("id");
@@ -149,7 +150,7 @@ class GoogleMailUtilsTest {
         when(mockedGet.execute())
             .thenReturn(message);
 
-        Message result = GoogleMailUtils.getMessage(parameters, mockedGmail);
+        Message result = GoogleMailUtils.getMessage(mockedInputParameters, mockedGmail);
 
         assertEquals(message, result);
         assertEquals(List.of(ME, "id", Format.FULL.getMapping()), stringArgumentCaptor.getAllValues());
@@ -214,11 +215,19 @@ class GoogleMailUtilsTest {
         Attachments mockedAttachments = mock(Attachments.class);
         Attachments.Get mockedAttachmentsGet = mock(Attachments.Get.class);
 
-        when(mockedGmail.users()).thenReturn(mockedUsers);
-        when(mockedUsers.messages()).thenReturn(mockedMessages);
-        when(mockedMessages.attachments()).thenReturn(mockedAttachments);
-        when(mockedAttachments.get(anyString(), anyString(), anyString())).thenReturn(mockedAttachmentsGet);
-        when(mockedAttachmentsGet.execute()).thenReturn(new MessagePartBody().setData("YXRhY2htZW50IGNvbnRlbnQ="));
+        when(mockedGmail.users())
+            .thenReturn(mockedUsers);
+        when(mockedUsers.messages())
+            .thenReturn(mockedMessages);
+        when(mockedMessages.attachments())
+            .thenReturn(mockedAttachments);
+        when(mockedAttachments.get(
+            stringArgumentCaptor.capture(),
+            stringArgumentCaptor.capture(),
+            stringArgumentCaptor.capture()))
+                .thenReturn(mockedAttachmentsGet);
+        when(mockedAttachmentsGet.execute())
+            .thenReturn(new MessagePartBody().setData("YXRhY2htZW50IGNvbnRlbnQ="));
 
         Context.File mockedFile = mock(Context.File.class);
 
@@ -228,11 +237,10 @@ class GoogleMailUtilsTest {
             return function.apply(mockedFile);
         });
 
-        FileEntry mockedFileEntry1 = mock(FileEntry.class);
-        FileEntry mockedFileEntry2 = mock(FileEntry.class);
+        FileEntry mockedFileEntry = mock(FileEntry.class);
 
-        when(mockedFile.storeContent(anyString(), any(InputStream.class))).thenReturn(
-            mockedFileEntry1, mockedFileEntry2);
+        when(mockedFile.storeContent(anyString(), any(InputStream.class)))
+            .thenReturn(mockedFileEntry);
 
         GoogleMailUtils.SimpleMessage result = GoogleMailUtils.getSimpleMessage(
             message, mockedActionContext, mockedGmail);
@@ -243,7 +251,7 @@ class GoogleMailUtilsTest {
 
         assertEquals(2, attachments.size());
 
-        ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> fileNameCaptor = forClass(String.class);
 
         verify(mockedFile, times(2)).storeContent(fileNameCaptor.capture(), any(InputStream.class));
 
@@ -251,6 +259,7 @@ class GoogleMailUtilsTest {
 
         assertEquals("attachment", capturedFileNames.get(0));
         assertEquals("noextension", capturedFileNames.get(1));
+        assertEquals(List.of(ME, ID, "attachmentId1", ME, ID, "attachmentId2"), stringArgumentCaptor.getAllValues());
     }
 
     @Test
