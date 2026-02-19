@@ -46,8 +46,9 @@ public interface ActionDefinitionFacade {
 
     Object executePerform(
         String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
-        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIds, Map<String, ?> extensions,
-        @Nullable Long environmentId, @Nullable PlatformType type, boolean editorEnvironment,
-        @Nullable Map<String, ?> continueParameters, @Nullable Instant suspendExpiresAt);
+        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable Long taskExecutionId,
+        @Nullable String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
+        Map<String, ?> extensions, @Nullable Long environmentId, @Nullable PlatformType type,
+        boolean editorEnvironment, @Nullable Map<String, ?> continueParameters,
+        @Nullable Instant suspendExpiresAt);
 }

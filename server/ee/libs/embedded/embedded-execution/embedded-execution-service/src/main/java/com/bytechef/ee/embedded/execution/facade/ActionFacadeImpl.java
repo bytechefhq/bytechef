@@ -42,7 +42,7 @@ public class ActionFacadeImpl implements ActionFacade {
         Long connectionId = connectionIdHelper.getConnectionId(externalUserId, componentName, instanceId, environment);
 
         return actionDefinitionFacade.executePerform(
-            componentName, componentVersion, actionName, null, null, null, null, inputParameters,
+            componentName, componentVersion, actionName, null, null, null, null, null, inputParameters,
             connectionId == null ? Map.of() : Map.of(componentName, connectionId), Map.of(), null, null, false,
             null, null);
     }

@@ -72,7 +72,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public Object executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
-        Long jobId, String workflowId, Map<String, ?> inputParameters,
+        Long jobId, @Nullable Long taskExecutionId, String workflowId, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
         boolean editorEnvironment, PlatformType type, Map<String, ?> continueParameters, Instant suspendExpiresAt) {
 

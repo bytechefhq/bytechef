@@ -51,6 +51,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
     private final @Nullable LogFileStorageWriter logFileStorageWriter;
     private final Nested nested;
     private final @Nullable String publicUrl;
+    private final long taskExecutionId;
     private final TempFileStorage tempFileStorage;
     private final @Nullable PlatformType type;
     private final @Nullable String workflowId;
@@ -74,6 +75,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         this.logFileStorageWriter = builder.logFileStorageWriter;
         this.nested = new NestedImpl();
         this.publicUrl = builder.publicUrl;
+        this.taskExecutionId = builder.taskExecutionId;
         this.tempFileStorage = builder.tempFileStorage;
         this.type = builder.type;
         this.workflowId = builder.workflowId;
@@ -113,6 +115,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
             .logFileStorageWriter(logFileStorageWriter)
             .publicUrl(publicUrl)
+            .taskExecutionId(taskExecutionId)
             .type(type)
             .workflowId(workflowId)
             .build();
@@ -281,6 +284,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         private @Nullable Long jobPrincipalWorkflowId;
         private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
+        private long taskExecutionId;
         private final TempFileStorage tempFileStorage;
         private @Nullable PlatformType type;
         private @Nullable String workflowId;
@@ -345,6 +349,12 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
 
         Builder publicUrl(@Nullable String publicUrl) {
             this.publicUrl = publicUrl;
+
+            return this;
+        }
+
+        Builder taskExecutionId(long taskExecutionId) {
+            this.taskExecutionId = taskExecutionId;
 
             return this;
         }

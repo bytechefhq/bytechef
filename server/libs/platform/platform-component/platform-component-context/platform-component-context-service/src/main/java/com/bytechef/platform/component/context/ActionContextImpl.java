@@ -58,6 +58,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable LogFileStorageWriter logFileStorageWriter;
     private final @Nullable PlatformType type;
     private final @Nullable String publicUrl;
+    private final long taskExecutionId;
     private final TempFileStorage tempFileStorage;
     private final @Nullable String workflowId;
     private final @Nullable Long environmentId;
@@ -67,7 +68,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         super(
             builder.componentName, builder.componentVersion, builder.actionName, builder.componentConnection,
             builder.editorEnvironment, builder.httpClientExecutor, builder.tempFileStorage,
-            builder.logFileStorageWriter, builder.jobId, builder.jobId != null ? builder.jobId : 0);
+            builder.logFileStorageWriter, builder.jobId, builder.taskExecutionId);
 
         this.actionName = builder.actionName;
         this.cacheManager = builder.cacheManager;
@@ -76,6 +77,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.eventPublisher = builder.eventPublisher;
         this.httpClientExecutor = builder.httpClientExecutor;
         this.logFileStorageWriter = builder.logFileStorageWriter;
+        this.taskExecutionId = builder.taskExecutionId;
         this.tempFileStorage = builder.tempFileStorage;
 
         if (builder.jobId != null && builder.publicUrl != null) {
@@ -123,6 +125,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
                 .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
                 .logFileStorageWriter(logFileStorageWriter)
                 .publicUrl(publicUrl)
+                .taskExecutionId(taskExecutionId)
                 .type(type)
                 .workflowId(workflowId)
                 .build();
@@ -145,6 +148,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         private @Nullable Long jobPrincipalWorkflowId;
         private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
+        private long taskExecutionId;
         private final TempFileStorage tempFileStorage;
         private @Nullable PlatformType type;
         private @Nullable String workflowId;
@@ -203,6 +207,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
         Builder publicUrl(@Nullable String publicUrl) {
             this.publicUrl = publicUrl;
+
+            return this;
+        }
+
+        Builder taskExecutionId(long taskExecutionId) {
+            this.taskExecutionId = taskExecutionId;
 
             return this;
         }
@@ -304,6 +314,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
             .logFileStorageWriter(logFileStorageWriter)
             .publicUrl(publicUrl)
+            .taskExecutionId(taskExecutionId)
             .type(type)
             .workflowId(workflowId)
             .build();

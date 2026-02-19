@@ -99,8 +99,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, workflowId, componentConnection, null, null,
-            true);
+            componentName, componentVersion, actionName, null, null, null, null, workflowId, componentConnection, null,
+            null, true);
 
         return doExecuteDynamicProperties(
             componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
@@ -117,7 +117,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, null, componentConnection, null, null, true);
+            componentName, componentVersion, actionName, null, null, null, null, null, componentConnection, null, null,
+            true);
 
         return doExecuteOptions(
             componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
@@ -146,14 +147,14 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
 
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, firstComponentConnection, null,
-                null, true);
+                componentName, componentVersion, actionName, null, null, null, null, null, firstComponentConnection,
+                null, null, true);
 
             return executeSingleConnectionOutput(
                 outputFunction, inputParameters, firstComponentConnection, actionContext);
         } else {
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null, null, null, true);
+                componentName, componentVersion, actionName, null, null, null, null, null, null, null, null, true);
 
             return executeMultipleConnectionsOutput(
                 (MultipleConnectionsOutputFunction) baseOutputFunction, inputParameters, componentConnections, Map.of(),
@@ -168,8 +169,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public Object executePerform(
         @ComponentNameParam String componentName, int componentVersion, String actionName,
         Long jobPrincipalId,
-        Long jobPrincipalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
-        @ConnectionParam Map<String, ComponentConnection> componentConnections,
+        Long jobPrincipalWorkflowId, Long jobId, @Nullable Long taskExecutionId, String workflowId,
+        Map<String, ?> inputParameters, @ConnectionParam Map<String, ComponentConnection> componentConnections,
         Map<String, ?> extensions, Long environmentId, boolean editorEnvironment, PlatformType type,
         @Nullable Map<String, ?> continueParameters, @Nullable Instant suspendExpiresAt) {
 
@@ -184,7 +185,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
                 ActionContext actionContext = contextFactory.createActionContext(
                     componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                    workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
+                    taskExecutionId, workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
 
                 return executeResumePerform(
                     actionDefinition, resumePerformOptional.get(), inputParameters, continueParameters,
@@ -198,8 +199,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
 
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
-                firstComponentConnection, environmentId, type, editorEnvironment);
+                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                taskExecutionId, workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
 
             return executeSuspendPerform(
                 actionDefinition, suspendPerformOptional.get(), inputParameters, firstComponentConnection,
@@ -214,15 +215,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
 
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
-                firstComponentConnection, environmentId, type, editorEnvironment);
+                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                taskExecutionId, workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
 
             return executeSingleConnectionPerform(
                 performFunction, inputParameters, firstComponentConnection, actionContext);
         } else {
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
-                null, environmentId, type, editorEnvironment);
+                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                taskExecutionId, workflowId, null, environmentId, type, editorEnvironment);
 
             if (basePerformFunction instanceof MultipleConnectionsPerformFunction performFunction) {
                 return executeMultipleConnectionsPerform(
@@ -264,7 +265,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, componentOperationName);
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, componentOperationName, null, null, null, null, null, null, null, false);
+            componentName, componentVersion, componentOperationName, null, null, null, null, null, null, null, null,
+            false);
 
         try {
             return actionDefinition.getProcessErrorResponse()
@@ -283,7 +285,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction =
             getWorkflowNodeDescriptionFunction(componentName, componentVersion, actionName);
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, null, null, null, null, true);
+            componentName, componentVersion, actionName, null, null, null, null, null, null, null, null, true);
 
         try {
             return workflowNodeDescriptionFunction.apply(
