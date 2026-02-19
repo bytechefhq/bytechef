@@ -4,6 +4,7 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyCodeEditorDialog from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialog';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
 import {ReactNode, forwardRef} from 'react';
@@ -101,7 +102,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
 
                     {error && (
                         <p className="mt-2 text-sm text-destructive" id={`${name}-error`} role="alert">
-                            {errorMessage || 'This field is required.'}
+                            {errorMessage || ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED}
                         </p>
                     )}
                 </fieldset>

@@ -3,6 +3,7 @@ import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
 import PropertyJsonSchemaBuilderSheet from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilderSheet';
 import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
@@ -100,7 +101,7 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
 
                     {error && (
                         <p className="mt-2 text-sm text-destructive" id={`${name}-error`} role="alert">
-                            {errorMessage || 'This field is required.'}
+                            {errorMessage || ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED}
                         </p>
                     )}
                 </fieldset>
