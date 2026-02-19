@@ -182,7 +182,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
                 dynamicOutputDefined = triggerDefinitionService.isDynamicOutputDefined(
-                    workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    Objects.requireNonNull(workflowNodeType.operation()));
 
                 break;
             }
@@ -277,13 +278,23 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-            if (Objects.equals(workflowNodeType.name(), "loop")) {
-                List<WorkflowTask> childWorkflowTasks = MapUtils
-                    .getList(
-                        workflowTask.getParameters(), "iteratee", new TypeReference<Map<String, ?>>() {}, List.of())
-                    .stream()
-                    .map(WorkflowTask::new)
-                    .toList();
+            if (Objects.equals(workflowNodeType.name(), "loop") || Objects.equals(workflowNodeType.name(), "each") ||
+                Objects.equals(workflowNodeType.name(), "map")) {
+
+                List<WorkflowTask> childWorkflowTasks;
+
+                if (Objects.equals(workflowNodeType.name(), "each")) {
+                    Map<String, ?> iterateeMap = MapUtils.getMap(workflowTask.getParameters(), "iteratee", Map.of());
+
+                    childWorkflowTasks = iterateeMap.isEmpty() ? List.of() : List.of(new WorkflowTask(iterateeMap));
+                } else {
+                    childWorkflowTasks = MapUtils
+                        .getList(
+                            workflowTask.getParameters(), "iteratee", new TypeReference<Map<String, ?>>() {}, List.of())
+                        .stream()
+                        .map(WorkflowTask::new)
+                        .toList();
+                }
 
                 if (containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName)) {
                     workflowNodeOutputDTOs.add(
@@ -335,7 +346,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService.getClusterElementDefinition(
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
-            clusterElementWorkflowNodeType.operation());
+            Objects.requireNonNull(clusterElementWorkflowNodeType.operation()));
 
         Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
@@ -457,8 +468,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowNodeType.name(), workflowNodeType.version(),
-            workflowNodeType.operation());
+            workflowNodeType.name(), workflowNodeType.version(), Objects.requireNonNull(workflowNodeType.operation()));
 
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName(), environmentId)
@@ -489,7 +499,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         if (!actionDefinitionService.isDynamicOutputDefined(
-            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation())) {
+            workflowNodeType.name(), workflowNodeType.version(),
+            Objects.requireNonNull(workflowNodeType.operation()))) {
 
             return null;
         }
