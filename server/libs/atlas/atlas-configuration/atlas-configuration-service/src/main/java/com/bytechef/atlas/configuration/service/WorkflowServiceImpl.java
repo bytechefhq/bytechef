@@ -24,6 +24,7 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -117,18 +118,24 @@ public class WorkflowServiceImpl implements WorkflowService {
     public Optional<Workflow> fetchWorkflow(String id) {
         Assert.notNull(id, "'id' must not be null");
 
+        String tenantWorkflowCacheKey = TenantCacheKeyUtils.getKey(id);
+
         Cache workflowCache = Validate.notNull(cacheManager.getCache(WORKFLOW_CACHE), WORKFLOW_CACHE);
 
-        if (workflowCache.get(id) != null) {
-            Cache.ValueWrapper valueWrapper = Validate.notNull(workflowCache.get(id), "valueWrapper");
+        if (workflowCache.get(tenantWorkflowCacheKey) != null) {
+            Cache.ValueWrapper valueWrapper = Validate.notNull(
+                workflowCache.get(tenantWorkflowCacheKey), "valueWrapper");
 
             return Optional.ofNullable((Workflow) valueWrapper.get());
         }
 
+        String tenantWorkflowsCacheKey = TenantCacheKeyUtils.getKey(WORKFLOWS_CACHE);
+
         Cache workflowsCache = Validate.notNull(cacheManager.getCache(WORKFLOWS_CACHE), WORKFLOWS_CACHE);
 
-        if (workflowsCache.get(WORKFLOWS_CACHE) != null) {
-            Cache.ValueWrapper valueWrapper = Validate.notNull(workflowsCache.get(WORKFLOWS_CACHE), "valueWrapper");
+        if (workflowsCache.get(tenantWorkflowsCacheKey) != null) {
+            Cache.ValueWrapper valueWrapper = Validate.notNull(
+                workflowsCache.get(tenantWorkflowsCacheKey), "valueWrapper");
 
             @SuppressWarnings("unchecked")
             List<Workflow> workflows = (List<Workflow>) valueWrapper.get();
@@ -149,7 +156,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
                     workflow.setSourceType(workflowRepository.getSourceType());
 
-                    workflowCache.put(id, workflow);
+                    workflowCache.put(tenantWorkflowCacheKey, workflow);
 
                     return Optional.of(workflow);
                 }
@@ -179,17 +186,20 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<WorkflowRepository> filteredWorkflowRepositories = CollectionUtils.filter(
             workflowRepositories, curWorkflowRepository -> sourceTypes.contains(curWorkflowRepository.getSourceType()));
 
+        String tenantWorkflowsCacheKey = TenantCacheKeyUtils.getKey(WORKFLOWS_CACHE);
+
         Cache workflowsCache = Validate.notNull(cacheManager.getCache(WORKFLOWS_CACHE), WORKFLOWS_CACHE);
 
-        if (workflowsCache.get(WORKFLOWS_CACHE) == null) {
+        if (workflowsCache.get(tenantWorkflowsCacheKey) == null) {
             workflows = filteredWorkflowRepositories.stream()
                 .flatMap(WorkflowServiceImpl::stream)
                 .sorted(WorkflowServiceImpl::compare)
                 .collect(Collectors.toList());
 
-            workflowsCache.put(WORKFLOWS_CACHE, workflows);
+            workflowsCache.put(tenantWorkflowsCacheKey, workflows);
         } else {
-            Cache.ValueWrapper valueWrapper = Validate.notNull(workflowsCache.get(WORKFLOWS_CACHE), WORKFLOWS_CACHE);
+            Cache.ValueWrapper valueWrapper = Validate.notNull(
+                workflowsCache.get(tenantWorkflowsCacheKey), WORKFLOWS_CACHE);
 
             workflows = (List<Workflow>) valueWrapper.get();
         }
@@ -228,20 +238,25 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
         }
 
+        String tenantWorkflowCacheKey = TenantCacheKeyUtils.getKey(id);
+
         Cache workflowCache = Validate.notNull(cacheManager.getCache(WORKFLOW_CACHE), WORKFLOW_CACHE);
 
-        if (workflowCache.get(id) != null) {
+        if (workflowCache.get(tenantWorkflowCacheKey) != null) {
             if (workflow == null) {
-                workflowCache.evictIfPresent(id);
+                workflowCache.evictIfPresent(tenantWorkflowCacheKey);
             } else {
-                workflowCache.put(id, workflow);
+                workflowCache.put(tenantWorkflowCacheKey, workflow);
             }
         }
 
+        String tenantWorkflowsCacheKey = TenantCacheKeyUtils.getKey(WORKFLOWS_CACHE);
+
         Cache workflowsCache = Validate.notNull(cacheManager.getCache(WORKFLOWS_CACHE), WORKFLOWS_CACHE);
 
-        if (workflowsCache.get(WORKFLOWS_CACHE) != null) {
-            Cache.ValueWrapper valueWrapper = Validate.notNull(workflowsCache.get(WORKFLOWS_CACHE), WORKFLOW_CACHE);
+        if (workflowsCache.get(tenantWorkflowsCacheKey) != null) {
+            Cache.ValueWrapper valueWrapper = Validate.notNull(
+                workflowsCache.get(tenantWorkflowsCacheKey), WORKFLOW_CACHE);
 
             @SuppressWarnings("unchecked")
             List<Workflow> workflows = (List<Workflow>) Validate.notNull(valueWrapper.get(), "workflows");
@@ -262,7 +277,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 }
             }
 
-            workflowsCache.put(WORKFLOWS_CACHE, workflows);
+            workflowsCache.put(tenantWorkflowsCacheKey, workflows);
         }
     }
 
@@ -332,16 +347,20 @@ public class WorkflowServiceImpl implements WorkflowService {
     private Workflow updateCache(Workflow workflow) {
         Cache workflowCache = Validate.notNull(cacheManager.getCache(WORKFLOW_CACHE), WORKFLOW_CACHE);
 
-        String workflowId = Validate.notNull(workflow.getId(), "id");
+        String tenantWorkflowCacheKey = TenantCacheKeyUtils.getKey(
+            Validate.notNull(workflow.getId(), "id"));
 
-        if (workflowCache.get(workflowId) != null) {
-            workflowCache.put(workflowId, workflow);
+        if (workflowCache.get(tenantWorkflowCacheKey) != null) {
+            workflowCache.put(tenantWorkflowCacheKey, workflow);
         }
+
+        String tenantWorkflowsCacheKey = TenantCacheKeyUtils.getKey(WORKFLOWS_CACHE);
 
         Cache workflowsCache = Validate.notNull(cacheManager.getCache(WORKFLOWS_CACHE), WORKFLOWS_CACHE);
 
-        if (workflowsCache.get(WORKFLOWS_CACHE) != null) {
-            Cache.ValueWrapper valueWrapper = Validate.notNull(workflowsCache.get(WORKFLOWS_CACHE), WORKFLOWS_CACHE);
+        if (workflowsCache.get(tenantWorkflowsCacheKey) != null) {
+            Cache.ValueWrapper valueWrapper = Validate.notNull(
+                workflowsCache.get(tenantWorkflowsCacheKey), WORKFLOWS_CACHE);
 
             @SuppressWarnings("unchecked")
             List<Workflow> workflows = (List<Workflow>) Validate.notNull(valueWrapper.get(), "workflows");
@@ -356,7 +375,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 workflows.add(index, workflow);
             }
 
-            workflowsCache.put(WORKFLOWS_CACHE, workflows);
+            workflowsCache.put(tenantWorkflowsCacheKey, workflows);
         }
 
         return workflow;
