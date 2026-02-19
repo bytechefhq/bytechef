@@ -22,8 +22,10 @@ import com.bytechef.ee.component.codeworkflow.task.CodeWorkflowTaskExecutor;
  */
 public class CodeWorkflowPerformAction {
 
-    public static CodeWorkflowPerformActionDefinition of(CodeWorkflowTaskExecutor codeWorkflowTaskExecutor) {
-        return new CodeWorkflowPerformActionDefinition(
+    public final CodeWorkflowPerformActionDefinition actionDefinition;
+
+    public CodeWorkflowPerformAction(CodeWorkflowTaskExecutor codeWorkflowTaskExecutor) {
+        actionDefinition = new CodeWorkflowPerformActionDefinition(
             action(PERFORM)
                 .title("Perform Code Workflow Task")
                 .description("Perform code workflow task.")
@@ -35,8 +37,5 @@ public class CodeWorkflowPerformAction {
                     string("taskName")
                         .label("Task Name")),
             codeWorkflowTaskExecutor);
-    }
-
-    private CodeWorkflowPerformAction() {
     }
 }

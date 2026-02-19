@@ -1,3 +1,0 @@
-query editorJobFileLogsExist($jobId: ID!) {
-    editorJobFileLogsExist(jobId: $jobId)
-}

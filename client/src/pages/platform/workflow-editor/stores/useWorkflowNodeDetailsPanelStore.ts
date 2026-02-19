@@ -25,9 +25,6 @@ interface WorkflowNodeDetailsPanelStoreI {
     focusedInput: Editor | null;
     setFocusedInput: (focusedInput: Editor | null) => void;
 
-    operationChangeInProgress: boolean;
-    setOperationChangeInProgress: (operationChangeInProgress: boolean) => void;
-
     reset: () => void;
 
     workflowNodeDetailsPanelOpen: boolean;
@@ -60,17 +57,12 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
             focusedInput: null,
             setFocusedInput: (focusedInput) => set((state) => ({...state, focusedInput})),
 
-            operationChangeInProgress: false,
-            setOperationChangeInProgress: (operationChangeInProgress) =>
-                set((state) => ({...state, operationChangeInProgress})),
-
             reset: () =>
                 set(() => ({
                     currentComponent: undefined,
                     currentComponentDefinition: undefined,
                     currentNode: undefined,
                     focusedInput: null,
-                    operationChangeInProgress: false,
                     workflowNodeDetailsPanelOpen: false,
                 })),
 

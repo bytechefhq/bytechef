@@ -20,11 +20,10 @@ export type ContextType = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters: Record<string, any>;
     mode: MODE;
-    workflowExecutionError?: {
+    taskExecutionError?: {
         errorMessage?: string;
         stackTrace?: string[];
         title?: string;
-        workflowId?: string;
     };
 };
 
@@ -40,27 +39,22 @@ interface CopilotStateI {
                   errorMessage?: string;
                   stackTrace?: string[];
                   title?: string;
-                  workflowId?: string;
               }
             | undefined
     ) => void;
+
+    copilotPanelOpen: boolean;
+    setCopilotPanelOpen: (showCopilot: boolean) => void;
 
     messages: ThreadMessageLike[];
     addMessage: (message: ThreadMessageLike) => void;
     appendToLastAssistantMessage: (text: string) => void;
     resetMessages: () => void;
-
-    savedState: {conversationId: string | undefined; context: ContextType; messages: ThreadMessageLike[]} | null;
-    saveConversationState: () => void;
-    restoreConversationState: () => void;
 }
 
 export const useCopilotStore = create<CopilotStateI>()(
     devtools((set) => ({
-        conversationId: Array(32)
-            .fill(0)
-            .map(() => Math.random().toString(36).charAt(2))
-            .join(''),
+        conversationId: undefined,
         generateConversationId: () => {
             set((state) => {
                 return {
@@ -92,8 +86,17 @@ export const useCopilotStore = create<CopilotStateI>()(
                     ...state,
                     context: {
                         ...state.context,
-                        workflowExecutionError: error,
+                        taskExecutionError: error,
                     },
+                };
+            }),
+
+        copilotPanelOpen: false,
+        setCopilotPanelOpen: (copilotPanelOpen) =>
+            set((state) => {
+                return {
+                    ...state,
+                    copilotPanelOpen,
                 };
             }),
 
@@ -126,30 +129,5 @@ export const useCopilotStore = create<CopilotStateI>()(
                 return {...state, messages};
             }),
         resetMessages: () => set({messages: []}),
-
-        savedState: null,
-        saveConversationState: () =>
-            set((state) => ({
-                ...state,
-                savedState: {
-                    conversationId: state.conversationId,
-                    context: state.context,
-                    messages: state.messages,
-                },
-            })),
-        restoreConversationState: () =>
-            set((state) => {
-                if (!state.savedState) {
-                    return state;
-                }
-
-                return {
-                    ...state,
-                    conversationId: state.savedState.conversationId,
-                    context: state.savedState.context,
-                    messages: state.savedState.messages,
-                    savedState: null,
-                };
-            }),
     }))
 );

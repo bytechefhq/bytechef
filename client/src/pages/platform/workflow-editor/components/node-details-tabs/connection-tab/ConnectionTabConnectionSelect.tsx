@@ -7,13 +7,15 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
-import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/middleware/graphql';
 import {
     ComponentConnection,
     ComponentDefinition,
     WorkflowTestConfigurationConnection,
 } from '@/shared/middleware/platform/configuration';
-import {useDeleteWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
+import {
+    useDeleteWorkflowTestConfigurationConnectionMutation,
+    useSaveWorkflowTestConfigurationConnectionMutation,
+} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
@@ -118,8 +120,10 @@ const ConnectionTabConnectionSelect = ({
             }
 
             saveWorkflowTestConfigurationConnectionMutation.mutate({
-                connectionId,
                 environmentId: currentEnvironmentId,
+                saveWorkflowTestConfigurationConnectionRequest: {
+                    connectionId,
+                },
                 workflowConnectionKey,
                 workflowId,
                 workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,
@@ -174,8 +178,8 @@ const ConnectionTabConnectionSelect = ({
             clearedConnectionIdRef.current = connectionId;
 
             deleteWorkflowTestConfigurationConnectionMutation.mutate({
-                deleteWorkflowTestConfigurationConnectionRequest: {connectionId: previousConnectionId},
                 environmentId: currentEnvironmentId,
+                saveWorkflowTestConfigurationConnectionRequest: {connectionId: previousConnectionId},
                 workflowConnectionKey,
                 workflowId,
                 workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,

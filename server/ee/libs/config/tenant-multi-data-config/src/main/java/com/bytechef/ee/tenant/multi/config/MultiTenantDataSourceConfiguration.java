@@ -17,7 +17,6 @@ import javax.sql.DataSource;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 /**
  * @version ee
@@ -30,7 +29,6 @@ import org.springframework.context.annotation.Primary;
 public class MultiTenantDataSourceConfiguration {
 
     @Bean
-    @Primary
     public DataSource dataSource(DataSourceProperties properties) {
         final HikariDataSource dataSource = properties.initializeDataSourceBuilder()
             .type(HikariDataSource.class)
@@ -44,7 +42,7 @@ public class MultiTenantDataSourceConfiguration {
     }
 
     @Bean
-    MultiTenantLiquibaseChangelogLoader multiTenantLiquibaseChangelogLoader(TenantService tenantService) {
+    MultiTenantLiquibaseChangelogLoader multiTenantLiquibaseCheck(TenantService tenantService) {
         return new MultiTenantLiquibaseChangelogLoader(tenantService);
     }
 }

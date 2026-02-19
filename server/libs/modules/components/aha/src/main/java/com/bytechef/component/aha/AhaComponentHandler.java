@@ -45,9 +45,7 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
     @Override
     public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
-            String name = modifiableActionDefinition.getName();
-
-            if (Objects.equals(name, "createFeature")) {
+            if (Objects.equals(modifiableActionDefinition.getName(), "createFeature")) {
                 Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
 
                 List<Property> properties = new ArrayList<>(propertiesOptional.orElse(List.of()));
@@ -60,10 +58,6 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
                         .required(false));
 
                 modifiableActionDefinition.properties(properties);
-                modifiableActionDefinition.help(
-                    "", "https://docs.bytechef.io/reference/components/aha_v1#create-feature");
-            } else if (Objects.equals(name, "createIdea")) {
-                modifiableActionDefinition.help("", "https://docs.bytechef.io/reference/components/aha_v1#create-idea");
             }
         }
 
@@ -73,11 +67,9 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
-            .customActionHelp("", "https://www.aha.io/api")
             .customAction(true)
             .icon("path:assets/aha.svg")
-            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
-            .version(1);
+            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
     }
 
     @Override
@@ -112,8 +104,6 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
 
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "https://%s.aha.io/api/v1"
-                .formatted(connectionParameters.getRequiredString(SUBDOMAIN)))
-            .help("", "https://docs.bytechef.io/reference/components/aha_v1#connection-setup")
-            .version(1);
+                .formatted(connectionParameters.getRequiredString(SUBDOMAIN)));
     }
 }

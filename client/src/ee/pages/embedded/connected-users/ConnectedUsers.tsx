@@ -1,8 +1,8 @@
-import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox/ComboBox';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
+import {Button} from '@/components/ui/button';
 import {Calendar} from '@/components/ui/calendar';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';

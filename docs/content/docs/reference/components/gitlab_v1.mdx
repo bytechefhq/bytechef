@@ -30,23 +30,6 @@ Version: 1
 
 
 
-## Connection Setup
-
-1. Login to your GitLab account.
-2. Click on your profile icon in the top right corner and select **Edit profile**.
-3. On the left sidebar, select **Applications**.
-4. Click on **Add new application**.
-5. Fill in the required fields:
-    - **Name**: Enter a name for your application (e.g., `Test App`).
-    - **Redirect URI**: Specify the URI where users will be redirected after authorization (e.g., `http://127.0.0.1:5173/callback`).
-6. Select OAuth 2 Scopes. For the ByteChef connector, enable: `api`.
-7. Click on **Save application**.
-8. Copy the **Application ID** as Client ID and **Secret** as Client Secret and use it in ByteChef.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(53.05219207% + 32px)'}}>
-<iframe src="https://www.guidejar.com/embed/kcgOnF9seW2JSJpxX99R?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
-
 
 
 <hr />
@@ -115,11 +98,6 @@ Type: OBJECT
 }
 ```
 
-#### Find Project ID
-
-To find the Project ID, click [here](/reference/components/gitlab_v1#how-to-find-the-project-id).
-
-
 
 ### Create Comment on Issue
 Name: createCommentOnIssue
@@ -173,13 +151,6 @@ Type: OBJECT
 }
 ```
 
-#### Find Project ID and Issue ID
-
-To find the Project ID, click [here](/reference/components/gitlab_v1#how-to-find-the-project-id).
-
-To find the Issue ID, click [here](/reference/components/gitlab_v1#how-to-find-the-issue-id).
-
-
 
 
 ## Triggers
@@ -230,10 +201,6 @@ Type: OBJECT
   "type" : "gitlab/v1/newIssue"
 }
 ```
-#### Find Project ID
-
-To find the Project ID, click [here](/reference/components/gitlab_v1#how-to-find-the-project-id).
-
 
 
 
@@ -248,31 +215,19 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 
 # Additional Instructions
 
-### How to find the Project ID
+## Connection Setup
 
-The Project ID is a unique numeric value that can be found in the Gitlab UI or via the API.
+1. Login to your GitLab account.
+2. Click on your profile icon in the top right corner and select **Edit profile**.
+3. On the left sidebar, select **Applications**.
+4. Click on **Add new application**.
+5. Fill in the required fields:
+    - **Name**: Enter a name for your application (e.g., `Test App`).
+    - **Redirect URI**: Specify the URI where users will be redirected after authorization (e.g., `http://127.0.0.1:5173/callback`).
+6. Select OAuth 2 Scopes. For the ByteChef connector, enable: `api`.
+7. Click on **Save application**.
+8. Copy the **Application ID** as Client ID and **Secret** as Client Secret and use it in ByteChef.
 
-- **Method 1: Via API**
-
-Use the `GET /projects` endpoint to retrieve a list of all projects and their numeric IDs.
-
-- **Method 2: In the Gitlab UI**
-
-1. On the top bar, select **Search or go to** and find your project.
-2. On the project overview page, in the upper-right corner, select **Actions** (  ).
-3. Select **Copy project ID**.
-
-### How to find the Issue ID
-
-The Issue ID is a project-scoped identifier for an issue that can be found in the Gitlab UI or via the API.
-
-- **Method 1: Via API**
-
-Use the GET /projects/PROJECT_ID/issues endpoint. List issues within a project to retrieve their IDs.
-
-- **Method 2: In the Gitlab UI**
-
-1. On the top bar, select **Search or go to** and find your project.
-2. On the left bar, click on **Issues**.
-3. Open the issue in your project.
-4. The Issue ID appears after the # symbol above the issue title.
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(53.05219207% + 32px)'}}>
+<iframe src="https://www.guidejar.com/embed/kcgOnF9seW2JSJpxX99R?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>

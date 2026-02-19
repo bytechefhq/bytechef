@@ -1,8 +1,7 @@
 ---
-title: "Figma"
-description: "Figma is a cloud-based design and prototyping tool that enables teams to collaborate in real-time on user interface and user experience projects."
+description: "Figma integration for ByteChef. Connect and automate with this service in your workflows. Learn how to implement this in your ByteChef automation."
+title: Figma
 ---
-
 
 Categories: Productivity and Collaboration
 
@@ -28,35 +27,6 @@ Version: 1
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
 
-
-
-## Connection Setup
-
-### Create a Figma OAuth App
-
-1. Go to https://www.figma.com/developers/apps (or click “My Apps” in the top toolbar).
-2. Click **Create a new app** (top-right).
-3. Enter a name for your OAuth app and select a Team/Organization. The app must be associated with a team or organization.
-4. Click **Create**.
-5. Copy the **Client ID** and **Client Secret** and store them securely.
-   - Figma shows the Client Secret only once. You’ll need it for token exchange and refreshing access tokens.
-
-### Configure OAuth Scopes
-
-On the OAuth scopes page, select the scopes your app needs. For the ByteChef Figma connector, enable:
-
-- `file_comments:read`
-- `file_comments:write`
-- `webhooks:write`
-
-### Set the Redirect URI
-
-Add the ByteChef OAuth2 callback URL as a Redirect URI in your Figma app:
-
-- Example cloud URL: `https://app.bytechef.io/callback`
-- Example local URL: `http://127.0.0.1:5173/callback`
-
-If you run ByteChef with a custom domain, the pattern is: `<YOUR_PUBLIC_URL>/callback`.
 
 
 
@@ -123,11 +93,6 @@ Type: OBJECT
 }
 ```
 
-#### Find File Key
-
-To find a Figma file key, copy the alphanumeric string located between `/file/` (or `/design/`, `/proto/`, etc.) and the file name in the browser URL. For example, in `https://www.figma.com/file/ABC123456/File-Name`, the file key is `ABC123456`. You can also right-click a file in the desktop app and select **Copy link** to extract it.
-
-
 
 ### Post Comment
 Name: postComment
@@ -183,11 +148,6 @@ Type: OBJECT
 }
 ```
 
-#### Find File Key
-
-To find a Figma file key, copy the alphanumeric string located between `/file/` (or `/design/`, `/proto/`, etc.) and the file name in the browser URL. For example, in `https://www.figma.com/file/ABC123456/File-Name`, the file key is `ABC123456`. You can also right-click a file in the desktop app and select **Copy link** to extract it.
-
-
 
 
 ## Triggers
@@ -209,33 +169,7 @@ Type: DYNAMIC_WEBHOOK
 
 #### Output
 
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| file_name | STRING | The name of the file that was updated. |
-| created_at | STRING | The UTC ISO 8601 time at which the comment was left. |
-| comment_id | STRING | ID of the comment. |
-| triggered_by | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(handle), STRING\(email), STRING\(img_url)&#125; </details> | The user that made the comment and triggered this event. |
-| file_key | STRING | The key of the file that was updated. |
-| retries | INTEGER | Number of times the event has been retried. |
-| event_type | STRING | Type of the event. |
-| webhook_id | STRING | The id of the webhook that caused the callback. |
-| parent_id | STRING | If present, the id of the comment to which this is the reply. |
-| resolved_at | STRING | If set, the UTC ISO 8601 time the comment was resolved. |
-| mentions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(handle), STRING\(email), STRING\(img_url)&#125;] </details> | Users that were mentioned in the comment. |
-| comment | ARRAY <details> <summary> Items </summary> [&#123;STRING\(text), STRING\(mention)&#125;] </details> | Contents of the comment itself. |
-| order_id | STRING | Only set for top level comments. The number displayed with the comment in the UI. |
-| passcode | STRING | The passcode specified when the webhook was created, should match what was initially provided. |
-| timestamp | STRING | UTC ISO 8601 timestamp of when the event was triggered. |
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -248,10 +182,6 @@ Type: OBJECT
   "type" : "figma/v1/newComment"
 }
 ```
-#### Find Team ID
-
-To find your Figma Team ID, open the Figma web browser app, click on your team name in the left-hand sidebar, and copy the long numerical string located after `/team/` in the URL bar (e.g., `figma.com/team/123456789/team-name`).
-
 
 
 
@@ -262,3 +192,34 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Create a Figma OAuth App
+
+1. Go to https://www.figma.com/developers/apps (or click “My Apps” in the top toolbar).
+2. Click **Create a new app** (top-right).
+3. Enter a name for your OAuth app and select a Team/Organization. The app must be associated with a team or organization.
+4. Click **Create**.
+5. Copy the **Client ID** and **Client Secret** and store them securely.
+   - Figma shows the Client Secret only once. You’ll need it for token exchange and refreshing access tokens.
+
+### Configure OAuth Scopes
+
+On the OAuth scopes page, select the scopes your app needs. For the ByteChef Figma connector, enable:
+
+- `file_comments:read`
+- `file_comments:write`
+- `webhooks:write`
+
+### Set the Redirect URI
+
+Add the ByteChef OAuth2 callback URL as a Redirect URI in your Figma app:
+
+- Example cloud URL: `https://app.bytechef.io/callback`
+- Example local URL: `http://127.0.0.1:5173/callback`
+
+If you run ByteChef with a custom domain, the pattern is: `<YOUR_PUBLIC_URL>/callback`.

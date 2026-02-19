@@ -49,13 +49,12 @@ public class RemoteTriggerLifecycleFacadeController {
     public void executeTriggerEnable(TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerEnable(
             triggerRequest.workflowId, triggerRequest.workflowExecutionId, triggerRequest.triggerWorkflowNodeType,
-            triggerRequest.triggerParameters, triggerRequest.connectionId, triggerRequest.webhookUrl,
-            triggerRequest.environmentId);
+            triggerRequest.triggerParameters, triggerRequest.connectionId, triggerRequest.webhookUrl);
     }
 
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
         String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
-        Map<String, ?> triggerParameters, long connectionId, String webhookUrl, long environmentId) {
+        Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
     }
 }

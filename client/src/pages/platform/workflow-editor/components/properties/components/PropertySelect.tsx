@@ -97,7 +97,6 @@ const PropertySelect = ({
 
                 <SelectContent
                     align="start"
-                    aria-label="Select options"
                     className="max-h-select-content-available-height min-w-select-trigger-width"
                     position="popper"
                     sideOffset={5}

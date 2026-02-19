@@ -1,4 +1,3 @@
-import Button from '@/components/Button/Button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -9,6 +8,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ApiClientDialog from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientDialog';
 import {ApiClient} from '@/ee/shared/middleware/automation/api-platform';
@@ -94,24 +94,26 @@ const ApiClientTable = ({apiClients}: ApiClientTableProps) => {
                 cell: (info) => (
                     <>
                         <Button
-                            icon={<EditIcon className="size-4" />}
                             onClick={() => {
                                 setCurrentApiClient(info.row.original);
                                 setShowEditDialog(true);
                             }}
                             size="icon"
                             variant="ghost"
-                        />
+                        >
+                            <EditIcon className="size-4" />
+                        </Button>
 
                         <Button
-                            icon={<Trash2Icon className="h-4 text-destructive" />}
                             onClick={() => {
                                 setCurrentApiClient(info.row.original);
                                 setShowDeleteDialog(true);
                             }}
                             size="icon"
                             variant="ghost"
-                        />
+                        >
+                            <Trash2Icon className="h-4 text-destructive" />
+                        </Button>
                     </>
                 ),
                 header: '',

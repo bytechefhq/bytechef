@@ -9,7 +9,6 @@ package com.bytechef.ee.platform.customcomponent.loader;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent.Language;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -24,11 +23,6 @@ import org.springframework.cache.CacheManager;
  */
 public class ComponentHandlerLoader {
 
-    /**
-     * Security Note: PATH_TRAVERSAL_IN - URL comes from internal file storage after admin upload, not direct user
-     * input. Access is controlled through admin-only upload permissions.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public static ComponentHandler loadComponentHandler(
         URL url, Language language, String cacheKey, CacheManager cacheManager) {
 
@@ -52,11 +46,6 @@ public class ComponentHandlerLoader {
         }
     }
 
-    /**
-     * Security Note: PATH_TRAVERSAL_IN - URL comes from internal file storage after admin upload, not direct user
-     * input.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private static ComponentHandler loadPolyglotComponentHandler(URL url, Language language)
         throws URISyntaxException, IOException {
 

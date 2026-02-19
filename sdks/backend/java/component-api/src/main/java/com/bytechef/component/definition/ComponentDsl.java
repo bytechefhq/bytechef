@@ -822,7 +822,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
+        public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -1349,12 +1349,6 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableComponentDefinition customActionHelp(String body, String learnMoreUrl) {
-            this.customActionHelp = new HelpImpl(body, learnMoreUrl);
-
-            return this;
-        }
-
         public ModifiableComponentDefinition description(String description) {
             this.description = description;
 
@@ -1568,12 +1562,10 @@ public final class ComponentDsl {
 
         private List<? extends ModifiableAuthorization> authorizations;
         private BaseUriFunction baseUriFunction;
-        private Help help;
         private List<? extends Property> properties;
         private TestConsumer testConsumer;
         private int version = 1;
         private Boolean authorizationRequired;
-        private ProcessErrorResponseFunction processErrorResponseFunction;
 
         private ModifiableConnectionDefinition() {
         }
@@ -1611,26 +1603,8 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableConnectionDefinition help(String body) {
-            this.help = new HelpImpl(body, null);
-
-            return this;
-        }
-
-        public ModifiableConnectionDefinition help(String body, String learnMoreUrl) {
-            this.help = new HelpImpl(body, learnMoreUrl);
-
-            return this;
-        }
-
         public ModifiableConnectionDefinition version(int version) {
             this.version = version;
-
-            return this;
-        }
-
-        public ModifiableConnectionDefinition processErrorResponse(ProcessErrorResponseFunction processErrorResponse) {
-            this.processErrorResponseFunction = processErrorResponse;
 
             return this;
         }
@@ -1669,7 +1643,7 @@ public final class ComponentDsl {
         @Override
         public int hashCode() {
             return Objects.hash(
-                authorizationRequired, authorizations, baseUriFunction, help, properties, testConsumer, version);
+                authorizationRequired, authorizations, baseUriFunction, properties, testConsumer, version);
         }
 
         @Override
@@ -1685,16 +1659,6 @@ public final class ComponentDsl {
         @Override
         public Optional<BaseUriFunction> getBaseUri() {
             return Optional.ofNullable(baseUriFunction);
-        }
-
-        @Override
-        public Optional<Help> getHelp() {
-            return Optional.ofNullable(help);
-        }
-
-        @Override
-        public Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
-            return Optional.ofNullable(processErrorResponseFunction);
         }
 
         @Override
@@ -1718,7 +1682,6 @@ public final class ComponentDsl {
                 "version=" + version +
                 ", authorizationRequired=" + authorizationRequired +
                 ", authorizations=" + authorizations +
-                ", help=" + help +
                 ", properties=" + properties +
                 '}';
         }
@@ -1899,7 +1862,7 @@ public final class ComponentDsl {
 
         @Override
         public T getElement() {
-            return objectSupplier != null ? objectSupplier.get() : null;
+            return objectSupplier.get();
         }
 
         @Override
@@ -2057,7 +2020,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
+        public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -2167,7 +2130,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
+        public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -2217,14 +2180,6 @@ public final class ComponentDsl {
         }
 
         public ModifiableDynamicPropertiesProperty properties(PropertiesFunction propertiesFunction) {
-            this.propertiesFunction = propertiesFunction;
-
-            return this;
-        }
-
-        public ModifiableDynamicPropertiesProperty properties(
-            ClusterElementDefinition.PropertiesFunction propertiesFunction) {
-
             this.propertiesFunction = propertiesFunction;
 
             return this;
@@ -2461,7 +2416,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
+        public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -2697,7 +2652,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
+        public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -2871,7 +2826,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
+        public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -3301,7 +3256,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
+        public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -3418,7 +3373,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OptionsDataSource<?>> getOptionsDataSource() {
+        public Optional<OptionsDataSource> getOptionsDataSource() {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
@@ -3982,14 +3937,17 @@ public final class ComponentDsl {
         private final BasePropertiesFunction propertiesFunction;
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-        private PropertiesDataSourceImpl(
-            List<String> loadPropertiesDependOn, BasePropertiesFunction propertiesFunction) {
+        private PropertiesDataSourceImpl(List<String> loadPropertiesDependOn,
+            BasePropertiesFunction propertiesFunction) {
+            if (loadPropertiesDependOn == null || loadPropertiesDependOn.isEmpty()) {
+                throw new IllegalArgumentException("propertiesLookupDependsOn is not defined.");
+            }
 
             if (propertiesFunction == null) {
                 throw new IllegalArgumentException("propertiesFunction is not defined.");
             }
 
-            this.propertiesLookupDependsOn = loadPropertiesDependOn == null ? List.of() : loadPropertiesDependOn;
+            this.propertiesLookupDependsOn = loadPropertiesDependOn;
             this.propertiesFunction = propertiesFunction;
         }
 

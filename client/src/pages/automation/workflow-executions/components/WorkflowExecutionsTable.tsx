@@ -5,7 +5,6 @@ import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTa
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
-import WorkflowExecutionsDropdownMenu from './WorkflowExecutionsDropdownMenu';
 
 const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>) => {
     const infoValue = info.getValue();
@@ -63,10 +62,6 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
                     </>
                 ),
                 header: 'Execution date',
-            }),
-            columnHelper.accessor((row) => row.job, {
-                cell: (info) => <WorkflowExecutionsDropdownMenu data={info} />,
-                header: 'Action',
             }),
         ],
         data,

@@ -1,5 +1,5 @@
-import Button from '@/components/Button/Button';
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
+import {Button} from '@/components/ui/button';
+import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,30 +10,60 @@ import {
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ApiConnectorDeleteAlertDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorDeleteAlertDialog';
-import ApiConnectorEditDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEditDialog';
-import ApiConnectorEndpointListItem from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEndpointListItem';
-import {ApiConnector} from '@/shared/middleware/graphql';
+import ApiConnectorImportDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorImportDialog';
+import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
+import {
+    useDeleteApiConnectorMutation,
+    useEnableApiConnectorMutation,
+} from '@/ee/shared/mutations/platform/apiConnector.mutations';
+import {ApiConnectorKeys} from '@/ee/shared/queries/platform/apiConnectors.queries';
+import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, EllipsisVerticalIcon} from 'lucide-react';
-
-import useApiConnectorListItem from './hooks/useApiConnectorListItem';
+import {useState} from 'react';
 
 interface ApiConnectorItemProps {
     apiConnector: ApiConnector;
 }
 
 const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
-    const {
-        handleAlertDeleteDialogClick,
-        handleOnCheckedChange,
-        lastModifiedDate,
-        setShowDeleteDialog,
-        setShowEditDialog,
-        showDeleteDialog,
-        showEditDialog,
-    } = useApiConnectorListItem({apiConnector});
+    const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const queryClient = useQueryClient();
+
+    const deleteApiConnectorMutation = useDeleteApiConnectorMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ApiConnectorKeys.apiConnectors,
+            });
+        },
+    });
+
+    const enableApiConnectorMutation = useEnableApiConnectorMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ApiConnectorKeys.apiConnectors,
+            });
+        },
+    });
+
+    const handleAlertDeleteDialogClick = () => {
+        if (apiConnector.id) {
+            deleteApiConnectorMutation.mutate(apiConnector.id);
+
+            setShowDeleteDialog(false);
+        }
+    };
+
+    const handleOnCheckedChange = (value: boolean) => {
+        enableApiConnectorMutation.mutate({
+            enable: value,
+            id: apiConnector.id!,
+        });
+    };
 
     return (
-        <Collapsible className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
+        <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
             <div className="flex items-center justify-between">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
@@ -81,30 +111,28 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                 <div className="flex items-center justify-end gap-x-6">
                     <div className="flex flex-col items-end gap-y-4">
-                        <Switch checked={apiConnector.enabled ?? false} onCheckedChange={handleOnCheckedChange} />
+                        <Switch checked={apiConnector.enabled} onCheckedChange={handleOnCheckedChange} />
 
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                                {lastModifiedDate ? (
+                                {apiConnector.lastModifiedDate ? (
                                     <span className="text-xs">
-                                        {`Modified at ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}
+                                        {`Modified at ${apiConnector.lastModifiedDate?.toLocaleDateString()} ${apiConnector.lastModifiedDate?.toLocaleTimeString()}`}
                                     </span>
                                 ) : (
                                     '-'
                                 )}
                             </TooltipTrigger>
 
-                            <TooltipContent>Modified Date</TooltipContent>
+                            <TooltipContent>Created Date</TooltipContent>
                         </Tooltip>
                     </div>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button
-                                icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                                size="icon"
-                                variant="ghost"
-                            />
+                            <Button size="icon" variant="ghost">
+                                <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
+                            </Button>
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
@@ -120,27 +148,6 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                 </div>
             </div>
 
-            <CollapsibleContent className="mt-4">
-                {apiConnector.endpoints && apiConnector.endpoints.length > 0 ? (
-                    <ul className="space-y-1 border-t pt-4">
-                        {apiConnector.endpoints.map((endpoint) => (
-                            <li
-                                className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
-                                key={endpoint.id}
-                            >
-                                <ApiConnectorEndpointListItem
-                                    apiConnectorEndpoint={endpoint}
-                                    apiConnectorName={apiConnector.name}
-                                    specification={apiConnector.specification ?? undefined}
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <div className="border-t pt-4 text-center text-sm text-gray-500">No endpoints configured</div>
-                )}
-            </CollapsibleContent>
-
             {showDeleteDialog && (
                 <ApiConnectorDeleteAlertDialog
                     onClose={() => setShowDeleteDialog(false)}
@@ -149,9 +156,9 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
             )}
 
             {showEditDialog && (
-                <ApiConnectorEditDialog apiConnector={apiConnector} onClose={() => setShowEditDialog(false)} />
+                <ApiConnectorImportDialog apiConnector={apiConnector} onClose={() => setShowEditDialog(false)} />
             )}
-        </Collapsible>
+        </div>
     );
 };
 

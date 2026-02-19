@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationVersionHistorySheet from '@/ee/pages/embedded/integration/components/IntegrationVersionHistorySheet';
 import IntegrationHeaderDeleteIntegrationAlertDialog from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeaderDeleteIntegrationAlertDialog';
@@ -292,18 +292,15 @@ const IntegrationHeader = ({
                             createWorkflowMutation={createIntegrationWorkflowMutation}
                             integrationId={integrationId}
                             triggerNode={
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            className="hover:bg-background/70 [&_svg]:size-5"
-                                            icon={<PlusIcon />}
-                                            size="icon"
-                                            variant="ghost"
-                                        />
-                                    </TooltipTrigger>
+                                <Button className="hover:bg-background/70 [&_svg]:size-5" size="icon" variant="ghost">
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <PlusIcon />
+                                        </TooltipTrigger>
 
-                                    <TooltipContent>Create new workflow</TooltipContent>
-                                </Tooltip>
+                                        <TooltipContent>Create new workflow</TooltipContent>
+                                    </Tooltip>
+                                </Button>
                             }
                             useGetWorkflowQuery={useGetWorkflowQuery}
                         />

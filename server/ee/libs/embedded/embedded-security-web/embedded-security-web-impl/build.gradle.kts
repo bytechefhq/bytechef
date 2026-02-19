@@ -2,7 +2,7 @@ dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
     implementation("org.apache.commons:commons-lang3")
-    implementation(libs.jjwt.api)
+    implementation("io.jsonwebtoken:jjwt-api:0.12.5")
     implementation("org.springframework.security:spring-security-web")
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
@@ -12,14 +12,6 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))
 
-    runtimeOnly(libs.jjwt.impl)
-    runtimeOnly(libs.jjwt.jackson)
-
-    testImplementation("jakarta.servlet:jakarta.servlet-api")
-    testImplementation("org.mockito:mockito-core")
-    testImplementation(project(":server:libs:core:commons:commons-util"))
-    testImplementation(project(":server:libs:core:tenant:tenant-api"))
-
-    testRuntimeOnly(libs.jjwt.impl)
-    testRuntimeOnly(libs.jjwt.jackson)
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
 }

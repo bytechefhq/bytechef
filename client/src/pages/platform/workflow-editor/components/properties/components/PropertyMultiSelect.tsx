@@ -53,14 +53,7 @@ const PropertyMultiSelect = ({
     workflowId,
 }: PropertyMultiSelectProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-
-    const {currentNode, operationChangeInProgress} = useWorkflowNodeDetailsPanelStore(
-        useShallow((state) => ({
-            currentNode: state.currentNode,
-            operationChangeInProgress: state.operationChangeInProgress,
-        }))
-    );
-
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const {rootClusterElementNodeData} = useWorkflowEditorStore(
         useShallow((state) => ({
             rootClusterElementNodeData: state.rootClusterElementNodeData,
@@ -129,16 +122,8 @@ const PropertyMultiSelect = ({
                 ? lookupDependsOnValues?.every((loadDependencyValue) => !!loadDependencyValue)
                 : true) &&
             !!connectionRequirementMet &&
-            optionsDataSource &&
-            !operationChangeInProgress,
-        [
-            connectionRequirementMet,
-            currentNode,
-            lookupDependsOnPaths?.length,
-            lookupDependsOnValues,
-            operationChangeInProgress,
             optionsDataSource,
-        ]
+        [connectionRequirementMet, currentNode, lookupDependsOnPaths?.length, lookupDependsOnValues, optionsDataSource]
     );
 
     const {data: optionsData, isLoading: isOptionsDataLoading} = useGetWorkflowNodeOptionsQuery(

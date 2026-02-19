@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public interface ItemReader extends ItemStream, FieldsProvider {
+public interface ItemReader extends ItemStream {
 
     ClusterElementType SOURCE = new ClusterElementType("SOURCE", "source", "Source");
 

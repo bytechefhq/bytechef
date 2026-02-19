@@ -16,7 +16,6 @@
 
 package com.bytechef.component.definition;
 
-import com.bytechef.component.exception.ProviderException;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,17 +48,6 @@ public interface ConnectionDefinition {
      * @return
      */
     Optional<BaseUriFunction> getBaseUri();
-
-    Optional<Help> getHelp();
-
-    /**
-     * Returns the optional function used to process HTTP error responses and map them to {@link ProviderException}
-     * instances. This hook is invoked when an HTTP response returns an error status code, allowing components to
-     * provide custom error handling logic specific to their API.
-     *
-     * @return an {@link Optional} containing the {@link ProcessErrorResponseFunction} if defined, or empty otherwise
-     */
-    Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
 
     /**
      *
@@ -105,26 +93,5 @@ public interface ConnectionDefinition {
          * @param context
          */
         void accept(Parameters connectionParameters, Context context);
-    }
-
-    /**
-     * A functional interface for processing HTTP error responses and mapping them to {@link ProviderException}
-     * instances. Implementations can extract error details from the response body and status code to create meaningful
-     * exception messages.
-     */
-    @FunctionalInterface
-    interface ProcessErrorResponseFunction {
-
-        /**
-         * Maps a failed HTTP response to a {@link ProviderException}.
-         *
-         * @param statusCode the HTTP status code of the error response
-         * @param body       the response body associated with the error
-         * @param context    the invocation context for the current call
-         * @return a {@link ProviderException} (or subclass) representing the mapped remote error
-         * @throws Exception if the error response cannot be mapped to a {@link ProviderException}
-         */
-        ProviderException apply(int statusCode, Object body, Context context) throws Exception;
-
     }
 }

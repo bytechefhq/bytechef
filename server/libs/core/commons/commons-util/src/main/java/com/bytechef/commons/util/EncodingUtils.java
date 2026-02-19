@@ -67,11 +67,6 @@ public class EncodingUtils {
             .encodeToString(token);
     }
 
-    public static String urlEncodeBase64ToString(String string) {
-        return URL_ENCODER.withoutPadding()
-            .encodeToString(string.getBytes(StandardCharsets.UTF_8));
-    }
-
     public static byte[] urlDecodeBase64FromString(String string) {
         return URL_DECODER.decode(string);
     }

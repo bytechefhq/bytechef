@@ -6,7 +6,6 @@ dependencies {
     implementation("org.springframework:spring-tx")
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-config")
     implementation("org.springframework.security:spring-security-web")
     implementation(project(":server:libs:config:app-config"))

@@ -1,8 +1,7 @@
 ---
-title: "MistralAI"
-description: "Open, efficient, helpful and trustworthy AI models through ground-breaking innovations."
+description: "Mistral component for ByteChef. AI language models. Learn how to implement this in your ByteChef workflows."
+title: MistralAI
 ---
-
 
 Categories: Artificial Intelligence
 
@@ -31,7 +30,6 @@ Version: 1
 
 
 
-
 <hr />
 
 
@@ -47,7 +45,7 @@ Name: ask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> <span>codestral-latest</span>, <span>devstral-medium-latest</span>, <span>devstral-small-latest</span>, <span>magistral-medium-latest</span>, <span>magistral-small-latest</span>, <span>ministral-14b-latest</span>, <span>ministral-3b-latest</span>, <span>ministral-8b-latest</span>, <span>mistral-large-latest</span>, <span>mistral-medium-latest</span>, <span>mistral-small-latest</span>, <span>open-mistral-nemo</span>, <span>pixtral-12b-latest</span>, <span>pixtral-large-latest</span> </details> | ID of the model to use. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>codestral-latest</span>, <span>devstral-small-latest</span>, <span>magistral-medium-latest</span>, <span>magistral-small-latest</span>, <span>ministral-3b-latest</span>, <span>ministral-8b-latest</span>, <span>mistral-large-latest</span>, <span>mistral-medium-latest</span>, <span>mistral-small-latest</span>, <span>open-mistral-nemo</span>, <span>pixtral-12b-2409</span>, <span>pixtral-large-latest</span> </details> | ID of the model to use. | true |
 | format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
 | userPrompt | Prompt | STRING | User prompt to the model. | true |
 | systemPrompt | System Prompt | STRING | System prompt to the model. | false |
@@ -105,8 +103,6 @@ Name: ask
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -187,8 +183,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Upload File
 Name: uploadFile
 
@@ -261,9 +255,3 @@ Type: OBJECT
   "signature" : ""
 }
 ```
-
-
-
-
-
-

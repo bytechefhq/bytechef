@@ -8,7 +8,7 @@ import resolvePath from 'object-resolve-path';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
-import {decodePath, encodeParameters, encodePath} from '../../../utils/encodingUtils';
+import {encodeParameters, encodePath} from '../../../utils/encodingUtils';
 import getParameterItemType from '../../../utils/getParameterItemType';
 import saveProperty from '../../../utils/saveProperty';
 
@@ -26,7 +26,7 @@ interface BuildPropertyFromParameterKeyProps {
     parameterKey: string;
     parameterObject: {[key: string]: unknown};
     path: string;
-    properties?: Array<PropertyAllType>;
+    properties: Array<PropertyAllType>;
 }
 
 const getPropertyKey = (name: string | undefined, displayCondition?: string): string => {
@@ -49,6 +49,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
     const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
         (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
     );
+    const [parameterObject, setParameterObject] = useState<{[key: string]: unknown}>({});
 
     const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
     const workflow = useWorkflowDataStore((state) => state.workflow);
@@ -94,15 +95,13 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
     }
 
     const handleAddItemClick = useCallback(() => {
-        const encodedPropertyName = encodePath(newPropertyName);
-
         const newItem: SubPropertyType = {
             additionalProperties,
             controlType: VALUE_PROPERTY_CONTROL_TYPES[newPropertyType] as ControlType,
             custom: true,
             expressionEnabled: true,
             label: newPropertyName,
-            name: encodedPropertyName,
+            name: newPropertyName,
             type: (newPropertyType ||
                 additionalProperties?.[0].type ||
                 'STRING') as keyof typeof VALUE_PROPERTY_CONTROL_TYPES,
@@ -115,7 +114,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
             saveProperty({
                 includeInMetadata: true,
-                path: `${path}.${encodedPropertyName}`,
+                path: `${path}.${newPropertyName}`,
                 type: newPropertyType,
                 updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
@@ -221,13 +220,13 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             path,
             properties,
         }: BuildPropertyFromParameterKeyProps): PropertyAllType => {
-            let matchingProperty = properties?.find(
+            let matchingProperty = properties.find(
                 (property) => property.name === parameterKey && property.displayCondition === displayCondition
             ) as PropertyAllType | undefined;
 
             if (!matchingProperty) {
                 matchingProperty = !displayCondition
-                    ? (properties?.find((property) => property.name === parameterKey) as PropertyAllType | undefined)
+                    ? (properties.find((property) => property.name === parameterKey) as PropertyAllType | undefined)
                     : undefined;
             }
 
@@ -272,7 +271,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
                     displayCondition,
                     expressionEnabled: true,
                     label: parameterKey,
-                    name: encodePath(parameterKey),
+                    name: parameterKey,
                     type: parameterItemType as PropertyType,
                 } as PropertyAllType;
             }
@@ -282,23 +281,15 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
     // render individual object items with data gathered from parameters
     useEffect(() => {
-        if (!name || !path || !currentComponent?.parameters) {
+        if (
+            !name ||
+            !path ||
+            !currentComponent?.parameters ||
+            !properties ||
+            !parameterObject ||
+            !isObject(parameterObject)
+        ) {
             return;
-        }
-
-        const encodedParameters = encodeParameters(currentComponent.parameters);
-        const encodedPath = encodePath(path);
-
-        const resolvedParameterObject = resolvePath(encodedParameters, encodedPath);
-
-        const parameterObject: {[key: string]: unknown} = {};
-
-        if (resolvedParameterObject && isObject(resolvedParameterObject)) {
-            for (const encodedKey of Object.keys(resolvedParameterObject)) {
-                parameterObject[decodePath(encodedKey)] = (resolvedParameterObject as {[key: string]: unknown})[
-                    encodedKey
-                ];
-            }
         }
 
         const dynamicPropertyTypes = currentComponent?.metadata?.ui?.dynamicPropertyTypes;
@@ -325,11 +316,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
                 const parameterKeyValue = parameterObject[propertyDefinition.name];
 
-                if (
-                    parameterKeyValue !== undefined ||
-                    objectParameterKeys.includes(propertyDefinition.name) ||
-                    propertyDefinition.displayCondition
-                ) {
+                if (parameterKeyValue !== undefined || objectParameterKeys.includes(propertyDefinition.name)) {
                     const builtProperty = buildPropertyFromParameterKey({
                         baseProperty: property,
                         displayCondition: propertyDefinition.displayCondition,
@@ -386,7 +373,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        currentComponent?.parameters,
+        parameterObject,
         properties,
         path,
         currentComponent?.metadata?.ui?.dynamicPropertyTypes,
@@ -427,12 +414,10 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
                     return accumulator;
                 }
 
-                const decodedName = decodePath(name);
-
                 if (type === 'OBJECT' && properties) {
-                    accumulator[decodedName] = buildObject(properties);
+                    accumulator[name] = buildObject(properties);
                 } else {
-                    accumulator[decodedName] = defaultValue;
+                    accumulator[name] = defaultValue;
                 }
                 return accumulator;
             }, {});
@@ -460,6 +445,17 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             setSubProperties(properties as Array<PropertyAllType>);
         }
     }, [properties]);
+
+    // update parameterObject when workflowDefinition changes
+    useEffect(() => {
+        if (workflow.definition && path) {
+            const resolvedParameterObject = resolvePath(currentComponent?.parameters ?? {}, path) as {
+                [key: string]: unknown;
+            };
+
+            setParameterObject(resolvedParameterObject);
+        }
+    }, [workflow.definition, path, currentComponent?.parameters]);
 
     return {
         availablePropertyTypes,

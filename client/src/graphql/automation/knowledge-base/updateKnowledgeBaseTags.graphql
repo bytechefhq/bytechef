@@ -1,3 +1,0 @@
-mutation updateKnowledgeBaseTags($input: UpdateKnowledgeBaseTagsInput!) {
-    updateKnowledgeBaseTags(input: $input)
-}

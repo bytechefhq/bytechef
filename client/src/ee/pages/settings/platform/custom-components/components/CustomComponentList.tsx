@@ -1,4 +1,4 @@
-import {CustomComponent} from '@/shared/middleware/graphql';
+import {CustomComponent} from '@/ee/shared/middleware/platform/custom-component';
 
 import CustomComponentListItem from './CustomComponentListItem';
 

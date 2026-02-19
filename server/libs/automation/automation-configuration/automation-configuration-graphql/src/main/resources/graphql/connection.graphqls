@@ -1,3 +1,0 @@
-extend type Mutation {
-    disconnectConnection(connectionId: ID!): Boolean!
-}

@@ -23,8 +23,10 @@ import com.bytechef.atlas.configuration.exception.WorkflowErrorType;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -92,8 +94,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         workflowCrudRepositories
             .stream()
-            .filter(workflowCrudRepository -> workflowCrudRepository.findById(id)
-                .isPresent())
+            .filter(workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(id)))
             .findFirst()
             .ifPresent(workflowCrudRepository -> workflowCrudRepository.deleteById(id));
     }
@@ -200,12 +201,17 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional(readOnly = true)
     public List<Workflow> getWorkflows(List<String> workflowIds) {
-        List<Workflow> workflows = getWorkflows()
-            .stream()
-            .filter(workflow -> workflowIds.contains(workflow.getId()))
-            .toList();
+        List<Workflow> workflows = new ArrayList<>();
 
-        return CollectionUtils.sort(workflows, WorkflowServiceImpl::compare);
+        for (String workflowId : workflowIds) {
+            workflows.add(getWorkflow(workflowId));
+        }
+
+        return CollectionUtils.sort(workflows, (workflow1, workflow2) -> {
+            String label1 = workflow1.getLabel();
+
+            return label1.compareTo(workflow2.getLabel());
+        });
     }
 
     @Override
@@ -275,24 +281,18 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         return CollectionUtils.getFirstFilter(
             workflowCrudRepositories,
-            workflowCrudRepository -> workflowCrudRepository.findById(id)
-                .isPresent(),
+            workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(id)),
             workflowCrudRepository -> update(definition, version, workflow, workflowCrudRepository));
     }
 
-    private static int compare(Workflow workflow1, Workflow workflow2) {
-        String label1 = workflow1.getLabel();
-        String label2 = workflow2.getLabel();
-
-        if (label1 == null && label2 == null) {
-            return 0;
-        } else if (label1 == null) {
+    private static int compare(Workflow a, Workflow b) {
+        if (a.getLabel() == null || b.getLabel() == null) {
             return -1;
-        } else if (label2 == null) {
-            return 1;
         }
 
-        return label1.compareTo(label2);
+        String label = a.getLabel();
+
+        return label.compareTo(b.getLabel());
     }
 
     private static Stream<Workflow> stream(WorkflowRepository workflowRepository) {

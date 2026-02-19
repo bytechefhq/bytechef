@@ -31,11 +31,7 @@ const DOM_RECT_FALLBACK: DOMRect = {
 
 export function getSuggestionOptions(): MentionOptions['suggestion'] {
     return {
-        allow: ({editor, isActive, range}) => {
-            if (!editor.isFocused && !isActive) {
-                return false;
-            }
-
+        allow: ({editor, range}) => {
             const editorContent = editor.state.doc.textContent;
 
             if (range.from === 2) {
@@ -89,10 +85,6 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                 },
 
                 onStart: (props) => {
-                    if (!props.editor.isFocused) {
-                        return;
-                    }
-
                     component = new ReactRenderer(PropertyMentionsInputEditorSuggestionList, {
                         editor: props.editor,
                         props,
@@ -103,7 +95,7 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                     }
 
                     popup = tippy('body', {
-                        appendTo: () => document.body,
+                        appendTo: () => props.editor.view.dom.closest('.property-mentions-editor') || document.body,
                         content: component.element,
                         getReferenceClientRect: () => props.clientRect?.() ?? DOM_RECT_FALLBACK,
                         interactive: true,

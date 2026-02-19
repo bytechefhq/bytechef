@@ -28,6 +28,7 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.copilot.repository.converter.ListDoubleToPGObjectConverter;
 import com.bytechef.ee.ai.copilot.repository.converter.MapToPGObjectConverter;
 import com.bytechef.ee.ai.copilot.repository.converter.PGObjectToListDoubleConverter;
@@ -41,12 +42,10 @@ import com.bytechef.platform.workflow.execution.repository.converter.StringToWor
 import com.bytechef.platform.workflow.execution.repository.converter.TriggerStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
-import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import javax.sql.DataSource;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -81,15 +80,15 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class JdbcConfiguration extends AbstractJdbcConfiguration {
 
-    private final DataSourceProperties dataSourceProperties;
+    private final ApplicationProperties.Datasource datasource;
     private final Encryption encryption;
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
     public JdbcConfiguration(
-        DataSourceProperties dataSourceProperties, Encryption encryption, ObjectMapper objectMapper) {
+        ApplicationProperties applicationProperties, Encryption encryption, ObjectMapper objectMapper) {
 
-        this.dataSourceProperties = dataSourceProperties;
+        this.datasource = applicationProperties.getDatasource();
         this.encryption = encryption;
         this.objectMapper = objectMapper;
     }
@@ -108,13 +107,12 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     @Bean
     @Primary
     @ConditionalOnProperty(prefix = "bytechef.datasource", name = "url")
-    @ConditionalOnSingleTenant
     DataSource dataSource(DataSourceProperties properties) {
         return DataSourceBuilder.create(properties.getClassLoader())
             .type(HikariDataSource.class)
-            .url(Objects.requireNonNull(dataSourceProperties.getUrl()))
-            .username(dataSourceProperties.getUsername())
-            .password(dataSourceProperties.getPassword())
+            .url(datasource.getUrl())
+            .username(datasource.getUsername())
+            .password(datasource.getPassword())
             .build();
     }
 

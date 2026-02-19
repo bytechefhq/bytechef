@@ -1,8 +1,7 @@
 ---
-title: "Typeform"
-description: "Typeform is an online survey and form-building tool that enables users to create interactive and engaging forms for collecting data and feedback."
+description: "Typeform component for ByteChef. Form and survey builder. Learn how to implement this in your ByteChef workflows."
+title: Typeform
 ---
-
 
 Categories: Surveys and Feedback
 
@@ -19,36 +18,16 @@ Type: typeform/v1
 Version: 1
 
 
-### Bearer Token
+### OAuth2 Authorization Code
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| token | Personal Access Token | STRING |  | true |
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
-
-## Connection Setup
-
-### Using Personal Access Token
-
-1. Log into your [Typeform account](https://admin.typeform.com/).
-2. Select your profile avatar in the upper right.
-3. Select **Your settings**.
-4. Select **Personal tokens**.
-5. Select **Generate a new token**.
-6. Give your token a name, like `Bytechef Integration`.
-7. For scopes, select **Custom scopes**. Select these scopes:
-    - Forms: Read, Write
-    - Webhooks: Read, Write
-    - Workspaces: Read
-8. Click **Generate token**.
-9. Copy the token and use it to create a connection in ByteChef.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/At2vxJbo2Fb6UmXLS6Gc?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
 
 
 
@@ -58,10 +37,10 @@ Version: 1
 ## Actions
 
 
-### Create Empty Form
-Name: createEmptyForm
+### Create Form
+Name: createForm
 
-`Creates a new empty form.`
+`Creates a new form`
 
 #### Properties
 
@@ -69,19 +48,19 @@ Name: createEmptyForm
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | title | Title | STRING | Title to use for the form. | true |
 | type | Type | STRING <details> <summary> Options </summary> <span>quiz</span>, <span>classification</span>, <span>score</span>, <span>branching</span>, <span>classification_branching</span>, <span>score_branching</span> </details> | Form type for the typeform. | false |
-| workspace | Workspace URL | STRING | URL of the workspace to use for the typeform. | true |
+| workspace | Workspace | STRING | Workspace where the form will be created. | false |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Create Empty Form",
-  "name" : "createEmptyForm",
+  "label" : "Create Form",
+  "name" : "createForm",
   "parameters" : {
     "title" : "",
     "type" : "",
     "workspace" : ""
   },
-  "type" : "typeform/v1/createEmptyForm"
+  "type" : "typeform/v1/createForm"
 }
 ```
 
@@ -92,63 +71,8 @@ Name: createEmptyForm
 Type: OBJECT
 
 
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| type | STRING |  |
-| title | STRING |  |
-| workspace | OBJECT <details> <summary> Properties </summary> &#123;STRING\(href)&#125; </details> |  |
-| theme | OBJECT <details> <summary> Properties </summary> &#123;STRING\(href)&#125; </details> |  |
-| settings | OBJECT <details> <summary> Properties </summary> &#123;STRING\(language), STRING\(progress_bar), &#123;BOOLEAN\(allow_indexing)&#125;\(meta), BOOLEAN\(hide_navigation), BOOLEAN\(is_public), BOOLEAN\(is_trial), BOOLEAN\(show_progress_bar), BOOLEAN\(show_typeform_branding), BOOLEAN\(are_uploads_public), BOOLEAN\(show_time_to_complete), BOOLEAN\(show_number_of_submissions), BOOLEAN\(show_cookie_consent), BOOLEAN\(show_question_number), BOOLEAN\(show_key_hint_on_choices), BOOLEAN\(autosave_progress), BOOLEAN\(free_form_navigation), BOOLEAN\(use_lead_qualification), BOOLEAN\(pro_subdomain_enabled), BOOLEAN\(auto_translate), BOOLEAN\(partial_responses_to_all_integrations)&#125; </details> |  |
-| _links | OBJECT <details> <summary> Properties </summary> &#123;STRING\(display), STRING\(responses)&#125; </details> |  |
 
 
-
-
-#### Output Example
-```json
-{
-  "id" : "",
-  "type" : "",
-  "title" : "",
-  "workspace" : {
-    "href" : ""
-  },
-  "theme" : {
-    "href" : ""
-  },
-  "settings" : {
-    "language" : "",
-    "progress_bar" : "",
-    "meta" : {
-      "allow_indexing" : false
-    },
-    "hide_navigation" : false,
-    "is_public" : false,
-    "is_trial" : false,
-    "show_progress_bar" : false,
-    "show_typeform_branding" : false,
-    "are_uploads_public" : false,
-    "show_time_to_complete" : false,
-    "show_number_of_submissions" : false,
-    "show_cookie_consent" : false,
-    "show_question_number" : false,
-    "show_key_hint_on_choices" : false,
-    "autosave_progress" : false,
-    "free_form_navigation" : false,
-    "use_lead_qualification" : false,
-    "pro_subdomain_enabled" : false,
-    "auto_translate" : false,
-    "partial_responses_to_all_integrations" : false
-  },
-  "_links" : {
-    "display" : "",
-    "responses" : ""
-  }
-}
-```
 
 
 
@@ -168,12 +92,18 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| formId | Form ID | STRING | ID for the form. Find in your form URL. For example, in the URL "https://mysite.typeform.com/to/u6nXL7" the form id is u6nXL7. | true |
+| form | Form Name | STRING |  | true |
 
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+Type: OBJECT
+
+
+
+
 
 #### JSON Example
 ```json
@@ -181,13 +111,8 @@ The output for this action is dynamic and may vary depending on the input parame
   "label" : "New Submission",
   "name" : "newSubmission",
   "parameters" : {
-    "formId" : ""
+    "form" : ""
   },
   "type" : "typeform/v1/newSubmission"
 }
 ```
-
-
-
-
-

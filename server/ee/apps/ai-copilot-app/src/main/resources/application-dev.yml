@@ -8,6 +8,6 @@ bytechef:
     copilot:
       vectorstore:
         pgvector:
-          url: jdbc:postgresql://localhost:5433/bytechef_vectorstore
+          url: jdbc:postgresql://localhost:5433/bytechef_copilot
           username: postgres
           password: postgres

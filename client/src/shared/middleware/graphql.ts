@@ -55,7 +55,7 @@ export type ActionDefinition = {
 
 export type AddColumnInput = {
   column: ColumnInput;
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   tableId: Scalars['ID']['input'];
 };
 
@@ -84,58 +84,6 @@ export type AdminUserPage = {
   size: Scalars['Int']['output'];
   totalElements: Scalars['Int']['output'];
   totalPages: Scalars['Int']['output'];
-};
-
-export type ApiCollectionSearchResult = SearchResult & {
-  __typename?: 'ApiCollectionSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type ApiConnector = {
-  __typename?: 'ApiConnector';
-  connectorVersion: Scalars['Int']['output'];
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  definition?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  enabled?: Maybe<Scalars['Boolean']['output']>;
-  endpoints?: Maybe<Array<ApiConnectorEndpoint>>;
-  icon?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  name: Scalars['String']['output'];
-  specification?: Maybe<Scalars['String']['output']>;
-  title?: Maybe<Scalars['String']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type ApiConnectorEndpoint = {
-  __typename?: 'ApiConnectorEndpoint';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  httpMethod?: Maybe<HttpMethod>;
-  id: Scalars['ID']['output'];
-  lastExecutionDate?: Maybe<Scalars['Long']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  name: Scalars['String']['output'];
-  path?: Maybe<Scalars['String']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type ApiEndpointSearchResult = SearchResult & {
-  __typename?: 'ApiEndpointSearchResult';
-  collectionId: Scalars['ID']['output'];
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  path?: Maybe<Scalars['String']['output']>;
-  type: SearchAssetType;
 };
 
 export type ApiKey = {
@@ -263,15 +211,6 @@ export type ComponentCategory = {
   name: Scalars['String']['output'];
 };
 
-export type ComponentConnection = {
-  __typename?: 'ComponentConnection';
-  componentName: Scalars['String']['output'];
-  componentVersion: Scalars['Int']['output'];
-  key: Scalars['String']['output'];
-  required: Scalars['Boolean']['output'];
-  workflowNodeName: Scalars['String']['output'];
-};
-
 export type ComponentDefinition = {
   __typename?: 'ComponentDefinition';
   actionClusterElementTypes?: Maybe<Scalars['Map']['output']>;
@@ -370,14 +309,6 @@ export type ConnectionDefinition = {
   version: Scalars['Int']['output'];
 };
 
-export type ConnectionSearchResult = SearchResult & {
-  __typename?: 'ConnectionSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
 export enum ControlType {
   ArrayBuilder = 'ARRAY_BUILDER',
   CodeEditor = 'CODE_EDITOR',
@@ -401,19 +332,11 @@ export enum ControlType {
   Url = 'URL'
 }
 
-export type CreateApiConnectorInput = {
-  connectorVersion: Scalars['Int']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  title?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type CreateDataTableInput = {
   baseName: Scalars['String']['input'];
   columns: Array<ColumnInput>;
   description?: InputMaybe<Scalars['String']['input']>;
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -430,50 +353,6 @@ export type CreateWorkspaceMcpServerInput = {
   name: Scalars['String']['input'];
   type: PlatformType;
   workspaceId: Scalars['ID']['input'];
-};
-
-export type CustomComponent = {
-  __typename?: 'CustomComponent';
-  componentVersion?: Maybe<Scalars['Int']['output']>;
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  enabled?: Maybe<Scalars['Boolean']['output']>;
-  icon?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  language?: Maybe<CustomComponentLanguage>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  name: Scalars['String']['output'];
-  title?: Maybe<Scalars['String']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type CustomComponentActionDefinition = {
-  __typename?: 'CustomComponentActionDefinition';
-  description?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  title?: Maybe<Scalars['String']['output']>;
-};
-
-export type CustomComponentDefinition = {
-  __typename?: 'CustomComponentDefinition';
-  actions: Array<CustomComponentActionDefinition>;
-  triggers: Array<CustomComponentTriggerDefinition>;
-};
-
-export enum CustomComponentLanguage {
-  Java = 'JAVA',
-  Javascript = 'JAVASCRIPT',
-  Python = 'PYTHON',
-  Ruby = 'RUBY'
-}
-
-export type CustomComponentTriggerDefinition = {
-  __typename?: 'CustomComponentTriggerDefinition';
-  description?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  title?: Maybe<Scalars['String']['output']>;
 };
 
 export type DataTable = {
@@ -505,14 +384,6 @@ export type DataTableRowPage = {
   nextOffset?: Maybe<Scalars['Int']['output']>;
 };
 
-export type DataTableSearchResult = SearchResult & {
-  __typename?: 'DataTableSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
 export type DataTableTagsEntry = {
   __typename?: 'DataTableTagsEntry';
   tableId: Scalars['ID']['output'];
@@ -528,9 +399,9 @@ export type DataTableWebhook = {
 };
 
 export enum DataTableWebhookType {
-  RecordCreated = 'RECORD_CREATED',
-  RecordDeleted = 'RECORD_DELETED',
-  RecordUpdated = 'RECORD_UPDATED'
+  Delete = 'DELETE',
+  Insert = 'INSERT',
+  Update = 'UPDATE'
 }
 
 export type DateProperty = Property & {
@@ -568,36 +439,13 @@ export type DateTimeProperty = Property & {
 };
 
 export type DeleteRowInput = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   id: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
 };
 
-export type DiscoverEndpointsInput = {
-  documentationUrl: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  userPrompt?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type DiscoveredEndpoint = {
-  __typename?: 'DiscoveredEndpoint';
-  id: Scalars['ID']['output'];
-  method: Scalars['String']['output'];
-  path: Scalars['String']['output'];
-  resource?: Maybe<Scalars['String']['output']>;
-  summary?: Maybe<Scalars['String']['output']>;
-};
-
-export type DocumentStatusUpdate = {
-  __typename?: 'DocumentStatusUpdate';
-  documentId: Scalars['ID']['output'];
-  message?: Maybe<Scalars['String']['output']>;
-  status: Scalars['Int']['output'];
-  timestamp: Scalars['Long']['output'];
-};
-
 export type DuplicateDataTableInput = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   newBaseName: Scalars['String']['input'];
   tableId: Scalars['ID']['input'];
 };
@@ -616,25 +464,6 @@ export type DynamicPropertiesProperty = Property & {
   type: PropertyType;
 };
 
-export type EndpointDefinitionInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  httpMethod: HttpMethod;
-  operationId: Scalars['String']['input'];
-  parameters?: InputMaybe<Array<ParameterDefinitionInput>>;
-  path: Scalars['String']['input'];
-  requestBody?: InputMaybe<RequestBodyDefinitionInput>;
-  responses?: InputMaybe<Array<ResponseDefinitionInput>>;
-  summary?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type EndpointDiscoveryResult = {
-  __typename?: 'EndpointDiscoveryResult';
-  endpoints?: Maybe<Array<DiscoveredEndpoint>>;
-  errorMessage?: Maybe<Scalars['String']['output']>;
-  jobId: Scalars['String']['output'];
-  status: GenerationJobStatusEnum;
-};
-
 export type Environment = {
   __typename?: 'Environment';
   id: Scalars['ID']['output'];
@@ -646,20 +475,6 @@ export enum EnvironmentEnum {
   Production = 'PRODUCTION',
   Staging = 'STAGING'
 }
-
-export type ExecutionError = {
-  __typename?: 'ExecutionError';
-  message?: Maybe<Scalars['String']['output']>;
-  stackTrace?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-};
-
-export type FileEntry = {
-  __typename?: 'FileEntry';
-  extension?: Maybe<Scalars['String']['output']>;
-  mimeType?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  url: Scalars['String']['output'];
-};
 
 export type FileEntryProperty = Property & {
   __typename?: 'FileEntryProperty';
@@ -678,75 +493,20 @@ export type FileEntryProperty = Property & {
   type: PropertyType;
 };
 
-export type GenerateForEndpointsInput = {
-  documentationUrl: Scalars['String']['input'];
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  selectedEndpoints: Array<SelectedEndpointInput>;
-};
-
-export type GenerateFromDocumentationInput = {
-  documentationUrl: Scalars['String']['input'];
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  userPrompt?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type GenerateSpecificationInput = {
-  baseUrl?: InputMaybe<Scalars['String']['input']>;
-  endpoints: Array<EndpointDefinitionInput>;
-  name: Scalars['String']['input'];
-};
-
-export type GenerateSpecificationResponse = {
-  __typename?: 'GenerateSpecificationResponse';
-  specification?: Maybe<Scalars['String']['output']>;
-};
-
-export type GenerationJobStatus = {
-  __typename?: 'GenerationJobStatus';
-  errorMessage?: Maybe<Scalars['String']['output']>;
-  jobId: Scalars['String']['output'];
-  specification?: Maybe<Scalars['String']['output']>;
-  status: GenerationJobStatusEnum;
-};
-
-export enum GenerationJobStatusEnum {
-  Cancelled = 'CANCELLED',
-  Completed = 'COMPLETED',
-  Failed = 'FAILED',
-  Pending = 'PENDING',
-  Processing = 'PROCESSING'
-}
-
 export type Help = {
   __typename?: 'Help';
   description?: Maybe<Scalars['String']['output']>;
   documentationUrl?: Maybe<Scalars['String']['output']>;
 };
 
-export enum HttpMethod {
-  Delete = 'DELETE',
-  Get = 'GET',
-  Patch = 'PATCH',
-  Post = 'POST',
-  Put = 'PUT'
-}
-
 export type ImportCsvInput = {
   csv: Scalars['String']['input'];
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   tableId: Scalars['ID']['input'];
 };
 
-export type ImportOpenApiSpecificationInput = {
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  specification: Scalars['String']['input'];
-};
-
 export type InsertRowInput = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   tableId: Scalars['ID']['input'];
   values: Scalars['Map']['input'];
 };
@@ -776,121 +536,6 @@ export type Integration = {
   __typename?: 'Integration';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-};
-
-export type KnowledgeBase = {
-  __typename?: 'KnowledgeBase';
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  documents?: Maybe<Array<Maybe<KnowledgeBaseDocument>>>;
-  id: Scalars['ID']['output'];
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  maxChunkSize?: Maybe<Scalars['Int']['output']>;
-  minChunkSizeChars?: Maybe<Scalars['Int']['output']>;
-  name: Scalars['String']['output'];
-  overlap?: Maybe<Scalars['Int']['output']>;
-};
-
-export type KnowledgeBaseDocument = {
-  __typename?: 'KnowledgeBaseDocument';
-  chunks?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  document?: Maybe<FileEntry>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  status: Scalars['Int']['output'];
-  tags?: Maybe<Array<Tag>>;
-};
-
-export type KnowledgeBaseDocumentChunk = {
-  __typename?: 'KnowledgeBaseDocumentChunk';
-  content?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  knowledgeBaseDocumentId: Scalars['ID']['output'];
-  metadata?: Maybe<Scalars['Map']['output']>;
-  score?: Maybe<Scalars['Float']['output']>;
-};
-
-export type KnowledgeBaseDocumentChunkInput = {
-  content: Scalars['String']['input'];
-};
-
-export type KnowledgeBaseDocumentSearchResult = SearchResult & {
-  __typename?: 'KnowledgeBaseDocumentSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  knowledgeBaseId: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type KnowledgeBaseDocumentTagsEntry = {
-  __typename?: 'KnowledgeBaseDocumentTagsEntry';
-  knowledgeBaseDocumentId: Scalars['ID']['output'];
-  tags: Array<Tag>;
-};
-
-export type KnowledgeBaseInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  maxChunkSize?: InputMaybe<Scalars['Int']['input']>;
-  minChunkSizeChars?: InputMaybe<Scalars['Int']['input']>;
-  name: Scalars['String']['input'];
-  overlap?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type KnowledgeBaseSearchResult = SearchResult & {
-  __typename?: 'KnowledgeBaseSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type KnowledgeBaseTagsEntry = {
-  __typename?: 'KnowledgeBaseTagsEntry';
-  knowledgeBaseId: Scalars['ID']['output'];
-  tags: Array<Tag>;
-};
-
-export type LogEntry = {
-  __typename?: 'LogEntry';
-  componentName: Scalars['String']['output'];
-  componentOperationName?: Maybe<Scalars['String']['output']>;
-  exceptionMessage?: Maybe<Scalars['String']['output']>;
-  exceptionType?: Maybe<Scalars['String']['output']>;
-  level: LogLevel;
-  message: Scalars['String']['output'];
-  stackTrace?: Maybe<Scalars['String']['output']>;
-  taskExecutionId: Scalars['ID']['output'];
-  timestamp: Scalars['String']['output'];
-};
-
-export type LogFilterInput = {
-  componentName?: InputMaybe<Scalars['String']['input']>;
-  fromTimestamp?: InputMaybe<Scalars['String']['input']>;
-  minLevel?: InputMaybe<LogLevel>;
-  searchText?: InputMaybe<Scalars['String']['input']>;
-  taskExecutionId?: InputMaybe<Scalars['ID']['input']>;
-  toTimestamp?: InputMaybe<Scalars['String']['input']>;
-};
-
-export enum LogLevel {
-  Debug = 'DEBUG',
-  Error = 'ERROR',
-  Info = 'INFO',
-  Trace = 'TRACE',
-  Warn = 'WARN'
-}
-
-export type LogPage = {
-  __typename?: 'LogPage';
-  content: Array<LogEntry>;
-  hasNext: Scalars['Boolean']['output'];
-  hasPrevious: Scalars['Boolean']['output'];
-  pageNumber: Scalars['Int']['output'];
-  pageSize: Scalars['Int']['output'];
-  totalElements: Scalars['Int']['output'];
-  totalPages: Scalars['Int']['output'];
 };
 
 export type McpComponent = {
@@ -1030,49 +675,32 @@ export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   addDataTableColumn: Scalars['Boolean']['output'];
-  cancelGenerationJob: Scalars['Boolean']['output'];
-  createApiConnector: ApiConnector;
   createApiKey: Scalars['String']['output'];
   createDataTable: Scalars['Boolean']['output'];
-  createKnowledgeBase?: Maybe<KnowledgeBase>;
   createMcpComponent?: Maybe<McpComponent>;
   createMcpComponentWithTools?: Maybe<McpComponent>;
   createMcpProject?: Maybe<McpProject>;
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpServer?: Maybe<McpServer>;
   createMcpTool?: Maybe<McpTool>;
-  createTask?: Maybe<Task>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
-  deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
-  deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
-  deleteJobFileLogs: Scalars['Boolean']['output'];
-  deleteKnowledgeBase?: Maybe<Scalars['Boolean']['output']>;
-  deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
-  deleteKnowledgeBaseDocumentChunk?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProject?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
-  deleteTask?: Maybe<Scalars['Boolean']['output']>;
   deleteUser: Scalars['Boolean']['output'];
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
-  disconnectConnection: Scalars['Boolean']['output'];
   dropDataTable: Scalars['Boolean']['output'];
   duplicateDataTable: Scalars['Boolean']['output'];
-  enableApiConnector: Scalars['Boolean']['output'];
-  enableCustomComponent: Scalars['Boolean']['output'];
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
-  generateFromDocumentation: ApiConnector;
-  generateSpecification: GenerateSpecificationResponse;
   importDataTableCsv: Scalars['Boolean']['output'];
-  importOpenApiSpecification: ApiConnector;
   importProjectTemplate: Scalars['ID']['output'];
   importWorkflowTemplate: Scalars['ID']['output'];
   insertDataTableRow: DataTableRow;
@@ -1080,28 +708,15 @@ export type Mutation = {
   removeDataTableColumn: Scalars['Boolean']['output'];
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
-  saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
-  saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
-  startDiscoverEndpoints: EndpointDiscoveryResult;
-  startGenerateForEndpoints: GenerationJobStatus;
-  startGenerateFromDocumentationPreview: GenerationJobStatus;
-  testClusterElementScript: ScriptTestExecution;
-  testWorkflowNodeScript: ScriptTestExecution;
-  updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
-  updateKnowledgeBase?: Maybe<KnowledgeBase>;
-  updateKnowledgeBaseDocumentChunk?: Maybe<KnowledgeBaseDocumentChunk>;
-  updateKnowledgeBaseDocumentTags: Scalars['Boolean']['output'];
-  updateKnowledgeBaseTags: Scalars['Boolean']['output'];
   updateManagementMcpServerUrl: Scalars['String']['output'];
   updateMcpComponentWithTools?: Maybe<McpComponent>;
   updateMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   updateMcpServer?: Maybe<McpServer>;
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
-  updateTask?: Maybe<Task>;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
 };
@@ -1109,16 +724,6 @@ export type Mutation = {
 
 export type MutationAddDataTableColumnArgs = {
   input: AddColumnInput;
-};
-
-
-export type MutationCancelGenerationJobArgs = {
-  jobId: Scalars['String']['input'];
-};
-
-
-export type MutationCreateApiConnectorArgs = {
-  input: CreateApiConnectorInput;
 };
 
 
@@ -1131,12 +736,6 @@ export type MutationCreateApiKeyArgs = {
 
 export type MutationCreateDataTableArgs = {
   input: CreateDataTableInput;
-};
-
-
-export type MutationCreateKnowledgeBaseArgs = {
-  knowledgeBase: KnowledgeBaseInput;
-  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -1170,11 +769,6 @@ export type MutationCreateMcpToolArgs = {
 };
 
 
-export type MutationCreateTaskArgs = {
-  task: TaskInput;
-};
-
-
 export type MutationCreateWorkspaceApiKeyArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -1187,43 +781,13 @@ export type MutationCreateWorkspaceMcpServerArgs = {
 };
 
 
-export type MutationDeleteApiConnectorArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
 export type MutationDeleteApiKeyArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteCustomComponentArgs = {
   id: Scalars['ID']['input'];
 };
 
 
 export type MutationDeleteDataTableRowArgs = {
   input: DeleteRowInput;
-};
-
-
-export type MutationDeleteJobFileLogsArgs = {
-  jobId: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteKnowledgeBaseArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteKnowledgeBaseDocumentArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteKnowledgeBaseDocumentChunkArgs = {
-  id: Scalars['ID']['input'];
 };
 
 
@@ -1257,11 +821,6 @@ export type MutationDeleteSharedWorkflowArgs = {
 };
 
 
-export type MutationDeleteTaskArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
 export type MutationDeleteUserArgs = {
   login: Scalars['String']['input'];
 };
@@ -1277,11 +836,6 @@ export type MutationDeleteWorkspaceMcpServerArgs = {
 };
 
 
-export type MutationDisconnectConnectionArgs = {
-  connectionId: Scalars['ID']['input'];
-};
-
-
 export type MutationDropDataTableArgs = {
   input: RemoveTableInput;
 };
@@ -1289,18 +843,6 @@ export type MutationDropDataTableArgs = {
 
 export type MutationDuplicateDataTableArgs = {
   input: DuplicateDataTableInput;
-};
-
-
-export type MutationEnableApiConnectorArgs = {
-  enable: Scalars['Boolean']['input'];
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationEnableCustomComponentArgs = {
-  enable: Scalars['Boolean']['input'];
-  id: Scalars['ID']['input'];
 };
 
 
@@ -1316,23 +858,8 @@ export type MutationExportSharedWorkflowArgs = {
 };
 
 
-export type MutationGenerateFromDocumentationArgs = {
-  input: GenerateFromDocumentationInput;
-};
-
-
-export type MutationGenerateSpecificationArgs = {
-  input: GenerateSpecificationInput;
-};
-
-
 export type MutationImportDataTableCsvArgs = {
   input: ImportCsvInput;
-};
-
-
-export type MutationImportOpenApiSpecificationArgs = {
-  input: ImportOpenApiSpecificationInput;
 };
 
 
@@ -1377,65 +904,6 @@ export type MutationRenameDataTableColumnArgs = {
 };
 
 
-export type MutationSaveClusterElementTestConfigurationConnectionArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  connectionId: Scalars['Long']['input'];
-  environmentId: Scalars['Long']['input'];
-  workflowConnectionKey: Scalars['String']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
-  connectionId: Scalars['Long']['input'];
-  environmentId: Scalars['Long']['input'];
-  workflowConnectionKey: Scalars['String']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationStartDiscoverEndpointsArgs = {
-  input: DiscoverEndpointsInput;
-};
-
-
-export type MutationStartGenerateForEndpointsArgs = {
-  input: GenerateForEndpointsInput;
-};
-
-
-export type MutationStartGenerateFromDocumentationPreviewArgs = {
-  input: GenerateFromDocumentationInput;
-};
-
-
-export type MutationTestClusterElementScriptArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationTestWorkflowNodeScriptArgs = {
-  environmentId: Scalars['Long']['input'];
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationUpdateApiConnectorArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateApiConnectorInput;
-};
-
-
 export type MutationUpdateApiKeyArgs = {
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -1449,28 +917,6 @@ export type MutationUpdateDataTableRowArgs = {
 
 export type MutationUpdateDataTableTagsArgs = {
   input: UpdateDataTableTagsInput;
-};
-
-
-export type MutationUpdateKnowledgeBaseArgs = {
-  id: Scalars['ID']['input'];
-  knowledgeBase: KnowledgeBaseInput;
-};
-
-
-export type MutationUpdateKnowledgeBaseDocumentChunkArgs = {
-  id: Scalars['ID']['input'];
-  knowledgeBaseDocumentChunk: KnowledgeBaseDocumentChunkInput;
-};
-
-
-export type MutationUpdateKnowledgeBaseDocumentTagsArgs = {
-  input: UpdateKnowledgeBaseDocumentTagsInput;
-};
-
-
-export type MutationUpdateKnowledgeBaseTagsArgs = {
-  input: UpdateKnowledgeBaseTagsInput;
 };
 
 
@@ -1500,11 +946,6 @@ export type MutationUpdateMcpServerTagsArgs = {
 
 export type MutationUpdateMcpServerUrlArgs = {
   id: Scalars['ID']['input'];
-};
-
-
-export type MutationUpdateTaskArgs = {
-  task: TaskInput;
 };
 
 
@@ -1589,30 +1030,6 @@ export type OptionsDataSource = {
   optionsLookupDependsOn?: Maybe<Array<Scalars['String']['output']>>;
 };
 
-export type ParameterDefinitionInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  example?: InputMaybe<Scalars['String']['input']>;
-  location: ParameterLocation;
-  name: Scalars['String']['input'];
-  required?: InputMaybe<Scalars['Boolean']['input']>;
-  type: ParameterType;
-};
-
-export enum ParameterLocation {
-  Header = 'HEADER',
-  Path = 'PATH',
-  Query = 'QUERY'
-}
-
-export enum ParameterType {
-  Array = 'ARRAY',
-  Boolean = 'BOOLEAN',
-  Integer = 'INTEGER',
-  Number = 'NUMBER',
-  Object = 'OBJECT',
-  String = 'STRING'
-}
-
 export enum PlatformType {
   Automation = 'AUTOMATION',
   Embedded = 'EMBEDDED'
@@ -1645,15 +1062,6 @@ export type ProjectDeployment = {
   version: Scalars['Int']['output'];
 };
 
-export type ProjectDeploymentSearchResult = SearchResult & {
-  __typename?: 'ProjectDeploymentSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  projectName: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
 export type ProjectDeploymentWorkflow = {
   __typename?: 'ProjectDeploymentWorkflow';
   connections: Array<ProjectDeploymentWorkflowConnection>;
@@ -1683,14 +1091,6 @@ export type ProjectInfo = {
   __typename?: 'ProjectInfo';
   description?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
-};
-
-export type ProjectSearchResult = SearchResult & {
-  __typename?: 'ProjectSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
 };
 
 export type ProjectTemplate = {
@@ -1764,16 +1164,11 @@ export type Query = {
   actionDefinition: ActionDefinition;
   actionDefinitions: Array<ActionDefinition>;
   adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
-  apiConnector?: Maybe<ApiConnector>;
-  apiConnectors: Array<ApiConnector>;
   apiKey?: Maybe<ApiKey>;
   apiKeys?: Maybe<Array<Maybe<ApiKey>>>;
   authorities: Array<Scalars['String']['output']>;
-  automationSearch: Array<SearchResult>;
-  clusterElementComponentConnections: Array<ComponentConnection>;
   clusterElementDefinition: ClusterElementDefinition;
   clusterElementDefinitions: Array<ClusterElementDefinition>;
-  clusterElementScriptInput?: Maybe<Scalars['Map']['output']>;
   componentDefinition: ComponentDefinition;
   componentDefinitionSearch: Array<ComponentDefinition>;
   componentDefinitionVersions: Array<ComponentDefinition>;
@@ -1784,33 +1179,15 @@ export type Query = {
   connectionComponentDefinition: ComponentDefinition;
   connectionDefinition: ConnectionDefinition;
   connectionDefinitions: Array<ConnectionDefinition>;
-  customComponent?: Maybe<CustomComponent>;
-  customComponentDefinition?: Maybe<CustomComponentDefinition>;
-  customComponents: Array<CustomComponent>;
   dataTableRows: Array<DataTableRow>;
   dataTableRowsPage: DataTableRowPage;
   dataTableTags: Array<Tag>;
   dataTableTagsByTable: Array<DataTableTagsEntry>;
   dataTableWebhooks: Array<DataTableWebhook>;
   dataTables: Array<DataTable>;
-  editorJobFileLogs: LogPage;
-  editorJobFileLogsExist: Scalars['Boolean']['output'];
-  editorTaskExecutionFileLogs: Array<LogEntry>;
-  endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
   environments?: Maybe<Array<Maybe<Environment>>>;
   exportDataTableCsv: Scalars['String']['output'];
-  generationJobStatus?: Maybe<GenerationJobStatus>;
   integration?: Maybe<Integration>;
-  jobFileLogs: LogPage;
-  jobFileLogsExist: Scalars['Boolean']['output'];
-  knowledgeBase?: Maybe<KnowledgeBase>;
-  knowledgeBaseDocument?: Maybe<KnowledgeBaseDocument>;
-  knowledgeBaseDocumentStatus?: Maybe<DocumentStatusUpdate>;
-  knowledgeBaseDocumentTags: Array<Tag>;
-  knowledgeBaseDocumentTagsByDocument: Array<KnowledgeBaseDocumentTagsEntry>;
-  knowledgeBaseTags: Array<Tag>;
-  knowledgeBaseTagsByKnowledgeBase: Array<KnowledgeBaseTagsEntry>;
-  knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpComponent?: Maybe<McpComponent>;
   mcpComponents?: Maybe<Array<Maybe<McpComponent>>>;
@@ -1834,23 +1211,16 @@ export type Query = {
   projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
   projectTemplate?: Maybe<ProjectTemplate>;
   projects?: Maybe<Array<Maybe<Project>>>;
-  searchKnowledgeBase?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
   sharedProject?: Maybe<SharedProject>;
   sharedWorkflow?: Maybe<SharedWorkflow>;
-  task?: Maybe<Task>;
   taskDispatcherDefinition: TaskDispatcherDefinition;
   taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
   taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
-  taskExecutionFileLogs: Array<LogEntry>;
-  tasks?: Maybe<Array<Maybe<Task>>>;
-  tasksByIds?: Maybe<Array<Maybe<Task>>>;
   triggerDefinition: TriggerDefinition;
   triggerDefinitions: Array<TriggerDefinition>;
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
   user?: Maybe<AdminUser>;
   users?: Maybe<AdminUserPage>;
-  workflowNodeComponentConnections: Array<ComponentConnection>;
-  workflowNodeScriptInput?: Maybe<Scalars['Map']['output']>;
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
@@ -1876,11 +1246,6 @@ export type QueryAdminApiKeysArgs = {
 };
 
 
-export type QueryApiConnectorArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
 export type QueryApiKeyArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1889,20 +1254,6 @@ export type QueryApiKeyArgs = {
 export type QueryApiKeysArgs = {
   environmentId: Scalars['ID']['input'];
   type: PlatformType;
-};
-
-
-export type QueryAutomationSearchArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  query: Scalars['String']['input'];
-};
-
-
-export type QueryClusterElementComponentConnectionsArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
 };
 
 
@@ -1917,15 +1268,6 @@ export type QueryClusterElementDefinitionsArgs = {
   clusterElementType: Scalars['String']['input'];
   rootComponentName: Scalars['String']['input'];
   rootComponentVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryClusterElementScriptInputArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
 };
 
 
@@ -1992,24 +1334,14 @@ export type QueryConnectionDefinitionsArgs = {
 };
 
 
-export type QueryCustomComponentArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryCustomComponentDefinitionArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
 export type QueryDataTableRowsArgs = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 
 export type QueryDataTableRowsPageArgs = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   tableId: Scalars['ID']['input'];
@@ -2017,87 +1349,25 @@ export type QueryDataTableRowsPageArgs = {
 
 
 export type QueryDataTableWebhooksArgs = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 
 export type QueryDataTablesArgs = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   workspaceId: Scalars['ID']['input'];
 };
 
 
-export type QueryEditorJobFileLogsArgs = {
-  filter?: InputMaybe<LogFilterInput>;
-  jobId: Scalars['ID']['input'];
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryEditorJobFileLogsExistArgs = {
-  jobId: Scalars['ID']['input'];
-};
-
-
-export type QueryEditorTaskExecutionFileLogsArgs = {
-  jobId: Scalars['ID']['input'];
-  taskExecutionId: Scalars['ID']['input'];
-};
-
-
-export type QueryEndpointDiscoveryStatusArgs = {
-  jobId: Scalars['String']['input'];
-};
-
-
 export type QueryExportDataTableCsvArgs = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   tableId: Scalars['ID']['input'];
-};
-
-
-export type QueryGenerationJobStatusArgs = {
-  jobId: Scalars['String']['input'];
 };
 
 
 export type QueryIntegrationArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryJobFileLogsArgs = {
-  filter?: InputMaybe<LogFilterInput>;
-  jobId: Scalars['ID']['input'];
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryJobFileLogsExistArgs = {
-  jobId: Scalars['ID']['input'];
-};
-
-
-export type QueryKnowledgeBaseArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryKnowledgeBaseDocumentArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryKnowledgeBaseDocumentStatusArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryKnowledgeBasesArgs = {
-  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2190,13 +1460,6 @@ export type QueryProjectTemplateArgs = {
 };
 
 
-export type QuerySearchKnowledgeBaseArgs = {
-  id: Scalars['ID']['input'];
-  metadataFilters?: InputMaybe<Scalars['String']['input']>;
-  query: Scalars['String']['input'];
-};
-
-
 export type QuerySharedProjectArgs = {
   projectUuid: Scalars['String']['input'];
 };
@@ -2204,11 +1467,6 @@ export type QuerySharedProjectArgs = {
 
 export type QuerySharedWorkflowArgs = {
   workflowUuid: Scalars['String']['input'];
-};
-
-
-export type QueryTaskArgs = {
-  id: Scalars['ID']['input'];
 };
 
 
@@ -2220,17 +1478,6 @@ export type QueryTaskDispatcherDefinitionArgs = {
 
 export type QueryTaskDispatcherDefinitionVersionsArgs = {
   name: Scalars['String']['input'];
-};
-
-
-export type QueryTaskExecutionFileLogsArgs = {
-  jobId: Scalars['ID']['input'];
-  taskExecutionId: Scalars['ID']['input'];
-};
-
-
-export type QueryTasksByIdsArgs = {
-  ids: Array<Scalars['ID']['input']>;
 };
 
 
@@ -2263,19 +1510,6 @@ export type QueryUsersArgs = {
 };
 
 
-export type QueryWorkflowNodeComponentConnectionsArgs = {
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type QueryWorkflowNodeScriptInputArgs = {
-  environmentId: Scalars['Long']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
 export type QueryWorkflowTemplateArgs = {
   id: Scalars['String']['input'];
   sharedWorkflow: Scalars['Boolean']['input'];
@@ -2302,75 +1536,31 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
 
 export type RemoveColumnInput = {
   columnId: Scalars['ID']['input'];
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 export type RemoveTableInput = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 export type RenameColumnInput = {
   columnId: Scalars['ID']['input'];
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   newName: Scalars['String']['input'];
   tableId: Scalars['ID']['input'];
 };
 
 export type RenameDataTableInput = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   newBaseName: Scalars['String']['input'];
   tableId: Scalars['ID']['input'];
-};
-
-export type RequestBodyDefinitionInput = {
-  contentType: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  required?: InputMaybe<Scalars['Boolean']['input']>;
-  schema: Scalars['String']['input'];
 };
 
 export type Resources = {
   __typename?: 'Resources';
   documentationUrl?: Maybe<Scalars['String']['output']>;
-};
-
-export type ResponseDefinitionInput = {
-  contentType?: InputMaybe<Scalars['String']['input']>;
-  description: Scalars['String']['input'];
-  schema?: InputMaybe<Scalars['String']['input']>;
-  statusCode: Scalars['String']['input'];
-};
-
-export type ScriptTestExecution = {
-  __typename?: 'ScriptTestExecution';
-  error?: Maybe<ExecutionError>;
-  output?: Maybe<Scalars['Map']['output']>;
-};
-
-export enum SearchAssetType {
-  ApiCollection = 'API_COLLECTION',
-  ApiEndpoint = 'API_ENDPOINT',
-  Connection = 'CONNECTION',
-  DataTable = 'DATA_TABLE',
-  Deployment = 'DEPLOYMENT',
-  KnowledgeBase = 'KNOWLEDGE_BASE',
-  KnowledgeBaseDocument = 'KNOWLEDGE_BASE_DOCUMENT',
-  Project = 'PROJECT',
-  Workflow = 'WORKFLOW'
-}
-
-export type SearchResult = {
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type SelectedEndpointInput = {
-  method: Scalars['String']['input'];
-  path: Scalars['String']['input'];
 };
 
 export type SharedProject = {
@@ -2427,19 +1617,7 @@ export type Tag = {
 
 export type TagInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
-  name: Scalars['String']['input'];
-};
-
-export type Task = {
-  __typename?: 'Task';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  version: Scalars['Int']['output'];
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type TaskDispatcherDefinition = {
@@ -2456,13 +1634,6 @@ export type TaskDispatcherDefinition = {
   title?: Maybe<Scalars['String']['output']>;
   variablePropertiesDefined?: Maybe<Scalars['Boolean']['output']>;
   version: Scalars['Int']['output'];
-};
-
-export type TaskInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  name: Scalars['String']['input'];
-  version?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type TimeProperty = Property & {
@@ -2517,31 +1688,13 @@ export enum UnifiedApiCategory {
   Ticketing = 'TICKETING'
 }
 
-export type UpdateApiConnectorInput = {
-  connectorVersion?: InputMaybe<Scalars['Int']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type UpdateDataTableTagsInput = {
   tableId: Scalars['ID']['input'];
   tags?: InputMaybe<Array<TagInput>>;
 };
 
-export type UpdateKnowledgeBaseDocumentTagsInput = {
-  knowledgeBaseDocumentId: Scalars['ID']['input'];
-  tags?: InputMaybe<Array<TagInput>>;
-};
-
-export type UpdateKnowledgeBaseTagsInput = {
-  knowledgeBaseId: Scalars['ID']['input'];
-  tags?: InputMaybe<Array<TagInput>>;
-};
-
 export type UpdateRowInput = {
-  environmentId: Scalars['ID']['input'];
+  environmentId: Scalars['Int']['input'];
   id: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
   values: Scalars['Map']['input'];
@@ -2565,16 +1718,6 @@ export type WorkflowInfo = {
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   label: Scalars['String']['output'];
-};
-
-export type WorkflowSearchResult = SearchResult & {
-  __typename?: 'WorkflowSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  label: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  projectId: Scalars['ID']['output'];
-  type: SearchAssetType;
 };
 
 export type WorkflowTemplate = {
@@ -2659,13 +1802,6 @@ export type DeleteWorkspaceMcpServerMutationVariables = Exact<{
 
 
 export type DeleteWorkspaceMcpServerMutation = { __typename?: 'Mutation', deleteWorkspaceMcpServer?: boolean | null };
-
-export type DisconnectConnectionMutationVariables = Exact<{
-  connectionId: Scalars['ID']['input'];
-}>;
-
-
-export type DisconnectConnectionMutation = { __typename?: 'Mutation', disconnectConnection: boolean };
 
 export type ExportSharedProjectMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2817,294 +1953,6 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 
 export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
-export type AddDataTableColumnMutationVariables = Exact<{
-  input: AddColumnInput;
-}>;
-
-
-export type AddDataTableColumnMutation = { __typename?: 'Mutation', addDataTableColumn: boolean };
-
-export type CreateDataTableMutationVariables = Exact<{
-  input: CreateDataTableInput;
-}>;
-
-
-export type CreateDataTableMutation = { __typename?: 'Mutation', createDataTable: boolean };
-
-export type DataTableRowsQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-}>;
-
-
-export type DataTableRowsQuery = { __typename?: 'Query', dataTableRows: Array<{ __typename?: 'DataTableRow', id: string, values: any }> };
-
-export type DataTableRowsPageQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type DataTableRowsPageQuery = { __typename?: 'Query', dataTableRowsPage: { __typename?: 'DataTableRowPage', hasMore: boolean, nextOffset?: number | null, items: Array<{ __typename?: 'DataTableRow', id: string, values: any }> } };
-
-export type DataTableTagsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type DataTableTagsQuery = { __typename?: 'Query', dataTableTags: Array<{ __typename?: 'Tag', id: string, name: string }> };
-
-export type DataTableTagsByTableQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type DataTableTagsByTableQuery = { __typename?: 'Query', dataTableTagsByTable: Array<{ __typename?: 'DataTableTagsEntry', tableId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> };
-
-export type DataTablesQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
-}>;
-
-
-export type DataTablesQuery = { __typename?: 'Query', dataTables: Array<{ __typename?: 'DataTable', id: string, baseName: string, lastModifiedDate?: any | null, columns: Array<{ __typename?: 'DataTableColumn', id: string, name: string, type: ColumnType }> }> };
-
-export type DeleteDataTableRowMutationVariables = Exact<{
-  input: DeleteRowInput;
-}>;
-
-
-export type DeleteDataTableRowMutation = { __typename?: 'Mutation', deleteDataTableRow: boolean };
-
-export type DropDataTableMutationVariables = Exact<{
-  input: RemoveTableInput;
-}>;
-
-
-export type DropDataTableMutation = { __typename?: 'Mutation', dropDataTable: boolean };
-
-export type DuplicateDataTableMutationVariables = Exact<{
-  input: DuplicateDataTableInput;
-}>;
-
-
-export type DuplicateDataTableMutation = { __typename?: 'Mutation', duplicateDataTable: boolean };
-
-export type ExportDataTableCsvQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-}>;
-
-
-export type ExportDataTableCsvQuery = { __typename?: 'Query', exportDataTableCsv: string };
-
-export type ImportDataTableCsvMutationVariables = Exact<{
-  input: ImportCsvInput;
-}>;
-
-
-export type ImportDataTableCsvMutation = { __typename?: 'Mutation', importDataTableCsv: boolean };
-
-export type InsertDataTableRowMutationVariables = Exact<{
-  input: InsertRowInput;
-}>;
-
-
-export type InsertDataTableRowMutation = { __typename?: 'Mutation', insertDataTableRow: { __typename?: 'DataTableRow', id: string, values: any } };
-
-export type RemoveDataTableColumnMutationVariables = Exact<{
-  input: RemoveColumnInput;
-}>;
-
-
-export type RemoveDataTableColumnMutation = { __typename?: 'Mutation', removeDataTableColumn: boolean };
-
-export type RenameDataTableMutationVariables = Exact<{
-  input: RenameDataTableInput;
-}>;
-
-
-export type RenameDataTableMutation = { __typename?: 'Mutation', renameDataTable: boolean };
-
-export type RenameDataTableColumnMutationVariables = Exact<{
-  input: RenameColumnInput;
-}>;
-
-
-export type RenameDataTableColumnMutation = { __typename?: 'Mutation', renameDataTableColumn: boolean };
-
-export type UpdateDataTableRowMutationVariables = Exact<{
-  input: UpdateRowInput;
-}>;
-
-
-export type UpdateDataTableRowMutation = { __typename?: 'Mutation', updateDataTableRow: { __typename?: 'DataTableRow', id: string, values: any } };
-
-export type UpdateDataTableTagsMutationVariables = Exact<{
-  input: UpdateDataTableTagsInput;
-}>;
-
-
-export type UpdateDataTableTagsMutation = { __typename?: 'Mutation', updateDataTableTags: boolean };
-
-export type CreateKnowledgeBaseMutationVariables = Exact<{
-  knowledgeBase: KnowledgeBaseInput;
-  workspaceId: Scalars['ID']['input'];
-}>;
-
-
-export type CreateKnowledgeBaseMutation = { __typename?: 'Mutation', createKnowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string } | null };
-
-export type DeleteKnowledgeBaseMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteKnowledgeBaseMutation = { __typename?: 'Mutation', deleteKnowledgeBase?: boolean | null };
-
-export type DeleteKnowledgeBaseDocumentMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteKnowledgeBaseDocumentMutation = { __typename?: 'Mutation', deleteKnowledgeBaseDocument?: boolean | null };
-
-export type DeleteKnowledgeBaseDocumentChunkMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteKnowledgeBaseDocumentChunkMutation = { __typename?: 'Mutation', deleteKnowledgeBaseDocumentChunk?: boolean | null };
-
-export type KnowledgeBaseQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type KnowledgeBaseQuery = { __typename?: 'Query', knowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, documents?: Array<{ __typename?: 'KnowledgeBaseDocument', id: string, name: string, status: number, createdDate?: any | null, document?: { __typename?: 'FileEntry', name: string, extension?: string | null, mimeType?: string | null, url: string } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string }> | null, chunks?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null } | null> | null } | null> | null } | null };
-
-export type KnowledgeBaseDocumentStatusQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type KnowledgeBaseDocumentStatusQuery = { __typename?: 'Query', knowledgeBaseDocumentStatus?: { __typename?: 'DocumentStatusUpdate', documentId: string, status: number, timestamp: any, message?: string | null } | null };
-
-export type KnowledgeBaseDocumentTagsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type KnowledgeBaseDocumentTagsQuery = { __typename?: 'Query', knowledgeBaseDocumentTags: Array<{ __typename?: 'Tag', id: string, name: string }> };
-
-export type KnowledgeBaseDocumentTagsByDocumentQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type KnowledgeBaseDocumentTagsByDocumentQuery = { __typename?: 'Query', knowledgeBaseDocumentTagsByDocument: Array<{ __typename?: 'KnowledgeBaseDocumentTagsEntry', knowledgeBaseDocumentId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> };
-
-export type KnowledgeBaseTagsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type KnowledgeBaseTagsQuery = { __typename?: 'Query', knowledgeBaseTags: Array<{ __typename?: 'Tag', id: string, name: string }> };
-
-export type KnowledgeBaseTagsByKnowledgeBaseQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type KnowledgeBaseTagsByKnowledgeBaseQuery = { __typename?: 'Query', knowledgeBaseTagsByKnowledgeBase: Array<{ __typename?: 'KnowledgeBaseTagsEntry', knowledgeBaseId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> };
-
-export type KnowledgeBasesQueryVariables = Exact<{
-  workspaceId: Scalars['ID']['input'];
-}>;
-
-
-export type KnowledgeBasesQuery = { __typename?: 'Query', knowledgeBases?: Array<{ __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null, createdDate?: any | null, lastModifiedDate?: any | null } | null> | null };
-
-export type SearchKnowledgeBaseQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-  query: Scalars['String']['input'];
-  metadataFilters?: InputMaybe<Scalars['String']['input']>;
-}>;
-
-
-export type SearchKnowledgeBaseQuery = { __typename?: 'Query', searchKnowledgeBase?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null, score?: number | null } | null> | null };
-
-export type UpdateKnowledgeBaseMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  knowledgeBase: KnowledgeBaseInput;
-}>;
-
-
-export type UpdateKnowledgeBaseMutation = { __typename?: 'Mutation', updateKnowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null } | null };
-
-export type UpdateKnowledgeBaseDocumentChunkMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  knowledgeBaseDocumentChunk: KnowledgeBaseDocumentChunkInput;
-}>;
-
-
-export type UpdateKnowledgeBaseDocumentChunkMutation = { __typename?: 'Mutation', updateKnowledgeBaseDocumentChunk?: { __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null } | null };
-
-export type UpdateKnowledgeBaseDocumentTagsMutationVariables = Exact<{
-  input: UpdateKnowledgeBaseDocumentTagsInput;
-}>;
-
-
-export type UpdateKnowledgeBaseDocumentTagsMutation = { __typename?: 'Mutation', updateKnowledgeBaseDocumentTags: boolean };
-
-export type UpdateKnowledgeBaseTagsMutationVariables = Exact<{
-  input: UpdateKnowledgeBaseTagsInput;
-}>;
-
-
-export type UpdateKnowledgeBaseTagsMutation = { __typename?: 'Mutation', updateKnowledgeBaseTags: boolean };
-
-export type AutomationSearchQueryVariables = Exact<{
-  query: Scalars['String']['input'];
-  limit?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type AutomationSearchQuery = { __typename?: 'Query', automationSearch: Array<
-    | { __typename?: 'ApiCollectionSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'ApiEndpointSearchResult', collectionId: string, path?: string | null, id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'ConnectionSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'DataTableSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'KnowledgeBaseDocumentSearchResult', knowledgeBaseId: string, id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'KnowledgeBaseSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'ProjectDeploymentSearchResult', projectName: string, id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'ProjectSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'WorkflowSearchResult', projectId: string, label: string, id: string, name: string, description?: string | null, type: SearchAssetType }
-  > };
-
-export type CreateTaskMutationVariables = Exact<{
-  task: TaskInput;
-}>;
-
-
-export type CreateTaskMutation = { __typename?: 'Mutation', createTask?: { __typename?: 'Task', description?: string | null, id: string, name: string } | null };
-
-export type DeleteTaskMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteTaskMutation = { __typename?: 'Mutation', deleteTask?: boolean | null };
-
-export type TaskQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type TaskQuery = { __typename?: 'Query', task?: { __typename?: 'Task', createdBy?: string | null, createdDate?: string | null, description?: string | null, id: string, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, version: number } | null };
-
-export type TasksQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type TasksQuery = { __typename?: 'Query', tasks?: Array<{ __typename?: 'Task', createdBy?: string | null, createdDate?: string | null, description?: string | null, id: string, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, version: number } | null> | null };
-
-export type UpdateTaskMutationVariables = Exact<{
-  task: TaskInput;
-}>;
-
-
-export type UpdateTaskMutation = { __typename?: 'Mutation', updateTask?: { __typename?: 'Task', description?: string | null, id: string, name: string, version: number } | null };
-
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
   environmentId?: InputMaybe<Scalars['ID']['input']>;
@@ -3120,133 +1968,6 @@ export type IntegrationByIdQueryVariables = Exact<{
 
 export type IntegrationByIdQuery = { __typename?: 'Query', integration?: { __typename?: 'Integration', id: string, name: string } | null };
 
-export type ApiConnectorQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type ApiConnectorQuery = { __typename?: 'Query', apiConnector?: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } | null };
-
-export type ApiConnectorsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ApiConnectorsQuery = { __typename?: 'Query', apiConnectors: Array<{ __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null }> };
-
-export type CancelGenerationJobMutationVariables = Exact<{
-  jobId: Scalars['String']['input'];
-}>;
-
-
-export type CancelGenerationJobMutation = { __typename?: 'Mutation', cancelGenerationJob: boolean };
-
-export type CreateApiConnectorMutationVariables = Exact<{
-  input: CreateApiConnectorInput;
-}>;
-
-
-export type CreateApiConnectorMutation = { __typename?: 'Mutation', createApiConnector: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } };
-
-export type DeleteApiConnectorMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteApiConnectorMutation = { __typename?: 'Mutation', deleteApiConnector: boolean };
-
-export type EnableApiConnectorMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  enable: Scalars['Boolean']['input'];
-}>;
-
-
-export type EnableApiConnectorMutation = { __typename?: 'Mutation', enableApiConnector: boolean };
-
-export type GenerateSpecificationMutationVariables = Exact<{
-  input: GenerateSpecificationInput;
-}>;
-
-
-export type GenerateSpecificationMutation = { __typename?: 'Mutation', generateSpecification: { __typename?: 'GenerateSpecificationResponse', specification?: string | null } };
-
-export type GenerationJobStatusQueryVariables = Exact<{
-  jobId: Scalars['String']['input'];
-}>;
-
-
-export type GenerationJobStatusQuery = { __typename?: 'Query', generationJobStatus?: { __typename?: 'GenerationJobStatus', jobId: string, status: GenerationJobStatusEnum, specification?: string | null, errorMessage?: string | null } | null };
-
-export type ImportOpenApiSpecificationMutationVariables = Exact<{
-  input: ImportOpenApiSpecificationInput;
-}>;
-
-
-export type ImportOpenApiSpecificationMutation = { __typename?: 'Mutation', importOpenApiSpecification: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } };
-
-export type StartGenerateFromDocumentationPreviewMutationVariables = Exact<{
-  input: GenerateFromDocumentationInput;
-}>;
-
-
-export type StartGenerateFromDocumentationPreviewMutation = { __typename?: 'Mutation', startGenerateFromDocumentationPreview: { __typename?: 'GenerationJobStatus', jobId: string, status: GenerationJobStatusEnum, specification?: string | null, errorMessage?: string | null } };
-
-export type UpdateApiConnectorMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: UpdateApiConnectorInput;
-}>;
-
-
-export type UpdateApiConnectorMutation = { __typename?: 'Mutation', updateApiConnector: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } };
-
-export type EditorJobFileLogsQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
-  filter?: InputMaybe<LogFilterInput>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type EditorJobFileLogsQuery = { __typename?: 'Query', editorJobFileLogs: { __typename?: 'LogPage', totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> } };
-
-export type EditorJobFileLogsExistQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
-}>;
-
-
-export type EditorJobFileLogsExistQuery = { __typename?: 'Query', editorJobFileLogsExist: boolean };
-
-export type EditorTaskExecutionFileLogsQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
-  taskExecutionId: Scalars['ID']['input'];
-}>;
-
-
-export type EditorTaskExecutionFileLogsQuery = { __typename?: 'Query', editorTaskExecutionFileLogs: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> };
-
-export type JobFileLogsQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
-  filter?: InputMaybe<LogFilterInput>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type JobFileLogsQuery = { __typename?: 'Query', jobFileLogs: { __typename?: 'LogPage', totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> } };
-
-export type JobFileLogsExistQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
-}>;
-
-
-export type JobFileLogsExistQuery = { __typename?: 'Query', jobFileLogsExist: boolean };
-
-export type TaskExecutionFileLogsQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
-  taskExecutionId: Scalars['ID']['input'];
-}>;
-
-
-export type TaskExecutionFileLogsQuery = { __typename?: 'Query', taskExecutionFileLogs: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> };
-
 export type AdminApiKeysQueryVariables = Exact<{
   environmentId: Scalars['ID']['input'];
 }>;
@@ -3261,34 +1982,6 @@ export type ApiKeysQueryVariables = Exact<{
 
 
 export type ApiKeysQuery = { __typename?: 'Query', apiKeys?: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null } | null> | null };
-
-export type ClusterElementComponentConnectionsQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-}>;
-
-
-export type ClusterElementComponentConnectionsQuery = { __typename?: 'Query', clusterElementComponentConnections: Array<{ __typename?: 'ComponentConnection', componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
-
-export type ClusterElementScriptInputQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-}>;
-
-
-export type ClusterElementScriptInputQuery = { __typename?: 'Query', clusterElementScriptInput?: any | null };
-
-export type ComponentDefinitionSearchQueryVariables = Exact<{
-  query: Scalars['String']['input'];
-}>;
-
-
-export type ComponentDefinitionSearchQuery = { __typename?: 'Query', componentDefinitionSearch: Array<{ __typename?: 'ComponentDefinition', name: string, title?: string | null, icon?: string | null, description?: string | null, version?: number | null, actionsCount?: number | null, triggersCount?: number | null, clusterElementsCount?: any | null, componentCategories?: Array<{ __typename?: 'ComponentCategory', name: string, label?: string | null }> | null, actions?: Array<{ __typename?: 'ActionDefinition', name: string, title?: string | null, description?: string | null }> | null, triggers?: Array<{ __typename?: 'TriggerDefinition', name: string, title?: string | null, description?: string | null }> | null, clusterElements?: Array<{ __typename?: 'ClusterElementDefinition', type?: { __typename?: 'ClusterElementType', name?: string | null, label?: string | null } | null }> | null }> };
 
 export type CreateApiKeyMutationVariables = Exact<{
   name: Scalars['String']['input'];
@@ -3372,52 +2065,6 @@ export type McpToolsByComponentIdQueryVariables = Exact<{
 
 export type McpToolsByComponentIdQuery = { __typename?: 'Query', mcpToolsByComponentId?: Array<{ __typename?: 'McpTool', id: string, name: string, mcpComponentId: string, parameters?: any | null } | null> | null };
 
-export type SaveClusterElementTestConfigurationConnectionMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  workflowConnectionKey: Scalars['String']['input'];
-  connectionId: Scalars['Long']['input'];
-  environmentId: Scalars['Long']['input'];
-}>;
-
-
-export type SaveClusterElementTestConfigurationConnectionMutation = { __typename?: 'Mutation', saveClusterElementTestConfigurationConnection?: boolean | null };
-
-export type SaveWorkflowTestConfigurationConnectionMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  workflowConnectionKey: Scalars['String']['input'];
-  connectionId: Scalars['Long']['input'];
-  environmentId: Scalars['Long']['input'];
-}>;
-
-
-export type SaveWorkflowTestConfigurationConnectionMutation = { __typename?: 'Mutation', saveWorkflowTestConfigurationConnection?: boolean | null };
-
-export type TestClusterElementScriptMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-}>;
-
-
-export type TestClusterElementScriptMutation = { __typename?: 'Mutation', testClusterElementScript: { __typename?: 'ScriptTestExecution', output?: any | null, error?: { __typename?: 'ExecutionError', message?: string | null, stackTrace?: Array<string | null> | null } | null } };
-
-export type TestWorkflowNodeScriptMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-}>;
-
-
-export type TestWorkflowNodeScriptMutation = { __typename?: 'Mutation', testWorkflowNodeScript: { __typename?: 'ScriptTestExecution', output?: any | null, error?: { __typename?: 'ExecutionError', message?: string | null, stackTrace?: Array<string | null> | null } | null } };
-
 export type UpdateApiKeyMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -3445,57 +2092,6 @@ export type UpdateMcpServerUrlMutationVariables = Exact<{
 
 
 export type UpdateMcpServerUrlMutation = { __typename?: 'Mutation', updateMcpServerUrl: string };
-
-export type WorkflowNodeComponentConnectionsQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-}>;
-
-
-export type WorkflowNodeComponentConnectionsQuery = { __typename?: 'Query', workflowNodeComponentConnections: Array<{ __typename?: 'ComponentConnection', componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
-
-export type WorkflowNodeScriptInputQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-}>;
-
-
-export type WorkflowNodeScriptInputQuery = { __typename?: 'Query', workflowNodeScriptInput?: any | null };
-
-export type CustomComponentQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type CustomComponentQuery = { __typename?: 'Query', customComponent?: { __typename?: 'CustomComponent', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, componentVersion?: number | null, enabled?: boolean | null, language?: CustomComponentLanguage | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
-
-export type CustomComponentDefinitionQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type CustomComponentDefinitionQuery = { __typename?: 'Query', customComponentDefinition?: { __typename?: 'CustomComponentDefinition', actions: Array<{ __typename?: 'CustomComponentActionDefinition', name: string, title?: string | null, description?: string | null }>, triggers: Array<{ __typename?: 'CustomComponentTriggerDefinition', name: string, title?: string | null, description?: string | null }> } | null };
-
-export type CustomComponentsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type CustomComponentsQuery = { __typename?: 'Query', customComponents: Array<{ __typename?: 'CustomComponent', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, componentVersion?: number | null, enabled?: boolean | null, language?: CustomComponentLanguage | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null }> };
-
-export type DeleteCustomComponentMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteCustomComponentMutation = { __typename?: 'Mutation', deleteCustomComponent: boolean };
-
-export type EnableCustomComponentMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  enable: Scalars['Boolean']['input'];
-}>;
-
-
-export type EnableCustomComponentMutation = { __typename?: 'Mutation', enableCustomComponent: boolean };
 
 export type AuthoritiesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3699,25 +2295,6 @@ export const useDeleteWorkspaceMcpServerMutation = <
       {
     mutationKey: ['deleteWorkspaceMcpServer'],
     mutationFn: (variables?: DeleteWorkspaceMcpServerMutationVariables) => fetcher<DeleteWorkspaceMcpServerMutation, DeleteWorkspaceMcpServerMutationVariables>(DeleteWorkspaceMcpServerDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const DisconnectConnectionDocument = `
-    mutation DisconnectConnection($connectionId: ID!) {
-  disconnectConnection(connectionId: $connectionId)
-}
-    `;
-
-export const useDisconnectConnectionMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DisconnectConnectionMutation, TError, DisconnectConnectionMutationVariables, TContext>) => {
-    
-    return useMutation<DisconnectConnectionMutation, TError, DisconnectConnectionMutationVariables, TContext>(
-      {
-    mutationKey: ['DisconnectConnection'],
-    mutationFn: (variables?: DisconnectConnectionMutationVariables) => fetcher<DisconnectConnectionMutation, DisconnectConnectionMutationVariables>(DisconnectConnectionDocument, variables)(),
     ...options
   }
     )};
@@ -4338,989 +2915,6 @@ export const useWorkspaceMcpServersQuery = <
   }
     )};
 
-export const AddDataTableColumnDocument = `
-    mutation addDataTableColumn($input: AddColumnInput!) {
-  addDataTableColumn(input: $input)
-}
-    `;
-
-export const useAddDataTableColumnMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<AddDataTableColumnMutation, TError, AddDataTableColumnMutationVariables, TContext>) => {
-    
-    return useMutation<AddDataTableColumnMutation, TError, AddDataTableColumnMutationVariables, TContext>(
-      {
-    mutationKey: ['addDataTableColumn'],
-    mutationFn: (variables?: AddDataTableColumnMutationVariables) => fetcher<AddDataTableColumnMutation, AddDataTableColumnMutationVariables>(AddDataTableColumnDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const CreateDataTableDocument = `
-    mutation createDataTable($input: CreateDataTableInput!) {
-  createDataTable(input: $input)
-}
-    `;
-
-export const useCreateDataTableMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CreateDataTableMutation, TError, CreateDataTableMutationVariables, TContext>) => {
-    
-    return useMutation<CreateDataTableMutation, TError, CreateDataTableMutationVariables, TContext>(
-      {
-    mutationKey: ['createDataTable'],
-    mutationFn: (variables?: CreateDataTableMutationVariables) => fetcher<CreateDataTableMutation, CreateDataTableMutationVariables>(CreateDataTableDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const DataTableRowsDocument = `
-    query dataTableRows($environmentId: ID!, $tableId: ID!) {
-  dataTableRows(environmentId: $environmentId, tableId: $tableId) {
-    id
-    values
-  }
-}
-    `;
-
-export const useDataTableRowsQuery = <
-      TData = DataTableRowsQuery,
-      TError = unknown
-    >(
-      variables: DataTableRowsQueryVariables,
-      options?: Omit<UseQueryOptions<DataTableRowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableRowsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<DataTableRowsQuery, TError, TData>(
-      {
-    queryKey: ['dataTableRows', variables],
-    queryFn: fetcher<DataTableRowsQuery, DataTableRowsQueryVariables>(DataTableRowsDocument, variables),
-    ...options
-  }
-    )};
-
-export const DataTableRowsPageDocument = `
-    query dataTableRowsPage($environmentId: ID!, $tableId: ID!, $limit: Int, $offset: Int) {
-  dataTableRowsPage(
-    environmentId: $environmentId
-    tableId: $tableId
-    limit: $limit
-    offset: $offset
-  ) {
-    items {
-      id
-      values
-    }
-    hasMore
-    nextOffset
-  }
-}
-    `;
-
-export const useDataTableRowsPageQuery = <
-      TData = DataTableRowsPageQuery,
-      TError = unknown
-    >(
-      variables: DataTableRowsPageQueryVariables,
-      options?: Omit<UseQueryOptions<DataTableRowsPageQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableRowsPageQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<DataTableRowsPageQuery, TError, TData>(
-      {
-    queryKey: ['dataTableRowsPage', variables],
-    queryFn: fetcher<DataTableRowsPageQuery, DataTableRowsPageQueryVariables>(DataTableRowsPageDocument, variables),
-    ...options
-  }
-    )};
-
-export const DataTableTagsDocument = `
-    query dataTableTags {
-  dataTableTags {
-    id
-    name
-  }
-}
-    `;
-
-export const useDataTableTagsQuery = <
-      TData = DataTableTagsQuery,
-      TError = unknown
-    >(
-      variables?: DataTableTagsQueryVariables,
-      options?: Omit<UseQueryOptions<DataTableTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<DataTableTagsQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['dataTableTags'] : ['dataTableTags', variables],
-    queryFn: fetcher<DataTableTagsQuery, DataTableTagsQueryVariables>(DataTableTagsDocument, variables),
-    ...options
-  }
-    )};
-
-export const DataTableTagsByTableDocument = `
-    query dataTableTagsByTable {
-  dataTableTagsByTable {
-    tableId
-    tags {
-      id
-      name
-    }
-  }
-}
-    `;
-
-export const useDataTableTagsByTableQuery = <
-      TData = DataTableTagsByTableQuery,
-      TError = unknown
-    >(
-      variables?: DataTableTagsByTableQueryVariables,
-      options?: Omit<UseQueryOptions<DataTableTagsByTableQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsByTableQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<DataTableTagsByTableQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['dataTableTagsByTable'] : ['dataTableTagsByTable', variables],
-    queryFn: fetcher<DataTableTagsByTableQuery, DataTableTagsByTableQueryVariables>(DataTableTagsByTableDocument, variables),
-    ...options
-  }
-    )};
-
-export const DataTablesDocument = `
-    query dataTables($environmentId: ID!, $workspaceId: ID!) {
-  dataTables(environmentId: $environmentId, workspaceId: $workspaceId) {
-    id
-    baseName
-    lastModifiedDate
-    columns {
-      id
-      name
-      type
-    }
-  }
-}
-    `;
-
-export const useDataTablesQuery = <
-      TData = DataTablesQuery,
-      TError = unknown
-    >(
-      variables: DataTablesQueryVariables,
-      options?: Omit<UseQueryOptions<DataTablesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTablesQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<DataTablesQuery, TError, TData>(
-      {
-    queryKey: ['dataTables', variables],
-    queryFn: fetcher<DataTablesQuery, DataTablesQueryVariables>(DataTablesDocument, variables),
-    ...options
-  }
-    )};
-
-export const DeleteDataTableRowDocument = `
-    mutation deleteDataTableRow($input: DeleteRowInput!) {
-  deleteDataTableRow(input: $input)
-}
-    `;
-
-export const useDeleteDataTableRowMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DeleteDataTableRowMutation, TError, DeleteDataTableRowMutationVariables, TContext>) => {
-    
-    return useMutation<DeleteDataTableRowMutation, TError, DeleteDataTableRowMutationVariables, TContext>(
-      {
-    mutationKey: ['deleteDataTableRow'],
-    mutationFn: (variables?: DeleteDataTableRowMutationVariables) => fetcher<DeleteDataTableRowMutation, DeleteDataTableRowMutationVariables>(DeleteDataTableRowDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const DropDataTableDocument = `
-    mutation dropDataTable($input: RemoveTableInput!) {
-  dropDataTable(input: $input)
-}
-    `;
-
-export const useDropDataTableMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DropDataTableMutation, TError, DropDataTableMutationVariables, TContext>) => {
-    
-    return useMutation<DropDataTableMutation, TError, DropDataTableMutationVariables, TContext>(
-      {
-    mutationKey: ['dropDataTable'],
-    mutationFn: (variables?: DropDataTableMutationVariables) => fetcher<DropDataTableMutation, DropDataTableMutationVariables>(DropDataTableDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const DuplicateDataTableDocument = `
-    mutation duplicateDataTable($input: DuplicateDataTableInput!) {
-  duplicateDataTable(input: $input)
-}
-    `;
-
-export const useDuplicateDataTableMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DuplicateDataTableMutation, TError, DuplicateDataTableMutationVariables, TContext>) => {
-    
-    return useMutation<DuplicateDataTableMutation, TError, DuplicateDataTableMutationVariables, TContext>(
-      {
-    mutationKey: ['duplicateDataTable'],
-    mutationFn: (variables?: DuplicateDataTableMutationVariables) => fetcher<DuplicateDataTableMutation, DuplicateDataTableMutationVariables>(DuplicateDataTableDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const ExportDataTableCsvDocument = `
-    query exportDataTableCsv($environmentId: ID!, $tableId: ID!) {
-  exportDataTableCsv(environmentId: $environmentId, tableId: $tableId)
-}
-    `;
-
-export const useExportDataTableCsvQuery = <
-      TData = ExportDataTableCsvQuery,
-      TError = unknown
-    >(
-      variables: ExportDataTableCsvQueryVariables,
-      options?: Omit<UseQueryOptions<ExportDataTableCsvQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ExportDataTableCsvQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<ExportDataTableCsvQuery, TError, TData>(
-      {
-    queryKey: ['exportDataTableCsv', variables],
-    queryFn: fetcher<ExportDataTableCsvQuery, ExportDataTableCsvQueryVariables>(ExportDataTableCsvDocument, variables),
-    ...options
-  }
-    )};
-
-export const ImportDataTableCsvDocument = `
-    mutation importDataTableCsv($input: ImportCsvInput!) {
-  importDataTableCsv(input: $input)
-}
-    `;
-
-export const useImportDataTableCsvMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<ImportDataTableCsvMutation, TError, ImportDataTableCsvMutationVariables, TContext>) => {
-    
-    return useMutation<ImportDataTableCsvMutation, TError, ImportDataTableCsvMutationVariables, TContext>(
-      {
-    mutationKey: ['importDataTableCsv'],
-    mutationFn: (variables?: ImportDataTableCsvMutationVariables) => fetcher<ImportDataTableCsvMutation, ImportDataTableCsvMutationVariables>(ImportDataTableCsvDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const InsertDataTableRowDocument = `
-    mutation insertDataTableRow($input: InsertRowInput!) {
-  insertDataTableRow(input: $input) {
-    id
-    values
-  }
-}
-    `;
-
-export const useInsertDataTableRowMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<InsertDataTableRowMutation, TError, InsertDataTableRowMutationVariables, TContext>) => {
-    
-    return useMutation<InsertDataTableRowMutation, TError, InsertDataTableRowMutationVariables, TContext>(
-      {
-    mutationKey: ['insertDataTableRow'],
-    mutationFn: (variables?: InsertDataTableRowMutationVariables) => fetcher<InsertDataTableRowMutation, InsertDataTableRowMutationVariables>(InsertDataTableRowDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const RemoveDataTableColumnDocument = `
-    mutation removeDataTableColumn($input: RemoveColumnInput!) {
-  removeDataTableColumn(input: $input)
-}
-    `;
-
-export const useRemoveDataTableColumnMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<RemoveDataTableColumnMutation, TError, RemoveDataTableColumnMutationVariables, TContext>) => {
-    
-    return useMutation<RemoveDataTableColumnMutation, TError, RemoveDataTableColumnMutationVariables, TContext>(
-      {
-    mutationKey: ['removeDataTableColumn'],
-    mutationFn: (variables?: RemoveDataTableColumnMutationVariables) => fetcher<RemoveDataTableColumnMutation, RemoveDataTableColumnMutationVariables>(RemoveDataTableColumnDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const RenameDataTableDocument = `
-    mutation renameDataTable($input: RenameDataTableInput!) {
-  renameDataTable(input: $input)
-}
-    `;
-
-export const useRenameDataTableMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<RenameDataTableMutation, TError, RenameDataTableMutationVariables, TContext>) => {
-    
-    return useMutation<RenameDataTableMutation, TError, RenameDataTableMutationVariables, TContext>(
-      {
-    mutationKey: ['renameDataTable'],
-    mutationFn: (variables?: RenameDataTableMutationVariables) => fetcher<RenameDataTableMutation, RenameDataTableMutationVariables>(RenameDataTableDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const RenameDataTableColumnDocument = `
-    mutation renameDataTableColumn($input: RenameColumnInput!) {
-  renameDataTableColumn(input: $input)
-}
-    `;
-
-export const useRenameDataTableColumnMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<RenameDataTableColumnMutation, TError, RenameDataTableColumnMutationVariables, TContext>) => {
-    
-    return useMutation<RenameDataTableColumnMutation, TError, RenameDataTableColumnMutationVariables, TContext>(
-      {
-    mutationKey: ['renameDataTableColumn'],
-    mutationFn: (variables?: RenameDataTableColumnMutationVariables) => fetcher<RenameDataTableColumnMutation, RenameDataTableColumnMutationVariables>(RenameDataTableColumnDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const UpdateDataTableRowDocument = `
-    mutation updateDataTableRow($input: UpdateRowInput!) {
-  updateDataTableRow(input: $input) {
-    id
-    values
-  }
-}
-    `;
-
-export const useUpdateDataTableRowMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateDataTableRowMutation, TError, UpdateDataTableRowMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateDataTableRowMutation, TError, UpdateDataTableRowMutationVariables, TContext>(
-      {
-    mutationKey: ['updateDataTableRow'],
-    mutationFn: (variables?: UpdateDataTableRowMutationVariables) => fetcher<UpdateDataTableRowMutation, UpdateDataTableRowMutationVariables>(UpdateDataTableRowDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const UpdateDataTableTagsDocument = `
-    mutation updateDataTableTags($input: UpdateDataTableTagsInput!) {
-  updateDataTableTags(input: $input)
-}
-    `;
-
-export const useUpdateDataTableTagsMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateDataTableTagsMutation, TError, UpdateDataTableTagsMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateDataTableTagsMutation, TError, UpdateDataTableTagsMutationVariables, TContext>(
-      {
-    mutationKey: ['updateDataTableTags'],
-    mutationFn: (variables?: UpdateDataTableTagsMutationVariables) => fetcher<UpdateDataTableTagsMutation, UpdateDataTableTagsMutationVariables>(UpdateDataTableTagsDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const CreateKnowledgeBaseDocument = `
-    mutation createKnowledgeBase($knowledgeBase: KnowledgeBaseInput!, $workspaceId: ID!) {
-  createKnowledgeBase(knowledgeBase: $knowledgeBase, workspaceId: $workspaceId) {
-    id
-    name
-  }
-}
-    `;
-
-export const useCreateKnowledgeBaseMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CreateKnowledgeBaseMutation, TError, CreateKnowledgeBaseMutationVariables, TContext>) => {
-    
-    return useMutation<CreateKnowledgeBaseMutation, TError, CreateKnowledgeBaseMutationVariables, TContext>(
-      {
-    mutationKey: ['createKnowledgeBase'],
-    mutationFn: (variables?: CreateKnowledgeBaseMutationVariables) => fetcher<CreateKnowledgeBaseMutation, CreateKnowledgeBaseMutationVariables>(CreateKnowledgeBaseDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const DeleteKnowledgeBaseDocument = `
-    mutation deleteKnowledgeBase($id: ID!) {
-  deleteKnowledgeBase(id: $id)
-}
-    `;
-
-export const useDeleteKnowledgeBaseMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DeleteKnowledgeBaseMutation, TError, DeleteKnowledgeBaseMutationVariables, TContext>) => {
-    
-    return useMutation<DeleteKnowledgeBaseMutation, TError, DeleteKnowledgeBaseMutationVariables, TContext>(
-      {
-    mutationKey: ['deleteKnowledgeBase'],
-    mutationFn: (variables?: DeleteKnowledgeBaseMutationVariables) => fetcher<DeleteKnowledgeBaseMutation, DeleteKnowledgeBaseMutationVariables>(DeleteKnowledgeBaseDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const DeleteKnowledgeBaseDocumentDocument = `
-    mutation deleteKnowledgeBaseDocument($id: ID!) {
-  deleteKnowledgeBaseDocument(id: $id)
-}
-    `;
-
-export const useDeleteKnowledgeBaseDocumentMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DeleteKnowledgeBaseDocumentMutation, TError, DeleteKnowledgeBaseDocumentMutationVariables, TContext>) => {
-    
-    return useMutation<DeleteKnowledgeBaseDocumentMutation, TError, DeleteKnowledgeBaseDocumentMutationVariables, TContext>(
-      {
-    mutationKey: ['deleteKnowledgeBaseDocument'],
-    mutationFn: (variables?: DeleteKnowledgeBaseDocumentMutationVariables) => fetcher<DeleteKnowledgeBaseDocumentMutation, DeleteKnowledgeBaseDocumentMutationVariables>(DeleteKnowledgeBaseDocumentDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const DeleteKnowledgeBaseDocumentChunkDocument = `
-    mutation deleteKnowledgeBaseDocumentChunk($id: ID!) {
-  deleteKnowledgeBaseDocumentChunk(id: $id)
-}
-    `;
-
-export const useDeleteKnowledgeBaseDocumentChunkMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DeleteKnowledgeBaseDocumentChunkMutation, TError, DeleteKnowledgeBaseDocumentChunkMutationVariables, TContext>) => {
-    
-    return useMutation<DeleteKnowledgeBaseDocumentChunkMutation, TError, DeleteKnowledgeBaseDocumentChunkMutationVariables, TContext>(
-      {
-    mutationKey: ['deleteKnowledgeBaseDocumentChunk'],
-    mutationFn: (variables?: DeleteKnowledgeBaseDocumentChunkMutationVariables) => fetcher<DeleteKnowledgeBaseDocumentChunkMutation, DeleteKnowledgeBaseDocumentChunkMutationVariables>(DeleteKnowledgeBaseDocumentChunkDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const KnowledgeBaseDocument = `
-    query knowledgeBase($id: ID!) {
-  knowledgeBase(id: $id) {
-    id
-    name
-    description
-    maxChunkSize
-    minChunkSizeChars
-    overlap
-    documents {
-      id
-      name
-      document {
-        name
-        extension
-        mimeType
-        url
-      }
-      status
-      tags {
-        id
-        name
-      }
-      createdDate
-      chunks {
-        id
-        knowledgeBaseDocumentId
-        content
-        metadata
-      }
-    }
-    createdDate
-    lastModifiedDate
-  }
-}
-    `;
-
-export const useKnowledgeBaseQuery = <
-      TData = KnowledgeBaseQuery,
-      TError = unknown
-    >(
-      variables: KnowledgeBaseQueryVariables,
-      options?: Omit<UseQueryOptions<KnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<KnowledgeBaseQuery, TError, TData>(
-      {
-    queryKey: ['knowledgeBase', variables],
-    queryFn: fetcher<KnowledgeBaseQuery, KnowledgeBaseQueryVariables>(KnowledgeBaseDocument, variables),
-    ...options
-  }
-    )};
-
-export const KnowledgeBaseDocumentStatusDocument = `
-    query knowledgeBaseDocumentStatus($id: ID!) {
-  knowledgeBaseDocumentStatus(id: $id) {
-    documentId
-    status
-    timestamp
-    message
-  }
-}
-    `;
-
-export const useKnowledgeBaseDocumentStatusQuery = <
-      TData = KnowledgeBaseDocumentStatusQuery,
-      TError = unknown
-    >(
-      variables: KnowledgeBaseDocumentStatusQueryVariables,
-      options?: Omit<UseQueryOptions<KnowledgeBaseDocumentStatusQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentStatusQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<KnowledgeBaseDocumentStatusQuery, TError, TData>(
-      {
-    queryKey: ['knowledgeBaseDocumentStatus', variables],
-    queryFn: fetcher<KnowledgeBaseDocumentStatusQuery, KnowledgeBaseDocumentStatusQueryVariables>(KnowledgeBaseDocumentStatusDocument, variables),
-    ...options
-  }
-    )};
-
-export const KnowledgeBaseDocumentTagsDocument = `
-    query knowledgeBaseDocumentTags {
-  knowledgeBaseDocumentTags {
-    id
-    name
-  }
-}
-    `;
-
-export const useKnowledgeBaseDocumentTagsQuery = <
-      TData = KnowledgeBaseDocumentTagsQuery,
-      TError = unknown
-    >(
-      variables?: KnowledgeBaseDocumentTagsQueryVariables,
-      options?: Omit<UseQueryOptions<KnowledgeBaseDocumentTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentTagsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<KnowledgeBaseDocumentTagsQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['knowledgeBaseDocumentTags'] : ['knowledgeBaseDocumentTags', variables],
-    queryFn: fetcher<KnowledgeBaseDocumentTagsQuery, KnowledgeBaseDocumentTagsQueryVariables>(KnowledgeBaseDocumentTagsDocument, variables),
-    ...options
-  }
-    )};
-
-export const KnowledgeBaseDocumentTagsByDocumentDocument = `
-    query knowledgeBaseDocumentTagsByDocument {
-  knowledgeBaseDocumentTagsByDocument {
-    knowledgeBaseDocumentId
-    tags {
-      id
-      name
-    }
-  }
-}
-    `;
-
-export const useKnowledgeBaseDocumentTagsByDocumentQuery = <
-      TData = KnowledgeBaseDocumentTagsByDocumentQuery,
-      TError = unknown
-    >(
-      variables?: KnowledgeBaseDocumentTagsByDocumentQueryVariables,
-      options?: Omit<UseQueryOptions<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['knowledgeBaseDocumentTagsByDocument'] : ['knowledgeBaseDocumentTagsByDocument', variables],
-    queryFn: fetcher<KnowledgeBaseDocumentTagsByDocumentQuery, KnowledgeBaseDocumentTagsByDocumentQueryVariables>(KnowledgeBaseDocumentTagsByDocumentDocument, variables),
-    ...options
-  }
-    )};
-
-export const KnowledgeBaseTagsDocument = `
-    query knowledgeBaseTags {
-  knowledgeBaseTags {
-    id
-    name
-  }
-}
-    `;
-
-export const useKnowledgeBaseTagsQuery = <
-      TData = KnowledgeBaseTagsQuery,
-      TError = unknown
-    >(
-      variables?: KnowledgeBaseTagsQueryVariables,
-      options?: Omit<UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<KnowledgeBaseTagsQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['knowledgeBaseTags'] : ['knowledgeBaseTags', variables],
-    queryFn: fetcher<KnowledgeBaseTagsQuery, KnowledgeBaseTagsQueryVariables>(KnowledgeBaseTagsDocument, variables),
-    ...options
-  }
-    )};
-
-export const KnowledgeBaseTagsByKnowledgeBaseDocument = `
-    query knowledgeBaseTagsByKnowledgeBase {
-  knowledgeBaseTagsByKnowledgeBase {
-    knowledgeBaseId
-    tags {
-      id
-      name
-    }
-  }
-}
-    `;
-
-export const useKnowledgeBaseTagsByKnowledgeBaseQuery = <
-      TData = KnowledgeBaseTagsByKnowledgeBaseQuery,
-      TError = unknown
-    >(
-      variables?: KnowledgeBaseTagsByKnowledgeBaseQueryVariables,
-      options?: Omit<UseQueryOptions<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['knowledgeBaseTagsByKnowledgeBase'] : ['knowledgeBaseTagsByKnowledgeBase', variables],
-    queryFn: fetcher<KnowledgeBaseTagsByKnowledgeBaseQuery, KnowledgeBaseTagsByKnowledgeBaseQueryVariables>(KnowledgeBaseTagsByKnowledgeBaseDocument, variables),
-    ...options
-  }
-    )};
-
-export const KnowledgeBasesDocument = `
-    query knowledgeBases($workspaceId: ID!) {
-  knowledgeBases(workspaceId: $workspaceId) {
-    id
-    name
-    description
-    maxChunkSize
-    minChunkSizeChars
-    overlap
-    createdDate
-    lastModifiedDate
-  }
-}
-    `;
-
-export const useKnowledgeBasesQuery = <
-      TData = KnowledgeBasesQuery,
-      TError = unknown
-    >(
-      variables: KnowledgeBasesQueryVariables,
-      options?: Omit<UseQueryOptions<KnowledgeBasesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBasesQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<KnowledgeBasesQuery, TError, TData>(
-      {
-    queryKey: ['knowledgeBases', variables],
-    queryFn: fetcher<KnowledgeBasesQuery, KnowledgeBasesQueryVariables>(KnowledgeBasesDocument, variables),
-    ...options
-  }
-    )};
-
-export const SearchKnowledgeBaseDocument = `
-    query searchKnowledgeBase($id: ID!, $query: String!, $metadataFilters: String) {
-  searchKnowledgeBase(id: $id, query: $query, metadataFilters: $metadataFilters) {
-    id
-    knowledgeBaseDocumentId
-    content
-    metadata
-    score
-  }
-}
-    `;
-
-export const useSearchKnowledgeBaseQuery = <
-      TData = SearchKnowledgeBaseQuery,
-      TError = unknown
-    >(
-      variables: SearchKnowledgeBaseQueryVariables,
-      options?: Omit<UseQueryOptions<SearchKnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SearchKnowledgeBaseQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<SearchKnowledgeBaseQuery, TError, TData>(
-      {
-    queryKey: ['searchKnowledgeBase', variables],
-    queryFn: fetcher<SearchKnowledgeBaseQuery, SearchKnowledgeBaseQueryVariables>(SearchKnowledgeBaseDocument, variables),
-    ...options
-  }
-    )};
-
-export const UpdateKnowledgeBaseDocument = `
-    mutation updateKnowledgeBase($id: ID!, $knowledgeBase: KnowledgeBaseInput!) {
-  updateKnowledgeBase(id: $id, knowledgeBase: $knowledgeBase) {
-    id
-    name
-    description
-    maxChunkSize
-    minChunkSizeChars
-    overlap
-  }
-}
-    `;
-
-export const useUpdateKnowledgeBaseMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateKnowledgeBaseMutation, TError, UpdateKnowledgeBaseMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateKnowledgeBaseMutation, TError, UpdateKnowledgeBaseMutationVariables, TContext>(
-      {
-    mutationKey: ['updateKnowledgeBase'],
-    mutationFn: (variables?: UpdateKnowledgeBaseMutationVariables) => fetcher<UpdateKnowledgeBaseMutation, UpdateKnowledgeBaseMutationVariables>(UpdateKnowledgeBaseDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const UpdateKnowledgeBaseDocumentChunkDocument = `
-    mutation updateKnowledgeBaseDocumentChunk($id: ID!, $knowledgeBaseDocumentChunk: KnowledgeBaseDocumentChunkInput!) {
-  updateKnowledgeBaseDocumentChunk(
-    id: $id
-    knowledgeBaseDocumentChunk: $knowledgeBaseDocumentChunk
-  ) {
-    id
-    knowledgeBaseDocumentId
-    content
-    metadata
-  }
-}
-    `;
-
-export const useUpdateKnowledgeBaseDocumentChunkMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateKnowledgeBaseDocumentChunkMutation, TError, UpdateKnowledgeBaseDocumentChunkMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateKnowledgeBaseDocumentChunkMutation, TError, UpdateKnowledgeBaseDocumentChunkMutationVariables, TContext>(
-      {
-    mutationKey: ['updateKnowledgeBaseDocumentChunk'],
-    mutationFn: (variables?: UpdateKnowledgeBaseDocumentChunkMutationVariables) => fetcher<UpdateKnowledgeBaseDocumentChunkMutation, UpdateKnowledgeBaseDocumentChunkMutationVariables>(UpdateKnowledgeBaseDocumentChunkDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const UpdateKnowledgeBaseDocumentTagsDocument = `
-    mutation updateKnowledgeBaseDocumentTags($input: UpdateKnowledgeBaseDocumentTagsInput!) {
-  updateKnowledgeBaseDocumentTags(input: $input)
-}
-    `;
-
-export const useUpdateKnowledgeBaseDocumentTagsMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateKnowledgeBaseDocumentTagsMutation, TError, UpdateKnowledgeBaseDocumentTagsMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateKnowledgeBaseDocumentTagsMutation, TError, UpdateKnowledgeBaseDocumentTagsMutationVariables, TContext>(
-      {
-    mutationKey: ['updateKnowledgeBaseDocumentTags'],
-    mutationFn: (variables?: UpdateKnowledgeBaseDocumentTagsMutationVariables) => fetcher<UpdateKnowledgeBaseDocumentTagsMutation, UpdateKnowledgeBaseDocumentTagsMutationVariables>(UpdateKnowledgeBaseDocumentTagsDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const UpdateKnowledgeBaseTagsDocument = `
-    mutation updateKnowledgeBaseTags($input: UpdateKnowledgeBaseTagsInput!) {
-  updateKnowledgeBaseTags(input: $input)
-}
-    `;
-
-export const useUpdateKnowledgeBaseTagsMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateKnowledgeBaseTagsMutation, TError, UpdateKnowledgeBaseTagsMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateKnowledgeBaseTagsMutation, TError, UpdateKnowledgeBaseTagsMutationVariables, TContext>(
-      {
-    mutationKey: ['updateKnowledgeBaseTags'],
-    mutationFn: (variables?: UpdateKnowledgeBaseTagsMutationVariables) => fetcher<UpdateKnowledgeBaseTagsMutation, UpdateKnowledgeBaseTagsMutationVariables>(UpdateKnowledgeBaseTagsDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const AutomationSearchDocument = `
-    query automationSearch($query: String!, $limit: Int) {
-  automationSearch(query: $query, limit: $limit) {
-    id
-    name
-    description
-    type
-    ... on WorkflowSearchResult {
-      projectId
-      label
-    }
-    ... on ProjectDeploymentSearchResult {
-      projectName
-    }
-    ... on ApiEndpointSearchResult {
-      collectionId
-      path
-    }
-    ... on KnowledgeBaseDocumentSearchResult {
-      knowledgeBaseId
-    }
-  }
-}
-    `;
-
-export const useAutomationSearchQuery = <
-      TData = AutomationSearchQuery,
-      TError = unknown
-    >(
-      variables: AutomationSearchQueryVariables,
-      options?: Omit<UseQueryOptions<AutomationSearchQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationSearchQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<AutomationSearchQuery, TError, TData>(
-      {
-    queryKey: ['automationSearch', variables],
-    queryFn: fetcher<AutomationSearchQuery, AutomationSearchQueryVariables>(AutomationSearchDocument, variables),
-    ...options
-  }
-    )};
-
-export const CreateTaskDocument = `
-    mutation createTask($task: TaskInput!) {
-  createTask(task: $task) {
-    description
-    id
-    name
-  }
-}
-    `;
-
-export const useCreateTaskMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CreateTaskMutation, TError, CreateTaskMutationVariables, TContext>) => {
-    
-    return useMutation<CreateTaskMutation, TError, CreateTaskMutationVariables, TContext>(
-      {
-    mutationKey: ['createTask'],
-    mutationFn: (variables?: CreateTaskMutationVariables) => fetcher<CreateTaskMutation, CreateTaskMutationVariables>(CreateTaskDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const DeleteTaskDocument = `
-    mutation deleteTask($id: ID!) {
-  deleteTask(id: $id)
-}
-    `;
-
-export const useDeleteTaskMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DeleteTaskMutation, TError, DeleteTaskMutationVariables, TContext>) => {
-    
-    return useMutation<DeleteTaskMutation, TError, DeleteTaskMutationVariables, TContext>(
-      {
-    mutationKey: ['deleteTask'],
-    mutationFn: (variables?: DeleteTaskMutationVariables) => fetcher<DeleteTaskMutation, DeleteTaskMutationVariables>(DeleteTaskDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const TaskDocument = `
-    query task($id: ID!) {
-  task(id: $id) {
-    createdBy
-    createdDate
-    description
-    id
-    lastModifiedBy
-    lastModifiedDate
-    name
-    version
-  }
-}
-    `;
-
-export const useTaskQuery = <
-      TData = TaskQuery,
-      TError = unknown
-    >(
-      variables: TaskQueryVariables,
-      options?: Omit<UseQueryOptions<TaskQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TaskQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<TaskQuery, TError, TData>(
-      {
-    queryKey: ['task', variables],
-    queryFn: fetcher<TaskQuery, TaskQueryVariables>(TaskDocument, variables),
-    ...options
-  }
-    )};
-
-export const TasksDocument = `
-    query tasks {
-  tasks {
-    createdBy
-    createdDate
-    description
-    id
-    lastModifiedBy
-    lastModifiedDate
-    name
-    version
-  }
-}
-    `;
-
-export const useTasksQuery = <
-      TData = TasksQuery,
-      TError = unknown
-    >(
-      variables?: TasksQueryVariables,
-      options?: Omit<UseQueryOptions<TasksQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TasksQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<TasksQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['tasks'] : ['tasks', variables],
-    queryFn: fetcher<TasksQuery, TasksQueryVariables>(TasksDocument, variables),
-    ...options
-  }
-    )};
-
-export const UpdateTaskDocument = `
-    mutation updateTask($task: TaskInput!) {
-  updateTask(task: $task) {
-    description
-    id
-    name
-    version
-  }
-}
-    `;
-
-export const useUpdateTaskMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateTaskMutation, TError, UpdateTaskMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateTaskMutation, TError, UpdateTaskMutationVariables, TContext>(
-      {
-    mutationKey: ['updateTask'],
-    mutationFn: (variables?: UpdateTaskMutationVariables) => fetcher<UpdateTaskMutation, UpdateTaskMutationVariables>(UpdateTaskDocument, variables)(),
-    ...options
-  }
-    )};
-
 export const ConnectedUserProjectsDocument = `
     query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
   connectedUserProjects(
@@ -5400,534 +2994,6 @@ export const useIntegrationByIdQuery = <
   }
     )};
 
-export const ApiConnectorDocument = `
-    query apiConnector($id: ID!) {
-  apiConnector(id: $id) {
-    id
-    name
-    title
-    description
-    icon
-    connectorVersion
-    enabled
-    specification
-    definition
-    endpoints {
-      id
-      name
-      description
-      path
-      httpMethod
-    }
-    createdBy
-    createdDate
-    lastModifiedBy
-    lastModifiedDate
-    version
-  }
-}
-    `;
-
-export const useApiConnectorQuery = <
-      TData = ApiConnectorQuery,
-      TError = unknown
-    >(
-      variables: ApiConnectorQueryVariables,
-      options?: Omit<UseQueryOptions<ApiConnectorQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiConnectorQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<ApiConnectorQuery, TError, TData>(
-      {
-    queryKey: ['apiConnector', variables],
-    queryFn: fetcher<ApiConnectorQuery, ApiConnectorQueryVariables>(ApiConnectorDocument, variables),
-    ...options
-  }
-    )};
-
-export const ApiConnectorsDocument = `
-    query apiConnectors {
-  apiConnectors {
-    id
-    name
-    title
-    description
-    icon
-    connectorVersion
-    enabled
-    specification
-    definition
-    endpoints {
-      id
-      name
-      description
-      path
-      httpMethod
-    }
-    createdBy
-    createdDate
-    lastModifiedBy
-    lastModifiedDate
-    version
-  }
-}
-    `;
-
-export const useApiConnectorsQuery = <
-      TData = ApiConnectorsQuery,
-      TError = unknown
-    >(
-      variables?: ApiConnectorsQueryVariables,
-      options?: Omit<UseQueryOptions<ApiConnectorsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiConnectorsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<ApiConnectorsQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['apiConnectors'] : ['apiConnectors', variables],
-    queryFn: fetcher<ApiConnectorsQuery, ApiConnectorsQueryVariables>(ApiConnectorsDocument, variables),
-    ...options
-  }
-    )};
-
-export const CancelGenerationJobDocument = `
-    mutation cancelGenerationJob($jobId: String!) {
-  cancelGenerationJob(jobId: $jobId)
-}
-    `;
-
-export const useCancelGenerationJobMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CancelGenerationJobMutation, TError, CancelGenerationJobMutationVariables, TContext>) => {
-    
-    return useMutation<CancelGenerationJobMutation, TError, CancelGenerationJobMutationVariables, TContext>(
-      {
-    mutationKey: ['cancelGenerationJob'],
-    mutationFn: (variables?: CancelGenerationJobMutationVariables) => fetcher<CancelGenerationJobMutation, CancelGenerationJobMutationVariables>(CancelGenerationJobDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const CreateApiConnectorDocument = `
-    mutation createApiConnector($input: CreateApiConnectorInput!) {
-  createApiConnector(input: $input) {
-    id
-    name
-    title
-    description
-    icon
-    connectorVersion
-    enabled
-    specification
-    definition
-    endpoints {
-      id
-      name
-      description
-      path
-      httpMethod
-    }
-    createdBy
-    createdDate
-    lastModifiedBy
-    lastModifiedDate
-    version
-  }
-}
-    `;
-
-export const useCreateApiConnectorMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CreateApiConnectorMutation, TError, CreateApiConnectorMutationVariables, TContext>) => {
-    
-    return useMutation<CreateApiConnectorMutation, TError, CreateApiConnectorMutationVariables, TContext>(
-      {
-    mutationKey: ['createApiConnector'],
-    mutationFn: (variables?: CreateApiConnectorMutationVariables) => fetcher<CreateApiConnectorMutation, CreateApiConnectorMutationVariables>(CreateApiConnectorDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const DeleteApiConnectorDocument = `
-    mutation deleteApiConnector($id: ID!) {
-  deleteApiConnector(id: $id)
-}
-    `;
-
-export const useDeleteApiConnectorMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DeleteApiConnectorMutation, TError, DeleteApiConnectorMutationVariables, TContext>) => {
-    
-    return useMutation<DeleteApiConnectorMutation, TError, DeleteApiConnectorMutationVariables, TContext>(
-      {
-    mutationKey: ['deleteApiConnector'],
-    mutationFn: (variables?: DeleteApiConnectorMutationVariables) => fetcher<DeleteApiConnectorMutation, DeleteApiConnectorMutationVariables>(DeleteApiConnectorDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const EnableApiConnectorDocument = `
-    mutation enableApiConnector($id: ID!, $enable: Boolean!) {
-  enableApiConnector(id: $id, enable: $enable)
-}
-    `;
-
-export const useEnableApiConnectorMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<EnableApiConnectorMutation, TError, EnableApiConnectorMutationVariables, TContext>) => {
-    
-    return useMutation<EnableApiConnectorMutation, TError, EnableApiConnectorMutationVariables, TContext>(
-      {
-    mutationKey: ['enableApiConnector'],
-    mutationFn: (variables?: EnableApiConnectorMutationVariables) => fetcher<EnableApiConnectorMutation, EnableApiConnectorMutationVariables>(EnableApiConnectorDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const GenerateSpecificationDocument = `
-    mutation generateSpecification($input: GenerateSpecificationInput!) {
-  generateSpecification(input: $input) {
-    specification
-  }
-}
-    `;
-
-export const useGenerateSpecificationMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<GenerateSpecificationMutation, TError, GenerateSpecificationMutationVariables, TContext>) => {
-    
-    return useMutation<GenerateSpecificationMutation, TError, GenerateSpecificationMutationVariables, TContext>(
-      {
-    mutationKey: ['generateSpecification'],
-    mutationFn: (variables?: GenerateSpecificationMutationVariables) => fetcher<GenerateSpecificationMutation, GenerateSpecificationMutationVariables>(GenerateSpecificationDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const GenerationJobStatusDocument = `
-    query generationJobStatus($jobId: String!) {
-  generationJobStatus(jobId: $jobId) {
-    jobId
-    status
-    specification
-    errorMessage
-  }
-}
-    `;
-
-export const useGenerationJobStatusQuery = <
-      TData = GenerationJobStatusQuery,
-      TError = unknown
-    >(
-      variables: GenerationJobStatusQueryVariables,
-      options?: Omit<UseQueryOptions<GenerationJobStatusQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GenerationJobStatusQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<GenerationJobStatusQuery, TError, TData>(
-      {
-    queryKey: ['generationJobStatus', variables],
-    queryFn: fetcher<GenerationJobStatusQuery, GenerationJobStatusQueryVariables>(GenerationJobStatusDocument, variables),
-    ...options
-  }
-    )};
-
-export const ImportOpenApiSpecificationDocument = `
-    mutation importOpenApiSpecification($input: ImportOpenApiSpecificationInput!) {
-  importOpenApiSpecification(input: $input) {
-    id
-    name
-    title
-    description
-    icon
-    connectorVersion
-    enabled
-    specification
-    definition
-    endpoints {
-      id
-      name
-      description
-      path
-      httpMethod
-    }
-    createdBy
-    createdDate
-    lastModifiedBy
-    lastModifiedDate
-    version
-  }
-}
-    `;
-
-export const useImportOpenApiSpecificationMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<ImportOpenApiSpecificationMutation, TError, ImportOpenApiSpecificationMutationVariables, TContext>) => {
-    
-    return useMutation<ImportOpenApiSpecificationMutation, TError, ImportOpenApiSpecificationMutationVariables, TContext>(
-      {
-    mutationKey: ['importOpenApiSpecification'],
-    mutationFn: (variables?: ImportOpenApiSpecificationMutationVariables) => fetcher<ImportOpenApiSpecificationMutation, ImportOpenApiSpecificationMutationVariables>(ImportOpenApiSpecificationDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const StartGenerateFromDocumentationPreviewDocument = `
-    mutation startGenerateFromDocumentationPreview($input: GenerateFromDocumentationInput!) {
-  startGenerateFromDocumentationPreview(input: $input) {
-    jobId
-    status
-    specification
-    errorMessage
-  }
-}
-    `;
-
-export const useStartGenerateFromDocumentationPreviewMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<StartGenerateFromDocumentationPreviewMutation, TError, StartGenerateFromDocumentationPreviewMutationVariables, TContext>) => {
-    
-    return useMutation<StartGenerateFromDocumentationPreviewMutation, TError, StartGenerateFromDocumentationPreviewMutationVariables, TContext>(
-      {
-    mutationKey: ['startGenerateFromDocumentationPreview'],
-    mutationFn: (variables?: StartGenerateFromDocumentationPreviewMutationVariables) => fetcher<StartGenerateFromDocumentationPreviewMutation, StartGenerateFromDocumentationPreviewMutationVariables>(StartGenerateFromDocumentationPreviewDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const UpdateApiConnectorDocument = `
-    mutation updateApiConnector($id: ID!, $input: UpdateApiConnectorInput!) {
-  updateApiConnector(id: $id, input: $input) {
-    id
-    name
-    title
-    description
-    icon
-    connectorVersion
-    enabled
-    specification
-    definition
-    endpoints {
-      id
-      name
-      description
-      path
-      httpMethod
-    }
-    createdBy
-    createdDate
-    lastModifiedBy
-    lastModifiedDate
-    version
-  }
-}
-    `;
-
-export const useUpdateApiConnectorMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateApiConnectorMutation, TError, UpdateApiConnectorMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateApiConnectorMutation, TError, UpdateApiConnectorMutationVariables, TContext>(
-      {
-    mutationKey: ['updateApiConnector'],
-    mutationFn: (variables?: UpdateApiConnectorMutationVariables) => fetcher<UpdateApiConnectorMutation, UpdateApiConnectorMutationVariables>(UpdateApiConnectorDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const EditorJobFileLogsDocument = `
-    query editorJobFileLogs($jobId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) {
-  editorJobFileLogs(jobId: $jobId, filter: $filter, page: $page, size: $size) {
-    content {
-      timestamp
-      level
-      componentName
-      componentOperationName
-      taskExecutionId
-      message
-      exceptionType
-      exceptionMessage
-      stackTrace
-    }
-    totalElements
-    totalPages
-    pageNumber
-    pageSize
-    hasNext
-    hasPrevious
-  }
-}
-    `;
-
-export const useEditorJobFileLogsQuery = <
-      TData = EditorJobFileLogsQuery,
-      TError = unknown
-    >(
-      variables: EditorJobFileLogsQueryVariables,
-      options?: Omit<UseQueryOptions<EditorJobFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorJobFileLogsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<EditorJobFileLogsQuery, TError, TData>(
-      {
-    queryKey: ['editorJobFileLogs', variables],
-    queryFn: fetcher<EditorJobFileLogsQuery, EditorJobFileLogsQueryVariables>(EditorJobFileLogsDocument, variables),
-    ...options
-  }
-    )};
-
-export const EditorJobFileLogsExistDocument = `
-    query editorJobFileLogsExist($jobId: ID!) {
-  editorJobFileLogsExist(jobId: $jobId)
-}
-    `;
-
-export const useEditorJobFileLogsExistQuery = <
-      TData = EditorJobFileLogsExistQuery,
-      TError = unknown
-    >(
-      variables: EditorJobFileLogsExistQueryVariables,
-      options?: Omit<UseQueryOptions<EditorJobFileLogsExistQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorJobFileLogsExistQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<EditorJobFileLogsExistQuery, TError, TData>(
-      {
-    queryKey: ['editorJobFileLogsExist', variables],
-    queryFn: fetcher<EditorJobFileLogsExistQuery, EditorJobFileLogsExistQueryVariables>(EditorJobFileLogsExistDocument, variables),
-    ...options
-  }
-    )};
-
-export const EditorTaskExecutionFileLogsDocument = `
-    query editorTaskExecutionFileLogs($jobId: ID!, $taskExecutionId: ID!) {
-  editorTaskExecutionFileLogs(jobId: $jobId, taskExecutionId: $taskExecutionId) {
-    timestamp
-    level
-    componentName
-    componentOperationName
-    taskExecutionId
-    message
-    exceptionType
-    exceptionMessage
-    stackTrace
-  }
-}
-    `;
-
-export const useEditorTaskExecutionFileLogsQuery = <
-      TData = EditorTaskExecutionFileLogsQuery,
-      TError = unknown
-    >(
-      variables: EditorTaskExecutionFileLogsQueryVariables,
-      options?: Omit<UseQueryOptions<EditorTaskExecutionFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorTaskExecutionFileLogsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<EditorTaskExecutionFileLogsQuery, TError, TData>(
-      {
-    queryKey: ['editorTaskExecutionFileLogs', variables],
-    queryFn: fetcher<EditorTaskExecutionFileLogsQuery, EditorTaskExecutionFileLogsQueryVariables>(EditorTaskExecutionFileLogsDocument, variables),
-    ...options
-  }
-    )};
-
-export const JobFileLogsDocument = `
-    query jobFileLogs($jobId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) {
-  jobFileLogs(jobId: $jobId, filter: $filter, page: $page, size: $size) {
-    content {
-      timestamp
-      level
-      componentName
-      componentOperationName
-      taskExecutionId
-      message
-      exceptionType
-      exceptionMessage
-      stackTrace
-    }
-    totalElements
-    totalPages
-    pageNumber
-    pageSize
-    hasNext
-    hasPrevious
-  }
-}
-    `;
-
-export const useJobFileLogsQuery = <
-      TData = JobFileLogsQuery,
-      TError = unknown
-    >(
-      variables: JobFileLogsQueryVariables,
-      options?: Omit<UseQueryOptions<JobFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<JobFileLogsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<JobFileLogsQuery, TError, TData>(
-      {
-    queryKey: ['jobFileLogs', variables],
-    queryFn: fetcher<JobFileLogsQuery, JobFileLogsQueryVariables>(JobFileLogsDocument, variables),
-    ...options
-  }
-    )};
-
-export const JobFileLogsExistDocument = `
-    query jobFileLogsExist($jobId: ID!) {
-  jobFileLogsExist(jobId: $jobId)
-}
-    `;
-
-export const useJobFileLogsExistQuery = <
-      TData = JobFileLogsExistQuery,
-      TError = unknown
-    >(
-      variables: JobFileLogsExistQueryVariables,
-      options?: Omit<UseQueryOptions<JobFileLogsExistQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<JobFileLogsExistQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<JobFileLogsExistQuery, TError, TData>(
-      {
-    queryKey: ['jobFileLogsExist', variables],
-    queryFn: fetcher<JobFileLogsExistQuery, JobFileLogsExistQueryVariables>(JobFileLogsExistDocument, variables),
-    ...options
-  }
-    )};
-
-export const TaskExecutionFileLogsDocument = `
-    query taskExecutionFileLogs($jobId: ID!, $taskExecutionId: ID!) {
-  taskExecutionFileLogs(jobId: $jobId, taskExecutionId: $taskExecutionId) {
-    timestamp
-    level
-    componentName
-    componentOperationName
-    taskExecutionId
-    message
-    exceptionType
-    exceptionMessage
-    stackTrace
-  }
-}
-    `;
-
-export const useTaskExecutionFileLogsQuery = <
-      TData = TaskExecutionFileLogsQuery,
-      TError = unknown
-    >(
-      variables: TaskExecutionFileLogsQueryVariables,
-      options?: Omit<UseQueryOptions<TaskExecutionFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TaskExecutionFileLogsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<TaskExecutionFileLogsQuery, TError, TData>(
-      {
-    queryKey: ['taskExecutionFileLogs', variables],
-    queryFn: fetcher<TaskExecutionFileLogsQuery, TaskExecutionFileLogsQueryVariables>(TaskExecutionFileLogsDocument, variables),
-    ...options
-  }
-    )};
-
 export const AdminApiKeysDocument = `
     query adminApiKeys($environmentId: ID!) {
   adminApiKeys(environmentId: $environmentId) {
@@ -5986,118 +3052,6 @@ export const useApiKeysQuery = <
       {
     queryKey: ['apiKeys', variables],
     queryFn: fetcher<ApiKeysQuery, ApiKeysQueryVariables>(ApiKeysDocument, variables),
-    ...options
-  }
-    )};
-
-export const ClusterElementComponentConnectionsDocument = `
-    query clusterElementComponentConnections($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!) {
-  clusterElementComponentConnections(
-    workflowId: $workflowId
-    workflowNodeName: $workflowNodeName
-    clusterElementType: $clusterElementType
-    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
-  ) {
-    componentName
-    componentVersion
-    key
-    required
-    workflowNodeName
-  }
-}
-    `;
-
-export const useClusterElementComponentConnectionsQuery = <
-      TData = ClusterElementComponentConnectionsQuery,
-      TError = unknown
-    >(
-      variables: ClusterElementComponentConnectionsQueryVariables,
-      options?: Omit<UseQueryOptions<ClusterElementComponentConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementComponentConnectionsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<ClusterElementComponentConnectionsQuery, TError, TData>(
-      {
-    queryKey: ['clusterElementComponentConnections', variables],
-    queryFn: fetcher<ClusterElementComponentConnectionsQuery, ClusterElementComponentConnectionsQueryVariables>(ClusterElementComponentConnectionsDocument, variables),
-    ...options
-  }
-    )};
-
-export const ClusterElementScriptInputDocument = `
-    query clusterElementScriptInput($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!) {
-  clusterElementScriptInput(
-    workflowId: $workflowId
-    workflowNodeName: $workflowNodeName
-    clusterElementType: $clusterElementType
-    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
-    environmentId: $environmentId
-  )
-}
-    `;
-
-export const useClusterElementScriptInputQuery = <
-      TData = ClusterElementScriptInputQuery,
-      TError = unknown
-    >(
-      variables: ClusterElementScriptInputQueryVariables,
-      options?: Omit<UseQueryOptions<ClusterElementScriptInputQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementScriptInputQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<ClusterElementScriptInputQuery, TError, TData>(
-      {
-    queryKey: ['clusterElementScriptInput', variables],
-    queryFn: fetcher<ClusterElementScriptInputQuery, ClusterElementScriptInputQueryVariables>(ClusterElementScriptInputDocument, variables),
-    ...options
-  }
-    )};
-
-export const ComponentDefinitionSearchDocument = `
-    query ComponentDefinitionSearch($query: String!) {
-  componentDefinitionSearch(query: $query) {
-    name
-    title
-    icon
-    description
-    version
-    actionsCount
-    triggersCount
-    clusterElementsCount
-    componentCategories {
-      name
-      label
-    }
-    actions {
-      name
-      title
-      description
-    }
-    triggers {
-      name
-      title
-      description
-    }
-    clusterElements {
-      type {
-        name
-        label
-      }
-    }
-  }
-}
-    `;
-
-export const useComponentDefinitionSearchQuery = <
-      TData = ComponentDefinitionSearchQuery,
-      TError = unknown
-    >(
-      variables: ComponentDefinitionSearchQueryVariables,
-      options?: Omit<UseQueryOptions<ComponentDefinitionSearchQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ComponentDefinitionSearchQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<ComponentDefinitionSearchQuery, TError, TData>(
-      {
-    queryKey: ['ComponentDefinitionSearch', variables],
-    queryFn: fetcher<ComponentDefinitionSearchQuery, ComponentDefinitionSearchQueryVariables>(ComponentDefinitionSearchDocument, variables),
     ...options
   }
     )};
@@ -6411,120 +3365,6 @@ export const useMcpToolsByComponentIdQuery = <
   }
     )};
 
-export const SaveClusterElementTestConfigurationConnectionDocument = `
-    mutation saveClusterElementTestConfigurationConnection($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $workflowConnectionKey: String!, $connectionId: Long!, $environmentId: Long!) {
-  saveClusterElementTestConfigurationConnection(
-    workflowId: $workflowId
-    workflowNodeName: $workflowNodeName
-    clusterElementType: $clusterElementType
-    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
-    workflowConnectionKey: $workflowConnectionKey
-    connectionId: $connectionId
-    environmentId: $environmentId
-  )
-}
-    `;
-
-export const useSaveClusterElementTestConfigurationConnectionMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<SaveClusterElementTestConfigurationConnectionMutation, TError, SaveClusterElementTestConfigurationConnectionMutationVariables, TContext>) => {
-    
-    return useMutation<SaveClusterElementTestConfigurationConnectionMutation, TError, SaveClusterElementTestConfigurationConnectionMutationVariables, TContext>(
-      {
-    mutationKey: ['saveClusterElementTestConfigurationConnection'],
-    mutationFn: (variables?: SaveClusterElementTestConfigurationConnectionMutationVariables) => fetcher<SaveClusterElementTestConfigurationConnectionMutation, SaveClusterElementTestConfigurationConnectionMutationVariables>(SaveClusterElementTestConfigurationConnectionDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const SaveWorkflowTestConfigurationConnectionDocument = `
-    mutation saveWorkflowTestConfigurationConnection($workflowId: String!, $workflowNodeName: String!, $workflowConnectionKey: String!, $connectionId: Long!, $environmentId: Long!) {
-  saveWorkflowTestConfigurationConnection(
-    workflowId: $workflowId
-    workflowNodeName: $workflowNodeName
-    workflowConnectionKey: $workflowConnectionKey
-    connectionId: $connectionId
-    environmentId: $environmentId
-  )
-}
-    `;
-
-export const useSaveWorkflowTestConfigurationConnectionMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<SaveWorkflowTestConfigurationConnectionMutation, TError, SaveWorkflowTestConfigurationConnectionMutationVariables, TContext>) => {
-    
-    return useMutation<SaveWorkflowTestConfigurationConnectionMutation, TError, SaveWorkflowTestConfigurationConnectionMutationVariables, TContext>(
-      {
-    mutationKey: ['saveWorkflowTestConfigurationConnection'],
-    mutationFn: (variables?: SaveWorkflowTestConfigurationConnectionMutationVariables) => fetcher<SaveWorkflowTestConfigurationConnectionMutation, SaveWorkflowTestConfigurationConnectionMutationVariables>(SaveWorkflowTestConfigurationConnectionDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const TestClusterElementScriptDocument = `
-    mutation testClusterElementScript($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!, $inputParameters: Map) {
-  testClusterElementScript(
-    workflowId: $workflowId
-    workflowNodeName: $workflowNodeName
-    clusterElementType: $clusterElementType
-    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
-    environmentId: $environmentId
-    inputParameters: $inputParameters
-  ) {
-    error {
-      message
-      stackTrace
-    }
-    output
-  }
-}
-    `;
-
-export const useTestClusterElementScriptMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<TestClusterElementScriptMutation, TError, TestClusterElementScriptMutationVariables, TContext>) => {
-    
-    return useMutation<TestClusterElementScriptMutation, TError, TestClusterElementScriptMutationVariables, TContext>(
-      {
-    mutationKey: ['testClusterElementScript'],
-    mutationFn: (variables?: TestClusterElementScriptMutationVariables) => fetcher<TestClusterElementScriptMutation, TestClusterElementScriptMutationVariables>(TestClusterElementScriptDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const TestWorkflowNodeScriptDocument = `
-    mutation testWorkflowNodeScript($workflowId: String!, $workflowNodeName: String!, $environmentId: Long!, $inputParameters: Map) {
-  testWorkflowNodeScript(
-    workflowId: $workflowId
-    workflowNodeName: $workflowNodeName
-    environmentId: $environmentId
-    inputParameters: $inputParameters
-  ) {
-    error {
-      message
-      stackTrace
-    }
-    output
-  }
-}
-    `;
-
-export const useTestWorkflowNodeScriptMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<TestWorkflowNodeScriptMutation, TError, TestWorkflowNodeScriptMutationVariables, TContext>) => {
-    
-    return useMutation<TestWorkflowNodeScriptMutation, TError, TestWorkflowNodeScriptMutationVariables, TContext>(
-      {
-    mutationKey: ['testWorkflowNodeScript'],
-    mutationFn: (variables?: TestWorkflowNodeScriptMutationVariables) => fetcher<TestWorkflowNodeScriptMutation, TestWorkflowNodeScriptMutationVariables>(TestWorkflowNodeScriptDocument, variables)(),
-    ...options
-  }
-    )};
-
 export const UpdateApiKeyDocument = `
     mutation updateApiKey($id: ID!, $name: String!) {
   updateApiKey(id: $id, name: $name)
@@ -6608,206 +3448,6 @@ export const useUpdateMcpServerUrlMutation = <
       {
     mutationKey: ['updateMcpServerUrl'],
     mutationFn: (variables?: UpdateMcpServerUrlMutationVariables) => fetcher<UpdateMcpServerUrlMutation, UpdateMcpServerUrlMutationVariables>(UpdateMcpServerUrlDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const WorkflowNodeComponentConnectionsDocument = `
-    query workflowNodeComponentConnections($workflowId: String!, $workflowNodeName: String!) {
-  workflowNodeComponentConnections(
-    workflowId: $workflowId
-    workflowNodeName: $workflowNodeName
-  ) {
-    componentName
-    componentVersion
-    key
-    required
-    workflowNodeName
-  }
-}
-    `;
-
-export const useWorkflowNodeComponentConnectionsQuery = <
-      TData = WorkflowNodeComponentConnectionsQuery,
-      TError = unknown
-    >(
-      variables: WorkflowNodeComponentConnectionsQueryVariables,
-      options?: Omit<UseQueryOptions<WorkflowNodeComponentConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeComponentConnectionsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<WorkflowNodeComponentConnectionsQuery, TError, TData>(
-      {
-    queryKey: ['workflowNodeComponentConnections', variables],
-    queryFn: fetcher<WorkflowNodeComponentConnectionsQuery, WorkflowNodeComponentConnectionsQueryVariables>(WorkflowNodeComponentConnectionsDocument, variables),
-    ...options
-  }
-    )};
-
-export const WorkflowNodeScriptInputDocument = `
-    query workflowNodeScriptInput($workflowId: String!, $workflowNodeName: String!, $environmentId: Long!) {
-  workflowNodeScriptInput(
-    workflowId: $workflowId
-    workflowNodeName: $workflowNodeName
-    environmentId: $environmentId
-  )
-}
-    `;
-
-export const useWorkflowNodeScriptInputQuery = <
-      TData = WorkflowNodeScriptInputQuery,
-      TError = unknown
-    >(
-      variables: WorkflowNodeScriptInputQueryVariables,
-      options?: Omit<UseQueryOptions<WorkflowNodeScriptInputQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeScriptInputQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<WorkflowNodeScriptInputQuery, TError, TData>(
-      {
-    queryKey: ['workflowNodeScriptInput', variables],
-    queryFn: fetcher<WorkflowNodeScriptInputQuery, WorkflowNodeScriptInputQueryVariables>(WorkflowNodeScriptInputDocument, variables),
-    ...options
-  }
-    )};
-
-export const CustomComponentDocument = `
-    query customComponent($id: ID!) {
-  customComponent(id: $id) {
-    id
-    name
-    title
-    description
-    icon
-    componentVersion
-    enabled
-    language
-    createdBy
-    createdDate
-    lastModifiedBy
-    lastModifiedDate
-    version
-  }
-}
-    `;
-
-export const useCustomComponentQuery = <
-      TData = CustomComponentQuery,
-      TError = unknown
-    >(
-      variables: CustomComponentQueryVariables,
-      options?: Omit<UseQueryOptions<CustomComponentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<CustomComponentQuery, TError, TData>(
-      {
-    queryKey: ['customComponent', variables],
-    queryFn: fetcher<CustomComponentQuery, CustomComponentQueryVariables>(CustomComponentDocument, variables),
-    ...options
-  }
-    )};
-
-export const CustomComponentDefinitionDocument = `
-    query customComponentDefinition($id: ID!) {
-  customComponentDefinition(id: $id) {
-    actions {
-      name
-      title
-      description
-    }
-    triggers {
-      name
-      title
-      description
-    }
-  }
-}
-    `;
-
-export const useCustomComponentDefinitionQuery = <
-      TData = CustomComponentDefinitionQuery,
-      TError = unknown
-    >(
-      variables: CustomComponentDefinitionQueryVariables,
-      options?: Omit<UseQueryOptions<CustomComponentDefinitionQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentDefinitionQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<CustomComponentDefinitionQuery, TError, TData>(
-      {
-    queryKey: ['customComponentDefinition', variables],
-    queryFn: fetcher<CustomComponentDefinitionQuery, CustomComponentDefinitionQueryVariables>(CustomComponentDefinitionDocument, variables),
-    ...options
-  }
-    )};
-
-export const CustomComponentsDocument = `
-    query customComponents {
-  customComponents {
-    id
-    name
-    title
-    description
-    icon
-    componentVersion
-    enabled
-    language
-    createdBy
-    createdDate
-    lastModifiedBy
-    lastModifiedDate
-    version
-  }
-}
-    `;
-
-export const useCustomComponentsQuery = <
-      TData = CustomComponentsQuery,
-      TError = unknown
-    >(
-      variables?: CustomComponentsQueryVariables,
-      options?: Omit<UseQueryOptions<CustomComponentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<CustomComponentsQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['customComponents'] : ['customComponents', variables],
-    queryFn: fetcher<CustomComponentsQuery, CustomComponentsQueryVariables>(CustomComponentsDocument, variables),
-    ...options
-  }
-    )};
-
-export const DeleteCustomComponentDocument = `
-    mutation deleteCustomComponent($id: ID!) {
-  deleteCustomComponent(id: $id)
-}
-    `;
-
-export const useDeleteCustomComponentMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DeleteCustomComponentMutation, TError, DeleteCustomComponentMutationVariables, TContext>) => {
-    
-    return useMutation<DeleteCustomComponentMutation, TError, DeleteCustomComponentMutationVariables, TContext>(
-      {
-    mutationKey: ['deleteCustomComponent'],
-    mutationFn: (variables?: DeleteCustomComponentMutationVariables) => fetcher<DeleteCustomComponentMutation, DeleteCustomComponentMutationVariables>(DeleteCustomComponentDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const EnableCustomComponentDocument = `
-    mutation enableCustomComponent($id: ID!, $enable: Boolean!) {
-  enableCustomComponent(id: $id, enable: $enable)
-}
-    `;
-
-export const useEnableCustomComponentMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<EnableCustomComponentMutation, TError, EnableCustomComponentMutationVariables, TContext>) => {
-    
-    return useMutation<EnableCustomComponentMutation, TError, EnableCustomComponentMutationVariables, TContext>(
-      {
-    mutationKey: ['enableCustomComponent'],
-    mutationFn: (variables?: EnableCustomComponentMutationVariables) => fetcher<EnableCustomComponentMutation, EnableCustomComponentMutationVariables>(EnableCustomComponentDocument, variables)(),
     ...options
   }
     )};

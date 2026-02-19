@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import IntegrationPortalDialogContent from '@/ee/pages/embedded/integration/components/delete/IntegrationPortalDialogContent';
 import * as React from 'react';

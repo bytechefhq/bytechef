@@ -1,8 +1,7 @@
 ---
-title: "Object Helper"
-description: "Object Helper allows you to do various operations on objects."
+description: "Object Helper component. Object manipulation operations. Learn how to implement this in your ByteChef workflows."
+title: Object Helper
 ---
-
 
 Categories: Helpers
 
@@ -62,8 +61,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
-
 ### Add Key-Value Pairs
 Name: addKeyValuePairs
 
@@ -100,8 +97,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
-
 ### Contains
 Name: contains
 
@@ -111,7 +106,7 @@ Name: contains
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Object that you'd like to check. | true |
+| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Object that you'd like to check. | true |
 | key | Key | STRING | Key to check for existence. | true |
 
 #### Example JSON Structure
@@ -120,7 +115,7 @@ Name: contains
   "label" : "Contains",
   "name" : "contains",
   "parameters" : {
-    "source" : { },
+    "input" : { },
     "key" : ""
   },
   "type" : "objectHelper/v1/contains"
@@ -140,8 +135,6 @@ Type: BOOLEAN
 
 
 
-
-
 ### Delete Key-Value Pair
 Name: deleteKeyValuePair
 
@@ -151,7 +144,7 @@ Name: deleteKeyValuePair
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The object from which to delete the key-value pair. | true |
+| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The object from which to delete the key-value pair. | true |
 | key | Key | STRING | The key of the key-value pair to delete. | true |
 
 #### Example JSON Structure
@@ -160,7 +153,7 @@ Name: deleteKeyValuePair
   "label" : "Delete Key-Value Pair",
   "name" : "deleteKeyValuePair",
   "parameters" : {
-    "source" : { },
+    "input" : { },
     "key" : ""
   },
   "type" : "objectHelper/v1/deleteKeyValuePair"
@@ -170,8 +163,6 @@ Name: deleteKeyValuePair
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -214,8 +205,6 @@ Type: BOOLEAN
 
 
 
-
-
 ### Merge Two Objects
 Name: mergeTwoObjects
 
@@ -244,11 +233,3 @@ Name: mergeTwoObjects
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-
-

@@ -26,8 +26,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
+import com.bytechef.component.ai.agent.action.AiAgentChatAction;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -37,12 +37,15 @@ import java.util.List;
 
 public class AiAgentChatTool {
 
-    public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(ActionDefinition actionDefinition) {
-        MultipleConnectionsPerformFunction performFn = (MultipleConnectionsPerformFunction) actionDefinition
-            .getPerform()
-            .orElseThrow();
+    public final ClusterElementDefinition<MultipleConnectionsToolFunction> clusterElementDefinition;
 
-        return ComponentDsl.<MultipleConnectionsToolFunction>clusterElement("aiAgent")
+    public AiAgentChatTool(AiAgentChatAction aiAgentChatAction) {
+        MultipleConnectionsPerformFunction performFn =
+            (MultipleConnectionsPerformFunction) aiAgentChatAction.actionDefinition
+                .getPerform()
+                .orElseThrow();
+
+        this.clusterElementDefinition = ComponentDsl.<MultipleConnectionsToolFunction>clusterElement("aiAgent")
             .title("AI Agent")
             .description("AI Agent tool")
             .properties(
@@ -62,9 +65,6 @@ public class AiAgentChatTool {
             .object(
                 () -> (inputParameters, connectionParameters, extensions, componentConnections, context) -> performFn
                     .apply(inputParameters, componentConnections, extensions, new ActionContextAdapter(context)));
-    }
-
-    private AiAgentChatTool() {
     }
 
     private static class ActionContextAdapter implements ActionContext {

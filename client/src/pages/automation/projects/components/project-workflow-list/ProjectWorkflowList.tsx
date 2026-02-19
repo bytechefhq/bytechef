@@ -57,10 +57,10 @@ const ProjectWorkflowList = ({project, queryEnabled}: {project: Project; queryEn
     const queryClient = useQueryClient();
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
-        onSuccess: (response) => {
+        onSuccess: (projectWorkflowId) => {
             captureProjectWorkflowCreated();
 
-            navigate(`/automation/projects/${project.id}/project-workflows/${response.projectWorkflowId}`);
+            navigate(`/automation/projects/${project.id}/project-workflows/${projectWorkflowId}`);
         },
     });
 

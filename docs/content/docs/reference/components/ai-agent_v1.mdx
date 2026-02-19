@@ -1,8 +1,8 @@
 ---
-title: "AI Agent"
-description: "With the AI Agent, you can chat with the AI agent."
+description: 'description: Learn how to use AI Agent in ByteChef. Comprehensive guide
+  with examples'
+title: AI Agent
 ---
-
 
 Categories: Artificial Intelligence
 
@@ -72,72 +72,3 @@ Name: chat
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-### Chat (stream)
-Name: streamChat
-
-`Chat with the AI agent and stream the response.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
-| userPrompt | Prompt | STRING | User prompt to the model. | true |
-| systemPrompt | System Prompt | STRING | System prompt to the model. | false |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | Only text and image files are supported. Also, only certain models supports images. Please check the documentation. | false |
-| messages | Messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)&#125;] </details> | A list of messages comprising the conversation so far. | true |
-| response | Response | OBJECT <details> <summary> Properties </summary> &#123;STRING\(responseFormat), STRING\(responseSchema)&#125; </details> | The response from the API. | true |
-| conversationId | null | STRING | The conversation id used in conjunction with memory. | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Chat (stream)",
-  "name" : "streamChat",
-  "parameters" : {
-    "format" : "",
-    "userPrompt" : "",
-    "systemPrompt" : "",
-    "attachments" : [ {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    } ],
-    "messages" : [ {
-      "role" : "",
-      "content" : "",
-      "attachments" : [ {
-        "extension" : "",
-        "mimeType" : "",
-        "name" : "",
-        "url" : ""
-      } ]
-    } ],
-    "response" : {
-      "responseFormat" : "",
-      "responseSchema" : ""
-    },
-    "conversationId" : ""
-  },
-  "type" : "aiAgent/v1/streamChat"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-
-

@@ -5,38 +5,9 @@ import useEditUserDialog from '../useEditUserDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
-        storeState: {
-            clearLoginToEdit: vi.fn(),
-            editRole: null as string | null,
-            loginToEdit: null as string | null,
-            setEditRole: vi.fn(),
-            setLoginToEdit: vi.fn(),
-        },
         updateUserMutate: vi.fn(),
     };
 });
-
-vi.mock('@/pages/settings/platform/users/stores/useEditUserDialogStore', () => ({
-    useEditUserDialogStore: vi.fn(() => {
-        return {
-            clearLoginToEdit: () => {
-                hoisted.storeState.editRole = null;
-                hoisted.storeState.loginToEdit = null;
-                hoisted.storeState.clearLoginToEdit();
-            },
-            editRole: hoisted.storeState.editRole,
-            loginToEdit: hoisted.storeState.loginToEdit,
-            setEditRole: (role: string) => {
-                hoisted.storeState.editRole = role;
-                hoisted.storeState.setEditRole(role);
-            },
-            setLoginToEdit: (login: string) => {
-                hoisted.storeState.loginToEdit = login;
-                hoisted.storeState.setLoginToEdit(login);
-            },
-        };
-    }),
-}));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useAuthoritiesQuery: vi.fn(() => ({
@@ -89,8 +60,6 @@ vi.mock('@tanstack/react-query', () => ({
 describe('useEditUserDialog', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        hoisted.storeState.editRole = null;
-        hoisted.storeState.loginToEdit = null;
     });
 
     describe('initial state', () => {
@@ -116,30 +85,64 @@ describe('useEditUserDialog', () => {
     });
 
     describe('open dialog', () => {
-        it('opens dialog', () => {
-            const {rerender, result} = renderHook(() => useEditUserDialog());
+        it('opens dialog and sets user and role', () => {
+            const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleOpen('admin');
+                result.current.handleEditUserDialogOpen('admin');
             });
 
-            rerender();
+            expect(result.current.open).toBe(true);
+            expect(result.current.editRole).toBe('ROLE_ADMIN');
+            expect(result.current.editUser?.login).toBe('admin');
+        });
+
+        it('sets correct role for different user', () => {
+            const {result} = renderHook(() => useEditUserDialog());
+
+            act(() => {
+                result.current.handleEditUserDialogOpen('user');
+            });
 
             expect(result.current.open).toBe(true);
-            expect(result.current.editUser?.login).toBe('admin');
+            expect(result.current.editRole).toBe('ROLE_USER');
+            expect(result.current.editUser?.login).toBe('user');
+        });
+
+        it('falls back to first authority when user has no role', () => {
+            const {result} = renderHook(() => useEditUserDialog());
+
+            act(() => {
+                result.current.handleEditUserDialogOpen('unknown');
+            });
+
+            expect(result.current.open).toBe(true);
+            expect(result.current.editRole).toBe('ROLE_ADMIN');
+            expect(result.current.editUser).toBeNull();
+        });
+
+        it('sets updateDisabled to false when dialog is open with role', () => {
+            const {result} = renderHook(() => useEditUserDialog());
+
+            act(() => {
+                result.current.handleEditUserDialogOpen('admin');
+            });
+
+            expect(result.current.updateDisabled).toBe(false);
         });
     });
 
     describe('close dialog', () => {
         it('closes dialog', () => {
-            hoisted.storeState.loginToEdit = 'admin';
-            const {rerender, result} = renderHook(() => useEditUserDialog());
+            const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleClose();
+                result.current.handleEditUserDialogOpen('admin');
             });
 
-            rerender();
+            act(() => {
+                result.current.handleEditUserDialogClose();
+            });
 
             expect(result.current.open).toBe(false);
         });
@@ -147,27 +150,45 @@ describe('useEditUserDialog', () => {
 
     describe('update role', () => {
         it('updates edit role', () => {
-            hoisted.storeState.loginToEdit = 'admin';
-            const {rerender, result} = renderHook(() => useEditUserDialog());
+            const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleRoleChange('ROLE_USER');
+                result.current.handleEditUserDialogOpen('admin');
             });
 
-            rerender();
+            act(() => {
+                result.current.setEditRole('ROLE_USER');
+            });
 
             expect(result.current.editRole).toBe('ROLE_USER');
+        });
+
+        it('sets updateDisabled to true when role is null', () => {
+            const {result} = renderHook(() => useEditUserDialog());
+
+            act(() => {
+                result.current.handleEditUserDialogOpen('admin');
+            });
+
+            act(() => {
+                result.current.setEditRole(null);
+            });
+
+            expect(result.current.updateDisabled).toBe(true);
         });
     });
 
     describe('handle update', () => {
         it('calls update mutation with correct parameters', () => {
-            hoisted.storeState.loginToEdit = 'admin';
-            hoisted.storeState.editRole = 'ROLE_USER';
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleUpdate();
+                result.current.handleEditUserDialogOpen('admin');
+                result.current.setEditRole('ROLE_USER');
+            });
+
+            act(() => {
+                result.current.handleEditUserDialogUpdate();
             });
 
             expect(hoisted.updateUserMutate).toHaveBeenCalledWith({
@@ -180,22 +201,37 @@ describe('useEditUserDialog', () => {
             const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleUpdate();
+                result.current.handleEditUserDialogUpdate();
+            });
+
+            expect(hoisted.updateUserMutate).not.toHaveBeenCalled();
+        });
+
+        it('does not call update mutation when editRole is null', () => {
+            const {result} = renderHook(() => useEditUserDialog());
+
+            act(() => {
+                result.current.handleEditUserDialogOpen('admin');
+                result.current.setEditRole(null);
+            });
+
+            act(() => {
+                result.current.handleEditUserDialogUpdate();
             });
 
             expect(hoisted.updateUserMutate).not.toHaveBeenCalled();
         });
 
         it('closes dialog after successful update', () => {
-            hoisted.storeState.loginToEdit = 'admin';
-            hoisted.storeState.editRole = 'ROLE_ADMIN';
-            const {rerender, result} = renderHook(() => useEditUserDialog());
+            const {result} = renderHook(() => useEditUserDialog());
 
             act(() => {
-                result.current.handleUpdate();
+                result.current.handleEditUserDialogOpen('admin');
             });
 
-            rerender();
+            act(() => {
+                result.current.handleEditUserDialogUpdate();
+            });
 
             expect(result.current.open).toBe(false);
         });

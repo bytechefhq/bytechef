@@ -1,3 +1,0 @@
-mutation duplicateDataTable($input: DuplicateDataTableInput!) {
-    duplicateDataTable(input: $input)
-}

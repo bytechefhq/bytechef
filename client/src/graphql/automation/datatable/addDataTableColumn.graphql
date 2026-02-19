@@ -1,3 +1,0 @@
-mutation addDataTableColumn($input: AddColumnInput!) {
-    addDataTableColumn(input: $input)
-}

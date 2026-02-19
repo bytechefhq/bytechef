@@ -1,6 +1,6 @@
 ---
 title: "PDF Helper"
-description: "null"
+description: "PDF Helper component. Convert PDFs and extract text. Learn how to implement this in your ByteChef workflows."
 ---
 
 
@@ -72,8 +72,6 @@ Items Type: FILE_ENTRY
 ```
 
 
-
-
 ### Extract Text
 Name: extractText
 
@@ -115,8 +113,6 @@ Type: STRING
 
 
 
-
-
 ### Image to PDF
 Name: imageToPdf
 
@@ -126,7 +122,7 @@ Name: imageToPdf
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| images | null | ARRAY <details> <summary> Items </summary> [FILE_ENTRY\($image)] </details> | List of images that will be converted to one PDF. | true |
+| image | Image | FILE_ENTRY | The image which will be converted to PDF. | true |
 | filename | Filename | STRING | The name of the PDF file. | true |
 
 #### Example JSON Structure
@@ -135,12 +131,12 @@ Name: imageToPdf
   "label" : "Image to PDF",
   "name" : "imageToPdf",
   "parameters" : {
-    "images" : [ {
+    "image" : {
       "extension" : "",
       "mimeType" : "",
       "name" : "",
       "url" : ""
-    } ],
+    },
     "filename" : ""
   },
   "type" : "pdfHelper/v1/imageToPdf"
@@ -175,8 +171,6 @@ Type: FILE_ENTRY
   "url" : ""
 }
 ```
-
-
 
 
 ### Text to PDF
@@ -232,8 +226,6 @@ Type: FILE_ENTRY
   "url" : ""
 }
 ```
-
-
 
 
 

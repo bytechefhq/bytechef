@@ -36,7 +36,6 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestTestConfiguration;
-import com.bytechef.automation.configuration.web.rest.model.CreateProjectWorkflow200ResponseModel;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
@@ -204,8 +203,8 @@ public class WorkflowApiControllerIntTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(CreateProjectWorkflow200ResponseModel.class)
-            .value(response -> Assertions.assertEquals(1L, response.getProjectWorkflowId()));
+            .expectBody(Long.class)
+            .isEqualTo(1L);
 
         verify(projectWorkflowFacade).addWorkflow(anyLong(), any());
     }

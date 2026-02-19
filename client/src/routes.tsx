@@ -37,11 +37,7 @@ const AutomationWorkflowExecutions = lazy(() =>
         default: module.WorkflowExecutions,
     }))
 );
-const DataTables = lazy(() => import('@/pages/automation/datatables/DataTables'));
-const DataTable = lazy(() => import('@/pages/automation/datatable/DataTable'));
 const Home = lazy(() => import('@/pages/home/Home'));
-const KnowledgeBase = lazy(() => import('@/pages/automation/knowledge-base/KnowledgeBase'));
-const KnowledgeBases = lazy(() => import('@/pages/automation/knowledge-bases/KnowledgeBases'));
 const McpServer = lazy(() => import('@/pages/settings/platform/mcp-server/McpServer'));
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const Notifications = lazy(() => import('@/pages/settings/platform/notifications/Notifications'));
@@ -50,7 +46,6 @@ const ProjectTemplate = lazy(() => import('@/pages/automation/template/project-t
 const ProjectTemplates = lazy(() => import('@/pages/automation/templates/project-templates/ProjectTemplates'));
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
-const Tasks = lazy(() => import('@/pages/automation/tasks/Tasks'));
 const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
 const WorkflowChatContainer = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChatContainer'));
 const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
@@ -60,13 +55,6 @@ const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers
 const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
 const ApiCollections = lazy(() => import('@/ee/pages/automation/api-platform/api-collections/ApiCollections'));
 const ApiConnectors = lazy(() => import('@/ee/pages/settings/platform/api-connectors/ApiConnectors'));
-const ApiConnectorManualPage = lazy(
-    () => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorManualPage')
-);
-const ApiConnectorImportPage = lazy(
-    () => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorImportPage')
-);
-const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorAiPage'));
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
@@ -240,56 +228,15 @@ const platformSettingsRoutes = {
             path: 'custom-components',
         },
         {
-            children: [
-                {
-                    element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                            <EEVersion>
-                                <LazyLoadWrapper>
-                                    <ApiConnectors />
-                                </LazyLoadWrapper>
-                            </EEVersion>
-                        </PrivateRoute>
-                    ),
-                    index: true,
-                },
-                {
-                    element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                            <EEVersion>
-                                <LazyLoadWrapper>
-                                    <ApiConnectorManualPage />
-                                </LazyLoadWrapper>
-                            </EEVersion>
-                        </PrivateRoute>
-                    ),
-                    path: 'new/manual',
-                },
-                {
-                    element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                            <EEVersion>
-                                <LazyLoadWrapper>
-                                    <ApiConnectorImportPage />
-                                </LazyLoadWrapper>
-                            </EEVersion>
-                        </PrivateRoute>
-                    ),
-                    path: 'new/import',
-                },
-                {
-                    element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                            <EEVersion>
-                                <LazyLoadWrapper>
-                                    <ApiConnectorAiPage />
-                                </LazyLoadWrapper>
-                            </EEVersion>
-                        </PrivateRoute>
-                    ),
-                    path: 'new/ai',
-                },
-            ],
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <ApiConnectors />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
             path: 'api-connectors',
         },
         {
@@ -363,6 +310,10 @@ export const loadEnvironments = async (queryClient: QueryClient) => {
 
 export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
+        // {
+        //     element: <OAuthPopup />,
+        //     path: '/oauth',
+        // },
         {
             element: <Login />,
             path: '/login',
@@ -638,51 +589,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                     path: 'connections',
                                 },
                                 {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <DataTables />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'datatables',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <DataTable />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'datatables/:id',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <KnowledgeBases />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'knowledge-bases',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <KnowledgeBase />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'knowledge-bases/:id',
-                                },
-                                {
                                     children: [
                                         {
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                                    <LazyLoadWrapper hasLeftSidebar>
+                                                    <LazyLoadWrapper>
                                                         <WorkflowChat />
                                                     </LazyLoadWrapper>
                                                 </PrivateRoute>
@@ -692,16 +603,6 @@ export const getRouter = (queryClient: QueryClient) =>
                                     ],
                                     element: <WorkflowChatContainer />,
                                     path: 'chat',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
-                                                <Tasks />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'tasks',
                                 },
                                 {
                                     children: [

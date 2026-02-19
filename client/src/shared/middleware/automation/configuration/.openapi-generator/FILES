@@ -22,9 +22,7 @@ docs/ConnectionApi.md
 docs/ConnectionBase.md
 docs/ConnectionTagApi.md
 docs/CreateProjectDeploymentWorkflowJob200Response.md
-docs/CreateProjectWorkflow200Response.md
 docs/CredentialStatus.md
-docs/DuplicateWorkflow200Response.md
 docs/Project.md
 docs/ProjectApi.md
 docs/ProjectBasic.md
@@ -64,9 +62,7 @@ models/ComponentDefinitionBasic.ts
 models/Connection.ts
 models/ConnectionBase.ts
 models/CreateProjectDeploymentWorkflowJob200Response.ts
-models/CreateProjectWorkflow200Response.ts
 models/CredentialStatus.ts
-models/DuplicateWorkflow200Response.ts
 models/Project.ts
 models/ProjectBasic.ts
 models/ProjectDeployment.ts

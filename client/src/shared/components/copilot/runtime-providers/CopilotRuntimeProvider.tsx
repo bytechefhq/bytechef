@@ -36,15 +36,13 @@ export function CopilotRuntimeProvider({
 
     const {projectId, projectWorkflowId} = useParams();
 
-    const sourceKey = context?.source ?? Source.WORKFLOW_EDITOR;
-
     const agent = new HttpAgent({
-        agentId: Source[sourceKey],
+        agentId: Source[context.source],
         headers: {
             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
         },
         threadId: conversationId!,
-        url: `/api/platform/internal/ai/chat/${Source[sourceKey].toLowerCase()}`,
+        url: `/api/platform/internal/ai/chat/${Source[context.source].toLowerCase()}`,
     });
 
     const queryClient = useQueryClient();
@@ -64,26 +62,12 @@ export function CopilotRuntimeProvider({
             id: getRandomId(),
             role: 'user',
         });
-
-        const {workflowExecutionError, ...contextWithoutError} = (context ?? {}) as typeof context & {
-            workflowExecutionError?: {
-                errorMessage?: string;
-                stackTrace?: string[];
-                title?: string;
-                workflowId?: string;
-            };
-        };
-
-        const stateToSend = {
-            ...contextWithoutError,
+        agent.setState({
+            ...context,
             currentSelectedNode: currentComponent?.name,
+            workflowExecutionError: context.taskExecutionError,
             workflowId: workflow.id,
-            ...(workflow.id === workflowExecutionError?.workflowId
-                ? {workflowExecutionError: workflowExecutionError}
-                : {}),
-        };
-
-        agent.setState(stateToSend);
+        });
 
         // Prepare an empty assistant message to stream into
         addMessage({content: '', role: 'assistant'});

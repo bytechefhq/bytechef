@@ -1,6 +1,0 @@
-mutation updateDataTableRow($input: UpdateRowInput!) {
-    updateDataTableRow(input: $input) {
-        id
-        values
-    }
-}

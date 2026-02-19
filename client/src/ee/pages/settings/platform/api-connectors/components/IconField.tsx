@@ -1,19 +1,30 @@
-import Button from '@/components/Button/Button';
 import {Avatar, AvatarImage} from '@/components/ui/avatar';
+import {Button} from '@/components/ui/button';
+import {ChangeEvent, useRef, useState} from 'react';
 import {ControllerRenderProps, FieldPath, FieldValues} from 'react-hook-form';
 
-import useIconField from './hooks/useIconField';
+const IconField = <T extends FieldValues, K extends FieldPath<T>>({field}: {field: ControllerRenderProps<T, K>}) => {
+    const hiddenInputRef = useRef<HTMLInputElement>(null);
 
-interface IconFieldProps<T extends FieldValues, K extends FieldPath<T>> {
-    field: ControllerRenderProps<T, K>;
-    onIconChange?: (value: string) => void;
-}
+    const [preview, setPreview] = useState<string>();
 
-const IconField = <T extends FieldValues, K extends FieldPath<T>>({field, onIconChange}: IconFieldProps<T, K>) => {
-    const {handleUploadedFile, hiddenInputRef, onUpload, preview, uploadButtonLabel} = useIconField({
-        field,
-        onIconChange,
-    });
+    const handleUploadedFile = async (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.item(0);
+
+        if (file) {
+            field.onChange(await file.text());
+
+            const urlIcon = URL.createObjectURL(file);
+
+            setPreview(urlIcon);
+        }
+    };
+
+    const onUpload = () => {
+        hiddenInputRef.current?.click();
+    };
+
+    const uploadButtonLabel = preview ? 'Change icon' : 'Upload icon';
 
     return (
         <div className="flex items-center space-x-1">
@@ -30,7 +41,7 @@ const IconField = <T extends FieldValues, K extends FieldPath<T>>({field, onIcon
             <input
                 accept=".svg"
                 className="hidden"
-                onChange={(event) => handleUploadedFile(event)}
+                onChange={(e) => handleUploadedFile(e)}
                 ref={hiddenInputRef}
                 type="file"
                 value=""

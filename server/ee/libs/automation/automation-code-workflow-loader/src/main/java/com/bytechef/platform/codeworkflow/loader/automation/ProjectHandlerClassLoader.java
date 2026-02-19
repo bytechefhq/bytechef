@@ -7,10 +7,10 @@
 
 package com.bytechef.platform.codeworkflow.loader.automation;
 
-import com.bytechef.automation.project.ProjectHandler;
-import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.classloader.IsolatingClassLoader;
 import com.bytechef.classloader.util.ClassLoaderUtils;
+import com.bytechef.workflow.ProjectHandler;
+import com.bytechef.workflow.definition.ProjectDefinition;
 import java.net.URL;
 import java.util.ServiceLoader;
 import org.springframework.cache.CacheManager;

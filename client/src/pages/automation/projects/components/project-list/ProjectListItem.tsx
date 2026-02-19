@@ -101,10 +101,10 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const queryClient = useQueryClient();
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
-        onSuccess: (response) => {
+        onSuccess: (projectWorkflowId) => {
             captureProjectWorkflowCreated();
 
-            navigate(`/automation/projects/${project.id}/project-workflows/${response.projectWorkflowId}`);
+            navigate(`/automation/projects/${project.id}/project-workflows/${projectWorkflowId}`);
         },
     });
 
@@ -124,18 +124,8 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     });
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
-        onError: () => {
-            toast({
-                description: 'Project duplication failed.',
-                variant: 'destructive',
-            });
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-
-            toast({
-                description: 'Project duplicated successfully.',
-            });
         },
     });
 
@@ -286,7 +276,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
-                                <ButtonGroup aria-label="Workflow Creation Actions">
+                                <ButtonGroup>
                                     <Button
                                         aria-label="Create Workflow"
                                         onClick={(event) => {
@@ -303,11 +293,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button
-                                                aria-label="More Workflow Creation Actions"
-                                                size="xs"
-                                                variant="outline"
-                                            >
+                                            <Button size="xs" variant="outline">
                                                 <ChevronDownIcon />
                                             </Button>
                                         </DropdownMenuTrigger>
@@ -315,7 +301,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         <DropdownMenuContent align="end">
                                             {ff_1041 && (
                                                 <DropdownMenuItem
-                                                    aria-label="Create Workflow from Template"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
 
@@ -327,7 +312,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             )}
 
                                             <DropdownMenuItem
-                                                aria-label="Import Workflow"
                                                 onClick={(event) => {
                                                     event.stopPropagation();
 
@@ -614,7 +598,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 accept=".json,.yaml,.yml"
                 alt="file"
                 className="hidden"
-                data-testid={`${project.id}-importWorkflowHiddenInput`}
                 onChange={(event) => handleImportWorkflow(event, project.id!, importProjectWorkflowMutation)}
                 ref={hiddenFileInputRef}
                 type="file"

@@ -1,5 +1,5 @@
-import Badge from '@/components/Badge/Badge';
 import {Alert, AlertTitle} from '@/components/ui/alert';
+import {Badge} from '@/components/ui/badge';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
 import {InfoCircledIcon} from '@radix-ui/react-icons';
@@ -66,7 +66,7 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 
                                     <span>→</span>
 
-                                    <Badge label="Add More" styleType="outline-outline" />
+                                    <Badge variant="outline">Add More</Badge>
                                 </div>
 
                                 <Alert className="flex items-center gap-2" variant="default">
@@ -101,19 +101,19 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 
                                     <span>→</span>
 
-                                    <Badge label="Settings" styleType="outline-outline" />
+                                    <Badge variant="outline">Settings</Badge>
 
                                     <span>→</span>
 
-                                    <Badge label="Developer" styleType="outline-outline" />
+                                    <Badge variant="outline">Developer</Badge>
 
                                     <span>→</span>
 
-                                    <Badge label="Edit Config" styleType="outline-outline" />
+                                    <Badge variant="outline">Edit Config</Badge>
 
                                     <span>→</span>
 
-                                    <Badge label="Open claude_desktop_config.json" styleType="outline-outline" />
+                                    <Badge variant="outline">Open claude_desktop_config.json</Badge>
                                 </div>
 
                                 <p className="text-sm text-muted-foreground">
@@ -143,19 +143,19 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 
                                     <span>→</span>
 
-                                    <Badge label="Settings" styleType="outline-outline" />
+                                    <Badge variant="outline">Settings</Badge>
 
                                     <span>→</span>
 
-                                    <Badge label="Cursor Settings" styleType="outline-outline" />
+                                    <Badge variant="outline">Cursor Settings</Badge>
 
                                     <span>→</span>
 
-                                    <Badge label="MCP" styleType="outline-outline" />
+                                    <Badge variant="outline">MCP</Badge>
 
                                     <span>→</span>
 
-                                    <Badge label="Add new global MCP server" styleType="outline-outline" />
+                                    <Badge variant="outline">Add new global MCP server</Badge>
                                 </div>
 
                                 <p className="text-sm text-muted-foreground">Paste the configuration below and save.</p>
@@ -183,23 +183,23 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 
                                     <span>→</span>
 
-                                    <Badge label="Settings" styleType="outline-outline" />
+                                    <Badge variant="outline">Settings</Badge>
 
                                     <span>→</span>
 
-                                    <Badge label="Advanced" styleType="outline-outline" />
+                                    <Badge variant="outline">Advanced</Badge>
 
                                     <span>→</span>
 
-                                    <Badge label="Cascade" styleType="outline-outline" />
+                                    <Badge variant="outline">Cascade</Badge>
 
                                     <span>→</span>
 
-                                    <Badge label="Add Server" styleType="outline-outline" />
+                                    <Badge variant="outline">Add Server</Badge>
 
                                     <span>→</span>
 
-                                    <Badge label="Add custom server" styleType="outline-outline" />
+                                    <Badge variant="outline">Add custom server</Badge>
                                 </div>
 
                                 <p className="text-sm text-muted-foreground">Paste the configuration below and save.</p>

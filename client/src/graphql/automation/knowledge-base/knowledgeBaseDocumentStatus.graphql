@@ -1,8 +1,0 @@
-query knowledgeBaseDocumentStatus($id: ID!) {
-    knowledgeBaseDocumentStatus(id: $id) {
-        documentId
-        status
-        timestamp
-        message
-    }
-}

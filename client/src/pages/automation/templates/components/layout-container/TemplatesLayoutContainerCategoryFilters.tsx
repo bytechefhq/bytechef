@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {useTemplatesStore} from '@/pages/automation/templates/stores/useTemplatesStore';
 import {useState} from 'react';
 

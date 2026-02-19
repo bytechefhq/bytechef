@@ -1,5 +1,0 @@
-extend type Query {
-    editorJobFileLogs(jobId: ID!, filter: LogFilterInput, page: Int, size: Int): LogPage!
-    editorTaskExecutionFileLogs(jobId: ID!, taskExecutionId: ID!): [LogEntry!]!
-    editorJobFileLogsExist(jobId: ID!): Boolean!
-}

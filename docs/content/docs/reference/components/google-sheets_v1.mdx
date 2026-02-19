@@ -1,8 +1,7 @@
 ---
-title: "Google Sheets"
-description: "Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate on spreadsheets in real-time."
+description: "Google Sheets component for ByteChef. Spreadsheet automation. Learn how to implement this in your ByteChef workflows."
+title: Google Sheets
 ---
-
 
 Categories: Productivity and Collaboration
 
@@ -29,25 +28,6 @@ Version: 1
 | clientSecret | Client Secret | STRING |  | true |
 
 
-
-## Connection Setup
-
-### Create OAuth 2.0 Application
-
-Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
-
-### Enable Google Sheets API
-
-1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
-2. Go to the **APIs & Services**.
-3. Click on **ENABLE APIS AND SERVICES**.
-4. Search for "google sheets api" in the search bar.
-5. Click on **Google Sheets API**.
-6. Click **Enable**.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/61d6b773-ad2d-49c3-9c9c-d0b906cd5086?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
 
 
 
@@ -87,8 +67,6 @@ Name: clearSheet
 #### Output
 
 This action does not produce any output.
-
-
 
 
 
@@ -148,8 +126,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Create Sheet
 Name: createSheet
 
@@ -205,8 +181,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Create Spreadsheet
 Name: createSpreadsheet
 
@@ -235,8 +209,6 @@ Name: createSpreadsheet
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -275,8 +247,6 @@ This action does not produce any output.
 
 
 
-
-
 ### Delete Row
 Name: deleteRow
 
@@ -311,8 +281,6 @@ This action does not produce any output.
 
 
 
-
-
 ### Delete Sheet
 Name: deleteSheet
 
@@ -341,8 +309,6 @@ Name: deleteSheet
 #### Output
 
 This action does not produce any output.
-
-
 
 
 
@@ -383,8 +349,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
-
 ### Get Rows
 Name: getRows
 
@@ -415,8 +379,6 @@ Name: getRows
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -459,8 +421,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
-
 ### Insert Row
 Name: insertRow
 
@@ -495,8 +455,6 @@ Name: insertRow
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -555,8 +513,6 @@ Items Type: OBJECT
 ```
 
 
-
-
 ### Update Row
 Name: updateRow
 
@@ -593,8 +549,6 @@ Name: updateRow
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -640,7 +594,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
@@ -650,6 +603,25 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+## Connection Setup
+
+### Create OAuth 2.0 Application
+
+Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
+
+### Enable Google Sheets API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Go to the **APIs & Services**.
+3. Click on **ENABLE APIS AND SERVICES**.
+4. Search for "google sheets api" in the search bar.
+5. Click on **Google Sheets API**.
+6. Click **Enable**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/61d6b773-ad2d-49c3-9c9c-d0b906cd5086?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
 
 ## Troubleshooting
 

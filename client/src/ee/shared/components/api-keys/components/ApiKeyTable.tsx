@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
 import {ApiKey} from '@/shared/middleware/graphql';
@@ -51,24 +51,26 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                 cell: (info) => (
                     <>
                         <Button
-                            icon={<EditIcon className="size-4" />}
                             onClick={() => {
                                 setCurrentApiKey(info.row.original);
                                 setShowEditDialog(true);
                             }}
                             size="icon"
                             variant="ghost"
-                        />
+                        >
+                            <EditIcon className="size-4" />
+                        </Button>
 
                         <Button
-                            icon={<Trash2Icon className="h-4 text-destructive" />}
                             onClick={() => {
                                 setCurrentApiKey(info.row.original);
                                 setShowDeleteDialog(true);
                             }}
                             size="icon"
                             variant="ghost"
-                        />
+                        >
+                            <Trash2Icon className="h-4 text-destructive" />
+                        </Button>
                     </>
                 ),
                 header: '',

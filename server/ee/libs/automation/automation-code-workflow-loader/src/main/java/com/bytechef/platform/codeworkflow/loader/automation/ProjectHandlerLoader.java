@@ -7,9 +7,8 @@
 
 package com.bytechef.platform.codeworkflow.loader.automation;
 
-import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.workflow.ProjectHandler;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -47,11 +46,6 @@ public class ProjectHandlerLoader {
         }
     }
 
-    /**
-     * <b>Security Note:</b> Path traversal is intentional. The URL is derived from internal code workflow container
-     * configuration, not from untrusted user input.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private static ProjectHandler loadPolyglotProjectHandler(URL url, Language language)
         throws URISyntaxException, IOException {
 

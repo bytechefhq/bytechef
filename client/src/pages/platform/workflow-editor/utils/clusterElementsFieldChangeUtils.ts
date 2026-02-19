@@ -67,7 +67,7 @@ export function updateClusterRootElementField({
     currentOperationProperties,
     fieldUpdate,
     mainRootElement,
-}: UpdateClusterRootElementFieldProps): NodeDataType {
+}: UpdateClusterRootElementFieldProps) {
     const updatedElementData = createUpdatedElement({
         currentComponentDefinition,
         currentOperationProperties,
@@ -81,7 +81,7 @@ export function updateClusterRootElementField({
         componentName: mainRootElement.componentName,
         name: mainRootElement.name,
         workflowNodeName: mainRootElement.workflowNodeName,
-    } as NodeDataType;
+    };
 }
 
 interface UpdateNestedClusterElementFieldProps {

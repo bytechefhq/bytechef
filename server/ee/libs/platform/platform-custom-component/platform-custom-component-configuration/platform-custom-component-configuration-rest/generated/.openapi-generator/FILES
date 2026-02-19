@@ -1,4 +1,5 @@
 README.md
 pom.xml
-src/main/java/com/bytechef/ee/platform/customcomponent/configuration/public_/web/rest/ApiUtil.java
-src/main/java/com/bytechef/ee/platform/customcomponent/configuration/public_/web/rest/CustomComponentApi.java
+src/main/java/com/bytechef/ee/platform/customcomponent/configuration/web/rest/ApiUtil.java
+src/main/java/com/bytechef/ee/platform/customcomponent/configuration/web/rest/CustomComponentApi.java
+src/main/java/com/bytechef/ee/platform/customcomponent/configuration/web/rest/model/CustomComponentModel.java

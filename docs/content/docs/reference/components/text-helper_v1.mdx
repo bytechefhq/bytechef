@@ -1,8 +1,7 @@
 ---
-title: "Text Helper"
-description: "Helper component which contains operations to help you work with text."
+description: "Text Helper component. Text manipulation operations. Learn how to implement this in your ByteChef workflows."
+title: Text Helper
 ---
-
 
 Categories: Helpers
 
@@ -55,46 +54,6 @@ Type: STRING
 
 
 
-
-
-### Change Type
-Name: changeType
-
-`Change the type of the input text to number.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The input text to be changed to a number. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Change Type",
-  "name" : "changeType",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/changeType"
-}
-```
-
-#### Output
-
-
-
-Type: NUMBER
-
-
-
-
-
-
-
-
-
-
 ### Concatenate
 Name: concatenate
 
@@ -125,8 +84,6 @@ Name: concatenate
 
 
 Type: STRING
-
-
 
 
 
@@ -173,95 +130,6 @@ Type: BOOLEAN
 
 
 
-
-
-### Escape Characters
-Name: escapeCharacters
-
-`Escape characters in a string, specified in the input.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text in which you want to escape characters. | true |
-| escapeCharacters | Escape Characters | ARRAY <details> <summary> Items </summary> [STRING\($escapeCharacter)] </details> | Characters you want to escape. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Escape Characters",
-  "name" : "escapeCharacters",
-  "parameters" : {
-    "text" : "",
-    "escapeCharacters" : [ "" ]
-  },
-  "type" : "textHelper/v1/escapeCharacters"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Extract All by Regular Expression
-Name: extractAllRegEx
-
-`Extract all strings that match a given pattern.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text on which regular expression will be used on. | true |
-| regularExpression | Regular Expression | STRING | Regular expression that will be used for extracting strings. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Extract All by Regular Expression",
-  "name" : "extractAllRegEx",
-  "parameters" : {
-    "text" : "",
-    "regularExpression" : ""
-  },
-  "type" : "textHelper/v1/extractAllRegEx"
-}
-```
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-Items Type: STRING
-
-
-
-
-
-
-#### Output Example
-```json
-[ "" ]
-```
-
-
-
-
 ### Extract Content from HTML
 Name: extractContentFromHtml
 
@@ -271,10 +139,10 @@ Name: extractContentFromHtml
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| content | HTML Content | STRING | The full HTML document or fragment to extract data from. | true |
-| querySelector | CSS Selector | STRING | A CSS selector used to locate the element(s) you want to extract (for example: div.article, a[href], #title). | true |
-| returnValue | Return Value | STRING <details> <summary> Options </summary> <span title="Get the attribute value like 'class' from an element.">ATTRIBUTE</span>, <span title="Get the HTML content that the element contains.">HTML</span>, <span title="Get the text content of the element.">TEXT</span> </details> | Specifies what content should be extracted from the matched element(s). | true |
-| attribute | Attribute | STRING | The name of the HTML attribute to extract from the matched element(s) (for example: href, src, or class). | true |
+| content | HTML Content | STRING | HTML content to extract content from. | true |
+| querySelector | CSS Selector | STRING | The CSS selector to search for. | true |
+| returnValue | Return Value | STRING <details> <summary> Options </summary> <span title="Get the attribute value like 'class' from an element.">ATTRIBUTE</span>, <span title="Get the HTML content that the element contains.">HTML</span>, <span title="Get the text content of the element.">TEXT</span> </details> | The data to return. | true |
+| attribute | Attribute | STRING | The name of the attribute to return the value of | true |
 | returnArray | Return Array | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string. | false |
 
 #### Example JSON Structure
@@ -296,95 +164,6 @@ Name: extractContentFromHtml
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-### Extract Key by Regular Expression
-Name: extractKeyRegEx
-
-`Extract first string that match a given pattern.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| keyValueObject | Key-Value Object | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The object on which regular expression will be used on. | true |
-| regularExpression | Regular Expression | STRING | Extract key by regex match. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Extract Key by Regular Expression",
-  "name" : "extractKeyRegEx",
-  "parameters" : {
-    "keyValueObject" : { },
-    "regularExpression" : ""
-  },
-  "type" : "textHelper/v1/extractKeyRegEx"
-}
-```
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-Items Type: STRING
-
-
-
-
-
-
-#### Output Example
-```json
-[ "" ]
-```
-
-
-
-
-### Extract by Regular Expression
-Name: extractRegEx
-
-`Extract first string that match a given pattern.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text on which regular expression will be used on. | true |
-| regularExpression | Regular Expression | STRING | Regular expression that will be used for extracting strings. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Extract by Regular Expression",
-  "name" : "extractRegEx",
-  "parameters" : {
-    "text" : "",
-    "regularExpression" : ""
-  },
-  "type" : "textHelper/v1/extractRegEx"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
 
 
 
@@ -432,8 +211,6 @@ Items Type: STRING
 ```
 
 
-
-
 ### Format Currency
 Name: formatCurrency
 
@@ -445,7 +222,7 @@ Name: formatCurrency
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | currency | Currency | STRING <details> <summary> Options </summary> <span>ADP</span>, <span>AED</span>, <span>AFA</span>, <span>AFN</span>, <span>ALL</span>, <span>AMD</span>, <span>ANG</span>, <span>AOA</span>, <span>ARS</span>, <span>ATS</span>, <span>AUD</span>, <span>AWG</span>, <span>AYM</span>, <span>AZM</span>, <span>AZN</span>, <span>BAM</span>, <span>BBD</span>, <span>BDT</span>, <span>BEF</span>, <span>BGL</span>, <span>BGN</span>, <span>BHD</span>, <span>BIF</span>, <span>BMD</span>, <span>BND</span>, <span>BOB</span>, <span>BOV</span>, <span>BRL</span>, <span>BSD</span>, <span>BTN</span>, <span>BWP</span>, <span>BYB</span>, <span>BYN</span>, <span>BYR</span>, <span>BZD</span>, <span>CAD</span>, <span>CDF</span>, <span>CHE</span>, <span>CHF</span>, <span>CHW</span>, <span>CLF</span>, <span>CLP</span>, <span>CNY</span>, <span>COP</span>, <span>COU</span>, <span>CRC</span>, <span>CSD</span>, <span>CUC</span>, <span>CUP</span>, <span>CVE</span>, <span>CYP</span>, <span>CZK</span>, <span>DEM</span>, <span>DJF</span>, <span>DKK</span>, <span>DOP</span>, <span>DZD</span>, <span>EEK</span>, <span>EGP</span>, <span>ERN</span>, <span>ESP</span>, <span>ETB</span>, <span>EUR</span>, <span>FIM</span>, <span>FJD</span>, <span>FKP</span>, <span>FRF</span>, <span>GBP</span>, <span>GEL</span>, <span>GHC</span>, <span>GHS</span>, <span>GIP</span>, <span>GMD</span>, <span>GNF</span>, <span>GRD</span>, <span>GTQ</span>, <span>GWP</span>, <span>GYD</span>, <span>HKD</span>, <span>HNL</span>, <span>HRK</span>, <span>HTG</span>, <span>HUF</span>, <span>IDR</span>, <span>IEP</span>, <span>ILS</span>, <span>INR</span>, <span>IQD</span>, <span>IRR</span>, <span>ISK</span>, <span>ITL</span>, <span>JMD</span>, <span>JOD</span>, <span>JPY</span>, <span>KES</span>, <span>KGS</span>, <span>KHR</span>, <span>KMF</span>, <span>KPW</span>, <span>KRW</span>, <span>KWD</span>, <span>KYD</span>, <span>KZT</span>, <span>LAK</span>, <span>LBP</span>, <span>LKR</span>, <span>LRD</span>, <span>LSL</span>, <span>LTL</span>, <span>LUF</span>, <span>LVL</span>, <span>LYD</span>, <span>MAD</span>, <span>MDL</span>, <span>MGA</span>, <span>MGF</span>, <span>MKD</span>, <span>MMK</span>, <span>MNT</span>, <span>MOP</span>, <span>MRO</span>, <span>MRU</span>, <span>MTL</span>, <span>MUR</span>, <span>MVR</span>, <span>MWK</span>, <span>MXN</span>, <span>MXV</span>, <span>MYR</span>, <span>MZM</span>, <span>MZN</span>, <span>NAD</span>, <span>NGN</span>, <span>NIO</span>, <span>NLG</span>, <span>NOK</span>, <span>NPR</span>, <span>NZD</span>, <span>OMR</span>, <span>PAB</span>, <span>PEN</span>, <span>PGK</span>, <span>PHP</span>, <span>PKR</span>, <span>PLN</span>, <span>PTE</span>, <span>PYG</span>, <span>QAR</span>, <span>ROL</span>, <span>RON</span>, <span>RSD</span>, <span>RUB</span>, <span>RUR</span>, <span>RWF</span>, <span>SAR</span>, <span>SBD</span>, <span>SCR</span>, <span>SDD</span>, <span>SDG</span>, <span>SEK</span>, <span>SGD</span>, <span>SHP</span>, <span>SIT</span>, <span>SKK</span>, <span>SLE</span>, <span>SLL</span>, <span>SOS</span>, <span>SRD</span>, <span>SRG</span>, <span>SSP</span>, <span>STD</span>, <span>STN</span>, <span>SVC</span>, <span>SYP</span>, <span>SZL</span>, <span>THB</span>, <span>TJS</span>, <span>TMM</span>, <span>TMT</span>, <span>TND</span>, <span>TOP</span>, <span>TPE</span>, <span>TRL</span>, <span>TRY</span>, <span>TTD</span>, <span>TWD</span>, <span>TZS</span>, <span>UAH</span>, <span>UGX</span>, <span>USD</span>, <span>USN</span>, <span>USS</span>, <span>UYI</span>, <span>UYU</span>, <span>UZS</span>, <span>VEB</span>, <span>VED</span>, <span>VEF</span>, <span>VES</span>, <span>VND</span>, <span>VUV</span>, <span>WST</span>, <span>XAD</span>, <span>XAF</span>, <span>XAG</span>, <span>XAU</span>, <span>XBA</span>, <span>XBB</span>, <span>XBC</span>, <span>XBD</span>, <span>XCD</span>, <span>XCG</span>, <span>XDR</span>, <span>XFO</span>, <span>XFU</span>, <span>XOF</span>, <span>XPD</span>, <span>XPF</span>, <span>XPT</span>, <span>XSU</span>, <span>XTS</span>, <span>XUA</span>, <span>XXX</span>, <span>YER</span>, <span>YUM</span>, <span>ZAR</span>, <span>ZMK</span>, <span>ZMW</span>, <span>ZWD</span>, <span>ZWG</span>, <span>ZWL</span>, <span>ZWN</span>, <span>ZWR</span> </details> | The type of currency you wish to use. | true |
 | amount | Amount | NUMBER | The amount to be formatted. | true |
-| decimalDigits | Decimal Digits | INTEGER | Number of digits that will be visible after the decimal seperator. | true |
+| decimalDigits | Decimal Digits | INTEGER | Digits you would like after your decimal. | true |
 | decimalSeparator | Decimal Separator | STRING | The character you would like to use as a decimal separator. | true |
 | thousandsSeparator | Thousands Separator | STRING | The character you would like to use as a thousands separator. | true |
 
@@ -478,345 +255,8 @@ Type: STRING
 
 
 
-
-
-### Get Domain From Email Address
-Name: getDomainFromEmail
-
-`Extracts domain from the given email address.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Email | STRING | The email you want to extract domain from. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Domain From Email Address",
-  "name" : "getDomainFromEmail",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/getDomainFromEmail"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Get Domain From URL
-Name: getDomainFromUrl
-
-`Extracts domain from the given URL.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | URL | STRING | The URL you want to extract domain from. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Domain From URL",
-  "name" : "getDomainFromUrl",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/getDomainFromUrl"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Get First Middle and Last Name
-Name: getFirstMiddleLastName
-
-`From full name extract first, middle and last name.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fullName | Full Name | STRING | The full name. | true |
-| isFirstNameFirst | Is First Name First? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Is the first name listed first in the full name? | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get First Middle and Last Name",
-  "name" : "getFirstMiddleLastName",
-  "parameters" : {
-    "fullName" : "",
-    "isFirstNameFirst" : false
-  },
-  "type" : "textHelper/v1/getFirstMiddleLastName"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| firstName | STRING | First name. |
-| middleName | STRING | Middle name |
-| lastName | STRING | Last name |
-
-
-
-
-#### Output Example
-```json
-{
-  "firstName" : "",
-  "middleName" : "",
-  "lastName" : ""
-}
-```
-
-
-
-
-### Get Text After
-Name: getTextAfter
-
-`Given a string and a pattern, this operation will return the substring between where the pattern was found depending on the match number and ending of the string.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text that will be searched for the pattern. | true |
-| pattern | Pattern | STRING | Pattern after which substring will be extracted. | true |
-| matchNumber | Match Number | INTEGER | Specifies which match to use for extracting the substring when multiple matches exist. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Text After",
-  "name" : "getTextAfter",
-  "parameters" : {
-    "text" : "",
-    "pattern" : "",
-    "matchNumber" : 1
-  },
-  "type" : "textHelper/v1/getTextAfter"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Get Text Before
-Name: getTextBefore
-
-`Given a string and a pattern, this operation will return the substring between where the pattern was found depending on the match number and beginning of the string.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text that will be searched for the pattern. | true |
-| pattern | Pattern | STRING | Pattern after which substring will be extracted. | true |
-| matchNumber | Match Number | INTEGER | Specifies which match to use for extracting the substring when multiple matches exist. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Text Before",
-  "name" : "getTextBefore",
-  "parameters" : {
-    "text" : "",
-    "pattern" : "",
-    "matchNumber" : 1
-  },
-  "type" : "textHelper/v1/getTextBefore"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Get Text Between
-Name: getTextBetween
-
-`Extract text between two patterns.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text that will be searched for the patterns. | true |
-| patternStart | Start Pattern | STRING | Start pattern from where substring will be extracted. | true |
-| patternEnd | End Pattern | STRING | End pattern to where substring will be extracted. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Text Between",
-  "name" : "getTextBetween",
-  "parameters" : {
-    "text" : "",
-    "patternStart" : "",
-    "patternEnd" : ""
-  },
-  "type" : "textHelper/v1/getTextBetween"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Get Text Length
-Name: getTextLength
-
-`Returns length of the given text.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text of which the length will be returned of. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Text Length",
-  "name" : "getTextLength",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/getTextLength"
-}
-```
-
-#### Output
-
-
-
-Type: INTEGER
-
-
-
-
-
-
-
-
-
-
-### Hex Encode/Decode
-Name: hexEncodeDecode
-
-`Hex encode/decode a specified string.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text that will be encoded or decoded. | true |
-| operation | Encode or Decode | STRING <details> <summary> Options </summary> <span>ENCODE</span>, <span>DECODE</span> </details> | Select whether to encode or decode the text. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Hex Encode/Decode",
-  "name" : "hexEncodeDecode",
-  "parameters" : {
-    "text" : "",
-    "operation" : ""
-  },
-  "type" : "textHelper/v1/hexEncodeDecode"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
 ### HTML to Markdown
-Name: HtmlToMarkdown
+Name: HTMLToMarkdown
 
 `Converts HTML to markdown.`
 
@@ -830,11 +270,11 @@ Name: HtmlToMarkdown
 ```json
 {
   "label" : "HTML to Markdown",
-  "name" : "HtmlToMarkdown",
+  "name" : "HTMLToMarkdown",
   "parameters" : {
     "html" : ""
   },
-  "type" : "textHelper/v1/HtmlToMarkdown"
+  "type" : "textHelper/v1/HTMLToMarkdown"
 }
 ```
 
@@ -843,168 +283,6 @@ Name: HtmlToMarkdown
 
 
 Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Is Domain?
-Name: isDomain
-
-`Check if a string is a valid domain.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text to be checked as a valid domain name. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Is Domain?",
-  "name" : "isDomain",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/isDomain"
-}
-```
-
-#### Output
-
-
-
-Type: BOOLEAN
-
-
-
-
-
-
-
-
-
-
-### Is Email?
-Name: isEmail
-
-`Check if a string is a valid email address.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text to be checked as a valid email address. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Is Email?",
-  "name" : "isEmail",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/isEmail"
-}
-```
-
-#### Output
-
-
-
-Type: BOOLEAN
-
-
-
-
-
-
-
-
-
-
-### Is Numeric?
-Name: isNumeric
-
-`Check if a text string is a number.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The input text that will be checked. Decimal point is a point '.'. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Is Numeric?",
-  "name" : "isNumeric",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/isNumeric"
-}
-```
-
-#### Output
-
-
-
-Type: BOOLEAN
-
-
-
-
-
-
-
-
-
-
-### Is URL?
-Name: isUrl
-
-`Check if a string is a valid URL.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The input text that will be checked. | true |
-| allow2slashes | Allow 2 Slashes | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allows double '/' characters in the path component. | false |
-| noFragment | No Fragment | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enabling this options disallows any URL fragments. | false |
-| allowAllSchemes | Allow All Schemes | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allows all validly formatted schemes to pass validation instead of supplying a set of valid schemes. | false |
-| allowLocalUrls | Allow Local URLs | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allow local URLs, such as https://localhost/ or https://machine/ . | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Is URL?",
-  "name" : "isUrl",
-  "parameters" : {
-    "text" : "",
-    "allow2slashes" : false,
-    "noFragment" : false,
-    "allowAllSchemes" : false,
-    "allowLocalUrls" : false
-  },
-  "type" : "textHelper/v1/isUrl"
-}
-```
-
-#### Output
-
-
-
-Type: BOOLEAN
-
-
 
 
 
@@ -1049,10 +327,8 @@ Type: STRING
 
 
 
-
-
 ### Markdown to HTML
-Name: markdownToHtml
+Name: markdownToHTML
 
 `Converts markdown to HTML.`
 
@@ -1066,11 +342,11 @@ Name: markdownToHtml
 ```json
 {
   "label" : "Markdown to HTML",
-  "name" : "markdownToHtml",
+  "name" : "markdownToHTML",
   "parameters" : {
     "markdown" : ""
   },
-  "type" : "textHelper/v1/markdownToHtml"
+  "type" : "textHelper/v1/markdownToHTML"
 }
 ```
 
@@ -1079,404 +355,6 @@ Name: markdownToHtml
 
 
 Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Match
-Name: match
-
-`Retrieve the result of matching a string against a regular expression.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text that will be matched to the regular expression. | true |
-| regularExpression | Regular Expression | STRING | Regular expression that will be used on the text. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Match",
-  "name" : "match",
-  "parameters" : {
-    "text" : "",
-    "regularExpression" : ""
-  },
-  "type" : "textHelper/v1/match"
-}
-```
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-Items Type: STRING
-
-
-
-
-
-
-#### Output Example
-```json
-[ "" ]
-```
-
-
-
-
-### Parse Email
-Name: parseEmail
-
-`Parse email into structured object. For example: "Name <name@domain.com>" into {displayName: 'Name', localPart: 'name', domain: 'domain.com'}.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email | STRING | The email that will be turned into structured data. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Parse Email",
-  "name" : "parseEmail",
-  "parameters" : {
-    "email" : ""
-  },
-  "type" : "textHelper/v1/parseEmail"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| localPart | STRING | The local part of the email address. |
-| displayName | STRING | The display name of the email address. |
-| domain | STRING | The domain part of the email address. |
-| email | STRING | The full email address. |
-
-
-
-
-#### Output Example
-```json
-{
-  "localPart" : "",
-  "displayName" : "",
-  "domain" : "",
-  "email" : ""
-}
-```
-
-
-
-
-### Parse Email List
-Name: parseEmailList
-
-`Parse emails into structured objects. For example: "Name <name@domain.com>" into {displayName: 'Name', localPart: 'name', domain: 'domain.com'}.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| emails | Emails | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | A list of emails that will be turned into structured data. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Parse Email List",
-  "name" : "parseEmailList",
-  "parameters" : {
-    "emails" : [ "" ]
-  },
-  "type" : "textHelper/v1/parseEmailList"
-}
-```
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-Items Type: OBJECT
-
-
-#### Properties
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| localPart | STRING | The local part of the email address. |
-| displayName | STRING | The display name of the email address. |
-| domain | STRING | The domain part of the email address. |
-| email | STRING | The full email address. |
-
-
-
-
-
-#### Output Example
-```json
-[ {
-  "localPart" : "",
-  "displayName" : "",
-  "domain" : "",
-  "email" : ""
-} ]
-```
-
-
-
-
-### Parse URL
-Name: parseUrl
-
-`Parses URL into structured data.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| url | URL | STRING | The URL that will be turned into structured data. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Parse URL",
-  "name" : "parseUrl",
-  "parameters" : {
-    "url" : ""
-  },
-  "type" : "textHelper/v1/parseUrl"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| protocol | STRING | The protocol of the URL. |
-| slashes | STRING | Indicates if the URL has a slash after the protocol. |
-| auth | STRING | The authentication information of the URL. |
-| host | STRING | The host part of the URL. |
-| port | STRING | The port part of the URL. |
-| hostname | STRING | The hostname part of the URL. |
-| hash | STRING | The hash part of the URL. |
-| search | STRING | The search part of the URL. |
-| pathname | STRING | The pathname part of the URL. |
-| path | STRING | The path part of the URL including the query if present. |
-| href | STRING | The full URL as a string. |
-| query | OBJECT <details> <summary> Properties </summary> &#123;STRING\(key), STRING\(value)&#125; </details> | The query parameters of the URL. |
-
-
-
-
-#### Output Example
-```json
-{
-  "protocol" : "",
-  "slashes" : "",
-  "auth" : "",
-  "host" : "",
-  "port" : "",
-  "hostname" : "",
-  "hash" : "",
-  "search" : "",
-  "pathname" : "",
-  "path" : "",
-  "href" : "",
-  "query" : {
-    "key" : "",
-    "value" : ""
-  }
-}
-```
-
-
-
-
-### Proper Case
-Name: properCase
-
-`Capitalize the first letter of every word.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text that will be turned into proper case. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Proper Case",
-  "name" : "properCase",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/properCase"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Regular Expression Match Test
-Name: regExMatchTest
-
-`Test if a string matches a regex.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text that will be matched to the regular expression. | true |
-| regularExpression | Regular Expression | STRING | Regular expression that will be used on the text. | true |
-| ignoreCase | Ignore Case | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If this value is set to true the regular expression will be case-insensitive. | false |
-| multiline | Multiline | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If this value is set to true the regular expression will be applied to multiple lines. | false |
-| unicode | Unicode | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If this value is set to true the regular expression will support unicode characters. | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Regular Expression Match Test",
-  "name" : "regExMatchTest",
-  "parameters" : {
-    "text" : "",
-    "regularExpression" : "",
-    "ignoreCase" : false,
-    "multiline" : false,
-    "unicode" : false
-  },
-  "type" : "textHelper/v1/regExMatchTest"
-}
-```
-
-#### Output
-
-
-
-Type: BOOLEAN
-
-
-
-
-
-
-
-
-
-
-### Remove Characters
-Name: removeCharacters
-
-`Remove specified characters from a string.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text that will be processed to remove specified characters. | true |
-| character | Character | STRING | Character that will be removed from the text. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Remove Characters",
-  "name" : "removeCharacters",
-  "parameters" : {
-    "text" : "",
-    "character" : ""
-  },
-  "type" : "textHelper/v1/removeCharacters"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Remove Special Characters
-Name: removeSpecialCharacters
-
-`Remove special characters from a string.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text that will be processed to remove special characters. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Remove Special Characters",
-  "name" : "removeSpecialCharacters",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/removeSpecialCharacters"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
 
 
 
@@ -1527,8 +405,6 @@ Type: STRING
 
 
 
-
-
 ### Select First N Characters
 Name: selectFirstNCharacters
 
@@ -1567,8 +443,6 @@ Type: STRING
 
 
 
-
-
 ### Select Last N Characters
 Name: selectLastNCharacters
 
@@ -1599,86 +473,6 @@ Name: selectLastNCharacters
 
 
 Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Sentence Case
-Name: sentenceCase
-
-`Converts string into sentence case.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The input text that will be converted to sentence case. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Sentence Case",
-  "name" : "sentenceCase",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/sentenceCase"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Shorten
-Name: shorten
-
-`Shorten string to a max allowed length.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The text that will be shortened. | true |
-| length | Length | INTEGER | Maximum allowed length of the string. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Shorten",
-  "name" : "shorten",
-  "parameters" : {
-    "text" : "",
-    "length" : 1
-  },
-  "type" : "textHelper/v1/shorten"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
 
 
 
@@ -1732,46 +526,6 @@ Items Type: STRING
 ```
 
 
-
-
-### Strip HTML Tags
-Name: stripHtmlTags
-
-`Remove HTML tags from a string leaving only the tag's text content.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The input text that will be stripped from HTML tags. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Strip HTML Tags",
-  "name" : "stripHtmlTags",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/stripHtmlTags"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
 ### Trim Whitespace
 Name: trimWhitespace
 
@@ -1800,46 +554,6 @@ Name: trimWhitespace
 
 
 Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Underscore
-Name: underscore
-
-`Convert text to snake case, lowercasing all text, removing special characters, and replacing spaces with underscores.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| text | Text | STRING | The input text that will be converted to snake case. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Underscore",
-  "name" : "underscore",
-  "parameters" : {
-    "text" : ""
-  },
-  "type" : "textHelper/v1/underscore"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
 
 
 
@@ -1884,8 +598,6 @@ Type: STRING
 
 
 
-
-
 ### URL Encode/Decode
 Name: urlEncodeDecode
 
@@ -1916,58 +628,3 @@ Name: urlEncodeDecode
 
 
 Type: STRING
-
-
-
-
-
-
-
-
-
-
-### URL Encode/Decode Key/Value Pair
-Name: urlEncodeDecodeKeyValuePair
-
-`URL encode/decode a specified set of key/value pairs.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| pairs | Pairs | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(value)&#125;] </details> | Key/Value pairs that will be encoded. | true |
-| operation | Encode or Decode | STRING <details> <summary> Options </summary> <span>ENCODE</span>, <span>DECODE</span> </details> | Select whether to encode or decode the text. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "URL Encode/Decode Key/Value Pair",
-  "name" : "urlEncodeDecodeKeyValuePair",
-  "parameters" : {
-    "pairs" : [ {
-      "key" : "",
-      "value" : ""
-    } ],
-    "operation" : ""
-  },
-  "type" : "textHelper/v1/urlEncodeDecodeKeyValuePair"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-
-

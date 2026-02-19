@@ -18,7 +18,7 @@ All URIs are relative to */api/automation/internal*
 
 ## createProjectWorkflow
 
-> CreateProjectWorkflow200Response createProjectWorkflow(id, workflow)
+> number createProjectWorkflow(id, workflow)
 
 Create new workflow and adds it to an existing project.
 
@@ -66,7 +66,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**CreateProjectWorkflow200Response**](CreateProjectWorkflow200Response.md)
+**number**
 
 ### Authorization
 
@@ -155,7 +155,7 @@ No authorization required
 
 ## duplicateWorkflow
 
-> DuplicateWorkflow200Response duplicateWorkflow(id, workflowId)
+> string duplicateWorkflow(id, workflowId)
 
 Duplicates existing workflow.
 
@@ -203,7 +203,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**DuplicateWorkflow200Response**](DuplicateWorkflow200Response.md)
+**string**
 
 ### Authorization
 

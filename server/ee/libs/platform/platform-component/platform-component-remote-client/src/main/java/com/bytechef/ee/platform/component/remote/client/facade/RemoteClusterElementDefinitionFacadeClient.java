@@ -34,9 +34,8 @@ public class RemoteClusterElementDefinitionFacadeClient implements ClusterElemen
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,
-        String searchText, @Nullable Long connectionId, Map<String, Long> clusterElementConnectionIds,
-        Map<String, Map<String, ?>> clusterElementInputParameters) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @Nullable Long connectionId) {
 
         throw new UnsupportedOperationException();
     }

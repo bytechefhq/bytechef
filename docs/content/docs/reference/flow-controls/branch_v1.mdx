@@ -1,14 +1,11 @@
 ---
-title: "Branch"
-description: "Executes one and only one branch of execution based on the `expression` value."
+description: "The Branch flow control executes one branch based on a single expression and only one branch of execution based on the `expression` value."
+title: Branch
 ---
 
+The Branch flow control evaluates an expression and routes workflow execution to a specific branch based on the result. Unlike flows like [Condition](/reference/flow-controls/condition_v1) which uses the true/false logic, the Branch flow control allows multiple named paths.
 
-
-Type: branch/v1
-
-<hr />
-
+**Type:** `branch/v1`
 
 ## Properties
 
@@ -17,6 +14,52 @@ Type: branch/v1
 | expression | Expression | STRING | Defines expression upon which evaluation the proper branch continues execution. | false |
 
 
+Executes one and only one branch of execution based on the `expression` value.
+
+## Usage
+
+To use the Branch flow control, follow these steps in the workflow UI editor:
+
+### Step 1: Add Branch to Your Workflow
+1. Select the **Branch** component from the **Flows** component panel
+2. Add it after the component whose output you want to evaluate
+
+![Branch Flow Control](/BranchComponent.png "Branch Flow Control Diagram")
+
+### Step 2: Configure the Expression
+1. In the **Expression** field under the **Properties** tab, enter the value to evaluate
+   - Example: `${script_1.risk_level}` or `${order_1.status}`
+2. This value will be matched against your branch names based on your data pill
+
+### Step 3: Create Branches
+1. Click the **+** button in the branch for each possible outcome
+2. Name each branch to match the expected values:
+   - `low_risk`, `medium_risk`, `high_risk`
+   - `approved`, `pending`, `rejected`
+![Branch Example](/branchexample.png "Branch Flow Control Diagram")
+
+3. Add components to each branch path
 
 
+> **Warning**
+> 
+> The default branch is automatically created and cannot be deleted. It handles any values that don't match your defined branches. While you can customize its behavior, the default branch itself cannot be removed from the Branch component.
 
+## Example Workflow
+
+```
+Typeform Trigger
+    ↓
+Risk Calculator Script (returns: "low_risk", "medium_risk", or "high_risk")
+    ↓
+Branch (expression: ${script_1})
+```
+
+You can refer to this [json file](https://www.npoint.io/docs/27fea2085acb49fd5146) to see the Branch flow control in action.
+
+## Best practices for using Branch
+
+- Branch names must **exactly match** the expression value (case-sensitive)
+- Use lowercase with underscores for consistency
+- Always include a default branch
+- Test with all possible values before deploying

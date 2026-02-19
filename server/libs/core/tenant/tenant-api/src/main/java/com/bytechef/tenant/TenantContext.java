@@ -51,12 +51,6 @@ public class TenantContext {
             : TenantConstants.TENANT_PREFIX + "_" + getCurrentTenantId();
     }
 
-    public static String getCurrentDatabaseSchema(String suffix) {
-        return Objects.equals(getCurrentTenantId(), DEFAULT_TENANT_ID)
-            ? DEFAULT_TENANT_ID
-            : TenantConstants.TENANT_PREFIX + "_" + suffix + "_" + getCurrentTenantId();
-    }
-
     public static String getCurrentTenantId() {
         return currentTenant.get();
     }

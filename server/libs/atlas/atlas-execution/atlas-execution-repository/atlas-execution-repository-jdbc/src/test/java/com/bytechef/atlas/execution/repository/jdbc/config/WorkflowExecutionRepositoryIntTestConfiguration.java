@@ -39,13 +39,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = "com.bytechef.atlas.configuration.converter")
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.atlas.configuration.converter", "com.bytechef.atlas.execution.repository.jdbc"
+    })
 @EnableAutoConfiguration
 @Import({
     JacksonConfiguration.class, LiquibaseConfiguration.class
@@ -58,7 +61,7 @@ public class WorkflowExecutionRepositoryIntTestConfiguration {
         return new TaskFileStorageImpl(new Base64FileStorageService());
     }
 
-    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
+    @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")
     public static class WorkflowExecutionIntJdbcTestConfiguration extends AbstractIntTestJdbcConfiguration {
 
         private final ObjectMapper objectMapper;

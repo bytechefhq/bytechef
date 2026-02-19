@@ -4,14 +4,12 @@ import PageLoader from '@/components/PageLoader';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
-import {useToast} from '@/hooks/use-toast';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import ProjectsLeftSidebarNav from '@/pages/automation/projects/components/ProjectsLeftSidebarNav';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useImportProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -38,19 +36,7 @@ const Projects = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
-    const {toast} = useToast();
-
     const queryClient = useQueryClient();
-
-    const importProjectMutation = useImportProjectMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-
-            toast({
-                description: 'Project is imported.',
-            });
-        },
-    });
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
     const ff_1041 = useFeatureFlagsStore()('ff-1041');
@@ -82,15 +68,7 @@ const Projects = () => {
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
-    const isRefetchingProjects =
-        queryClient.isFetching({
-            exact: true,
-            queryKey: ProjectKeys.filteredProjects({
-                categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
-                id: currentWorkspaceId!,
-                tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
-            }),
-        }) > 0;
+    const isRefetchingProjects = queryClient.isFetching({queryKey: ProjectKeys.projects}) > 0;
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
 
@@ -211,7 +189,7 @@ const Projects = () => {
 
             <input
                 accept=".zip"
-                onChange={(event) => handleImportProject(event, currentWorkspaceId!, importProjectMutation)}
+                onChange={(event) => handleImportProject(event, currentWorkspaceId, queryClient)}
                 ref={fileInputRef}
                 style={{display: 'none'}}
                 type="file"

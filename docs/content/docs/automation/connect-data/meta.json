@@ -1,0 +1,11 @@
+{
+  "title": "Connect Data",
+  "description": "Connect and manage third-party application connections",
+  "icon": "Link",
+  "pages": [
+    "overview",
+    "how-to-guides/index",
+    "authentication",
+    "troubleshooting"
+  ]
+}

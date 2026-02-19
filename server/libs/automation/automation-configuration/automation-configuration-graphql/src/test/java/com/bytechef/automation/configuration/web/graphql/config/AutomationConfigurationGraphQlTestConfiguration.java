@@ -19,7 +19,6 @@ package com.bytechef.automation.configuration.web.graphql.config;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.category.service.CategoryService;
@@ -82,11 +81,5 @@ public class AutomationConfigurationGraphQlTestConfiguration {
     @Primary
     public WorkflowFacade workflowFacade() {
         return Mockito.mock(WorkflowFacade.class);
-    }
-
-    @Bean
-    @Primary
-    public WorkspaceConnectionFacade workspaceConnectionFacade() {
-        return Mockito.mock(WorkspaceConnectionFacade.class);
     }
 }

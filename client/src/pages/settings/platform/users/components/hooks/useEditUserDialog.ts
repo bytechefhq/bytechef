@@ -1,23 +1,22 @@
-import {useEditUserDialogStore} from '@/pages/settings/platform/users/stores/useEditUserDialogStore';
 import {useAuthoritiesQuery, useUpdateUserMutation, useUsersQuery} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useEffect, useMemo} from 'react';
+import {Dispatch, SetStateAction, useMemo, useState} from 'react';
 
 interface UseEditUserDialogI {
     authorities: string[];
     editRole: string | null;
     editUser: {email?: string | null; login?: string | null; authorities?: (string | null)[] | null} | null;
-    handleClose: () => void;
-    handleOpen: (login: string) => void;
-    handleOpenChange: (open: boolean) => void;
-    handleRoleChange: (role: string) => void;
-    handleUpdate: () => void;
+    handleEditUserDialogClose: () => void;
+    handleEditUserDialogOpen: (login: string) => void;
+    handleEditUserDialogUpdate: () => void;
     open: boolean;
+    setEditRole: Dispatch<SetStateAction<string | null>>;
     updateDisabled: boolean;
 }
 
 export default function useEditUserDialog(): UseEditUserDialogI {
-    const {clearLoginToEdit, editRole, loginToEdit, setEditRole, setLoginToEdit} = useEditUserDialogStore();
+    const [editLogin, setEditLogin] = useState<string | null>(null);
+    const [editRole, setEditRole] = useState<string | null>(null);
 
     const {data: usersData} = useUsersQuery({});
     const {data: authoritiesData} = useAuthoritiesQuery({});
@@ -27,51 +26,36 @@ export default function useEditUserDialog(): UseEditUserDialogI {
     const updateUserMutation = useUpdateUserMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['users']});
-            clearLoginToEdit();
+            setEditLogin(null);
         },
     });
 
     const authorities = useMemo(() => authoritiesData?.authorities ?? [], [authoritiesData]);
     const users = useMemo(() => usersData?.users?.content ?? [], [usersData]);
-    const updateDisabled = !loginToEdit || !editRole;
+    const updateDisabled = !editLogin || !editRole;
 
-    const editUser = users.find((user) => user?.login === loginToEdit) || null;
-
-    useEffect(() => {
-        if (loginToEdit) {
-            const current = users.find((user) => user?.login === loginToEdit);
-            const currentRole = current?.authorities?.[0] ?? authorities[0] ?? null;
-
-            if (currentRole) {
-                setEditRole(currentRole);
-            }
-        }
-    }, [loginToEdit, users, authorities, setEditRole]);
-
-    const handleClose = () => {
-        clearLoginToEdit();
-    };
+    const editUser = users.find((user) => user?.login === editLogin) || null;
 
     const handleOpen = (login: string) => {
-        setLoginToEdit(login);
+        setEditLogin(login);
+
+        const current = users.find((user) => user?.login === login);
+
+        const currentRole = current?.authorities?.[0] ?? null;
+
+        setEditRole(currentRole ?? authorities[0] ?? null);
     };
 
-    const handleRoleChange = (role: string) => {
-        setEditRole(role);
+    const handleClose = () => {
+        setEditLogin(null);
     };
 
     const handleUpdate = () => {
-        if (loginToEdit && editRole) {
+        if (editLogin && editRole) {
             updateUserMutation.mutate({
-                login: loginToEdit,
+                login: editLogin,
                 role: editRole,
             });
-        }
-    };
-
-    const handleOpenChange = (open: boolean) => {
-        if (!open) {
-            handleClose();
         }
     };
 
@@ -79,12 +63,11 @@ export default function useEditUserDialog(): UseEditUserDialogI {
         authorities,
         editRole,
         editUser,
-        handleClose,
-        handleOpen,
-        handleOpenChange,
-        handleRoleChange,
-        handleUpdate,
-        open: loginToEdit !== null,
+        handleEditUserDialogClose: handleClose,
+        handleEditUserDialogOpen: handleOpen,
+        handleEditUserDialogUpdate: handleUpdate,
+        open: !!editLogin,
+        setEditRole,
         updateDisabled,
     };
 }

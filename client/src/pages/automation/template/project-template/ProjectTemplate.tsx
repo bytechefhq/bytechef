@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ComponentRow from '@/pages/automation/template/components/ComponentRow';
 import TemplateLayoutContainer from '@/pages/automation/template/components/TemplateLayoutContainer';

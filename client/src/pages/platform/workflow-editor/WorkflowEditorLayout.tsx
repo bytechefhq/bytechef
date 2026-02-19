@@ -4,19 +4,22 @@ import '@xyflow/react/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
+import Button from '@/components/Button/Button';
+import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
-import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {XIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
+import ClusterElementsWorkflowEditor from '../cluster-element-editor/components/ClusterElementsWorkflowEditor';
 import WorkflowCodeEditorSheet from './components/WorkflowCodeEditorSheet';
 import {
     DataPillPanelSkeleton,
@@ -41,7 +44,7 @@ interface WorkflowEditorLayoutProps {
 }
 
 const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInputs}: WorkflowEditorLayoutProps) => {
-    const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
+    const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
     const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
@@ -96,14 +99,6 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
         () => currentNode?.clusterRoot && !currentNode?.isNestedClusterRoot,
         [currentNode?.clusterRoot, currentNode?.isNestedClusterRoot]
     );
-
-    const handleClusterElementsCanvasOpenChange = (open: boolean) => {
-        setClusterElementsCanvasOpen(open);
-
-        if (!open) {
-            setRootClusterElementNodeData(undefined);
-        }
-    };
 
     useEffect(() => {
         if (isMainRootClusterElement) {
@@ -162,14 +157,50 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
             )}
 
             {clusterElementsCanvasOpen && (
-                <ClusterElementsCanvasDialog
-                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                    onOpenChange={handleClusterElementsCanvasOpenChange}
+                <Dialog
+                    onOpenChange={(open) => {
+                        setClusterElementsCanvasOpen(open);
+
+                        if (!open) {
+                            setRootClusterElementNodeData(undefined);
+                            useWorkflowNodeDetailsPanelStore.getState().reset();
+                        }
+                    }}
                     open={clusterElementsCanvasOpen}
-                    previousComponentDefinitions={previousComponentDefinitions}
-                    updateWorkflowMutation={updateWorkflowMutation!}
-                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                />
+                >
+                    <DialogHeader>
+                        <DialogTitle className="sr-only"></DialogTitle>
+
+                        <DialogDescription />
+                    </DialogHeader>
+
+                    <DialogContent className="absolute bottom-4 left-16 top-12 h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 gap-2 bg-surface-main p-0">
+                        <ClusterElementsWorkflowEditor />
+
+                        <WorkflowNodeDetailsPanel
+                            className="fixed inset-y-0 right-0 rounded-l-none"
+                            closeButton={
+                                <DialogClose asChild>
+                                    <Button icon={<XIcon />} size="icon" title="Close the canvas" variant="ghost" />
+                                </DialogClose>
+                            }
+                            invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                            previousComponentDefinitions={previousComponentDefinitions}
+                            updateWorkflowMutation={updateWorkflowMutation!}
+                            workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                        />
+
+                        {dataPillPanelOpen && (
+                            <Suspense fallback={<DataPillPanelSkeleton />}>
+                                <DataPillPanel
+                                    className="fixed inset-y-0 right-[465px] rounded-none"
+                                    previousComponentDefinitions={previousComponentDefinitions}
+                                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                                />
+                            </Suspense>
+                        )}
+                    </DialogContent>
+                </Dialog>
             )}
 
             {workflow.id && <WorkflowTestChatPanel />}

@@ -196,7 +196,7 @@ public class RemoteTriggerDefinitionFacadeController {
             dynamicWebhookEnableRequest.componentName, dynamicWebhookEnableRequest.componentVersion,
             dynamicWebhookEnableRequest.triggerName, dynamicWebhookEnableRequest.inputParameters,
             dynamicWebhookEnableRequest.workflowExecutionId, dynamicWebhookEnableRequest.connectionId,
-            dynamicWebhookEnableRequest.webhookUrl, dynamicWebhookEnableRequest.environmentId));
+            dynamicWebhookEnableRequest.webhookUrl));
     }
 
     @RequestMapping(
@@ -224,8 +224,9 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record DynamicWebhookEnableRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> inputParameters,
-        String workflowExecutionId, String webhookUrl, Long connectionId, long environmentId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, Object> inputParameters, String workflowExecutionId, String webhookUrl,
+        Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")

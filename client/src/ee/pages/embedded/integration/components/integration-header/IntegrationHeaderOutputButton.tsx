@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {SquareChevronRightIcon} from 'lucide-react';
@@ -23,7 +23,6 @@ const IntegrationHeaderOutputButton = ({
             <TooltipTrigger asChild>
                 <Button
                     className="hover:bg-background/70 [&_svg]:size-5"
-                    icon={<SquareChevronRightIcon />}
                     onClick={() => {
                         setShowBottomPanelOpen(!showBottomPanel);
 
@@ -33,7 +32,9 @@ const IntegrationHeaderOutputButton = ({
                     }}
                     size="icon"
                     variant="ghost"
-                />
+                >
+                    <SquareChevronRightIcon />
+                </Button>
             </TooltipTrigger>
 
             <TooltipContent>Show the current workflow test execution output</TooltipContent>

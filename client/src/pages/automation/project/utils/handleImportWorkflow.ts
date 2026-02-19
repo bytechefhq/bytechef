@@ -1,19 +1,11 @@
-import {
-    CreateProjectWorkflow200Response,
-    CreateProjectWorkflowRequest,
-} from '@/shared/middleware/automation/configuration';
+import {CreateProjectWorkflowRequest} from '@/shared/middleware/automation/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
 
 const handleImportWorkflow = async (
     event: ChangeEvent<HTMLInputElement>,
     projectId: number,
-    importProjectWorkflowMutation: UseMutationResult<
-        CreateProjectWorkflow200Response,
-        Error,
-        CreateProjectWorkflowRequest,
-        unknown
-    >
+    importProjectWorkflowMutation: UseMutationResult<number, Error, CreateProjectWorkflowRequest, unknown>
 ) => {
     if (event.target.files) {
         const file = event.target.files[0];

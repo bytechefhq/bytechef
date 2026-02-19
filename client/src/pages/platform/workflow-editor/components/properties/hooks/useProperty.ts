@@ -53,15 +53,7 @@ const INPUT_PROPERTY_CONTROL_TYPES = [
     'URL',
 ];
 
-const MENTION_INPUT_PROPERTY_CONTROL_TYPES = [
-    'EMAIL',
-    'FORMULA_MODE',
-    'PHONE',
-    'RICH_TEXT',
-    'TEXT',
-    'TEXT_AREA',
-    'URL',
-];
+const MENTION_INPUT_PROPERTY_CONTROL_TYPES = ['EMAIL', 'PHONE', 'RICH_TEXT', 'TEXT', 'TEXT_AREA', 'URL'];
 
 type UsePropertyReturnType = {
     controlType?: ControlType;
@@ -303,16 +295,8 @@ export const useProperty = ({
         }
 
         displayConditionIndexes.forEach((index) => {
-            displayCondition = displayCondition!.replace('[index]', `[${index}]`);
+            displayCondition = displayCondition!.replace(`[index]`, `[${index}]`);
         });
-
-        if (displayConditionIndexes.length > 0 && displayCondition.includes('[index]')) {
-            const lastIndex = displayConditionIndexes[displayConditionIndexes.length - 1];
-
-            while (displayCondition.includes('[index]')) {
-                displayCondition = displayCondition.replace('[index]', `[${lastIndex}]`);
-            }
-        }
     }
 
     const saveInputValue = useDebouncedCallback(() => {
@@ -501,7 +485,7 @@ export const useProperty = ({
             return;
         }
 
-        const parentParameterValue = resolvePath(encodeParameters(currentComponent.parameters ?? {}), encodePath(path));
+        const parentParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -681,12 +665,10 @@ export const useProperty = ({
 
             if (fromAi) {
                 if (editorRef.current) {
-                    const fromAi = `=fromAi('${property.name}', 'description')`;
-
-                    editorRef.current.commands.setContent(fromAi);
+                    editorRef.current.commands.setContent(`fromAi(${property.name}, 'description')`);
                     editorRef.current.setEditable(false);
 
-                    value = fromAi;
+                    value = `fromAi(${property.name}, 'description')`;
                 }
             } else {
                 if (editorRef.current) {
@@ -823,15 +805,15 @@ export const useProperty = ({
 
         const {parameters} = currentComponent;
 
-        const encodedParameters = encodeParameters(parameters);
-        const encodedPath = path ? encodePath(path) : undefined;
-
         if (Object.keys(parameters).length && (!propertyParameterValue || propertyParameterValue === defaultValue)) {
-            if (!path || !encodedPath) {
+            if (!path) {
                 setPropertyParameterValue(parameters[name]);
 
                 return;
             }
+
+            const encodedParameters = encodeParameters(parameters);
+            const encodedPath = encodePath(path);
 
             const valueFromDefinition = resolvePath(encodedParameters, encodedPath);
 
@@ -848,17 +830,17 @@ export const useProperty = ({
             }
         }
 
-        const shouldSaveHiddenProperty =
+        // save hidden property to definition on render
+        if (
             hidden &&
-            encodedPath &&
+            path &&
             (objectName === undefined || dynamicPropertySource === objectName) &&
             (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
-            resolvePath(encodedParameters, encodedPath) !== defaultValue;
-
-        if (shouldSaveHiddenProperty) {
+            resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
+        ) {
             const saveDefaultValue = () => {
                 saveProperty({
-                    path: path!,
+                    path,
                     type,
                     updateClusterElementParameterMutation,
                     updateWorkflowNodeParameterMutation,

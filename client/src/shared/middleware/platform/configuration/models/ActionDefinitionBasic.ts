@@ -76,12 +76,6 @@ export interface ActionDefinitionBasic {
      */
     outputSchemaDefined?: boolean;
     /**
-     * Does action support SSE streaming.
-     * @type {boolean}
-     * @memberof ActionDefinitionBasic
-     */
-    sseStreamResponse?: boolean;
-    /**
      * The title
      * @type {string}
      * @memberof ActionDefinitionBasic
@@ -119,7 +113,6 @@ export function ActionDefinitionBasicFromJSONTyped(json: any, ignoreDiscriminato
         'outputDefined': json['outputDefined'],
         'outputFunctionDefined': json['outputFunctionDefined'],
         'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
-        'sseStreamResponse': json['sseStreamResponse'] == null ? undefined : json['sseStreamResponse'],
         'title': json['title'] == null ? undefined : json['title'],
     };
 }
@@ -143,7 +136,6 @@ export function ActionDefinitionBasicToJSONTyped(value?: ActionDefinitionBasic |
         'outputDefined': value['outputDefined'],
         'outputFunctionDefined': value['outputFunctionDefined'],
         'outputSchemaDefined': value['outputSchemaDefined'],
-        'sseStreamResponse': value['sseStreamResponse'],
         'title': value['title'],
     };
 }

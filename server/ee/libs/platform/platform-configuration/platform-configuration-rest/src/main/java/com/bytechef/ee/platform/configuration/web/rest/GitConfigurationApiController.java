@@ -12,7 +12,6 @@ import com.bytechef.ee.platform.configuration.dto.GitConfigurationDTO;
 import com.bytechef.ee.platform.configuration.facade.GitConfigurationFacade;
 import com.bytechef.ee.platform.configuration.web.rest.model.GitConfigurationModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
 @ConditionalOnEEVersion
-@SuppressFBWarnings("HARD_CODE_PASSWORD")
 public class GitConfigurationApiController implements GitConfigurationApi {
 
     protected static final String PASSWORD = "********";

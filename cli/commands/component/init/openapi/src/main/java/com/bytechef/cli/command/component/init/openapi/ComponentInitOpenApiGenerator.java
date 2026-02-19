@@ -96,7 +96,6 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class ComponentInitOpenApiGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentInitOpenApiGenerator.class);

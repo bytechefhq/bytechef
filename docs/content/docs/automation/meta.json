@@ -8,6 +8,8 @@
     "overview",
     "quick-start",
     "---Connect Data---",
+    "connect-data/overview",
+    "connect-data/how-to-guides/index",
     "...connect-data",
     "---Build Workflows---",
     "build/index",

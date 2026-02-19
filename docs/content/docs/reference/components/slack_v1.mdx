@@ -1,8 +1,7 @@
 ---
-title: "Slack"
-description: "Slack is a messaging platform for teams to communicate and collaborate."
+description: "Slack component for ByteChef. Team messaging. Learn how to implement this in your ByteChef workflows."
+title: Slack
 ---
-
 
 Categories: Communication, Developer Tools
 
@@ -29,36 +28,6 @@ Version: 1
 | clientSecret | Client Secret | STRING |  | true |
 
 
-
-## Connection Setup
-
-### Create OAuth 2.0 App
-
-1. Navigate to [Slack App](https://api.slack.com/apps).
-2. Click on **Create New App**.
-3. Click on **From scratch**.
-4. Enter name of your app and select workspace where it will be installed.
-5. Click on **Create App**.
-6. Click on **Basic Information**
-7. Click on **OAuth & Permissions**.
-8. Click on **Add New Redirect URL**. ByteChef redirect URL: https://127.0.0.1:5173/callback or https://app.bytechef.io/callback.
-9. Click on **Add**.
-10. Click on **Save URLs**.
-11. Click on **Add an OAuth Scope**.
-    - channels:read
-    - channels:write
-    - channels:history
-    - chat:write:bot
-    - groups:read
-    - reactions:read
-    - mpim:read
-    - users:read
-    - incoming-webhook
-12. Under OAuth tokens click on **Install to ...**.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/893e27e9-f6f7-4a07-bae8-b08169858c43?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
 
 
 
@@ -123,8 +92,6 @@ Type: OBJECT
   }
 }
 ```
-
-
 
 
 ### Send Approval Message
@@ -195,8 +162,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Send Channel Message
 Name: sendChannelMessage
 
@@ -263,8 +228,6 @@ Type: OBJECT
   }
 }
 ```
-
-
 
 
 ### Send Direct Message
@@ -336,8 +299,6 @@ Type: OBJECT
 
 
 
-
-
 ## Triggers
 
 
@@ -365,7 +326,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
@@ -375,6 +335,36 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+## Connection Setup
+
+### Create OAuth 2.0 App
+
+1. Navigate to [Slack App](https://api.slack.com/apps).
+2. Click on **Create New App**.
+3. Click on **From scratch**.
+4. Enter name of your app and select workspace where it will be installed.
+5. Click on **Create App**.
+6. Click on **Basic Information**
+7. Click on **OAuth & Permissions**.
+8. Click on **Add New Redirect URL**. ByteChef redirect URL: https://127.0.0.1:5173/callback or https://app.bytechef.io/callback.
+9. Click on **Add**.
+10. Click on **Save URLs**.
+11. Click on **Add an OAuth Scope**.
+    - channels:read
+    - channels:write
+    - channels:history
+    - chat:write:bot
+    - groups:read
+    - reactions:read
+    - mpim:read
+    - users:read
+    - incoming-webhook
+12. Under OAuth tokens click on **Install to ...**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/893e27e9-f6f7-4a07-bae8-b08169858c43?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
 
 ## Trigger Setup
 
@@ -405,6 +395,6 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 23. You can select any event you want to trigger your workflow.
 24. Click on **Save Changes**.
 
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/c766204a-48a4-4793-b433-7bf10e703b03?type=1&controls=on " width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>

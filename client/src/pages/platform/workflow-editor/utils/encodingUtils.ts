@@ -29,8 +29,6 @@ function encodeParametersGeneric({
     const encodedParameters = {...parameters};
 
     Object.keys(encodedParameters).forEach((key) => {
-        let currentKey = key;
-
         if (key.match(matchPattern)) {
             const newKey = replacementFn
                 ? key.replace(matchPattern, replacementFn(key))
@@ -39,31 +37,13 @@ function encodeParametersGeneric({
             encodedParameters[newKey] = encodedParameters[key];
 
             delete encodedParameters[key];
-
-            currentKey = newKey;
         }
 
-        const value = encodedParameters[currentKey];
-
-        if (Array.isArray(value)) {
-            encodedParameters[currentKey] = value.map((item) => {
-                if (isObject(item) && item !== null) {
-                    return encodeParametersGeneric({
-                        matchPattern,
-                        parameters: item as {[key: string]: unknown},
-                        replacement,
-                        replacementFn,
-                    });
-                }
-
-                return item;
-            });
-        } else if (isObject(value) && value !== null) {
-            encodedParameters[currentKey] = encodeParametersGeneric({
+        if (isObject(encodedParameters[key]) && encodedParameters[key] !== null) {
+            encodedParameters[key] = encodeParametersGeneric({
                 matchPattern,
-                parameters: value as {[key: string]: unknown},
+                parameters: encodedParameters[key] as {[key: string]: unknown},
                 replacement,
-                replacementFn,
             });
         }
     });
@@ -329,8 +309,4 @@ export function transformValueForObjectAccess(value: string): string {
     }
 
     return value;
-}
-
-export function escapeHtmlForParagraph(line: string): string {
-    return line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }

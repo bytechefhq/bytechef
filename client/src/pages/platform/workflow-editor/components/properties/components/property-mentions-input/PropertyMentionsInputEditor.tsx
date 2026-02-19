@@ -8,7 +8,6 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {
     encodeParameters,
     encodePath,
-    escapeHtmlForParagraph,
     transformValueForObjectAccess,
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
@@ -211,10 +210,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             mergeAttributes(options.HTMLAttributes, {
                                 class: twMerge(
                                     'relative inline-flex items-center gap-0.5 not-prose bg-muted hover:bg-foreground/15 px-2 rounded-full',
-                                    controlType !== 'RICH_TEXT' &&
-                                        controlType !== 'TEXT_AREA' &&
-                                        controlType !== 'FORMULA_MODE' &&
-                                        'text-sm'
+                                    controlType !== 'RICH_TEXT' && controlType !== 'TEXT_AREA' && 'text-sm'
                                 ),
                             }),
                             [
@@ -243,7 +239,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 }),
             ];
 
-            if (controlType !== 'TEXT_AREA' && controlType !== 'RICH_TEXT' && controlType !== 'FORMULA_MODE') {
+            if (controlType !== 'TEXT_AREA' && controlType !== 'RICH_TEXT') {
                 extensions.push(
                     Extension.create({
                         addKeyboardShortcuts(this) {
@@ -319,13 +315,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
             if (!savingRef.current) {
                 const runSaveProperty = () => {
-                    const valueToSave = pendingValueRef.current;
+                    const toSave = pendingValueRef.current;
 
                     pendingValueRef.current = undefined;
 
-                    if (valueToSave === undefined) {
+                    if (toSave === undefined) {
                         savingRef.current = null;
-
                         return;
                     }
 
@@ -336,12 +331,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             type,
                             updateClusterElementParameterMutation,
                             updateWorkflowNodeParameterMutation,
-                            value: valueToSave,
+                            value: toSave,
                             workflowId,
                         })
                     )
                         .then(() => {
-                            lastSavedRef.current = valueToSave;
+                            lastSavedRef.current = toSave;
                         })
                         .catch(() => {})
                         .finally(() => {
@@ -403,58 +398,40 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             [editorValue, onChange, saveMentionInputValue]
         );
 
-        const getContent = useCallback(
-            (value?: string) => {
-                if (typeof value !== 'string') {
-                    return;
+        const getContent = useCallback((value?: string) => {
+            if (typeof value !== 'string') {
+                return;
+            }
+
+            if (!value) {
+                return '';
+            }
+
+            let content = value;
+
+            if (value.includes('\n')) {
+                const valueLines = value.split('\n');
+
+                const paragraphedLines = valueLines.map((valueLine) => `<p>${valueLine}</p>`);
+
+                content = paragraphedLines.join('');
+            }
+
+            const dataPillRegex = /\${([^}]+)}/g;
+
+            const matches = value.match(dataPillRegex)?.map((match) => match.slice(2, -1));
+
+            if (matches) {
+                for (const match of matches) {
+                    content = content.replace(
+                        `\${${match}}`,
+                        `<span data-type="mention" class="property-mention" data-id="${match}"></span>`
+                    );
                 }
+            }
 
-                if (!value) {
-                    return '';
-                }
-
-                let content = value;
-                let contentIsDecodedHtml = false;
-
-                if (
-                    controlType === 'RICH_TEXT' &&
-                    (content.includes('&lt;') || content.includes('&gt;') || content.includes('&amp;'))
-                ) {
-                    content = decode(content);
-
-                    content = sanitizeHtml(content);
-
-                    contentIsDecodedHtml = true;
-                }
-
-                if (!contentIsDecodedHtml && content.includes('\n')) {
-                    const valueLines = content.split('\n');
-
-                    const paragraphedLines =
-                        controlType === 'TEXT_AREA' || controlType === 'TEXT' || controlType === 'FORMULA_MODE'
-                            ? valueLines.map((valueLine) => `<p>${escapeHtmlForParagraph(valueLine)}</p>`)
-                            : valueLines.map((valueLine) => `<p>${valueLine}</p>`);
-
-                    content = paragraphedLines.join('');
-                }
-
-                const dataPillRegex = /\${([^}]+)}/g;
-
-                const matches = value.match(dataPillRegex)?.map((match) => match.slice(2, -1));
-
-                if (matches) {
-                    for (const match of matches) {
-                        content = content.replace(
-                            `\${${match}}`,
-                            `<span data-type="mention" class="property-mention" data-id="${match}"></span>`
-                        );
-                    }
-                }
-
-                return content;
-            },
-            [controlType]
-        );
+            return content;
+        }, []);
 
         const moveCursorToEnd = useCallback((view: EditorView, pos: number) => {
             const valueSize = view.state.doc.content.size;
@@ -668,7 +645,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             variant="ghost"
                         />
                     ))}
-
                 {controlType === 'RICH_TEXT' && editor && <PropertyMentionsInputBubbleMenu editor={editor} />}
             </>
         );

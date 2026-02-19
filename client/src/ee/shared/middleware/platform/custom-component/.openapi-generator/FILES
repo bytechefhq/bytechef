@@ -1,0 +1,8 @@
+apis/CustomComponentApi.ts
+apis/index.ts
+docs/CustomComponent.md
+docs/CustomComponentApi.md
+index.ts
+models/CustomComponent.ts
+models/index.ts
+runtime.ts

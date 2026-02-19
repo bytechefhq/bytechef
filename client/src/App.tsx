@@ -1,9 +1,8 @@
-import GlobalSearchDialog from '@/components/GlobalSearch/GlobalSearchDialog';
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
-import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
@@ -17,7 +16,6 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
-    CircleIcon,
     FolderIcon,
     Layers3Icon,
     LayoutTemplateIcon,
@@ -27,10 +25,8 @@ import {
     ServerIcon,
     Settings2Icon,
     SquareIcon,
-    Table2Icon,
     UnplugIcon,
     UsersIcon,
-    VectorSquareIcon,
     Workflow,
     ZapIcon,
 } from 'lucide-react';
@@ -78,18 +74,7 @@ const automationNavigation: NavigationType[] = [
         name: 'Workflow Executions',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
-    {
-        href: '/automation/datatables',
-        icon: Table2Icon,
-        name: 'Data Tables',
-    },
-    {
-        href: '/automation/knowledge-bases',
-        icon: VectorSquareIcon,
-        name: 'Knowledge Base',
-    },
     {href: '/automation/chat', icon: MessageCircleMoreIcon, name: 'Workflow Chat'},
-    {href: '/automation/tasks', icon: CircleIcon, name: 'Tasks'},
 ];
 
 const embeddedNavigation: NavigationType[] = [
@@ -132,7 +117,6 @@ const platformNavigation = [
 
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [searchOpen, setSearchOpen] = useState(false);
 
     const {ai, edition} = useApplicationInfoStore(
         useShallow((state) => ({
@@ -151,7 +135,7 @@ function App() {
             reset: state.reset,
         }))
     );
-    const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
+    const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {currentType, setCurrentType} = usePlatformTypeStore(
         useShallow((state) => ({
@@ -167,15 +151,11 @@ function App() {
 
     useFetchInterceptor();
 
-    const ff_732 = useFeatureFlagsStore()('ff-732');
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
     const ff_2311 = useFeatureFlagsStore()('ff-2311');
-    const ff_2396 = useFeatureFlagsStore()('ff-2396');
     const ff_2894 = useFeatureFlagsStore()('ff-2894');
-    const ff_3955 = useFeatureFlagsStore()('ff-3955');
-    const ff_4000 = useFeatureFlagsStore()('ff-4000');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (
@@ -196,18 +176,6 @@ function App() {
 
         if (navItem.href === '/automation/chat') {
             return ff_2311 || ff_2894;
-        }
-
-        if (navItem.href === '/automation/datatables') {
-            return ff_3955;
-        }
-
-        if (navItem.href === '/automation/knowledge-bases') {
-            return ff_4000;
-        }
-
-        if (navItem.href === '/automation/tasks') {
-            return ff_732;
         }
 
         return true;
@@ -274,29 +242,6 @@ function App() {
         }
     }, [currentType, location, setCurrentType]);
 
-    useEffect(() => {
-        if (!ff_2396) {
-            return;
-        }
-
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.defaultPrevented) {
-                return;
-            }
-
-            if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-                event.preventDefault();
-                setSearchOpen(true);
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [ff_2396]);
-
     return authenticated ? (
         <div className="flex h-full">
             <MobileSidebar
@@ -308,25 +253,21 @@ function App() {
 
             <DesktopSidebar navigation={navigation} />
 
-            <div className="flex h-full min-w-0 flex-1 flex-col">
+            <div className="flex min-w-0 flex-1 flex-col">
                 <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
 
                 <div className="flex size-full">
-                    <div className="flex h-full min-w-0 flex-1">
-                        <Outlet />
-                    </div>
+                    <Outlet />
 
-                    {ai.copilot.enabled && (
-                        <aside className="h-full shrink-0">
-                            <CopilotPanel open={copilotPanelOpen} />
+                    {ai.copilot.enabled && copilotPanelOpen && (
+                        <aside>
+                            <CopilotPanel />
                         </aside>
                     )}
                 </div>
             </div>
 
             <Toaster />
-
-            {ff_2396 && <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />}
         </div>
     ) : (
         <Outlet />

@@ -8,8 +8,6 @@ import {UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import {decodePath} from './encodingUtils';
-import {enqueueWorkflowMutation} from './workflowMutationQueue';
 
 export default function deleteProperty(
     workflowId: string,
@@ -31,8 +29,6 @@ export default function deleteProperty(
     const currentNode = useWorkflowNodeDetailsPanelStore.getState().currentNode;
     const rootClusterElementNodeData = useWorkflowEditorStore.getState().rootClusterElementNodeData;
 
-    const decodedPath = decodePath(path);
-
     if (!currentComponent) {
         console.error('No current component found in the store');
 
@@ -40,59 +36,16 @@ export default function deleteProperty(
     }
 
     if (currentNode?.clusterElementType) {
-        if (!deleteClusterElementParameterMutation) {
-            return;
-        }
-
-        const clusterElementType = currentNode.clusterElementType;
-        const clusterElementWorkflowNodeName = currentNode.workflowNodeName;
-
-        enqueueWorkflowMutation(() =>
-            deleteClusterElementParameterMutation.mutateAsync(
-                {
-                    clusterElementType,
-                    clusterElementWorkflowNodeName,
-                    deleteClusterElementParameterRequest: {
-                        path: decodedPath,
-                    },
-                    environmentId: environmentStore.getState().currentEnvironmentId,
-                    id: workflowId,
-                    workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
-                },
-                {
-                    onSuccess: (response) => {
-                        const {setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
-
-                        setCurrentComponent({
-                            ...currentComponent,
-                            displayConditions: response.displayConditions,
-                            metadata: response.metadata,
-                            parameters: response.parameters,
-                        });
-
-                        setCurrentNode({
-                            ...currentNode,
-                            displayConditions: response.displayConditions,
-                            metadata: response.metadata,
-                            parameters: response.parameters,
-                        });
-                    },
-                }
-            )
-        );
-
-        return;
-    }
-
-    enqueueWorkflowMutation(() =>
-        deleteWorkflowNodeParameterMutation.mutateAsync(
+        deleteClusterElementParameterMutation?.mutate(
             {
+                clusterElementType: currentNode?.clusterElementType,
+                clusterElementWorkflowNodeName: currentNode?.workflowNodeName,
                 deleteClusterElementParameterRequest: {
-                    path: decodedPath,
+                    path,
                 },
                 environmentId: environmentStore.getState().currentEnvironmentId,
                 id: workflowId,
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || currentNode?.workflowNodeName || '',
+                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
             },
             {
                 onSuccess: (response) => {
@@ -100,21 +53,49 @@ export default function deleteProperty(
 
                     setCurrentComponent({
                         ...currentComponent,
-                        displayConditions: response.displayConditions,
                         metadata: response.metadata,
                         parameters: response.parameters,
                     });
 
-                    if (currentNode) {
-                        setCurrentNode({
-                            ...currentNode,
-                            displayConditions: response.displayConditions,
-                            metadata: response.metadata,
-                            parameters: response.parameters,
-                        });
-                    }
+                    setCurrentNode({
+                        ...currentNode,
+                        metadata: response.metadata,
+                        parameters: response.parameters,
+                    });
                 },
             }
-        )
+        );
+
+        return;
+    }
+
+    deleteWorkflowNodeParameterMutation.mutate(
+        {
+            deleteClusterElementParameterRequest: {
+                path,
+            },
+            environmentId: environmentStore.getState().currentEnvironmentId,
+            id: workflowId,
+            workflowNodeName: currentComponent?.workflowNodeName,
+        },
+        {
+            onSuccess: (response) => {
+                const {setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
+
+                setCurrentComponent({
+                    ...currentComponent,
+                    metadata: response.metadata,
+                    parameters: response.parameters,
+                });
+
+                if (currentNode) {
+                    setCurrentNode({
+                        ...currentNode,
+                        metadata: response.metadata,
+                        parameters: response.parameters,
+                    });
+                }
+            },
+        }
     );
 }

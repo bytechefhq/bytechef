@@ -11,11 +11,10 @@
     "deployment/docker",
     "deployment/kubernetes",
     "deployment/aws-ec2",
-    "deployment/aws-ec3",
-    "deployment/azures",
+    "deployment/azure",
     "deployment/google-cloud",
     "deployment/digitalocean",
-    "---Manage Insatance---",
+    "---Manage Instance---",
     "configuration/configure-instance",
     "configuration/environment-variables",
     "configuration/manage-instance"

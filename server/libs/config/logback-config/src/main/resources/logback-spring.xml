@@ -1,31 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE configuration>
-<configuration scan="true">
 
+<configuration scan="true">
+    <!-- Patterns based on https://github.com/spring-projects/spring-boot/blob/v3.0.0/spring-boot-project/spring-boot/src/main/resources/org/springframework/boot/logging/logback/defaults.xml -->
+    <conversionRule conversionWord="crlf" class="com.bytechef.logback.config.CRLFLogConverter" />
+    <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %crlf(%m){red} %n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+    <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
+    <property name="FILE_LOG_PATTERN" value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } &#45;&#45;&#45; [%t] %-40.40logger{39} : %crlf(%m) %n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+
+    <springProperty name="applicationName" source="spring.application.name" />
     <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
+    <springProperty name="loki.appender.level" source="bytechef.observability.loki.appender.level" defaultValue="OFF" />
+    <springProperty name="loki.appender.http.url" source="bytechef.observability.loki.appender.http.url" defaultValue="http://localhost:3100/loki/api/v1/push" />
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
-    <SpringProfile name="!testint">
-        <appender name="OpenTelemetry"
-                  class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
-        </appender>
-    </SpringProfile>
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${loki.appender.level}</level>
+        </filter>
+        <http>
+            <url>${loki.appender.http.url}</url>
+        </http>
+        <format>
+            <label>
+                <pattern>app=${applicationName},host=${HOSTNAME},traceID=%X{traceId:-NONE},level=%level</pattern>
+            </label>
+            <message>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </message>
+        </format>
+    </appender>
 
-    <SpringProfile name="dev">
-        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-    </SpringProfile>
-
-    <SpringProfile name="prod">
-        <include resource="org/springframework/boot/logging/logback/structured-console-appender.xml"/>
-    </SpringProfile>
-
-    <!-- See https://github.com/open-telemetry/opentelemetry-java-instrumentation/issues/13069
-    <appender name="ASYNC-OpenTelemetry" class="ch.qos.logback.classic.AsyncAppender">
+    <appender name="ASYNC-LOKI" class="ch.qos.logback.classic.AsyncAppender">
         <queueSize>1024</queueSize>
         <neverBlock>true</neverBlock>
-        <appender-ref ref="OpenTelemetry"/>
+        <appender-ref ref="LOKI"/>
     </appender>
+
+    <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
+    <!--
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
+
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <appender-ref ref="FILE"/>
+    </appender>
+
+    <root level="${logging.level.root}">
+        <appender-ref ref="ASYNC"/>
+    </root>
     -->
 
     <!--<logger name="com.bytechef" level="INFO"/>-->
@@ -63,8 +88,8 @@
     <logger name="LiquibaseSchemaResolver" level="INFO"/>
 
     <root level="${log.level}">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="OpenTelemetry"/>
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="ASYNC-LOKI" />
     </root>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">

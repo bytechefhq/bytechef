@@ -2463,8 +2463,6 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
-    "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1

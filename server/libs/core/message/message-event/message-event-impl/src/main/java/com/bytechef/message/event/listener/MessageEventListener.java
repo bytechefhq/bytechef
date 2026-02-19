@@ -26,10 +26,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  * @author Ivica Cardic
@@ -50,7 +49,7 @@ public class MessageEventListener {
         this.messageEventPreSendProcessors = messageEventPreSendProcessors;
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    @EventListener
     @Async
     public void onMessageEvent(MessageEvent<?> messageEvent) {
         if (logger.isTraceEnabled()) {

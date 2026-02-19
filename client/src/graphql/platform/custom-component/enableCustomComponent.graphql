@@ -1,3 +1,0 @@
-mutation enableCustomComponent($id: ID!, $enable: Boolean!) {
-    enableCustomComponent(id: $id, enable: $enable)
-}

@@ -27,5 +27,5 @@ public interface DynamicOptionsProperty<T> extends OptionsProperty<T> {
      *
      * @return
      */
-    Optional<OptionsDataSource<?>> getOptionsDataSource();
+    Optional<OptionsDataSource> getOptionsDataSource();
 }

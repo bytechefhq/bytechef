@@ -19,16 +19,12 @@ package com.bytechef.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -46,9 +42,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -108,9 +102,6 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Autowired
     private JobFacade jobFacade;
-
-    @Autowired
-    private JobService jobService;
 
     @Autowired
     private PrincipalJobService principalJobService;
@@ -355,109 +346,5 @@ public class ProjectDeploymentFacadeIntTest {
     @Test
     public void testUpdateProjectDeploymentTags() {
         // TODO
-    }
-
-    @Test
-    public void testWorkflowLastExecutionDateFiltersJobsByDeploymentId() {
-        // Given - Create a project with a workflow and deploy it
-        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
-
-        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
-            workspace.getId(), projectDTO);
-
-        long deploymentId = projectDeploymentDTO.id();
-
-        // And mock job execution - simulate a job that ran in this deployment
-        long jobIdForThisDeployment = 12345L;
-        Instant executionTime = Instant.parse("2024-06-15T10:30:00Z");
-
-        Job mockJob = new Job();
-
-        mockJob.setEndDate(executionTime);
-
-        when(principalJobService.fetchLastWorkflowJobId(eq(deploymentId), anyList(), eq(PlatformType.AUTOMATION)))
-            .thenReturn(Optional.of(jobIdForThisDeployment));
-        when(jobService.getJob(jobIdForThisDeployment))
-            .thenReturn(mockJob);
-
-        // When - Get the project deployment (which fetches workflow execution dates)
-        ProjectDeploymentDTO result = projectDeploymentFacade.getProjectDeployment(deploymentId);
-
-        // Then - Verify that fetchLastWorkflowJobId was called with THIS deployment's ID
-        // This ensures execution dates are filtered by deployment, not fetched globally
-        verify(principalJobService, atLeastOnce()).fetchLastWorkflowJobId(
-            eq(deploymentId), anyList(), eq(PlatformType.AUTOMATION));
-
-        // And the workflow should have the execution date from the mocked job
-        assertThat(result.projectDeploymentWorkflows())
-            .hasSize(1)
-            .first()
-            .satisfies(workflow -> assertThat(workflow.lastExecutionDate()).isEqualTo(executionTime));
-    }
-
-    @Test
-    public void testWorkflowLastExecutionDateIsolatedBetweenDeployments() {
-        // Given - Create a project with a workflow
-        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
-
-        // And create TWO deployments (simulating different environments)
-        ProjectDeploymentDTO deployment1 = projectDeploymentFacadeHelper.createProjectDeployment(
-            workspace.getId(), projectDTO);
-
-        ProjectDeploymentDTO deployment2 = projectDeploymentFacadeHelper.createProjectDeploymentForEnvironment(
-            workspace.getId(), projectDTO, Environment.STAGING);
-
-        long deployment1Id = deployment1.id();
-        long deployment2Id = deployment2.id();
-
-        // And mock different job executions for each deployment
-        long jobIdForDeployment1 = 1001L;
-        long jobIdForDeployment2 = 2002L;
-        Instant executionTime1 = Instant.parse("2024-06-01T10:00:00Z");
-        Instant executionTime2 = Instant.parse("2024-06-15T15:00:00Z");
-
-        Job mockJob1 = new Job();
-
-        mockJob1.setEndDate(executionTime1);
-
-        Job mockJob2 = new Job();
-
-        mockJob2.setEndDate(executionTime2);
-
-        // Reset mocks to clear default stub
-        reset(principalJobService);
-
-        when(principalJobService.fetchLastWorkflowJobId(eq(deployment1Id), anyList(), eq(PlatformType.AUTOMATION)))
-            .thenReturn(Optional.of(jobIdForDeployment1));
-        when(principalJobService.fetchLastWorkflowJobId(eq(deployment2Id), anyList(), eq(PlatformType.AUTOMATION)))
-            .thenReturn(Optional.of(jobIdForDeployment2));
-
-        when(jobService.getJob(jobIdForDeployment1))
-            .thenReturn(mockJob1);
-        when(jobService.getJob(jobIdForDeployment2))
-            .thenReturn(mockJob2);
-
-        // Re-stub getJobIds for other tests
-        when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), anyInt()))
-            .thenReturn(Page.empty());
-
-        // When - Get each deployment
-        ProjectDeploymentDTO result1 = projectDeploymentFacade.getProjectDeployment(deployment1Id);
-        ProjectDeploymentDTO result2 = projectDeploymentFacade.getProjectDeployment(deployment2Id);
-
-        // Then - Each deployment should have its OWN execution date, not mixed up
-        assertThat(result1.projectDeploymentWorkflows())
-            .first()
-            .satisfies(workflow -> assertThat(workflow.lastExecutionDate()).isEqualTo(executionTime1));
-
-        assertThat(result2.projectDeploymentWorkflows())
-            .first()
-            .satisfies(workflow -> assertThat(workflow.lastExecutionDate()).isEqualTo(executionTime2));
-
-        // Verify the correct deployment IDs were used in the queries
-        verify(principalJobService, atLeastOnce()).fetchLastWorkflowJobId(
-            eq(deployment1Id), anyList(), eq(PlatformType.AUTOMATION));
-        verify(principalJobService, atLeastOnce()).fetchLastWorkflowJobId(
-            eq(deployment2Id), anyList(), eq(PlatformType.AUTOMATION));
     }
 }

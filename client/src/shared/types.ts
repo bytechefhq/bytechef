@@ -103,8 +103,6 @@ export type ClickedOperationType = {
 
 export type TabNameType = 'description' | 'clusterElements' | 'connection' | 'properties' | 'output';
 
-export type TabValueType = 'input' | 'output' | 'error' | 'logs';
-
 type ConditionDataType = {
     conditionCase: 'caseTrue' | 'caseFalse';
     conditionId: string;
@@ -159,7 +157,6 @@ export type NestedClusterRootComponentDefinitionType = {
 export type ClusterElementItemType = {
     clusterElements?: ClusterElementsType;
     clusterElementTypesCount?: number;
-    connections?: {[key: string]: ComponentConnectionType};
     label?: string;
     isNestedClusterRoot?: boolean;
     metadata?: {

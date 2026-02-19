@@ -1,5 +1,5 @@
 import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
@@ -22,11 +22,12 @@ const IntegrationHeaderTitle = ({integration}: {integration: Integration}) => {
                     <TooltipTrigger asChild>
                         <Button
                             className="hover:bg-background/70 [&_svg]:size-5"
-                            icon={<PanelLeftIcon />}
                             onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
                             size="icon"
                             variant="ghost"
-                        />
+                        >
+                            <PanelLeftIcon />
+                        </Button>
                     </TooltipTrigger>
 
                     <TooltipContent>See integrations</TooltipContent>

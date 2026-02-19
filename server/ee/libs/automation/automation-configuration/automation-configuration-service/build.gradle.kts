@@ -1,6 +1,5 @@
 dependencies {
     implementation("org.springframework:spring-context")
-    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))

@@ -1,4 +1,4 @@
-FROM gradle:9.3.0-jdk25-alpine AS build
+FROM gradle:9.2.0-jdk25-alpine AS build
 
 WORKDIR /build
 
@@ -16,7 +16,7 @@ WORKDIR ./
 
 RUN gradle bootJar --no-daemon
 
-FROM ghcr.io/graalvm/graalvm-community:25.0.2
+FROM ghcr.io/graalvm/graalvm-community:25.0.0
 
 WORKDIR /opt
 

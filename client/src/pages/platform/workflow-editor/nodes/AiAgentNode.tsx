@@ -243,7 +243,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             </div>
 
             <Handle
-                className={twMerge(styles.handleVisible, '-top-[1px] rounded-b-none rounded-t-xs')}
+                className={styles.handle}
                 isConnectable={false}
                 position={Position.Top}
                 style={hasIcons ? {left: '120px'} : {left: '36px'}}
@@ -251,7 +251,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             />
 
             <Handle
-                className={twMerge(styles.handleVisible, 'rounded-b-xs rounded-t-none')}
+                className={styles.handle}
                 isConnectable={false}
                 position={Position.Bottom}
                 style={hasIcons ? {left: '120px'} : {left: '36px'}}

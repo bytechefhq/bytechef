@@ -36,9 +36,10 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * @author Ivica Cardic
@@ -115,6 +116,10 @@ public class WorkflowServiceIntTest {
         return workflow;
     }
 
+    @ComponentScan(
+        basePackages = {
+            "com.bytechef.atlas.configuration.repository.jdbc"
+        })
     @EnableAutoConfiguration
     @Configuration
     public static class WorkflowConfigurationIntTestConfiguration {
@@ -132,7 +137,7 @@ public class WorkflowServiceIntTest {
             return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
         }
 
-        @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
+        @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.configuration.repository.jdbc")
         public static class WorkflowIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
         }
     }

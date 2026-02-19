@@ -1,9 +1,0 @@
-query searchKnowledgeBase($id: ID!, $query: String!, $metadataFilters: String) {
-    searchKnowledgeBase(id: $id, query: $query, metadataFilters: $metadataFilters) {
-        id
-        knowledgeBaseDocumentId
-        content
-        metadata
-        score
-    }
-}

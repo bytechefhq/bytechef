@@ -24,59 +24,47 @@ interface OutputTabSampleDataDialogProps {
 }
 
 const OutputTabSampleDataDialog = ({onClose, onUpload, open, placeholder}: OutputTabSampleDataDialogProps) => {
-    const [rawValue, setRawValue] = useState<string>('');
-    const [parsedValue, setParsedValue] = useState<object | undefined>();
+    const [value, setValue] = useState<object | undefined>();
 
-    const handleEditorOnChange = (editorValue: string | undefined) => {
-        const placeholderElement = document.querySelector('#monaco-placeholder') as HTMLElement | null;
+    const handleEditorOnChange = (value: string | undefined) => {
+        const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
 
-        if (placeholderElement) {
-            placeholderElement.style.display = editorValue ? 'none' : 'block';
+        if (!placeholder) {
+            return;
         }
 
-        setRawValue(editorValue ?? '');
+        placeholder.style.display = value ? 'none' : 'block';
 
-        if (editorValue) {
+        if (value != null) {
             try {
-                setParsedValue(JSON.parse(editorValue));
-            } catch {
-                setParsedValue(undefined);
+                setValue(JSON.parse(value));
+            } catch (error) {
+                console.error('Invalid JSON:', error);
             }
-        } else {
-            setParsedValue(undefined);
         }
     };
 
     const handleEditorOnMount = (editor: StandaloneCodeEditorType) => {
-        const placeholderElement = document.querySelector('#monaco-placeholder') as HTMLElement | null;
+        const monacoPlaceholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
 
-        if (placeholderElement) {
-            placeholderElement.style.display = rawValue ? 'none' : 'block';
+        if (!monacoPlaceholder) {
+            return;
         }
+
+        monacoPlaceholder.style.display = value ? 'none' : 'block';
 
         editor.focus();
     };
 
-    const handleOpenChange = (isOpen: boolean) => {
-        if (!isOpen) {
-            const hasPlaceholder = placeholder !== undefined && Object.keys(placeholder).length > 0;
-
-            setRawValue(hasPlaceholder ? JSON.stringify(placeholder, null, SPACE) : '');
-            setParsedValue(hasPlaceholder ? placeholder : undefined);
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            setValue(placeholder);
             onClose();
         }
     };
 
     useEffect(() => {
-        if (placeholder !== undefined && Object.keys(placeholder).length) {
-            const stringified = JSON.stringify(placeholder, null, SPACE);
-
-            setRawValue(stringified);
-            setParsedValue(placeholder);
-        } else {
-            setRawValue('');
-            setParsedValue(undefined);
-        }
+        setValue(placeholder !== undefined && Object.keys(placeholder).length ? placeholder : undefined);
     }, [placeholder]);
 
     return (
@@ -102,7 +90,7 @@ const OutputTabSampleDataDialog = ({onClose, onUpload, open, placeholder}: Outpu
                                 defaultLanguage="json"
                                 onChange={handleEditorOnChange}
                                 onMount={handleEditorOnMount}
-                                value={rawValue}
+                                value={JSON.stringify(value, null, SPACE)}
                             />
                         </Suspense>
 
@@ -117,11 +105,11 @@ const OutputTabSampleDataDialog = ({onClose, onUpload, open, placeholder}: Outpu
 
                 <DialogFooter>
                     <Button
-                        disabled={!parsedValue}
+                        disabled={!value}
                         label="Upload"
                         onClick={() => {
-                            if (parsedValue) {
-                                onUpload(JSON.stringify(parsedValue));
+                            if (value) {
+                                onUpload(value && JSON.stringify(value));
                             }
                         }}
                         type="submit"

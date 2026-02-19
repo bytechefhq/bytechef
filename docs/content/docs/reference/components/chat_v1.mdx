@@ -1,8 +1,7 @@
 ---
-title: "Chat"
-description: "Actions and triggers for using with the chat widget."
+description: "Chat integration for ByteChef. Connect and automate with this service in your workflows. Learn how to implement this in your ByteChef automation."
+title: Chat
 ---
-
 
 Categories: Helpers
 
@@ -55,47 +54,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
-### Stream Response to Chat Request
-Name: streamResponseToRequest
-
-`Stream the response to chat request.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| stream | Stream | STRING | The stream messages. | false |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | The attachments of the response. | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Stream Response to Chat Request",
-  "name" : "streamResponseToRequest",
-  "parameters" : {
-    "stream" : "",
-    "attachments" : [ {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    } ]
-  },
-  "type" : "chat/v1/streamResponseToRequest"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-
 ## Triggers
 
 
@@ -142,8 +100,3 @@ Type: OBJECT
   "type" : "chat/v1/newChatRequest"
 }
 ```
-
-
-
-
-

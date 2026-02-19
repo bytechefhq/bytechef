@@ -1,16 +1,14 @@
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {ForwardedRef, forwardRef} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import UsersPage from '../UsersPage';
 
 const hoisted = vi.hoisted(() => {
     return {
-        handleDeleteDialogOpen: vi.fn(),
-        handleEditDialogOpen: vi.fn(),
-        handleInviteDialogOpen: vi.fn(),
-        mockUseDeleteUserAlertDialog: vi.fn(),
-        mockUseEditUserDialog: vi.fn(),
-        mockUseInviteUserDialog: vi.fn(),
+        deleteDialogOpen: vi.fn(),
+        editDialogOpen: vi.fn(),
+        inviteDialogOpen: vi.fn(),
         mockUseUsersTable: vi.fn(),
     };
 });
@@ -19,83 +17,70 @@ vi.mock('@/pages/settings/platform/users/components/hooks/useUsersTable', () => 
     default: hoisted.mockUseUsersTable,
 }));
 
-vi.mock('@/pages/settings/platform/users/components/hooks/useDeleteUserAlertDialog', () => ({
-    default: hoisted.mockUseDeleteUserAlertDialog,
+vi.mock('@/pages/settings/platform/users/components/DeleteUserAlertDialog', () => ({
+    default: forwardRef((_, ref: ForwardedRef<{open: (login: string | null) => void}>) => {
+        if (ref && typeof ref === 'object') {
+            ref.current = {
+                open: hoisted.deleteDialogOpen,
+            };
+        }
+
+        return <div data-testid="delete-dialog" />;
+    }),
 }));
 
-vi.mock('@/pages/settings/platform/users/components/hooks/useEditUserDialog', () => ({
-    default: hoisted.mockUseEditUserDialog,
+vi.mock('@/pages/settings/platform/users/components/InviteUserDialog', () => ({
+    default: forwardRef((_, ref: ForwardedRef<{open: () => void}>) => {
+        if (ref && typeof ref === 'object') {
+            ref.current = {
+                open: hoisted.inviteDialogOpen,
+            };
+        }
+
+        return <div data-testid="invite-dialog" />;
+    }),
 }));
 
-vi.mock('@/pages/settings/platform/users/components/hooks/useInviteUserDialog', () => ({
-    default: hoisted.mockUseInviteUserDialog,
+vi.mock('@/pages/settings/platform/users/components/EditUserDialog', () => ({
+    default: forwardRef((_, ref: ForwardedRef<{open: (login: string) => void}>) => {
+        if (ref && typeof ref === 'object') {
+            ref.current = {
+                open: hoisted.editDialogOpen,
+            };
+        }
+
+        return <div data-testid="edit-dialog" />;
+    }),
 }));
 
-const mockUsers = [
-    {
-        activated: true,
-        authorities: ['ROLE_ADMIN'],
-        email: 'admin@test.com',
-        firstName: 'Admin',
-        id: '1',
-        lastName: 'User',
-        login: 'admin',
-    },
-    {
-        activated: false,
-        authorities: ['ROLE_USER'],
-        email: 'user@test.com',
-        firstName: 'Regular',
-        id: '2',
-        lastName: 'User',
-        login: 'user',
-    },
-];
-
-const defaultUsersTableMockReturn = {
+const defaultMockReturn = {
     error: null,
     isLoading: false,
-    pageNumber: 0,
-    pageSize: 20,
-    totalElements: mockUsers.length,
-    totalPages: 1,
-    users: mockUsers,
+    users: [
+        {
+            activated: true,
+            authorities: ['ROLE_ADMIN'],
+            email: 'admin@test.com',
+            firstName: 'Admin',
+            id: '1',
+            lastName: 'User',
+            login: 'admin',
+        },
+        {
+            activated: false,
+            authorities: ['ROLE_USER'],
+            email: 'user@test.com',
+            firstName: 'Regular',
+            id: '2',
+            lastName: 'User',
+            login: 'user',
+        },
+    ],
 };
 
 beforeEach(() => {
     windowResizeObserver();
-    hoisted.mockUseUsersTable.mockReturnValue({...defaultUsersTableMockReturn});
-    hoisted.mockUseDeleteUserAlertDialog.mockReturnValue({
-        handleClose: vi.fn(),
-        handleDelete: vi.fn(),
-        handleOpen: hoisted.handleDeleteDialogOpen,
-        open: false,
-    });
-    hoisted.mockUseEditUserDialog.mockReturnValue({
-        authorities: [],
-        editRole: null,
-        editUser: null,
-        handleClose: vi.fn(),
-        handleOpen: hoisted.handleEditDialogOpen,
-        handleRoleChange: vi.fn(),
-        handleUpdate: vi.fn(),
-        open: false,
-        updateDisabled: true,
-    });
-    hoisted.mockUseInviteUserDialog.mockReturnValue({
-        authorities: [],
-        handleClose: vi.fn(),
-        handleEmailChange: vi.fn(),
-        handleInvite: vi.fn(),
-        handleOpen: hoisted.handleInviteDialogOpen,
-        handleRegeneratePassword: vi.fn(),
-        handleRoleChange: vi.fn(),
-        inviteDisabled: true,
-        inviteEmail: '',
-        invitePassword: '',
-        inviteRole: null,
-        open: false,
-    });
+    hoisted.mockUseUsersTable.mockReturnValue({...defaultMockReturn});
 });
 
 afterEach(() => {
@@ -106,7 +91,7 @@ afterEach(() => {
 describe('UsersPage', () => {
     describe('loading state', () => {
         it('should render skeleton rows when isLoading is true', () => {
-            hoisted.mockUseUsersTable.mockReturnValue({...defaultUsersTableMockReturn, isLoading: true, users: []});
+            hoisted.mockUseUsersTable.mockReturnValue({...defaultMockReturn, isLoading: true, users: []});
 
             render(<UsersPage />);
 
@@ -116,7 +101,7 @@ describe('UsersPage', () => {
         });
 
         it('should not render user data when loading', () => {
-            hoisted.mockUseUsersTable.mockReturnValue({...defaultUsersTableMockReturn, isLoading: true, users: []});
+            hoisted.mockUseUsersTable.mockReturnValue({...defaultMockReturn, isLoading: true, users: []});
 
             render(<UsersPage />);
 
@@ -127,7 +112,7 @@ describe('UsersPage', () => {
     describe('error state', () => {
         it('should render error message when error exists', () => {
             hoisted.mockUseUsersTable.mockReturnValue({
-                ...defaultUsersTableMockReturn,
+                ...defaultMockReturn,
                 error: new Error('Failed to fetch users'),
             });
 
@@ -194,7 +179,7 @@ describe('UsersPage', () => {
         });
 
         it('should render empty state when no users', () => {
-            hoisted.mockUseUsersTable.mockReturnValue({...defaultUsersTableMockReturn, users: []});
+            hoisted.mockUseUsersTable.mockReturnValue({...defaultMockReturn, users: []});
 
             render(<UsersPage />);
 
@@ -203,45 +188,63 @@ describe('UsersPage', () => {
     });
 
     describe('invite dialog', () => {
-        it('should call handleOpen from useInviteUserDialog when clicking Invite User button', async () => {
+        it('should render InviteUserDialog component', () => {
+            render(<UsersPage />);
+
+            expect(screen.getByTestId('invite-dialog')).toBeInTheDocument();
+        });
+
+        it('should call invite dialog open method when clicking Invite User button', async () => {
             render(<UsersPage />);
 
             const inviteButton = screen.getByRole('button', {name: 'Invite User'});
             await userEvent.click(inviteButton);
 
-            expect(hoisted.handleInviteDialogOpen).toHaveBeenCalled();
+            expect(hoisted.inviteDialogOpen).toHaveBeenCalled();
         });
     });
 
     describe('delete dialog', () => {
-        it('should call handleOpen from useDeleteUserAlertDialog when clicking delete button', async () => {
+        it('should render DeleteUserAlertDialog component', () => {
+            render(<UsersPage />);
+
+            expect(screen.getByTestId('delete-dialog')).toBeInTheDocument();
+        });
+
+        it('should call delete dialog open method when clicking delete button', async () => {
             render(<UsersPage />);
 
             const deleteButtons = screen.getAllByRole('button', {name: ''});
-            const deleteButton = deleteButtons.find((button) => button.querySelector('.lucide-trash-2'));
+            const deleteButton = deleteButtons.find((btn) => btn.querySelector('.lucide-trash-2'));
 
             if (deleteButton) {
                 await userEvent.click(deleteButton);
 
                 await waitFor(() => {
-                    expect(hoisted.handleDeleteDialogOpen).toHaveBeenCalledWith('admin');
+                    expect(hoisted.deleteDialogOpen).toHaveBeenCalledWith('admin');
                 });
             }
         });
     });
 
     describe('edit dialog', () => {
-        it('should call handleOpen from useEditUserDialog when clicking edit button', async () => {
+        it('should render EditUserDialog component', () => {
+            render(<UsersPage />);
+
+            expect(screen.getByTestId('edit-dialog')).toBeInTheDocument();
+        });
+
+        it('should call edit dialog open method when clicking edit button', async () => {
             render(<UsersPage />);
 
             const editButtons = screen.getAllByRole('button', {name: ''});
-            const editButton = editButtons.find((button) => button.querySelector('.lucide-edit'));
+            const editButton = editButtons.find((btn) => btn.querySelector('.lucide-edit'));
 
             if (editButton) {
                 await userEvent.click(editButton);
 
                 await waitFor(() => {
-                    expect(hoisted.handleEditDialogOpen).toHaveBeenCalledWith('admin');
+                    expect(hoisted.editDialogOpen).toHaveBeenCalledWith('admin');
                 });
             }
         });

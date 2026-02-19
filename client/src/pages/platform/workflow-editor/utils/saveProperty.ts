@@ -9,7 +9,6 @@ import {UseMutationResult} from '@tanstack/react-query';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {decodePath} from './encodingUtils';
-import {enqueueWorkflowMutation} from './workflowMutationQueue';
 
 interface SavePropertyProps {
     fromAi?: boolean;
@@ -56,79 +55,82 @@ export default function saveProperty({
 
     const decodedPath = decodePath(path);
 
-    function handleSuccess(response: DeleteClusterElementParameter200Response & {workflowNodeName?: string}) {
-        if (successCallback) {
-            successCallback();
-        }
-
-        if (currentComponent) {
-            useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
-                ...currentComponent,
-                displayConditions: response.displayConditions,
-                metadata: response.metadata,
-                parameters: response.parameters,
-            });
-        }
-
-        if (currentNode) {
-            useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({
-                ...currentNode,
-                displayConditions: response.displayConditions,
-                metadata: response.metadata,
-                parameters: response.parameters,
-            });
-        }
-    }
-
     if (currentNode && currentNode.clusterElementType) {
-        if (!updateClusterElementParameterMutation) {
-            return;
-        }
-
-        const clusterElementType = currentNode.clusterElementType;
-        const clusterElementWorkflowNodeName = currentNode.workflowNodeName;
-
-        enqueueWorkflowMutation(() =>
-            updateClusterElementParameterMutation.mutateAsync(
-                {
-                    clusterElementType,
-                    clusterElementWorkflowNodeName,
-                    environmentId: environmentStore.getState().currentEnvironmentId,
-                    id: workflowId,
-                    updateClusterElementParameterRequest: {
-                        fromAiInMetadata: fromAi,
-                        includeInMetadata,
-                        path: decodedPath,
-                        type,
-                        value,
-                    },
-                    workflowNodeName: rootClusterElementNodeData?.workflowNodeName ?? '',
-                },
-                {
-                    onSuccess: (response) => handleSuccess(response),
-                }
-            )
-        );
-
-        return;
-    }
-
-    enqueueWorkflowMutation(() =>
-        updateWorkflowNodeParameterMutation.mutateAsync(
+        updateClusterElementParameterMutation?.mutate(
             {
+                clusterElementType: currentNode.clusterElementType,
+                clusterElementWorkflowNodeName: currentNode.workflowNodeName,
                 environmentId: environmentStore.getState().currentEnvironmentId,
                 id: workflowId,
-                updateWorkflowNodeParameterRequest: {
+                updateClusterElementParameterRequest: {
+                    fromAiInMetadata: fromAi,
                     includeInMetadata,
                     path: decodedPath,
                     type,
                     value,
                 },
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || currentNode?.workflowNodeName || '',
+                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
             },
             {
-                onSuccess: (response) => handleSuccess(response),
+                onSuccess: (response) => {
+                    if (successCallback) {
+                        successCallback();
+                    }
+
+                    useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
+                        ...currentComponent,
+                        displayConditions: response.displayConditions,
+                        metadata: response.metadata,
+                        parameters: response.parameters,
+                    });
+
+                    useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({
+                        ...currentNode,
+                        displayConditions: response.displayConditions,
+                        metadata: response.metadata,
+                        parameters: response.parameters,
+                    });
+                },
             }
-        )
+        );
+
+        return;
+    }
+
+    updateWorkflowNodeParameterMutation.mutate(
+        {
+            environmentId: environmentStore.getState().currentEnvironmentId,
+            id: workflowId,
+            updateWorkflowNodeParameterRequest: {
+                includeInMetadata,
+                path: decodedPath,
+                type,
+                value,
+            },
+            workflowNodeName: currentComponent.workflowNodeName,
+        },
+        {
+            onSuccess: (response) => {
+                if (successCallback) {
+                    successCallback();
+                }
+
+                useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
+                    ...currentComponent,
+                    displayConditions: response.displayConditions,
+                    metadata: response.metadata,
+                    parameters: response.parameters,
+                });
+
+                if (currentNode) {
+                    useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({
+                        ...currentNode,
+                        displayConditions: response.displayConditions,
+                        metadata: response.metadata,
+                        parameters: response.parameters,
+                    });
+                }
+            },
+        }
     );
 }

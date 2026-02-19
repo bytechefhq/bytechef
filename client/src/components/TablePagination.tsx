@@ -68,30 +68,29 @@ const TablePagination = ({onClick, pageNumber, pageSize, totalElements, totalPag
                     </p>
                 </div>
 
-                {totalPages > 1 && (
-                    <>
-                        {pageNumber > 0 && (
-                            <PaginationItem>
-                                <PaginationPrevious href="#" onClick={() => onClick(pageNumber - 1)} />
-                            </PaginationItem>
-                        )}
+                <PaginationItem>
+                    <PaginationPrevious
+                        href="#"
+                        onClick={() => {
+                            if (pageNumber > 0) {
+                                onClick(pageNumber - 1);
+                            }
+                        }}
+                    />
+                </PaginationItem>
 
-                        {renderPageLinks()}
+                {renderPageLinks()}
 
-                        {pageNumber < totalPages - 1 && (
-                            <PaginationItem>
-                                <PaginationNext
-                                    href="#"
-                                    onClick={() => {
-                                        if (pageNumber < totalPages - 1) {
-                                            onClick(pageNumber + 1);
-                                        }
-                                    }}
-                                />
-                            </PaginationItem>
-                        )}
-                    </>
-                )}
+                <PaginationItem>
+                    <PaginationNext
+                        href="#"
+                        onClick={() => {
+                            if (pageNumber < totalPages - 1) {
+                                onClick(pageNumber + 1);
+                            }
+                        }}
+                    />
+                </PaginationItem>
             </PaginationContent>
         </Pagination>
     );

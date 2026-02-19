@@ -53,38 +53,19 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
     });
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
-        onError: () => {
-            toast({
-                description: `Project duplication failed.`,
-                variant: 'destructive',
-            });
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             navigate(`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`);
-
-            toast({
-                description: 'Project duplicated successfully.',
-            });
         },
     });
 
     const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
         onError: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-
-            toast({
-                description: 'Workflow duplication failed.',
-                variant: 'destructive',
-            });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-
-            toast({
-                description: 'Workflow duplicated successfully.',
-            });
         },
     });
 

@@ -164,14 +164,12 @@ public final class MockParametersImpl implements Parameters {
 
     @Override
     public List<FileEntry> getFileEntries(String key) {
-        return (List<FileEntry>) this.get(key);
+        return getList(key, FileEntry.class);
     }
 
     @Override
     public List<FileEntry> getFileEntries(String key, List<FileEntry> defaultValue) {
-        List<FileEntry> fileEntries = (List<FileEntry>) this.get(key);
-
-        return fileEntries == null ? defaultValue : fileEntries;
+        return getList(key, FileEntry.class, defaultValue);
     }
 
     @Override
@@ -242,10 +240,6 @@ public final class MockParametersImpl implements Parameters {
 
     @Override
     public <T> List<T> getList(String key, Class<T> elementType) {
-        if (elementType.equals(FileEntry.class)) {
-            return (List<T>) getFileEntries(key);
-        }
-
         return MapUtils.getList(map, key, elementType);
     }
 
@@ -263,10 +257,6 @@ public final class MockParametersImpl implements Parameters {
 
     @Override
     public <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue) {
-        if (elementType.equals(FileEntry.class)) {
-            return (List<T>) getFileEntries(key);
-        }
-
         return MapUtils.getList(map, key, elementType, defaultValue);
     }
 
@@ -473,10 +463,6 @@ public final class MockParametersImpl implements Parameters {
 
     @Override
     public <T> List<T> getRequiredList(String key, Class<T> elementType) {
-        if (elementType.equals(FileEntry.class)) {
-            return (List<T>) getFileEntries(key);
-        }
-
         return MapUtils.getRequiredList(map, key, elementType);
     }
 

@@ -8,7 +8,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
     useDeleteClusterElementParameterMutation,
@@ -39,7 +39,7 @@ export const useProject = () => {
             workflow: state.workflow,
         }))
     );
-    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
+    const setCopilotPanelOpen = useCopilotStore((state) => state.setCopilotPanelOpen);
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const setProjectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.setProjectLeftSidebarOpen);

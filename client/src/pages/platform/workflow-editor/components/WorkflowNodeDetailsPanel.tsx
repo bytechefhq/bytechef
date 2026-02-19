@@ -80,7 +80,6 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
-import getOutputSchemaFromWorkflowNodeOutput from '../utils/getOutputSchemaFromWorkflowNodeOutput';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveClusterElementFieldChange from '../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
@@ -145,7 +144,6 @@ const WorkflowNodeDetailsPanel = ({
         setActiveTab,
         setCurrentComponent,
         setCurrentNode,
-        setOperationChangeInProgress,
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
@@ -155,7 +153,6 @@ const WorkflowNodeDetailsPanel = ({
             setActiveTab: state.setActiveTab,
             setCurrentComponent: state.setCurrentComponent,
             setCurrentNode: state.setCurrentNode,
-            setOperationChangeInProgress: state.setOperationChangeInProgress,
             workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
         }))
     );
@@ -768,7 +765,8 @@ const WorkflowNodeDetailsPanel = ({
 
         const componentProperties: Array<ComponentPropertiesType> = previousComponentDefinitions.map(
             (componentDefinition, index) => {
-                const outputSchemaDefinition = getOutputSchemaFromWorkflowNodeOutput(workflowNodeOutputs[index]);
+                const outputSchemaDefinition: PropertyAllType | undefined =
+                    workflowNodeOutputs[index]?.outputResponse?.outputSchema;
 
                 const properties = outputSchemaDefinition?.properties?.length
                     ? outputSchemaDefinition.properties
@@ -801,8 +799,6 @@ const WorkflowNodeDetailsPanel = ({
             }
 
             setCurrentOperationName(newOperationName);
-
-            setOperationChangeInProgress(true);
 
             let newOperationDefinition: ActionDefinition | TriggerDefinition | ClusterElementDefinition | undefined;
 
@@ -876,6 +872,7 @@ const WorkflowNodeDetailsPanel = ({
                         value: newOperationName,
                     },
                     invalidateWorkflowQueries,
+                    queryClient,
                     updateWorkflowMutation,
                 });
 
@@ -925,8 +922,6 @@ const WorkflowNodeDetailsPanel = ({
                         type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
                         workflowNodeName,
                     });
-
-                    setOperationChangeInProgress(false);
                 },
                 updateWorkflowMutation,
             });
@@ -950,7 +945,6 @@ const WorkflowNodeDetailsPanel = ({
             currentNodeIndex,
             setCurrentComponent,
             setCurrentNode,
-            setOperationChangeInProgress,
         ]
     );
 
@@ -1277,7 +1271,6 @@ const WorkflowNodeDetailsPanel = ({
 
     return (
         <div
-            aria-label={`${currentNode?.workflowNodeName} component configuration panel`}
             className={twMerge(
                 'absolute bottom-6 right-[69px] top-2 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
                 className

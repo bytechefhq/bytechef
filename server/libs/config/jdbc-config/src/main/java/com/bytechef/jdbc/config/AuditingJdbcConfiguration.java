@@ -19,17 +19,24 @@ package com.bytechef.jdbc.config;
 import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.auditing.CurrentDateTimeProvider;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
 @EnableJdbcAuditing(auditorAwareRef = "springSecurityAuditorAware", dateTimeProviderRef = "auditingDateTimeProvider")
+@EnableJdbcRepositories(
+    basePackages = "com.bytechef",
+    excludeFilters = @ComponentScan.Filter(
+        type = FilterType.ANNOTATION, classes = com.bytechef.platform.jdbc.ConditionalJdbcRepository.class))
 public class AuditingJdbcConfiguration {
 
     private static final String SYSTEM = "system";

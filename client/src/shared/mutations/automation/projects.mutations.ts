@@ -1,9 +1,4 @@
-import {
-    ImportProjectRequest,
-    Project,
-    ProjectApi,
-    PublishProjectOperationRequest,
-} from '@/shared/middleware/automation/configuration';
+import {Project, ProjectApi, PublishProjectOperationRequest} from '@/shared/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateProjectMutationProps {
@@ -17,20 +12,6 @@ export const useCreateProjectMutation = (mutationProps?: CreateProjectMutationPr
             return new ProjectApi().createProject({
                 project,
             });
-        },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
-    });
-
-interface ImportProjectMutationProps {
-    onSuccess?: (result: number, variables: ImportProjectRequest) => void;
-    onError?: (error: Error, variables: ImportProjectRequest) => void;
-}
-
-export const useImportProjectMutation = (mutationProps?: ImportProjectMutationProps) =>
-    useMutation({
-        mutationFn: (request: ImportProjectRequest) => {
-            return new ProjectApi().importProject(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

@@ -37,7 +37,7 @@ Type: STATIC_WEBHOOK
 | useWorkflowTimezone | Use Workflow Timezone | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Use the workflow timezone for the submittedAt timestamp instead of UTC. | false |
 | appendAttribution | Append Attribution | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Show an attribution footer on the public form. | false |
 | customFormStyling | Custom Form Styling (CSS) | STRING | Override default form styles with custom CSS. | false |
-| inputs | Form Inputs | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(fieldType), STRING\(fieldLabel), STRING\(fieldName), STRING\(fieldDescription), STRING\(placeholder), STRING\(defaultValue), STRING\(defaultValue), [&#123;STRING\(label), STRING\(value)&#125;]\(fieldOptions), BOOLEAN\(multipleChoice), INTEGER\(minSelection), INTEGER\(maxSelection), BOOLEAN\(required)&#125;] </details> | Define the form input fields | true |
+| inputs | Form Inputs | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fieldLabel), STRING\(fieldName), INTEGER\(fieldType), STRING\(fieldDescription), STRING\(placeholder), STRING\(defaultValue), STRING\(defaultValue), [&#123;STRING\(label), STRING\(value)&#125;]\(fieldOptions), BOOLEAN\(multipleChoice), INTEGER\(minSelection), INTEGER\(maxSelection), BOOLEAN\(required)&#125;] </details> | Define the form input fields | true |
 
 
 #### Output
@@ -58,9 +58,9 @@ The output for this action is dynamic and may vary depending on the input parame
     "appendAttribution" : false,
     "customFormStyling" : "",
     "inputs" : [ {
-      "fieldType" : 1,
       "fieldLabel" : "",
       "fieldName" : "",
+      "fieldType" : 1,
       "fieldDescription" : "",
       "placeholder" : "",
       "defaultValue" : "",
@@ -77,7 +77,6 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "form/v1/newFormRequest"
 }
 ```
-
 
 
 

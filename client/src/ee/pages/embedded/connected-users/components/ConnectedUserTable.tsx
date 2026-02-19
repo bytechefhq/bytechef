@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -117,11 +117,9 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                 cell: (info) => (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button
-                                icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                                size="icon"
-                                variant="ghost"
-                            />
+                            <Button size="icon" variant="ghost">
+                                <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
+                            </Button>
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">

@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
@@ -40,12 +40,9 @@ const IntegrationsSidebarHeader = () => {
                     <div>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
-                                    className="size-8 hover:bg-muted [&_svg]:size-5"
-                                    icon={<FilterIcon />}
-                                    size="icon"
-                                    variant="ghost"
-                                />
+                                <Button className="size-8 hover:bg-muted [&_svg]:size-5" size="icon" variant="ghost">
+                                    <FilterIcon />
+                                </Button>
                             </TooltipTrigger>
 
                             <TooltipContent side="right">Filter integrations</TooltipContent>
@@ -63,11 +60,12 @@ const IntegrationsSidebarHeader = () => {
                     <TooltipTrigger asChild>
                         <Button
                             className="hover:bg-muted [&_svg]:size-5"
-                            icon={<PanelLeftIcon />}
                             onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
                             size="icon"
                             variant="ghost"
-                        />
+                        >
+                            <PanelLeftIcon />
+                        </Button>
                     </TooltipTrigger>
 
                     <TooltipContent>See integrations</TooltipContent>

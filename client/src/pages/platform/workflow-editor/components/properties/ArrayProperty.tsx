@@ -11,7 +11,7 @@ import resolvePath from 'object-resolve-path';
 import {Fragment, useCallback, useEffect, useState} from 'react';
 
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
-import {decodePath, encodeParameters, encodePath} from '../../utils/encodingUtils';
+import {encodeParameters, encodePath} from '../../utils/encodingUtils';
 import getParameterItemType from '../../utils/getParameterItemType';
 import saveProperty from '../../utils/saveProperty';
 
@@ -297,13 +297,10 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 if (parameterItemType === 'OBJECT') {
                     if (parameterItemValue) {
                         const customSubProperties = Object.keys(parameterItemValue).map((key) => {
-                            const decodedKey = decodePath(key);
                             const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
 
                             let subPropertyParameterItemType =
-                                currentComponent.metadata?.ui?.dynamicPropertyTypes?.[
-                                    `${path}[${index}].${decodedKey}`
-                                ];
+                                currentComponent.metadata?.ui?.dynamicPropertyTypes?.[`${path}[${index}].${key}`];
 
                             if (!subPropertyParameterItemType) {
                                 subPropertyParameterItemType = getParameterItemType(subPropertyParameterValue);
@@ -316,7 +313,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                                 custom: true,
                                 defaultValue: subPropertyParameterValue,
                                 expressionEnabled: true,
-                                label: decodedKey,
+                                label: key,
                                 name: key,
                                 path: `${subPropertyPath}.${key}`,
                                 type: subPropertyParameterItemType as PropertyType,

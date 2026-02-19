@@ -1,4 +1,3 @@
-import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -24,31 +23,13 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/wor
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 
 import '@/shared/styles/dropdownMenu.css';
-import {useToast} from '@/hooks/use-toast';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
-import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {
-    ComponentIcon,
-    CopyIcon,
-    DownloadIcon,
-    EditIcon,
-    EllipsisVerticalIcon,
-    Share2Icon,
-    Trash2Icon,
-} from 'lucide-react';
-import {useMemo, useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
+import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Share2Icon, Trash2Icon} from 'lucide-react';
+import {useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
-
-type TriggerDataType = {
-    componentName: string;
-    description: string;
-    iconSrc: string;
-    label: string;
-};
 
 const ProjectWorkflowListItem = ({
     filteredComponentNames,
@@ -80,60 +61,6 @@ const ProjectWorkflowListItem = ({
 
     const queryClient = useQueryClient();
 
-    const {toast} = useToast();
-
-    const triggerComponentName = workflow.workflowTriggerComponentNames?.[0];
-    const triggerType = workflow.triggers?.[0]?.type;
-
-    const triggerVersionNumber = triggerType ? +triggerType.split('/')[1].replace('v', '') : 1;
-
-    const {data: triggerComponentDefinition} = useGetComponentDefinitionQuery(
-        {
-            componentName: triggerComponentName || '',
-            componentVersion: triggerVersionNumber,
-        },
-        !!triggerComponentName
-    );
-
-    const triggerData = useMemo<TriggerDataType | null>(() => {
-        if (!triggerComponentName && !workflow.triggers?.[0]) {
-            return null;
-        }
-
-        const triggerFromWorkflow = workflow.triggers?.[0];
-        const triggerDefinition = workflowComponentDefinitions[triggerComponentName || ''];
-
-        const matchedTrigger = triggerComponentDefinition?.triggers?.find(
-            (trigger) => trigger.name === triggerFromWorkflow?.type?.split('/')[2]
-        );
-
-        if (!matchedTrigger && !triggerFromWorkflow) {
-            return null;
-        }
-
-        const description = matchedTrigger?.description || triggerFromWorkflow?.description || '';
-        const label = matchedTrigger?.title || triggerFromWorkflow?.label || '';
-        const componentName = triggerDefinition?.title || triggerComponentName || 'Unknown Trigger';
-        const iconSrc = triggerDefinition?.icon || '';
-
-        return {
-            componentName,
-            description,
-            iconSrc,
-            label,
-        };
-    }, [workflow, workflowComponentDefinitions, triggerComponentName, triggerComponentDefinition]);
-
-    const taskOnlyComponentNames = useMemo(() => {
-        if (!filteredComponentNames) {
-            return [];
-        }
-
-        const triggerCount = workflow.workflowTriggerComponentNames?.length ?? 0;
-
-        return filteredComponentNames.slice(triggerCount);
-    }, [filteredComponentNames, workflow.workflowTriggerComponentNames]);
-
     const deleteWorkflowMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
@@ -145,27 +72,14 @@ const ProjectWorkflowListItem = ({
     const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
         onError: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-
-            toast({
-                description: 'Workflow duplication failed.',
-                variant: 'destructive',
-            });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-
-            toast({
-                description: 'Workflow duplicated successfully.',
-            });
         },
     });
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectKeys.projects,
-            });
-
             queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflows(project.id!),
             });
@@ -188,12 +102,10 @@ const ProjectWorkflowListItem = ({
             key={workflow.id}
         >
             <Link
-                aria-label={`Link to workflow ${workflow.label}`}
-                className="flex flex-1 items-center gap-2"
-                data-testid={`${workflow.projectWorkflowId}-link`}
+                className="flex flex-1 items-center"
                 to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`}
             >
-                <div className="w-80 shrink-0 pr-1 text-sm font-semibold">
+                <div className="w-80 pr-1 text-sm font-semibold">
                     <Tooltip>
                         <TooltipTrigger className="line-clamp-1 text-start">{workflow.label}</TooltipTrigger>
 
@@ -201,57 +113,8 @@ const ProjectWorkflowListItem = ({
                     </Tooltip>
                 </div>
 
-                {triggerData && (
-                    <div className="flex shrink-0 items-center gap-1">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <div className="flex shrink-0 items-center justify-center rounded-full border border-stroke-neutral-primary bg-surface-neutral-primary p-1">
-                                    {triggerData.iconSrc ? (
-                                        <InlineSVG
-                                            className="size-5"
-                                            loader={<ComponentIcon className="size-5 flex-none" />}
-                                            src={triggerData.iconSrc}
-                                            title={null}
-                                        />
-                                    ) : (
-                                        <ComponentIcon className="size-3 flex-none text-content-neutral-primary" />
-                                    )}
-                                </div>
-                            </TooltipTrigger>
-
-                            <TooltipContent>{triggerData.componentName}</TooltipContent>
-                        </Tooltip>
-
-                        {triggerData.description ? (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="shrink-0">
-                                        <Badge
-                                            label={triggerData.label || triggerData.componentName}
-                                            styleType="outline-outline"
-                                            weight="semibold"
-                                        />
-                                    </div>
-                                </TooltipTrigger>
-
-                                <TooltipContent className="max-w-xs text-sm" side="right">
-                                    {triggerData.description}
-                                </TooltipContent>
-                            </Tooltip>
-                        ) : (
-                            <div className="shrink-0">
-                                <Badge
-                                    label={triggerData.label || triggerData.componentName}
-                                    styleType="outline-outline"
-                                    weight="semibold"
-                                />
-                            </div>
-                        )}
-                    </div>
-                )}
-
                 <WorkflowComponentsList
-                    filteredComponentNames={taskOnlyComponentNames}
+                    filteredComponentNames={filteredComponentNames || []}
                     workflowComponentDefinitions={workflowComponentDefinitions}
                     workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
                 />

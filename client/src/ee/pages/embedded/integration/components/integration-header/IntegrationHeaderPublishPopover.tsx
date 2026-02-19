@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Textarea} from '@/components/ui/textarea';
@@ -73,18 +73,15 @@ const IntegrationHeaderPublishPopover = ({integration}: {integration: Integratio
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            className="hover:bg-background/70 [&_svg]:size-5"
-                            icon={<CircleDotIcon />}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
+                <Button className="hover:bg-background/70 [&_svg]:size-5" size="icon" variant="ghost">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <CircleDotIcon />
+                        </TooltipTrigger>
 
-                    <TooltipContent>Publish the integration</TooltipContent>
-                </Tooltip>
+                        <TooltipContent>Publish the integration</TooltipContent>
+                    </Tooltip>
+                </Button>
             </PopoverTrigger>
 
             <PopoverContent align="end" className="flex h-full w-96 flex-col justify-between space-y-4">

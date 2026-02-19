@@ -1,52 +1,46 @@
-import {useDeleteUserDialogStore} from '@/pages/settings/platform/users/stores/useDeleteUserDialogStore';
 import {useDeleteUserMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
+import {useState} from 'react';
 
 interface UseDeleteUserAlertDialogI {
-    handleClose: () => void;
-    handleDelete: () => void;
-    handleOpen: (login: string | null) => void;
-    handleOpenChange: (open: boolean) => void;
+    deleteLogin: string | null;
+    handleDeleteUserAlertDialogClose: () => void;
+    handleDeleteUserAlertDialogDelete: () => void;
+    handleDeleteUserAlertDialogOpen: (login: string | null) => void;
     open: boolean;
 }
 
 export default function useDeleteUserAlertDialog(): UseDeleteUserAlertDialogI {
-    const {clearLoginToDelete, loginToDelete, setLoginToDelete} = useDeleteUserDialogStore();
+    const [deleteLogin, setDeleteLogin] = useState<string | null>(null);
 
     const queryClient = useQueryClient();
 
     const deleteUserMutation = useDeleteUserMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['users']});
-            clearLoginToDelete();
+            setDeleteLogin(null);
         },
     });
 
     const handleClose = () => {
-        clearLoginToDelete();
-    };
-
-    const handleOpen = (login: string | null) => {
-        setLoginToDelete(login);
+        setDeleteLogin(null);
     };
 
     const handleDelete = () => {
-        if (loginToDelete) {
-            deleteUserMutation.mutate({login: loginToDelete});
+        if (deleteLogin) {
+            deleteUserMutation.mutate({login: deleteLogin});
         }
     };
 
-    const handleOpenChange = (open: boolean) => {
-        if (!open) {
-            handleClose();
-        }
+    const handleOpen = (login: string | null) => {
+        setDeleteLogin(login);
     };
 
     return {
-        handleClose,
-        handleDelete,
-        handleOpen,
-        handleOpenChange,
-        open: loginToDelete !== null,
+        deleteLogin,
+        handleDeleteUserAlertDialogClose: handleClose,
+        handleDeleteUserAlertDialogDelete: handleDelete,
+        handleDeleteUserAlertDialogOpen: handleOpen,
+        open: !!deleteLogin,
     };
 }

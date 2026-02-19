@@ -89,8 +89,8 @@ public class MultiQueryExpander {
 
         ChatModel chatModel = (ChatModel) modelFunction
             .apply(
-                ParametersFactory.create(clusterElement.getParameters()),
-                ParametersFactory.create(componentConnection.getParameters()), false);
+                ParametersFactory.createParameters(clusterElement.getParameters()),
+                ParametersFactory.createParameters(componentConnection.getParameters()), false);
 
         return new org.springframework.ai.rag.preretrieval.query.expansion.MultiQueryExpander(
             ChatClient.builder(chatModel), null, inputParameters.getBoolean(INCLUDE_ORIGINAL, true),

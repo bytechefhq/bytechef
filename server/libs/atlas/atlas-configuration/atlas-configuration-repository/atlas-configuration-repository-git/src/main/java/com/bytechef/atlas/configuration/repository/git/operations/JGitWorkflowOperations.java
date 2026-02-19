@@ -154,14 +154,8 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         }
     }
 
-    /**
-     * Security Note: PATH_TRAVERSAL_IN - Path traversal is intentional. Paths are derived from Git repository contents,
-     * not external user input. Access is controlled through Git authentication credentials.
-     */
     @Override
-    @SuppressFBWarnings({
-        "REC_CATCH_EXCEPTION", "PATH_TRAVERSAL_IN"
-    })
+    @SuppressFBWarnings("REC_CATCH_EXCEPTION")
     public String write(List<WorkflowResource> workflowResources, String commitMessage) {
         ReentrantLock lock = getTenantLock();
         try {
@@ -352,11 +346,6 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         }
     }
 
-    /**
-     * Security Note: PATH_TRAVERSAL_IN - Repository directory is created in a system temp location with a generated
-     * name, not user-controlled paths.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private void clear() {
         if (repositoryDir != null) {
             org.springframework.util.FileSystemUtils.deleteRecursively(repositoryDir);
@@ -366,7 +355,6 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
 
         try {
             String tenantKey = TenantCacheKeyUtils.getKey("git");
-
             path = Files.createTempDirectory("jgit_" + tenantKey + "_");
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -1,8 +1,7 @@
 ---
-title: "Salesforce"
-description: "Salesforce is a cloud-based customer relationship management (CRM) platform that provides tools for sales, service, marketing, and analytics to help businesses manage customer interactions and data."
+description: "Salesforce component for ByteChef. CRM platform. Learn how to implement this in your ByteChef workflows."
+title: Salesforce
 ---
-
 
 Categories: CRM
 
@@ -28,7 +27,6 @@ Version: 1
 | subdomain | Subdomain | STRING | The subdomain of your Salesforce instance. | true |
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
-
 
 
 
@@ -91,8 +89,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Delete Record
 Name: deleteRecord
 
@@ -125,8 +121,6 @@ This action does not produce any output.
 
 
 
-
-
 ### SOQL Query
 Name: soqlQuery
 
@@ -153,8 +147,6 @@ Name: soqlQuery
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -196,8 +188,6 @@ This action does not produce any output.
 
 
 
-
-
 ## Triggers
 
 
@@ -230,7 +220,6 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "salesforce/v1/newRecord"
 }
 ```
-
 
 
 ### Updated Record
@@ -266,10 +255,8 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
-

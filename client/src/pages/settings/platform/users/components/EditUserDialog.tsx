@@ -9,24 +9,33 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {forwardRef, useImperativeHandle} from 'react';
 
 import useEditUserDialog from './hooks/useEditUserDialog';
 
-const EditUserDialog = () => {
+export interface EditUserDialogRefI {
+    open: (login: string) => void;
+}
+
+const EditUserDialog = forwardRef<EditUserDialogRefI>(function EditUserDialog(_, ref) {
     const {
         authorities,
         editRole,
         editUser,
-        handleClose,
-        handleOpenChange,
-        handleRoleChange,
-        handleUpdate,
+        handleEditUserDialogClose,
+        handleEditUserDialogOpen,
+        handleEditUserDialogUpdate,
         open,
+        setEditRole,
         updateDisabled,
     } = useEditUserDialog();
 
+    useImperativeHandle(ref, () => ({
+        open: handleEditUserDialogOpen,
+    }));
+
     return (
-        <Dialog onOpenChange={handleOpenChange} open={open}>
+        <Dialog onOpenChange={(isOpen) => !isOpen && handleEditUserDialogClose()} open={open}>
             <DialogContent>
                 <div className="flex flex-col gap-4">
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0">
@@ -47,7 +56,7 @@ const EditUserDialog = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Role</label>
 
-                            <Select onValueChange={(value) => handleRoleChange(value)} value={editRole ?? undefined}>
+                            <Select onValueChange={(value) => setEditRole(value)} value={editRole ?? undefined}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select role" />
                                 </SelectTrigger>
@@ -65,12 +74,12 @@ const EditUserDialog = () => {
 
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button onClick={handleClose} variant="outline">
+                            <Button onClick={handleEditUserDialogClose} variant="outline">
                                 Cancel
                             </Button>
                         </DialogClose>
 
-                        <Button disabled={updateDisabled} onClick={handleUpdate}>
+                        <Button disabled={updateDisabled} onClick={handleEditUserDialogUpdate}>
                             Save
                         </Button>
                     </DialogFooter>
@@ -78,6 +87,6 @@ const EditUserDialog = () => {
             </DialogContent>
         </Dialog>
     );
-};
+});
 
 export default EditUserDialog;

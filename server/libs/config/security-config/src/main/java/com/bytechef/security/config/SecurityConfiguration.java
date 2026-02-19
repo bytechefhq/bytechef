@@ -23,19 +23,16 @@ import com.bytechef.config.ApplicationProperties.Security;
 import com.bytechef.config.ApplicationProperties.Security.RememberMe;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
-import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -52,6 +49,7 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -80,22 +78,15 @@ public class SecurityConfiguration {
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
-    private final OAuth2LoginCustomizer oAuth2LoginCustomizer;
-    private final PasswordEncoder passwordEncoder;
     private final RememberMeServices rememberMeServices;
     private final Security security;
 
-    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public SecurityConfiguration(
         ApplicationProperties applicationProperties, AuthenticationFailureHandler authenticationFailureHandler,
-        AuthenticationSuccessHandler authenticationSuccessHandler,
-        ObjectProvider<OAuth2LoginCustomizer> oAuth2LoginCustomizerProvider, PasswordEncoder passwordEncoder,
-        RememberMeServices rememberMeServices) {
+        AuthenticationSuccessHandler authenticationSuccessHandler, RememberMeServices rememberMeServices) {
 
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
-        this.oAuth2LoginCustomizer = oAuth2LoginCustomizerProvider.getIfAvailable();
-        this.passwordEncoder = passwordEncoder;
         this.rememberMeServices = rememberMeServices;
         this.security = applicationProperties.getSecurity();
     }
@@ -172,13 +163,8 @@ public class SecurityConfiguration {
         List<SpaWebFilterContributor> spaWebFilterContributors)
         throws Exception {
 
-        if (oAuth2LoginCustomizer != null) {
-            http.securityMatcher("/api/**", "/graphql", "/oauth2/**", "/login/oauth2/**");
-        } else {
-            http.securityMatcher("/api/**", "/graphql");
-        }
-
         http
+            .securityMatcher("/api/**", "/graphql")
             .cors(withDefaults())
             .csrf(csrf -> {
                 csrf
@@ -237,10 +223,6 @@ public class SecurityConfiguration {
                 .logoutUrl("/api/logout")
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 .permitAll());
-
-        if (oAuth2LoginCustomizer != null) {
-            oAuth2LoginCustomizer.customize(http);
-        }
 
         for (SecurityConfigurerContributor securityConfigurerContributor : securityConfigurerContributors) {
 
@@ -345,6 +327,11 @@ public class SecurityConfiguration {
         return PathPatternRequestMatcher.withDefaults();
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     private DaoAuthenticationProvider getSystemAuthenticationProvider(Security.System system) {
         String password = system.getPassword();
         String username = system.getUsername();
@@ -352,6 +339,8 @@ public class SecurityConfiguration {
         if (password == null || password.isBlank() || username == null || username.isBlank()) {
             return null;
         }
+
+        PasswordEncoder passwordEncoder = passwordEncoder();
 
         UserDetails user = User.withUsername(system.getUsername())
             .password(passwordEncoder.encode(system.getPassword()))
@@ -361,7 +350,7 @@ public class SecurityConfiguration {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(
             new InMemoryUserDetailsManager(user));
 
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 
         return daoAuthenticationProvider;
     }

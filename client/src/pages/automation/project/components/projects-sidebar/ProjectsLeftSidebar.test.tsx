@@ -122,15 +122,6 @@ vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
     useFeatureFlagsStore: () => () => true, // always enable ff_1041
 }));
 
-vi.mock('@/shared/mutations/automation/projects.mutations', () => ({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    useImportProjectMutation: (opts: any) => ({
-        mutate: vi.fn().mockImplementation(() => {
-            opts?.onSuccess?.();
-        }),
-    }),
-}));
-
 vi.mock('@/shared/mutations/automation/workflows.mutations', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useCreateProjectWorkflowMutation: (opts: any) => ({

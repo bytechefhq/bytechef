@@ -8,7 +8,6 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PropertyAllType} from '@/shared/types';
 import {useEffect, useMemo, useState} from 'react';
-import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
 import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
@@ -39,14 +38,7 @@ const PropertyDynamicProperties = ({
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workflow = useWorkflowDataStore((state) => state.workflow);
-
-    const {currentNode, operationChangeInProgress} = useWorkflowNodeDetailsPanelStore(
-        useShallow((state) => ({
-            currentNode: state.currentNode,
-            operationChangeInProgress: state.operationChangeInProgress,
-        }))
-    );
-
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const {rootClusterElementNodeData} = useWorkflowEditorStore();
 
     const lookupDependsOnValuesKey = getFormattedDependencyKey(lookupDependsOnValues);
@@ -91,10 +83,8 @@ const PropertyDynamicProperties = ({
         () =>
             (lookupDependsOnPaths?.length
                 ? lookupDependsOnValues?.every((loadDependencyValue) => loadDependencyValue != null)
-                : true) &&
-            enabled &&
-            !operationChangeInProgress,
-        [lookupDependsOnPaths?.length, lookupDependsOnValues, enabled, operationChangeInProgress]
+                : true) && enabled,
+        [lookupDependsOnPaths?.length, lookupDependsOnValues, enabled]
     );
 
     const {data: properties, isLoading} = useGetWorkflowNodeDynamicPropertiesQuery(

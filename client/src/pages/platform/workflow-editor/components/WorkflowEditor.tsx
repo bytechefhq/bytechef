@@ -3,16 +3,17 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {CANVAS_BACKGROUND_COLOR} from '@/shared/constants';
+import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {CANVAS_BACKGROUND_COLOR, MINIMAP_MASK_COLOR, MINIMAP_NODE_COLOR} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {ClickedDefinitionType} from '@/shared/types';
-import {Background, BackgroundVariant, Controls, ReactFlow, useReactFlow} from '@xyflow/react';
+import {Background, BackgroundVariant, Controls, MiniMap, ReactFlow, useReactFlow} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import LabeledBranchCaseEdge from '../edges/LabeledBranchCaseEdge';
@@ -69,7 +70,7 @@ const WorkflowEditor = ({
             onNodesChange: state.onNodesChange,
         }))
     );
-    const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
+    const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
@@ -304,6 +305,15 @@ const WorkflowEditor = ({
                 zoomOnDoubleClick={false}
                 zoomOnScroll={false}
             >
+                {!readOnlyWorkflow && (
+                    <MiniMap
+                        className={twMerge('mb-3 mr-16', rightSidebarOpen && 'absolute right-minimap-placement')}
+                        maskColor={MINIMAP_MASK_COLOR}
+                        nodeBorderRadius={24}
+                        nodeColor={MINIMAP_NODE_COLOR}
+                    />
+                )}
+
                 <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
 
                 <Controls

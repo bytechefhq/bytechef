@@ -58,7 +58,7 @@ public interface ClusterElementDefinition<T> {
      */
     String getName();
 
-    Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
+    Optional<ClusterElementDefinition.ProcessErrorResponseFunction> getProcessErrorResponse();
 
     /**
      *

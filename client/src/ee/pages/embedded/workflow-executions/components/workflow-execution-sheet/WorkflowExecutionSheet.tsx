@@ -5,14 +5,11 @@ import WorkflowExecutionSheetWorkflowPanel from '@/ee/pages/embedded/workflow-ex
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationWorkflowExecutionQuery} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
-import {useCallback, useMemo} from 'react';
+import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionSheetContent from './WorkflowExecutionSheetContent';
-
-const POLLING_INTERVAL_MS = 2000;
 
 const WorkflowExecutionSheet = () => {
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
@@ -29,20 +26,6 @@ const WorkflowExecutionSheet = () => {
             id: workflowExecutionId,
         },
         workflowExecutionSheetOpen
-    );
-
-    const isWorkflowRunning = useMemo(() => {
-        if (!workflowExecution?.job) {
-            return false;
-        }
-
-        return getWorkflowStatusType(workflowExecution.job, workflowExecution.triggerExecution) === 'running';
-    }, [workflowExecution]);
-
-    useGetIntegrationWorkflowExecutionQuery(
-        {id: workflowExecutionId},
-        workflowExecutionSheetOpen && isWorkflowRunning,
-        POLLING_INTERVAL_MS
     );
 
     const handleOpenChange = useCallback(() => {

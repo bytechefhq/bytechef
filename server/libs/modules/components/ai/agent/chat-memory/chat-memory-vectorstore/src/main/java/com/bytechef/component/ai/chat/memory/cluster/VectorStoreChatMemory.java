@@ -78,9 +78,9 @@ public class VectorStoreChatMemory {
         Builder builder = VectorStoreChatMemoryAdvisor
             .builder(
                 vectorStoreFunction.apply(
-                    ParametersFactory.create(clusterElement.getParameters()),
-                    ParametersFactory.create(componentConnectionConnectionParameters),
-                    ParametersFactory.create(clusterElement.getExtensions()), componentConnections))
+                    ParametersFactory.createParameters(clusterElement.getParameters()),
+                    ParametersFactory.createParameters(componentConnectionConnectionParameters),
+                    ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections))
             .defaultTopK(
                 inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20));
 

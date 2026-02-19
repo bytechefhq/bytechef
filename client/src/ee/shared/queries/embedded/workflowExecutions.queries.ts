@@ -24,14 +24,9 @@ export const useGetIntegrationWorkflowExecutionsQuery = (request: GetWorkflowExe
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecutionsPage(request),
     });
 
-export const useGetIntegrationWorkflowExecutionQuery = (
-    request: GetWorkflowExecutionRequest,
-    isEnabled: boolean,
-    refetchInterval?: number | false
-) =>
+export const useGetIntegrationWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, isEnabled: boolean) =>
     useQuery<WorkflowExecution, Error>({
         queryKey: WorkflowExecutionKeys.workflowExecution(request.id),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecution(request),
         enabled: isEnabled,
-        refetchInterval,
     });

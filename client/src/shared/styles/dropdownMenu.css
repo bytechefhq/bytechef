@@ -20,14 +20,3 @@
     @apply focus:!bg-surface-destructive-secondary;
     @apply focus:!text-content-destructive;
 }
-
-.dropdown-menu-item-destructive-disabled {
-    @apply dropdown-menu-item-base;
-    @apply !text-content-destructive-primary;
-    @apply !cursor-not-allowed;
-    @apply !opacity-50;
-    @apply hover:!bg-transparent;
-    @apply hover:!text-content-destructive-primary;
-    @apply focus:!bg-transparent;
-    @apply focus:!text-content-destructive-primary;
-}

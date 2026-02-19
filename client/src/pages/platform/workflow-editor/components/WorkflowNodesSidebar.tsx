@@ -1,8 +1,7 @@
 import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {useMemo} from 'react';
+import {useEffect, useState} from 'react';
 
-import {useFilteredComponentDefinitions} from '../hooks/useFilteredComponentDefinitions';
 import WorkflowNodesTabs from './workflow-nodes-tabs/WorkflowNodesTabs';
 
 const WorkflowNodesSidebar = ({
@@ -13,35 +12,49 @@ const WorkflowNodesSidebar = ({
         taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     };
 }) => {
-    const {componentsWithActions, filter, setFilter, trimmedFilter} = useFilteredComponentDefinitions(
-        data.componentDefinitions
-    );
+    const [filter, setFilter] = useState('');
 
-    const filteredActionComponentDefinitions = useMemo(
-        () =>
-            componentsWithActions.filter(
-                (componentDefinition) => componentDefinition?.actionsCount && componentDefinition.actionsCount > 0
-            ),
-        [componentsWithActions]
-    );
+    const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
+        Array<ComponentDefinitionBasic>
+    >([]);
 
-    const filteredTaskDispatcherDefinitions = useMemo(
-        () =>
-            data.taskDispatcherDefinitions.filter(
+    const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
+        Array<TaskDispatcherDefinition>
+    >([]);
+
+    const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
+        Array<ComponentDefinitionBasic>
+    >([]);
+
+    const {componentDefinitions, taskDispatcherDefinitions} = data;
+
+    useEffect(() => {
+        setFilteredActionComponentDefinitions(
+            componentDefinitions.filter(
+                (componentDefinition) =>
+                    componentDefinition?.actionsCount &&
+                    (componentDefinition.name?.toLowerCase().includes(filter.toLowerCase()) ||
+                        componentDefinition?.title?.toLowerCase().includes(filter.toLowerCase()))
+            )
+        );
+
+        setFilteredTaskDispatcherDefinitions(
+            taskDispatcherDefinitions.filter(
                 (taskDispatcherDefinition) =>
-                    taskDispatcherDefinition.name?.toLowerCase().includes(trimmedFilter.toLowerCase()) ||
-                    taskDispatcherDefinition?.title?.toLowerCase().includes(trimmedFilter.toLowerCase())
-            ),
-        [data.taskDispatcherDefinitions, trimmedFilter]
-    );
+                    taskDispatcherDefinition.name?.toLowerCase().includes(filter.toLowerCase()) ||
+                    taskDispatcherDefinition?.title?.toLowerCase().includes(filter.toLowerCase())
+            )
+        );
 
-    const filteredTriggerComponentDefinitions = useMemo(
-        () =>
-            componentsWithActions.filter(
-                (componentDefinition) => componentDefinition?.triggersCount && componentDefinition.triggersCount > 0
-            ),
-        [componentsWithActions]
-    );
+        setFilteredTriggerComponentDefinitions(
+            componentDefinitions.filter(
+                (componentDefinition) =>
+                    componentDefinition?.triggersCount &&
+                    (componentDefinition.name?.toLowerCase().includes(filter.toLowerCase()) ||
+                        componentDefinition?.title?.toLowerCase().includes(filter.toLowerCase()))
+            )
+        );
+    }, [componentDefinitions, filter, taskDispatcherDefinitions]);
 
     return (
         <aside className="absolute inset-y-2 right-14 flex w-96 flex-col overflow-hidden rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary pb-4">

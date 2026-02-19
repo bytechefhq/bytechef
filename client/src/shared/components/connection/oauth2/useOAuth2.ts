@@ -1,6 +1,6 @@
 import {MutableRefObject, useCallback, useRef, useState} from 'react';
 
-import {OAUTH_BROADCAST_CHANNEL, OAUTH_RESPONSE, OAUTH_STATE_KEY, OAUTH_STORAGE_KEY} from './constants';
+import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from './constants';
 import {objectToQuery} from './tools';
 
 export interface TokenPayloadI {
@@ -31,8 +31,6 @@ export interface Oauth2Props {
 
 const POPUP_HEIGHT = 800;
 const POPUP_WIDTH = 600;
-
-const POPUP_CLOSED_GRACE_PERIOD_MS = 120_000;
 
 const enhanceAuthorizationUrl = (
     authorizeUrl: string,
@@ -95,37 +93,17 @@ const closePopup = (popupRef: MutableRefObject<Window | null | undefined>) => {
     popupRef.current?.close();
 };
 
-const clearStorageResponse = () => {
-    try {
-        localStorage.removeItem(OAUTH_STORAGE_KEY);
-    } catch {
-        // Ignore localStorage errors
-    }
-};
-
 const cleanup = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     intervalRef: MutableRefObject<any>,
     popupRef: MutableRefObject<Window | null | undefined>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleMessageListener: any,
-    broadcastChannel?: BroadcastChannel,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleStorageListener?: any
+    handleMessageListener: any
 ) => {
     clearInterval(intervalRef.current);
     closePopup(popupRef);
     removeState();
-    clearStorageResponse();
     window.removeEventListener('message', handleMessageListener);
-
-    if (broadcastChannel) {
-        broadcastChannel.close();
-    }
-
-    if (handleStorageListener) {
-        window.removeEventListener('storage', handleStorageListener);
-    }
 };
 
 const useOAuth2 = (props: Oauth2Props) => {
@@ -152,17 +130,17 @@ const useOAuth2 = (props: Oauth2Props) => {
     }>({error: null, loading: false});
 
     const getAuth = useCallback(() => {
+        // 1. Init
         setUI({
             error: null,
             loading: true,
         });
 
-        clearStorageResponse();
-
+        // 2. Generate and save state
         const state = generateState();
-
         saveState(state);
 
+        // 3. Open popup
         popupRef.current = openPopup(
             enhanceAuthorizationUrl(
                 authorizationUrl,
@@ -175,19 +153,18 @@ const useOAuth2 = (props: Oauth2Props) => {
             )
         );
 
-        let broadcastChannel: BroadcastChannel | undefined;
-
+        // 4. Register message listener
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        function processOAuthResponse(data: any) {
-            const type = data?.type;
+        async function handleMessageListener(message: MessageEvent<any>) {
+            const type = message?.data?.type;
 
-            if (type !== OAUTH_RESPONSE || curStateRef.current === data?.payload?.state) {
+            if (type !== OAUTH_RESPONSE || curStateRef.current === message?.data?.payload?.state) {
                 return;
             }
 
             // Validate state to prevent CSRF attacks
             const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
-            const receivedState = data?.payload?.state;
+            const receivedState = message?.data?.payload?.state;
 
             if (!receivedState || savedState !== receivedState) {
                 setUI({
@@ -199,7 +176,7 @@ const useOAuth2 = (props: Oauth2Props) => {
                     onError('OAuth error: State mismatch.');
                 }
 
-                doCleanup();
+                cleanup(intervalRef, popupRef, handleMessageListener);
 
                 return;
             }
@@ -207,7 +184,7 @@ const useOAuth2 = (props: Oauth2Props) => {
             curStateRef.current = receivedState;
 
             try {
-                const error = data?.error;
+                const error = message?.data?.error;
 
                 if (error) {
                     setUI({
@@ -219,7 +196,7 @@ const useOAuth2 = (props: Oauth2Props) => {
                         onError(error);
                     }
                 } else {
-                    const payload = data?.payload;
+                    const payload = message?.data?.payload;
 
                     if (responseType === 'code' && onCodeSuccess) {
                         onCodeSuccess(payload);
@@ -242,94 +219,37 @@ const useOAuth2 = (props: Oauth2Props) => {
                     loading: false,
                 });
             } finally {
-                doCleanup();
+                // Clear stuff ...
+                cleanup(intervalRef, popupRef, handleMessageListener);
             }
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        function handleMessageListener(message: MessageEvent<any>) {
-            processOAuthResponse(message?.data);
         }
         window.addEventListener('message', handleMessageListener);
 
-        if (typeof BroadcastChannel !== 'undefined') {
-            try {
-                broadcastChannel = new BroadcastChannel(OAUTH_BROADCAST_CHANNEL);
-
-                broadcastChannel.onmessage = (event) => {
-                    processOAuthResponse(event.data);
-                };
-            } catch {
-                // BroadcastChannel not supported in this context
-            }
-        }
-
-        const handleStorageListener = (event: StorageEvent) => {
-            if (event.key !== OAUTH_STORAGE_KEY || !event.newValue) {
-                return;
-            }
-
-            try {
-                const data = JSON.parse(event.newValue);
-
-                processOAuthResponse(data);
-            } catch {
-                // Ignore JSON parse errors
-            }
-        };
-        window.addEventListener('storage', handleStorageListener);
-
-        function doCleanup() {
-            cleanup(intervalRef, popupRef, handleMessageListener, broadcastChannel, handleStorageListener);
-        }
-
-        let popupClosedAt: number | null = null;
-
+        // 4. Begin interval to check if popup was closed forcefully by the user
         intervalRef.current = setInterval(() => {
-            try {
-                const storedResponse = localStorage.getItem(OAUTH_STORAGE_KEY);
+            const popupClosed = !popupRef.current?.window || popupRef.current?.window?.closed;
+            if (popupClosed) {
+                // Popup was closed before completing auth...
+                setUI((ui) => ({
+                    ...ui,
+                    loading: false,
+                }));
 
-                if (storedResponse) {
-                    const data = JSON.parse(storedResponse);
+                console.warn('Warning: Popup was closed before completing authentication.');
 
-                    processOAuthResponse(data);
-
-                    return;
-                }
-            } catch {
-                // Ignore localStorage errors
-            }
-
-            let popupAppearsClosed = false;
-
-            try {
-                popupAppearsClosed = !popupRef.current || popupRef.current.closed;
-            } catch {
-                popupAppearsClosed = false;
-            }
-
-            if (popupAppearsClosed) {
-                if (!popupClosedAt) {
-                    popupClosedAt = Date.now();
-                }
-
-                if (Date.now() - popupClosedAt > POPUP_CLOSED_GRACE_PERIOD_MS) {
-                    setUI((currentUI) => ({
-                        ...currentUI,
-                        loading: false,
-                    }));
-
-                    console.warn('Warning: Popup was closed before completing authentication.');
-
-                    doCleanup();
-                }
-            } else {
-                popupClosedAt = null;
+                clearInterval(intervalRef.current);
+                removeState();
+                window.removeEventListener('message', handleMessageListener);
             }
         }, 250);
 
+        // 5. Remove listener(s) on unmount
         return () => {
-            doCleanup();
+            window.removeEventListener('message', handleMessageListener);
+
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
         };
     }, [authorizationUrl, clientId, redirectUri, scope, responseType, onCodeSuccess, onTokenSuccess, onError, setUI]);
 

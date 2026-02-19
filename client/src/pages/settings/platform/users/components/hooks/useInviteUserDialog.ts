@@ -1,37 +1,28 @@
-import {useInviteUserDialogStore} from '@/pages/settings/platform/users/stores/useInviteUserDialogStore';
-import {isValidPassword} from '@/pages/settings/platform/users/util/password-utils';
+import {generatePassword, isValidPassword} from '@/pages/settings/platform/users/util/password-utils';
 import {useAuthoritiesQuery, useInviteUserMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useEffect, useMemo} from 'react';
+import {Dispatch, SetStateAction, useMemo, useState} from 'react';
 
 interface UseInviteUserDialogI {
     authorities: string[];
-    handleClose: () => void;
-    handleEmailChange: (email: string) => void;
-    handleInvite: () => void;
-    handleOpen: () => void;
-    handleOpenChange: (open: boolean) => void;
-    handleRegeneratePassword: () => void;
-    handleRoleChange: (role: string) => void;
+    handleInviteUserDialogClose: () => void;
+    handleInviteUserDialogInvite: () => void;
+    handleInviteUserDialogOpen: () => void;
+    handleInviteUserDialogRegeneratePassword: () => void;
     inviteDisabled: boolean;
     inviteEmail: string;
     invitePassword: string;
     inviteRole: string | null;
     open: boolean;
+    setInviteEmail: Dispatch<SetStateAction<string>>;
+    setInviteRole: Dispatch<SetStateAction<string | null>>;
 }
 
 export default function useInviteUserDialog(): UseInviteUserDialogI {
-    const {
-        inviteEmail,
-        invitePassword,
-        inviteRole,
-        open,
-        regeneratePassword,
-        reset,
-        setInviteEmail,
-        setInviteRole,
-        setOpen,
-    } = useInviteUserDialogStore();
+    const [inviteOpen, setInviteOpen] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [invitePassword, setInvitePassword] = useState(generatePassword());
+    const [inviteRole, setInviteRole] = useState<string | null>(null);
 
     const {data: authoritiesData} = useAuthoritiesQuery({});
 
@@ -39,69 +30,54 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
 
     const inviteUserMutation = useInviteUserMutation({
         onSuccess: () => {
+            const newPassword = generatePassword();
+
             queryClient.invalidateQueries({queryKey: ['users']});
-            reset();
+            setInviteOpen(false);
+            setInviteEmail('');
+            setInvitePassword(newPassword);
+            setInviteRole(null);
         },
     });
 
     const authorities = useMemo(() => authoritiesData?.authorities ?? [], [authoritiesData]);
     const inviteDisabled = !inviteEmail || !inviteRole || !isValidPassword(invitePassword);
 
-    useEffect(() => {
-        if (open && !inviteRole && authorities.length > 0) {
-            setInviteRole(authorities[0]);
-        }
-    }, [open, inviteRole, authorities, setInviteRole]);
+    const handleOpen = () => {
+        setInviteOpen(true);
+        setInviteRole((authorities && authorities.length > 0 && authorities[0]) || null);
+    };
 
     const handleClose = () => {
-        reset();
-    };
-
-    const handleOpen = () => {
-        setOpen();
-    };
-
-    const handleEmailChange = (email: string) => {
-        setInviteEmail(email);
-    };
-
-    const handleRoleChange = (role: string) => {
-        setInviteRole(role);
-    };
-
-    const handleRegeneratePassword = () => {
-        regeneratePassword();
-    };
-
-    const handleOpenChange = (open: boolean) => {
-        if (!open) {
-            handleClose();
-        }
+        setInviteOpen(false);
     };
 
     const handleInvite = () => {
-        if (inviteEmail && inviteRole) {
-            inviteUserMutation.mutate({
-                email: inviteEmail,
-                password: invitePassword,
-                role: inviteRole,
-            });
-        }
+        inviteUserMutation.mutate({
+            email: inviteEmail,
+            password: invitePassword,
+            role: inviteRole as string,
+        });
+    };
+
+    const handleRegeneratePassword = () => {
+        const newPassword = generatePassword();
+
+        setInvitePassword(newPassword);
     };
 
     return {
         authorities,
-        handleClose,
-        handleEmailChange,
-        handleInvite,
-        handleOpen,
-        handleOpenChange,
-        handleRegeneratePassword,
-        handleRoleChange,
+        handleInviteUserDialogClose: handleClose,
+        handleInviteUserDialogInvite: handleInvite,
+        handleInviteUserDialogOpen: handleOpen,
+        handleInviteUserDialogRegeneratePassword: handleRegeneratePassword,
         inviteDisabled,
         inviteEmail,
         invitePassword,
         inviteRole,
-        open,
+        open: inviteOpen,
+        setInviteEmail,
+        setInviteRole,
     };
 }

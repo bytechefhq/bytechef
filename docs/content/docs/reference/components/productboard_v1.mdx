@@ -40,41 +40,6 @@ Version: 1
 
 
 
-## Connection Setup
-
-Connect Productboard to ByteChef using either a Public API Access Token (Bearer Token) or OAuth 2.0 Authorization Code.
-
-### Public API Access Token
-1. Log in to Productboard.
-2. Open **Settings** → **Integrations**.
-3. Go to the **Manage** tab.
-4. Under **Public APIs**, click **Access token**.
-5. Click **+ Add token** and follow the prompts.
-6. Copy the generated token value.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/f3AWaxY95z6JMKcNyFxz?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
-</div>
-
-### OAuth 2.0 Authorization Code
-1. In Productboard, open: https://app.productboard.com/oauth2/applications
-2. Click **New OAuth2 Application**.
-3. Enter a name, description, and any other required fields.
-4. Add the ByteChef OAuth redirect (callback) URL(s):
-   - Cloud: `https://app.bytechef.io/callback`
-   - Local development: `http://localhost:5173/callback`
-5. Select the scopes your app needs. For the ByteChef Productboard connector, enable:
-    - `notes:create`
-    - `notes:read`
-    - `notes:manage`
-    - `product_hierarchy_data:read`
-6. Click **Create Application**.
-7. Copy the generated `Client ID` and `Client Secret`.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/vwnJVxj8Wrg5MIsO6jM0?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
-</div>
-
 
 
 <hr />
@@ -164,8 +129,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Create Note
 Name: createNote
 
@@ -221,8 +184,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Delete Note
 Name: deleteNote
 
@@ -249,8 +210,6 @@ Name: deleteNote
 #### Output
 
 This action does not produce any output.
-
-
 
 
 
@@ -343,8 +302,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Update Note
 Name: updateNote
 
@@ -406,8 +363,6 @@ Type: OBJECT
   }
 }
 ```
-
-
 
 
 ### List All Notes
@@ -506,8 +461,6 @@ Items Type: OBJECT
 
 
 
-
-
 ## Triggers
 
 
@@ -545,7 +498,6 @@ Type: OBJECT
   "type" : "productboard/v1/newNote"
 }
 ```
-
 
 
 ### Updated Feature
@@ -587,10 +539,47 @@ Type: OBJECT
 
 
 
-
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+Connect Productboard to ByteChef using either a Public API Access Token (Bearer Token) or OAuth 2.0 Authorization Code.
+
+### Public API Access Token
+1. Log in to Productboard.
+2. Open **Settings** → **Integrations**.
+3. Go to the **Manage** tab.
+4. Under **Public APIs**, click **Access token**.
+5. Click **+ Add token** and follow the prompts.
+6. Copy the generated token value.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/f3AWaxY95z6JMKcNyFxz?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
+
+### OAuth 2.0 Authorization Code
+1. In Productboard, open: https://app.productboard.com/oauth2/applications
+2. Click **New OAuth2 Application**.
+3. Enter a name, description, and any other required fields.
+4. Add the ByteChef OAuth redirect (callback) URL(s):
+   - Cloud: `https://app.bytechef.io/callback`
+   - Local development: `http://localhost:5173/callback`
+5. Select the scopes your app needs. For the ByteChef Productboard connector, enable:
+    - `notes:create`
+    - `notes:read`
+    - `notes:manage`
+    - `product_hierarchy_data:read`
+6. Click **Create Application**.
+7. Copy the generated `Client ID` and `Client Secret`.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/vwnJVxj8Wrg5MIsO6jM0?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>

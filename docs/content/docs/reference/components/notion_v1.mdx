@@ -30,95 +30,12 @@ Version: 1
 
 
 
-## Connection Setup
-
-Connect Notion to ByteChef using OAuth 2.0 (Authorization Code).
-
-### Create a Notion OAuth app
-1. Open the Notion developer dashboard: https://www.notion.so/my-integrations
-2. Click **+ New integration**.
-3. Enter a clear name (for example, `ByteChef Integration`), select a workspace, and set the **Integration type** to **Public**.
-4. Fill out the remaining required fields (company name, website, email, etc.).
-5. Add the ByteChef OAuth redirect (callback) URL(s):
-   - Cloud: `https://app.bytechef.io/callback`
-   - Local development: `http://127.0.0.1:5173/callback` or `http://localhost:5173/callback`
-6. Click **Save**, then open **Configure integration settings**.
-7. Under **Capabilities**, enable at minimum:
-   - Read content
-   - Update content
-   - Insert content
-   - User information including email addresses
-8. Click **Save changes** and copy the generated **Client ID** and **Client Secret**.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/tjGvn39BIE7TbZ4ztjc6?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
-</div>
-
 
 
 <hr />
 
 
 ## Actions
-
-
-### Add Block to Page
-Name: addBlockToPage
-
-`Adds a new content block to a page.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Parent Page ID | STRING |  | true |
-| children | Children | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), [&#123;STRING\(type), &#123;STRING\(content)&#125;\(text), &#123;STRING\(expression)&#125;\(equation)&#125;]\(caption), STRING\(url), STRING\(url), STRING\(expression), BOOLEAN\(checked), STRING\(color), [&#123;STRING\(type), &#123;STRING\(content)&#125;\(text), &#123;STRING\(expression)&#125;\(equation)&#125;]\(rich_text), STRING\(language)&#125;] </details> | Child content to append to a container block as an array of block objects. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Add Block to Page",
-  "name" : "addBlockToPage",
-  "parameters" : {
-    "id" : "",
-    "children" : [ {
-      "type" : "",
-      "caption" : [ {
-        "type" : "",
-        "text" : {
-          "content" : ""
-        },
-        "equation" : {
-          "expression" : ""
-        }
-      } ],
-      "url" : "",
-      "expression" : "",
-      "checked" : false,
-      "color" : "",
-      "rich_text" : [ {
-        "type" : "",
-        "text" : {
-          "content" : ""
-        },
-        "equation" : {
-          "expression" : ""
-        }
-      } ],
-      "language" : ""
-    } ]
-  },
-  "type" : "notion/v1/addBlockToPage"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
 
 
 ### Create Database Item
@@ -151,8 +68,6 @@ Name: createDatabaseItem
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -257,8 +172,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Get Database
 Name: getDatabase
 
@@ -339,8 +252,6 @@ Type: OBJECT
   "public_url" : ""
 }
 ```
-
-
 
 
 ### Get Page
@@ -441,76 +352,6 @@ Type: OBJECT
 ```
 
 
-
-
-### Get Page or Block Children
-Name: getPageOrBlockChildren
-
-`Retrieve the actual content of a page (represented by blocks)`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Page or Parent Block ID | STRING |  | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Page or Block Children",
-  "name" : "getPageOrBlockChildren",
-  "parameters" : {
-    "id" : ""
-  },
-  "type" : "notion/v1/getPageOrBlockChildren"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-### List Database Items
-Name: listDatabaseItems
-
-`List all items in a Notion database.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Database ID | STRING | The ID of the database. | true |
-| property | Sort By | STRING | Property to sort the items by. | true |
-| direction | Sort Direction | STRING <details> <summary> Options </summary> <span>ascending</span>, <span>descending</span> </details> | The direction to sort the items. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "List Database Items",
-  "name" : "listDatabaseItems",
-  "parameters" : {
-    "id" : "",
-    "property" : "",
-    "direction" : ""
-  },
-  "type" : "notion/v1/listDatabaseItems"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
 ### Update Database Item
 Name: updateDatabaseItem
 
@@ -541,8 +382,6 @@ Name: updateDatabaseItem
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -584,10 +423,36 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+Connect Notion to ByteChef using OAuth 2.0 (Authorization Code).
+
+### Create a Notion OAuth app
+1. Open the Notion developer dashboard: https://www.notion.so/my-integrations
+2. Click **+ New integration**.
+3. Enter a clear name (for example, `ByteChef Integration`), select a workspace, and set the **Integration type** to **Public**.
+4. Fill out the remaining required fields (company name, website, email, etc.).
+5. Add the ByteChef OAuth redirect (callback) URL(s):
+   - Cloud: `https://app.bytechef.io/callback`
+   - Local development: `http://127.0.0.1:5173/callback` or `http://localhost:5173/callback`
+6. Click **Save**, then open **Configure integration settings**.
+7. Under **Capabilities**, enable at minimum:
+   - Read content
+   - Update content
+   - Insert content
+   - User information including email addresses
+8. Click **Save changes** and copy the generated **Client ID** and **Client Secret**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/tjGvn39BIE7TbZ4ztjc6?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>

@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -30,12 +30,9 @@ const IntegrationHeaderWorkflowDropDownMenu = ({
                 <div>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
-                                className="hover:bg-background/70"
-                                icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                                size="icon"
-                                variant="ghost"
-                            />
+                            <Button className="hover:bg-background/70" size="icon" variant="ghost">
+                                <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
+                            </Button>
                         </TooltipTrigger>
 
                         <TooltipContent>Workflow Settings</TooltipContent>

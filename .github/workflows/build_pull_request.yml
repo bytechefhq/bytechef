@@ -17,7 +17,7 @@ permissions:
 jobs:
   # JOB to run change detection
   changes:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     # Required permissions
     permissions:
       pull-requests: read
@@ -42,7 +42,7 @@ jobs:
   cli:
     needs: changes
     if: ${{ needs.changes.outputs.cli == 'true' }}
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -76,7 +76,7 @@ jobs:
   client:
     needs: changes
     if: ${{ needs.changes.outputs.client == 'true' }}
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -105,7 +105,7 @@ jobs:
   server:
     needs: changes
     if: ${{ needs.changes.outputs.server == 'true' }}
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3

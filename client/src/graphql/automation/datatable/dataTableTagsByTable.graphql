@@ -1,9 +1,0 @@
-query dataTableTagsByTable {
-    dataTableTagsByTable {
-        tableId
-        tags {
-            id
-            name
-        }
-    }
-}

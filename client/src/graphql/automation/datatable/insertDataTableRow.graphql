@@ -1,6 +1,0 @@
-mutation insertDataTableRow($input: InsertRowInput!) {
-    insertDataTableRow(input: $input) {
-        id
-        values
-    }
-}

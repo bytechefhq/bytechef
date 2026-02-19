@@ -10,27 +10,36 @@ import {
 } from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {forwardRef, useImperativeHandle} from 'react';
 
 import useInviteUserDialog from './hooks/useInviteUserDialog';
 
-const InviteUserDialog = () => {
+export interface InviteUserDialogRefI {
+    open: () => void;
+}
+
+const InviteUserDialog = forwardRef<InviteUserDialogRefI>(function InviteUserDialog(_, ref) {
     const {
         authorities,
-        handleClose,
-        handleEmailChange,
-        handleInvite,
-        handleOpenChange,
-        handleRegeneratePassword,
-        handleRoleChange,
+        handleInviteUserDialogClose,
+        handleInviteUserDialogInvite,
+        handleInviteUserDialogOpen,
+        handleInviteUserDialogRegeneratePassword,
         inviteDisabled,
         inviteEmail,
         invitePassword,
         inviteRole,
         open,
+        setInviteEmail,
+        setInviteRole,
     } = useInviteUserDialog();
 
+    useImperativeHandle(ref, () => ({
+        open: handleInviteUserDialogOpen,
+    }));
+
     return (
-        <Dialog onOpenChange={handleOpenChange} open={open}>
+        <Dialog onOpenChange={(isOpen) => !isOpen && handleInviteUserDialogClose()} open={open}>
             <DialogContent>
                 <div className="flex flex-col gap-4">
                     <DialogHeader className="flex flex-row items-center justify-between space-y-0">
@@ -49,7 +58,7 @@ const InviteUserDialog = () => {
                             <label className="text-sm font-medium">Email</label>
 
                             <Input
-                                onChange={(event) => handleEmailChange(event.target.value)}
+                                onChange={(event) => setInviteEmail(event.target.value)}
                                 placeholder="user@example.com"
                                 type="email"
                                 value={inviteEmail}
@@ -62,7 +71,7 @@ const InviteUserDialog = () => {
                             <Input readOnly type="text" value={invitePassword} />
 
                             <div>
-                                <Button onClick={handleRegeneratePassword} size="sm" variant="outline">
+                                <Button onClick={handleInviteUserDialogRegeneratePassword} size="sm" variant="outline">
                                     Regenerate
                                 </Button>
                             </div>
@@ -76,7 +85,7 @@ const InviteUserDialog = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Role</label>
 
-                            <Select onValueChange={(value) => handleRoleChange(value)} value={inviteRole ?? undefined}>
+                            <Select onValueChange={(value) => setInviteRole(value)} value={inviteRole ?? undefined}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select role" />
                                 </SelectTrigger>
@@ -94,12 +103,12 @@ const InviteUserDialog = () => {
 
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button onClick={handleClose} variant="outline">
+                            <Button onClick={handleInviteUserDialogClose} variant="outline">
                                 Cancel
                             </Button>
                         </DialogClose>
 
-                        <Button disabled={inviteDisabled} onClick={handleInvite}>
+                        <Button disabled={inviteDisabled} onClick={handleInviteUserDialogInvite}>
                             Invite
                         </Button>
                     </DialogFooter>
@@ -107,6 +116,6 @@ const InviteUserDialog = () => {
             </DialogContent>
         </Dialog>
     );
-};
+});
 
 export default InviteUserDialog;

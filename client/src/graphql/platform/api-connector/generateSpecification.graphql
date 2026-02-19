@@ -1,5 +1,0 @@
-mutation generateSpecification($input: GenerateSpecificationInput!) {
-    generateSpecification(input: $input) {
-        specification
-    }
-}

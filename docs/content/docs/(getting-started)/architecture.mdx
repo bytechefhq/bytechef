@@ -1,118 +1,119 @@
 ---
 title: Platform Architecture
-description: ByteChef is an open-source, enterprise-ready platform for API integration and workflow automation.
+description: "ByteChef Platform Architecture. Learn the infrastructure design and technical components of the ByteChef system in your ByteChef workflows."
 ---
 
 ByteChef is built on a scalable, modular architecture designed to handle enterprise-grade workflow automation and integrations. The platform provides a flexible foundation that supports multiple deployment models, from cloud-hosted to on-premises deployments.
 
+![Workflow Architecture](/Architecture_Diagram.png)
 ## System Architecture Overview
 
 The ByteChef platform is composed of several interconnected layers that work together to deliver workflow automation capabilities.
 
-**API & Integration Layer** : This layer handles communication with external services and applications. It provides comprehensive REST and GraphQL APIs that allow seamless integration with over 500+ pre-built connectors and custom integrations through our component system.
+**API & Integration Layer**: This layer handles communication with external services and applications. It provides comprehensive REST and GraphQL APIs that allow seamless integration with over 500+ pre-built connectors and custom integrations through our component system.
 
-**Workflow Engine** : The core execution engine processes workflow definitions, manages task execution, handles data transformations, and orchestrates component interactions. It supports parallel execution, conditional branching, looping, and error handling.
+**Workflow Engine**: The core execution engine processes workflow definitions, manages task execution, handles data transformations, and orchestrates component interactions. It supports parallel execution, conditional branching, looping, and error handling.
 
-**Component System** : A modular framework for building integrations. Each component encapsulates actions, triggers, and connections to external services. Components can be pre-built (Slack, GitHub, Salesforce, etc.) or custom-built using our developer framework.
+**Component System**: A modular framework for building integrations. Each component encapsulates actions, triggers, and connections to external services. Components can be pre-built (Slack, GitHub, Salesforce, etc.) or custom-built using our developer framework.
 
-**Data & State Management** : Manages workflow execution state, handles data persistence, processes data mappings and transformations, and maintains audit logs for compliance and debugging.
+**Data & State Management**: Manages workflow execution state, handles data persistence, processes data mappings and transformations, and maintains audit logs for compliance and debugging.
 
-**Runtime & Execution** : Provides execution environments for workflows, manages job scheduling and queueing, handles resource allocation, and enables both synchronous and asynchronous execution patterns.
+**Runtime & Execution**: Provides execution environments for workflows, manages job scheduling and queueing, handles resource allocation, and enables both synchronous and asynchronous execution patterns.
 
 ## Multi-Tier Deployment Architecture
 
 ByteChef supports flexible deployment options to meet different organizational needs.
 
-**Cloud Deployment** : ByteChef Cloud is our managed, hosted solution. Users access the platform via a web-based interface with zero infrastructure management. Ideal for teams wanting quick time-to-value without managing their own infrastructure. Includes automatic scaling, security patches, and regular updates.
+**Cloud Deployment**: ByteChef Cloud is our managed, hosted solution. Users access the platform via a web-based interface with zero infrastructure management. Ideal for teams wanting quick time-to-value without managing their own infrastructure. Includes automatic scaling, security patches, and regular updates.
 
-**Self-Hosted Deployment** : Organizations can deploy ByteChef on their own infrastructure using Docker, Kubernetes, AWS, Azure, Google Cloud, or DigitalOcean. Provides complete control over data, infrastructure, and customization. Suitable for enterprises with specific compliance, security, or data residency requirements.
+**Self-Hosted Deployment**: Organizations can deploy ByteChef on their own infrastructure using Docker, Kubernetes, AWS, Azure, Google Cloud, or DigitalOcean. Provides complete control over data, infrastructure, and customization. Suitable for enterprises with specific compliance, security, or data residency requirements.
 
 ## Core Components
 
-**Web Interface** : User-friendly workflow builder with drag-and-drop component configuration, real-time execution monitoring, and workflow management capabilities. Built with React and TypeScript for a responsive, modern experience.
+**Web Interface**: User-friendly workflow builder with drag-and-drop component configuration, real-time execution monitoring, and workflow management capabilities. Built with React and TypeScript for a responsive, modern experience.
 
-**API Server** : Handles all API requests, manages authentication and authorization, processes workflow definitions, and orchestrates execution. Provides REST endpoints for programmatic access to all platform features.
+**API Server**: Handles all API requests, manages authentication and authorization, processes workflow definitions, and orchestrates execution. Provides REST endpoints for programmatic access to all platform features.
 
-**Workflow Engine** : Processes workflow definitions in JSON format, manages execution state and transitions between tasks, handles error recovery and retries, and supports complex control flow patterns including branches, loops, and parallel execution.
+**Workflow Engine**: Processes workflow definitions in JSON format, manages execution state and transitions between tasks, handles error recovery and retries, and supports complex control flow patterns including branches, loops, and parallel execution.
 
-**Component Registry** : Centralizes all available components and their metadata, manages component versioning and updates, and provides discovery and configuration interfaces for users.
+**Component Registry**: Centralizes all available components and their metadata, manages component versioning and updates, and provides discovery and configuration interfaces for users.
 
-**Data Storage** : Persists workflow definitions, execution history, audit logs, and user data. Supports multiple database backends (PostgreSQL, MySQL, etc.) and file storage options.
+**Data Storage**: Persists workflow definitions, execution history, audit logs, and user data. Supports multiple database backends (PostgreSQL, MySQL, etc.) and file storage options.
 
-**Message Queue** : Handles asynchronous task processing, manages job scheduling and prioritization, and enables decoupled processing for improved scalability and reliability.
+**Message Queue**: Handles asynchronous task processing, manages job scheduling and prioritization, and enables decoupled processing for improved scalability and reliability.
 
 ## Workflow Execution Flow
 
 When you trigger a workflow, the platform executes it through a well-defined pipeline.
 
-1. **Trigger Activation** : A webhook, schedule, or manual trigger initiates workflow execution
-2. **Workflow Parsing** : The engine loads and parses the workflow definition
-3. **Input Processing** : Trigger data is prepared and validated
-4. **Component Execution** : Tasks execute sequentially or in parallel based on workflow configuration
-5. **Data Transformation** : Data flows between components using mapping expressions
-6. **Conditional Logic** : Branches are evaluated and appropriate paths are taken
-7. **Output Generation** : Final results are formatted and returned
-8. **State Persistence** : Execution state and logs are saved for monitoring and debugging
+1. **Trigger Activation**: A webhook, schedule, or manual trigger initiates workflow execution
+2. **Workflow Parsing**: The engine loads and parses the workflow definition
+3. **Input Processing**: Trigger data is prepared and validated
+4. **Component Execution**: Tasks execute sequentially or in parallel based on workflow configuration
+5. **Data Transformation**: Data flows between components using mapping expressions
+6. **Conditional Logic**: Branches are evaluated and appropriate paths are taken
+7. **Output Generation**: Final results are formatted and returned
+8. **State Persistence**: Execution state and logs are saved for monitoring and debugging
 
 ## Integration Architecture
 
 ByteChef connects applications through a standardized component model.
 
-**Connection Management** : Securely stores API credentials, OAuth tokens, and authentication details. Supports multiple authentication methods (API keys, OAuth 2.0, Basic Auth, custom).
+**Connection Management**: Securely stores API credentials, OAuth tokens, and authentication details. Supports multiple authentication methods (API keys, OAuth 2.0, Basic Auth, custom).
 
-**Component Interface** : Standardized interface that all components implement, ensuring consistency across 500+ integrations. Each component defines its actions, triggers, and required properties.
+**Component Interface**: Standardized interface that all components implement, ensuring consistency across 500+ integrations. Each component defines its actions, triggers, and required properties.
 
-**Data Mapping** : Powerful expression engine allows transforming and mapping data between components. Supports JavaScript expressions, field references, and utility functions for data manipulation.
+**Data Mapping**: Powerful expression engine allows transforming and mapping data between components. Supports JavaScript expressions, field references, and utility functions for data manipulation.
 
-**Error Handling** : Components can define retry strategies, timeout behaviors, and error recovery patterns. The engine supports both component-level and workflow-level error handling.
+**Error Handling**: Components can define retry strategies, timeout behaviors, and error recovery patterns. The engine supports both component-level and workflow-level error handling.
 
 ## Scalability & Performance
 
 ByteChef is designed to handle enterprise-scale automation demands.
 
-**Horizontal Scaling** : The stateless design of the API server and execution engine allows deploying multiple instances behind a load balancer for handling increased load.
+**Horizontal Scaling**: The stateless design of the API server and execution engine allows deploying multiple instances behind a load balancer for handling increased load.
 
-**Asynchronous Processing** : Heavy operations are queued and processed asynchronously, preventing blocking and ensuring responsive APIs.
+**Asynchronous Processing**: Heavy operations are queued and processed asynchronously, preventing blocking and ensuring responsive APIs.
 
-**Resource Management** : Execution is optimized for efficiency with configurable timeouts, concurrent execution limits, and resource allocation policies.
+**Resource Management**: Execution is optimized for efficiency with configurable timeouts, concurrent execution limits, and resource allocation policies.
 
-**Data Efficiency** : Large payloads are handled efficiently with streaming support, compression options, and smart caching strategies.
+**Data Efficiency**: Large payloads are handled efficiently with streaming support, compression options, and smart caching strategies.
 
 ## Security Architecture
 
 Security is built into every layer of the platform.
 
-**Authentication** : Supports multiple authentication methods including OAuth 2.0, API keys, and single sign-on (SSO) integration.
+**Authentication**: Supports multiple authentication methods including OAuth 2.0, API keys, and single sign-on (SSO) integration.
 
-**Authorization** : Fine-grained RBAC (Role-Based Access Control) allows controlling what users can access and modify at the project and workflow levels.
+**Authorization**: Fine-grained RBAC (Role-Based Access Control) allows controlling what users can access and modify at the project and workflow levels.
 
-**Data Protection** : Credentials are encrypted at rest and in transit. Sensitive data in logs is masked. Audit logs track all actions for compliance.
+**Data Protection**: Credentials are encrypted at rest and in transit. Sensitive data in logs is masked. Audit logs track all actions for compliance.
 
-**API Security** : Rate limiting, input validation, and CORS protection prevent abuse. All API endpoints require authentication.
+**API Security**: Rate limiting, input validation, and CORS protection prevent abuse. All API endpoints require authentication.
 
 ## Monitoring & Observability
 
 Complete visibility into workflow execution and system health.
 
-**Execution Tracking** : Real-time monitoring of workflow runs with detailed execution logs showing each step, data transformations, and timing information.
+**Execution Tracking**: Real-time monitoring of workflow runs with detailed execution logs showing each step, data transformations, and timing information.
 
-**Performance Metrics** : Track workflow execution duration, error rates, and component performance. Identify bottlenecks and optimization opportunities.
+**Performance Metrics**: Track workflow execution duration, error rates, and component performance. Identify bottlenecks and optimization opportunities.
 
-**Audit Logging** : Comprehensive logs of all system activities for compliance, debugging, and security investigation.
+**Audit Logging**: Comprehensive logs of all system activities for compliance, debugging, and security investigation.
 
-**Alerting** : Configurable alerts for workflow failures, performance issues, and security events enable proactive issue management.
+**Alerting**: Configurable alerts for workflow failures, performance issues, and security events enable proactive issue management.
 
 ## Development & Extensibility
 
 Build custom integrations and extend the platform.
 
-**Component Development** : Developer SDK for building custom components in TypeScript/JavaScript. Create actions, triggers, and connections for proprietary or niche systems.
+**Component Development**: Developer SDK for building custom components in TypeScript/JavaScript. Create actions, triggers, and connections for proprietary or niche systems.
 
-**API Access** : Full API access enables building custom applications on top of ByteChef or integrating it into existing systems.
+**API Access**: Full API access enables building custom applications on top of ByteChef or integrating it into existing systems.
 
-**Webhooks** : Send workflow data to external systems in real-time using webhooks. Enables two-way integrations and event-driven architectures.
+**Webhooks**: Send workflow data to external systems in real-time using webhooks. Enables two-way integrations and event-driven architectures.
 
-**Configuration as Code** : Define workflows in JSON format, enabling version control, CI/CD integration, and infrastructure-as-code practices.
+**Configuration as Code**: Define workflows in JSON format, enabling version control, CI/CD integration, and infrastructure-as-code practices.
 
 ## Data Flow & Processing
 
@@ -124,32 +125,32 @@ Data enters through triggers (webhooks, schedules, manual), flows through compon
 
 ByteChef leverages proven, open-source technologies.
 
-**Backend** : Java/Spring Boot for the core platform, providing stability, performance, and extensive ecosystem support.
+**Backend**: Java/Spring Boot for the core platform, providing stability, performance, and extensive ecosystem support.
 
-**Frontend** : React with TypeScript for a modern, responsive user interface.
+**Frontend**: React with TypeScript for a modern, responsive user interface.
 
-**Database** : PostgreSQL as the primary data store, with support for other databases.
+**Database**: PostgreSQL as the primary data store, with support for other databases.
 
-**Message Queue** : RabbitMQ or similar for asynchronous job processing and reliable message delivery.
+**Message Queue**: RabbitMQ or similar for asynchronous job processing and reliable message delivery.
 
-**Container** : Docker for containerization, enabling deployment flexibility across cloud and on-premises environments.
+**Container**: Docker for containerization, enabling deployment flexibility across cloud and on-premises environments.
 
 ## Architecture Benefits
 
 The modular, layered architecture provides several advantages.
 
-**Scalability** : Add more nodes to handle increased load without redesigning the system.
+**Scalability**: Add more nodes to handle increased load without redesigning the system.
 
-**Reliability** : Separated concerns and async processing prevent cascading failures.
+**Reliability**: Separated concerns and async processing prevent cascading failures.
 
-**Flexibility** : Modular design allows customization at every level without touching core platform code.
+**Flexibility**: Modular design allows customization at every level without touching core platform code.
 
-**Maintainability** : Clear separation of concerns makes the system easier to understand and maintain.
+**Maintainability**: Clear separation of concerns makes the system easier to understand and maintain.
 
-**Security** : Multiple layers of security controls with defense in depth approach.
+**Security**: Multiple layers of security controls with defense in depth approach.
 
-**Performance** : Optimized data flow, caching strategies, and async processing ensure fast execution.
+**Performance**: Optimized data flow, caching strategies, and async processing ensure fast execution.
 
 ---
 
-For information on deploying ByteChef in your specific environment, see the [Deployment](/deployment/environment_variables) section. For details on building custom integrations, visit the [Developer Guide](/developer-guide).
+For information on deploying ByteChef in your specific environment, see [Deployment](/self-hosting/deployment/local-docker) section. For details on building custom integrations, visit the [Developer Guide](/developer-guide/build-component/initial-setup).

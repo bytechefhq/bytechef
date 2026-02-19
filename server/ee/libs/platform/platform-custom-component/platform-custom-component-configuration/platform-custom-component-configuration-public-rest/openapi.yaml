@@ -1,0 +1,32 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Custom Component Public API"
+  version: "1"
+servers:
+  - url: "/api/platform/v1"
+tags:
+  - name: "custom-component"
+    description: "The Platform Custom Component Public API"
+paths:
+  /custom-components/deploy:
+    post:
+      description: "Deploy a new custom component."
+      summary: "Deploy a new custom component"
+      tags:
+        - "custom-component"
+      operationId: "deployCustomComponent"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                componentFile:
+                  description: "The file of a custom component."
+                  type: "string"
+                  format: "binary"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."

@@ -21,7 +21,6 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.tenant.TenantContext;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -52,12 +51,6 @@ public class FilesystemFileStorageService implements FileStorageService {
 
     private final Path baseDirPath;
 
-    /**
-     * <b>Security Note:</b> Path traversal is intentional for this component. The baseDir parameter is sourced from
-     * application configuration properties ({@code bytechef.file-storage.filesystem.base-path}), not from untrusted
-     * user input. This allows deployment-specific storage location configuration.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public FilesystemFileStorageService(String baseDir) {
         this.baseDirPath = Paths.get(baseDir);
     }
@@ -304,13 +297,6 @@ public class FilesystemFileStorageService implements FileStorageService {
         return url.replace(URL_PREFIX + "/" + directory + File.separator, "");
     }
 
-    /**
-     * <b>Security Note:</b> Path traversal is intentional for this component. This service manages file storage for
-     * workflow artifacts and is designed to access files under a configured base directory. File paths are derived from
-     * tenant context and internal directory parameters, not from untrusted user input. Access control is handled
-     * through tenant isolation.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private Path resolveDirectoryPath(String directory) {
         try {
             Path tenantDirectoryPath = baseDirPath.resolve(TenantContext.getCurrentTenantId());

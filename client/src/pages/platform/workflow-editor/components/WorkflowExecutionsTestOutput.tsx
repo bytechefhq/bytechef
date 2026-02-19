@@ -13,7 +13,6 @@ import {
 } from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import {TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import {TabValueType} from '@/shared/types';
 import {ChevronDownIcon, RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
@@ -28,7 +27,7 @@ const WorkflowExecutionsTestOutput = ({
     workflowTestExecution?: WorkflowTestExecution;
     onCloseClick?: () => void;
 }) => {
-    const [activeTab, setActiveTab] = useState<TabValueType>('input');
+    const [activeTab, setActiveTab] = useState<'input' | 'output' | 'error'>('input');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
         getInitialSelectedItem(workflowTestExecution)
@@ -38,27 +37,27 @@ const WorkflowExecutionsTestOutput = ({
 
     const job = workflowTestExecution?.job;
     const triggerExecution = workflowTestExecution?.triggerExecution;
-    const currentWorkflowId = job?.workflowId;
 
     useEffect(() => {
         setSelectedItem(getInitialSelectedItem(workflowTestExecution));
         setActiveTab('input');
     }, [workflowTestExecution]);
 
+    // Set workflow execution error in copilot store when an error exists
     useEffect(() => {
         const errorItem = getErrorItem(workflowTestExecution);
 
-        if (errorItem?.error && currentWorkflowId) {
+        if (errorItem?.error) {
             setWorkflowExecutionError({
                 errorMessage: errorItem.error.message,
                 stackTrace: errorItem.error.stackTrace,
                 title: errorItem.title,
-                workflowId: currentWorkflowId,
             });
-        } else if (!errorItem?.error) {
+        } else {
+            // Clear error when workflow succeeds
             setWorkflowExecutionError(undefined);
         }
-    }, [workflowTestExecution, currentWorkflowId, setWorkflowExecutionError]);
+    }, [workflowTestExecution, setWorkflowExecutionError]);
 
     const tasksTree = useMemo(() => (job ? getTasksTree(job) : []), [job]);
 
@@ -75,7 +74,7 @@ const WorkflowExecutionsTestOutput = ({
                 {job ? (
                     <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
                 ) : (
-                    <span className="flex w-full items-center gap-x-3 px-3 py-4 text-sm uppercase">Test Output</span>
+                    <span className="text-sm uppercase">Test Output</span>
                 )}
 
                 {onCloseClick && (
@@ -140,7 +139,6 @@ const WorkflowExecutionsTestOutput = ({
                                             <WorkflowExecutionsTabsPanel
                                                 activeTab={activeTab}
                                                 dialogOpen={dialogOpen}
-                                                isEditorEnvironment={true}
                                                 job={job}
                                                 selectedItem={selectedItem}
                                                 setActiveTab={setActiveTab}

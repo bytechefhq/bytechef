@@ -1,5 +1,5 @@
-import Button from '@/components/Button/Button';
 import {ComboBoxItemType} from '@/components/ComboBox';
+import {Button} from '@/components/ui/button';
 import ComponentRow from '@/pages/automation/template/components/ComponentRow';
 import TemplateLayoutContainer from '@/pages/automation/template/components/TemplateLayoutContainer';
 import ProjectsComboBox from '@/pages/automation/template/workflow-template/components/ProjectsComboBox';

@@ -1,8 +1,7 @@
 ---
-title: "Zoom"
-description: "Zoom is a cloud-based video conferencing platform that enables virtual meetings, webinars, and collaboration through video, audio, and chat."
+description: "Zoom component for ByteChef. Video conferencing. Learn how to implement this in your ByteChef workflows."
+title: Zoom
 ---
-
 
 Categories: Communication
 
@@ -29,23 +28,6 @@ Version: 1
 | clientSecret | Client Secret | STRING |  | true |
 
 
-
-## Connection Setup
-
-### Find OAuth Credentials and Add Required Scopes
-
-1. Go to [marketplace.zoom.us](https://marketplace.zoom.us/) and log in to your account.
-2. Click on Develop.
-3. Click on Build app.
-4. Select General App.
-5. Click on Create.
-6. Here you can see Client ID and Client Secret.
-7. Enter a redirect URI, e.g., http://127.0.0.1:5173/callback, https://app.bytechef.io/callback. Click Create.
-8. Go to **Scopes** from left sidebar and add **meeting:write:meeting** and **meeting:write:registrant** as scopes.`,
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/23d01159-c615-4e15-9592-edb2439c0da7?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
-</div>
 
 
 
@@ -187,8 +169,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Add Meeting Registrant
 Name: addMeetingRegistrant
 
@@ -291,11 +271,29 @@ Type: OBJECT
 
 
 
-
-
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Find OAuth Credentials and Add Required Scopes
+
+1. Go to [marketplace.zoom.us](https://marketplace.zoom.us/) and log in to your account.
+2. Click on Develop.
+3. Click on Build app.
+4. Select General App.
+5. Click on Create.
+6. Here you can see Client ID and Client Secret.
+7. Enter a redirect URI, e.g., http://127.0.0.1:5173/callback, https://app.bytechef.io/callback. Click Create.
+8. Go to **Scopes** from left sidebar and add **meeting:write:meeting** and **meeting:write:registrant** as scopes.`,
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/23d01159-c615-4e15-9592-edb2439c0da7?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>

@@ -2,7 +2,6 @@ logging:
   level:
     ROOT: INFO
     com.bytechef: DEBUG
-    com.bytechef.ee.observability: INFO
     org.springframework.ai.chat.client.advisor': DEBUG
 
 server:
@@ -26,11 +25,12 @@ spring:
 
 bytechef:
   ai:
-    vectorstore:
-      pgvector:
-        url: jdbc:postgresql://localhost:5433/bytechef_vectorstore
-        username: postgres
-        password: postgres
+    copilot:
+      vectorstore:
+        pgvector:
+          url: jdbc:postgresql://localhost:5433/bytechef_copilot
+          username: postgres
+          password: postgres
   datasource:
     # PostgreSQL database
     #    url: jdbc:postgresql://localhost:5432/bytechef

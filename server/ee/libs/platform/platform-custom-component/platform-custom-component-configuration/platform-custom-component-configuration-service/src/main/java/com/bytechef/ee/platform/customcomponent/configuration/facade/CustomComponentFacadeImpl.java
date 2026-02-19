@@ -9,9 +9,7 @@ package com.bytechef.ee.platform.customcomponent.configuration.facade;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent.Language;
 import com.bytechef.ee.platform.customcomponent.configuration.service.CustomComponentService;
@@ -22,10 +20,8 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.cache.CacheManager;
@@ -63,34 +59,6 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
         customComponentService.delete(id);
 
         customComponentFileStorage.deleteCustomComponentFile(customComponent.getComponent());
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public CustomComponentDefinitionRecord getCustomComponentDefinition(Long id) {
-        CustomComponent customComponent = customComponentService.getCustomComponent(id);
-
-        URL componentUrl = customComponentFileStorage.getCustomComponentFileURL(customComponent.getComponent());
-
-        ComponentHandler componentHandler = ComponentHandlerLoader.loadComponentHandler(
-            componentUrl, customComponent.getLanguage(),
-            componentUrl.toString() + UUID.randomUUID(), cacheManager);
-
-        ComponentDefinition componentDefinition = componentHandler.getDefinition();
-
-        List<ActionDefinitionRecord> actions = componentDefinition.getActions()
-            .orElse(Collections.emptyList())
-            .stream()
-            .map(this::toActionDefinitionRecord)
-            .toList();
-
-        List<TriggerDefinitionRecord> triggers = componentDefinition.getTriggers()
-            .orElse(Collections.emptyList())
-            .stream()
-            .map(this::toTriggerDefinitionRecord)
-            .toList();
-
-        return new CustomComponentDefinitionRecord(actions, triggers);
     }
 
     @Transactional(readOnly = true)
@@ -135,11 +103,6 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
         customComponentService.create(customComponent);
     }
 
-    /**
-     * Security Note: PATH_TRAVERSAL_IN - Temporary files are created with system-generated names in the temp directory,
-     * not user-controlled paths. Access is restricted to administrators.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private ComponentDefinition loadComponentDefinition(Language language, byte[] bytes) throws IOException {
         Path path = Files.createTempFile("custom_component", language.getExtension());
 
@@ -155,20 +118,6 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
         } finally {
             Files.delete(path);
         }
-    }
-
-    private ActionDefinitionRecord toActionDefinitionRecord(ActionDefinition actionDefinition) {
-        return new ActionDefinitionRecord(
-            actionDefinition.getName(),
-            OptionalUtils.orElse(actionDefinition.getTitle(), null),
-            OptionalUtils.orElse(actionDefinition.getDescription(), null));
-    }
-
-    private TriggerDefinitionRecord toTriggerDefinitionRecord(TriggerDefinition triggerDefinition) {
-        return new TriggerDefinitionRecord(
-            triggerDefinition.getName(),
-            OptionalUtils.orElse(triggerDefinition.getTitle(), null),
-            OptionalUtils.orElse(triggerDefinition.getDescription(), null));
     }
 
     private void update(CustomComponent customComponent, ComponentDefinition componentDefinition) {

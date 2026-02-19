@@ -1,5 +1,5 @@
-import Button from '@/components/Button/Button';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
+import {Button} from '@/components/ui/button';
 import {ComponentDefinition, ConnectionDefinition} from '@/shared/middleware/graphql';
 import {Dispatch, SetStateAction} from 'react';
 

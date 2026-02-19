@@ -93,8 +93,8 @@ public class ModularRag {
 
                 try {
                     return documentJoinerFunction.apply(
-                        ParametersFactory.create(clusterElement.getParameters()),
-                        ParametersFactory.create(componentConnection.getParameters()));
+                        ParametersFactory.createParameters(clusterElement.getParameters()),
+                        ParametersFactory.createParameters(componentConnection.getParameters()));
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -118,10 +118,10 @@ public class ModularRag {
 
                 try {
                     return documentRetrieverFunction.apply(
-                        ParametersFactory.create(clusterElement.getParameters()),
-                        ParametersFactory.create(
+                        ParametersFactory.createParameters(clusterElement.getParameters()),
+                        ParametersFactory.createParameters(
                             componentConnection == null ? Map.of() : componentConnection.getParameters()),
-                        ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
+                        ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -144,8 +144,8 @@ public class ModularRag {
 
                 try {
                     return queryAugmenterFunction.apply(
-                        ParametersFactory.create(clusterElement.getParameters()),
-                        ParametersFactory.create(componentConnection.getParameters()));
+                        ParametersFactory.createParameters(clusterElement.getParameters()),
+                        ParametersFactory.createParameters(componentConnection.getParameters()));
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -168,9 +168,9 @@ public class ModularRag {
 
                 try {
                     return queryExpanderFunction.apply(
-                        ParametersFactory.create(clusterElement.getParameters()),
-                        ParametersFactory.create(componentConnection.getParameters()),
-                        ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
+                        ParametersFactory.createParameters(clusterElement.getParameters()),
+                        ParametersFactory.createParameters(componentConnection.getParameters()),
+                        ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -196,9 +196,9 @@ public class ModularRag {
 
             queryTransformers.add(
                 queryTransformerFunction.apply(
-                    ParametersFactory.create(clusterElement.getParameters()),
-                    ParametersFactory.create(componentConnection.getParameters()),
-                    ParametersFactory.create(clusterElement.getExtensions()), componentConnections));
+                    ParametersFactory.createParameters(clusterElement.getParameters()),
+                    ParametersFactory.createParameters(componentConnection.getParameters()),
+                    ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections));
         }
 
         return queryTransformers;

@@ -5,4 +5,4 @@ org.springframework.cloud.bootstrap.BootstrapConfiguration=\
 com.bytechef.ee.discovery.redis.config.RedisDiscoveryClientBootstrapConfiguration
 
 org.springframework.boot.EnvironmentPostProcessor=\
-com.bytechef.ee.discovery.redis.boot.RedisDiscoveryServiceProviderEnvironmentPostProcessor
+com.bytechef.ee.discovery.redis.env.RedisDiscoveryServiceProviderEnvironmentPostProcessor

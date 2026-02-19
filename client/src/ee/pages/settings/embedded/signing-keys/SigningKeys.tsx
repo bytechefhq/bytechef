@@ -1,6 +1,6 @@
-import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import {Button} from '@/components/ui/button';
 import SigningKeyDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
 import SigningKeyTable from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyTable';
 import {useGeSigningKeysQuery} from '@/ee/shared/queries/embedded/signingKeys.queries';

@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentBasic", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectDeploymentBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-02-03T18:13:00.110740+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-05T14:11:26.033736+01:00[Europe/Ljubljana]", comments = "Generator version: 7.18.0")
 public class ProjectDeploymentBasicModel {
 
   private @Nullable String createdBy;
@@ -357,7 +357,7 @@ public class ProjectDeploymentBasicModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(@Nullable Object o) {
+  private String toIndentedString(Object o) {
     if (o == null) {
       return "null";
     }

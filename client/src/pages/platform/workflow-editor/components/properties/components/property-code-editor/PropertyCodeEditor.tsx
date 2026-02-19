@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import PropertyCodeEditorDialog from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialog';
+import PropertyCodeEditorSheet from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheet';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
@@ -107,7 +107,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                 </fieldset>
 
                 {showPropertyCodeEditorSheet && (
-                    <PropertyCodeEditorDialog
+                    <PropertyCodeEditorSheet
                         language={language}
                         onChange={onChange}
                         onClose={() => setShowPropertyCodeEditorSheet(false)}

@@ -1,3 +1,0 @@
-query exportDataTableCsv($environmentId: ID!, $tableId: ID!) {
-    exportDataTableCsv(environmentId: $environmentId, tableId: $tableId)
-}

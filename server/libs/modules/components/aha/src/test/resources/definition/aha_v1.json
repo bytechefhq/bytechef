@@ -6,10 +6,7 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new feature.",
-    "help": {
-      "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aha_v1#create-feature"
-    },
+    "help": null,
     "metadata": {
       "path": "/releases/{releaseId}/features",
       "mimeType": "application/json",
@@ -1313,10 +1310,7 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new idea.",
-    "help": {
-      "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aha_v1#create-idea"
-    },
+    "help": null,
     "metadata": {
       "path": "/products/{productId}/ideas",
       "mimeType": "application/json",
@@ -3521,20 +3515,12 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": {
-      "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aha_v1#connection-setup"
-    },
-    "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": {
-    "body": "",
-    "learnMoreUrl": "https://www.aha.io/api"
-  },
+  "customActionHelp": null,
   "description": "Aha! is a comprehensive product management software platform that helps teams set strategy, capture ideas, and plan, prioritize, and track work to build products customers love.",
   "icon": "path:assets/aha.svg",
   "metadata": null,

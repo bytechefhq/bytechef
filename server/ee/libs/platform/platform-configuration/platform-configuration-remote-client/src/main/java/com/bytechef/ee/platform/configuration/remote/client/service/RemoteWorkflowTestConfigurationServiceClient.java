@@ -52,11 +52,6 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
     }
 
     @Override
-    public void deleteWorkflowTestConfigurationConnection(long connectionId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId, long environmentId) {
         throw new UnsupportedOperationException();
     }

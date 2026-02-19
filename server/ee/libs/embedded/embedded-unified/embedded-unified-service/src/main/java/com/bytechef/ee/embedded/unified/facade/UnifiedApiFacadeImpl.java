@@ -38,7 +38,6 @@ import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,9 +49,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Unified API facade implementation that provides CRUD operations for unified API models. Hash comparisons use
- * timing-safe comparison via {@link MessageDigest#isEqual} to prevent timing attacks.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -102,7 +98,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         ProviderInputModel providerInputModel = providerModelMapper.desunify(unifiedInputModel, List.of());
 
         return providerModelAdapter.create(
-            providerInputModel, ParametersFactory.create(componentConnection.getParameters()),
+            providerInputModel, ParametersFactory.createParameters(componentConnection.getParameters()),
             contextFactory.createContext(componentName, componentConnection));
     }
 
@@ -121,7 +117,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
                 componentName, category, modelType);
 
         providerModelAdapter.delete(
-            id, ParametersFactory.create(componentConnection.getParameters()),
+            id, ParametersFactory.createParameters(componentConnection.getParameters()),
             contextFactory.createContext(componentName, componentConnection));
     }
 
@@ -143,7 +139,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
             unifiedApiDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
 
         ProviderOutputModel providerOutputModel = providerModelAdapter.get(
-            id, ParametersFactory.create(componentConnection.getParameters()),
+            id, ParametersFactory.createParameters(componentConnection.getParameters()),
             contextFactory.createContext(componentName, componentConnection));
 
         return providerModelMapper.unify(providerOutputModel, List.of());
@@ -185,9 +181,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
             String prevHash = params[0];
 
-            // Use timing-safe comparison to prevent timing attacks
-            if (!MessageDigest.isEqual(hashed.getBytes(StandardCharsets.UTF_8),
-                prevHash.getBytes(StandardCharsets.UTF_8))) {
+            if (!hashed.equals(prevHash)) {
                 throw new CursorPaginationException("Can't modify search filter when using a continuationToken");
             }
 
@@ -202,8 +196,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         }
 
         Page<? extends ProviderOutputModel> page = providerModelAdapter.getPage(
-            ParametersFactory.create(componentConnection.getParameters()),
-            ParametersFactory.create(cursorParameters),
+            ParametersFactory.createParameters(componentConnection.getParameters()),
+            ParametersFactory.createParameters(cursorParameters),
             contextFactory.createContext(componentName, componentConnection));
 
         String continuationToken = null;
@@ -253,7 +247,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         ProviderInputModel providerInputModel = providerModelMapper.desunify(unifiedInputModel, List.of());
 
         providerModelAdapter.update(
-            id, providerInputModel, ParametersFactory.create(componentConnection.getParameters()),
+            id, providerInputModel, ParametersFactory.createParameters(componentConnection.getParameters()),
             contextFactory.createContext(componentName, componentConnection));
     }
 

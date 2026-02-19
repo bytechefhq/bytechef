@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public interface ItemWriter extends ItemStream, FieldsProvider {
+public interface ItemWriter extends ItemStream {
 
     ClusterElementType DESTINATION = new ClusterElementType("DESTINATION", "destination", "Destination");
 

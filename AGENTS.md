@@ -357,85 +357,19 @@ it('should render button', () => {
 
 ### E2E Tests (Playwright)
 
--   Location: `test/playwright/`
--   **Fixtures Pattern**: Use independent fixtures combined with `mergeTests` (following Liferay pattern)
--   **Fixtures Location**: `test/playwright/fixtures/`
--   **Available Fixtures**:
-    -   `loginTest()` - Provides `authenticatedPage` (function, call with `()`)
-    -   `projectTest` - Provides `project` (auto-creates and cleans up)
-    -   `workflowTest` - Provides `workflow` (requires `project` when merged)
-
-#### Fixtures Pattern
-
-**The `use` Hook**: Playwright fixtures use a `use` callback that:
-1. **Setup** (before `use`) - Creates resources
-2. **Test Execution** (during `use`) - Your test runs
-3. **Cleanup** (after `use`) - Automatically cleans up resources
+-   Location: `tests/e2e/`
+-   Use helpers from `tests/e2e/helpers/auth.ts` for authentication
+-   Pattern:
 
 ```typescript
-// Example fixture structure
-export const projectTest = base.extend({
-    project: async ({page}, use) => {
-        // SETUP: Create project
-        const project = await createProject(page);
-        
-        // GIVE TO TEST: Your test runs here
-        await use(project);
-        
-        // CLEANUP: Delete project (runs after test)
-        await projectsPage.deleteProject(project.id);
-    },
+import {test, expect} from '@playwright/test';
+import {login} from './helpers/auth';
+
+test('should login', async ({page}) => {
+    await login(page, 'user@example.com', 'password');
+    await expect(page).toHaveURL('/');
 });
 ```
-
-**Using Fixtures with `mergeTests`**:
-
-```typescript
-import {expect, mergeTests} from '@playwright/test';
-import {loginTest, projectTest, workflowTest} from '../../fixtures';
-
-// Combine fixtures at the top of your test file
-export const test = mergeTests(loginTest(), projectTest, workflowTest);
-
-test.describe('My Tests', () => {
-    test('my test', async ({authenticatedPage, project, workflow}) => {
-        // All fixtures are available:
-        // - authenticatedPage (from loginTest)
-        // - project (from projectTest)
-        // - workflow (from workflowTest)
-        
-        await authenticatedPage.goto(`/projects/${project.id}/workflows/${workflow.workflowId}`);
-        // Test logic here
-        // Fixtures automatically clean up after test
-    });
-});
-```
-
-**Common Patterns**:
-
-```typescript
-// Test needs only authentication
-export const test = mergeTests(loginTest());
-
-// Test needs project
-export const test = mergeTests(loginTest(), projectTest);
-
-// Test needs everything
-export const test = mergeTests(loginTest(), projectTest, workflowTest);
-```
-
-**Key Principles**:
--   Fixtures are **independent** - don't extend each other
--   Use `mergeTests` in test files to combine fixtures
--   `loginTest()` is a function - call it with `()`
--   Fixtures automatically clean up resources after tests
--   Each fixture provides specific fixtures (see table below)
-
-| Fixture | Provides | Requires |
-|---------|-----------|----------|
-| `loginTest()` | `authenticatedPage` | Nothing |
-| `projectTest` | `project` | `page` (auto-authenticated) |
-| `workflowTest` | `workflow` | `page` + `project` (when merged) |
 
 ## Common Utilities
 

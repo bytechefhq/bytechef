@@ -35,7 +35,7 @@ public class CodeWorkflowComponentHandler implements ComponentHandler {
                 .title("Code Workflow")
                 .description("Execute code workflow tasks.")
                 .icon("path:assets/code-workflow.svg")
-                .actions(CodeWorkflowPerformAction.of(codeWorkflowTaskExecutor)));
+                .actions(new CodeWorkflowPerformAction(codeWorkflowTaskExecutor).actionDefinition));
     }
 
     @Override

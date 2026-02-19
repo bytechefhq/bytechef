@@ -1,8 +1,7 @@
 ---
-title: "Dropbox"
-description: "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software."
+description: "Dropbox integration for ByteChef. Connect and automate with this service in your workflows. Learn how to implement this in your ByteChef automation."
+title: Dropbox
 ---
-
 
 Categories: File Storage
 
@@ -29,28 +28,6 @@ Version: 1
 | clientSecret | Client Secret | STRING |  | true |
 
 
-
-![anl-c-dropbox-md](https://static.scarf.sh/a.png?x-pxid=8999e724-f122-49be-a4bb-139c6576aec3)
-## Connection Setup
-
-Connect Dropbox to ByteChef using OAuth 2.0 (Authorization Code).
-
-### Create a Dropbox OAuth app
-
-1. Open the [App Console](https://www.dropbox.com/developers/apps). Click on **Create app**.
-2. In Choose an API, select Scoped access. Choose the type of access you need and enter a name for your app. Click **Create app**.
-3. Add the ByteChef OAuth redirect (callback) URL(s):
-    - Cloud: `https://app.bytechef.io/callback`
-    - Local development: `http://localhost:5173/callback`
-4. Click on **Show**.
-5. Copy the **App key** and **Secret**.
-6. Go to **Permissions** tab.
-7. Select scopes: `files.metadata.write`, `files.content.write` and `openId`.
-8. Click **Submit**.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/756fb792-9de7-4ac9-b58a-c8c8a95fab66?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
 
 
 
@@ -116,8 +93,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Create New Folder
 Name: createFolder
 
@@ -168,8 +143,6 @@ Type: OBJECT
   }
 }
 ```
-
-
 
 
 ### Create New Paper File
@@ -241,8 +214,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Delete
 Name: delete
 
@@ -295,8 +266,6 @@ Type: OBJECT
   }
 }
 ```
-
-
 
 
 ### Get File Link
@@ -355,8 +324,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### List Folder
 Name: listFolder
 
@@ -407,8 +374,6 @@ Type: OBJECT
   } ]
 }
 ```
-
-
 
 
 ### Move
@@ -467,8 +432,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Search
 Name: search
 
@@ -521,8 +484,6 @@ Type: OBJECT
   } ]
 }
 ```
-
-
 
 
 ### Upload File
@@ -601,11 +562,34 @@ Type: OBJECT
 
 
 
-
-
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+![anl-c-dropbox-md](https://static.scarf.sh/a.png?x-pxid=8999e724-f122-49be-a4bb-139c6576aec3)
+## Connection Setup
+
+Connect Dropbox to ByteChef using OAuth 2.0 (Authorization Code).
+
+### Create a Dropbox OAuth app
+
+1. Open the [App Console](https://www.dropbox.com/developers/apps). Click on **Create app**.
+2. In Choose an API, select Scoped access. Choose the type of access you need and enter a name for your app. Click **Create app**.
+3. Add the ByteChef OAuth redirect (callback) URL(s):
+    - Cloud: `https://app.bytechef.io/callback`
+    - Local development: `http://localhost:5173/callback`
+4. Click on **Show**.
+5. Copy the **App key** and **Secret**.
+6. Go to **Permissions** tab.
+7. Select scopes: `files.metadata.write`, `files.content.write` and `openId`.
+8. Click **Submit**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/756fb792-9de7-4ac9-b58a-c8c8a95fab66?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>

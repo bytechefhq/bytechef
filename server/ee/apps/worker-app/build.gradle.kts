@@ -14,7 +14,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-jms")
     implementation("org.springframework.boot:spring-boot-starter-kafka")
-    implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
@@ -40,17 +39,15 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-service"))
-    implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-service"))
     implementation(project(":server:libs:platform:platform-worker"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl"))
 
     run {
         rootProject.subprojects
             .asSequence()
             .filter { it.path.startsWith(":server:libs:modules:components") }
-            .filterNot { it.path in setOf(":server:libs:modules:components:data-stream", ":server:libs:modules:components:example") }
+            .filterNot { it.path in setOf(":server:libs:modules:components:ai:llm:amazon-bedrock", ":server:libs:modules:components:data-stream", ":server:libs:modules:components:example") }
             .sortedBy { it.path }
             .forEach { implementation(project(it.path)) }
     }
@@ -64,7 +61,6 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-remote-client"))
-    implementation(project(":server:ee:libs:automation:automation-data-table:automation-data-table-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-rest"))
 

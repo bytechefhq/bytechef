@@ -1,16 +1,18 @@
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {createRef} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import InviteUserDialog from '../InviteUserDialog';
+import InviteUserDialog, {InviteUserDialogRefI} from '../InviteUserDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
-        handleClose: vi.fn(),
-        handleEmailChange: vi.fn(),
-        handleInvite: vi.fn(),
-        handleRegeneratePassword: vi.fn(),
-        handleRoleChange: vi.fn(),
+        handleInviteUserDialogClose: vi.fn(),
+        handleInviteUserDialogInvite: vi.fn(),
+        handleInviteUserDialogOpen: vi.fn(),
+        handleInviteUserDialogRegeneratePassword: vi.fn(),
         mockUseInviteUserDialog: vi.fn(),
+        setInviteEmail: vi.fn(),
+        setInviteRole: vi.fn(),
     };
 });
 
@@ -20,17 +22,17 @@ vi.mock('../hooks/useInviteUserDialog', () => ({
 
 const defaultMockReturn = {
     authorities: ['ROLE_ADMIN', 'ROLE_USER'],
-    handleClose: hoisted.handleClose,
-    handleEmailChange: hoisted.handleEmailChange,
-    handleInvite: hoisted.handleInvite,
-    handleOpen: vi.fn(),
-    handleRegeneratePassword: hoisted.handleRegeneratePassword,
-    handleRoleChange: hoisted.handleRoleChange,
+    handleInviteUserDialogClose: hoisted.handleInviteUserDialogClose,
+    handleInviteUserDialogInvite: hoisted.handleInviteUserDialogInvite,
+    handleInviteUserDialogOpen: hoisted.handleInviteUserDialogOpen,
+    handleInviteUserDialogRegeneratePassword: hoisted.handleInviteUserDialogRegeneratePassword,
     inviteDisabled: false,
     inviteEmail: 'test@example.com',
     invitePassword: 'GeneratedPass1',
     inviteRole: 'ROLE_ADMIN',
     open: true,
+    setInviteEmail: hoisted.setInviteEmail,
+    setInviteRole: hoisted.setInviteRole,
 };
 
 beforeEach(() => {
@@ -44,7 +46,10 @@ afterEach(() => {
 });
 
 const renderInviteUserDialog = () => {
-    return render(<InviteUserDialog />);
+    const ref = createRef<InviteUserDialogRefI>();
+    const result = render(<InviteUserDialog ref={ref} />);
+
+    return {...result, ref};
 };
 
 describe('InviteUserDialog', () => {
@@ -95,31 +100,46 @@ describe('InviteUserDialog', () => {
         expect(screen.getByRole('button', {name: 'Regenerate'})).toBeInTheDocument();
     });
 
-    it('should call handleInvite when clicking Invite button', async () => {
+    it('should call handleInviteUserDialogInvite when clicking Invite button', async () => {
         renderInviteUserDialog();
 
         const inviteButton = screen.getByRole('button', {name: 'Invite'});
         await userEvent.click(inviteButton);
 
-        expect(hoisted.handleInvite).toHaveBeenCalledTimes(1);
+        expect(hoisted.handleInviteUserDialogInvite).toHaveBeenCalledTimes(1);
     });
 
-    it('should call handleRegeneratePassword when clicking Regenerate button', async () => {
+    it('should call handleInviteUserDialogRegeneratePassword when clicking Regenerate button', async () => {
         renderInviteUserDialog();
 
         const regenerateButton = screen.getByRole('button', {name: 'Regenerate'});
         await userEvent.click(regenerateButton);
 
-        expect(hoisted.handleRegeneratePassword).toHaveBeenCalledTimes(1);
+        expect(hoisted.handleInviteUserDialogRegeneratePassword).toHaveBeenCalledTimes(1);
     });
 
-    it('should call handleClose when clicking Cancel button', async () => {
+    it('should call handleInviteUserDialogClose when clicking Cancel button', async () => {
         renderInviteUserDialog();
 
         const cancelButton = screen.getByRole('button', {name: 'Cancel'});
         await userEvent.click(cancelButton);
 
-        expect(hoisted.handleClose).toHaveBeenCalled();
+        expect(hoisted.handleInviteUserDialogClose).toHaveBeenCalled();
+    });
+
+    it('should expose open method via ref', () => {
+        const {ref} = renderInviteUserDialog();
+
+        expect(ref.current).not.toBeNull();
+        expect(typeof ref.current?.open).toBe('function');
+    });
+
+    it('should call handleInviteUserDialogOpen when open method is called via ref', () => {
+        const {ref} = renderInviteUserDialog();
+
+        ref.current?.open();
+
+        expect(hoisted.handleInviteUserDialogOpen).toHaveBeenCalled();
     });
 
     it('should display password value', () => {
@@ -143,17 +163,17 @@ describe('InviteUserDialog closed state', () => {
     beforeEach(() => {
         hoisted.mockUseInviteUserDialog.mockReturnValue({
             authorities: ['ROLE_ADMIN', 'ROLE_USER'],
-            handleClose: hoisted.handleClose,
-            handleEmailChange: hoisted.handleEmailChange,
-            handleInvite: hoisted.handleInvite,
-            handleOpen: vi.fn(),
-            handleRegeneratePassword: hoisted.handleRegeneratePassword,
-            handleRoleChange: hoisted.handleRoleChange,
+            handleInviteUserDialogClose: hoisted.handleInviteUserDialogClose,
+            handleInviteUserDialogInvite: hoisted.handleInviteUserDialogInvite,
+            handleInviteUserDialogOpen: hoisted.handleInviteUserDialogOpen,
+            handleInviteUserDialogRegeneratePassword: hoisted.handleInviteUserDialogRegeneratePassword,
             inviteDisabled: true,
             inviteEmail: '',
             invitePassword: 'GeneratedPass1',
             inviteRole: null,
             open: false,
+            setInviteEmail: hoisted.setInviteEmail,
+            setInviteRole: hoisted.setInviteRole,
         });
     });
 
@@ -168,17 +188,17 @@ describe('InviteUserDialog inviteDisabled state', () => {
     beforeEach(() => {
         hoisted.mockUseInviteUserDialog.mockReturnValue({
             authorities: ['ROLE_ADMIN', 'ROLE_USER'],
-            handleClose: hoisted.handleClose,
-            handleEmailChange: hoisted.handleEmailChange,
-            handleInvite: hoisted.handleInvite,
-            handleOpen: vi.fn(),
-            handleRegeneratePassword: hoisted.handleRegeneratePassword,
-            handleRoleChange: hoisted.handleRoleChange,
+            handleInviteUserDialogClose: hoisted.handleInviteUserDialogClose,
+            handleInviteUserDialogInvite: hoisted.handleInviteUserDialogInvite,
+            handleInviteUserDialogOpen: hoisted.handleInviteUserDialogOpen,
+            handleInviteUserDialogRegeneratePassword: hoisted.handleInviteUserDialogRegeneratePassword,
             inviteDisabled: true,
             inviteEmail: '',
             invitePassword: 'GeneratedPass1',
             inviteRole: 'ROLE_ADMIN',
             open: true,
+            setInviteEmail: hoisted.setInviteEmail,
+            setInviteRole: hoisted.setInviteRole,
         });
     });
 

@@ -16,7 +16,6 @@
 
 package com.bytechef.ai.mcp.tool.platform;
 
-import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
@@ -34,13 +33,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Marko Kriskovic
  */
 @Component
-@ConditionalOnAiEnabled
+@ConditionalOnProperty(name = "bytechef.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
 public class TaskDispatcherTools {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDispatcherTools.class);

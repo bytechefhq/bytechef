@@ -31,12 +31,13 @@ export const useActivateStore = create<ActivateI>()(
             loading: false,
 
             activate: async (key: string | null) => {
-                if (get().loading || get().activationSuccess) {
+                if (get().loading) {
                     return;
                 }
 
                 set((state) => ({
                     ...state,
+                    activationSuccess: false,
                     activationFailure: false,
                     loading: true,
                 }));

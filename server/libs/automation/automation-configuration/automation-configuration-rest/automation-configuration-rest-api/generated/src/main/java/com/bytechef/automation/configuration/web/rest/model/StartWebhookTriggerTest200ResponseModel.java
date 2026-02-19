@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("startWebhookTriggerTest_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-02-03T18:13:00.110740+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-05T14:11:26.033736+01:00[Europe/Ljubljana]", comments = "Generator version: 7.18.0")
 public class StartWebhookTriggerTest200ResponseModel {
 
   private @Nullable String webhookUrl;
@@ -76,7 +76,7 @@ public class StartWebhookTriggerTest200ResponseModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(@Nullable Object o) {
+  private String toIndentedString(Object o) {
     if (o == null) {
       return "null";
     }

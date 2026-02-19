@@ -30,40 +30,6 @@ Version: 1
 
 
 
-## Connection Setup
-
-Follow these steps to connect Jira Cloud to ByteChef using OAuth 2.0.
-
-1. Open the Atlassian Developer Console: https://developer.atlassian.com/console/
-2. Sign in with your Atlassian account (create one if needed).
-3. Click **Create** and choose **OAuth 2.0 integration**.
-4. Enter the app details (e.g., App name: "ByteChef Jira Integration") and accept Atlassian's developer terms, then click **Create**.
-5. Click on **Permissions**.
-6. Find Jira API and click **Add** and then click **Configure**.
-7. Configure permissions (scopes):
-   - In the Permissions tab, add the following scopes required by ByteChef Jira component:
-     - manage:jira-webhook
-     - read:jira-work
-     - write:jira-work
-     - read:jira-user
-   - You can adjust scopes later if your workflows need more/less access.
-
-8. Configure a redirect (callback) URL:
-   - Go to the **Authorization** tab and add the Callback URL:
-        - `https://app.bytechef.io/callback` (Cloud)
-        - `http://127.0.0.1:5173/callback` (Local dev)
-
-9. Retrieve credentials:
-   - Open the **Settings** page of your app and copy the **Client ID** and **Client Secret**.
-
-Notes:
-
-- Jira Cloud only: This connection uses Atlassian Cloud APIs. After consent, ByteChef automatically discovers the correct Jira site base URL.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/F5ZSvN2vE0Hbv1eRg6eM?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
-
 
 
 <hr />
@@ -102,8 +68,6 @@ Name: assignIssue
 #### Output
 
 This action does not produce any output.
-
-
 
 
 
@@ -169,8 +133,6 @@ Type: OBJECT
   "self" : ""
 }
 ```
-
-
 
 
 ### Create Issue Comment
@@ -252,50 +214,6 @@ Type: OBJECT
 ```
 
 
-
-
-### Edit Issue
-Name: editIssue
-
-`Edits an issue.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | ID of the project where the issue is located. | false |
-| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue. | true |
-| summary | Summary | STRING | The summary that will be edited. | false |
-| description | Description | STRING | The description that will be edited. | false |
-| addLabels | Add Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of labels that will be added to the issue. | false |
-| removeLabels | Remove Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of labels that will be removed from the issue. | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Edit Issue",
-  "name" : "editIssue",
-  "parameters" : {
-    "project" : "",
-    "issueId" : "",
-    "summary" : "",
-    "description" : "",
-    "addLabels" : [ "" ],
-    "removeLabels" : [ "" ]
-  },
-  "type" : "jira/v1/editIssue"
-}
-```
-
-#### Output
-
-This action does not produce any output.
-
-
-
-
-
-
 ### Get Issue
 Name: getIssue
 
@@ -367,8 +285,6 @@ Type: OBJECT
   }
 }
 ```
-
-
 
 
 ### List Issue Comments
@@ -451,8 +367,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Search Issues
 Name: searchForIssuesUsingJql
 
@@ -501,44 +415,6 @@ Items Type: OBJECT
   "id" : ""
 } ]
 ```
-
-
-
-
-### Transition Issue
-Name: transitionIssue
-
-`Move an issue to another status.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | ID of the project where the issue is located. | false |
-| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue to be assigned. | true |
-| statusId | Status ID | STRING <details> <summary> Depends On </summary> issueId </details> | ID of the status you want to put the issue in. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Transition Issue",
-  "name" : "transitionIssue",
-  "parameters" : {
-    "project" : "",
-    "issueId" : "",
-    "statusId" : ""
-  },
-  "type" : "jira/v1/transitionIssue"
-}
-```
-
-#### Output
-
-This action does not produce any output.
-
-
-
-
 
 
 
@@ -593,7 +469,6 @@ Type: OBJECT
 ```
 
 
-
 ### Updated Issue
 Name: updatedIssue
 
@@ -644,10 +519,46 @@ Type: OBJECT
 
 
 
-
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+Follow these steps to connect Jira Cloud to ByteChef using OAuth 2.0.
+
+1. Open the Atlassian Developer Console: https://developer.atlassian.com/console/
+2. Sign in with your Atlassian account (create one if needed).
+3. Click **Create** and choose **OAuth 2.0 integration**.
+4. Enter the app details (e.g., App name: "ByteChef Jira Integration") and accept Atlassian's developer terms, then click **Create**.
+5. Click on **Permissions**.
+6. Find Jira API and click **Add** and then click **Configure**.
+7. Configure permissions (scopes):
+   - In the Permissions tab, add the following scopes required by ByteChef Jira component:
+     - manage:jira-webhook
+     - read:jira-work
+     - write:jira-work
+     - read:jira-user
+   - You can adjust scopes later if your workflows need more/less access.
+
+8. Configure a redirect (callback) URL:
+   - Go to the **Authorization** tab and add the Callback URL:
+        - `https://app.bytechef.io/callback` (Cloud)
+        - `http://127.0.0.1:5173/callback` (Local dev)
+
+9. Retrieve credentials:
+   - Open the **Settings** page of your app and copy the **Client ID** and **Client Secret**.
+
+Notes:
+
+- Jira Cloud only: This connection uses Atlassian Cloud APIs. After consent, ByteChef automatically discovers the correct Jira site base URL.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/F5ZSvN2vE0Hbv1eRg6eM?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>

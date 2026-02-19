@@ -33,8 +33,6 @@ public interface ProjectDeploymentWorkflowService {
 
     void delete(long id);
 
-    void deleteProjectDeploymentWorkflowConnection(long connectionId);
-
     @Transactional(readOnly = true)
     Optional<ProjectDeploymentWorkflow> fetchProjectDeploymentWorkflow(long projectDeploymentId, String workflowId);
 

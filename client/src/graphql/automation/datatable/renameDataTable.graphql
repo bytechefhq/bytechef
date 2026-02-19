@@ -1,3 +1,0 @@
-mutation renameDataTable($input: RenameDataTableInput!) {
-    renameDataTable(input: $input)
-}

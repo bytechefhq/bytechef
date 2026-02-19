@@ -151,7 +151,7 @@ export default function WorkflowEdge({
                                 'flex cursor-pointer items-center justify-center rounded transition-all',
                                 isDropzoneActive
                                     ? 'size-16 border-2 border-blue-100 bg-blue-100'
-                                    : 'size-6 border-2 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
+                                    : 'size-6 border-2 border-gray-300 bg-white hover:scale-110 hover:border-gray-400'
                             )}
                             id={`${id}-button`}
                             onDragEnter={() => setDropzoneActive(true)}

@@ -20,8 +20,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.web.rest.model.CreateProjectWorkflow200ResponseModel;
-import com.bytechef.automation.configuration.web.rest.model.DuplicateWorkflow200ResponseModel;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.web.rest.AbstractWorkflowApiController;
@@ -60,13 +58,10 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
-    public ResponseEntity<CreateProjectWorkflow200ResponseModel> createProjectWorkflow(
-        Long id, WorkflowModel workflowModel) {
-
+    public ResponseEntity<Long> createProjectWorkflow(Long id, WorkflowModel workflowModel) {
         ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(id, workflowModel.getDefinition());
 
-        return ResponseEntity.ok(
-            new CreateProjectWorkflow200ResponseModel().projectWorkflowId(projectWorkflow.getId()));
+        return ResponseEntity.ok(projectWorkflow.getId());
     }
 
     @Override
@@ -78,10 +73,8 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
-    public ResponseEntity<DuplicateWorkflow200ResponseModel> duplicateWorkflow(Long id, String workflowId) {
-        return ResponseEntity.ok(
-            new DuplicateWorkflow200ResponseModel().workflowId(
-                projectWorkflowFacade.duplicateWorkflow(id, workflowId)));
+    public ResponseEntity<String> duplicateWorkflow(Long id, String workflowId) {
+        return ResponseEntity.ok(projectWorkflowFacade.duplicateWorkflow(id, workflowId));
     }
 
     @GetMapping("/workflows/{id}/export")

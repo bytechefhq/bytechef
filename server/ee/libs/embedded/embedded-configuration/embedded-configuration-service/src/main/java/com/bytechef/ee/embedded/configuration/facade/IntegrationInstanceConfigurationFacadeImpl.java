@@ -15,6 +15,7 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -762,17 +763,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfiguration.getIntegrationVersion());
     }
 
-    private Instant getJobEndDate(Long jobId) {
-        Job job = jobService.getJob(jobId);
-
-        return job.getEndDate();
-    }
-
-    private Instant getWorkflowLastExecutionDate(long integrationInstanceConfigurationId, List<String> workflowIds) {
-        return principalJobService.fetchLastWorkflowJobId(
-            integrationInstanceConfigurationId, workflowIds, PlatformType.EMBEDDED)
-            .map(this::getJobEndDate)
-            .orElse(null);
+    private Instant getWorkflowLastExecutionDate(List<String> workflowIds) {
+        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowIds), Job::getEndDate, null);
     }
 
     private String getWorkflowUuid(
@@ -843,8 +835,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
                     return new IntegrationInstanceConfigurationWorkflowDTO(
                         integrationInstanceConfigurationWorkflow,
-                        getWorkflowLastExecutionDate(
-                            integrationInstanceConfiguration.getId(), workflowUuidWorkflowIds),
+                        getWorkflowLastExecutionDate(workflowUuidWorkflowIds),
                         workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId()),
                         workflowUuid);
                 }),

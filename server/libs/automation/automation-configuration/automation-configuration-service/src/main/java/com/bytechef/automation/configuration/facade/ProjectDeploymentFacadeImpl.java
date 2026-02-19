@@ -67,7 +67,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,8 +101,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     @SuppressFBWarnings("EI")
     public ProjectDeploymentFacadeImpl(
         ConnectionService connectionService, Evaluator evaluator, EnvironmentService environmentService,
-        PrincipalJobFacade principalJobFacade, PrincipalJobService principalJobService, JobFacade jobFacade,
-        JobService jobService, ProjectDeploymentService projectDeploymentService,
+        PrincipalJobFacade principalJobFacade,
+        PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
@@ -649,8 +649,6 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
-        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
-            projectDeploymentWorkflow.getProjectDeploymentId());
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
@@ -667,7 +665,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 workflow.getId(), workflowExecutionId, workflowNodeType,
                 workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
                 getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger),
-                getWebhookUrl(workflowExecutionId), projectDeployment.getEnvironmentId());
+                getWebhookUrl(workflowExecutionId));
         }
     }
 
@@ -678,7 +676,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         int pageNumber = 0;
 
         while (true) {
-            Page<Long> page = principalJobService.getJobIds(
+            org.springframework.data.domain.Page<Long> page = principalJobService.getJobIds(
                 Job.Status.STARTED, null, null, principalIds, PlatformType.AUTOMATION, workflowIds, pageNumber);
 
             List<Long> jobIds = page.getContent();
@@ -797,9 +795,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return webhookUrl.replace("{id}", workflowExecutionId.toString());
     }
 
-    private Instant getWorkflowLastExecutionDate(long projectDeploymentId, List<String> workflowIds) {
-        return principalJobService.fetchLastWorkflowJobId(projectDeploymentId, workflowIds, PlatformType.AUTOMATION)
-            .map(this::getJobEndDate)
+    private Instant getWorkflowLastExecutionDate(List<String> workflowIds) {
+        return jobService.fetchLastWorkflowJob(workflowIds)
+            .map(Job::getEndDate)
             .orElse(null);
     }
 
@@ -830,7 +828,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         return new ProjectDeploymentWorkflowDTO(
             projectDeploymentWorkflow,
-            getWorkflowLastExecutionDate(projectDeployment.getId(), workflowUuidWorkflowIds),
+            getWorkflowLastExecutionDate(workflowUuidWorkflowIds),
             getStaticWebhookUrl(
                 projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectDeploymentWorkflow.getWorkflowId()),

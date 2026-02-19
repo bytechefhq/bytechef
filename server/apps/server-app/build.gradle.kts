@@ -51,18 +51,9 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-instance-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
-    implementation(project(":server:libs:automation:automation-data-table:automation-data-table-graphql"))
-    implementation(project(":server:libs:automation:automation-data-table:automation-data-table-service"))
     implementation(project(":server:libs:automation:automation-execution:automation-execution-service"))
-    implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-file-storage:automation-knowledge-base-file-storage-impl"))
-    implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-graphql"))
-    implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-rest"))
-    implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-service"))
-    implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-worker"))
     implementation(project(":server:libs:automation:automation-mcp:automation-mcp-graphql"))
     implementation(project(":server:libs:automation:automation-mcp:automation-mcp-service"))
-    implementation(project(":server:libs:automation:automation-search:automation-search-graphql"))
-    implementation(project(":server:libs:automation:automation-search:automation-search-service"))
     implementation(project(":server:libs:automation:automation-swagger"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-rest"))
@@ -93,12 +84,9 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
     implementation(project(":server:libs:core:rest:rest-impl"))
-    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:core:tenant:tenant-single-service"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-service"))
-    implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-graphql"))
-    implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-service"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-graphql"))
@@ -129,14 +117,13 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl"))
 
     run {
         rootProject.subprojects
             .asSequence()
             .filter { it.path.startsWith(":server:libs:modules:components") }
-            .filterNot { it.path in setOf(":server:libs:modules:components:example") }
+            .filterNot { it.path in setOf(":server:libs:modules:components:ai:llm:amazon-bedrock", ":server:libs:modules:components:example") }
             .sortedBy { it.path }
             .forEach { implementation(project(it.path)) }
     }
@@ -165,8 +152,6 @@ dependencies {
     implementation(project(":server:ee:libs:config:cloud-config"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
-    implementation(project(":server:ee:libs:config:tenant-multi-knowledge-base-config"))
-    implementation(project(":server:ee:libs:config:tenant-multi-pgvector-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-security-config"))
     implementation(project(":server:ee:libs:core:cloud:cloud-aws"))
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-api"))
@@ -194,7 +179,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))
-    implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-graphql"))
+    implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-rest"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-handler"))
@@ -204,8 +189,8 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-rest"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-handler"))
+    implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-public-rest"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-rest"))
-    implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-graphql"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-file-storage:platform-custom-component-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-aws"))
@@ -225,15 +210,7 @@ dependencies {
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
 
-    testImplementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-automation-impl"))
-    testImplementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-platform"))
     testImplementation(project(":server:libs:test:test-int-support"))
-    testImplementation(project(":server:libs:core:tenant:tenant-api"))
-    testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
-    testImplementation("org.springframework.boot:spring-boot-jdbc")
-    testImplementation("org.testcontainers:testcontainers")
-    testImplementation("org.testcontainers:postgresql")
-    testImplementation("org.testcontainers:junit-jupiter")
 }
 
 configure<com.gorylenko.GitPropertiesPluginExtension> {

@@ -1,3 +1,0 @@
-mutation cancelGenerationJob($jobId: String!) {
-    cancelGenerationJob(jobId: $jobId)
-}

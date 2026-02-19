@@ -1,8 +1,7 @@
 ---
-title: "Google Forms"
-description: "Google Forms is a web-based application that allows users to create surveys, quizzes, and forms for data collection and analysis, with real-time collaboration and response tracking."
+description: "Google Forms component for ByteChef. Surveys and questionnaires. Learn how to implement this in your ByteChef workflows."
+title: Google Forms
 ---
-
 
 Categories: Surveys and Feedback
 
@@ -29,25 +28,6 @@ Version: 1
 | clientSecret | Client Secret | STRING |  | true |
 
 
-
-## Connection Setup
-
-### Create OAuth 2.0 Application
-
-Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
-
-### Enable Google Forms API
-
-1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
-2. Go to the **APIs & Services**.
-3. Click on **ENABLE APIS AND SERVICES**.
-4. Search for "google forms api" in the search bar.
-5. Click on **Google Forms API**.
-6. Click **Enable**.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/6O0wffw3j1b6d9hcAxOy?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
 
 
 
@@ -87,8 +67,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
-
 ### Get Form
 Name: getForm
 
@@ -115,8 +93,6 @@ Name: getForm
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -149,8 +125,6 @@ Name: getResponse
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -192,7 +166,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
@@ -202,6 +175,25 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+## Connection Setup
+
+### Create OAuth 2.0 Application
+
+Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
+
+### Enable Google Forms API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Go to the **APIs & Services**.
+3. Click on **ENABLE APIS AND SERVICES**.
+4. Search for "google forms api" in the search bar.
+5. Click on **Google Forms API**.
+6. Click **Enable**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/6O0wffw3j1b6d9hcAxOy?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
 
 ## Troubleshooting
 

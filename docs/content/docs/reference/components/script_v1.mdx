@@ -1,8 +1,7 @@
 ---
-title: "Script"
-description: "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages."
+description: "Script component for ByteChef. Execute custom code. Learn how to implement this in your ByteChef workflows."
+title: Script
 ---
-
 
 Categories: Helpers, Developer Tools
 
@@ -49,8 +48,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
-
 ### Python
 Name: python
 
@@ -83,42 +80,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
-
-### R
-Name: r
-
-`Executes custom R code.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Initialize parameter values used in the custom code. | false |
-| script | R Code | STRING | Add your R custom logic here. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "R",
-  "name" : "r",
-  "parameters" : {
-    "input" : { },
-    "script" : ""
-  },
-  "type" : "script/v1/r"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
 ### Ruby
 Name: ruby
 
@@ -147,42 +108,6 @@ Name: ruby
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-### Java
-Name: java
-
-`Executes custom Java code.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Initialize parameter values used in the custom code. | false |
-| script | Java Code | STRING | Add your Java custom logic here. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Java",
-  "name" : "java",
-  "parameters" : {
-    "input" : { },
-    "script" : ""
-  },
-  "type" : "script/v1/java"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
 
 
 
@@ -232,7 +157,7 @@ function perform(input, context) {
 }
 ```
 
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/a905b8d2-66d0-4d0d-82fb-46c11117c688?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0">
     </iframe></div>
 
@@ -257,6 +182,6 @@ function perform(input, context) {
 }
 ```
 
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
 <iframe src="https://www.guidejar.com/embed/6ec7275a-fbd9-4bd9-b97b-1c1a460acd9a?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0">
 </iframe></div>

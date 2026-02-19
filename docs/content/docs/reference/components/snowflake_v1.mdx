@@ -1,8 +1,7 @@
 ---
-title: "Snowflake"
-description: "Snowflake enables organizations to collaborate, build AI-powered data apps, and unlock data insights—all within a secure and scalable AI Data Cloud."
+description: "Snowflake component for ByteChef. Cloud data warehouse. Learn how to implement this in your ByteChef workflows."
+title: Snowflake
 ---
-
 
 Categories: Analytics
 
@@ -30,53 +29,6 @@ Version: 1
 | clientSecret | Client Secret | STRING | Snowflake OAuth Client Secret. | true |
 
 
-
-## Connection Setup
-
-### Find Account Identifier
-
-1. Navigate to your Snowflake dashboard.
-2. Click on your account in the lower left corner.
-3. Click on **View account details**.
-4. Here you can find your **Account Identifier**.
-
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/c86bcbbd-5131-45b3-84a9-2262104ba169?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
-</div>
-
-
-### Create Security Integration
-
-1. Navigate to your Snowflake dashboard.
-2. Click on **Worksheets**.
-3. Click on **+** to create SQL worksheet.
-4. Paste this into worksheet, just change NAME to the name of your security integration:
-        CREATE SECURITY INTEGRATION NAME
-        TYPE = oauth
-        ENABLED = true
-        OAUTH_CLIENT = custom
-        OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
-        OAUTH_REDIRECT_URI = 'http://127.0.0.1:5173/callback'
-        OAUTH_ISSUE_REFRESH_TOKENS = TRUE
-        OAUTH_ALLOW_NON_TLS_REDIRECT_URI = true
-        OAUTH_REFRESH_TOKEN_VALIDITY = 86400;
-5. Click on this icon.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/bed6729c-aaa5-4b8b-9901-0ef8f849d6f2?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
-</div>
-
-### Find Client ID and Secret
-
-https://docs.snowflake.com/sql-reference/functions/system_show_oauth_client_secrets
-
-1. Navigate to your Snowflake dashboard.
-2. Click on **Worksheets**.
-3. Click on **+** to create SQL worksheet.
-4. Paste this into worksheet, just change NAME to the name of your security integration:
-        select system$show_oauth_client_secrets(NAME)
-5. Run SQL worksheet.
 
 
 
@@ -160,8 +112,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Execute SQL
 Name: executeSql
 
@@ -228,8 +178,6 @@ Type: OBJECT
   "stats" : [ ]
 }
 ```
-
-
 
 
 ### Insert Row
@@ -304,8 +252,6 @@ Type: OBJECT
   "stats" : [ ]
 }
 ```
-
-
 
 
 ### Update Row
@@ -386,5 +332,53 @@ Type: OBJECT
 
 
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Find Account Identifier
+
+1. Navigate to your Snowflake dashboard.
+2. Click on your account in the lower left corner.
+3. Click on **View account details**.
+4. Here you can find your **Account Identifier**.
 
 
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/c86bcbbd-5131-45b3-84a9-2262104ba169?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
+
+
+### Create Security Integration
+
+1. Navigate to your Snowflake dashboard.
+2. Click on **Worksheets**.
+3. Click on **+** to create SQL worksheet.
+4. Paste this into worksheet, just change NAME to the name of your security integration:
+        CREATE SECURITY INTEGRATION NAME
+        TYPE = oauth
+        ENABLED = true
+        OAUTH_CLIENT = custom
+        OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+        OAUTH_REDIRECT_URI = 'http://127.0.0.1:5173/callback'
+        OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+        OAUTH_ALLOW_NON_TLS_REDIRECT_URI = true
+        OAUTH_REFRESH_TOKEN_VALIDITY = 86400;
+5. Click on this icon.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/bed6729c-aaa5-4b8b-9901-0ef8f849d6f2?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
+
+### Find Client ID and Secret
+
+https://docs.snowflake.com/sql-reference/functions/system_show_oauth_client_secrets
+
+1. Navigate to your Snowflake dashboard.
+2. Click on **Worksheets**.
+3. Click on **+** to create SQL worksheet.
+4. Paste this into worksheet, just change NAME to the name of your security integration:
+        select system$show_oauth_client_secrets(NAME)
+5. Run SQL worksheet.

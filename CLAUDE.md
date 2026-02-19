@@ -75,15 +75,15 @@ docker compose -f docker-compose.dev.server.yml up -d
 ## Architecture Overview
 
 ### Core Technology Stack
-- **Backend**: Java 25 with Spring Boot 4.0.2
-- **Frontend**: React 19.2 with TypeScript 5.9, Vite 7.3, TailwindCSS 3.4
+- **Backend**: Java 25 with Spring Boot 3.5.7
+- **Frontend**: React 19.2 with TypeScript 5.9, Vite 7.2, TailwindCSS 3.4
 - **Database**: PostgreSQL 15+ with Liquibase migrations
 - **Message Broker**: Memory(default), Redis, RabbitMQ, Kafka, JMS, AMQP, AWS SQS
 - **Build System**: Gradle 8+ with Kotlin DSL
 - **Code Execution**: GraalVM Polyglot 25.0.1 (Java, JavaScript, Python, Ruby)
 - **Testing**: JUnit 5, Vitest 4, Testcontainers
 - **Node.js**: Version 20.19+ required for client development
-- **Additional Tools**: MapStruct 1.6.3, Jackson 2.19.2, SpringDoc OpenAPI 3.0.0
+- **Additional Tools**: MapStruct 1.6.3, Jackson 2.19.2, SpringDoc OpenAPI 2.8.14
 
 ### Main Server Module Structure
 
@@ -95,14 +95,10 @@ docker compose -f docker-compose.dev.server.yml up -d
     - `atlas-configuration/` - Workflow configuration management
 
 - **`automation/`** - iPaaS automation implementation
-    - `automation-ai/` - AI-powered automation features
     - `automation-configuration/` - Project and workflow configuration
-    - `automation-data-table/` - Data table management
-    - `automation-execution/` - Workflow execution services
-    - `automation-knowledge-base/` - Knowledge base integration
-    - `automation-mcp/` - MCP (Model Context Protocol) integration
-    - `automation-task/` - Task management services
+    - `automation-connection/` - Connection management
     - `automation-workflow/` - Workflow coordination and execution
+    - `automation-task/` - Task management services
 
 - **`platform/`** - Core infrastructure services
     - `platform-component/` - Component definition and management
@@ -194,12 +190,6 @@ public class ExampleComponentHandler implements ComponentHandler {
 
 ## Code Style and Best Practices
 
-### Client ESLint sort-keys Rule
-- Object keys must be in natural ascending (alphabetical) order in client code
-- Applies to mock objects, hoisted state, test data, and component props
-- ESLint `--fix` does NOT auto-fix sort-keys - must be fixed manually
-- Example: `{content: 'x', id: 'y'}` not `{id: 'y', content: 'x'}`
-
 ### Variable Naming
 - Do not use short or cryptic variable names on both the server and client sides; prefer clear, descriptive names that communicate intent.
 - This applies everywhere, including arrow function parameters and loop variables.
@@ -218,28 +208,6 @@ public class ExampleComponentHandler implements ComponentHandler {
   // Good
   for (Order order : orders) { ... }
   ```
-
-### Lucide Icon Imports (Client)
-- Always import icons with the `Icon` suffix: `SearchIcon`, `DatabaseIcon`, `Loader2Icon`
-- Not: `Search`, `Database`, `Loader2`
-
-### CSS Class Merging (Client)
-- Use `twMerge` from `tailwind-merge` for conditional class merging
-- Do not use `cn()` utility
-
-### React Patterns (Client)
-- Use `fieldset` (with `border-0`) for semantic form grouping instead of `div`
-- Replace nested ternary operators with render functions (e.g., `renderTrigger()`)
-- Use `useMemo` for computed values instead of IIFEs in JSX
-- Prefer `||` over `??` for JSX fallbacks (e.g., `trigger || defaultTrigger`)
-
-### GraphQL Conventions
-- Enum values must use SCREAMING_SNAKE_CASE (e.g., `DELETE`, `GET`, `QUERY`, `PATH`)
-- Consistent with HttpMethod and other enums in `*.graphqls` files
-
-### ID Generation
-- Avoid `hashCode()` for generating unique identifiers (collision risk)
-- Prefer SHA-256 with first 8 bytes for deterministic long IDs, or UUID for true uniqueness
 
 ### Blank Line Before Control Statements (Java)
 - Insert exactly one empty line before control statements to improve visual separation of logic:
@@ -269,21 +237,6 @@ public class ExampleComponentHandler implements ComponentHandler {
   }
   ```
 
-### Blank Line After Variable Modification (Java)
-- Insert exactly one empty line between a variable modification and a subsequent statement that uses that variable
-- This improves readability by visually separating the setup from the usage
-- Example:
-  ```java
-  // Bad
-  document.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
-  knowledgeBaseDocumentService.saveKnowledgeBaseDocument(document);
-
-  // Good
-  document.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
-
-  knowledgeBaseDocumentService.saveKnowledgeBaseDocument(document);
-  ```
-
 ### Method Chaining
 - Do not chain method calls except where this is natural and idiomatic
 - Allowed exceptions (non-exhaustive):
@@ -305,21 +258,6 @@ public class ExampleComponentHandler implements ComponentHandler {
   - Break each chained step onto its own line for readability when there are 3+ operations or lines exceed the limit
   - Keep declarative chains (queries, reactive pipelines) as one logical block; prefer one operation per line
   - Avoid chaining when side effects are involved or intermediate values deserve names for clarity/debugging
-
-### Code Quality Tool Patterns
-
-**SpotBugs**:
-- Don't use rough approximations of known constants (e.g., use `Math.PI` instead of `3.14`)
-- Always check return values of methods like `CountDownLatch.await(long, TimeUnit)` - returns boolean
-- Use try-with-resources for `Connection` objects to avoid resource leaks
-- Catch specific exceptions (`SQLException`) instead of generic `Exception` when possible
-
-**PMD**:
-- Use `@SuppressWarnings("PMD.UnusedFormalParameter")` for interface-required but unused parameters
-- Don't qualify static method calls with the class name when already inside that class (e.g., `builder()` not `ClassName.builder()`)
-
-**Checkstyle**:
-- Test method names must be camelCase without underscores (e.g., `testExecuteSuccess` not `testExecute_Success`)
 
 ### Spring Boot Best Practices
 
@@ -491,10 +429,6 @@ ByteChef includes a CLI tool for scaffolding components:
 cd cli
 ./gradlew :cli-app:bootRun --args="component init openapi --name=my-component --openapi-path=/path/to/openapi.yaml"
 ```
-
-### Resolving PR Review Comments
-- Use `gh api graphql` with `resolveReviewThread` mutation to close threads programmatically
-- Get thread IDs via: `gh api graphql -f query='{ repository(owner: "X", name: "Y") { pullRequest(number: N) { reviewThreads(first: 20) { nodes { id isResolved path } } } }'`
 
 ## Build and Deployment
 
@@ -775,8 +709,8 @@ tail -f server/apps/server-app/build/logs/application.log
 
 **Gradle Build Optimization**
 - Gradle JVM is configured with 4GB heap in `gradle.properties`
-- Parallel builds are enabled by default
-- Build cache is enabled by default
+- Parallel builds are disabled by default but can be enabled
+- Use build cache: `./gradlew --build-cache build`
 - Use configuration cache: `./gradlew --configuration-cache build`
 - Gradle daemon runs by default for faster subsequent builds
 

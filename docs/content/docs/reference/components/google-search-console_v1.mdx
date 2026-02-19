@@ -1,8 +1,7 @@
 ---
-title: "Google Search Console"
-description: "The Search Console API provides access to both Search Console data (verified users only) and to public information on an URL basis (anyone)."
+description: "Google Search Console component for ByteChef. Monitor search performance and SEO analytics in workflows."
+title: Google Search Console
 ---
-
 
 Categories: Productivity and Collaboration
 
@@ -29,26 +28,6 @@ Version: 1
 | clientSecret | Client Secret | STRING |  | true |
 
 
-
-## Connection Setup
-
-### Create OAuth 2.0 Application
-
-Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
-
-### Enable Google Search Console API
-
-1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
-2. Go to the **APIs & Services**.
-3. Click on **ENABLE APIS AND SERVICES**.
-4. Search for "google search console api" in the search bar.
-5. Click on **Google Search Console API**.
-6. Click **Enable**.
-
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/AQ8Q5FVSFi5jj3NasPXz?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
 
 
 
@@ -99,8 +78,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Delete Site
 Name: deleteSite
 
@@ -127,8 +104,6 @@ Name: deleteSite
 #### Output
 
 This action does not produce any output.
-
-
 
 
 
@@ -182,8 +157,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Add Site
 Name: addSite
 
@@ -210,8 +183,6 @@ Name: addSite
 #### Output
 
 This action does not produce any output.
-
-
 
 
 
@@ -296,8 +267,6 @@ Type: OBJECT
 
 
 
-
-
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
@@ -307,6 +276,26 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+## Connection Setup
+
+### Create OAuth 2.0 Application
+
+Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
+
+### Enable Google Search Console API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Go to the **APIs & Services**.
+3. Click on **ENABLE APIS AND SERVICES**.
+4. Search for "google search console api" in the search bar.
+5. Click on **Google Search Console API**.
+6. Click **Enable**.
+
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/AQ8Q5FVSFi5jj3NasPXz?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
 
 ## Troubleshooting
 

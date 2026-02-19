@@ -1,6 +1,5 @@
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import {TabValueType} from '@/shared/types';
 
 export interface TaskTreeItemProps {
     children: TaskTreeItemProps[];
@@ -113,7 +112,7 @@ export const getInitialSelectedItem = (
 interface GetDisplayValueProps {
     job: Job;
     selectedItem: TaskExecution | TriggerExecution | undefined;
-    tab: TabValueType;
+    tab: 'input' | 'output' | 'error';
     triggerExecution?: TriggerExecution;
 }
 
@@ -171,11 +170,6 @@ export const hasDialogContentValue = ({job, selectedItem, tab, triggerExecution}
         const displayValue = getDisplayValue({job, selectedItem, tab, triggerExecution});
 
         return hasValue(displayValue);
-    }
-
-    // Logs tab has its own display mechanism, no dialog content
-    if (tab === 'logs') {
-        return false;
     }
 
     return false;

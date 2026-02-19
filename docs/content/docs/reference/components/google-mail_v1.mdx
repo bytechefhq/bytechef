@@ -1,8 +1,7 @@
 ---
-title: "Gmail"
-description: "Gmail is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps."
+description: "Google Mail component for ByteChef. Gmail email management. Learn how to implement this in your ByteChef workflows."
+title: Gmail
 ---
-
 
 Categories: Communication
 
@@ -29,25 +28,6 @@ Version: 1
 | clientSecret | Client Secret | STRING |  | true |
 
 
-
-## Connection Setup
-
-### Create OAuth 2.0 Application
-
-Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
-
-### Enable Gmail API
-
-1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
-2. Go to the **APIs & Services**.
-3. Click on **ENABLE APIS AND SERVICES**.
-4. Search for "gmail api" in the search bar.
-5. Click on **Gmail API**.
-6. Click **Enable**.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/2d7279c7-91c3-43c9-9004-99f08d7e30ff?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
 
 
 
@@ -110,116 +90,6 @@ Type: OBJECT
 ```
 
 
-
-
-### Archive Email
-Name: archiveEmail
-
-`Archive an Email message.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Message ID | STRING | ID of the message to be archived. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Archive Email",
-  "name" : "archiveEmail",
-  "parameters" : {
-    "id" : ""
-  },
-  "type" : "googleMail/v1/archiveEmail"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | The ID of the message. |
-| threadId | STRING | The ID of the thread the message belongs to. |
-| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of IDs of labels applied to this message. |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : "",
-  "threadId" : "",
-  "labelIds" : [ "" ]
-}
-```
-
-
-
-
-### Create Label
-Name: createLabel
-
-`Creates a new label.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | The display name of the newly created label. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Create Label",
-  "name" : "createLabel",
-  "parameters" : {
-    "name" : ""
-  },
-  "type" : "googleMail/v1/createLabel"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the newly created label. |
-| labelListVisibility | STRING | The visibility of the label in the label list in the Gmail web interface. |
-| messageListVisibility | STRING | The visibility of messages with this label in the message list in the Gmail web interface. |
-| name | STRING | The display name of the label. |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : "",
-  "labelListVisibility" : "",
-  "messageListVisibility" : "",
-  "name" : ""
-}
-```
-
-
-
-
 ### Delete Mail
 Name: deleteMail
 
@@ -246,8 +116,6 @@ Name: deleteMail
 #### Output
 
 This action does not produce any output.
-
-
 
 
 
@@ -286,8 +154,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
-
 ### Get Thread
 Name: getThread
 
@@ -318,59 +184,6 @@ Name: getThread
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-### List Labels
-Name: listLabels
-
-`Lists labels that are connected to your Google Mail account.`
-
-#### Example JSON Structure
-```json
-{
-  "label" : "List Labels",
-  "name" : "listLabels",
-  "type" : "googleMail/v1/listLabels"
-}
-```
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-Items Type: OBJECT
-
-
-#### Properties
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| name | STRING | The display name of the label. |
-| id | STRING | ID of the label. |
-| messageListVisibility | STRING | The visibility of messages with this label in the message list in the Gmail web interface. |
-| labelListVisibility | STRING | The visibility of the label in the label list in the Gmail web interface. |
-| type | STRING | The owner type for the label. |
-
-
-
-
-
-#### Output Example
-```json
-[ {
-  "name" : "",
-  "id" : "",
-  "messageListVisibility" : "",
-  "labelListVisibility" : "",
-  "type" : ""
-} ]
-```
 
 
 
@@ -426,8 +239,6 @@ Type: OBJECT
   "labelIds" : [ "" ]
 }
 ```
-
-
 
 
 ### Reply to Email
@@ -499,8 +310,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Search Email
 Name: searchEmail
 
@@ -567,8 +376,6 @@ Type: OBJECT
   "resultSizeEstimate" : 0.0
 }
 ```
-
-
 
 
 ### Send Email
@@ -643,8 +450,6 @@ Type: OBJECT
 
 
 
-
-
 ## Triggers
 
 
@@ -679,6 +484,79 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleMail/v1/newEmail"
 }
 ```
+
+
+### New Email Polling
+Name: newEmailPolling
+
+`Periodically checks your Gmail inbox for any new incoming emails.`
+
+Type: POLLING
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the message. |
+| threadId | STRING | The ID of the thread the message belongs to. |
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Email Polling",
+  "name" : "newEmailPolling",
+  "type" : "googleMail/v1/newEmailPolling"
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Create OAuth 2.0 Application
+
+Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
+
+### Enable Gmail API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Go to the **APIs & Services**.
+3. Click on **ENABLE APIS AND SERVICES**.
+4. Search for "gmail api" in the search bar.
+5. Click on **Gmail API**.
+6. Click **Enable**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+<iframe src="https://www.guidejar.com/embed/2d7279c7-91c3-43c9-9004-99f08d7e30ff?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+## Trigger Setup
+
 ### New Email Trigger Setup
 
 Setting up Pub/Sub service
@@ -707,41 +585,10 @@ Setting up Pub/Sub service
 22. Click on **MyTopic**.
 23. This is your **topic name**.
 
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/934ccb3b-1052-440e-bcfa-9cd5d27b8a91?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
 
-
-
-### New Email Polling
-Name: newEmailPolling
-
-`Periodically checks your Gmail inbox for any new incoming emails.`
-
-Type: POLLING
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns only email message ID and labels; does not return the email headers, body, or payload.">MINIMAL</span>, <span title="Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">FULL</span>, <span title="Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">RAW</span>, <span title="Returns only email message ID, labels, and email headers.">metadata</span> </details> | The format to return the message in. | false |
-
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
-```json
-{
-  "label" : "New Email Polling",
-  "name" : "newEmailPolling",
-  "parameters" : {
-    "format" : ""
-  },
-  "type" : "googleMail/v1/newEmailPolling"
-}
-```
 ### New Email Pooling Trigger Setup
 
 Turning on Google Calendar API
@@ -755,23 +602,9 @@ Gmail doesn’t manage its own time zone; it inherits the time zone from your Go
 5. Click on **Enable**.
 6. Done 🚀
 
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/157feabc-9dec-4ac4-a538-5aa6a0bb0928?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
-
-
-
-
-
-## What to do if your action is not listed here?
-
-If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
-
-To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
-
-<hr />
-
-# Additional Instructions
 
 ## Troubleshooting
 

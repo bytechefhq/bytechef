@@ -1,3 +1,0 @@
-mutation removeDataTableColumn($input: RemoveColumnInput!) {
-    removeDataTableColumn(input: $input)
-}

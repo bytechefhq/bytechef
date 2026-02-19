@@ -31,27 +31,6 @@ Version: 1
 
 
 
-## Connection Setup
-
-### Create OAuth Application
-
-1. Navigate to your Aha! dashboard.
-2. Click on **Personal**.
-3. Click on **Developer**.
-4. Click on **OAuth applications**.
-5. Click on **Register OAuth application**.
-6. Enter name of your OAuth application.
-7. Enter **Redirect URI** depending on your instance:
-    - `https://app.bytechef.io/callback` (Cloud)
-    - `http://localhost:5173/callback` (Local dev)
-8. Click **Create**.
-9. Here you can see your credentials.
-10. Done 🚀.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/739b69f7-a2e8-44de-9a31-1957c6c67f9c?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
-
 
 
 <hr />
@@ -140,13 +119,6 @@ Type: OBJECT
   }
 }
 ```
-
-#### Find product ID and release ID
-
-To find the Product ID, click [here](/reference/components/aha_v1#how-to-find-the-product-id).
-
-To find the Release ID, click [here](/reference/components/aha_v1#how-to-find-the-release-id).
-
 
 
 ### Create Idea
@@ -251,13 +223,6 @@ Type: OBJECT
 }
 ```
 
-#### Find product ID and release ID
-
-To find the Product ID, click [here](/reference/components/aha_v1#how-to-find-the-product-id).
-
-To find the Release ID, click [here](/reference/components/aha_v1#how-to-find-the-release-id).
-
-
 
 
 
@@ -271,25 +236,23 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 
 # Additional Instructions
 
-### How to find the Release ID
+## Connection Setup
 
-The Release ID (also known as the Reference Number) can be found in the Aha! UI or via the API.
+### Create OAuth Application
 
-#### In the Aha! UI
-- **Release Detail View**: Open a specific release. The Reference Number (e.g., `APP-R-1`) is displayed in the header or in the URL.
-- **Gantt Views**: **Releases** → **Gantt**. The Reference Number is shown in its own column.
-- **Search**: Use the search bar (or press `/`) and type the release name. The Reference Number (e.g., `APP-R-1`) will appear in the results.
+1. Navigate to your Aha! dashboard.
+2. Click on **Personal**.
+3. Click on **Developer**.
+4. Click on **OAuth applications**.
+5. Click on **Register OAuth application**.
+6. Enter name of your OAuth application.
+7. Enter **Redirect URI** depending on your instance:
+    - `https://app.bytechef.io/callback` (Cloud)
+    - `http://localhost:5173/callback` (Local dev)
+8. Click **Create**.
+9. Here you can see your credentials.
+10. Done 🚀.
 
-#### Via API
-- Use the `GET /products/{product_id}/releases` endpoint.
-- List releases within a product to retrieve their IDs.
-
-### How to find the Product ID
-
-The Product ID is a unique numeric value that can be found in the URL or via the API.
-
-#### Via API
-- Use the `GET /products` endpoint to retrieve a list of all products and their numeric IDs.
-
-#### Via Search
-- Press `/` to open the search modal. Recently viewed products will be listed with their IDs.
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/739b69f7-a2e8-44de-9a31-1957c6c67f9c?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>

@@ -1,8 +1,8 @@
 ---
-title: "Jenkins"
-description: "Jenkins is leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project."
+description: 'description: Jenkins is leading open source automation server, Jenkins
+  provides hundreds'
+title: Jenkins
 ---
-
 
 Categories: Developer Tools
 
@@ -30,23 +30,6 @@ Version: 1
 | baseUri | Base URI | STRING | Complete base URI of your jenkins server. | true |
 
 
-
-## Connection Setup
-
-### Create Jenkins API Token
-
-1. Click on **Manage Jenkins** icon.
-2. Click on **Users**.
-3. Click this icon on the user you want to create the API token for.
-4. Click on **Security**.
-5. Click on **Add new token**.
-6. Enter name of the token and then click on **Generate**.
-7. Copy token, you will not be able to see the whole token again.
-8. Click on **Done**.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/152dd033-4f42-4501-88cc-e6a5a4a2d4e2?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
 
 
 
@@ -84,8 +67,6 @@ Name: createJob
 #### Output
 
 This action does not produce any output.
-
-
 
 
 
@@ -129,6 +110,37 @@ Type: OBJECT
   "type" : "jenkins/v1/newJobStatusNotification"
 }
 ```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Create Jenkins API Token
+
+1. Click on **Manage Jenkins** icon.
+2. Click on **Users**.
+3. Click this icon on the user you want to create the API token for.
+4. Click on **Security**.
+5. Click on **Add new token**.
+6. Enter name of the token and then click on **Generate**.
+7. Copy token, you will not be able to see the whole token again.
+8. Click on **Done**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/152dd033-4f42-4501-88cc-e6a5a4a2d4e2?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
 ## Trigger Setup
 
 ### Enable Notification Plugin
@@ -143,7 +155,7 @@ Type: OBJECT
 8. Wait for everything to finish downloading.
 9. Click on **Go back to the top page**.
 
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/ef274d47-9a11-4394-afde-2b93679f73b2?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
 
@@ -155,17 +167,6 @@ Type: OBJECT
 4. Paste Webhook URL. See [Deploy documentation](https://docs.bytechef.io/automation/deploy) on how to get Webhook URL.
 5. Click on **Save**.
 
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/41f291bd-ac7c-4cec-af6b-c5922be20ac0?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
-
-
-
-
-
-## What to do if your action is not listed here?
-
-If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
-
-To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
-

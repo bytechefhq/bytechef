@@ -14,7 +14,6 @@ import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEn
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnectorErrorType;
 import com.bytechef.ee.platform.apiconnector.configuration.generator.OpenApiGenerator;
-import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -27,17 +26,13 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,32 +46,15 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
-    private final ApiConnectorAiService apiConnectorAiService;
     private final ApiConnectorFileStorage apiConnectorFileStorage;
     private final ApiConnectorService apiConnectorService;
 
     @SuppressFBWarnings("EI")
     public ApiConnectorFacadeImpl(
-        @Nullable ApiConnectorAiService apiConnectorAiService,
-        ApiConnectorFileStorage apiConnectorFileStorage,
-        ApiConnectorService apiConnectorService) {
+        ApiConnectorFileStorage apiConnectorFileStorage, ApiConnectorService apiConnectorService) {
 
-        this.apiConnectorAiService = apiConnectorAiService;
         this.apiConnectorFileStorage = apiConnectorFileStorage;
         this.apiConnectorService = apiConnectorService;
-    }
-
-    @Override
-    public ApiConnector generateFromDocumentation(String name, String documentationUrl) {
-        if (apiConnectorAiService == null) {
-            throw new ConfigurationException(
-                "AI service is not configured. Please configure bytechef.ai.copilot settings.",
-                ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
-        }
-
-        String specification = apiConnectorAiService.generateOpenApiSpecification(documentationUrl);
-
-        return importOpenApiSpecification(name, specification);
     }
 
     @Override
@@ -164,56 +142,41 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
                 if (pathItem.getDelete() != null) {
                     Operation operation = pathItem.getDelete();
 
-                    ApiConnectorEndpoint endpoint = new ApiConnectorEndpoint(
-                        path, operation.getOperationId(), operation.getDescription(), HttpMethod.DELETE);
-
-                    endpoint.setId(generateEndpointId(path, HttpMethod.DELETE));
-
-                    curEndpoints.add(endpoint);
+                    curEndpoints.add(
+                        new ApiConnectorEndpoint(
+                            path, operation.getOperationId(), operation.getDescription(), HttpMethod.DELETE));
                 }
 
                 if (pathItem.getGet() != null) {
                     Operation operation = pathItem.getGet();
 
-                    ApiConnectorEndpoint endpoint = new ApiConnectorEndpoint(
-                        path, operation.getOperationId(), operation.getDescription(), HttpMethod.GET);
-
-                    endpoint.setId(generateEndpointId(path, HttpMethod.GET));
-
-                    curEndpoints.add(endpoint);
+                    curEndpoints.add(
+                        new ApiConnectorEndpoint(
+                            path, operation.getOperationId(), operation.getDescription(), HttpMethod.GET));
                 }
 
                 if (pathItem.getPatch() != null) {
                     Operation operation = pathItem.getPatch();
 
-                    ApiConnectorEndpoint endpoint = new ApiConnectorEndpoint(
-                        path, operation.getOperationId(), operation.getDescription(), HttpMethod.PATCH);
-
-                    endpoint.setId(generateEndpointId(path, HttpMethod.PATCH));
-
-                    curEndpoints.add(endpoint);
+                    curEndpoints.add(
+                        new ApiConnectorEndpoint(
+                            path, operation.getOperationId(), operation.getDescription(), HttpMethod.PATCH));
                 }
 
                 if (pathItem.getPost() != null) {
                     Operation operation = pathItem.getPost();
 
-                    ApiConnectorEndpoint endpoint = new ApiConnectorEndpoint(
-                        path, operation.getOperationId(), operation.getDescription(), HttpMethod.POST);
-
-                    endpoint.setId(generateEndpointId(path, HttpMethod.POST));
-
-                    curEndpoints.add(endpoint);
+                    curEndpoints.add(
+                        new ApiConnectorEndpoint(
+                            path, operation.getOperationId(), operation.getDescription(), HttpMethod.POST));
                 }
 
                 if (pathItem.getPut() != null) {
                     Operation operation = pathItem.getPut();
 
-                    ApiConnectorEndpoint endpoint = new ApiConnectorEndpoint(
-                        path, operation.getOperationId(), operation.getDescription(), HttpMethod.PUT);
-
-                    endpoint.setId(generateEndpointId(path, HttpMethod.PUT));
-
-                    curEndpoints.add(endpoint);
+                    curEndpoints.add(
+                        new ApiConnectorEndpoint(
+                            path, operation.getOperationId(), operation.getDescription(), HttpMethod.PUT));
                 }
 
                 return CollectionUtils.stream(curEndpoints);
@@ -223,26 +186,6 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         return new ApiConnectorDTO(
             apiConnector, apiConnectorFileStorage.readApiConnectorDefinition(apiConnector.getDefinition()),
             specification, endpoints);
-    }
-
-    private static long generateEndpointId(String path, HttpMethod httpMethod) {
-        String combined = path + ":" + httpMethod.name();
-
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hashBytes = digest.digest(combined.getBytes(StandardCharsets.UTF_8));
-
-            // Use first 8 bytes of SHA-256 hash for a long value with very low collision probability
-            long result = 0;
-
-            for (int i = 0; i < 8; i++) {
-                result = (result << 8) | (hashBytes[i] & 0xFF);
-            }
-
-            return Math.abs(result);
-        } catch (NoSuchAlgorithmException exception) {
-            throw new RuntimeException("SHA-256 algorithm not available", exception);
-        }
     }
 
     private static String convertComponentName(String componentName) {

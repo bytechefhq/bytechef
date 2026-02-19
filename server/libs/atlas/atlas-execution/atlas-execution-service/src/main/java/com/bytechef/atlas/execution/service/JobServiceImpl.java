@@ -145,7 +145,6 @@ public class JobServiceImpl implements JobService {
         Assert.isTrue(
             job.getStatus() == Job.Status.STARTED, "Job id=" + id + " can not be stopped as it is " + job.getStatus());
 
-        job.setEndDate(Instant.now());
         job.setStatus(Job.Status.STOPPED);
 
         jobRepository.save(job);

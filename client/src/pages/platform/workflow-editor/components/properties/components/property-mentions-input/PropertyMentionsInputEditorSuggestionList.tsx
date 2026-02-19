@@ -62,7 +62,7 @@ const PropertyMentionsInputEditorSuggestionList = forwardRef<
         <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto">
             {items.length ? (
                 items.map((item: DataPillType, index: number) => (
-                    <li key={item.value}>
+                    <li key={index}>
                         <button
                             className={twMerge(index === selectedIndex && 'is-selected')}
                             onClick={() => selectItem(index)}

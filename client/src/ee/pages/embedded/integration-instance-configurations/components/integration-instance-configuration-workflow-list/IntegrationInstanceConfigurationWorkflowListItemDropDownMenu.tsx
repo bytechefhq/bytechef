@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {EllipsisVerticalIcon} from 'lucide-react';
@@ -15,11 +15,9 @@ const IntegrationInstanceConfigurationWorkflowListItemDropDownMenu = ({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button
-                    icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                    size="icon"
-                    variant="ghost"
-                />
+                <Button size="icon" variant="ghost">
+                    <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
+                </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">

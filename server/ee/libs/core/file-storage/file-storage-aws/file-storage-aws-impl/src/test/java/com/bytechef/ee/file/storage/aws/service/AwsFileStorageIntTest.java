@@ -13,6 +13,7 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import io.awspring.cloud.s3.S3Template;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,11 +25,13 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.localstack.LocalStackContainer;
@@ -47,6 +50,7 @@ import software.amazon.awssdk.regions.providers.AwsRegionProvider;
  */
 @SpringBootTest
 @Testcontainers
+@Import(JacksonConfiguration.class)
 class AwsFileStorageIntTest {
 
     private static final String BUCKET_NAME = String.valueOf(UUID.randomUUID());
@@ -223,14 +227,9 @@ class AwsFileStorageIntTest {
     }
 
     @Configuration
+    @ComponentScan("io.awspring.cloud")
     @EnableConfigurationProperties(ApplicationProperties.class)
-    @ImportAutoConfiguration({
-        io.awspring.cloud.autoconfigure.core.AwsAutoConfiguration.class,
-        io.awspring.cloud.autoconfigure.core.CredentialsProviderAutoConfiguration.class,
-        io.awspring.cloud.autoconfigure.core.RegionProviderAutoConfiguration.class,
-        io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration.class,
-        io.awspring.cloud.autoconfigure.s3.S3TransferManagerAutoConfiguration.class
-    })
+    @EnableAutoConfiguration
     static class AwsFileStorageIntTestConfiguration {
 
         @Bean

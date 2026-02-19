@@ -30,26 +30,6 @@ Version: 1
 
 
 
-## Connection Setup
-
-1. Log in to the [X developer portal](https://developer.x.com/en/portal/dashboard) and go to the **Overview** tab in your project.
-2. Click on **+ Add App**.
-3. Give your app a name (for example, `ByteChef Integration`) and select **Next**.
-4. Go to the **App Settings**.
-5. In the **User authentication settings**, select **Set Up**.
-6. Set the **App permissions** to **Read and write and Direct message**.
-7. In the **Type of app** section, select **Native App**.
-8. Add the ByteChef OAuth redirect (callback) URL(s):
-    - Cloud: `https://app.bytechef.io/callback`
-    - Local development: `http://127.0.0.1:5173/callback` or `http://localhost:5173/callback`
-9. Add a **Website URL**. Click **Save**.
-10. Click **Yes**.
-11. Copy your **Client ID** and **Client Secret**. You will use these in ByteChef when creating the X connection.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(53.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/fgmTMRGbY06kFYGe2Jnd?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
-
 
 
 <hr />
@@ -116,8 +96,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Delete Post
 Name: deletePost
 
@@ -165,8 +143,6 @@ Type: OBJECT
   }
 }
 ```
-
-
 
 
 ### Like Post
@@ -218,8 +194,6 @@ Type: OBJECT
 ```
 
 
-
-
 ### Repost Post
 Name: repostPost
 
@@ -268,8 +242,6 @@ Type: OBJECT
   }
 }
 ```
-
-
 
 
 ### Send Direct Message
@@ -332,8 +304,6 @@ Type: OBJECT
 
 
 
-
-
 ## Triggers
 
 
@@ -384,4 +354,26 @@ Type: OBJECT
 
 
 
+<hr />
 
+# Additional Instructions
+
+## Connection Setup
+
+1. Log in to the [X developer portal](https://developer.x.com/en/portal/dashboard) and go to the **Overview** tab in your project.
+2. Click on **+ Add App**.
+3. Give your app a name (for example, `ByteChef Integration`) and select **Next**.
+4. Go to the **App Settings**.
+5. In the **User authentication settings**, select **Set Up**.
+6. Set the **App permissions** to **Read and write and Direct message**.
+7. In the **Type of app** section, select **Native App**.
+8. Add the ByteChef OAuth redirect (callback) URL(s):
+    - Cloud: `https://app.bytechef.io/callback`
+    - Local development: `http://127.0.0.1:5173/callback` or `http://localhost:5173/callback`
+9. Add a **Website URL**. Click **Save**.
+10. Click **Yes**.
+11. Copy your **Client ID** and **Client Secret**. You will use these in ByteChef when creating the X connection.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(53.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/fgmTMRGbY06kFYGe2Jnd?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>

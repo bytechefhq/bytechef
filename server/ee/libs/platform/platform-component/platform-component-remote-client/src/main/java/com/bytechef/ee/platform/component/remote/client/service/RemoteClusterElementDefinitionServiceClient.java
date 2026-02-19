@@ -10,7 +10,6 @@ package com.bytechef.ee.platform.component.remote.client.service;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
@@ -41,7 +40,7 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable ComponentConnection componentConnection, ClusterElementResolverFunction clusterElementResolver) {
+        @Nullable ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
@@ -116,8 +115,7 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, int connectionVersion, String componentOperationName,
-        int statusCode, Object body) {
+        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body) {
 
         throw new UnsupportedOperationException();
     }

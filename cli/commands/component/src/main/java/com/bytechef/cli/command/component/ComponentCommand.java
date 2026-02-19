@@ -17,7 +17,6 @@
 package com.bytechef.cli.command.component;
 
 import com.bytechef.cli.command.component.init.openapi.ComponentInitOpenApiGenerator;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
@@ -25,9 +24,11 @@ import org.springframework.shell.core.command.annotation.Option;
 @org.springframework.stereotype.Component
 public class ComponentCommand {
 
-    private static final String COMMAND_PREFIX = "component";
+    @Command
+    public void component() {
+    }
 
-    @Command(name = COMMAND_PREFIX + " init", description = "Generates project for a new component.")
+    @Command(name = "init", description = "Generates project for a new component.")
     public void init(
         @Option(
             longName = "base-package-name", description = "package for generated classes",
@@ -52,7 +53,6 @@ public class ComponentCommand {
         }
     }
 
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private void generateOpenApiComponent(
         String basePackageName, boolean internalComponent, String name, String openApiPath, String outputPath,
         int version) throws Exception {
