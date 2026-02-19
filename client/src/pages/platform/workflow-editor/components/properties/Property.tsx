@@ -119,6 +119,7 @@ const Property = ({
         showInputTypeSwitchButton,
         type,
         typeIcon,
+        validatePropertyValue,
         workflow,
     } = useProperty({
         arrayIndex,
@@ -204,6 +205,7 @@ const Property = ({
                     setIsFormulaMode={setIsFormulaMode}
                     showInputTypeSwitchButton={showInputTypeSwitchButton}
                     type={type}
+                    validateBeforeSave={validatePropertyValue}
                     value={mentionInputValue}
                 />
             )}
