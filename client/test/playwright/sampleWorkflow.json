@@ -47,6 +47,12 @@
                     }
                 }
             }
+        },
+        {
+            "label": "Property Testing",
+            "name": "propertyTesting_1",
+            "parameters": {},
+            "type": "propertyTesting/v1/testingAction"
         }
     ]
 }
