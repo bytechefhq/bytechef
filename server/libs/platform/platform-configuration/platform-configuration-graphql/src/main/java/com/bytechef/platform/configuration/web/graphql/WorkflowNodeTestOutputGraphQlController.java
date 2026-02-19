@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.dto.WorkflowNodeTestOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import java.util.Map;
@@ -43,15 +44,13 @@ class WorkflowNodeTestOutputGraphQlController {
         @Argument String clusterElementWorkflowNodeName, @Argument long environmentId,
         @Argument Map<String, Object> inputParameters) {
 
-        if (inputParameters != null) {
-            return new WorkflowNodeTestOutputDTO(
-                workflowNodeTestOutputFacade.saveClusterElementTestOutput(
-                    workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId,
-                    inputParameters));
-        }
+        WorkflowNodeTestOutput workflowNodeTestOutput = inputParameters != null
+            ? workflowNodeTestOutputFacade.saveClusterElementTestOutput(
+                workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId,
+                inputParameters)
+            : workflowNodeTestOutputFacade.saveClusterElementTestOutput(
+                workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId);
 
-        return new WorkflowNodeTestOutputDTO(
-            workflowNodeTestOutputFacade.saveClusterElementTestOutput(
-                workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId));
+        return new WorkflowNodeTestOutputDTO(workflowNodeTestOutput);
     }
 }

@@ -55,17 +55,21 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
         ClusterElementOutputDTO clusterElementOutputDTO = workflowNodeOutputFacade.getClusterElementOutput(
             workflowId, workflowNodeName, clusterElementType, clusterElementName, environmentId);
 
-        OutputResponse outputResponse =
-            clusterElementOutputDTO != null && clusterElementOutputDTO.outputSchema() != null
-                ? new OutputResponse(
-                    clusterElementOutputDTO.outputSchema(), clusterElementOutputDTO.sampleOutput(),
-                    clusterElementOutputDTO.placeholder())
-                : null;
+        if (clusterElementOutputDTO == null) {
+            return ResponseEntity.notFound()
+                .build();
+        }
+
+        OutputResponse outputResponse = clusterElementOutputDTO.outputSchema() != null
+            ? new OutputResponse(
+                clusterElementOutputDTO.outputSchema(), clusterElementOutputDTO.sampleOutput(),
+                clusterElementOutputDTO.placeholder())
+            : null;
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
-            null, clusterElementOutputDTO != null ? clusterElementOutputDTO.clusterElementDefinition() : null,
+            null, clusterElementOutputDTO.clusterElementDefinition(),
             outputResponse, null, false, null,
-            clusterElementOutputDTO != null ? clusterElementOutputDTO.clusterElementName() : "");
+            clusterElementOutputDTO.clusterElementName());
 
         return ResponseEntity.ok(
             conversionService.convert(workflowNodeOutputDTO, WorkflowNodeOutputModel.class));
