@@ -25,7 +25,7 @@ import org.springframework.ai.tool.annotation.ToolParam;
  *
  * @author Ivica Cardic
  */
-record AgentThinking(
+public record AgentThinking(
     @ToolParam(
         description = "Your reasoning for calling this tool and choosing these parameters",
         required = true) String reasoning,
