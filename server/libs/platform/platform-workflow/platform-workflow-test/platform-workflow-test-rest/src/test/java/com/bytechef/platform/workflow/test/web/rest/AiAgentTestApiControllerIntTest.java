@@ -98,8 +98,8 @@ class AiAgentTestApiControllerIntTest {
 
         when(
             actionDefinitionFacade.executePerform(
-                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), anyString(), anyMap(), anyMap(),
-                anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
+                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), isNull(), anyString(), anyMap(),
+                anyMap(), anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
                     .thenReturn("Test response");
 
         MvcResult mvcResult = mockMvc.perform(
@@ -138,8 +138,8 @@ class AiAgentTestApiControllerIntTest {
 
         when(
             actionDefinitionFacade.executePerform(
-                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), anyString(), anyMap(), anyMap(),
-                anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
+                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), isNull(), anyString(), anyMap(),
+                anyMap(), anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
                     .thenReturn(sseEmitterHandler);
 
         MvcResult mvcResult = mockMvc.perform(
@@ -172,8 +172,8 @@ class AiAgentTestApiControllerIntTest {
 
         when(
             actionDefinitionFacade.executePerform(
-                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), anyString(), anyMap(), anyMap(),
-                anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
+                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), isNull(), anyString(), anyMap(),
+                anyMap(), anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
                     .thenThrow(new RuntimeException("Something went wrong"));
 
         MvcResult mvcResult = mockMvc.perform(
@@ -210,8 +210,8 @@ class AiAgentTestApiControllerIntTest {
 
         when(
             actionDefinitionFacade.executePerform(
-                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), anyString(), anyMap(), anyMap(),
-                anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
+                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), isNull(), anyString(), anyMap(),
+                anyMap(), anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
                     .thenReturn(sseEmitterHandler);
 
         MvcResult mvcResult = mockMvc.perform(

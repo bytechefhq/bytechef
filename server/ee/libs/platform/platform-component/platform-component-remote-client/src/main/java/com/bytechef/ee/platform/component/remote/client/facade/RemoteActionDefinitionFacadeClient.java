@@ -79,16 +79,17 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public Object executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
-        Long jobId, String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
-        Map<String, ?> extensions, Long environmentId, PlatformType type, boolean editorEnvironment,
-        Map<String, ?> continueParameters, Instant suspendExpiresAt) {
+        Long jobId, Long taskExecutionId, String workflowId, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, ?> extensions, Long environmentId, PlatformType type,
+        boolean editorEnvironment, Map<String, ?> continueParameters, Instant suspendExpiresAt) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-perform"),
             new PerformRequest(
                 componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                workflowId, inputParameters, connectionIds, castExtensions(extensions), environmentId),
+                taskExecutionId, workflowId, inputParameters, connectionIds, castExtensions(extensions),
+                environmentId),
             new ParameterizedTypeReference<>() {});
     }
 
@@ -127,8 +128,9 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     private record PerformRequest(
         String componentName, int componentVersion, String actionName, PlatformType type, Long jobPrincipalId,
-        Long jobPrincipalWorkflowId, long jobId, String workflowId, Map<String, ?> inputParameters,
-        Map<String, Long> connectionIds, Map<String, Long> extensions, Long environmentId) {
+        Long jobPrincipalWorkflowId, long jobId, Long taskExecutionId, String workflowId,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIds, Map<String, Long> extensions,
+        Long environmentId) {
     }
 
     private record PropertiesRequest(

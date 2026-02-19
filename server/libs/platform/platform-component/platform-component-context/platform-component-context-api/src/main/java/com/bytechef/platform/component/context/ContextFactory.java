@@ -32,9 +32,9 @@ public interface ContextFactory {
 
     ActionContext createActionContext(
         String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
-        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
-        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, @Nullable PlatformType type,
-        boolean editorEnvironment);
+        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable Long taskExecutionId,
+        @Nullable String workflowId, @Nullable ComponentConnection componentConnection,
+        @Nullable Long environmentId, @Nullable PlatformType type, boolean editorEnvironment);
 
     Context createContext(String componentName, @Nullable ComponentConnection componentConnection);
 

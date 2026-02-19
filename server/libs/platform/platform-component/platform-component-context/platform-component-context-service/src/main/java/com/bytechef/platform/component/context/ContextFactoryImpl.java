@@ -69,9 +69,9 @@ public class ContextFactoryImpl implements ContextFactory {
     @Override
     public ActionContext createActionContext(
         String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
-        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
-        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, @Nullable PlatformType type,
-        boolean editorEnvironment) {
+        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable Long taskExecutionId,
+        @Nullable String workflowId, @Nullable ComponentConnection componentConnection,
+        @Nullable Long environmentId, @Nullable PlatformType type, boolean editorEnvironment) {
 
         return ActionContextImpl
             .builder(
@@ -84,6 +84,7 @@ public class ContextFactoryImpl implements ContextFactory {
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
             .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
             .publicUrl(publicUrl)
+            .taskExecutionId(taskExecutionId != null ? taskExecutionId : 0)
             .type(type)
             .workflowId(workflowId)
             .build();

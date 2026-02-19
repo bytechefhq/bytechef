@@ -66,7 +66,7 @@ public class ActionDefinitionFacadeIntTest {
             connectionService, actionDefinitionService);
 
         Object result = actionDefinitionFacade.executePerform(
-            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), 1000L, 1000L, 1000L, "123456789",
+            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), 1000L, 1000L, 1000L, 1000L, "123456789",
             Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v3"), Map.of(), Map.of(), 0L, PlatformType.AUTOMATION,
             false, null, null);
 
@@ -78,7 +78,7 @@ public class ActionDefinitionFacadeIntTest {
         Assertions.assertFalse(results.isEmpty());
 
         Http.Response response = (Http.Response) actionDefinitionFacade.executePerform(
-            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), 1000L, 1000L, 1000L, "123456789",
+            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), 1000L, 1000L, 1000L, 1000L, "123456789",
             Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v2", "fullResponse", "true"), Map.of(), Map.of(),
             0L, PlatformType.AUTOMATION, false, null, null);
 

@@ -179,8 +179,8 @@ class ComponentToolsTest {
         assertEquals("actionResult", result.name());
         verify(componentDefinitionService).getComponentDefinition(componentName, version);
         verify(actionDefinitionFacade, never()).executePerform(
-            anyString(), anyInt(), anyString(), any(), any(), any(), anyString(), anyMap(), anyMap(), anyMap(), any(),
-            any(), anyBoolean(), any(), any());
+            anyString(), anyInt(), anyString(), any(), any(), any(), any(), anyString(), anyMap(), anyMap(), anyMap(),
+            any(), any(), anyBoolean(), any(), any());
     }
 
     @Test
@@ -254,7 +254,7 @@ class ComponentToolsTest {
             actionDefinitionFacade
                 .executePerform(
                     eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(),
-                    anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull()))
+                    isNull(), anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull()))
                         .thenReturn(performResult);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
@@ -263,8 +263,8 @@ class ComponentToolsTest {
         verify(actionDefinitionFacade).executeOutput(eq(componentName), eq(version), eq(actionName), anyMap(),
             anyMap());
         verify(actionDefinitionFacade).executePerform(
-            eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), anyMap(),
-            isNull(), isNull(), isNull(), eq(true), isNull(), isNull());
+            eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
+            anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull());
     }
 
     @Test
