@@ -25,15 +25,14 @@ import java.util.UUID;
 /**
  * @author Ivica Cardic
  */
-@Deprecated
-public class ApprovalId implements Serializable {
+public class JobResumeId implements Serializable {
 
     private final boolean approved;
     private final long jobId;
     private final String tenantId;
     private final String uuid;
 
-    private ApprovalId(String tenantId, long jobId, String uuid, boolean approved) {
+    private JobResumeId(String tenantId, long jobId, String uuid, boolean approved) {
         this.approved = approved;
         this.jobId = jobId;
         this.tenantId = tenantId;
@@ -41,18 +40,23 @@ public class ApprovalId implements Serializable {
         this.uuid = uuid;
     }
 
-    public static ApprovalId of(long jobId, boolean approved) {
+    public static JobResumeId of(long jobId, boolean approved) {
         UUID uuid = UUID.randomUUID();
 
-        return new ApprovalId(TenantContext.getCurrentTenantId(), jobId, uuid.toString(), approved);
+        return new JobResumeId(TenantContext.getCurrentTenantId(), jobId, uuid.toString(), approved);
     }
 
-    public static ApprovalId parse(String id) {
-        id = EncodingUtils.base64DecodeToString(id);
+    public static JobResumeId parse(String id) {
+        String decoded = EncodingUtils.base64DecodeToString(id);
 
-        String[] items = id.split(":");
+        String[] items = decoded.split(":");
 
-        return new ApprovalId(items[0], Long.parseLong(items[1]), items[2], Boolean.parseBoolean(items[3]));
+        if (items.length != 4) {
+            throw new IllegalArgumentException(
+                "Invalid JobResumeId format, expected 4 colon-separated parts but got " + items.length);
+        }
+
+        return new JobResumeId(items[0], Long.parseLong(items[1]), items[2], Boolean.parseBoolean(items[3]));
     }
 
     public long getJobId() {
@@ -69,6 +73,27 @@ public class ApprovalId implements Serializable {
 
     public boolean isApproved() {
         return approved;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof JobResumeId jobResumeId)) {
+            return false;
+        }
+
+        return approved == jobResumeId.approved &&
+            jobId == jobResumeId.jobId &&
+            Objects.equals(tenantId, jobResumeId.tenantId) &&
+            Objects.equals(uuid, jobResumeId.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(approved, jobId, tenantId, uuid);
     }
 
     @Override

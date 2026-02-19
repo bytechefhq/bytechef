@@ -35,9 +35,13 @@ import com.bytechef.ee.ai.copilot.repository.converter.PGobjectToMapConverter;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.data.storage.jdbc.repository.converter.DataEntryValueWrapperToStringConverter;
 import com.bytechef.platform.data.storage.jdbc.repository.converter.StringToDataEntryValueWrapperConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.StringToTaskStateValueConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToTriggerStateValueConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowTriggerConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.TaskStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.TriggerStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
@@ -163,18 +167,22 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new ListDoubleToPGObjectConverter(),
             new MapToPGObjectConverter(objectMapper),
             new MapWrapperToStringConverter(objectMapper),
+            new JobResumeIdToStringConverter(),
             new PGObjectToListDoubleConverter(),
             new PGobjectToMapConverter(objectMapper),
             new StringToDataEntryValueWrapperConverter(),
             new StringToExecutionErrorConverter(objectMapper),
             new StringToFileEntryConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
+            new StringToJobResumeIdConverter(),
+            new StringToTriggerStateValueConverter(objectMapper),
+            new StringToTaskStateValueConverter(objectMapper),
             new StringToWebhooksConverter(objectMapper),
             new StringToWorkflowExecutionIdConverter(),
             new StringToWorkflowTaskConverter(objectMapper),
             new StringToWorkflowTriggerConverter(objectMapper),
-            new StringToTriggerStateValueConverter(objectMapper),
             new TriggerStateValueToStringConverter(objectMapper),
+            new TaskStateValueToStringConverter(objectMapper),
             new WebhooksToStringConverter(objectMapper),
             new WorkflowExecutionIdToStringConverter(),
             new WorkflowTaskToStringConverter(objectMapper),
