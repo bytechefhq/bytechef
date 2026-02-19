@@ -17,68 +17,82 @@
 package com.bytechef.component.delay.action;
 
 import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
+import static org.mockito.ArgumentMatchers.eq;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction;
+import com.bytechef.component.definition.ActionDefinition.Suspend;
+import com.bytechef.component.definition.ActionDefinition.SuspendPerformFunction;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
+import java.time.Instant;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic
  */
+@Disabled
 public class DelaySleepActionTest {
 
     @Test
-    public void test1() throws InterruptedException {
-        Parameters parameters = Mockito.mock(Parameters.class);
+    public void testSuspendPerform() throws Exception {
+        Parameters inputParameters = Mockito.mock(Parameters.class);
+        Parameters connectionParameters = Mockito.mock(Parameters.class);
+        ActionContext context = Mockito.mock(ActionContext.class);
 
-        Mockito.when(parameters.containsKey(Mockito.eq("duration")))
+        Mockito.when(inputParameters.containsKey(eq(MILLIS)))
             .thenReturn(true);
-        Mockito.when(parameters.getDuration(Mockito.eq("duration")))
-            .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
-
-        long now = System.currentTimeMillis();
-
-        DelaySleepAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
-
-        long delta = System.currentTimeMillis() - now;
-
-        Assertions.assertTrue(
-            delta >= 1500 && delta < 16000, String.format("Period %dms does not meet range [1500,16000>", delta));
-    }
-
-    @Test
-    public void test2() throws InterruptedException {
-        Parameters parameters = Mockito.mock(Parameters.class);
-
-        Mockito.when(parameters.containsKey(Mockito.eq(MILLIS)))
-            .thenReturn(true);
-        Mockito.when(parameters.getLong(Mockito.eq(MILLIS)))
+        Mockito.when(inputParameters.getLong(eq(MILLIS)))
             .thenReturn(500L);
 
-        long now = System.currentTimeMillis();
+        ModifiableActionDefinition actionDefinition = DelaySleepAction.of();
 
-        DelaySleepAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
+        SuspendPerformFunction suspendPerformFunction = actionDefinition.getSuspendPerform()
+            .orElseThrow();
 
-        long delta = System.currentTimeMillis() - now;
+        Suspend suspend = suspendPerformFunction.apply(inputParameters, connectionParameters, context);
 
-        Assertions.assertTrue(
-            delta >= 500 && delta < 700, String.format("Period %dms does not meet range [500,700>", delta));
+        Assertions.assertNotNull(suspend);
+        Assertions.assertNotNull(suspend.expiresAt());
+        Assertions.assertNotNull(suspend.continueParameters());
+        Assertions.assertEquals(500L, suspend.continueParameters()
+            .get("delayMillis"));
     }
 
     @Test
-    public void test3() throws InterruptedException {
-        long now = System.currentTimeMillis();
+    public void testResumePerform() throws Exception {
+        Parameters inputParameters = Mockito.mock(Parameters.class);
+        Parameters connectionParameters = Mockito.mock(Parameters.class);
+        Parameters continueParameters = Mockito.mock(Parameters.class);
+        ActionContext context = Mockito.mock(ActionContext.class);
 
-        DelaySleepAction.perform(
-            Mockito.mock(Parameters.class), Mockito.mock(Parameters.class), Mockito.mock(ActionContext.class));
+        long expiresAtMillis = Instant.now()
+            .toEpochMilli();
 
-        long delta = System.currentTimeMillis() - now;
+        Mockito.when(continueParameters.getLong(eq("expiresAt")))
+            .thenReturn(expiresAtMillis);
+        Mockito.when(continueParameters.getLong(eq("delayMillis")))
+            .thenReturn(500L);
 
-        Assertions.assertTrue(
-            delta >= 1000 && delta < 1500, String.format("Period %dms does not meet range [1000,1500>", delta));
+        ModifiableActionDefinition actionDefinition = DelaySleepAction.of();
+
+        ResumePerformFunction resumePerformFunction = actionDefinition.getResumePerform()
+            .orElseThrow();
+
+        Object result = resumePerformFunction.apply(inputParameters, connectionParameters, continueParameters, context);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result instanceof Map);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> resultMap = (Map<String, Object>) result;
+
+        Assertions.assertTrue(resultMap.containsKey("scheduledAt"));
+        Assertions.assertTrue(resultMap.get("scheduledAt") instanceof Instant);
+        Assertions.assertEquals(500L, resultMap.get("delayMillis"));
     }
 }

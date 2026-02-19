@@ -17,6 +17,7 @@
 package com.bytechef.component.delay;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.delay.constant.DelayConstants.DELAY;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -30,12 +31,12 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class DelayComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("delay")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(DELAY)
         .title("Delay")
         .description("Sets a value which can then be referenced in other tasks.")
         .categories(ComponentCategory.HELPERS)
         .icon("path:assets/delay.svg")
-        .actions(DelaySleepAction.ACTION_DEFINITION);
+        .actions(DelaySleepAction.of());
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -27,6 +27,7 @@ import com.google.auto.service.AutoService;
 /**
  * @author Ivica Cardic
  */
+@Deprecated
 @AutoService(ComponentHandler.class)
 public class ApprovalLinkComponentHandler implements ComponentHandler {
 

@@ -10,7 +10,7 @@
     "metadata": null,
     "name": "sleep",
     "outputDefinition": null,
-    "perform": { },
+    "perform": null,
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
@@ -32,8 +32,8 @@
       "required": true,
       "type": "INTEGER"
     } ],
-    "resumePerform": null,
-    "suspendPerform": null,
+    "resumePerform": { },
+    "suspendPerform": { },
     "title": "Sleep",
     "workflowNodeDescription": null
   } ],

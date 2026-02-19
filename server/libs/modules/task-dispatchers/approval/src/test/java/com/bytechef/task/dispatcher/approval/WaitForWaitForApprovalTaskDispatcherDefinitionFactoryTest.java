@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
+@Deprecated
 public class WaitForWaitForApprovalTaskDispatcherDefinitionFactoryTest {
 
     @Test

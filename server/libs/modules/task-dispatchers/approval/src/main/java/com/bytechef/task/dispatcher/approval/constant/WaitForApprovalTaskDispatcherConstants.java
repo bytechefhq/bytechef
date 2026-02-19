@@ -19,6 +19,7 @@ package com.bytechef.task.dispatcher.approval.constant;
 /**
  * @author Ivica Cardic
  */
+@Deprecated
 public class WaitForApprovalTaskDispatcherConstants {
 
     public static final String WAIT_FOR_APPROVAL = "waitForApproval";

@@ -27,6 +27,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
+@Deprecated
 public class ApprovalLinkCreateApprovalLinksAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createApprovalLinks")

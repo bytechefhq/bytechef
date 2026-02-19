@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
+@Deprecated
 @Component
 public class WaitForApprovalTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 

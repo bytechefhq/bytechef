@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Ivica Cardic
  */
+@Deprecated
 @Configuration
 public class WaitForApprovalTaskDispatcherConfiguration {
 
