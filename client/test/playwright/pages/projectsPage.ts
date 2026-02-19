@@ -88,6 +88,7 @@ export class ProjectsPage {
 
         await clickAndExpectToBeHidden({
             target: moreProjectActionsButton,
+            timeout: 15000,
             trigger: this.deleteProjectConfirmationButton,
         });
     }
