@@ -32,10 +32,10 @@ import java.io.IOException;
 /**
  * @author J. Iamsamang
  */
-public class GoogleMailDeleteMailAction {
+public class GoogleMailDeleteEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteMail")
-        .title("Delete Mail")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteEmail")
+        .title("Delete Email")
         .description("Deletes an email from your Gmail account immediately and permanently.")
         .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#delete-mail")
         .properties(
@@ -43,9 +43,9 @@ public class GoogleMailDeleteMailAction {
                 .label("Message ID")
                 .description("The ID of the message to delete.")
                 .required(true))
-        .perform(GoogleMailDeleteMailAction::perform);
+        .perform(GoogleMailDeleteEmailAction::perform);
 
-    private GoogleMailDeleteMailAction() {
+    private GoogleMailDeleteEmailAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {

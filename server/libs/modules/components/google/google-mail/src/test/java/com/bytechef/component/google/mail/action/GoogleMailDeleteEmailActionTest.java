@@ -38,7 +38,7 @@ import org.mockito.MockedStatic;
 /**
  * @author J. Iamsamang
  */
-class GoogleMailDeleteMailActionTest {
+class GoogleMailDeleteEmailActionTest {
 
     private final Gmail.Users.Messages.Delete mockedDelete = mock(Gmail.Users.Messages.Delete.class);
     private final Gmail mockedGmail = mock(Gmail.class);
@@ -61,7 +61,7 @@ class GoogleMailDeleteMailActionTest {
             when(mockedMessages.delete(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedDelete);
 
-            GoogleMailDeleteMailAction.perform(parameters, parameters, mock(ActionContext.class));
+            GoogleMailDeleteEmailAction.perform(parameters, parameters, mock(ActionContext.class));
 
             assertEquals(parameters, parametersArgumentCaptor.getValue());
             assertEquals(List.of(ME, "123"), stringArgumentCaptor.getAllValues());
