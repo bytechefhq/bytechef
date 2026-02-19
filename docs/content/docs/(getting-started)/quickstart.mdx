@@ -9,18 +9,18 @@ In this tutorial, you'll learn:
 - How to add and configure a component with data expressions
 - How to execute workflow automations
 
+
 ## Pick Your Platform
 
 You have two ways to use ByteChef:
 
-- **[ByteChef Cloud](https://app.bytechef.io/)**: We host it. Zero installation. Best for testing and getting familiar with platform. We'll use this for this guide.
+- **[ByteChef Cloud](https://app.bytechef.io/)**: We host it. Zero installation. Best for testing and getting familiar with the platform. We'll use this for this guide.
 
 - **Your own infrastructure (Self-Hosted)**: Deploy and run ByteChef yourself. Supported on:
 
   - [Docker](/self-hosting/deployment/local-docker)
   - [Kubernetes](/self-hosting/deployment/kubernetes)
   - [AWS EC2](/self-hosting/deployment/aws-ec2)
-  - [AWS ECS](/self-hosting/deployment/aws-ecs)
   - [Azure](/self-hosting/deployment/azure)
   - [GCP](/self-hosting/deployment/google-cloud)
   - [DigitalOcean](/self-hosting/deployment/digitalocean)
@@ -31,7 +31,7 @@ In this quickstart guide, we'll be working with the Cloud instance so you can di
 
 ## Step 1: Create a Project
 
-- Go to your ByteChef dashboard on [Cloud](https://app.bytechef.io/) or Self-hosted instance
+- Go to your ByteChef dashboard on the [Cloud](https://app.bytechef.io/) or Self-hosted instance
 - Click on `Create Project`
 - Enter your project's name and description click `Create`
 
@@ -39,7 +39,7 @@ In this quickstart guide, we'll be working with the Cloud instance so you can di
 
 Inside your project:
 
-- Click <img 
+- Click the <img 
     src="/addworkflow.png" 
     alt="add workflow" 
     width="100"
@@ -49,7 +49,7 @@ Inside your project:
       verticalAlign: 'middle',
       margin: '0 4px'
     }}
-  /> button in project pane
+  /> button in the project pane
 - Give it a label (e.g., "Send Welcome Email")
 - Click `Save`.
 
@@ -57,7 +57,7 @@ Now, you now have a blank canvas in your workflow; let's build something.
 
 ## Step 3: Add a Trigger
 
-Every workflow in ByteChef starts with a trigger, it's event that kicks off your automation.
+Every workflow in ByteChef starts with a trigger, it's the event that kicks off your automation.
 
 - Click the **+** button on the canvas
 - Search for and select Manual Trigger (this lets you start the workflow by testing or deploying)
@@ -69,9 +69,9 @@ Every workflow in ByteChef starts with a trigger, it's event that kicks off your
 
 ## Step 4: Add and Configure Your First Component
 
-Now, let's add a component that does something. Let's use the Spotify component to create a playlist and share with your teammates on Slack.
+Now, let's add a component that does something. Let's use the Spotify component to create a playlist and share with your teammates on Slack. 
 
-- Click the **+** icon after the Manual Trigger
+- Click the + icon after the Manual Trigger
 - Search for Spotify
 - Select **Spotify** and click to add it
 - Select an action from the dropdown (the **Create Playlist** action)
@@ -83,7 +83,7 @@ Now, let's add a component that does something. Let's use the Spotify component 
 - Add the **Slack** component and select the **Send Channel Message** action
 - Configure the component:
   - Make a connection with the component by providing your Slack Bot User OAuth Access Token
-  - In the properties panel, provide the channel ID and message.
+  - In the properties panel, provide the channel ID and message. 
   - In the message section of the Slack properties panel, click on the message tab and enter this expression:
 
 ```
