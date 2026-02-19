@@ -3,6 +3,7 @@ import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workf
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionWithActionsProps} from '@/shared/queries/platform/componentDefinitionsGraphQL.queries';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
@@ -70,6 +71,8 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const ff_3839 = getFeatureFlag('ff-3839');
         const ff_4000 = getFeatureFlag('ff-4000');
 
+        const knowledgeBaseEnabled = useApplicationInfoStore((state) => state.knowledgeBase.enabled);
+
         const filteredActionComponentDefinitions = useMemo(() => {
             if (!componentsWithActions) {
                 return [];
@@ -81,7 +84,8 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     ({name}) =>
                         ((!ff_797 && name !== 'dataStream') || ff_797) &&
                         ((!ff_1652 && name !== 'aiAgent') || ff_1652) &&
-                        ((!ff_4000 && name !== 'knowledgeBase') || ff_4000)
+                        (((!ff_4000 || !knowledgeBaseEnabled) && name !== 'knowledgeBase') ||
+                            (ff_4000 && knowledgeBaseEnabled))
                 );
 
             if (clusterElementType) {
@@ -91,7 +95,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
             }
 
             return actionComponents;
-        }, [componentsWithActions, clusterElementType, ff_797, ff_1652, ff_4000]);
+        }, [componentsWithActions, clusterElementType, ff_797, ff_1652, ff_4000, knowledgeBaseEnabled]);
 
         const filteredTaskDispatcherDefinitions = useMemo(
             () =>
