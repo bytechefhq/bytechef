@@ -65,6 +65,7 @@ interface PropertyMentionsInputEditorProps {
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
     type: string;
     value?: string | number;
+    validateBeforeSave?: (value: string | number) => boolean;
     workflow: Workflow;
 }
 
@@ -88,6 +89,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             setIsFormulaMode,
             taskDispatcherDefinitions,
             type,
+            validateBeforeSave,
             value,
             workflow,
         },
@@ -279,6 +281,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
                 !path
             ) {
+                return;
+            }
+
+            if (validateBeforeSave && !validateBeforeSave(editorValue)) {
                 return;
             }
 

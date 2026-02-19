@@ -58,6 +58,7 @@ interface PropertyMentionsInputProps {
     setIsFormulaMode?: (isFormulaMode: boolean) => void;
     showInputTypeSwitchButton?: boolean;
     type?: string;
+    validateBeforeSave?: (value: string | number) => boolean;
     value?: string;
 }
 
@@ -84,6 +85,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             setIsFormulaMode,
             showInputTypeSwitchButton = false,
             type = 'STRING',
+            validateBeforeSave,
             value,
         },
         ref: ForwardedRef<Editor>
@@ -301,6 +303,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             setIsFormulaMode={setIsFormulaMode}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                             type={type}
+                            validateBeforeSave={validateBeforeSave}
                             value={value || defaultValue}
                             workflow={workflow}
                         />

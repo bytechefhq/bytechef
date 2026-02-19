@@ -549,6 +549,7 @@ import {twMerge} from 'tailwind-merge';
 12. ❌ Don't use single-letter parameters in methods: `(a, b)`, `(acc, item)` → Use descriptive names: `(firstNumber, secondNumber)`, `(accumulator, item)`
 13. ❌ Don't use em dashes (—) or en dashes (–) → Use regular hyphens (-) instead
 14. ❌ Don't add comments, only allowed comments are just above a `useEffect` explaining their behaviour in human language
+15. ❌ Don't put evaluations inside function arguments → always extract into a variable
 
 ## Code Generation
 

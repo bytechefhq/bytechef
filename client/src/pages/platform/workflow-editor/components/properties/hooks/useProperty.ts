@@ -118,6 +118,7 @@ type UsePropertyReturnType = {
     showInputTypeSwitchButton: boolean;
     type?: PropertyAllType['type'];
     typeIcon: ReactNode;
+    validatePropertyValue: (value: string | number) => boolean;
     workflow: Workflow;
 };
 
@@ -327,6 +328,67 @@ export const useProperty = ({
         }
     }
 
+    const validatePropertyValue = useCallback(
+        (value: string | number): boolean => {
+            const stringValue = typeof value === 'string' ? value : String(value);
+
+            if (typeof value === 'string' && (value.startsWith('=') || value.startsWith('${'))) {
+                return true;
+            }
+
+            if ((type === 'INTEGER' || type === 'NUMBER') && typeof value === 'string' && !value.startsWith('${')) {
+                const numericValue = parseFloat(value);
+
+                if (minValue != null && numericValue < minValue) {
+                    return false;
+                }
+
+                if (maxValue != null && numericValue > maxValue) {
+                    return false;
+                }
+
+                if (controlType === 'INTEGER' && !/^-?\d+$/.test(value)) {
+                    return false;
+                }
+
+                if (controlType === 'NUMBER' && !/^-?\d+(\.\d+)?$/.test(value)) {
+                    return false;
+                }
+
+                if (numberPrecision != null && value.includes('.')) {
+                    const decimalLength = value.split('.')[1]?.length ?? 0;
+
+                    if (numberPrecision === 0 || decimalLength > numberPrecision) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            if (minLength != null && stringValue.length < minLength) {
+                return false;
+            }
+
+            if (maxLength != null && stringValue.length > maxLength) {
+                return false;
+            }
+
+            if (regex) {
+                try {
+                    if (new RegExp(regex).test(stringValue)) {
+                        return false;
+                    }
+                } catch {
+                    console.warn('Invalid regex provided: ', regex);
+                }
+            }
+
+            return true;
+        },
+        [controlType, maxLength, maxValue, minLength, minValue, numberPrecision, regex, type]
+    );
+
     const saveInputValue = useDebouncedCallback(() => {
         if (
             !currentComponent ||
@@ -339,6 +401,10 @@ export const useProperty = ({
         }
 
         const valueToSave = latestValueRef.current;
+
+        if (valueToSave !== undefined && valueToSave !== '' && !validatePropertyValue(valueToSave)) {
+            return;
+        }
 
         isSavingRef.current = true;
 
@@ -1246,6 +1312,7 @@ export const useProperty = ({
         showInputTypeSwitchButton,
         type,
         typeIcon,
+        validatePropertyValue,
         workflow,
     };
 };
