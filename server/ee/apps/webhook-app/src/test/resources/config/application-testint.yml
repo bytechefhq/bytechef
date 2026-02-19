@@ -9,6 +9,8 @@ bytechef:
     provider: jdbc
   oauth2:
     redirect-uri:
+  worker:
+    enabled: false
   workflow:
     output-storage:
       provider: jdbc

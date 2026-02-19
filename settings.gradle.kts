@@ -446,6 +446,7 @@ include("server:libs:modules:task-dispatchers:map")
 include("server:libs:modules:task-dispatchers:on-error")
 include("server:libs:modules:task-dispatchers:parallel")
 include("server:libs:modules:task-dispatchers:subflow")
+include("server:libs:modules:task-dispatchers:suspend")
 include("server:libs:modules:task-dispatchers:terminate")
 
 
