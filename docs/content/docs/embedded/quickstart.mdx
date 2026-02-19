@@ -1,11 +1,34 @@
 ---
-<<<<<<< HEAD
-title: "Embedded Quickstart"
-description: "ByteChef Embedded Quickstart. Step-by-step guide to embed and integrate workflows into your applications."
-=======
-description: "ByteChef Embedded Quickstart. Step-by-step guide to embed and integrate workflows into your applications."
-title: Embedded Quickstart
->>>>>>> 002576c3f5 (docs: Update Docker deployment documentation and clean up files)
+description: "Quick start guide for embedding ByteChef in your applications. Learn how to integrate ByteChef workflows into your existing systems."
+title: Quick Start
 ---
 
-This is currently in development. For more information please contact [support@bytechef.io](mailto:support@bytechef.io).
+ByteChef Embedded allows you to integrate workflow automation directly into your applications, giving your users access to powerful automation capabilities without leaving your platform.
+
+## Getting Started
+
+1. **Set up your ByteChef account**: Create an account and configure your workspace
+2. **Generate API keys**: Create secure API credentials for your application
+3. **Install the SDK**: Add ByteChef to your project using npm or yarn
+4. **Create workflows**: Build automation workflows that your users can access
+5. **Integrate**: Embed workflow interfaces into your application
+
+## Example Integration
+
+```javascript
+import { ByteChefClient } from '@bytechef/embedded';
+
+const client = new ByteChefClient({
+  apiKey: 'your-api-key',
+  workspace: 'your-workspace'
+});
+
+// Embed a workflow in your app
+client.embedWorkflow('workflow-id', '#workflow-container');
+```
+
+## Next Steps
+
+- [View API Documentation](/embedded/api-reference)
+- [Explore Examples](/embedded/examples)
+- [Configure Authentication](/embedded/authentication)
