@@ -58,10 +58,10 @@ public class TriggerStateServiceImpl implements TriggerStateService {
         triggerStateRepository
             .findByWorkflowExecutionId(workflowExecutionId.toString())
             .ifPresentOrElse(
-                triggerLifecycle -> {
-                    triggerLifecycle.setValue(value);
+                triggerState -> {
+                    triggerState.setValue(value);
 
-                    triggerStateRepository.save(triggerLifecycle);
+                    triggerStateRepository.save(triggerState);
                 },
                 () -> triggerStateRepository.save(new TriggerState(workflowExecutionId, value)));
     }
