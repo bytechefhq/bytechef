@@ -46,6 +46,7 @@ public class GoogleMailAddLabelsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addLabels")
         .title("Add Labels")
         .description("Add labels to an email in your Gmail account.")
+        .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#add-labels")
         .properties(
             string(ID)
                 .label("Message ID")

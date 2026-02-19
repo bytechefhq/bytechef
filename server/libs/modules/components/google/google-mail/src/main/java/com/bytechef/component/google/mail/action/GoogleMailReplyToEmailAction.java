@@ -54,6 +54,7 @@ public class GoogleMailReplyToEmailAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("replyToEmail")
         .title("Reply to Email")
         .description("Send a reply to an email message.")
+        .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#reply-to-email")
         .properties(
             string(ID)
                 .label("Message ID")

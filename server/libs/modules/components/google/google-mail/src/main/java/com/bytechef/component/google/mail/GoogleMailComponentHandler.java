@@ -51,6 +51,7 @@ public class GoogleMailComponentHandler implements ComponentHandler {
                 "organization, and storage capabilities accessible through web browsers and mobile apps.")
         .icon("path:assets/google-mail.svg")
         .customAction(true)
+        .customActionHelp("", "https://developers.google.com/workspace/gmail/api/reference/rest")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(CONNECTION_DEFINITION)
         .actions(
@@ -79,7 +80,8 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             tool(GoogleMailRemoveLabelsAction.ACTION_DEFINITION),
             tool(GoogleMailReplyToEmailAction.ACTION_DEFINITION),
             tool(GoogleMailSearchEmailAction.ACTION_DEFINITION),
-            tool(GoogleMailSendEmailAction.ACTION_DEFINITION));
+            tool(GoogleMailSendEmailAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

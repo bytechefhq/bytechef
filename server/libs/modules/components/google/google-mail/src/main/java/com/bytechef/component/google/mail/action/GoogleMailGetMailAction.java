@@ -42,6 +42,7 @@ public class GoogleMailGetMailAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getMail")
         .title("Get Mail")
         .description("Get an email from your Gmail account via Id")
+        .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#get-mail")
         .properties(
             string(ID)
                 .label("Message ID")

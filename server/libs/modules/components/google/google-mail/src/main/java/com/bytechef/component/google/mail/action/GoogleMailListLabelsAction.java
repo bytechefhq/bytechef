@@ -37,6 +37,7 @@ public class GoogleMailListLabelsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listLabels")
         .title("List Labels")
         .description("Lists labels that are connected to your Google Mail account.")
+        .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#list-labels")
         .output(
             outputSchema(
                 array()

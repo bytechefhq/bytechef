@@ -58,6 +58,7 @@ public class GoogleMailGetThreadAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getThread")
         .title("Get Thread")
         .description("Gets the specified thread.")
+        .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#get-thread")
         .properties(
             string(ID)
                 .label("Thread ID")

@@ -57,6 +57,7 @@ public class GoogleMailNewEmailPollingTrigger {
         .title("New Email Polling")
         .description("Periodically checks your Gmail inbox for any new incoming emails.")
         .type(TriggerType.POLLING)
+        .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#new-email-polling")
         .properties(FORMAT_PROPERTY)
         .output(GoogleMailUtils::getMessageOutput)
         .poll(GoogleMailNewEmailPollingTrigger::poll);

@@ -55,6 +55,7 @@ public class GoogleMailSendEmailAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
         .title("Send Email")
         .description("Sends the specified message to the recipients in the To, Cc, and Bcc headers.")
+        .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#send-email")
         .properties(
             array(TO)
                 .label("To")
