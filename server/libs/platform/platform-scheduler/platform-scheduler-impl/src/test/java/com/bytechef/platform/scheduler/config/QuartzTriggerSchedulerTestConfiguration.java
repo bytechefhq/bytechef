@@ -16,10 +16,8 @@
 
 package com.bytechef.platform.scheduler.config;
 
-import com.bytechef.commons.util.JsonUtils;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Test configuration for QuartzTriggerScheduler integration tests
@@ -29,10 +27,4 @@ import tools.jackson.databind.json.JsonMapper;
 @SpringBootConfiguration
 @EnableAutoConfiguration
 public class QuartzTriggerSchedulerTestConfiguration {
-
-    public QuartzTriggerSchedulerTestConfiguration() {
-        JsonUtils.setObjectMapper(
-            JsonMapper.builder()
-                .build());
-    }
 }

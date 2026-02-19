@@ -18,8 +18,8 @@ package com.bytechef.platform.scheduler;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.scheduler.job.DelaySchedulerJob;
 import com.bytechef.platform.scheduler.job.DynamicWebhookTriggerRefreshJob;
+import com.bytechef.platform.scheduler.job.OneTimeSchedulerJob;
 import com.bytechef.platform.scheduler.job.PollingTriggerJob;
 import com.bytechef.platform.scheduler.job.ScheduleTriggerJob;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -129,19 +129,21 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
     }
 
     @Override
-    public void scheduleOneTimeTask(
-        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
-        String taskExecutionId) {
+    public void scheduleOneTimeTask(Instant executeAt, Map<String, ?> output, long jobId) {
+        String jobIdStr = String.valueOf(jobId);
 
-        JobDetail jobDetail = JobBuilder.newJob(DelaySchedulerJob.class)
-            .withIdentity(JobKey.jobKey(taskExecutionId, "DelayTask"))
-            .usingJobData("output", JsonUtils.write(output))
-            .usingJobData("workflowExecutionId", workflowExecutionId.toString())
-            .usingJobData("taskExecutionId", taskExecutionId)
-            .build();
+        JobBuilder jobBuilder = JobBuilder.newJob(OneTimeSchedulerJob.class)
+            .withIdentity(JobKey.jobKey(jobIdStr, "OneTimeTask"))
+            .usingJobData("jobId", jobId);
+
+        if (output != null && !output.isEmpty()) {
+            jobBuilder.usingJobData("continueParameters", JsonUtils.write(output));
+        }
+
+        JobDetail jobDetail = jobBuilder.build();
 
         Trigger trigger = TriggerBuilder.newTrigger()
-            .withIdentity(TriggerKey.triggerKey(taskExecutionId, "DelayTask"))
+            .withIdentity(TriggerKey.triggerKey(jobIdStr, "OneTimeTask"))
             .startAt(Date.from(executeAt))
             .build();
 

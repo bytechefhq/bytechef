@@ -21,6 +21,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.scheduler.config.QuartzTriggerSchedulerTestConfiguration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -50,6 +52,7 @@ import org.springframework.context.annotation.Primary;
  *
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 @SpringBootTest(classes = QuartzTriggerSchedulerTestConfiguration.class, properties = "spring.profiles.active=test")
 @Import({
     PostgreSQLContainerConfiguration.class,
@@ -68,103 +71,6 @@ public class QuartzTriggerSchedulerIntTest {
         if (!scheduler.isShutdown()) {
             scheduler.clear();
         }
-    }
-
-    @Test
-    public void testScheduleOneTimeTask() throws Exception {
-        // Given
-        String taskExecutionId = "test-task-123";
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, 456L, "test-workflow-456", "testTrigger");
-        Map<String, Object> output = Map.of("delayMillis", 100L);
-        Instant executeAt = LocalDateTime.now()
-            .plus(Duration.ofMillis(100))
-            .toInstant(ZoneOffset.UTC);
-
-        // When
-        quartzTriggerScheduler.scheduleOneTimeTask(
-            executeAt, output, workflowExecutionId, taskExecutionId);
-
-        // Then
-        // Verify job was created
-        JobKey jobKey = JobKey.jobKey(taskExecutionId, "DelayTask");
-        TriggerKey triggerKey = TriggerKey.triggerKey(taskExecutionId, "DelayTask");
-
-        Assertions.assertTrue(scheduler.checkExists(jobKey));
-        Assertions.assertTrue(scheduler.checkExists(triggerKey));
-
-        // Verify job details
-        JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-        Assertions.assertNotNull(jobDetail);
-        Assertions.assertEquals(workflowExecutionId.toString(),
-            jobDetail.getJobDataMap()
-                .getString("workflowExecutionId"));
-        Assertions.assertEquals(taskExecutionId,
-            jobDetail.getJobDataMap()
-                .getString("taskExecutionId"));
-    }
-
-    @Test
-    public void testScheduleOneTimeTaskWithDelay() throws Exception {
-        // Given
-        String taskExecutionId = "test-task-delay-789";
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, 101L, "test-workflow-delay-101", "testTrigger");
-        Map<String, Object> output = Map.of("delayMillis", 200L);
-        Instant executeAt = LocalDateTime.now()
-            .plus(Duration.ofMillis(200))
-            .toInstant(ZoneOffset.UTC);
-
-        // When
-        quartzTriggerScheduler.scheduleOneTimeTask(
-            executeAt, output, workflowExecutionId, taskExecutionId);
-
-        // Then
-        // Verify job was created
-        JobKey jobKey = JobKey.jobKey(taskExecutionId, "DelayTask");
-        TriggerKey triggerKey = TriggerKey.triggerKey(taskExecutionId, "DelayTask");
-
-        Assertions.assertTrue(scheduler.checkExists(jobKey));
-        Assertions.assertTrue(scheduler.checkExists(triggerKey));
-
-        // Verify trigger timing
-        Trigger trigger = scheduler.getTrigger(triggerKey);
-        Assertions.assertNotNull(trigger);
-        Assertions.assertNotNull(trigger.getStartTime());
-    }
-
-    @Test
-    public void testScheduleOneTimeTaskJobExists() throws Exception {
-        // Given
-        String taskExecutionId = "test-task-job-exists";
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, 1L, "test-workflow-job-exists", "testTrigger");
-        Map<String, Object> output = Map.of("delayMillis", 100L);
-        Instant executeAt = LocalDateTime.now()
-            .plus(Duration.ofMillis(100))
-            .toInstant(ZoneOffset.UTC);
-
-        // When
-        quartzTriggerScheduler.scheduleOneTimeTask(
-            executeAt, output, workflowExecutionId, taskExecutionId);
-
-        // Then
-        // Verify job was created
-        JobKey jobKey = JobKey.jobKey(taskExecutionId, "DelayTask");
-        TriggerKey triggerKey = TriggerKey.triggerKey(taskExecutionId, "DelayTask");
-
-        Assertions.assertTrue(scheduler.checkExists(jobKey));
-        Assertions.assertTrue(scheduler.checkExists(triggerKey));
-
-        // Verify job details
-        JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-        Assertions.assertNotNull(jobDetail);
-        Assertions.assertEquals(workflowExecutionId.toString(),
-            jobDetail.getJobDataMap()
-                .getString("workflowExecutionId"));
-        Assertions.assertEquals(taskExecutionId,
-            jobDetail.getJobDataMap()
-                .getString("taskExecutionId"));
     }
 
     @Test
@@ -244,6 +150,73 @@ public class QuartzTriggerSchedulerIntTest {
         Trigger trigger = scheduler.getTrigger(triggerKey);
         Assertions.assertNotNull(trigger);
         Assertions.assertTrue(trigger instanceof org.quartz.CronTrigger);
+
+        // Clean up
+        scheduler.deleteJob(jobKey);
+    }
+
+    @Test
+    public void testScheduleOneTimeTask() throws Exception {
+        // Given
+        long jobId = 999L;
+        Instant executeAt = LocalDateTime.now()
+            .plus(Duration.ofMinutes(5))
+            .toInstant(ZoneOffset.UTC);
+        Map<String, Object> output = Map.of("key", "value");
+
+        // When
+        quartzTriggerScheduler.scheduleOneTimeTask(executeAt, output, jobId);
+
+        // Then
+        String jobIdStr = String.valueOf(jobId);
+        JobKey jobKey = JobKey.jobKey(jobIdStr, "OneTimeTask");
+        TriggerKey triggerKey = TriggerKey.triggerKey(jobIdStr, "OneTimeTask");
+
+        // Verify job and trigger were created
+        Assertions.assertTrue(scheduler.checkExists(jobKey));
+        Assertions.assertTrue(scheduler.checkExists(triggerKey));
+
+        // Verify job details
+        JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+
+        Assertions.assertNotNull(jobDetail);
+        Assertions.assertEquals(jobId, jobDetail.getJobDataMap()
+            .getLong("jobId"));
+        Assertions.assertNotNull(jobDetail.getJobDataMap()
+            .getString("continueParameters"));
+
+        // Verify trigger timing
+        Trigger trigger = scheduler.getTrigger(triggerKey);
+
+        Assertions.assertNotNull(trigger);
+        Assertions.assertNotNull(trigger.getStartTime());
+
+        // Clean up
+        scheduler.deleteJob(jobKey);
+    }
+
+    @Test
+    public void testScheduleOneTimeTaskWithEmptyOutput() throws Exception {
+        // Given
+        long jobId = 1000L;
+        Instant executeAt = LocalDateTime.now()
+            .plus(Duration.ofMinutes(5))
+            .toInstant(ZoneOffset.UTC);
+
+        // When
+        quartzTriggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), jobId);
+
+        // Then
+        String jobIdStr = String.valueOf(jobId);
+        JobKey jobKey = JobKey.jobKey(jobIdStr, "OneTimeTask");
+
+        JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+
+        Assertions.assertNotNull(jobDetail);
+        Assertions.assertEquals(jobId, jobDetail.getJobDataMap()
+            .getLong("jobId"));
+        Assertions.assertFalse(jobDetail.getJobDataMap()
+            .containsKey("continueParameters"));
 
         // Clean up
         scheduler.deleteJob(jobKey);

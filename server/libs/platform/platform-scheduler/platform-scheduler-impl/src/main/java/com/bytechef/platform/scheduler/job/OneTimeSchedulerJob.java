@@ -16,14 +16,7 @@
 
 package com.bytechef.platform.scheduler.job;
 
-import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.workflow.WorkflowExecutionId;
-import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.Map;
+import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -33,27 +26,17 @@ import org.springframework.context.ApplicationEventPublisher;
 /**
  * @author Ivica Cardic
  */
-public class DelaySchedulerJob implements Job {
+public class OneTimeSchedulerJob implements Job {
 
     private ApplicationEventPublisher eventPublisher;
 
     @Override
     public void execute(JobExecutionContext context) {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
-        Date fireTime = context.getFireTime();
 
-        LocalDateTime localDateTime = fireTime.toInstant()
-            .atZone(ZoneId.systemDefault())
-            .toLocalDateTime();
+        long jobId = jobDataMap.getLong("jobId");
 
-        eventPublisher.publishEvent(
-            new TriggerListenerEvent(
-                new TriggerListenerEvent.ListenerParameters(
-                    WorkflowExecutionId.parse(jobDataMap.getString("workflowExecutionId")),
-                    fireTime.toInstant(),
-                    MapUtils.concat(
-                        Map.of("fireTime", fireTime, "datetime", localDateTime),
-                        JsonUtils.readMap(jobDataMap.getString("output"), Object.class)))));
+        eventPublisher.publishEvent(new ResumeJobEvent(jobId));
     }
 
     @Autowired
