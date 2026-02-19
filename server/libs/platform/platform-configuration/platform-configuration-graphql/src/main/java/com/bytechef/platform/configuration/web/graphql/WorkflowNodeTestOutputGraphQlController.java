@@ -46,8 +46,8 @@ class WorkflowNodeTestOutputGraphQlController {
 
         WorkflowNodeTestOutput workflowNodeTestOutput = inputParameters != null
             ? workflowNodeTestOutputFacade.saveClusterElementTestOutput(
-                workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId,
-                inputParameters)
+                workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, inputParameters,
+                environmentId)
             : workflowNodeTestOutputFacade.saveClusterElementTestOutput(
                 workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId);
 

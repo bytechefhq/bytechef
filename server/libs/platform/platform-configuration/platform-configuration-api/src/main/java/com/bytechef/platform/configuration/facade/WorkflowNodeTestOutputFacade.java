@@ -32,7 +32,7 @@ public interface WorkflowNodeTestOutputFacade {
 
     WorkflowNodeTestOutput saveClusterElementTestOutput(
         String workflowId, String workflowNodeName, String clusterElementType,
-        String clusterElementWorkflowNodeName, long environmentId, Map<String, Object> inputParameters);
+        String clusterElementWorkflowNodeName, Map<String, Object> inputParameters, long environmentId);
 
     WorkflowNodeTestOutput saveWorkflowNodeSampleOutput(
         String workflowId, String workflowNodeName, Object sampleOutput, long environmentId);
@@ -40,7 +40,7 @@ public interface WorkflowNodeTestOutputFacade {
     WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName, long environmentId);
 
     WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, long environmentId, Map<String, Object> inputParameters);
+        String workflowId, String workflowNodeName, Map<String, Object> inputParameters, long environmentId);
 
     void saveWorkflowNodeTestOutput(
         WorkflowExecutionId workflowExecutionId, long environmentId, WebhookRequest webhookRequest);
