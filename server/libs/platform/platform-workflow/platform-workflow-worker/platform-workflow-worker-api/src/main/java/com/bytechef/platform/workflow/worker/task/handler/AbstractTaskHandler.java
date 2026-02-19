@@ -25,8 +25,10 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -53,6 +55,9 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
         Map<String, Long> connectIdMap = MapUtils.getMap(
             taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 
+        Map<String, ?> continueParameters = extractContinueParameters(taskExecution);
+        Instant suspendExpiresAt = extractSuspendExpiresAt(taskExecution);
+
         try {
             WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
@@ -65,9 +70,45 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
                 taskExecution.getParameters(), connectIdMap, workflowTask.getExtensions(),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.ENVIRONMENT_ID),
                 MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, PlatformType.class),
-                MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false));
+                MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false),
+                continueParameters, suspendExpiresAt);
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static @Nullable Map<String, ?> extractContinueParameters(TaskExecution taskExecution) {
+        Map<String, ?> suspendData = MapUtils.getMap(
+            taskExecution.getMetadata(), MetadataConstants.SUSPEND, Map.of());
+
+        if (suspendData.isEmpty()) {
+            return null;
+        }
+
+        Object continueParametersValue = suspendData.get("continueParameters");
+
+        if (continueParametersValue instanceof Map) {
+            return (Map<String, ?>) continueParametersValue;
+        }
+
+        return null;
+    }
+
+    private static @Nullable Instant extractSuspendExpiresAt(TaskExecution taskExecution) {
+        Map<String, ?> suspendData = MapUtils.getMap(
+            taskExecution.getMetadata(), MetadataConstants.SUSPEND, Map.of());
+
+        if (suspendData.isEmpty()) {
+            return null;
+        }
+
+        Object expiresAtValue = suspendData.get("expiresAt");
+
+        if (expiresAtValue instanceof Number expiresAtNumber) {
+            return Instant.ofEpochMilli(expiresAtNumber.longValue());
+        }
+
+        return null;
     }
 }

@@ -24,6 +24,7 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -122,7 +123,8 @@ public interface ActionDefinitionService extends OperationDefinitionService {
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
-        boolean editorEnvironment, PlatformType type);
+        boolean editorEnvironment, PlatformType type, @Nullable Map<String, ?> continueParameters,
+        @Nullable Instant suspendExpiresAt);
 
     /**
      * Executes the perform logic for a specific component and its version in the context of polyglot execution. This

@@ -92,7 +92,6 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
     }
 
     private void awaitCompletion(ActionDefinition.SseEmitterHandler.SseEmitter emitter, CountDownLatch latch) {
-
         try {
             Long timeout = null;
 

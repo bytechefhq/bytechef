@@ -14,6 +14,7 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -76,10 +77,11 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public Map<String, ?> executePerform(
+    public Object executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
-        Map<String, ?> extensions, Long environmentId, PlatformType type, boolean editorEnvironment) {
+        Map<String, ?> extensions, Long environmentId, PlatformType type, boolean editorEnvironment,
+        Map<String, ?> continueParameters, Instant suspendExpiresAt) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(

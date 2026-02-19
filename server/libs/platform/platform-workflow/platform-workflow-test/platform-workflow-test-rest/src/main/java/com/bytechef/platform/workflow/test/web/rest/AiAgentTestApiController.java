@@ -160,7 +160,7 @@ class AiAgentTestApiController {
 
                 Object result = actionDefinitionFacade.executePerform(
                     workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null,
-                    workflowId, evaluatedParameters, connectionIds, extensions, environmentId, null, true);
+                    workflowId, evaluatedParameters, connectionIds, extensions, environmentId, null, true, null, null);
 
                 if (result instanceof ActionDefinition.SseEmitterHandler sseEmitterHandler) {
                     AiAgentSseEmitterBridge bridge = new AiAgentSseEmitterBridge(sseEmitter, testId);

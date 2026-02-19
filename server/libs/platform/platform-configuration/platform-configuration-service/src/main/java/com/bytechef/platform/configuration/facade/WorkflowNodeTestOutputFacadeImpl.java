@@ -323,7 +323,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         Object value = actionDefinitionFacade.executePerform(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null, null,
-            inputParameters, connectionIds, extensions, environmentId, null, true);
+            inputParameters, connectionIds, extensions, environmentId, null, true, null, null);
 
         if (value == null) {
             return null;

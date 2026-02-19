@@ -21,10 +21,16 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.BaseOutputFunction;
 import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
+import com.bytechef.component.definition.ActionDefinition.BeforeResumeFunction;
+import com.bytechef.component.definition.ActionDefinition.BeforeSuspendConsumer;
+import com.bytechef.component.definition.ActionDefinition.BeforeTimeoutResumeFunction;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
+import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction;
+import com.bytechef.component.definition.ActionDefinition.Suspend;
+import com.bytechef.component.definition.ActionDefinition.SuspendPerformFunction;
 import com.bytechef.component.definition.ActionDefinition.WorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -57,6 +63,8 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -162,10 +170,41 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         Long jobPrincipalId,
         Long jobPrincipalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
         @ConnectionParam Map<String, ComponentConnection> componentConnections,
-        Map<String, ?> extensions, Long environmentId, boolean editorEnvironment, PlatformType type) {
+        Map<String, ?> extensions, Long environmentId, boolean editorEnvironment, PlatformType type,
+        @Nullable Map<String, ?> continueParameters, @Nullable Instant suspendExpiresAt) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition = componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName);
+
+        if (continueParameters != null) {
+            Optional<ResumePerformFunction> resumePerformOptional = actionDefinition.getResumePerform();
+
+            if (resumePerformOptional.isPresent()) {
+                ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
+
+                ActionContext actionContext = contextFactory.createActionContext(
+                    componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                    workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
+
+                return executeResumePerform(
+                    actionDefinition, resumePerformOptional.get(), inputParameters, continueParameters,
+                    suspendExpiresAt, firstComponentConnection, actionContext);
+            }
+        }
+
+        Optional<SuspendPerformFunction> suspendPerformOptional = actionDefinition.getSuspendPerform();
+
+        if (suspendPerformOptional.isPresent()) {
+            ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
+
+            ActionContext actionContext = contextFactory.createActionContext(
+                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
+                firstComponentConnection, environmentId, type, editorEnvironment);
+
+            return executeSuspendPerform(
+                actionDefinition, suspendPerformOptional.get(), inputParameters, firstComponentConnection,
+                actionContext);
+        }
 
         BasePerformFunction basePerformFunction = actionDefinition
             .getPerform()
@@ -423,6 +462,88 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             }
 
             throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+        }
+    }
+
+    private Object executeResumePerform(
+        com.bytechef.component.definition.ActionDefinition actionDefinition,
+        ResumePerformFunction resumePerformFunction, Map<String, ?> inputParameters,
+        Map<String, ?> continueParameters, @Nullable Instant suspendExpiresAt,
+        @Nullable ComponentConnection componentConnection, ActionContext context) {
+
+        try {
+            Map<String, Object> mergedInputParameters = new HashMap<>(inputParameters);
+
+            if (suspendExpiresAt != null) {
+                Optional<BeforeTimeoutResumeFunction> beforeTimeoutResumeOptional =
+                    actionDefinition.getBeforeTimeoutResume();
+
+                if (beforeTimeoutResumeOptional.isPresent()) {
+                    Optional<Map<String, ?>> additionalParameters = beforeTimeoutResumeOptional.get()
+                        .apply(
+                            ParametersFactory.create(inputParameters), ParametersFactory.create(continueParameters),
+                            context);
+
+                    if (additionalParameters.isPresent()) {
+                        mergedInputParameters.putAll(additionalParameters.get());
+                    }
+                }
+            }
+
+            Optional<BeforeResumeFunction> beforeResumeOptional = actionDefinition.getBeforeResume();
+
+            if (beforeResumeOptional.isPresent()) {
+                Optional<Map<String, ?>> additionalParameters = beforeResumeOptional.get()
+                    .apply(
+                        null, ParametersFactory.create(mergedInputParameters),
+                        ParametersFactory.create(continueParameters), context);
+
+                if (additionalParameters.isPresent()) {
+                    mergedInputParameters.putAll(additionalParameters.get());
+                }
+            }
+
+            return resumePerformFunction.apply(
+                ParametersFactory.create(mergedInputParameters),
+                componentConnection == null
+                    ? null : ParametersFactory.create(componentConnection.getConnectionParameters()),
+                ParametersFactory.create(continueParameters), context);
+        } catch (Exception exception) {
+            if (exception instanceof ProviderException) {
+                throw (ProviderException) exception;
+            }
+
+            throw new ExecutionException(exception, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+        }
+    }
+
+    private Suspend executeSuspendPerform(
+        com.bytechef.component.definition.ActionDefinition actionDefinition,
+        SuspendPerformFunction suspendPerformFunction, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, ActionContext context) {
+
+        try {
+            Suspend suspend = suspendPerformFunction.apply(
+                ParametersFactory.create(inputParameters),
+                componentConnection == null
+                    ? null : ParametersFactory.create(componentConnection.getConnectionParameters()),
+                context);
+
+            Optional<BeforeSuspendConsumer> beforeSuspendOptional = actionDefinition.getBeforeSuspend();
+
+            if (beforeSuspendOptional.isPresent()) {
+                beforeSuspendOptional.get()
+                    .apply(
+                        null, suspend.expiresAt(), ParametersFactory.create(suspend.continueParameters()), context);
+            }
+
+            return suspend;
+        } catch (Exception exception) {
+            if (exception instanceof ProviderException) {
+                throw (ProviderException) exception;
+            }
+
+            throw new ExecutionException(exception, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
         }
     }
 

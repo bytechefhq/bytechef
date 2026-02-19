@@ -573,7 +573,7 @@ public class ComponentTools {
 
                                     var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
                                         componentDefinition.getVersion(), actionDefinition.getName(), null, null, null,
-                                        null, null, connectionIds, null, null, null, true);
+                                        null, null, connectionIds, null, null, null, true, null, null);
                                     if (output != null) {
                                         outputResponse = SchemaUtils.toOutput(
                                             output, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
