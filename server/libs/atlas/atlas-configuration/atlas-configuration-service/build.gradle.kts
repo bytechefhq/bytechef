@@ -7,6 +7,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework.boot:spring-boot")
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
