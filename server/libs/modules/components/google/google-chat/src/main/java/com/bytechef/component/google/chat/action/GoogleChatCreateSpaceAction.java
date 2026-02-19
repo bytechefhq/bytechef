@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.chat.constant.GoogleChatConstants.DISPLAY_NAME;
-import static com.bytechef.component.google.chat.constant.GoogleChatConstants.SPACE;
 import static com.bytechef.component.google.chat.constant.GoogleChatConstants.SPACE_TYPE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -93,7 +92,7 @@ public class GoogleChatCreateSpaceAction {
             .body(
                 Body.of(
                     Map.of(
-                        SPACE_TYPE, SPACE,
+                        SPACE_TYPE, "SPACE",
                         DISPLAY_NAME, inputParameters.getRequiredString(DISPLAY_NAME))))
             .execute()
             .getBody(new TypeReference<>() {});

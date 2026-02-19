@@ -69,7 +69,7 @@ class GoogleChatUtilsTest {
             .thenReturn(
                 Map.of("spaces", List.of(Map.of("name", "testName", DISPLAY_NAME, "testDisplayName"))));
 
-        List<Option<String>> result = GoogleChatUtils.getSpaceOptions(
+        List<Option<String>> result = GoogleChatUtils.getSpaceNameOptions(
             mockedParameters, mockedParameters, null, "", mockedContext);
 
         List<Option<String>> expected = List.of(option("testDisplayName", "testName"));
