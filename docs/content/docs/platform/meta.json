@@ -4,6 +4,8 @@
   "icon": "Layers",
   "root": true,
   "pages": [
-    "overview"
+    "overview",
+    "copilot",
+    "mcp-server"
   ]
 }
