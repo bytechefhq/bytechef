@@ -65,6 +65,7 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:map"))
     implementation(project(":server:libs:modules:task-dispatchers:parallel"))
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
+    implementation(project(":server:libs:modules:task-dispatchers:suspend"))
 
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     testImplementation(project(":server:libs:test:test-int-support"))
