@@ -1,14 +1,10 @@
 ---
-<<<<<<< HEAD
 title: "Overview"
 description: "ByteChef Connect Data Overview. Learn how to integrate and manage data sources and connectivity in workflows."
-=======
-description: "ByteChef Connect Data Overview. Learn how to integrate and manage data sources and connectivity in workflows."
-title: Overview
->>>>>>> 002576c3f5 (docs: Update Docker deployment documentation and clean up files)
 ---
 
 ByteChef's Connect Data feature allows you to seamlessly integrate with hundreds of third-party applications and services. This section will guide you through managing these connections to power your automations.
+
 ## What are Connections?
 
 Connections in ByteChef are secure links between your ByteChef account and external services. They store authentication details and configuration needed to interact with these services through your workflows.
@@ -21,42 +17,3 @@ Think of a connection as a bridge: one end is in ByteChef, and the other is in y
 - **Reusable**: Create a connection once and use it across dozens of different workflows.
 - **Secure**: All credentials are encrypted at rest using industry-standard AES-256 encryption.
 - **Easy Setup**: Guided wizards help you navigate the authentication process for each service.
-- **Sharing**: (Enterprise) Share connections with your team while maintaining control over permissions.
-
-## Getting Started
-
-Setting up a connection is a quick process:
-
-1. **Navigate to Connections**: Click the **Connections** tab in the main sidebar.
-2. **Choose a Service**: Click **New Connection** and search for the application you want to connect.
-3. **Authenticate**: Follow the prompts to authorize ByteChef. This might involve logging in via OAuth, pasting an API Key, or providing basic credentials.
-4. **Name and Save**: Give your connection a descriptive name (e.g., `Company Slack - Marketing`) to help you identify it later.
-
-## Popular Integrations
-
-- [Connect to Google Workspace](/reference/components/google-application-setup_v1)
-- [Connect to Microsoft 365](/reference/components/microsoft-graph-application-setup_v1)
-- [Connect to Slack](/reference/components/slack_v1)
-
-## Authentication Methods
-
-ByteChef supports various authentication methods to accommodate the security requirements of different services:
-
-- **OAuth 2.0**: The industry standard for secure authorization. It redirects you to the app's own login page so ByteChef never sees your password.
-- **API Key**: A secret token provided by the service that you paste into ByteChef.
-- **Bearer Token**: A security token that gives access to the bearer.
-- **Basic Auth**: Traditional username and password authentication, typically used by internal or legacy systems.
-
-Learn more about [Authentication Methods](/automation/connect-data/authentication).
-
-## Next Steps
-
-<<<<<<< HEAD
-- [Authentication](/automation/connect-data/authentication) - Learn about different authentication methods.
-- [Troubleshooting](/automation/connect-data/troubleshooting) - Fix common connection errors.
-- [Connections Reference](/reference/components) - Detailed reference for all supported connections.
-
-=======
-- [How-To Guides](/automation/connect-data/how-to-guides) - Step-by-step connection guides for popular services
-- [Connections Reference](/automation/connect-data/reference/connections) - Detailed reference for all connection types and settings
->>>>>>> 002576c3f5 (docs: Update Docker deployment documentation and clean up files)
