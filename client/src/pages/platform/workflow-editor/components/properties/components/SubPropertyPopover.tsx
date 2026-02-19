@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
 import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
@@ -12,6 +13,8 @@ interface SubPropertyPopoverProps {
     availablePropertyTypes: Array<{label: string; value: string}>;
     buttonLabel?: string;
     condition?: boolean;
+    disabled?: boolean;
+    disabledTooltip?: string;
     handleClick: () => void;
     newPropertyName?: string;
     newPropertyType: keyof typeof VALUE_PROPERTY_CONTROL_TYPES | string;
@@ -24,6 +27,8 @@ const SubPropertyPopover = ({
     availablePropertyTypes,
     buttonLabel,
     condition,
+    disabled,
+    disabledTooltip,
     handleClick,
     newPropertyName,
     newPropertyType,
@@ -41,6 +46,27 @@ const SubPropertyPopover = ({
             setNewPropertyName(value);
         }
     };
+
+    if (disabled && disabledTooltip) {
+        return (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <span className="inline-block">
+                        <Button
+                            className="mt-3 rounded-sm"
+                            disabled
+                            icon={<PlusIcon />}
+                            label={buttonLabel || `Add ${array ? 'array item' : 'object property'}`}
+                            size="sm"
+                            variant="secondary"
+                        />
+                    </span>
+                </TooltipTrigger>
+
+                <TooltipContent>{disabledTooltip}</TooltipContent>
+            </Tooltip>
+        );
+    }
 
     return (
         <Popover>
