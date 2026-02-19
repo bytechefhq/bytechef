@@ -35,6 +35,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -165,6 +166,19 @@ class AiAgentTestApiController {
                     AiAgentSseEmitterBridge bridge = new AiAgentSseEmitterBridge(sseEmitter, testId);
 
                     sseEmitterHandler.handle(bridge);
+                } else if (result instanceof Map<?, ?> resultMap && resultMap.containsKey("toolExecutions")) {
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, Object>> toolExecutions =
+                        (List<Map<String, Object>>) resultMap.get("toolExecutions");
+
+                    for (Map<String, Object> toolExecution : toolExecutions) {
+                        sendEvent(sseEmitter, "tool_execution", toolExecution);
+                    }
+
+                    sendEvent(
+                        sseEmitter, "result", resultMap.get("response") != null ? resultMap.get("response") : "");
+
+                    completeEmitter(sseEmitter, testId);
                 } else {
                     sendEvent(sseEmitter, "result", result != null ? result : "");
 
@@ -226,15 +240,13 @@ class AiAgentTestApiController {
 
     private void sendEvent(SseEmitter sseEmitter, String name, Object data) {
         try {
-            Object eventData = data instanceof String stringData ? JsonUtils.write(stringData) : data;
-
             sseEmitter.send(
                 SseEmitter.event()
                     .name(name)
-                    .data(eventData));
+                    .data(data instanceof String ? JsonUtils.write(data) : data));
         } catch (Exception exception) {
             if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+                logger.trace("Failed to send SSE '{}' event: {}", name, exception.getMessage(), exception);
             }
         }
     }
@@ -313,12 +325,25 @@ class AiAgentTestApiController {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void send(Object data) {
-            if (data instanceof String stringData) {
-                accumulatedContent.append(stringData);
-            }
+            if (data instanceof Map<?, ?> map && "tool_execution".equals(map.get("__eventType"))) {
+                Map<String, Object> eventData = new LinkedHashMap<>((Map<String, Object>) map);
 
-            sendEvent(springSseEmitter, "stream", data);
+                eventData.remove("__eventType");
+
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Sending tool_execution SSE event: toolName={}", eventData.get("toolName"));
+                }
+
+                sendEvent(springSseEmitter, "tool_execution", eventData);
+            } else {
+                if (data instanceof String stringData) {
+                    accumulatedContent.append(stringData);
+                }
+
+                sendEvent(springSseEmitter, "stream", data);
+            }
         }
     }
 }
