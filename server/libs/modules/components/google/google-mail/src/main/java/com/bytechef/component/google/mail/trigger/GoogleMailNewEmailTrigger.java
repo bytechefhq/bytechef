@@ -64,6 +64,7 @@ public class GoogleMailNewEmailTrigger {
         .title("New Email")
         .description("Triggers when new mail is found in your Gmail inbox.")
         .type(TriggerType.STATIC_WEBHOOK)
+        .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#new-email")
         .properties(
             string(TOPIC_NAME)
                 .label("Topic Name")

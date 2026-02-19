@@ -37,6 +37,7 @@ public class GoogleMailDeleteMailAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteMail")
         .title("Delete Mail")
         .description("Delete an email from your Gmail account permanently via Id")
+        .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#delete-mail")
         .properties(
             string(ID)
                 .label("Message ID")

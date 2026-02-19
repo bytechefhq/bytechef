@@ -41,6 +41,7 @@ public class GoogleMailCreateLabelAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createLabel")
         .title("Create Label")
         .description("Creates a new label.")
+        .help("", "https://docs.bytechef.io/reference/components/google-mail_v1#create-label")
         .properties(
             string(NAME)
                 .label("Name")
