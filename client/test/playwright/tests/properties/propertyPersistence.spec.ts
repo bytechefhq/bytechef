@@ -275,16 +275,16 @@ test.describe('Saving to Workflow Definition', () => {
         const booleanProperty = configurationPanel.getByLabel('Boolean property');
 
         const booleanSelect = booleanProperty.getByLabel('Select');
-        const booleanSelectOptions = authenticatedPage.getByLabel('Select options');
+        const testValue = false;
+        const optionName = testValue ? 'True' : 'False';
+
+        const option = authenticatedPage.getByRole('option', {name: optionName});
 
         await clickAndExpectToBeVisible({
-            target: booleanSelectOptions,
+            autoClick: true,
+            target: option,
             trigger: booleanSelect,
         });
-
-        const testValue = false;
-
-        await booleanSelectOptions.getByRole('option', {name: testValue ? 'True' : 'False'}).click();
 
         expectedPropertyType = typeof testValue;
         expectedPropertyValue = testValue;
