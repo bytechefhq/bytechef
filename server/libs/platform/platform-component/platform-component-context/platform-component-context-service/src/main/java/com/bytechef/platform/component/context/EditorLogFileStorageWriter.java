@@ -17,49 +17,31 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * LogFileStorage implementation for writing logs in editor/test environments. Writes logs to temporary files using
+ * LogFileStorage implementation for writing logs in editor/test environments. Writes logs using FileStorageService in
  * JSONL format asynchronously using virtual threads.
  *
  * @author Ivica Cardic
  */
 public class EditorLogFileStorageWriter implements LogFileStorageWriter {
 
-    private static final Logger logger = LoggerFactory.getLogger(EditorLogFileStorageWriter.class);
-
-    private static final String LOG_DIR_NAME = "bytechef_editor_logs";
+    private static final String EDITOR_LOG_DIR = "editor/logs";
 
     private final ExecutorService asyncExecutor = Executors.newVirtualThreadPerTaskExecutor();
-    private final Path logDirectory;
+    private final FileStorageService fileStorageService;
 
-    // Security: PATH_TRAVERSAL_IN is suppressed because logDirectory uses only a hardcoded constant (LOG_DIR_NAME)
-    // combined with java.io.tmpdir system property, with no user input involved.
-    // EI is suppressed because Path is effectively immutable and the field is private final.
-    @SuppressFBWarnings(value = {
-        "CT_CONSTRUCTOR_THROW", "EI", "PATH_TRAVERSAL_IN"
-    }, justification = "Constructor must fail fast if log directory cannot be created; Path is immutable and private; "
-        +
-        "no user input in path construction")
-    public EditorLogFileStorageWriter() {
-        this.logDirectory = Path.of(System.getProperty("java.io.tmpdir"), LOG_DIR_NAME);
-
-        try {
-            Files.createDirectories(logDirectory);
-        } catch (IOException exception) {
-            throw new RuntimeException("Failed to create editor log directory", exception);
-        }
+    @SuppressFBWarnings("EI")
+    public EditorLogFileStorageWriter(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
@@ -69,33 +51,32 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
 
     @Override
     public void deleteLogEntries(long jobId) {
-        Path logFile = getLogFilePath(jobId);
+        String filename = jobId + ".jsonl";
 
-        try {
-            Files.deleteIfExists(logFile);
-        } catch (IOException exception) {
-            logger.warn("Failed to delete editor log file: {}", logFile, exception);
+        if (fileStorageService.fileExists(EDITOR_LOG_DIR, filename)) {
+            FileEntry fileEntry = fileStorageService.getFileEntry(EDITOR_LOG_DIR, filename);
+
+            fileStorageService.deleteFile(EDITOR_LOG_DIR, fileEntry);
         }
     }
 
-    // Security: jobId is a primitive long, so it cannot contain path traversal characters
-    private Path getLogFilePath(long jobId) {
-        return logDirectory.resolve("job_" + jobId + ".jsonl");
-    }
-
     private synchronized void appendLogEntry(long jobId, LogEntry logEntry) {
-        try {
-            Path logFile = getLogFilePath(jobId);
+        String filename = jobId + ".jsonl";
+        byte[] logLineBytes = (JsonUtils.write(logEntry) + "\n").getBytes(StandardCharsets.UTF_8);
 
-            if (!Files.exists(logFile)) {
-                Files.createFile(logFile);
-            }
+        if (fileStorageService.fileExists(EDITOR_LOG_DIR, filename)) {
+            FileEntry existingFile = fileStorageService.getFileEntry(EDITOR_LOG_DIR, filename);
 
-            String logLine = JsonUtils.write(logEntry) + "\n";
+            byte[] existingContent = fileStorageService.readFileToBytes(EDITOR_LOG_DIR, existingFile);
 
-            Files.writeString(logFile, logLine, StandardOpenOption.APPEND);
-        } catch (IOException exception) {
-            logger.error("Failed to append log entry for job {}", jobId, exception);
+            byte[] newContent = new byte[existingContent.length + logLineBytes.length];
+
+            System.arraycopy(existingContent, 0, newContent, 0, existingContent.length);
+            System.arraycopy(logLineBytes, 0, newContent, existingContent.length, logLineBytes.length);
+
+            fileStorageService.storeFileContent(EDITOR_LOG_DIR, filename, newContent, false);
+        } else {
+            fileStorageService.storeFileContent(EDITOR_LOG_DIR, filename, logLineBytes, false);
         }
     }
 }

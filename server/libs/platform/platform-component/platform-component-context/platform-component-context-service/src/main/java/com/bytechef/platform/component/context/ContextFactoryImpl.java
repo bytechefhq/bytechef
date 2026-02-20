@@ -22,6 +22,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.log.LogFileStorage;
@@ -42,11 +43,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContextFactoryImpl implements ContextFactory {
 
-    private static final EditorLogFileStorageWriter EDITOR_LOG_FILE_STORAGE_WRITER = new EditorLogFileStorageWriter();
-
     private final ApplicationContext applicationContext;
     private final CacheManager cacheManager;
     private final DataStorage dataStorage;
+    private final EditorLogFileStorageWriter editorLogFileStorageWriter;
     private final EditorTempFileStorage editorTempFileStorage;
     private final ApplicationEventPublisher eventPublisher;
     private final LogFileStorage logFileStorage;
@@ -63,10 +63,14 @@ public class ContextFactoryImpl implements ContextFactory {
         this.applicationContext = applicationContext;
         this.cacheManager = cacheManager;
         this.dataStorage = dataStorage;
-        this.editorTempFileStorage = new EditorTempFileStorage(fileStorageServiceRegistry.getFileStorageService(
+
+        FileStorageService fileStorageService = fileStorageServiceRegistry.getFileStorageService(
             applicationProperties.getFileStorage()
                 .getProvider()
-                .name()));
+                .name());
+
+        this.editorLogFileStorageWriter = new EditorLogFileStorageWriter(fileStorageService);
+        this.editorTempFileStorage = new EditorTempFileStorage(fileStorageService);
         this.eventPublisher = eventPublisher;
         this.logFileStorage = logFileStorage;
         this.tempFileStorage = tempFileStorage;
@@ -162,7 +166,7 @@ public class ContextFactoryImpl implements ContextFactory {
 
     private LogFileStorageWriter getLogFileStorageWriter(boolean editorEnvironment) {
         if (editorEnvironment) {
-            return EDITOR_LOG_FILE_STORAGE_WRITER;
+            return editorLogFileStorageWriter;
         }
 
         return logFileStorage;
