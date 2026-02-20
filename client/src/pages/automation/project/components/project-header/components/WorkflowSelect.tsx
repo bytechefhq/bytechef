@@ -56,7 +56,7 @@ const WorkflowSelect = ({
 
                     {projectWorkflows.map((workflow) => (
                         <SelectItem
-                            className="w-60 [&>span]:truncate"
+                            className="[&>span]:truncate"
                             key={workflow.projectWorkflowId!}
                             title={workflow.label!.length > 32 ? workflow.label! : undefined}
                             value={workflow.projectWorkflowId!.toString()}
