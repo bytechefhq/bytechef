@@ -17,25 +17,58 @@ Ensure you have the following:
 
 ## Getting Started with ByteChef
 
-- Download the ECS task definitions and deploy using AWS CLI:
-
-
-```shell
-curl -O https://raw.githubusercontent.com/bytechefhq/bytechef/master/ecs/postgres-task.json
-curl -O https://raw.githubusercontent.com/bytechefhq/bytechef/master/ecs/bytechef-task.json
-```
-
 - Create the ECS cluster:
 
 ```shell
 aws ecs create-cluster --cluster-name bytechef-cluster
 ```
 
-- Register the task definitions:
+- Register the PostgreSQL task definition:
 
 ```shell
-aws ecs register-task-definition --cli-input-json file://postgres-task.json
-aws ecs register-task-definition --cli-input-json file://bytechef-task.json
+aws ecs register-task-definition \
+  --family bytechef-postgres \
+  --requires-compatibilities FARGATE \
+  --network-mode awsvpc \
+  --cpu 1024 \
+  --memory 2048 \
+  --container-definitions '[
+    {
+      "name": "postgres",
+      "image": "postgres:16-alpine",
+      "essential": true,
+      "portMappings": [{"containerPort": 5432}],
+      "environment": [
+        {"name": "POSTGRES_USER", "value": "postgres"},
+        {"name": "POSTGRES_PASSWORD", "value": "postgres"},
+        {"name": "POSTGRES_DB", "value": "bytechef"}
+      ]
+    }
+  ]'
+```
+
+- Register the ByteChef task definition:
+
+```shell
+aws ecs register-task-definition \
+  --family bytechef-app \
+  --requires-compatibilities FARGATE \
+  --network-mode awsvpc \
+  --cpu 2048 \
+  --memory 4096 \
+  --container-definitions '[
+    {
+      "name": "bytechef",
+      "image": "docker.bytechef.io/bytechef/bytechef:latest",
+      "essential": true,
+      "portMappings": [{"containerPort": 8080}],
+      "environment": [
+        {"name": "BYTECHEF_DATASOURCE_URL", "value": "jdbc:postgresql://postgres-service.local:5432/bytechef"},
+        {"name": "BYTECHEF_DATASOURCE_USERNAME", "value": "postgres"},
+        {"name": "BYTECHEF_DATASOURCE_PASSWORD", "value": "postgres"}
+      ]
+    }
+  ]'
 ```
 
 - Create the ECS services (replace subnet and security group IDs):
@@ -103,7 +136,25 @@ Full ECS deployment examples for PostgreSQL are in the [ByteChef GitHub reposito
 To deploy a newer version, update the task definition and force a new deployment:
 
 ```shell
-aws ecs register-task-definition --cli-input-json file://bytechef-task.json
+aws ecs register-task-definition \
+  --family bytechef-app \
+  --requires-compatibilities FARGATE \
+  --network-mode awsvpc \
+  --cpu 2048 \
+  --memory 4096 \
+  --container-definitions '[
+    {
+      "name": "bytechef",
+      "image": "docker.bytechef.io/bytechef/bytechef:latest",
+      "essential": true,
+      "portMappings": [{"containerPort": 8080}],
+      "environment": [
+        {"name": "BYTECHEF_DATASOURCE_URL", "value": "jdbc:postgresql://postgres-service.local:5432/bytechef"},
+        {"name": "BYTECHEF_DATASOURCE_USERNAME", "value": "postgres"},
+        {"name": "BYTECHEF_DATASOURCE_PASSWORD", "value": "postgres"}
+      ]
+    }
+  ]'
 
 aws ecs update-service \
   --cluster bytechef-cluster \
@@ -123,7 +174,25 @@ This upgrade process:
 When managing ByteChef via ECS task definitions:
 
 ```shell
-aws ecs register-task-definition --cli-input-json file://bytechef-task.json
+aws ecs register-task-definition \
+  --family bytechef-app \
+  --requires-compatibilities FARGATE \
+  --network-mode awsvpc \
+  --cpu 2048 \
+  --memory 4096 \
+  --container-definitions '[
+    {
+      "name": "bytechef",
+      "image": "docker.bytechef.io/bytechef/bytechef:latest",
+      "essential": true,
+      "portMappings": [{"containerPort": 8080}],
+      "environment": [
+        {"name": "BYTECHEF_DATASOURCE_URL", "value": "jdbc:postgresql://postgres-service.local:5432/bytechef"},
+        {"name": "BYTECHEF_DATASOURCE_USERNAME", "value": "postgres"},
+        {"name": "BYTECHEF_DATASOURCE_PASSWORD", "value": "postgres"}
+      ]
+    }
+  ]'
 
 aws ecs update-service \
   --cluster bytechef-cluster \
