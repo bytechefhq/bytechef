@@ -524,13 +524,13 @@ const Property = ({
                         (controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') &&
                         calculatedPath &&
                         !property.properties?.length && (
-                        <ControlledObjectEntries
-                            control={control}
-                            controlPath={calculatedPath}
-                            formState={formState}
-                            property={property}
-                        />
-                    )}
+                            <ControlledObjectEntries
+                                control={control}
+                                controlPath={calculatedPath}
+                                formState={formState}
+                                property={property}
+                            />
+                        )}
 
                     {control && (isValidControlType || isNumericalInput) && calculatedPath && (
                         <Controller
