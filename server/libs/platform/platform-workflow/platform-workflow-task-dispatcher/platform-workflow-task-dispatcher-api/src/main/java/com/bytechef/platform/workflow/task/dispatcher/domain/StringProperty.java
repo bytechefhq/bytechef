@@ -31,7 +31,6 @@ public class StringProperty extends ValueProperty<String> {
     private Integer minLength;
     private String regex;
     private List<Option> options;
-    private Boolean optionsLoadedDynamically;
 
     private StringProperty() {
     }
@@ -45,7 +44,6 @@ public class StringProperty extends ValueProperty<String> {
         this.minLength = OptionalUtils.orElse(stringProperty.getMinLength(), null);
         this.regex = OptionalUtils.orElse(stringProperty.getRegex(), null);
         this.options = CollectionUtils.map(OptionalUtils.orElse(stringProperty.getOptions(), List.of()), Option::new);
-        this.optionsLoadedDynamically = OptionalUtils.orElse(stringProperty.getOptionsLoadedDynamically(), false);
     }
 
     @Override
@@ -69,10 +67,6 @@ public class StringProperty extends ValueProperty<String> {
         return Collections.unmodifiableList(options);
     }
 
-    public Boolean getOptionsLoadedDynamically() {
-        return optionsLoadedDynamically;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -87,14 +81,12 @@ public class StringProperty extends ValueProperty<String> {
             return false;
         }
 
-        return Objects.equals(regex, that.regex) &&
-            Objects.equals(options, that.options) &&
-            Objects.equals(optionsLoadedDynamically, that.optionsLoadedDynamically);
+        return Objects.equals(regex, that.regex) && Objects.equals(options, that.options);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), regex, options, optionsLoadedDynamically);
+        return Objects.hash(super.hashCode(), regex, options);
     }
 
     @Override
@@ -112,7 +104,6 @@ public class StringProperty extends ValueProperty<String> {
             ", exampleValue=" + exampleValue +
             ", defaultValue=" + defaultValue +
             ", options=" + options +
-            ", optionsLoadedDynamically=" + optionsLoadedDynamically +
             ", minLength=" + minLength +
             ", maxLength=" + maxLength +
             ", regex='" + regex + '\'' +

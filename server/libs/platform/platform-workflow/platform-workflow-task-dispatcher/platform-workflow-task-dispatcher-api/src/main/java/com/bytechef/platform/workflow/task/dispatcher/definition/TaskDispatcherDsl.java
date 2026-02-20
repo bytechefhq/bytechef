@@ -1116,7 +1116,6 @@ public final class TaskDispatcherDsl {
         private Integer maxLength;
         private Integer minLength;
         private String regex;
-        private Boolean optionsLoadedDynamically;
 
         private ModifiableStringProperty() {
             this(null);
@@ -1158,12 +1157,6 @@ public final class TaskDispatcherDsl {
 
         public ModifiableStringProperty regex(String regex) {
             this.regex = regex;
-
-            return this;
-        }
-
-        public ModifiableStringProperty optionsLoadedDynamically(boolean optionsLoadedDynamically) {
-            this.optionsLoadedDynamically = optionsLoadedDynamically;
 
             return this;
         }
@@ -1214,11 +1207,6 @@ public final class TaskDispatcherDsl {
         @Override
         public Optional<List<? extends Option<String>>> getOptions() {
             return Optional.ofNullable(options == null ? null : new ArrayList<>(options));
-        }
-
-        @Override
-        public Optional<Boolean> getOptionsLoadedDynamically() {
-            return Optional.ofNullable(optionsLoadedDynamically);
         }
     }
 

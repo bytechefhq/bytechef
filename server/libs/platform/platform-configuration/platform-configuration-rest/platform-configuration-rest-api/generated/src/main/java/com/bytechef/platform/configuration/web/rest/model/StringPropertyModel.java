@@ -54,8 +54,6 @@ public class StringPropertyModel extends ValuePropertyModel {
 
   private @Nullable OptionsDataSourceModel optionsDataSource;
 
-  private @Nullable Boolean optionsLoadedDynamically;
-
   public StringPropertyModel() {
     super();
   }
@@ -76,7 +74,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The language id used together with CODE_EDITOR control type.
    * @return languageId
    */
-  
+
   @Schema(name = "languageId", description = "The language id used together with CODE_EDITOR control type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("languageId")
   public @Nullable String getLanguageId() {
@@ -96,7 +94,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The property default value.
    * @return defaultValue
    */
-  
+
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
   public @Nullable String getDefaultValue() {
@@ -116,7 +114,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The property sample value.
    * @return exampleValue
    */
-  
+
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
   public @Nullable String getExampleValue() {
@@ -136,7 +134,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The maximum string length.
    * @return maxLength
    */
-  
+
   @Schema(name = "maxLength", description = "The maximum string length.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxLength")
   public @Nullable Integer getMaxLength() {
@@ -156,7 +154,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The minimum string length.
    * @return minLength
    */
-  
+
   @Schema(name = "minLength", description = "The minimum string length.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("minLength")
   public @Nullable Integer getMinLength() {
@@ -176,7 +174,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The regular expression pattern for validation.
    * @return regex
    */
-  
+
   @Schema(name = "regex", description = "The regular expression pattern for validation.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("regex")
   public @Nullable String getRegex() {
@@ -204,7 +202,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The list of valid property options.
    * @return options
    */
-  @Valid 
+  @Valid
   @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("options")
   public List<@Valid OptionModel> getOptions() {
@@ -224,7 +222,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * Get optionsDataSource
    * @return optionsDataSource
    */
-  @Valid 
+  @Valid
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsDataSource")
   public @Nullable OptionsDataSourceModel getOptionsDataSource() {
@@ -234,27 +232,6 @@ public class StringPropertyModel extends ValuePropertyModel {
   public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
-
-  public StringPropertyModel optionsLoadedDynamically(@Nullable Boolean optionsLoadedDynamically) {
-    this.optionsLoadedDynamically = optionsLoadedDynamically;
-    return this;
-  }
-
-  /**
-   * If the property options should be loaded dynamically.
-   * @return optionsLoadedDynamically
-   */
-  
-  @Schema(name = "optionsLoadedDynamically", description = "If the property options should be loaded dynamically.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("optionsLoadedDynamically")
-  public @Nullable Boolean getOptionsLoadedDynamically() {
-    return optionsLoadedDynamically;
-  }
-
-  public void setOptionsLoadedDynamically(@Nullable Boolean optionsLoadedDynamically) {
-    this.optionsLoadedDynamically = optionsLoadedDynamically;
-  }
-
 
   public StringPropertyModel controlType(ControlTypeModel controlType) {
     super.controlType(controlType);
@@ -327,13 +304,12 @@ public class StringPropertyModel extends ValuePropertyModel {
         Objects.equals(this.regex, stringProperty.regex) &&
         Objects.equals(this.options, stringProperty.options) &&
         Objects.equals(this.optionsDataSource, stringProperty.optionsDataSource) &&
-        Objects.equals(this.optionsLoadedDynamically, stringProperty.optionsLoadedDynamically) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(languageId, defaultValue, exampleValue, maxLength, minLength, regex, options, optionsDataSource, optionsLoadedDynamically, super.hashCode());
+    return Objects.hash(languageId, defaultValue, exampleValue, maxLength, minLength, regex, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -349,7 +325,6 @@ public class StringPropertyModel extends ValuePropertyModel {
     sb.append("    regex: ").append(toIndentedString(regex)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");
-    sb.append("    optionsLoadedDynamically: ").append(toIndentedString(optionsLoadedDynamically)).append("\n");
     sb.append("}");
     return sb.toString();
   }
