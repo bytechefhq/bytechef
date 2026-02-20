@@ -68,27 +68,37 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
             // Dynamically import PostHog only when needed
             import('posthog-js')
                 .then((posthog) => {
-                    posthog.default.onFeatureFlags(function () {
-                        if (posthog.default.isFeatureEnabled(featureFlag)) {
-                            setTimeout(() => setFeatureFlag(featureFlag, true), 0);
-                        } else {
-                            setTimeout(() => setFeatureFlag(featureFlag, false), 0);
-                        }
+                    const flagValue = posthog.default.getFeatureFlag(featureFlag);
 
-                        loadingFlagsRef.current.delete(featureFlag);
-                    });
+                    // If flags are already loaded, use the value directly
+                    if (flagValue !== undefined) {
+                        setTimeout(() => {
+                            setFeatureFlag(featureFlag, !!flagValue);
+                            loadingFlagsRef.current.delete(featureFlag);
+                        }, 0);
+                    } else {
+                        // Register callback for when flags finish loading
+                        posthog.default.onFeatureFlags(function () {
+                            setTimeout(() => {
+                                setFeatureFlag(featureFlag, !!posthog.default.isFeatureEnabled(featureFlag));
+                                loadingFlagsRef.current.delete(featureFlag);
+                            }, 0);
+                        });
+                    }
                 })
                 .catch(() => {
                     // If PostHog fails to load, default to false
-                    setTimeout(() => setFeatureFlag(featureFlag, false), 0);
-
-                    loadingFlagsRef.current.delete(featureFlag);
+                    setTimeout(() => {
+                        setFeatureFlag(featureFlag, false);
+                        loadingFlagsRef.current.delete(featureFlag);
+                    }, 0);
                 });
         } else {
             // If analytics are disabled, default to false
-            setTimeout(() => setFeatureFlag(featureFlag, false), 0);
-
-            loadingFlagsRef.current.delete(featureFlag);
+            setTimeout(() => {
+                setFeatureFlag(featureFlag, false);
+                loadingFlagsRef.current.delete(featureFlag);
+            }, 0);
         }
 
         return featureFlags[featureFlag] ?? false;
