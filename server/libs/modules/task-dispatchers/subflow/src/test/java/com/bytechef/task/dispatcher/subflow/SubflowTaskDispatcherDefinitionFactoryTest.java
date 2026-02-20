@@ -16,7 +16,12 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.workflow.task.dispatcher.registry.SubWorkflowDataSource;
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.SubWorkflowEntry;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,7 +31,26 @@ public class SubflowTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/subflow_v1.json",
-            new SubflowTaskDispatcherDefinitionFactory().getDefinition());
+        SubWorkflowDataSource subWorkflowDataSource = new SubWorkflowDataSource() {
+
+            @Override
+            public OutputResponse getSubWorkflowInputSchema(String workflowUuid) {
+                return null;
+            }
+
+            @Override
+            public OutputResponse getSubWorkflowOutputSchema(String workflowUuid) {
+                return null;
+            }
+
+            @Override
+            public List<SubWorkflowEntry> getSubWorkflows(PlatformType platformType, String search) {
+                return List.of();
+            }
+        };
+
+        JsonFileAssert.assertEquals(
+            "definition/subflow_v1.json",
+            new SubflowTaskDispatcherDefinitionFactory(subWorkflowDataSource).getDefinition());
     }
 }

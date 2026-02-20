@@ -17,6 +17,8 @@
 package com.bytechef.platform.workflow.task.dispatcher.service;
 
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.domain.Option;
+import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,11 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public interface TaskDispatcherDefinitionService {
+
+    List<Property> executeDynamicProperties(
+        String name, int version, String propertyName, Map<String, ?> inputParameters);
+
+    List<Option> executeOptions(String name, int version, String propertyName, String search);
 
     @Nullable
     OutputResponse executeOutput(String name, int version, Map<String, ?> inputParameters);

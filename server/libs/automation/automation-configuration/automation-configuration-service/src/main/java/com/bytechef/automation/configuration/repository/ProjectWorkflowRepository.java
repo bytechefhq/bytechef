@@ -101,4 +101,15 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
         LIMIT 1
         """)
     Optional<ProjectWorkflow> findLastByUuid(@Param("uuid") UUID uuid);
+
+    @Query("""
+        SELECT project_workflow.* FROM project_workflow
+        JOIN project_version ON project_version.project_id = project_workflow.project_id
+        AND project_version.version = project_workflow.project_version
+        WHERE project_workflow.uuid = :uuid
+        AND project_version.status = 1
+        ORDER BY project_workflow.project_version DESC
+        LIMIT 1
+        """)
+    Optional<ProjectWorkflow> findLastPublishedByUuid(@Param("uuid") UUID uuid);
 }

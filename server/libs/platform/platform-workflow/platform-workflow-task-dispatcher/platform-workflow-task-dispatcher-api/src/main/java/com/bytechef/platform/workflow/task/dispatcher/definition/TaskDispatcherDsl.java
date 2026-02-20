@@ -53,6 +53,10 @@ public final class TaskDispatcherDsl {
         return new ModifiableBooleanProperty(name);
     }
 
+    public static ModifiableDynamicPropertiesProperty dynamicProperties(String name) {
+        return new ModifiableDynamicPropertiesProperty(name);
+    }
+
     public static ModifiableDateProperty date() {
         return new ModifiableDateProperty();
     }
@@ -522,6 +526,78 @@ public final class TaskDispatcherDsl {
         @Override
         public Optional<List<? extends Option<LocalDateTime>>> getOptions() {
             return Optional.ofNullable(options);
+        }
+    }
+
+    public static final class ModifiableDynamicPropertiesProperty
+        extends ModifiableProperty<ModifiableDynamicPropertiesProperty>
+        implements Property.DynamicPropertiesProperty {
+
+        private String description;
+        private String header;
+        private String label;
+        private List<String> propertiesLookupDependsOn;
+        private TaskDispatcherDefinition.PropertiesFunction propertiesFunction;
+
+        private ModifiableDynamicPropertiesProperty(String name) {
+            super(name, Type.DYNAMIC_PROPERTIES);
+        }
+
+        public ModifiableDynamicPropertiesProperty description(String description) {
+            this.description = description;
+
+            return this;
+        }
+
+        public ModifiableDynamicPropertiesProperty header(String header) {
+            this.header = header;
+
+            return this;
+        }
+
+        public ModifiableDynamicPropertiesProperty label(String label) {
+            this.label = label;
+
+            return this;
+        }
+
+        public ModifiableDynamicPropertiesProperty propertiesLookupDependsOn(String... propertiesLookupDependsOn) {
+            if (propertiesLookupDependsOn != null) {
+                this.propertiesLookupDependsOn = List.of(propertiesLookupDependsOn);
+            }
+
+            return this;
+        }
+
+        public ModifiableDynamicPropertiesProperty propertiesFunction(
+            TaskDispatcherDefinition.PropertiesFunction propertiesFunction) {
+
+            this.propertiesFunction = propertiesFunction;
+
+            return this;
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        @Override
+        public Optional<String> getHeader() {
+            return Optional.ofNullable(header);
+        }
+
+        public Optional<String> getLabel() {
+            return Optional.ofNullable(label);
+        }
+
+        @Override
+        public Optional<PropertiesDataSource> getDynamicPropertiesDataSource() {
+            if (propertiesLookupDependsOn == null) {
+                return Optional.empty();
+            }
+
+            return Optional.of(new PropertiesDataSourceImpl(propertiesLookupDependsOn, propertiesFunction));
         }
     }
 
@@ -1115,8 +1191,9 @@ public final class TaskDispatcherDsl {
         private ControlType controlType;
         private Integer maxLength;
         private Integer minLength;
-        private String regex;
+        private TaskDispatcherDefinition.OptionsFunction optionsFunction;
         private Boolean optionsLoadedDynamically;
+        private String regex;
 
         private ModifiableStringProperty() {
             this(null);
@@ -1162,6 +1239,13 @@ public final class TaskDispatcherDsl {
             return this;
         }
 
+        public ModifiableStringProperty optionsFunction(TaskDispatcherDefinition.OptionsFunction optionsFunction) {
+            this.optionsFunction = optionsFunction;
+            this.optionsLoadedDynamically = true;
+
+            return this;
+        }
+
         public ModifiableStringProperty optionsLoadedDynamically(boolean optionsLoadedDynamically) {
             this.optionsLoadedDynamically = optionsLoadedDynamically;
 
@@ -1186,6 +1270,10 @@ public final class TaskDispatcherDsl {
         @Override
         public ControlType getControlType() {
             if (this.controlType == null) {
+                if (optionsFunction != null || Boolean.TRUE.equals(optionsLoadedDynamically)) {
+                    return ControlType.SELECT;
+                }
+
                 if (options == null || options.isEmpty()) {
                     return ControlType.TEXT;
                 } else {
@@ -1214,6 +1302,11 @@ public final class TaskDispatcherDsl {
         @Override
         public Optional<List<? extends Option<String>>> getOptions() {
             return Optional.ofNullable(options == null ? null : new ArrayList<>(options));
+        }
+
+        @Override
+        public Optional<TaskDispatcherDefinition.OptionsFunction> getOptionsFunction() {
+            return Optional.ofNullable(optionsFunction);
         }
 
         @Override
@@ -1518,6 +1611,22 @@ public final class TaskDispatcherDsl {
             this.name = name;
 
             return (P) this;
+        }
+    }
+
+    @SuppressFBWarnings("EI")
+    private record PropertiesDataSourceImpl(
+        List<String> propertiesLookupDependsOn,
+        TaskDispatcherDefinition.PropertiesFunction propertiesFunction) implements PropertiesDataSource {
+
+        @Override
+        public List<String> getPropertiesLookupDependsOn() {
+            return propertiesLookupDependsOn;
+        }
+
+        @Override
+        public Optional<TaskDispatcherDefinition.PropertiesFunction> getPropertiesFunction() {
+            return Optional.ofNullable(propertiesFunction);
         }
     }
 

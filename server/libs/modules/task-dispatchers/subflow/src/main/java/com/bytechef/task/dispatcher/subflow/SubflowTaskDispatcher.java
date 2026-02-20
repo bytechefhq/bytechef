@@ -19,6 +19,7 @@
 package com.bytechef.task.dispatcher.subflow;
 
 import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants.SUBFLOW;
+import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants.WORKFLOW_UUID;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Task;
@@ -28,6 +29,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.workflow.task.dispatcher.registry.SubWorkflowResolver;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.Objects;
@@ -42,16 +44,22 @@ import java.util.Objects;
 public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private final JobFacade jobFacade;
+    private final SubWorkflowResolver subWorkflowResolver;
 
     @SuppressFBWarnings("EI")
-    public SubflowTaskDispatcher(JobFacade jobFacade) {
+    public SubflowTaskDispatcher(JobFacade jobFacade, SubWorkflowResolver subWorkflowResolver) {
         this.jobFacade = jobFacade;
+        this.subWorkflowResolver = subWorkflowResolver;
     }
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
+        String workflowUuid = MapUtils.getRequiredString(taskExecution.getParameters(), WORKFLOW_UUID);
+
+        String workflowId = subWorkflowResolver.resolveWorkflowId(workflowUuid);
+
         JobParametersDTO jobParametersDTO = new JobParametersDTO(
-            MapUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID),
+            workflowId,
             taskExecution.getId(),
             MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
 

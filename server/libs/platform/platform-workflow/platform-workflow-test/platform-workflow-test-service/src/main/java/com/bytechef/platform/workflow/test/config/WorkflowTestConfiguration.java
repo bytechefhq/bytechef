@@ -53,6 +53,7 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
+import com.bytechef.platform.workflow.task.dispatcher.registry.SubWorkflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
@@ -96,7 +97,8 @@ public class WorkflowTestConfiguration {
     @Bean
     TestWorkflowExecutor testWorkflowExecutor(
         ComponentDefinitionService componentDefinitionService, Environment environment, Evaluator evaluator,
-        ObjectMapper objectMapper, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        ObjectMapper objectMapper, SubWorkflowResolver subWorkflowResolver,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
@@ -128,7 +130,7 @@ public class WorkflowTestConfiguration {
                 List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, evaluator, coordinatorEventPublisher, jobService,
-                    taskExecutionService, taskFileStorage, workflowService),
+                    subWorkflowResolver, taskExecutionService, taskFileStorage, workflowService),
                 taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, workflowService,
             workflowNodeOutputFacade, workflowTestConfigurationService);
@@ -200,8 +202,8 @@ public class WorkflowTestConfiguration {
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ContextService contextService, CounterService counterService, Evaluator evaluator,
-        ApplicationEventPublisher eventPublisher, JobService jobService, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        ApplicationEventPublisher eventPublisher, JobService jobService, SubWorkflowResolver subWorkflowResolver,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         JobFacade jobFacade = new JobFacadeImpl(
             eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
@@ -230,7 +232,7 @@ public class WorkflowTestConfiguration {
             (taskDispatcher) -> new ParallelTaskDispatcher(
                 contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
-            (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade),
+            (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade, subWorkflowResolver),
             (taskDispatcher) -> new TerminateTaskDispatcher(eventPublisher, taskExecutionService));
     }
 }

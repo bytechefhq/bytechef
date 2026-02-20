@@ -21,5 +21,7 @@ package com.bytechef.task.dispatcher.subflow.constant;
  */
 public class SubflowTaskDispatcherConstants {
 
+    public static final String INPUTS = "inputs";
     public static final String SUBFLOW = "subflow";
+    public static final String WORKFLOW_UUID = "workflowUuid";
 }

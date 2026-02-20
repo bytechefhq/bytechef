@@ -33,7 +33,10 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,6 +52,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final Evaluator evaluator;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
@@ -58,6 +62,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     public WorkflowNodeDynamicPropertiesFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
@@ -66,6 +71,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.evaluator = evaluator;
+        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
@@ -112,7 +118,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Property> getWorkflowNodeDynamicProperties(
+    public List<? extends BaseProperty> getWorkflowNodeDynamicProperties(
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         long environmentId) {
 
@@ -123,7 +129,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
         return WorkflowTrigger
             .fetch(workflow, workflowNodeName)
-            .map(workflowTrigger -> {
+            .<List<? extends BaseProperty>>map(workflowTrigger -> {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
                 return triggerDefinitionFacade.executeDynamicProperties(
@@ -134,9 +140,18 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
             .orElseGet(() -> {
                 WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
+                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+                if (workflowNodeType.operation() == null) {
+                    return new ArrayList<>(
+                        taskDispatcherDefinitionService.executeDynamicProperties(
+                            workflowNodeType.name(), workflowNodeType.version(), propertyName,
+                            workflowTask.evaluateParameters(
+                                (Map<String, Object>) inputs, evaluator)));
+                }
+
                 Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
                     workflowId, workflowTask.getName(), environmentId);
-                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
                 return actionDefinitionFacade.executeDynamicProperties(
                     workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), propertyName,
