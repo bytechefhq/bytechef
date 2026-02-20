@@ -26,6 +26,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.type.TypeReference;
 
@@ -39,6 +41,8 @@ import tools.jackson.core.type.TypeReference;
 class EditorLogFileStorageReaderImpl implements EditorLogFileStorageReader {
 
     private static final String EDITOR_LOG_DIR = "editor/logs";
+
+    private static final Logger logger = LoggerFactory.getLogger(EditorLogFileStorageReaderImpl.class);
 
     private final FileStorageService fileStorageService;
 
@@ -63,18 +67,24 @@ class EditorLogFileStorageReaderImpl implements EditorLogFileStorageReader {
 
     @Override
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
-        String filename = jobId + ".jsonl";
+        try {
+            String filename = jobId + ".jsonl";
 
-        if (!fileStorageService.fileExists(EDITOR_LOG_DIR, filename)) {
+            if (!fileStorageService.fileExists(EDITOR_LOG_DIR, filename)) {
+                return List.of();
+            }
+
+            FileEntry fileEntry = fileStorageService.getFileEntry(EDITOR_LOG_DIR, filename);
+
+            String content =
+                new String(fileStorageService.readFileToBytes(EDITOR_LOG_DIR, fileEntry), StandardCharsets.UTF_8);
+
+            return parseJsonLines(content);
+        } catch (Exception exception) {
+            logger.error("Failed to read editor log entries for job {}", jobId, exception);
+
             return List.of();
         }
-
-        FileEntry fileEntry = fileStorageService.getFileEntry(EDITOR_LOG_DIR, filename);
-
-        String content =
-            new String(fileStorageService.readFileToBytes(EDITOR_LOG_DIR, fileEntry), StandardCharsets.UTF_8);
-
-        return parseJsonLines(content);
     }
 
     @Override

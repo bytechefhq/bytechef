@@ -25,6 +25,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * LogFileStorage implementation for writing logs in editor/test environments. Writes logs using FileStorageService in
@@ -35,6 +37,8 @@ import java.util.concurrent.Executors;
 public class EditorLogFileStorageWriter implements LogFileStorageWriter {
 
     private static final String EDITOR_LOG_DIR = "editor/logs";
+
+    private static final Logger logger = LoggerFactory.getLogger(EditorLogFileStorageWriter.class);
 
     private final ExecutorService asyncExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private final FileStorageService fileStorageService;
@@ -51,32 +55,40 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
 
     @Override
     public void deleteLogEntries(long jobId) {
-        String filename = jobId + ".jsonl";
+        try {
+            String filename = jobId + ".jsonl";
 
-        if (fileStorageService.fileExists(EDITOR_LOG_DIR, filename)) {
-            FileEntry fileEntry = fileStorageService.getFileEntry(EDITOR_LOG_DIR, filename);
+            if (fileStorageService.fileExists(EDITOR_LOG_DIR, filename)) {
+                FileEntry fileEntry = fileStorageService.getFileEntry(EDITOR_LOG_DIR, filename);
 
-            fileStorageService.deleteFile(EDITOR_LOG_DIR, fileEntry);
+                fileStorageService.deleteFile(EDITOR_LOG_DIR, fileEntry);
+            }
+        } catch (Exception exception) {
+            logger.warn("Failed to delete editor log entries for job {}", jobId, exception);
         }
     }
 
     private synchronized void appendLogEntry(long jobId, LogEntry logEntry) {
-        String filename = jobId + ".jsonl";
-        byte[] logLineBytes = (JsonUtils.write(logEntry) + "\n").getBytes(StandardCharsets.UTF_8);
+        try {
+            String filename = jobId + ".jsonl";
+            byte[] logLineBytes = (JsonUtils.write(logEntry) + "\n").getBytes(StandardCharsets.UTF_8);
 
-        if (fileStorageService.fileExists(EDITOR_LOG_DIR, filename)) {
-            FileEntry existingFile = fileStorageService.getFileEntry(EDITOR_LOG_DIR, filename);
+            if (fileStorageService.fileExists(EDITOR_LOG_DIR, filename)) {
+                FileEntry existingFile = fileStorageService.getFileEntry(EDITOR_LOG_DIR, filename);
 
-            byte[] existingContent = fileStorageService.readFileToBytes(EDITOR_LOG_DIR, existingFile);
+                byte[] existingContent = fileStorageService.readFileToBytes(EDITOR_LOG_DIR, existingFile);
 
-            byte[] newContent = new byte[existingContent.length + logLineBytes.length];
+                byte[] newContent = new byte[existingContent.length + logLineBytes.length];
 
-            System.arraycopy(existingContent, 0, newContent, 0, existingContent.length);
-            System.arraycopy(logLineBytes, 0, newContent, existingContent.length, logLineBytes.length);
+                System.arraycopy(existingContent, 0, newContent, 0, existingContent.length);
+                System.arraycopy(logLineBytes, 0, newContent, existingContent.length, logLineBytes.length);
 
-            fileStorageService.storeFileContent(EDITOR_LOG_DIR, filename, newContent, false);
-        } else {
-            fileStorageService.storeFileContent(EDITOR_LOG_DIR, filename, logLineBytes, false);
+                fileStorageService.storeFileContent(EDITOR_LOG_DIR, filename, newContent, false);
+            } else {
+                fileStorageService.storeFileContent(EDITOR_LOG_DIR, filename, logLineBytes, false);
+            }
+        } catch (Exception exception) {
+            logger.error("Failed to append log entry for job {}", jobId, exception);
         }
     }
 }
