@@ -19,6 +19,7 @@ package com.bytechef.platform.component.context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.TriggerContextAware;
+import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -46,7 +47,8 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     private TriggerContextImpl(Builder builder) {
         super(
             builder.componentName, builder.componentVersion, builder.triggerName, builder.componentConnection,
-            builder.editorEnvironment, builder.httpClientExecutor, builder.tempFileStorage);
+            builder.editorEnvironment, builder.httpClientExecutor, builder.tempFileStorage,
+            builder.logFileStorageWriter, builder.jobId, builder.taskExecutionId);
 
         this.data = new DataImpl(
             builder.dataStorage, builder.componentName, builder.componentVersion, builder.triggerName,
@@ -79,7 +81,10 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         private final boolean editorEnvironment;
         private @Nullable Long environmentId;
         private final HttpClientExecutor httpClientExecutor;
+        private @Nullable Long jobId;
         private @Nullable Long jobPrincipalId;
+        private @Nullable LogFileStorageWriter logFileStorageWriter;
+        private long taskExecutionId;
         private final TempFileStorage tempFileStorage;
         private final String triggerName;
         private @Nullable PlatformType type;
@@ -112,8 +117,26 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
             return this;
         }
 
+        Builder jobId(@Nullable Long jobId) {
+            this.jobId = jobId;
+
+            return this;
+        }
+
         Builder jobPrincipalId(@Nullable Long jobPrincipalId) {
             this.jobPrincipalId = jobPrincipalId;
+
+            return this;
+        }
+
+        Builder logFileStorageWriter(@Nullable LogFileStorageWriter logFileStorageWriter) {
+            this.logFileStorageWriter = logFileStorageWriter;
+
+            return this;
+        }
+
+        Builder taskExecutionId(long taskExecutionId) {
+            this.taskExecutionId = taskExecutionId;
 
             return this;
         }

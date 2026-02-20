@@ -135,6 +135,7 @@ public class ContextFactoryImpl implements ContextFactory {
             .componentConnection(componentConnection)
             .environmentId(environmentId)
             .jobPrincipalId(jobPrincipalId)
+            .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
             .type(type)
             .workflowUuid(workflowUuid)
             .build();
