@@ -47,7 +47,6 @@ public class TaskStateServiceImpl implements TaskStateService {
 
     @Override
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
     public <T> Optional<T> fetchValue(JobResumeId jobResumeId) {
         return taskStateRepository.findByJobResumeId(jobResumeId.toString())
             .map(taskState -> (T) taskState.getValue());
