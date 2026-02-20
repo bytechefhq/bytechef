@@ -145,9 +145,7 @@ const ClusterElementsCanvasDialog = ({
                                 <DataPillPanel
                                     className={twMerge(
                                         'fixed inset-y-0 right-[465px] rounded-none',
-                                        testingPanelOpen && 'right-[1265px]',
-                                        copilotPanelOpen && 'right-[915px]',
-                                        testingPanelOpen && copilotPanelOpen && 'right-[1250px]'
+                                        copilotPanelOpen && 'right-[915px]'
                                     )}
                                     previousComponentDefinitions={previousComponentDefinitions}
                                     workflowNodeOutputs={workflowNodeOutputs}
@@ -158,9 +156,9 @@ const ClusterElementsCanvasDialog = ({
                         {testingPanelOpen && (
                             <div
                                 className={twMerge(
-                                    'fixed inset-y-0 right-0 z-10 w-[800px] overflow-hidden border-l border-r bg-background',
+                                    'fixed inset-y-0 right-0 z-0 w-[800px] overflow-hidden border-l border-r bg-background',
                                     workflowNodeDetailsPanelOpen && !copilotPanelOpen && 'right-[465px]',
-                                    copilotPanelOpen && 'right-[450px]'
+                                    copilotPanelOpen && 'z-10 right-[450px]'
                                 )}
                             >
                                 <AiAgentTestingPanel
