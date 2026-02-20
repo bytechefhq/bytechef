@@ -39,6 +39,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -59,6 +60,9 @@ import tools.jackson.core.type.TypeReference;
  * @author Ivica Cardic
  */
 public abstract class AbstractWebhookTriggerController {
+
+    public static final String HEADER_WORKFLOW_EXECUTION_ID = "X-ByteChef-Workflow-Execution-Id";
+    public static final String HEADER_PUBLIC_URL = "X-ByteChef-Public-Url";
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
@@ -104,6 +108,9 @@ public abstract class AbstractWebhookTriggerController {
             webhookRequest = WebhookRequestUtils.getWebhookRequest(
                 httpServletRequest, tempFileStorage, webhookTriggerFlags);
         }
+
+        // Add workflowExecutionId and publicUrl as headers for trigger access
+        webhookRequest = addPlatformHeaders(webhookRequest, workflowExecutionId);
 
         if (logger.isDebugEnabled()) {
             logger.debug(
@@ -314,5 +321,17 @@ public abstract class AbstractWebhookTriggerController {
                 walkThroughList((List<?>) item);
             }
         }
+    }
+
+    private WebhookRequest addPlatformHeaders(WebhookRequest webhookRequest, WorkflowExecutionId workflowExecutionId) {
+        Map<String, List<String>> headers = new HashMap<>(webhookRequest.headers());
+
+        headers.put(HEADER_WORKFLOW_EXECUTION_ID, List.of(workflowExecutionId.toString()));
+
+        if (publicUrl != null) {
+            headers.put(HEADER_PUBLIC_URL, List.of(publicUrl));
+        }
+
+        return new WebhookRequest(headers, webhookRequest.parameters(), webhookRequest.body(), webhookRequest.method());
     }
 }

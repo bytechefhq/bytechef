@@ -80,6 +80,19 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
     @Nullable
     PlatformType getPlatformType();
 
+    /**
+     * Get the public URL for webhook callbacks and external service integrations.
+     *
+     * @return the public URL, or null if not configured
+     */
+    @Nullable
+    String getPublicUrl();
+
+    /**
+     * Retrieves the identifier of the workflow.
+     *
+     * @return the workflow identifier as a string, or null if no workflow is associated.
+     */
     @Nullable
     String getWorkflowId();
 

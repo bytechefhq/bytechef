@@ -288,6 +288,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     @Override
     @Nullable
+    public String getPublicUrl() {
+        return publicUrl;
+    }
+
+    @Override
+    @Nullable
     public String getWorkflowId() {
         return workflowId;
     }
