@@ -730,6 +730,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 />
 
                 {fromAiExtension &&
+                    handleFromAiClick &&
                     (isFromAi ? (
                         <Button
                             className="self-center"

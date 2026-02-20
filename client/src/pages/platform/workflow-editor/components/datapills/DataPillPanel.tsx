@@ -24,14 +24,13 @@ const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOut
 
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
-    const {aiAgentNodeDetailsPanelOpen, currentNode, workflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore(
-            useShallow((state) => ({
-                aiAgentNodeDetailsPanelOpen: state.aiAgentNodeDetailsPanelOpen,
-                currentNode: state.currentNode,
-                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
-            }))
-        );
+    const {aiAgentNodeDetailsPanelOpen, currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            aiAgentNodeDetailsPanelOpen: state.aiAgentNodeDetailsPanelOpen,
+            currentNode: state.currentNode,
+            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+        }))
+    );
 
     const validWorkflowNodeOutputs = workflowNodeOutputs.filter((workflowNodeOutput) => {
         const {actionDefinition, taskDispatcherDefinition, triggerDefinition, workflowNodeName} = workflowNodeOutput;
