@@ -57,7 +57,11 @@ public class ResumeController {
      * external sources (e.g., email links) that cannot include CSRF tokens. Security is maintained through
      * cryptographic resume tokens that are verified before processing.
      */
-    @SuppressFBWarnings("SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING")
+    @SuppressFBWarnings(
+        value = {
+            "CRLF_INJECTION_LOGS", "SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING"
+        },
+        justification = "id is sanitized with replaceAll before logging; CSRF disabled for external resume callbacks")
     @RequestMapping(method = {
         RequestMethod.GET, RequestMethod.POST
     }, value = "/job/resume/{id}")
@@ -67,7 +71,7 @@ public class ResumeController {
         try {
             jobResumeId = JobResumeId.parse(id);
         } catch (IllegalArgumentException illegalArgumentException) {
-            logger.warn("Invalid resume id: {}", id);
+            logger.warn("Invalid resume id: {}", id.replaceAll("[\\r\\n]", ""));
 
             return ResponseEntity.badRequest()
                 .build();
