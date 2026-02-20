@@ -1234,6 +1234,23 @@
       "required": false
     },
     "workflowNodeDescription": null
+  }, {
+    "name": "dataSource",
+    "description": "Provides a JDBC DataSource for database connections.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Data Source",
+    "type": {
+      "name": "DATA_SOURCE",
+      "key": "dataSource",
+      "label": "Data Source",
+      "multipleElements": false,
+      "required": true
+    },
+    "workflowNodeDescription": null
   } ],
   "componentCategories": null,
   "connection": {

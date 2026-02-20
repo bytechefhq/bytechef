@@ -59,7 +59,9 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
@@ -71,7 +73,9 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.JdbcComponentDefinition;
+import com.bytechef.platform.component.definition.ai.agent.DataSourceFunction;
 import com.bytechef.platform.component.jdbc.DataSourceFactory;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.jdbc.datastream.JdbcItemWriter;
@@ -359,6 +363,13 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
     private ComponentDefinition getComponentDefinition(
         String description, String name, String icon, String title, String jdbcDriverClassName) {
 
+        ClusterElementDefinition<DataSourceFunction> dataSourceClusterElement =
+            ComponentDsl.<DataSourceFunction>clusterElement("dataSource")
+                .title("Data Source")
+                .description("Provides a JDBC DataSource for database connections.")
+                .type(DataSourceFunction.DATA_SOURCE)
+                .object(() -> this::createDataSource);
+
         return component(name)
             .description(description)
             .icon(icon)
@@ -366,7 +377,17 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             .connection(CONNECTION_DEFINITION)
             .actions(actionDefinitions)
             .triggers(triggerDefinitions)
-            .clusterElements(JdbcItemWriter.clusterElementDefinition(urlTemplate, jdbcDriverClassName));
+            .clusterElements(
+                JdbcItemWriter.clusterElementDefinition(urlTemplate, jdbcDriverClassName),
+                dataSourceClusterElement);
+    }
+
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    private javax.sql.DataSource createDataSource(
+        Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+        Map<String, ComponentConnection> componentConnections) {
+
+        return DataSourceFactory.getDataSource(connectionParameters, urlTemplate, jdbcDriverClassName);
     }
 
     protected PollOutput poll(

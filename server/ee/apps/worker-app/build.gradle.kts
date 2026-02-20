@@ -50,7 +50,7 @@ dependencies {
         rootProject.subprojects
             .asSequence()
             .filter { it.path.startsWith(":server:libs:modules:components") }
-            .filterNot { it.path in setOf(":server:libs:modules:components:data-stream", ":server:libs:modules:components:example") }
+            .filterNot { it.path in setOf(":server:libs:modules:components:ai:agent:chat-memory:chat-memory-jdbc", ":server:libs:modules:components:data-stream", ":server:libs:modules:components:example") }
             .sortedBy { it.path }
             .forEach { implementation(project(it.path)) }
     }
