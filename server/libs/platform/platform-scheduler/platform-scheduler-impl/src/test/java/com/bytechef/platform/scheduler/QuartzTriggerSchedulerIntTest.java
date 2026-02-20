@@ -32,6 +32,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.quartz.CronTrigger;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -100,12 +102,10 @@ public class QuartzTriggerSchedulerIntTest {
         // Verify job details
         JobDetail jobDetail = scheduler.getJobDetail(jobKey);
         Assertions.assertNotNull(jobDetail);
-        Assertions.assertEquals(workflowExecutionId.toString(),
-            jobDetail.getJobDataMap()
-                .getString("workflowExecutionId"));
-        Assertions.assertEquals(connectionId,
-            jobDetail.getJobDataMap()
-                .getLong("connectionId"));
+        JobDataMap jobDataMap = jobDetail.getJobDataMap();
+
+        Assertions.assertEquals(workflowExecutionId.toString(), jobDataMap.getString("workflowExecutionId"));
+        Assertions.assertEquals(connectionId, jobDataMap.getLong("connectionId"));
 
         // Verify trigger timing
         Trigger trigger = scheduler.getTrigger(triggerKey);
@@ -140,16 +140,16 @@ public class QuartzTriggerSchedulerIntTest {
         // Verify job details
         JobDetail jobDetail = scheduler.getJobDetail(jobKey);
         Assertions.assertNotNull(jobDetail);
-        Assertions.assertEquals(workflowExecutionId.toString(),
-            jobDetail.getJobDataMap()
-                .getString("workflowExecutionId"));
-        Assertions.assertNotNull(jobDetail.getJobDataMap()
-            .getString("output"));
+
+        JobDataMap jobDataMap = jobDetail.getJobDataMap();
+
+        Assertions.assertEquals(workflowExecutionId.toString(), jobDataMap.getString("workflowExecutionId"));
+        Assertions.assertNotNull(jobDataMap.getString("output"));
 
         // Verify trigger type is cron
         Trigger trigger = scheduler.getTrigger(triggerKey);
         Assertions.assertNotNull(trigger);
-        Assertions.assertTrue(trigger instanceof org.quartz.CronTrigger);
+        Assertions.assertInstanceOf(CronTrigger.class, trigger);
 
         // Clean up
         scheduler.deleteJob(jobKey);
@@ -180,10 +180,10 @@ public class QuartzTriggerSchedulerIntTest {
         JobDetail jobDetail = scheduler.getJobDetail(jobKey);
 
         Assertions.assertNotNull(jobDetail);
-        Assertions.assertEquals(jobId, jobDetail.getJobDataMap()
-            .getLong("jobId"));
-        Assertions.assertNotNull(jobDetail.getJobDataMap()
-            .getString("continueParameters"));
+        JobDataMap jobDataMap = jobDetail.getJobDataMap();
+
+        Assertions.assertEquals(jobId, jobDataMap.getLong("jobId"));
+        Assertions.assertNotNull(jobDataMap.getString("continueParameters"));
 
         // Verify trigger timing
         Trigger trigger = scheduler.getTrigger(triggerKey);
@@ -213,10 +213,11 @@ public class QuartzTriggerSchedulerIntTest {
         JobDetail jobDetail = scheduler.getJobDetail(jobKey);
 
         Assertions.assertNotNull(jobDetail);
-        Assertions.assertEquals(jobId, jobDetail.getJobDataMap()
-            .getLong("jobId"));
-        Assertions.assertFalse(jobDetail.getJobDataMap()
-            .containsKey("continueParameters"));
+
+        JobDataMap jobDataMap = jobDetail.getJobDataMap();
+
+        Assertions.assertEquals(jobId, jobDataMap.getLong("jobId"));
+        Assertions.assertFalse(jobDataMap.containsKey("continueParameters"));
 
         // Clean up
         scheduler.deleteJob(jobKey);
@@ -264,10 +265,9 @@ public class QuartzTriggerSchedulerIntTest {
         Map<String, Object> output = Map.of("test", "data");
 
         // Schedule first
-        quartzTriggerScheduler.scheduleScheduleTrigger(
-            cronPattern, ZoneId.systemDefault()
-                .getId(),
-            output, workflowExecutionId);
+        ZoneId zoneId = ZoneId.systemDefault();
+
+        quartzTriggerScheduler.scheduleScheduleTrigger(cronPattern, zoneId.getId(), output, workflowExecutionId);
 
         JobKey jobKey = JobKey.jobKey(workflowExecutionId.toString(), "ScheduleTrigger");
 
