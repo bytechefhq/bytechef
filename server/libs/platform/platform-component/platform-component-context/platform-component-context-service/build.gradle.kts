@@ -17,5 +17,6 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-jackson")
     testImplementation(project(":server:libs:config:jackson-config"))
+    testImplementation(project(":server:libs:test:test-support"))
     testImplementation(libs.org.wiremock.wiremock)
 }

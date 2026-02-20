@@ -19,6 +19,7 @@ dependencies {
 
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
