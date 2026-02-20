@@ -254,7 +254,7 @@ module.exports = {
                     fix: (fixer) => {
                         const fixings = [];
 
-                        const code = context.getSourceCode();
+                        const code = context.sourceCode;
 
                         const sources = new Map();
 

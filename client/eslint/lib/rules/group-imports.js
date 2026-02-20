@@ -20,12 +20,12 @@ module.exports = {
         function expectBlankLines(node, count = 1) {
             const comments = getLeadingComments(node, context);
             const initial = comments[0] || node;
-            const token = context.getSourceCode().getTokenBefore(initial, {
+            const token = context.sourceCode.getTokenBefore(initial, {
                 includeComments: true,
             });
 
             if (token) {
-                const source = context.getSourceCode();
+                const source = context.sourceCode;
 
                 const start = token.range[1];
                 const end = initial.range[0];
@@ -143,9 +143,9 @@ module.exports = {
                         continue;
                     }
 
-                    const token = context.getSourceCode().getTokenBefore(current);
+                    const token = context.sourceCode.getTokenBefore(current);
 
-                    const last = context.getSourceCode().getNodeByRangeIndex(token.range[0]);
+                    const last = context.sourceCode.getNodeByRangeIndex(token.range[0]);
 
                     if (last !== previous) {
                         expectBlankLines(current);

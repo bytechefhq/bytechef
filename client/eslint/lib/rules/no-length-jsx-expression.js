@@ -13,7 +13,7 @@ module.exports = {
                 }
 
                 if (rightSideLength || leftSideLength) {
-                    const sourceCode = context.getSourceCode();
+                    const sourceCode = context.sourceCode;
                     const ancestors = sourceCode.getAncestors(node) || [];
                     const jsxExpressionScope = ancestors.find((ancestor) => ancestor.type === 'JSXExpressionContainer');
 

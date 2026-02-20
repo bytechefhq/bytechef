@@ -12,7 +12,7 @@ module.exports = {
                 });
 
                 if (specifiers.length > 1) {
-                    const source = context.getSourceCode();
+                    const source = context.sourceCode;
 
                     if (source.commentsExistBetween(source.getTokenBefore(specifiers[0]), node.source)) {
                         // Don't touch if any of the specifiers have
