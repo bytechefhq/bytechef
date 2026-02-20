@@ -7,7 +7,9 @@ import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {SPACE} from '@/shared/constants';
 import {MessageCircleQuestionIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
-import {Suspense, lazy, useCallback, useState} from 'react';
+import {Suspense, lazy, useCallback, useRef, useState} from 'react';
+
+import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
@@ -21,6 +23,8 @@ interface PropertyJsonSchemaBuilderSheetProps {
 const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: PropertyJsonSchemaBuilderSheetProps) => {
     const [localSchema, setLocalSchema] = useState<SchemaRecordType | undefined>(schema);
 
+    const editorRef = useRef<StandaloneCodeEditorType | null>(null);
+
     const handleSchemaChange = useCallback(
         (newSchema: SchemaRecordType) => {
             setLocalSchema(newSchema);
@@ -29,6 +33,15 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
         },
         [onChange]
     );
+
+    const handleTabChange = useCallback((value: string) => {
+        if (value === 'editor' && editorRef.current) {
+            requestAnimationFrame(() => {
+                editorRef.current?.layout();
+                editorRef.current?.focus();
+            });
+        }
+    }, []);
 
     return (
         <Sheet onOpenChange={onClose} open>
@@ -41,7 +54,7 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
-                <Tabs className="flex size-full flex-col" defaultValue="designer">
+                <Tabs className="flex size-full flex-col" defaultValue="designer" onValueChange={handleTabChange}>
                     <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md bg-surface-neutral-primary p-3">
                         <div className="flex flex-col">
                             <span className="text-lg font-semibold">
@@ -74,7 +87,7 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                             <JsonSchemaBuilder onChange={handleSchemaChange} schema={localSchema} />
                         </TabsContent>
 
-                        <TabsContent className="h-full" value="editor">
+                        <TabsContent className="h-full data-[state=inactive]:hidden" forceMount value="editor">
                             <Suspense fallback={<MonacoEditorLoader />}>
                                 <MonacoEditor
                                     className="size-full"
@@ -89,7 +102,7 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                                         }
                                     }}
                                     onMount={(editor) => {
-                                        editor.focus();
+                                        editorRef.current = editor;
                                     }}
                                     value={JSON.stringify(localSchema, null, SPACE)}
                                 />
