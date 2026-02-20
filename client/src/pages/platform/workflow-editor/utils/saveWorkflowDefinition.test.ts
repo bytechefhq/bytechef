@@ -1,10 +1,9 @@
+import {SPACE} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {clearAllWorkflowMutations, isWorkflowMutating} from './workflowMutationGuard';
-
-const SPACE = 4;
 
 // ── Store mocks ──────────────────────────────────────────────────────
 

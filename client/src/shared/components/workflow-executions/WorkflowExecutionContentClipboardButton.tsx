@@ -1,10 +1,9 @@
 import Button from '@/components/Button/Button';
 import {useToast} from '@/hooks/use-toast';
+import {SPACE} from '@/shared/constants';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {CheckIcon, ClipboardCopyIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
-
-const SPACE = 4;
 const RESET_DELAY = 2000;
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */

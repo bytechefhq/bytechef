@@ -12,6 +12,7 @@ import {
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {CableIcon, EditIcon, Trash2Icon} from 'lucide-react';
@@ -19,8 +20,6 @@ import {useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import WorkflowOutputValue from './WorkflowOutputValue';
-
-const SPACE = 4;
 
 const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);

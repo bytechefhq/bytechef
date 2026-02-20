@@ -1,3 +1,4 @@
+import {SPACE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
@@ -5,8 +6,6 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import handleDeleteTask from './handleDeleteTask';
 import {clearAllWorkflowMutations, isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
-
-const SPACE = 4;
 
 // ── Store mocks ──────────────────────────────────────────────────────
 

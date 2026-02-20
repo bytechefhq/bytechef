@@ -3,6 +3,7 @@ import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/work
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {SPACE} from '@/shared/constants';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -11,8 +12,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
-
-const SPACE = 4;
 
 interface UsePropertyCodeEditorDialogRightPanelConnectionsPropsI {
     componentConnections: ComponentConnection[];

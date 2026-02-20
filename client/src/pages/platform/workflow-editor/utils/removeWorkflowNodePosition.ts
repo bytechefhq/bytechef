@@ -1,11 +1,10 @@
+import {SPACE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {clearTaskPositions} from './clearAllNodePositions';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
-
-const SPACE = 4;
 
 interface RemoveWorkflowNodePositionProps {
     incrementLayoutResetCounter: () => void;

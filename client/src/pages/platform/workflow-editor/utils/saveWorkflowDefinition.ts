@@ -1,3 +1,4 @@
+import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -7,8 +8,6 @@ import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
-
-const SPACE = 4;
 
 type UpdateWorkflowRequestType = {
     id: string;
