@@ -21,7 +21,7 @@ const WorkflowInputsSheet = ({
 }: WorkflowInputsSheetProps) => (
     <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>
         <SheetContent
-            className="flex flex-col p-4 sm:max-w-workflow-inputs-sheet-width"
+            className="absolute bottom-4 right-4 top-3 flex h-auto flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-workflow-inputs-sheet-width"
             onFocusOutside={(event) => event.preventDefault()}
             onPointerDownOutside={(event) => event.preventDefault()}
         >
