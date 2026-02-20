@@ -115,6 +115,7 @@ export default function useConnectDialog({
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
     const [enabledOverrides, setEnabledOverrides] = useState<Record<string, boolean | undefined>>({});
+    const [inputOverrides, setInputOverrides] = useState<Record<string, Record<string, string>>>({});
     const [workflowsView, setWorkflowsView] = useState(!!integrationInstanceId);
     const [currentIntegrationInstanceId, setCurrentIntegrationInstanceId] = useState<number | undefined>(
         integrationInstanceId ? Number(integrationInstanceId) : undefined
@@ -146,18 +147,23 @@ export default function useConnectDialog({
 
             const effectiveEnabled = enabledOverrides[workflow.workflowUuid] ?? serverEnabled;
 
+            const workflowInputOverrides = inputOverrides[workflow.workflowUuid];
+
             return {
                 ...workflow,
                 enabled: effectiveEnabled,
                 inputs: Array.isArray(workflow.inputs)
                     ? workflow.inputs.map((input: WorkflowInputType) => ({
                           ...input,
-                          value: (instanceWorkflow?.inputs as Record<string, string> | undefined)?.[input.name] ?? '',
+                          value:
+                              workflowInputOverrides?.[input.name] ??
+                              (instanceWorkflow?.inputs as Record<string, string> | undefined)?.[input.name] ??
+                              '',
                       }))
                     : [],
             } as MergedWorkflowType;
         });
-    }, [integration, currentIntegrationInstanceId, enabledOverrides]);
+    }, [integration, currentIntegrationInstanceId, enabledOverrides, inputOverrides]);
 
     const registerFormSubmit = useCallback<RegisterFormSubmitFunction>((submitFn) => {
         formSubmitRef.current = submitFn;
@@ -417,6 +423,7 @@ export default function useConnectDialog({
             });
 
             setFormValues({});
+            setInputOverrides({});
             setWorkflowsView(false);
         } catch (error) {
             console.error('Failed to disconnect:', error);
@@ -444,6 +451,14 @@ export default function useConnectDialog({
 
     const handleWorkflowInputChange = useCallback(
         (workflowUuid: string, inputName: string, value: string) => {
+            setInputOverrides((previous) => ({
+                ...previous,
+                [workflowUuid]: {
+                    ...previous[workflowUuid],
+                    [inputName]: value,
+                },
+            }));
+
             if (!currentIntegrationInstanceId || isNaN(currentIntegrationInstanceId)) {
                 console.error('Invalid integration instance ID');
 
