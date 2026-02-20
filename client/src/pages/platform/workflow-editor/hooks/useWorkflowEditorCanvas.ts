@@ -4,7 +4,14 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {FINAL_PLACEHOLDER_NODE_ID} from '@/shared/constants';
+import {
+    COPILOT_PANEL_WIDTH,
+    DATA_PILL_PANEL_WIDTH,
+    FINAL_PLACEHOLDER_NODE_ID,
+    NODE_DETAILS_PANEL_WIDTH,
+    PROJECT_LEFT_SIDEBAR_WIDTH,
+    WORKFLOW_NODES_SIDEBAR_WIDTH,
+} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
@@ -453,23 +460,23 @@ const useWorkflowEditorCanvas = ({
     let canvasWidth = window.innerWidth - 120;
 
     if (copilotPanelOpen) {
-        canvasWidth -= 450;
+        canvasWidth -= COPILOT_PANEL_WIDTH;
     }
 
     if (dataPillPanelOpen) {
-        canvasWidth -= 400;
+        canvasWidth -= DATA_PILL_PANEL_WIDTH;
     }
 
     if (projectLeftSidebarOpen) {
-        canvasWidth -= 384;
+        canvasWidth -= PROJECT_LEFT_SIDEBAR_WIDTH;
     }
 
     if (rightSidebarOpen) {
-        canvasWidth -= 384;
+        canvasWidth -= WORKFLOW_NODES_SIDEBAR_WIDTH;
     }
 
     if (workflowNodeDetailsPanelOpen || workflowTestChatPanelOpen) {
-        canvasWidth -= 460;
+        canvasWidth -= NODE_DETAILS_PANEL_WIDTH;
     }
 
     const canvasHeight = window.innerHeight - 60;

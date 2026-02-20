@@ -1,4 +1,9 @@
-import {DEFAULT_NODE_POSITION} from '@/shared/constants';
+import {
+    COPILOT_PANEL_WIDTH,
+    DATA_PILL_PANEL_WIDTH,
+    DEFAULT_NODE_POSITION,
+    NODE_DETAILS_PANEL_WIDTH,
+} from '@/shared/constants';
 import {ComponentDefinitionApi} from '@/shared/middleware/platform/configuration';
 import {
     ComponentDefinitionKeys,
@@ -97,14 +102,14 @@ const useClusterElementsLayout = () => {
     let canvasWidth = window.innerWidth - 80;
 
     if (copilotPanelOpen) {
-        canvasWidth -= 450;
+        canvasWidth -= COPILOT_PANEL_WIDTH;
     }
 
     if (workflowNodeDetailsPanelOpen) {
-        canvasWidth -= 460;
+        canvasWidth -= NODE_DETAILS_PANEL_WIDTH;
 
         if (dataPillPanelOpen) {
-            canvasWidth -= 400;
+            canvasWidth -= DATA_PILL_PANEL_WIDTH;
         }
     }
 
