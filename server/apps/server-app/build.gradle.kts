@@ -6,6 +6,75 @@ springBoot {
     mainClass.set("com.bytechef.server.ServerApplication")
 }
 
+// =============================================================================
+// FAST STARTUP CONFIGURATION FOR INTELLIJ
+// =============================================================================
+// When useComponentJars=true, use pre-built JARs instead of project dependencies
+// for component modules. This significantly speeds up IntelliJ startup because
+// ServiceLoader reads from JAR manifests (fast) instead of scanning directories (slow).
+//
+// Usage:
+//   1. Build all component JARs first: ./gradlew jar --parallel
+//   2. Refresh Gradle in IntelliJ
+//   3. Run the application - it will use the pre-built JARs
+//
+// To switch back to project dependencies (for active component development):
+//   Set useComponentJars=false in gradle.properties or remove the property
+// =============================================================================
+
+val useComponentJars = project.findProperty("useComponentJars")?.toString()?.toBoolean() ?: false
+
+// =============================================================================
+// COMPONENT FILTERING - Include/exclude specific components at build time
+// =============================================================================
+// includeComponents: Comma-separated whitelist. If set, ONLY these are loaded.
+// excludeComponents: Comma-separated blacklist. If set, these are skipped.
+//
+// Priority: includeComponents > excludeComponents > load all (default)
+//
+// | includeComponents | excludeComponents | Result                    |
+// |-------------------|-------------------|---------------------------|
+// | empty/not set     | empty/not set     | Load ALL components       |
+// | comp1,comp2       | (ignored)         | Load ONLY comp1, comp2    |
+// | empty/not set     | comp1,comp2       | Load all EXCEPT comp1,comp2|
+//
+// Component names = directory name under server/libs/modules/components/
+// =============================================================================
+
+val includeComponents = project.findProperty("includeComponents")?.toString()
+    ?.split(",")
+    ?.map { it.trim().lowercase() }
+    ?.filter { it.isNotEmpty() }
+    ?.toSet()
+    ?: emptySet()
+
+val excludeComponents = project.findProperty("excludeComponents")?.toString()
+    ?.split(",")
+    ?.map { it.trim().lowercase() }
+    ?.filter { it.isNotEmpty() }
+    ?.toSet()
+    ?: emptySet()
+
+fun shouldIncludeComponent(componentPath: String): Boolean {
+    val componentName = componentPath.substringAfterLast(":").lowercase()
+
+    // Always exclude the example component
+    if (componentName == "example") return false
+
+    // If includeComponents is specified, only include those
+    if (includeComponents.isNotEmpty()) {
+        return includeComponents.contains(componentName)
+    }
+
+    // If excludeComponents is specified, exclude those
+    if (excludeComponents.isNotEmpty()) {
+        return !excludeComponents.contains(componentName)
+    }
+
+    // Default: include all
+    return true
+}
+
 dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
@@ -133,11 +202,22 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl"))
 
-    run {
+    // CE Components - filtered by includeComponents/excludeComponents properties
+    // Use pre-built JARs when useComponentJars=true for faster IntelliJ startup
+    if (useComponentJars) {
         rootProject.subprojects
             .asSequence()
             .filter { it.path.startsWith(":server:libs:modules:components") }
-            .filterNot { it.path in setOf(":server:libs:modules:components:example") }
+            .filter { shouldIncludeComponent(it.path) }
+            .sortedBy { it.path }
+            .forEach {
+                implementation(files(it.tasks.named<Jar>("jar").flatMap { jar -> jar.archiveFile }))
+            }
+    } else {
+        rootProject.subprojects
+            .asSequence()
+            .filter { it.path.startsWith(":server:libs:modules:components") }
+            .filter { shouldIncludeComponent(it.path) }
             .sortedBy { it.path }
             .forEach { implementation(project(it.path)) }
     }
@@ -217,10 +297,22 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-graphql"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-scim"))
 
-    run {
+    // EE Components - filtered by includeComponents/excludeComponents properties
+    // Use pre-built JARs when useComponentJars=true for faster IntelliJ startup
+    if (useComponentJars) {
         rootProject.subprojects
             .asSequence()
             .filter { it.path.startsWith(":server:ee:libs:modules:components") }
+            .filter { shouldIncludeComponent(it.path) }
+            .sortedBy { it.path }
+            .forEach {
+                implementation(files(it.tasks.named<Jar>("jar").flatMap { jar -> jar.archiveFile }))
+            }
+    } else {
+        rootProject.subprojects
+            .asSequence()
+            .filter { it.path.startsWith(":server:ee:libs:modules:components") }
+            .filter { shouldIncludeComponent(it.path) }
             .sortedBy { it.path }
             .forEach { implementation(project(it.path)) }
     }
@@ -242,4 +334,35 @@ dependencies {
 
 configure<com.gorylenko.GitPropertiesPluginExtension> {
     dotGitDirectory = project.rootProject.layout.projectDirectory.dir(".git")
+}
+
+// Task to build component JARs for the fast IntelliJ startup (respects includeComponents/excludeComponents)
+val buildComponentJars by tasks.registering {
+    group = "build"
+    description = "Build component JARs for fast IntelliJ startup (respects includeComponents/excludeComponents filters)"
+
+    val filteredComponents = rootProject.subprojects
+        .filter { it.path.startsWith(":server:libs:modules:components") || it.path.startsWith(":server:ee:libs:modules:components") }
+        .filter { shouldIncludeComponent(it.path) }
+
+    dependsOn(filteredComponents.map { "${it.path}:jar" })
+
+    doLast {
+        val totalComponents = rootProject.subprojects
+            .filter { it.path.startsWith(":server:libs:modules:components") || it.path.startsWith(":server:ee:libs:modules:components") }
+            .filterNot { it.path.contains("example") }
+            .count()
+
+        println("\n✅ Built ${filteredComponents.size} / $totalComponents component JARs")
+
+        if (includeComponents.isNotEmpty()) {
+            println("📋 Whitelist (includeComponents): ${includeComponents.joinToString(", ")}")
+        }
+
+        if (excludeComponents.isNotEmpty()) {
+            println("🚫 Blacklist (excludeComponents): ${excludeComponents.joinToString(", ")}")
+        }
+
+        println("📝 Now set useComponentJars=true in gradle.properties and refresh Gradle in IntelliJ")
+    }
 }
