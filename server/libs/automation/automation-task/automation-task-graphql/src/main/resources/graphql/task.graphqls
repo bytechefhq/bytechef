@@ -1,4 +1,4 @@
-type Task {
+type ApprovalTask {
     id: ID!
     name: String!
     description: String
@@ -9,7 +9,7 @@ type Task {
     version: Int!
 }
 
-input TaskInput {
+input ApprovalTaskInput {
     id: ID
     name: String!
     description: String
@@ -17,13 +17,13 @@ input TaskInput {
 }
 
 extend type Query {
-    task(id: ID!): Task
-    tasks: [Task]
-    tasksByIds(ids: [ID!]!): [Task]
+    approvalTask(id: ID!): ApprovalTask
+    approvalTasks: [ApprovalTask]
+    approvalTasksByIds(ids: [ID!]!): [ApprovalTask]
 }
 
 extend type Mutation {
-    createTask(task: TaskInput!): Task
-    updateTask(task: TaskInput!): Task
-    deleteTask(id: ID!): Boolean
+    createApprovalTask(approvalTask: ApprovalTaskInput!): ApprovalTask
+    updateApprovalTask(approvalTask: ApprovalTaskInput!): ApprovalTask
+    deleteApprovalTask(id: ID!): Boolean
 }
