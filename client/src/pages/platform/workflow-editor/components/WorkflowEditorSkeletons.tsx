@@ -36,8 +36,13 @@ export const DescriptionTabSkeleton = () => (
     </div>
 );
 
-export const DataPillPanelSkeleton = () => (
-    <div className="absolute bottom-6 right-data-pill-panel-placement top-2 z-10 w-screen max-w-data-pill-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background">
+export const DataPillPanelSkeleton = ({className}: {className?: string}) => (
+    <div
+        className={twMerge(
+            'absolute bottom-6 right-data-pill-panel-placement top-2 z-10 w-screen max-w-data-pill-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
+            className
+        )}
+    >
         <ul className="flex flex-col">
             {Array.from({length: 12}).map((_, index) => (
                 <li className="flex items-center space-x-4 border-b border-border/50 p-4" key={index}>
