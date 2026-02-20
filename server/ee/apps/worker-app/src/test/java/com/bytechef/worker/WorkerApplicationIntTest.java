@@ -15,7 +15,15 @@ import org.springframework.boot.test.context.SpringBootTest;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = WorkerApplication.class)
+@SpringBootTest(
+    classes = WorkerApplication.class,
+    properties = {
+        "spring.autoconfigure.exclude=" +
+            "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration," +
+            "org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration," +
+            "org.springframework.boot.jdbc.autoconfigure.health.DataSourceHealthContributorAutoConfiguration," +
+            "org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration"
+    })
 public class WorkerApplicationIntTest {
 
     @Test
