@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {MultiSelectOptionType} from '@/components/MultiSelect/MultiSelect';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
@@ -16,6 +17,7 @@ import PropertyInput from '@/pages/platform/workflow-editor/components/propertie
 import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilder';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
+import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import {
     GetClusterElementParameterDisplayConditions200Response,
@@ -24,9 +26,9 @@ import {
 import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/types';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
-import {CircleQuestionMarkIcon} from 'lucide-react';
-import {ReactNode} from 'react';
-import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
+import {CircleQuestionMarkIcon, PlusIcon, XIcon} from 'lucide-react';
+import {ReactNode, useMemo, useState} from 'react';
+import {Control, Controller, FieldValues, FormState, useFormContext, useWatch} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
 interface PropertyProps {
@@ -48,6 +50,177 @@ interface PropertyProps {
     path?: string;
     property: PropertyAllType;
 }
+
+interface ControlledArrayItemsProps {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    control: Control<any, any>;
+    controlPath: string;
+    formState?: FormState<FieldValues>;
+    property: PropertyAllType;
+}
+
+const ControlledArrayItems = ({control, controlPath, formState, property}: ControlledArrayItemsProps) => {
+    const {setValue} = useFormContext();
+    const watchedValue = useWatch({control, name: controlPath});
+
+    const items = Array.isArray(watchedValue) ? (watchedValue as unknown[]) : [];
+    const itemDefinition = property.items?.[0];
+
+    return (
+        <>
+            <ul className="ml-2 flex flex-col space-y-4 border-l border-l-border/50">
+                {items.map((item, index) => (
+                    <li className="flex items-center gap-1" key={`${controlPath}_${index}`}>
+                        <Property
+                            control={control}
+                            controlPath={controlPath}
+                            customClassName="w-full pl-2"
+                            deletePropertyButton={
+                                <Button
+                                    icon={<XIcon />}
+                                    onClick={() => {
+                                        setValue(
+                                            controlPath,
+                                            items.filter((_, itemIndex) => itemIndex !== index)
+                                        );
+                                    }}
+                                    size="iconXs"
+                                    variant="destructiveGhost"
+                                />
+                            }
+                            formState={formState}
+                            parameterValue={item}
+                            property={
+                                {
+                                    ...itemDefinition,
+                                    defaultValue: item,
+                                    label: `Item ${index}`,
+                                    name: String(index),
+                                } as PropertyAllType
+                            }
+                        />
+                    </li>
+                ))}
+            </ul>
+
+            <Button
+                className="mt-3 rounded-sm"
+                icon={<PlusIcon />}
+                label="Add item"
+                onClick={() => setValue(controlPath, [...items, ''])}
+                size="sm"
+                variant="secondary"
+            />
+        </>
+    );
+};
+
+interface ControlledObjectEntriesProps {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    control: Control<any, any>;
+    controlPath: string;
+    formState?: FormState<FieldValues>;
+    property: PropertyAllType;
+}
+
+const ControlledObjectEntries = ({control, controlPath, formState, property}: ControlledObjectEntriesProps) => {
+    const {setValue} = useFormContext();
+    const watchedValue = useWatch({control, name: controlPath});
+    const [newEntryKey, setNewEntryKey] = useState('');
+
+    const entries = useMemo(() => {
+        if (watchedValue && typeof watchedValue === 'object' && !Array.isArray(watchedValue)) {
+            return Object.entries(watchedValue as Record<string, unknown>);
+        }
+
+        return [];
+    }, [watchedValue]);
+
+    const itemDefinition = property.additionalProperties?.[0];
+
+    return (
+        <>
+            <ul className="ml-2 flex flex-col space-y-4 border-l border-l-border/50">
+                {entries.map(([entryKey, entryValue]) => (
+                    <li className="flex items-center gap-1" key={`${controlPath}_${entryKey}`}>
+                        <Property
+                            control={control}
+                            controlPath={controlPath}
+                            customClassName="w-full pl-2"
+                            deletePropertyButton={
+                                <Button
+                                    icon={<XIcon />}
+                                    onClick={() => {
+                                        const currentObject = {...(watchedValue as Record<string, unknown>)};
+
+                                        delete currentObject[entryKey];
+
+                                        setValue(controlPath, currentObject);
+                                    }}
+                                    size="iconXs"
+                                    variant="destructiveGhost"
+                                />
+                            }
+                            formState={formState}
+                            parameterValue={entryValue}
+                            property={
+                                {
+                                    ...itemDefinition,
+                                    controlType: 'TEXT',
+                                    defaultValue: entryValue,
+                                    label: entryKey,
+                                    name: entryKey,
+                                    type: itemDefinition?.type || 'STRING',
+                                } as PropertyAllType
+                            }
+                        />
+                    </li>
+                ))}
+            </ul>
+
+            <div className="mt-3 flex items-center gap-2">
+                <input
+                    className="h-8 flex-1 rounded-md border bg-background px-2 text-sm"
+                    onChange={(event) => setNewEntryKey(event.target.value)}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter' && newEntryKey.trim()) {
+                            event.preventDefault();
+
+                            setValue(controlPath, {
+                                ...((watchedValue as Record<string, unknown>) || {}),
+                                [newEntryKey.trim()]: '',
+                            });
+
+                            setNewEntryKey('');
+                        }
+                    }}
+                    placeholder="Key name"
+                    type="text"
+                    value={newEntryKey}
+                />
+
+                <Button
+                    className="rounded-sm"
+                    disabled={!newEntryKey.trim()}
+                    icon={<PlusIcon />}
+                    label="Add"
+                    onClick={() => {
+                        if (newEntryKey.trim()) {
+                            setValue(controlPath, {
+                                ...((watchedValue as Record<string, unknown>) || {}),
+                                [newEntryKey.trim()]: '',
+                            });
+
+                            setNewEntryKey('');
+                        }
+                    }}
+                    size="sm"
+                    variant="secondary"
+                />
+            </div>
+        </>
+    );
+};
 
 const Property = ({
     arrayIndex,
@@ -135,6 +308,8 @@ const Property = ({
         path,
         property,
     });
+
+    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
 
     if (hidden && !control) {
         return <></>;
@@ -265,7 +440,7 @@ const Property = ({
                         </div>
                     )}
 
-                    {controlType === 'ARRAY_BUILDER' && calculatedPath && (
+                    {!control && controlType === 'ARRAY_BUILDER' && calculatedPath && (
                         <ArrayProperty
                             onDeleteClick={handleDeleteCustomPropertyClick}
                             parentArrayItems={parentArrayItems}
@@ -274,13 +449,49 @@ const Property = ({
                         />
                     )}
 
-                    {(controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') && (
+                    {control && controlType === 'ARRAY_BUILDER' && calculatedPath && (
+                        <ControlledArrayItems
+                            control={control}
+                            controlPath={calculatedPath}
+                            formState={formState}
+                            property={property}
+                        />
+                    )}
+
+                    {!control && (controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') && (
                         <ObjectProperty
                             arrayIndex={arrayIndex}
                             arrayName={arrayName}
                             onDeleteClick={handleDeleteCustomPropertyClick}
                             operationName={operationName}
                             path={calculatedPath}
+                            property={property}
+                        />
+                    )}
+
+                    {control &&
+                        (controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') &&
+                        calculatedPath &&
+                        !!property.properties?.length && (
+                            <ul className={twMerge('space-y-4', label && 'ml-2 border-l border-l-border/50')}>
+                                {(property.properties as PropertyAllType[]).map((subProperty, index) => (
+                                    <Property
+                                        control={control}
+                                        controlPath={calculatedPath}
+                                        customClassName="w-full pl-2"
+                                        formState={formState}
+                                        key={subProperty.name || `${property.name}_${index}`}
+                                        property={subProperty}
+                                    />
+                                ))}
+                            </ul>
+                        )}
+
+                    {control && controlType === 'OBJECT_BUILDER' && calculatedPath && !property.properties?.length && (
+                        <ControlledObjectEntries
+                            control={control}
+                            controlPath={calculatedPath}
+                            formState={formState}
                             property={property}
                         />
                     )}
@@ -297,6 +508,7 @@ const Property = ({
                                     errorMessage={errorMessage}
                                     label={label || name}
                                     leadingIcon={typeIcon}
+                                    onFocus={() => setDataPillPanelOpen(true)}
                                     placeholder={placeholder}
                                     required={required}
                                     type={hidden ? 'hidden' : getInputHTMLType(controlType)}
@@ -307,30 +519,75 @@ const Property = ({
                         />
                     )}
 
-                    {control && controlType === 'SELECT' && type !== 'BOOLEAN' && calculatedPath && (
-                        <Controller
-                            control={control}
-                            defaultValue={defaultValue}
-                            name={calculatedPath}
-                            render={({field: {name, onChange}}) => (
-                                <PropertySelect
-                                    description={description}
-                                    label={label || name}
-                                    leadingIcon={typeIcon}
-                                    name={name}
-                                    onValueChange={(value) => {
-                                        onChange(value);
+                    {control &&
+                        controlType === 'SELECT' &&
+                        type !== 'BOOLEAN' &&
+                        calculatedPath &&
+                        optionsDataSource && (
+                            <Controller
+                                control={control}
+                                defaultValue={defaultValue}
+                                name={calculatedPath}
+                                render={({field: {name: fieldName, onBlur, onChange, value: fieldValue}}) => (
+                                    <PropertyComboBox
+                                        arrayIndex={arrayIndex}
+                                        defaultValue={defaultValue}
+                                        description={description}
+                                        label={label || fieldName}
+                                        leadingIcon={typeIcon}
+                                        lookupDependsOnPaths={optionsDataSource.optionsLookupDependsOn?.map(
+                                            (optionLookupDependency) =>
+                                                optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
+                                        )}
+                                        lookupDependsOnValues={lookupDependsOnValues}
+                                        name={fieldName}
+                                        onBlur={onBlur}
+                                        onValueChange={(value) => {
+                                            onChange(value);
 
-                                        setSelectValue(value);
-                                    }}
-                                    options={options as Array<SelectOptionType>}
-                                    required={required}
-                                    value={selectValue}
-                                />
-                            )}
-                            rules={{required}}
-                        />
-                    )}
+                                            setSelectValue(value);
+                                        }}
+                                        options={(formattedOptions as Array<Option>) || []}
+                                        optionsDataSource={optionsDataSource}
+                                        path={calculatedPath}
+                                        required={required}
+                                        value={fieldValue !== undefined ? fieldValue : selectValue}
+                                        workflowId={workflow.id!}
+                                        workflowNodeName={currentNode?.name ?? ''}
+                                    />
+                                )}
+                                rules={{required}}
+                            />
+                        )}
+
+                    {control &&
+                        controlType === 'SELECT' &&
+                        type !== 'BOOLEAN' &&
+                        calculatedPath &&
+                        !optionsDataSource && (
+                            <Controller
+                                control={control}
+                                defaultValue={defaultValue}
+                                name={calculatedPath}
+                                render={({field: {name, onChange}}) => (
+                                    <PropertySelect
+                                        description={description}
+                                        label={label || name}
+                                        leadingIcon={typeIcon}
+                                        name={name}
+                                        onValueChange={(value) => {
+                                            onChange(value);
+
+                                            setSelectValue(value);
+                                        }}
+                                        options={options as Array<SelectOptionType>}
+                                        required={required}
+                                        value={selectValue}
+                                    />
+                                )}
+                                rules={{required}}
+                            />
+                        )}
 
                     {control && controlType === 'SELECT' && type === 'BOOLEAN' && calculatedPath && (
                         <Controller
@@ -372,6 +629,32 @@ const Property = ({
                                     leadingIcon={typeIcon}
                                     required={required}
                                     {...field}
+                                />
+                            )}
+                            rules={{required}}
+                        />
+                    )}
+
+                    {control && controlType === 'MULTI_SELECT' && calculatedPath && (
+                        <Controller
+                            control={control}
+                            defaultValue={defaultValue || []}
+                            name={calculatedPath}
+                            render={({field: {onChange, value}}) => (
+                                <PropertyMultiSelect
+                                    defaultValue={(value as string[]) || []}
+                                    deletePropertyButton={null}
+                                    leadingIcon={typeIcon}
+                                    onChange={(newValue) => {
+                                        onChange(newValue);
+                                    }}
+                                    options={formattedOptions as MultiSelectOptionType[]}
+                                    optionsDataSource={optionsDataSource}
+                                    path={calculatedPath}
+                                    property={property}
+                                    showInputTypeSwitchButton={false}
+                                    value={(value as string[]) || []}
+                                    workflowId={workflow.id!}
                                 />
                             )}
                             rules={{required}}
