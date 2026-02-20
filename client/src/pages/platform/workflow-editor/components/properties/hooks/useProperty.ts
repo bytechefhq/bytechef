@@ -294,7 +294,7 @@ export const useProperty = ({
     }
 
     if (control) {
-        path = `${controlPath}.${name}`;
+        path = controlPath ? `${controlPath}.${name}` : name;
     }
 
     if (path === objectName) {
