@@ -445,6 +445,7 @@ public class ApplicationProperties {
      */
     public static class Ai {
 
+        private Agent agent = new Agent();
         private Anthropic anthropic = new Anthropic();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
@@ -453,6 +454,10 @@ public class ApplicationProperties {
         private OpenAi openAi = new OpenAi();
         private Provider provider = new Provider();
         private Vectorstore vectorstore = new Vectorstore();
+
+        public Agent getAgent() {
+            return agent;
+        }
 
         public Anthropic getAnthropic() {
             return anthropic;
@@ -486,6 +491,10 @@ public class ApplicationProperties {
             return vectorstore;
         }
 
+        public void setAgent(Agent agent) {
+            this.agent = agent;
+        }
+
         public void setAnthropic(Anthropic anthropic) {
             this.anthropic = anthropic;
         }
@@ -516,6 +525,172 @@ public class ApplicationProperties {
 
         public void setVectorstore(Vectorstore vectorstore) {
             this.vectorstore = vectorstore;
+        }
+
+        /**
+         * AI agent configuration.
+         */
+        public static class Agent {
+
+            /** Agent memory configuration */
+            private Memory memory = new Memory();
+
+            public Memory getMemory() {
+                return memory;
+            }
+
+            public void setMemory(Memory memory) {
+                this.memory = memory;
+            }
+
+            /**
+             * Agent memory configuration for storing conversation history and context.
+             */
+            public static class Memory {
+
+                /**
+                 * Memory storage provider type.
+                 */
+                public enum Provider {
+                    /** JDBC-based memory storage */
+                    JDBC,
+                    /** Redis-based memory storage */
+                    REDIS
+                }
+
+                /** Whether agent memory is enabled */
+                private boolean enabled = true;
+
+                /** Memory storage provider */
+                private Provider provider = Provider.JDBC;
+
+                /** JDBC memory storage configuration */
+                private Jdbc jdbc = new Jdbc();
+
+                /** Redis memory storage configuration */
+                private Redis redis = new Redis();
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                public Provider getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(Provider provider) {
+                    this.provider = provider;
+                }
+
+                public Jdbc getJdbc() {
+                    return jdbc;
+                }
+
+                public void setJdbc(Jdbc jdbc) {
+                    this.jdbc = jdbc;
+                }
+
+                public Redis getRedis() {
+                    return redis;
+                }
+
+                public void setRedis(Redis redis) {
+                    this.redis = redis;
+                }
+
+                /**
+                 * JDBC-based agent memory storage configuration.
+                 */
+                public static class Jdbc {
+
+                    /** Whether to automatically initialize the database schema */
+                    private boolean initializeSchema = true;
+
+                    public boolean isInitializeSchema() {
+                        return initializeSchema;
+                    }
+
+                    public void setInitializeSchema(boolean initializeSchema) {
+                        this.initializeSchema = initializeSchema;
+                    }
+                }
+
+                /**
+                 * Redis-based agent memory storage configuration.
+                 */
+                public static class Redis {
+
+                    /** Redis server hostname */
+                    private String host = "localhost";
+
+                    /** Redis server port */
+                    private int port = 6379;
+
+                    /** Redis index name for chat memory */
+                    private String indexName = "bytechef-chat-memory-idx";
+
+                    /** Key prefix for Redis keys */
+                    private String keyPrefix = "bytechef-chat-memory:";
+
+                    /** Time to live for memory entries */
+                    private String timeToLive;
+
+                    /** Whether to automatically initialize the Redis schema */
+                    private boolean initializeSchema = true;
+
+                    public String getHost() {
+                        return host;
+                    }
+
+                    public void setHost(String host) {
+                        this.host = host;
+                    }
+
+                    public int getPort() {
+                        return port;
+                    }
+
+                    public void setPort(int port) {
+                        this.port = port;
+                    }
+
+                    public String getIndexName() {
+                        return indexName;
+                    }
+
+                    public void setIndexName(String indexName) {
+                        this.indexName = indexName;
+                    }
+
+                    public String getKeyPrefix() {
+                        return keyPrefix;
+                    }
+
+                    public void setKeyPrefix(String keyPrefix) {
+                        this.keyPrefix = keyPrefix;
+                    }
+
+                    public String getTimeToLive() {
+                        return timeToLive;
+                    }
+
+                    public void setTimeToLive(String timeToLive) {
+                        this.timeToLive = timeToLive;
+                    }
+
+                    public boolean isInitializeSchema() {
+                        return initializeSchema;
+                    }
+
+                    public void setInitializeSchema(boolean initializeSchema) {
+                        this.initializeSchema = initializeSchema;
+                    }
+                }
+            }
         }
 
         /**
