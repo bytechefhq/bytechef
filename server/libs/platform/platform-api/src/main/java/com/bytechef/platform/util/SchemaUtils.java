@@ -18,7 +18,6 @@ package com.bytechef.platform.util;
 
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.definition.BaseControlType;
 import com.bytechef.definition.BaseFileEntry;
 import com.bytechef.definition.BaseOutputDefinition;
@@ -34,6 +33,7 @@ import com.bytechef.definition.BaseProperty.BaseNumberProperty;
 import com.bytechef.definition.BaseProperty.BaseObjectProperty;
 import com.bytechef.definition.BaseProperty.BaseStringProperty;
 import com.bytechef.definition.BaseProperty.BaseTimeProperty;
+import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.constant.PlatformConstants;
 import com.bytechef.platform.domain.OutputResponse;
 import java.time.LocalDate;
@@ -45,8 +45,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Ivica Cardic
@@ -117,10 +119,10 @@ public class SchemaUtils {
             }
         }
 
-        BaseProperty.BaseValueProperty<?> outputSchema = outputResponse.getOutputSchema();
+        BaseValueProperty<?> outputSchema = outputResponse.getOutputSchema();
 
         if (outputSchema == null && sampleOutput != null) {
-            outputSchema = (BaseProperty.BaseValueProperty<?>) getOutputSchema(sampleOutput, propertyFactoryFunction);
+            outputSchema = (BaseValueProperty<?>) getOutputSchema(sampleOutput, propertyFactoryFunction);
         }
 
         return outputFactoryFunction.apply(outputSchema, sampleOutput, outputResponse.getPlaceholder());
@@ -131,27 +133,30 @@ public class SchemaUtils {
 
         return toOutput(
             BaseOutputDefinition.OutputResponse.of(
-                (BaseProperty.BaseValueProperty<?>) getOutputSchema(value, propertyFactoryFunction), value),
+                (BaseValueProperty<?>) getOutputSchema(value, propertyFactoryFunction), value),
             outputFactoryFunction, propertyFactoryFunction);
     }
 
     private static Object getSampleOutput(BaseProperty definitionProperty) {
-        if (definitionProperty instanceof BaseProperty.BaseValueProperty<?> valueProperty) {
-            if (OptionalUtils.isPresent(valueProperty.getExampleValue())) {
-                return valueProperty.getExampleValue();
+        if (definitionProperty instanceof BaseValueProperty<?> valueProperty) {
+            if (valueProperty.getExampleValue()
+                .isPresent()) {
+                return valueProperty.getExampleValue()
+                    .get();
             }
 
-            if (OptionalUtils.isPresent(valueProperty.getDefaultValue())) {
-                return valueProperty.getDefaultValue();
+            if (valueProperty.getDefaultValue()
+                .isPresent()) {
+                return valueProperty.getDefaultValue()
+                    .get();
             }
         }
 
         return switch (definitionProperty) {
-            case BaseArrayProperty<? extends BaseProperty> p -> {
+            case BaseArrayProperty<? extends BaseProperty> baseArrayProperty -> {
+                List<? extends BaseProperty> properties = baseArrayProperty.getItems()
+                    .orElse(List.of());
                 List<Object> items = new ArrayList<>();
-
-                List<? extends BaseProperty> properties = OptionalUtils.orElse(
-                    p.getItems(), List.of());
 
                 if (!properties.isEmpty()) {
                     items.add(getSampleOutput(properties.getFirst()));
@@ -169,12 +174,12 @@ public class SchemaUtils {
             case BaseIntegerProperty ignored -> 57;
             case BaseNullProperty ignored -> null;
             case BaseNumberProperty ignored -> 23.34;
-            case BaseObjectProperty<? extends BaseProperty> p -> {
+            case BaseObjectProperty<? extends BaseProperty> baseObjectProperty -> {
+                List<? extends BaseProperty> baseProperties = baseObjectProperty.getProperties()
+                    .orElse(List.of());
                 Map<String, Object> map = new HashMap<>();
 
-                for (BaseProperty property : OptionalUtils.orElse(
-                    p.getProperties(), List.of())) {
-
+                for (BaseProperty property : baseProperties) {
                     map.put(property.getName(), getSampleOutput(property));
                 }
 
@@ -193,6 +198,107 @@ public class SchemaUtils {
             default -> throw new IllegalArgumentException(
                 "Definition %s is not allowed".formatted(definitionProperty.getName()));
         };
+    }
+
+    public static @Nullable BaseValueProperty<?> getJsonSchemaProperty(
+        String jsonSchema, JsonSchemaPropertyFactory factory) {
+
+        return getJsonSchemaProperty(null, jsonSchema, factory);
+    }
+
+    public static @Nullable BaseValueProperty<?> getJsonSchemaProperty(
+        String propertyName, String jsonSchema, JsonSchemaPropertyFactory factory) {
+
+        if (jsonSchema == null) {
+            return null;
+        }
+
+        JsonNode schemaJsonNode = JsonUtils.readTree(jsonSchema);
+
+        return getJsonSchemaProperty(propertyName, schemaJsonNode, factory);
+    }
+
+    private static BaseValueProperty<?> getJsonSchemaProperty(
+        String propertyName, JsonNode jsonNode, JsonSchemaPropertyFactory factory) {
+
+        JsonNode typeJsonNode = jsonNode.get("type");
+
+        String type;
+
+        if (typeJsonNode == null) {
+            type = "string";
+        } else {
+            type = typeJsonNode.stringValue();
+        }
+
+        return switch (type) {
+            case "array" -> {
+                BaseValueProperty<?> arrayProperty = factory.create(propertyName, type);
+
+                JsonNode itemsJsonNode = jsonNode.get("items");
+
+                if (itemsJsonNode != null) {
+                    walkThroughArrayProperty(itemsJsonNode, arrayProperty, factory);
+                }
+
+                yield arrayProperty;
+            }
+            case "boolean" -> factory.create(propertyName, type);
+            case "integer" -> factory.create(propertyName, type);
+            case "number" -> factory.create(propertyName, type);
+            case "object" -> {
+                BaseValueProperty<?> objectProperty = factory.create(propertyName, type);
+
+                JsonNode propertiesJsonNode = jsonNode.get("properties");
+
+                if (propertiesJsonNode != null) {
+                    walkThroughObjectProperty(propertiesJsonNode, objectProperty, factory);
+                }
+
+                yield objectProperty;
+            }
+            case "string" -> factory.create(propertyName, type);
+            default -> throw new IllegalArgumentException("Unsupported JSON schema type: " + type);
+        };
+    }
+
+    private static void walkThroughArrayProperty(
+        JsonNode jsonNode, BaseValueProperty<?> property, JsonSchemaPropertyFactory factory) {
+
+        List<BaseValueProperty<?>> children = factory.getChildren(property);
+
+        children.add(getJsonSchemaProperty(null, jsonNode, factory));
+
+        factory.addChildren(property, children);
+    }
+
+    private static void walkThroughObjectProperty(
+        JsonNode jsonNode, BaseValueProperty<?> property, JsonSchemaPropertyFactory factory) {
+
+        if (jsonNode == null) {
+            return;
+        }
+
+        for (Map.Entry<String, JsonNode> field : jsonNode.properties()) {
+            String fieldName = field.getKey();
+            JsonNode fieldJsonNode = field.getValue();
+
+            List<BaseValueProperty<?>> children = factory.getChildren(property);
+
+            children.add(getJsonSchemaProperty(fieldName, fieldJsonNode, factory));
+
+            factory.addChildren(property, children);
+        }
+    }
+
+    public interface JsonSchemaPropertyFactory {
+
+        void addChildren(
+            BaseValueProperty<?> property, List<BaseValueProperty<?>> children);
+
+        BaseValueProperty<?> create(String name, String type);
+
+        List<BaseValueProperty<?>> getChildren(BaseValueProperty<?> property);
     }
 
     @FunctionalInterface

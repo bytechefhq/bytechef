@@ -20,6 +20,7 @@ import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
+import com.bytechef.platform.util.SchemaUtils.JsonSchemaPropertyFactory;
 import com.bytechef.platform.util.SchemaUtils.SchemaPropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableArrayProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableObjectProperty;
@@ -33,6 +34,54 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public record PropertyFactory() implements SchemaPropertyFactory {
+
+    @SuppressWarnings("unchecked")
+    public static final JsonSchemaPropertyFactory JSON_SCHEMA_PROPERTY_FACTORY = new JsonSchemaPropertyFactory() {
+
+        @Override
+        public void addChildren(
+            BaseProperty.BaseValueProperty<?> property, List<BaseProperty.BaseValueProperty<?>> children) {
+
+            if (property instanceof ModifiableArrayProperty modifiableArrayProperty) {
+                modifiableArrayProperty.items(
+                    children.stream()
+                        .map(child -> (ModifiableValueProperty<?, ?>) child)
+                        .toList());
+            } else {
+                ((ModifiableObjectProperty) property).properties(
+                    children.stream()
+                        .map(child -> (ModifiableValueProperty<?, ?>) child)
+                        .toList());
+            }
+        }
+
+        @Override
+        public BaseProperty.BaseValueProperty<?> create(String name, String type) {
+            return switch (type) {
+                case "array" -> TaskDispatcherDsl.array(name);
+                case "boolean" -> TaskDispatcherDsl.bool(name);
+                case "integer" -> TaskDispatcherDsl.integer(name);
+                case "number" -> TaskDispatcherDsl.number(name);
+                case "object" -> TaskDispatcherDsl.object(name);
+                case "string" -> TaskDispatcherDsl.string(name);
+                default -> throw new IllegalArgumentException("Unsupported JSON schema type: " + type);
+            };
+        }
+
+        @Override
+        public List<BaseProperty.BaseValueProperty<?>> getChildren(BaseProperty.BaseValueProperty<?> property) {
+            if (property instanceof ModifiableArrayProperty modifiableArrayProperty) {
+                return (List<BaseProperty.BaseValueProperty<?>>) (List<?>) modifiableArrayProperty.getItems()
+                    .map(ArrayList::new)
+                    .orElseGet(ArrayList::new);
+            } else {
+                return (List<BaseProperty.BaseValueProperty<?>>) (List<?>) ((ModifiableObjectProperty) property)
+                    .getProperties()
+                    .map(ArrayList::new)
+                    .orElseGet(ArrayList::new);
+            }
+        }
+    };
 
     public static final SchemaUtils.OutputFactoryFunction OUTPUT_FACTORY_FUNCTION =
         (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
@@ -93,9 +142,7 @@ public record PropertyFactory() implements SchemaPropertyFactory {
 
     private ModifiableObjectProperty getObjectProperty(String name, Object value) {
         ModifiableObjectProperty objectProperty = TaskDispatcherDsl.object(name);
-
         List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
-
         Map<?, ?> map;
 
         if (value instanceof Map<?, ?>) {

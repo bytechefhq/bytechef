@@ -16,8 +16,6 @@
 
 package com.bytechef.automation.configuration.registry;
 
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
-
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -27,11 +25,12 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.workflow.task.dispatcher.definition.JsonSchemaUtils;
-import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
+import com.bytechef.platform.util.SchemaUtils;
+import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.registry.SubWorkflowDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.SubWorkflowEntry;
 import java.util.ArrayList;
@@ -82,13 +81,14 @@ class SubWorkflowDataSourceImpl implements SubWorkflowDataSource {
             return null;
         }
 
-        ModifiableValueProperty<?, ?> inputProperty = JsonSchemaUtils.getProperty(inputSchema);
+        BaseProperty.BaseValueProperty<?> inputProperty = SchemaUtils.getJsonSchemaProperty(
+            inputSchema, PropertyFactory.JSON_SCHEMA_PROPERTY_FACTORY);
 
         if (inputProperty == null) {
             return null;
         }
 
-        return OutputResponse.of(object().properties(inputProperty));
+        return OutputResponse.of(inputProperty);
     }
 
     @Override

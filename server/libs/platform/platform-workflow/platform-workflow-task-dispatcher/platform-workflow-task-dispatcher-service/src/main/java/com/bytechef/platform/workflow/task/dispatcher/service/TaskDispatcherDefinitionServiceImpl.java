@@ -90,11 +90,11 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
 
-        List<? extends com.bytechef.platform.workflow.task.dispatcher.definition.Property> properties =
+        List<? extends Property> properties =
             taskDispatcherDefinition.getProperties()
                 .orElse(List.of());
 
-        for (com.bytechef.platform.workflow.task.dispatcher.definition.Property property : properties) {
+        for (Property property : properties) {
             if (property instanceof Property.StringProperty stringProperty &&
                 Objects.equals(property.getName(), propertyName)) {
 
