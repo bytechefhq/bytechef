@@ -64,6 +64,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -321,8 +322,8 @@ public class FirecrawlCrawlAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, Object> scrapeOptionsMap = inputParameters.getMap(
-            SCRAPE_OPTIONS, new TypeReference<>() {}, Map.of());
+        Map<String, Object> scrapeOptionsMap = new HashMap<>(inputParameters.getMap(
+            SCRAPE_OPTIONS, new TypeReference<>() {}, Map.of()));
 
         List<String> formatsList = inputParameters.getList(FORMATS, String.class);
 
