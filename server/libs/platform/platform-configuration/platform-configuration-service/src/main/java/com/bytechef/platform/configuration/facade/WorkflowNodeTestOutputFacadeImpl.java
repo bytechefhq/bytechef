@@ -147,23 +147,20 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         String clusterElementWorkflowNodeName, @EnvironmentIdParam long environmentId,
         Map<String, Object> inputParameters) {
 
-        ClusterElementTestContext clusterElementTestContext = getClusterElementTestContext(
+        ClusterElementTestContext context = getClusterElementTestContext(
             workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, environmentId);
 
-        Map<String, Object> mergedParameters = MapUtils.concat(
-            clusterElementTestContext.inputParameters(), Map.of("input", inputParameters));
+        ClusterElement clusterElement = context.clusterElement();
 
-        ClusterElement clusterElement = clusterElementTestContext.clusterElement();
+        Map<String, Object> mergedParameters = MapUtils.concat(context.inputParameters(), inputParameters);
 
-        Map<String, ?> extensions = evaluator.evaluate(
-            clusterElement.getExtensions(), clusterElementTestContext.outputs());
+        Map<String, ?> extensions = evaluator.evaluate(clusterElement.getExtensions(), context.outputs());
 
-        Workflow workflow = clusterElementTestContext.workflow();
+        Workflow workflow = context.workflow();
 
         return executeAndSaveTestOutput(
-            workflow.getId(), clusterElementWorkflowNodeName,
-            clusterElementTestContext.clusterElementWorkflowNodeType(), mergedParameters,
-            clusterElementTestContext.connectionIds(), extensions, environmentId);
+            workflow.getId(), clusterElementWorkflowNodeName, context.clusterElementWorkflowNodeType(),
+            mergedParameters, context.connectionIds(), extensions, environmentId);
     }
 
     @Override
@@ -248,8 +245,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                 workflowId, workflowNodeName, environmentId);
 
         Map<String, Long> connectionIds = MapUtils.toMap(
-            workflowTestConfigurationConnections,
-            WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+            workflowTestConfigurationConnections, WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
             WorkflowTestConfigurationConnection::getConnectionId);
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
@@ -261,8 +257,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, Object> evaluatedParameters = (Map<String, Object>) workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
 
-        Map<String, Object> mergedParameters = MapUtils.concat(
-            evaluatedParameters, Map.of("input", inputParameters));
+        Map<String, Object> mergedParameters = MapUtils.concat(evaluatedParameters, inputParameters);
 
         Map<String, ?> extensions = evaluator.evaluate(workflowTask.getExtensions(), outputs);
 
@@ -364,7 +359,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
             workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                workflowId, clusterElementWorkflowNodeName, environmentId);
+                workflowId, workflowNodeName, environmentId);
 
         Map<String, Long> connectionIds = MapUtils.toMap(
             workflowTestConfigurationConnections,

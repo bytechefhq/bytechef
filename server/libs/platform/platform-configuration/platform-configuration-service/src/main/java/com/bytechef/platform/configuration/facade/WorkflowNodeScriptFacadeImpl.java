@@ -185,71 +185,21 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     @Override
     public ScriptTestExecutionDTO testClusterElementScript(
         String workflowId, String workflowNodeName, String clusterElementType,
-        String clusterElementWorkflowNodeName, long environmentId) {
-
-        ExecutionError executionError = null;
-        WorkflowNodeTestOutput workflowNodeTestOutput = null;
-
-        try {
-            workflowNodeTestOutput = workflowNodeTestOutputFacade.saveClusterElementTestOutput(
-                workflowId, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
-                environmentId);
-        } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage(), exception);
-            }
-
-            executionError = extractExecutionError(exception);
-        }
-
-        OutputResponse outputResponse = null;
-
-        if (workflowNodeTestOutput != null) {
-            outputResponse = workflowNodeTestOutput.getOutput(Property.class);
-        }
-
-        return new ScriptTestExecutionDTO(executionError, getOutputAsMap(outputResponse));
-    }
-
-    @Override
-    public ScriptTestExecutionDTO testWorkflowNodeScript(
-        String workflowId, String workflowNodeName, long environmentId) {
-
-        ExecutionError executionError = null;
-        WorkflowNodeTestOutput workflowNodeTestOutput = null;
-
-        try {
-            workflowNodeTestOutput = workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-                workflowId, workflowNodeName, environmentId);
-        } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage(), exception);
-            }
-
-            executionError = extractExecutionError(exception);
-        }
-
-        OutputResponse outputResponse = null;
-
-        if (workflowNodeTestOutput != null) {
-            outputResponse = workflowNodeTestOutput.getOutput(Property.class);
-        }
-
-        return new ScriptTestExecutionDTO(executionError, getOutputAsMap(outputResponse));
-    }
-
-    @Override
-    public ScriptTestExecutionDTO testClusterElementScript(
-        String workflowId, String workflowNodeName, String clusterElementType,
         String clusterElementWorkflowNodeName, long environmentId, Map<String, Object> inputParameters) {
 
         ExecutionError executionError = null;
         WorkflowNodeTestOutput workflowNodeTestOutput = null;
 
         try {
-            workflowNodeTestOutput = workflowNodeTestOutputFacade.saveClusterElementTestOutput(
-                workflowId, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
-                environmentId, inputParameters);
+            if (inputParameters == null) {
+                workflowNodeTestOutput = workflowNodeTestOutputFacade.saveClusterElementTestOutput(
+                    workflowId, workflowNodeName, clusterElementType.toUpperCase(),
+                    clusterElementWorkflowNodeName, environmentId);
+            } else {
+                workflowNodeTestOutput = workflowNodeTestOutputFacade.saveClusterElementTestOutput(
+                    workflowId, workflowNodeName, clusterElementType.toUpperCase(),
+                    clusterElementWorkflowNodeName, environmentId, Map.of("input", inputParameters));
+            }
         } catch (Exception exception) {
             if (logger.isDebugEnabled()) {
                 logger.debug(exception.getMessage(), exception);
@@ -275,8 +225,13 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         WorkflowNodeTestOutput workflowNodeTestOutput = null;
 
         try {
-            workflowNodeTestOutput = workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-                workflowId, workflowNodeName, environmentId, inputParameters);
+            if (inputParameters == null) {
+                workflowNodeTestOutput = workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
+                    workflowId, workflowNodeName, environmentId);
+            } else {
+                workflowNodeTestOutput = workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
+                    workflowId, workflowNodeName, environmentId, Map.of("input", inputParameters));
+            }
         } catch (Exception exception) {
             if (logger.isDebugEnabled()) {
                 logger.debug(exception.getMessage(), exception);

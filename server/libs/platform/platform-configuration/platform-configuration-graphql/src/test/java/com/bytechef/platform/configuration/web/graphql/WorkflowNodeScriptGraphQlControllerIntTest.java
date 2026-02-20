@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.web.graphql;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -61,7 +62,7 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
         ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(null, outputMap);
 
         when(workflowNodeScriptFacade.testClusterElementScript(
-            anyString(), anyString(), anyString(), anyString(), anyLong())).thenReturn(dto);
+            anyString(), anyString(), anyString(), anyString(), anyLong(), any())).thenReturn(dto);
 
         this.graphQlTester
             .document("""
@@ -101,7 +102,7 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
         ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(executionError, null);
 
         when(workflowNodeScriptFacade.testClusterElementScript(
-            anyString(), anyString(), anyString(), anyString(), anyLong())).thenReturn(dto);
+            anyString(), anyString(), anyString(), anyString(), anyLong(), any())).thenReturn(dto);
 
         this.graphQlTester
             .document("""
@@ -137,7 +138,7 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
         ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(null, null);
 
         when(workflowNodeScriptFacade.testClusterElementScript(
-            anyString(), anyString(), anyString(), anyString(), anyLong())).thenReturn(dto);
+            anyString(), anyString(), anyString(), anyString(), anyLong(), any())).thenReturn(dto);
 
         this.graphQlTester
             .document("""
@@ -169,7 +170,7 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
         ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(null, outputMap);
 
         when(workflowNodeScriptFacade.testWorkflowNodeScript(
-            anyString(), anyString(), anyLong())).thenReturn(dto);
+            anyString(), anyString(), anyLong(), any())).thenReturn(dto);
 
         this.graphQlTester
             .document("""
@@ -207,7 +208,7 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
         ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(executionError, null);
 
         when(workflowNodeScriptFacade.testWorkflowNodeScript(
-            anyString(), anyString(), anyLong())).thenReturn(dto);
+            anyString(), anyString(), anyLong(), any())).thenReturn(dto);
 
         this.graphQlTester
             .document("""
@@ -241,7 +242,7 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
         ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(null, null);
 
         when(workflowNodeScriptFacade.testWorkflowNodeScript(
-            anyString(), anyString(), anyLong())).thenReturn(dto);
+            anyString(), anyString(), anyLong(), any())).thenReturn(dto);
 
         this.graphQlTester
             .document("""

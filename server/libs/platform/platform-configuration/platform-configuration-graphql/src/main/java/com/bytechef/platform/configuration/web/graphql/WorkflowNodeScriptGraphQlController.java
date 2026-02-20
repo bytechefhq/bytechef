@@ -55,14 +55,9 @@ public class WorkflowNodeScriptGraphQlController {
         @Argument String clusterElementWorkflowNodeName, @Argument Long environmentId,
         @Argument Map<String, Object> inputParameters) {
 
-        if (inputParameters != null) {
-            return workflowNodeScriptFacade.testClusterElementScript(
-                workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId,
-                inputParameters);
-        }
-
         return workflowNodeScriptFacade.testClusterElementScript(
-            workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId);
+            workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId,
+            inputParameters);
     }
 
     @MutationMapping
@@ -70,12 +65,8 @@ public class WorkflowNodeScriptGraphQlController {
         @Argument String workflowId, @Argument String workflowNodeName, @Argument Long environmentId,
         @Argument Map<String, Object> inputParameters) {
 
-        if (inputParameters != null) {
-            return workflowNodeScriptFacade.testWorkflowNodeScript(
-                workflowId, workflowNodeName, environmentId, inputParameters);
-        }
-
-        return workflowNodeScriptFacade.testWorkflowNodeScript(workflowId, workflowNodeName, environmentId);
+        return workflowNodeScriptFacade.testWorkflowNodeScript(
+            workflowId, workflowNodeName, environmentId, inputParameters);
     }
 
     @QueryMapping
