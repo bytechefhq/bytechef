@@ -72,27 +72,21 @@ const OutputTab = ({
         workflowId,
     });
 
-    function renderClusterElementTestButton() {
-        if (!hasClusterElementProperties) {
-            return undefined;
-        }
-
-        return (
-            <ClusterElementTestPropertiesPopover
-                currentNode={currentNode}
-                onOpenChange={setTestPropertiesPopoverOpen}
-                onSubmit={handleClusterElementTestSubmit}
-                open={testPropertiesPopoverOpen}
-                properties={currentOperationProperties!}
-            >
-                <Button
-                    disabled={connectionMissing || saveClusterElementTestOutputMutationPending}
-                    label="Test Action"
-                    variant="outline"
-                />
-            </ClusterElementTestPropertiesPopover>
-        );
-    }
+    const clusterElementTestButton = hasClusterElementProperties ? (
+        <ClusterElementTestPropertiesPopover
+            currentNode={currentNode}
+            onOpenChange={setTestPropertiesPopoverOpen}
+            onSubmit={handleClusterElementTestSubmit}
+            open={testPropertiesPopoverOpen}
+            properties={currentOperationProperties!}
+        >
+            <Button
+                disabled={connectionMissing || saveClusterElementTestOutputMutationPending}
+                label="Test Action"
+                variant="outline"
+            />
+        </ClusterElementTestPropertiesPopover>
+    ) : undefined;
 
     if (!testing && workflowNodeOutputIsFetching) {
         return <></>;
@@ -118,7 +112,7 @@ const OutputTab = ({
                             sampleOutput={sampleOutput}
                             saveWorkflowNodeTestOutputMutation={saveWorkflowNodeTestOutputMutation}
                             setShowUploadDialog={setShowUploadDialog}
-                            testActionButton={renderClusterElementTestButton()}
+                            testActionButton={clusterElementTestButton}
                             variablePropertiesDefined={variablePropertiesDefined}
                         />
                     )}
@@ -130,7 +124,7 @@ const OutputTab = ({
                             saveWorkflowNodeTestOutputMutationPending={saveWorkflowNodeTestOutputMutationPending}
                             setShowUploadDialog={setShowUploadDialog}
                             showUploadSampleOutputButton={outputDefined}
-                            testActionButton={renderClusterElementTestButton()}
+                            testActionButton={clusterElementTestButton}
                             trigger={currentNode.trigger}
                             uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutationPending}
                             variablePropertiesDefined={variablePropertiesDefined}
