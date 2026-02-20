@@ -218,6 +218,7 @@ include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-in-memo
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-jdbc")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-redis")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-vectorstore")
+include("server:libs:modules:components:ai:agent:guardrails")
 include("server:libs:modules:components:ai:agent:rag:rag-modular")
 include("server:libs:modules:components:ai:agent:rag:rag-modular:query-transformer")
 include("server:libs:modules:components:ai:agent:rag:rag-modular:query-expander")

@@ -18,6 +18,7 @@ package com.bytechef.component.ai.agent.action;
 
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CONVERSATION_ID;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
+import static com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.GUARDRAILS;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
 
@@ -32,6 +33,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
+import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
@@ -115,6 +117,12 @@ public abstract class AbstractAiAgentChatAction {
 
         List<Advisor> advisors = new ArrayList<>();
 
+        // guardrails (first to block early)
+
+        clusterElementMap.fetchClusterElement(GUARDRAILS)
+            .map(clusterElement -> getGuardrailsAdvisor(connectionParameters, clusterElement))
+            .ifPresent(advisors::add);
+
         // memory
 
         clusterElementMap.fetchClusterElement(CHAT_MEMORY)
@@ -158,6 +166,23 @@ public abstract class AbstractAiAgentChatAction {
 
         return ParametersFactory.create(
             componentConnection == null ? Map.of() : componentConnection.getParameters());
+    }
+
+    private Advisor getGuardrailsAdvisor(
+        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement) {
+
+        GuardrailsFunction guardrailsFunction = clusterElementDefinitionService.getClusterElement(
+            clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+            clusterElement.getClusterElementName());
+
+        try {
+            return guardrailsFunction.apply(
+                ParametersFactory.create(clusterElement.getParameters()),
+                getConnectionParameters(componentConnections, clusterElement),
+                ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static Consumer<ChatClient.AdvisorSpec> getConversationAdvisor(Parameters inputParameters) {
