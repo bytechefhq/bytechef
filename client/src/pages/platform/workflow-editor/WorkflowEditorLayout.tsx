@@ -126,7 +126,7 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                 )}
             </div>
 
-            {currentComponent && !isMainRootClusterElement && (
+            {currentComponent && !isMainRootClusterElement && !clusterElementsCanvasOpen && (
                 <WorkflowNodeDetailsPanel
                     invalidateWorkflowQueries={invalidateWorkflowQueries!}
                     previousComponentDefinitions={previousComponentDefinitions}
@@ -148,7 +148,7 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
             {workflow.id && <WorkflowTestChatPanel />}
 
-            {currentComponent && !isMainRootClusterElement && dataPillPanelOpen && (
+            {currentComponent && !isMainRootClusterElement && !clusterElementsCanvasOpen && dataPillPanelOpen && (
                 <Suspense fallback={<DataPillPanelSkeleton />}>
                     <DataPillPanel
                         previousComponentDefinitions={previousComponentDefinitions}

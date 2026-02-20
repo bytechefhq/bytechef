@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetTitle, SheetTrigger} from '@/components/ui/sheet';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
 import {
     ComponentDefinitionBasic,
@@ -7,21 +7,20 @@ import {
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
-import {Editor} from '@tiptap/react';
-import {MaximizeIcon} from 'lucide-react';
+import {MaximizeIcon, TextIcon} from 'lucide-react';
+import {VisuallyHidden} from 'radix-ui';
 
 export interface PropertyMentionsInputEditorSheetProps {
     componentDefinitions: ComponentDefinitionBasic[];
     controlType?: string;
     dataPills: DataPillType[];
-    path?: string;
     onClose?: () => void;
-    onFocus?: (editor: Editor) => void;
+    path?: string;
     placeholder?: string;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
+    title: string;
     type: string;
     value?: string;
-    title: string;
     workflow: Workflow;
 }
 
@@ -39,8 +38,8 @@ const PropertyMentionsInputEditorSheet = ({
     workflow,
 }: PropertyMentionsInputEditorSheetProps) => (
     <Sheet
-        onOpenChange={() => {
-            if (onClose) {
+        onOpenChange={(open) => {
+            if (!open && onClose) {
                 onClose();
             }
         }}
@@ -49,26 +48,40 @@ const PropertyMentionsInputEditorSheet = ({
             <Button icon={<MaximizeIcon />} size="iconXs" variant="secondary" />
         </SheetTrigger>
 
-        <SheetContent className="flex w-11/12 flex-col gap-0 p-4 sm:max-w-screen-md">
-            <SheetHeader className="flex flex-row items-center justify-between space-y-0">
+        <SheetContent
+            className="absolute bottom-4 right-4 top-3 flex h-auto w-11/12 flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-screen-md"
+            onFocusOutside={(event) => event.preventDefault()}
+            onPointerDownOutside={(event) => event.preventDefault()}
+        >
+            <VisuallyHidden.Root>
                 <SheetTitle>{title}</SheetTitle>
+            </VisuallyHidden.Root>
+
+            <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md bg-surface-neutral-primary p-3">
+                <div className="flex items-center gap-x-2">
+                    <TextIcon />
+
+                    <span className="text-base font-medium text-content-neutral-primary">{title}</span>
+                </div>
 
                 <SheetCloseButton />
-            </SheetHeader>
+            </header>
 
-            <div className="property-mentions-editor flex size-full overflow-y-auto rounded-md pt-3">
-                <PropertyMentionsInputEditor
-                    className="size-full"
-                    componentDefinitions={componentDefinitions}
-                    controlType={controlType}
-                    dataPills={dataPills}
-                    path={path}
-                    placeholder={placeholder}
-                    taskDispatcherDefinitions={taskDispatcherDefinitions}
-                    type={type}
-                    value={value}
-                    workflow={workflow}
-                />
+            <div className="property-mentions-editor flex min-h-0 flex-1 p-3">
+                <div className="flex flex-1 overflow-y-auto rounded-md bg-surface-neutral-primary p-3">
+                    <PropertyMentionsInputEditor
+                        className="size-full"
+                        componentDefinitions={componentDefinitions}
+                        controlType={controlType}
+                        dataPills={dataPills}
+                        path={path}
+                        placeholder={placeholder}
+                        taskDispatcherDefinitions={taskDispatcherDefinitions}
+                        type={type}
+                        value={value}
+                        workflow={workflow}
+                    />
+                </div>
             </div>
         </SheetContent>
     </Sheet>
