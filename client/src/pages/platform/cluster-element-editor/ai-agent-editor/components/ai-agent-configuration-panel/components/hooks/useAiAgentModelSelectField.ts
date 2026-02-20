@@ -1,6 +1,8 @@
+import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import {ClusterElementDefinitionApi} from '@/shared/middleware/platform/configuration';
 import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -128,13 +130,36 @@ export default function useAiAgentModelSelectField(): UseAiAgentModelSelectField
                 console.warn('Failed to pre-populate cluster element definition cache:', error);
             }
 
+            let modelMetadata: NodeDataType['metadata'] | undefined;
+            let modelParameters: NodeDataType['parameters'] | undefined;
+
+            if (rootClusterElementNodeData?.workflowNodeName && workflow.definition) {
+                const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+
+                const mainClusterRootTask = getTask({
+                    tasks: workflowDefinitionTasks,
+                    workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                });
+
+                if (mainClusterRootTask?.clusterElements) {
+                    const clusterElement = getClusterElementByName(mainClusterRootTask.clusterElements, modelItem.name);
+
+                    if (clusterElement) {
+                        modelMetadata = clusterElement.metadata;
+                        modelParameters = clusterElement.parameters;
+                    }
+                }
+            }
+
             const modelNodeData: NodeDataType = {
                 clusterElementName,
                 clusterElementType: 'model',
                 componentName: modelItem.componentName,
                 label: modelItem.label,
+                metadata: modelMetadata,
                 name: modelItem.name,
                 operationName: modelItem.operationName,
+                parameters: modelParameters,
                 parentClusterRootId: rootClusterElementNodeData?.name,
                 type: modelItem.type,
                 version: componentVersion,
@@ -154,10 +179,12 @@ export default function useAiAgentModelSelectField(): UseAiAgentModelSelectField
         [
             queryClient,
             rootClusterElementNodeData?.name,
+            rootClusterElementNodeData?.workflowNodeName,
             setActiveTab,
             setCurrentComponent,
             setCurrentNode,
             setAiAgentNodeDetailsPanelOpen,
+            workflow.definition,
         ]
     );
 
