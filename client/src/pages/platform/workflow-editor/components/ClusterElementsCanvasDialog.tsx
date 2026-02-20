@@ -141,7 +141,7 @@ const ClusterElementsCanvasDialog = ({
                                 className={twMerge(
                                     'fixed inset-y-0 right-0 z-0 w-[800px] overflow-hidden border-l border-r bg-background',
                                     workflowNodeDetailsPanelOpen && !copilotPanelOpen && 'right-[465px]',
-                                    copilotPanelOpen && 'z-10 right-[450px]'
+                                    copilotPanelOpen && 'right-[450px] z-10'
                                 )}
                             >
                                 <AiAgentTestingPanel
