@@ -129,6 +129,68 @@ describe('buildDraggingPlaceholderState', () => {
 
         expect(result).toBeNull();
     });
+
+    it('returns null when multiple edges exist but none target the placeholder', () => {
+        const nodeA = makeNode('accelo_1', {x: 100, y: 200});
+        const nodeB = makeNode('httpClient_1', {x: 100, y: 370});
+        const placeholder = makeNode(TRAILING_PLACEHOLDER_ID, {x: 100, y: 540});
+        const edges = [makeEdge('accelo_1', 'httpClient_1'), makeEdge('httpClient_1', 'other_node')];
+        const nodes = [nodeA, nodeB, placeholder];
+
+        const result = buildDraggingPlaceholderState(nodeA, false, TRAILING_PLACEHOLDER_ID, edges, nodes, new Map());
+
+        expect(result).toBeNull();
+    });
+
+    it('returns state when dispatcher has multiple children but one is the predecessor', () => {
+        const dispatcher = makeNode('condition_1', {x: 100, y: 200});
+        const trueGhost = makeNode('condition_1-true-ghost', {x: 50, y: 500});
+        const falseGhost = makeNode('condition_1-false-ghost', {x: 150, y: 500});
+        const bottomGhost = makeNode('condition_1-bottom-ghost', {x: 100, y: 600});
+        const placeholder = makeNode(TRAILING_PLACEHOLDER_ID, {x: 100, y: 770});
+        const edges = [
+            makeEdge('condition_1', 'condition_1-true-ghost'),
+            makeEdge('condition_1', 'condition_1-false-ghost'),
+            makeEdge('condition_1-bottom-ghost', TRAILING_PLACEHOLDER_ID),
+        ];
+        const nodes = [dispatcher, trueGhost, falseGhost, bottomGhost, placeholder];
+        const childIds = new Map([
+            ['condition_1-true-ghost', {x: 50, y: 500}],
+            ['condition_1-false-ghost', {x: 150, y: 500}],
+            ['condition_1-bottom-ghost', {x: 100, y: 600}],
+        ]);
+
+        const result = buildDraggingPlaceholderState(dispatcher, true, TRAILING_PLACEHOLDER_ID, edges, nodes, childIds);
+
+        expect(result).toEqual({
+            nodeId: 'condition_1',
+            nodeStartPosition: {x: 100, y: 200},
+            placeholderStartPosition: {x: 100, y: 770},
+        });
+    });
+
+    it('captures start positions as copies, not references', () => {
+        const draggedNode = makeNode('accelo_1', {x: 100, y: 200});
+        const placeholder = makeNode(TRAILING_PLACEHOLDER_ID, {x: 100, y: 370});
+        const edges = [makeEdge('accelo_1', TRAILING_PLACEHOLDER_ID)];
+        const nodes = [draggedNode, placeholder];
+
+        const result = buildDraggingPlaceholderState(
+            draggedNode,
+            false,
+            TRAILING_PLACEHOLDER_ID,
+            edges,
+            nodes,
+            new Map()
+        );
+
+        // Mutating original position should not affect captured state
+        draggedNode.position.x = 999;
+        placeholder.position.x = 888;
+
+        expect(result?.nodeStartPosition).toEqual({x: 100, y: 200});
+        expect(result?.placeholderStartPosition).toEqual({x: 100, y: 370});
+    });
 });
 
 describe('computePlaceholderDragPosition', () => {
@@ -178,5 +240,42 @@ describe('computePlaceholderDragPosition', () => {
         const result = computePlaceholderDragPosition(state, {x: 100, y: 200});
 
         expect(result).toEqual({x: 100, y: 370});
+    });
+
+    it('handles large delta movements correctly', () => {
+        const state: DraggingPlaceholderStateType = {
+            nodeId: 'accelo_1',
+            nodeStartPosition: {x: 0, y: 0},
+            placeholderStartPosition: {x: 0, y: 170},
+        };
+
+        const result = computePlaceholderDragPosition(state, {x: 5000, y: 5000});
+
+        expect(result).toEqual({x: 5000, y: 5170});
+    });
+
+    it('handles negative position values', () => {
+        const state: DraggingPlaceholderStateType = {
+            nodeId: 'accelo_1',
+            nodeStartPosition: {x: 100, y: 100},
+            placeholderStartPosition: {x: 100, y: 270},
+        };
+
+        const result = computePlaceholderDragPosition(state, {x: -50, y: -50});
+
+        expect(result).toEqual({x: -50, y: 120});
+    });
+
+    it('applies both x and y deltas independently', () => {
+        const state: DraggingPlaceholderStateType = {
+            nodeId: 'accelo_1',
+            nodeStartPosition: {x: 200, y: 300},
+            placeholderStartPosition: {x: 200, y: 470},
+        };
+
+        // Move x by +100, y by -50
+        const result = computePlaceholderDragPosition(state, {x: 300, y: 250});
+
+        expect(result).toEqual({x: 300, y: 420});
     });
 });

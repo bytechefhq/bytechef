@@ -11,7 +11,7 @@ interface ClearAllClusterElementPositionsProps {
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
-function clearClusterElementPositions(clusterElements: ClusterElementsType): ClusterElementsType {
+export function clearClusterElementPositions(clusterElements: ClusterElementsType): ClusterElementsType {
     const updatedClusterElements: ClusterElementsType = {};
 
     Object.entries(clusterElements).forEach(([elementKey, elementValue]) => {

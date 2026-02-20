@@ -14,7 +14,7 @@ interface RemoveWorkflowNodePositionProps {
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
-function clearSingleTaskPosition(tasks: WorkflowTask[], nodeName: string): WorkflowTask[] {
+export function clearSingleTaskPosition(tasks: WorkflowTask[], nodeName: string): WorkflowTask[] {
     if (!Array.isArray(tasks)) {
         return tasks;
     }
