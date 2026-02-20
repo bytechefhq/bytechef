@@ -100,7 +100,7 @@ public class WaitOnWebHookCallAction {
     protected void beforeSuspend(
         String resumeUrl, Instant expiresAt, Parameters continueParameters, ActionContext context) {
 
-        // TODO: When resumeUrl is available (currently null from the platform), call the external
+        // When resumeUrl is available (currently null from the platform), call the external
         // service URL to notify it of the webhook resume URL
     }
 
