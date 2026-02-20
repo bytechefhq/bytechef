@@ -1,4 +1,5 @@
 bytechef:
+  edition: EE
   workflow:
     repository:
       filesystem:
