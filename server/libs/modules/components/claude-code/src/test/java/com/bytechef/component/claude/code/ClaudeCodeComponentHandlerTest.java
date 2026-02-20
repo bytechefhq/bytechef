@@ -20,12 +20,13 @@ import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Marko Kriskovic
+ * @author Ivica Cardic
  */
 public class ClaudeCodeComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/claude-code_v1.json", new ClaudeCodeComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/claude-code_v1.json", new ClaudeCodeComponentHandler(null).getDefinition());
     }
 }

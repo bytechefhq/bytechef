@@ -13,6 +13,7 @@ org-springdoc = "3.0.1"
 pmd = "7.20.0"
 spotbugs = "4.9.8"
 spring-ai = "2.0.0-M2"
+springaicommunity-agent-utils = "0.4.2"
 spring-boot = "4.0.3"
 spring-cloud-aws = "4.0.0"
 spring-cloud-dependencies = "2025.1.1"
@@ -50,6 +51,7 @@ org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.2"
+org-springaicommunity-spring-ai-agent-utils = { module = "org.springaicommunity:spring-ai-agent-utils", version.ref = "springaicommunity-agent-utils" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
 
 [plugins]

@@ -16,32 +16,47 @@
 
 package com.bytechef.component.claude.code;
 
+import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.CLAUDE_CODE;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.claude.code.action.ClaudeCodeAddMCPAction;
-import com.bytechef.component.claude.code.action.ClaudeCodeChat;
-import com.bytechef.component.claude.code.action.ClaudeCodeInitializeClaude;
+import com.bytechef.component.claude.code.action.ClaudeCodeChatAction;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.google.auto.service.AutoService;
+import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
+import com.bytechef.platform.component.definition.ClaudeCodeComponentDefinition;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import org.springframework.stereotype.Component;
 
 /**
- *
- * @author Marko Kriskovic
+ * @author Ivica Cardic
  */
-@AutoService(ComponentHandler.class)
+@Component(CLAUDE_CODE + "_v1_ComponentHandler")
 public class ClaudeCodeComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("claudeCode")
-        .title("Claude Code")
-        .description("Allows you to chat with Claude Code and added MCP tools")
-        .icon("path:assets/anthropic.svg")
-        .actions(ClaudeCodeInitializeClaude.ACTION_DEFINITION,
-            ClaudeCodeAddMCPAction.ACTION_DEFINITION,
-            ClaudeCodeChat.ACTION_DEFINITION);
+    private final ClaudeCodeComponentDefinition componentDefinition;
+
+    public ClaudeCodeComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
+        this.componentDefinition = new ClaudeCodeComponentDefinitionImpl(
+            component(CLAUDE_CODE)
+                .title("Claude Code")
+                .description("AI agent with built-in tools for file system operations, code search, "
+                    + "web fetching, shell execution, and task management.")
+                .icon("path:assets/anthropic.svg")
+                .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+                .actions(ClaudeCodeChatAction.of(clusterElementDefinitionService)));
+    }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
+    }
+
+    private static class ClaudeCodeComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
+        implements ClaudeCodeComponentDefinition {
+
+        public ClaudeCodeComponentDefinitionImpl(ComponentDefinition componentDefinition) {
+            super(componentDefinition);
+        }
     }
 }

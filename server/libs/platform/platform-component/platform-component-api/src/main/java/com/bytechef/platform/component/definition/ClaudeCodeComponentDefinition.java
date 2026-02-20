@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.claude.code.constant;
+package com.bytechef.platform.component.definition;
 
-import com.bytechef.component.ai.llm.constant.LLMConstants;
-import com.bytechef.component.definition.Property;
+import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
+import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
+import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction.CLAUDE_CODE_TOOLS;
+
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public class ClaudeCodeConstants {
+public interface ClaudeCodeComponentDefinition extends ClusterRootComponentDefinition {
 
-    public static final String CLAUDE_CODE = "claudeCode";
-    public static final String CHAT = "chat";
-
-    public static final List<Property> CHAT_PROPERTIES = List.of(
-        LLMConstants.FORMAT_PROPERTY,
-        LLMConstants.PROMPT_PROPERTY,
-        LLMConstants.SYSTEM_PROMPT_PROPERTY,
-        LLMConstants.ATTACHMENTS_PROPERTY,
-        LLMConstants.MESSAGES_PROPERTY,
-        LLMConstants.RESPONSE_PROPERTY);
+    @Override
+    default List<ClusterElementType> getClusterElementTypes() {
+        return List.of(MODEL, CLAUDE_CODE_TOOLS, TOOLS);
+    }
 }
