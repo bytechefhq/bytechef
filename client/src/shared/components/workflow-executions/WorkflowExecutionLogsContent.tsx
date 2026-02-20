@@ -131,7 +131,7 @@ const WorkflowExecutionLogsContent = ({
         isLoading: isEditorLoading,
     } = useEditorJobFileLogsQuery(
         {
-            filter: taskExecutionId ? {taskExecutionId} : null,
+            filter: null,
             jobId,
             page,
             size,
