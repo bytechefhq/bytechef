@@ -177,3 +177,8 @@ rebel.xml
 # Docker
 ######################
 **/local.env
+
+
+# Davia
+.davia/
+.claude/skills/davia-documentation/SKILL.md
