@@ -657,135 +657,135 @@ class ContextImpl implements Context {
         public void debug(String message) {
             if (logger.isDebugEnabled()) {
                 logger.debug(message);
-
-                storeLogEntry(LogEntry.Level.DEBUG, message, null);
             }
+
+            storeLogEntry(LogEntry.Level.DEBUG, message, null);
         }
 
         @Override
         public void debug(String format, Object... args) {
             if (logger.isDebugEnabled()) {
                 logger.debug(format, args);
-
-                storeLogEntry(LogEntry.Level.DEBUG, formatMessage(format, args), null);
             }
+
+            storeLogEntry(LogEntry.Level.DEBUG, formatMessage(format, args), null);
         }
 
         @Override
         public void debug(String message, Exception exception) {
             if (logger.isDebugEnabled()) {
                 logger.debug(message, exception);
-
-                storeLogEntry(LogEntry.Level.DEBUG, message, exception);
             }
+
+            storeLogEntry(LogEntry.Level.DEBUG, message, exception);
         }
 
         @Override
         public void error(String message) {
             if (logger.isErrorEnabled()) {
                 logger.error(message);
-
-                storeLogEntry(LogEntry.Level.ERROR, message, null);
             }
+
+            storeLogEntry(LogEntry.Level.ERROR, message, null);
         }
 
         @Override
         public void error(String format, Object... args) {
             if (logger.isErrorEnabled()) {
                 logger.error(format, args);
-
-                storeLogEntry(LogEntry.Level.ERROR, formatMessage(format, args), null);
             }
+
+            storeLogEntry(LogEntry.Level.ERROR, formatMessage(format, args), null);
         }
 
         @Override
         public void error(String message, Exception exception) {
             if (logger.isErrorEnabled()) {
                 logger.error(message, exception);
-
-                storeLogEntry(LogEntry.Level.ERROR, message, exception);
             }
+
+            storeLogEntry(LogEntry.Level.ERROR, message, exception);
         }
 
         @Override
         public void info(String message) {
             if (logger.isInfoEnabled()) {
                 logger.info(message);
-
-                storeLogEntry(LogEntry.Level.INFO, message, null);
             }
+
+            storeLogEntry(LogEntry.Level.INFO, message, null);
         }
 
         @Override
         public void info(String format, Object... args) {
             if (logger.isInfoEnabled()) {
                 logger.info(format, args);
-
-                storeLogEntry(LogEntry.Level.INFO, formatMessage(format, args), null);
             }
+
+            storeLogEntry(LogEntry.Level.INFO, formatMessage(format, args), null);
         }
 
         @Override
         public void info(String message, Exception exception) {
             if (logger.isInfoEnabled()) {
                 logger.info(message, exception);
-
-                storeLogEntry(LogEntry.Level.INFO, message, exception);
             }
+
+            storeLogEntry(LogEntry.Level.INFO, message, exception);
         }
 
         @Override
         public void warn(String message) {
             if (logger.isWarnEnabled()) {
                 logger.warn(message);
-
-                storeLogEntry(LogEntry.Level.WARN, message, null);
             }
+
+            storeLogEntry(LogEntry.Level.WARN, message, null);
         }
 
         @Override
         public void warn(String format, Object... args) {
             if (logger.isWarnEnabled()) {
                 logger.warn(format, args);
-
-                storeLogEntry(LogEntry.Level.WARN, formatMessage(format, args), null);
             }
+
+            storeLogEntry(LogEntry.Level.WARN, formatMessage(format, args), null);
         }
 
         @Override
         public void warn(String message, Exception exception) {
             if (logger.isWarnEnabled()) {
                 logger.warn(message, exception);
-
-                storeLogEntry(LogEntry.Level.WARN, message, exception);
             }
+
+            storeLogEntry(LogEntry.Level.WARN, message, exception);
         }
 
         @Override
         public void trace(String message) {
             if (logger.isTraceEnabled()) {
                 logger.trace(message);
-
-                storeLogEntry(LogEntry.Level.TRACE, message, null);
             }
+
+            storeLogEntry(LogEntry.Level.TRACE, message, null);
         }
 
         @Override
         public void trace(String format, Object... args) {
             if (logger.isTraceEnabled()) {
                 logger.trace(format, args);
-
-                storeLogEntry(LogEntry.Level.TRACE, formatMessage(format, args), null);
             }
+
+            storeLogEntry(LogEntry.Level.TRACE, formatMessage(format, args), null);
         }
 
         @Override
         public void trace(String message, Exception exception) {
             if (logger.isTraceEnabled()) {
                 logger.trace(message, exception);
-
-                storeLogEntry(LogEntry.Level.TRACE, message, exception);
             }
+
+            storeLogEntry(LogEntry.Level.TRACE, message, exception);
         }
 
         private String formatMessage(String format, Object... args) {
