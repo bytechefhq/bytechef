@@ -14,7 +14,7 @@ const ClusterElementsWorkflowEditor = () => {
         useClusterElementsWorkflowEditor();
 
     return (
-        <div className="size-full rounded-lg bg-surface-popover-canvas">
+        <div className="flex-1">
             <ReactFlowProvider>
                 <ReactFlow
                     defaultViewport={{x: 0, y: 0, zoom: DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM}}
