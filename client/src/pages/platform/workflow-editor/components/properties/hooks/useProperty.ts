@@ -994,6 +994,10 @@ export const useProperty = ({
 
     // set propertyParameterValue on initial render
     useEffect(() => {
+        if (control) {
+            return;
+        }
+
         if (!name || !currentComponent || !currentComponent.parameters) {
             return;
         }
@@ -1228,6 +1232,10 @@ export const useProperty = ({
 
     // set propertyParameterValue on workflow definition change
     useEffect(() => {
+        if (control) {
+            return;
+        }
+
         if (!workflow.definition || !currentNode?.name || !name || !path) {
             return;
         }
