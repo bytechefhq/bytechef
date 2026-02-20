@@ -1,8 +1,7 @@
 import {UserI} from '@/shared/models/user.model';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useRef} from 'react';
-// TODO: restore once /actuator/info exposes userGuiding
-// import {useShallow} from 'zustand/react/shallow';
+import {useShallow} from 'zustand/react/shallow';
 
 export function initUserGuiding(containerId: string) {
     window.userGuidingLayer = window.userGuidingLayer || [];
@@ -48,14 +47,12 @@ export interface UserGuidingI {
 }
 
 export const useUserGuiding = (): UserGuidingI => {
-    // TODO: restore userGuiding from store once /actuator/info exposes it
-    // const {application, userGuiding} = useApplicationInfoStore(
-    //     useShallow((state) => ({
-    //         application: state.application,
-    //         userGuiding: state.userGuiding,
-    //     }))
-    // );
-    const application = useApplicationInfoStore((state) => state.application);
+    const {application, userGuiding} = useApplicationInfoStore(
+        useShallow((state) => ({
+            application: state.application,
+            userGuiding: state.userGuiding,
+        }))
+    );
 
     const identifyRef = useRef(false);
 
@@ -65,9 +62,7 @@ export const useUserGuiding = (): UserGuidingI => {
                 return;
             }
 
-            // TODO: restore backend-driven gate once /actuator/info exposes userGuiding
-            // if (window.userGuiding && userGuiding.enabled) {
-            if (window.userGuiding) {
+            if (window.userGuiding && userGuiding.enabled) {
                 identifyRef.current = true;
 
                 window.userGuiding.identify(account.uuid, {
