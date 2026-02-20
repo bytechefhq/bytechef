@@ -34,12 +34,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * Integration tests for {@link KnowledgeBaseFileStorageImpl}.
+ * Tests for {@link KnowledgeBaseFileStorageImpl}.
  *
  * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
-class KnowledgeBaseFileStorageImplIntTest {
+class KnowledgeBaseFileStorageTest {
 
     private static final String KNOWLEDGE_BASE_CHUNKS_DIR = "knowledge_base_chunks";
     private static final String KNOWLEDGE_BASE_DOCUMENTS_DIR = "knowledge_base";
