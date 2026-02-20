@@ -8,7 +8,6 @@ import {
     FormType,
     IntegrationInstanceType,
     IntegrationType,
-    IntegrationWorkflowType,
     MergedWorkflowType,
     PropertyType,
     RegisterFormSubmitFunction,
@@ -130,37 +129,28 @@ export default function useConnectDialog({
 
     // Merge integration workflows with instance workflows to get complete workflow data, because the backend is incomplete
     const mergedWorkflows: MergedWorkflowType[] = useMemo(() => {
-        if (!integration?.workflows || !integration?.integrationInstances) {
+        if (!integration?.workflows) {
             return [];
         }
 
-        const currentInstance = integration.integrationInstances.find(
+        const currentInstance = integration.integrationInstances?.find(
             (instance: IntegrationInstanceType) => instance.id === currentIntegrationInstanceId
         );
 
-        const workflows = currentInstance?.workflows || integration.workflows;
-
-        return workflows.map((workflow) => {
+        return integration.workflows.map((workflow) => {
             const instanceWorkflow = currentInstance?.workflows?.find(
                 (instanceWorkflow) => instanceWorkflow.workflowUuid === workflow.workflowUuid
             );
 
-            const baseWorkflow = integration.workflows?.find(
-                (integrationWorkflow) => integrationWorkflow.workflowUuid === workflow.workflowUuid
-            );
-
-            const serverEnabled =
-                instanceWorkflow?.enabled ?? (baseWorkflow as IntegrationWorkflowType | undefined)?.enabled ?? false;
+            const serverEnabled = instanceWorkflow?.enabled ?? workflow.enabled ?? false;
 
             const effectiveEnabled = enabledOverrides[workflow.workflowUuid] ?? serverEnabled;
 
             return {
-                ...baseWorkflow,
-                label: baseWorkflow?.label,
-                workflowUuid: baseWorkflow?.workflowUuid ?? workflow.workflowUuid,
+                ...workflow,
                 enabled: effectiveEnabled,
-                inputs: Array.isArray(baseWorkflow?.inputs)
-                    ? baseWorkflow!.inputs.map((input: WorkflowInputType) => ({
+                inputs: Array.isArray(workflow.inputs)
+                    ? workflow.inputs.map((input: WorkflowInputType) => ({
                           ...input,
                           value: (instanceWorkflow?.inputs as Record<string, string> | undefined)?.[input.name] ?? '',
                       }))
