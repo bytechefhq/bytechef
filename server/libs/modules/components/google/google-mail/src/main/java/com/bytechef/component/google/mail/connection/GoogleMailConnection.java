@@ -41,13 +41,13 @@ public class GoogleMailConnection {
             map.put("https://www.googleapis.com/auth/gmail.addons.current.message.action", false);
             map.put("https://www.googleapis.com/auth/gmail.addons.current.message.metadata", false);
             map.put("https://www.googleapis.com/auth/gmail.addons.current.message.readonly", false);
-            map.put("https://www.googleapis.com/auth/gmail.compose", true);
+            map.put("https://www.googleapis.com/auth/gmail.compose", false);
             map.put("https://www.googleapis.com/auth/gmail.insert", false);
             map.put("https://www.googleapis.com/auth/gmail.labels", false);
             map.put("https://www.googleapis.com/auth/gmail.metadata", false);
             map.put("https://www.googleapis.com/auth/gmail.modify", false);
-            map.put("https://www.googleapis.com/auth/gmail.readonly", true);
-            map.put("https://www.googleapis.com/auth/gmail.send", true);
+            map.put("https://www.googleapis.com/auth/gmail.readonly", false);
+            map.put("https://www.googleapis.com/auth/gmail.send", false);
             map.put("https://www.googleapis.com/auth/gmail.settings.basic", false);
             map.put("https://www.googleapis.com/auth/gmail.settings.sharing", false);
             map.put("email", true);
