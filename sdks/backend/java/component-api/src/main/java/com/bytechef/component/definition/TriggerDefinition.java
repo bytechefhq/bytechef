@@ -409,7 +409,8 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        ProviderException apply(int statusCode, Object body, TriggerContext context) throws Exception;
+        ProviderException apply(int statusCode, Object body, Map<String, List<String>> headers, TriggerContext context)
+            throws Exception;
     }
 
     /**

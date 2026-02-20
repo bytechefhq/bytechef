@@ -68,7 +68,7 @@ public interface TriggerDefinitionService extends OperationDefinitionService {
 
     ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,
-        int statusCode, Object body);
+        int statusCode, Object body, Map<String, List<String>> headers);
 
     TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,

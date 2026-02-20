@@ -441,10 +441,11 @@ class HttpClientExecutor {
                         Object body = httpResponse.body();
 
                         if (body != null && RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
+                            HttpHeaders headers = httpResponse.headers();
+
                             throw operationDefinitionService.executeProcessErrorResponse(
                                 componentName, componentVersion, connectionVersion, componentOperationName,
-                                httpResponse.statusCode(),
-                                body);
+                                httpResponse.statusCode(), body, headers.map());
                         }
                     }
 
@@ -452,10 +453,11 @@ class HttpClientExecutor {
                 }
 
                 Object body = httpResponse.body();
+                HttpHeaders headers = httpResponse.headers();
 
                 throw operationDefinitionService.executeProcessErrorResponse(
                     componentName, componentVersion, connectionVersion, componentOperationName,
-                    httpResponse.statusCode(), body);
+                    httpResponse.statusCode(), body, headers.map());
             }
 
             @Override

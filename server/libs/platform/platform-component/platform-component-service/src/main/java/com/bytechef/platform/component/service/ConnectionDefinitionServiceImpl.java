@@ -178,7 +178,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,
-        int statusCode, Object body) {
+        int statusCode, Object body, Map<String, List<String>> headers) {
 
         com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
             componentDefinitionRegistry.getConnectionDefinition(componentName, connectionVersion);
@@ -187,9 +187,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         try {
             return connectionDefinition.getProcessErrorResponse()
-                .orElseGet(() -> (statusCode1, body1, context1) -> ProviderException.getProviderException(
+                .orElseGet(() -> (statusCode1, body1, headers1, context1) -> ProviderException.getProviderException(
                     statusCode1, body1))
-                .apply(statusCode, body, context);
+                .apply(statusCode, body, headers, context);
         } catch (Exception e) {
             throw new ExecutionException(e, ConnectionDefinitionErrorType.INVALID_CLAIM);
         }

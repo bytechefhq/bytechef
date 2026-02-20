@@ -125,10 +125,10 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,
-        int statusCode, Object body) {
+        int statusCode, Object body, Map<String, List<String>> headers) {
 
         return executeProcessErrorResponse(
-            componentName, componentVersion, componentOperationName, statusCode, body,
+            componentName, componentVersion, componentOperationName, statusCode, body, headers,
             contextFactory.createClusterElementContext(
                 componentName, componentVersion, componentOperationName, null, false));
     }
@@ -343,7 +343,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     private ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, @Nullable String clusterElementName, int statusCode, Object body,
-        ClusterElementContext context) {
+        Map<String, List<String>> headers, ClusterElementContext context) {
 
         com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition =
             componentDefinitionRegistry.getClusterElementDefinition(
@@ -351,9 +351,9 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
         try {
             return clusterElementDefinition.getProcessErrorResponse()
-                .orElseGet(() -> (statusCode1, body1, context1) -> ProviderException.getProviderException(
+                .orElseGet(() -> (statusCode1, body1, headers1, context1) -> ProviderException.getProviderException(
                     statusCode1, body1))
-                .apply(statusCode, body, context);
+                .apply(statusCode, body, headers, context);
         } catch (Exception e) {
             throw new ExecutionException(e, ClusterElementDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
         }
