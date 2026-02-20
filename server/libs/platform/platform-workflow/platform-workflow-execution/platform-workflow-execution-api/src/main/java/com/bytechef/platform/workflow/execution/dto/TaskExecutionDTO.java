@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.execution.dto;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Map;
@@ -29,10 +30,12 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record TaskExecutionDTO(
     String createdBy, Instant createdDate, Instant endDate, ExecutionError error, long executionTime,
-    String icon, Long id, Map<String, ?> input, Long jobId, String lastModifiedBy, Instant lastModifiedDate,
-    int maxRetries, Object output, Long parentId, int priority, int progress, int retryAttempts, String retryDelay,
-    int retryDelayFactor, long retryDelayMillis, Instant startDate, TaskExecution.Status status, int taskNumber,
-    String title, String type, WorkflowTask workflowTask) {
+    String icon, @JsonFormat(shape = JsonFormat.Shape.STRING) Long id, Map<String, ?> input,
+    @JsonFormat(shape = JsonFormat.Shape.STRING) Long jobId, String lastModifiedBy, Instant lastModifiedDate,
+    int maxRetries, Object output, @JsonFormat(shape = JsonFormat.Shape.STRING) Long parentId, int priority,
+    int progress, int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis,
+    Instant startDate, TaskExecution.Status status, int taskNumber, String title, String type,
+    WorkflowTask workflowTask) {
 
     public TaskExecutionDTO(
         TaskExecution taskExecution, String title, String icon, Map<String, ?> input, Object output) {

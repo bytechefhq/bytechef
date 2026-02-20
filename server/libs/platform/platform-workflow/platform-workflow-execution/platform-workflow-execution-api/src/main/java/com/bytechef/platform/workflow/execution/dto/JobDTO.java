@@ -20,6 +20,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.atlas.execution.domain.Job.Webhook;
 import com.bytechef.error.ExecutionError;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -31,8 +32,9 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record JobDTO(
     String createdBy, Instant createdDate, int currentTask, Instant endDate, ExecutionError error,
-    Long id, Map<String, ?> inputs, String label, String lastModifiedBy, Instant lastModifiedDate,
-    Map<String, ?> metadata, Map<String, ?> outputs, Long parentTaskExecutionId, int priority, Instant startDate,
+    @JsonFormat(shape = JsonFormat.Shape.STRING) Long id, Map<String, ?> inputs, String label, String lastModifiedBy,
+    Instant lastModifiedDate, Map<String, ?> metadata, Map<String, ?> outputs,
+    @JsonFormat(shape = JsonFormat.Shape.STRING) Long parentTaskExecutionId, int priority, Instant startDate,
     Status status, List<TaskExecutionDTO> taskExecutions, int version, List<Webhook> webhooks, String workflowId) {
 
     public JobDTO(Job job) {
