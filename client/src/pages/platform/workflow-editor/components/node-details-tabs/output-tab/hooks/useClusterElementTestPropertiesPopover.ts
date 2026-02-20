@@ -18,17 +18,12 @@ export default function useClusterElementTestPropertiesPopover({
 }: UseClusterElementTestPropertiesPopoverProps) {
     const filteredDefaultValues = useMemo(() => {
         const parameters = currentNode.parameters ?? {};
-        const result: Record<string, unknown> = {};
 
-        for (const [key, value] of Object.entries(parameters)) {
-            if (typeof value === 'string' && FROM_AI_PATTERN.test(value)) {
-                continue;
-            }
-
-            result[key] = value;
-        }
-
-        return result;
+        return Object.fromEntries(
+            Object.entries(parameters).filter(
+                ([, value]) => !(typeof value === 'string' && FROM_AI_PATTERN.test(value))
+            )
+        );
     }, [currentNode.parameters]);
 
     const propertiesWithDefaults = useMemo(

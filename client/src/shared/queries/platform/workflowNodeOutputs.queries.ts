@@ -38,14 +38,14 @@ export const useGetClusterElementOutputQuery = (request: GetClusterElementOutput
     useQuery<WorkflowNodeOutput, Error>({
         queryKey: WorkflowNodeOutputKeys.clusterElementOutput(request),
         queryFn: () => new WorkflowNodeOutputApi().getClusterElementOutput(request),
-        enabled: enabled === undefined ? true : enabled,
+        enabled: enabled ?? true,
     });
 
 export const useGetWorkflowNodeOutputQuery = (request: GetWorkflowNodeOutputRequest, enabled?: boolean) =>
     useQuery<WorkflowNodeOutput, Error>({
         queryKey: WorkflowNodeOutputKeys.workflowNodeOutput(request),
         queryFn: () => new WorkflowNodeOutputApi().getWorkflowNodeOutput(request),
-        enabled: enabled === undefined ? true : enabled,
+        enabled: enabled ?? true,
     });
 
 export const useGetPreviousWorkflowNodeOutputsQuery = (
@@ -55,5 +55,5 @@ export const useGetPreviousWorkflowNodeOutputsQuery = (
     useQuery<WorkflowNodeOutput[], Error>({
         queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs(request),
         queryFn: () => new WorkflowNodeOutputApi().getPreviousWorkflowNodeOutputs(request),
-        enabled: enabled === undefined ? true : enabled,
+        enabled: enabled ?? true,
     });
