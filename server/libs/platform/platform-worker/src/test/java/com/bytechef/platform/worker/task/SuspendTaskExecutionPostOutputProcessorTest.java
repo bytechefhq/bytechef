@@ -56,15 +56,18 @@ class SuspendTaskExecutionPostOutputProcessorTest {
 
         taskExecution.setJobId(100L);
 
-        Instant expiresAt = Instant.now().plusSeconds(3600);
+        Instant expiresAt = Instant.now()
+            .plusSeconds(3600);
         Map<String, Object> continueParameters = Map.of("param1", "value1");
         Suspend suspend = new Suspend(continueParameters, expiresAt);
 
         Object result = processor.process(taskExecution, suspend);
 
         assertSame(suspend, result);
-        assertTrue(taskExecution.getMetadata().containsKey(MetadataConstants.JOB_RESUME_ID));
-        assertTrue(taskExecution.getMetadata().containsKey(MetadataConstants.SUSPEND));
+        assertTrue(taskExecution.getMetadata()
+            .containsKey(MetadataConstants.JOB_RESUME_ID));
+        assertTrue(taskExecution.getMetadata()
+            .containsKey(MetadataConstants.SUSPEND));
 
         verify(triggerScheduler).scheduleOneTimeTask(any(Instant.class), anyMap(), anyLong());
     }
@@ -86,8 +89,10 @@ class SuspendTaskExecutionPostOutputProcessorTest {
         Object result = processor.process(taskExecution, suspend);
 
         assertSame(suspend, result);
-        assertTrue(taskExecution.getMetadata().containsKey(MetadataConstants.JOB_RESUME_ID));
-        assertTrue(taskExecution.getMetadata().containsKey(MetadataConstants.SUSPEND));
+        assertTrue(taskExecution.getMetadata()
+            .containsKey(MetadataConstants.JOB_RESUME_ID));
+        assertTrue(taskExecution.getMetadata()
+            .containsKey(MetadataConstants.SUSPEND));
 
         verify(triggerScheduler, never()).scheduleOneTimeTask(any(Instant.class), anyMap(), anyLong());
     }
@@ -103,13 +108,15 @@ class SuspendTaskExecutionPostOutputProcessorTest {
 
         taskExecution.setJobId(100L);
 
-        Instant expiresAt = Instant.now().plusSeconds(3600);
+        Instant expiresAt = Instant.now()
+            .plusSeconds(3600);
         Suspend suspend = new Suspend(Map.of(), expiresAt);
 
         Object result = processor.process(taskExecution, suspend);
 
         assertSame(suspend, result);
-        assertNotNull(taskExecution.getMetadata().get(MetadataConstants.JOB_RESUME_ID));
+        assertNotNull(taskExecution.getMetadata()
+            .get(MetadataConstants.JOB_RESUME_ID));
     }
 
     @Test
@@ -127,7 +134,8 @@ class SuspendTaskExecutionPostOutputProcessorTest {
         Object result = processor.process(taskExecution, regularOutput);
 
         assertSame(regularOutput, result);
-        assertFalse(taskExecution.getMetadata().containsKey(MetadataConstants.JOB_RESUME_ID));
+        assertFalse(taskExecution.getMetadata()
+            .containsKey(MetadataConstants.JOB_RESUME_ID));
 
         verify(triggerScheduler, never()).scheduleOneTimeTask(any(Instant.class), anyMap(), anyLong());
     }
@@ -147,6 +155,7 @@ class SuspendTaskExecutionPostOutputProcessorTest {
         Object result = processor.process(taskExecution, mapOutput);
 
         assertEquals(mapOutput, result);
-        assertFalse(taskExecution.getMetadata().containsKey(MetadataConstants.SUSPEND));
+        assertFalse(taskExecution.getMetadata()
+            .containsKey(MetadataConstants.SUSPEND));
     }
 }

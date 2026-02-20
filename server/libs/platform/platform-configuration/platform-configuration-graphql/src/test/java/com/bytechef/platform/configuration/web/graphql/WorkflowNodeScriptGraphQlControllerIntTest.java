@@ -19,6 +19,9 @@ package com.bytechef.platform.configuration.web.graphql;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.error.ExecutionError;
@@ -93,6 +96,9 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
                 assert output.get("count")
                     .equals(42);
             });
+
+        verify(workflowNodeScriptFacade).testClusterElementScript(
+            eq("workflow-123"), eq("data-stream_1"), eq("PROCESSOR"), eq("script_1"), eq(1L), isNull());
     }
 
     @Test
@@ -199,6 +205,9 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
                 assert output.get("value")
                     .equals(100);
             });
+
+        verify(workflowNodeScriptFacade).testWorkflowNodeScript(
+            eq("workflow-456"), eq("script_1"), eq(1L), isNull());
     }
 
     @Test
@@ -264,5 +273,146 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
             .valueIsNull()
             .path("testWorkflowNodeScript.output")
             .valueIsNull();
+    }
+
+    @Test
+    void testTestClusterElementScriptWithInputParameters() {
+        Map<String, Object> outputMap = Map.of("processed", true);
+        ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(null, outputMap);
+
+        when(workflowNodeScriptFacade.testClusterElementScript(
+            anyString(), anyString(), anyString(), anyString(), anyLong(), any())).thenReturn(dto);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    testClusterElementScript(
+                        workflowId: "workflow-123"
+                        workflowNodeName: "data-stream_1"
+                        clusterElementType: "PROCESSOR"
+                        clusterElementWorkflowNodeName: "script_1"
+                        environmentId: 1
+                        inputParameters: {key: "value", count: 5}
+                    ) {
+                        error {
+                            message
+                        }
+                        output
+                    }
+                }
+                """)
+            .execute()
+            .path("testClusterElementScript.error")
+            .valueIsNull()
+            .path("testClusterElementScript.output")
+            .entity(Map.class)
+            .satisfies(output -> {
+                assert output.get("processed")
+                    .equals(true);
+            });
+
+        verify(workflowNodeScriptFacade).testClusterElementScript(
+            eq("workflow-123"), eq("data-stream_1"), eq("PROCESSOR"), eq("script_1"), eq(1L),
+            eq(Map.of("key", "value", "count", 5)));
+    }
+
+    @Test
+    void testTestWorkflowNodeScriptWithInputParameters() {
+        Map<String, Object> outputMap = Map.of("transformed", "data");
+        ScriptTestExecutionDTO dto = new ScriptTestExecutionDTO(null, outputMap);
+
+        when(workflowNodeScriptFacade.testWorkflowNodeScript(
+            anyString(), anyString(), anyLong(), any())).thenReturn(dto);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    testWorkflowNodeScript(
+                        workflowId: "workflow-456"
+                        workflowNodeName: "script_1"
+                        environmentId: 1
+                        inputParameters: {input: "test data"}
+                    ) {
+                        error {
+                            message
+                        }
+                        output
+                    }
+                }
+                """)
+            .execute()
+            .path("testWorkflowNodeScript.error")
+            .valueIsNull()
+            .path("testWorkflowNodeScript.output")
+            .entity(Map.class)
+            .satisfies(output -> {
+                assert output.get("transformed")
+                    .equals("data");
+            });
+
+        verify(workflowNodeScriptFacade).testWorkflowNodeScript(
+            eq("workflow-456"), eq("script_1"), eq(1L), eq(Map.of("input", "test data")));
+    }
+
+    @Test
+    void testClusterElementScriptInput() {
+        Map<String, Object> scriptInput = Map.of("field1", "value1", "field2", 42);
+
+        when(workflowNodeScriptFacade.getClusterElementScriptInput(
+            anyString(), anyString(), anyString(), anyString(), anyLong())).thenReturn(scriptInput);
+
+        this.graphQlTester
+            .document("""
+                query {
+                    clusterElementScriptInput(
+                        workflowId: "workflow-123"
+                        workflowNodeName: "data-stream_1"
+                        clusterElementType: "PROCESSOR"
+                        clusterElementWorkflowNodeName: "script_1"
+                        environmentId: 1
+                    )
+                }
+                """)
+            .execute()
+            .path("clusterElementScriptInput")
+            .entity(Map.class)
+            .satisfies(result -> {
+                assert result.get("field1")
+                    .equals("value1");
+                assert result.get("field2")
+                    .equals(42);
+            });
+
+        verify(workflowNodeScriptFacade).getClusterElementScriptInput(
+            eq("workflow-123"), eq("data-stream_1"), eq("PROCESSOR"), eq("script_1"), eq(1L));
+    }
+
+    @Test
+    void testWorkflowNodeScriptInput() {
+        Map<String, Object> scriptInput = Map.of("data", "sample input");
+
+        when(workflowNodeScriptFacade.getWorkflowNodeScriptInput(
+            anyString(), anyString(), anyLong())).thenReturn(scriptInput);
+
+        this.graphQlTester
+            .document("""
+                query {
+                    workflowNodeScriptInput(
+                        workflowId: "workflow-456"
+                        workflowNodeName: "script_1"
+                        environmentId: 1
+                    )
+                }
+                """)
+            .execute()
+            .path("workflowNodeScriptInput")
+            .entity(Map.class)
+            .satisfies(result -> {
+                assert result.get("data")
+                    .equals("sample input");
+            });
+
+        verify(workflowNodeScriptFacade).getWorkflowNodeScriptInput(
+            eq("workflow-456"), eq("script_1"), eq(1L));
     }
 }
