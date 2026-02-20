@@ -14,6 +14,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -21,8 +22,6 @@ import {Editor} from '@tiptap/react';
 import {ReactNode, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
-
-const SPACE = 4;
 
 const formSchema = z.object({
     name: z.string().min(2, {

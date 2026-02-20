@@ -1,10 +1,9 @@
+import {SPACE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
-
-const SPACE = 4;
 
 interface ClearAllNodePositionsProps {
     invalidateWorkflowQueries: () => void;
