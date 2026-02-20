@@ -147,7 +147,7 @@ const ProjectsLeftSidebar = ({
     }, [selectedProjectId]);
 
     return (
-        <aside className="flex h-full flex-col items-center gap-2 bg-surface-main pt-3">
+        <aside className="flex h-full min-w-96 flex-col items-center gap-2 bg-surface-main pt-3">
             <div className="mx-4 flex w-80 flex-col gap-2">
                 {projectsLoading ? (
                     <div className="flex items-center gap-2">
