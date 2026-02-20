@@ -847,7 +847,9 @@ export const useProperty = ({
 
             if (fromAi) {
                 if (editorRef.current) {
-                    const fromAi = `=fromAi('${property.name}', 'description')`;
+                    const fromAi = description
+                        ? `=fromAi('${property.name}', '${description}')`
+                        : `=fromAi('${property.name}')`;
 
                     editorRef.current.commands.setContent(fromAi);
                     editorRef.current.setEditable(false);
@@ -877,6 +879,7 @@ export const useProperty = ({
         },
         [
             custom,
+            description,
             path,
             property.name,
             propertyParameterValue,
