@@ -105,9 +105,9 @@ public class LogFileStorageImpl implements LogFileStorage {
             System.arraycopy(existingContent, 0, newContent, 0, existingContent.length);
             System.arraycopy(logLineBytes, 0, newContent, existingContent.length, logLineBytes.length);
 
-            fileStorageService.storeFileContent(LOG_FILES_DIR, filename, newContent);
+            fileStorageService.storeFileContent(LOG_FILES_DIR, filename, newContent, false);
         } else {
-            fileStorageService.storeFileContent(LOG_FILES_DIR, filename, logLineBytes);
+            fileStorageService.storeFileContent(LOG_FILES_DIR, filename, logLineBytes, false);
         }
     }
 
