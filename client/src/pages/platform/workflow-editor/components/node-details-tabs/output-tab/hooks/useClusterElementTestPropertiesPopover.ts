@@ -44,20 +44,22 @@ export default function useClusterElementTestPropertiesPopover({
     );
 
     const form = useForm({
-        defaultValues: {
-            parameters: filteredDefaultValues,
-        },
+        defaultValues: filteredDefaultValues,
     });
 
     useEffect(() => {
-        form.reset({parameters: filteredDefaultValues});
+        form.reset(filteredDefaultValues);
     }, [filteredDefaultValues, form]);
 
     const {control, formState, handleSubmit} = form;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function handleFormSubmit(values: {parameters: Record<string, any>}) {
-        onSubmit(values.parameters);
+    function handleFormSubmit(values: Record<string, any>) {
+        const sanitizedValues = Object.fromEntries(
+            Object.entries(values).map(([key, value]) => [key, value === '' ? null : value])
+        );
+
+        onSubmit(sanitizedValues);
     }
 
     return {control, form, formState, handleFormSubmit, handleSubmit, propertiesWithDefaults};
