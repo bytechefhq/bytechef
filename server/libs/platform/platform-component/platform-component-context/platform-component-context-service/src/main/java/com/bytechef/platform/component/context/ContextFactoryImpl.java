@@ -21,6 +21,7 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.log.LogFileStorage;
@@ -46,6 +47,7 @@ public class ContextFactoryImpl implements ContextFactory {
     private final ApplicationContext applicationContext;
     private final CacheManager cacheManager;
     private final DataStorage dataStorage;
+    private final EditorTempFileStorage editorTempFileStorage;
     private final ApplicationEventPublisher eventPublisher;
     private final LogFileStorage logFileStorage;
     private final TempFileStorage tempFileStorage;
@@ -54,12 +56,17 @@ public class ContextFactoryImpl implements ContextFactory {
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
-        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, LogFileStorage logFileStorage,
+        DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
+        FileStorageServiceRegistry fileStorageServiceRegistry, LogFileStorage logFileStorage,
         TempFileStorage tempFileStorage) {
 
         this.applicationContext = applicationContext;
         this.cacheManager = cacheManager;
         this.dataStorage = dataStorage;
+        this.editorTempFileStorage = new EditorTempFileStorage(fileStorageServiceRegistry.getFileStorageService(
+            applicationProperties.getFileStorage()
+                .getProvider()
+                .name()));
         this.eventPublisher = eventPublisher;
         this.logFileStorage = logFileStorage;
         this.tempFileStorage = tempFileStorage;
@@ -76,7 +83,7 @@ public class ContextFactoryImpl implements ContextFactory {
         return ActionContextImpl
             .builder(
                 componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage,
-                eventPublisher, getHttpClientExecutor(), tempFileStorage)
+                eventPublisher, getHttpClientExecutor(), getTempFileStorage(editorEnvironment))
             .componentConnection(componentConnection)
             .environmentId(environmentId)
             .jobId(jobId)
@@ -114,7 +121,7 @@ public class ContextFactoryImpl implements ContextFactory {
         return ClusterElementContextImpl
             .builder(
                 componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
-                eventPublisher, getHttpClientExecutor(), tempFileStorage)
+                eventPublisher, getHttpClientExecutor(), getTempFileStorage(editorEnvironment))
             .clusterElementResolver(clusterElementResolver)
             .componentConnection(componentConnection)
             .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
@@ -131,7 +138,7 @@ public class ContextFactoryImpl implements ContextFactory {
         return TriggerContextImpl
             .builder(
                 componentName, componentVersion, triggerName, editorEnvironment, cacheManager, dataStorage,
-                getHttpClientExecutor(), tempFileStorage)
+                getHttpClientExecutor(), getTempFileStorage(editorEnvironment))
             .componentConnection(componentConnection)
             .environmentId(environmentId)
             .jobPrincipalId(jobPrincipalId)
@@ -139,6 +146,14 @@ public class ContextFactoryImpl implements ContextFactory {
             .type(type)
             .workflowUuid(workflowUuid)
             .build();
+    }
+
+    private TempFileStorage getTempFileStorage(boolean editorEnvironment) {
+        if (editorEnvironment) {
+            return editorTempFileStorage;
+        }
+
+        return tempFileStorage;
     }
 
     private HttpClientExecutor getHttpClientExecutor() {
