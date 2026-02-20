@@ -179,6 +179,8 @@ spring:
     aws:
       s3:
         enabled: false
+        vector:
+          enabled: false
       sqs:
         enabled: false
   datasource:
