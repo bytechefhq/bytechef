@@ -201,9 +201,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
                     clusterElementWorkflowNodeName, Map.of("input", inputParameters), environmentId);
             }
         } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage(), exception);
-            }
+            logger.warn(exception.getMessage(), exception);
 
             executionError = extractExecutionError(exception);
         }
@@ -233,9 +231,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
                     workflowId, workflowNodeName, Map.of("input", inputParameters), environmentId);
             }
         } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage(), exception);
-            }
+            logger.warn(exception.getMessage(), exception);
 
             executionError = extractExecutionError(exception);
         }

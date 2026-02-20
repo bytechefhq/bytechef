@@ -110,7 +110,8 @@ class SuspendTaskDispatcherPreSendProcessorTest {
         TaskExecution result = preSendProcessor.process(taskExecution);
 
         assertNotNull(result);
-        assertNotNull(result.getMetadata().get(MetadataConstants.SUSPEND));
+        assertNotNull(result.getMetadata()
+            .get(MetadataConstants.SUSPEND));
 
         verify(jobService).update(any(Job.class));
         verify(taskStateService).delete(any(JobResumeId.class));
@@ -138,7 +139,8 @@ class SuspendTaskDispatcherPreSendProcessorTest {
         TaskExecution result = preSendProcessor.process(taskExecution);
 
         assertNotNull(result);
-        assertFalse(result.getMetadata().containsKey(MetadataConstants.SUSPEND));
+        assertFalse(result.getMetadata()
+            .containsKey(MetadataConstants.SUSPEND));
 
         verify(jobService).update(any(Job.class));
         verify(taskStateService).delete(any(JobResumeId.class));

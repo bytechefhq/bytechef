@@ -87,15 +87,17 @@ class JobResumeIdTest {
 
     @Test
     void testParseThrowsForInvalidFormat() {
-        String invalidBase64 = java.util.Base64.getEncoder().encodeToString("only:two:parts".getBytes());
+        String invalidBase64 = java.util.Base64.getEncoder()
+            .encodeToString("only:two:parts".getBytes());
 
         assertThrows(IllegalArgumentException.class, () -> JobResumeId.parse(invalidBase64));
     }
 
     @Test
     void testParseThrowsForTooManyParts() {
-        String tooManyParts = java.util.Base64.getEncoder().encodeToString(
-            "a:b:c:d:e".getBytes());
+        String tooManyParts = java.util.Base64.getEncoder()
+            .encodeToString(
+                "a:b:c:d:e".getBytes());
 
         assertThrows(IllegalArgumentException.class, () -> JobResumeId.parse(tooManyParts));
     }
