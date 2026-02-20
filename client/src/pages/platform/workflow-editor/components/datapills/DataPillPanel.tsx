@@ -24,12 +24,14 @@ const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOut
 
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
-    const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
-        useShallow((state) => ({
-            currentNode: state.currentNode,
-            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
-        }))
-    );
+    const {aiAgentNodeDetailsPanelOpen, currentNode, workflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                aiAgentNodeDetailsPanelOpen: state.aiAgentNodeDetailsPanelOpen,
+                currentNode: state.currentNode,
+                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+            }))
+        );
 
     const validWorkflowNodeOutputs = workflowNodeOutputs.filter((workflowNodeOutput) => {
         const {actionDefinition, taskDispatcherDefinition, triggerDefinition, workflowNodeName} = workflowNodeOutput;
@@ -70,11 +72,11 @@ const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOut
     });
 
     useEffect(() => {
-        if (!workflowNodeDetailsPanelOpen) {
+        if (!workflowNodeDetailsPanelOpen && !aiAgentNodeDetailsPanelOpen) {
             setDataPillPanelOpen(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowNodeDetailsPanelOpen]);
+    }, [aiAgentNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen]);
 
     return (
         <div

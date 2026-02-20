@@ -73,11 +73,7 @@ const ClusterElementsCanvasDialog = ({
                 {showAiAgentEditor ? (
                     <div className="flex size-full min-h-0 overflow-hidden">
                         <AiAgentEditor
-                            className={twMerge(
-                                copilotPanelOpen && 'mr-[450px]',
-                                dataPillPanelOpen && 'mr-[400px]',
-                                dataPillPanelOpen && copilotPanelOpen && 'mr-[850px]'
-                            )}
+                            className={twMerge(copilotPanelOpen && 'mr-[450px]')}
                             copilotEnabled={ff_4070 && copilotEnabled}
                             onClose={handleClose}
                             onCopilotClick={handleCopilotClick}
@@ -85,19 +81,6 @@ const ClusterElementsCanvasDialog = ({
                             previousComponentDefinitions={previousComponentDefinitions}
                             workflowNodeOutputs={workflowNodeOutputs}
                         />
-
-                        {dataPillPanelOpen && (
-                            <Suspense fallback={<DataPillPanelSkeleton />}>
-                                <DataPillPanel
-                                    className={twMerge(
-                                        'fixed inset-y-0 right-0 rounded-none',
-                                        copilotPanelOpen && 'right-[450px]'
-                                    )}
-                                    previousComponentDefinitions={previousComponentDefinitions}
-                                    workflowNodeOutputs={workflowNodeOutputs}
-                                />
-                            </Suspense>
-                        )}
 
                         <CopilotPanel
                             className="fixed inset-y-0 right-0 rounded-r-md border-l"

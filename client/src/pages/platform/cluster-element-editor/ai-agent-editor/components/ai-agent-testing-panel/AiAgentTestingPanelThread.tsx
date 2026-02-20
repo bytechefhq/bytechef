@@ -354,7 +354,15 @@ const Composer: FC = () => {
         const parameters = findRootTaskParameters(workflow.definition, rootClusterElementNodeData?.workflowNodeName);
         const attachments = parameters?.attachments;
 
-        return typeof attachments === 'string' && attachments.trim().length > 0;
+        if (typeof attachments === 'string') {
+            return attachments.trim().length > 0;
+        }
+
+        if (Array.isArray(attachments)) {
+            return attachments.length > 0;
+        }
+
+        return false;
     }, [workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
 
     return (
