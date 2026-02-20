@@ -1,12 +1,16 @@
 import AiAgentHeader from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/AiAgentHeader';
 import {AiAgentConfigurationPanel} from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/AiAgentConfigurationPanel';
 import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
+import {DataPillPanelSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
-import {useCallback} from 'react';
+import {Suspense, lazy, useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
+
+const DataPillPanel = lazy(() => import('@/pages/platform/workflow-editor/components/datapills/DataPillPanel'));
 
 interface AiAgentEditorProps {
     className?: string;
@@ -31,6 +35,7 @@ export default function AiAgentEditor({
     const currentNodeClusterElementType = useWorkflowNodeDetailsPanelStore(
         (state) => state.currentNode?.clusterElementType
     );
+    const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
@@ -58,21 +63,37 @@ export default function AiAgentEditor({
                     <AiAgentConfigurationPanel />
                 </div>
 
-                <div className="relative mb-4 overflow-hidden">
-                    <AiAgentTestingPanel />
+                <div className="relative mb-4">
+                    <div className="size-full overflow-hidden">
+                        <AiAgentTestingPanel />
+                    </div>
 
                     {showNodeDetailsPanel && (
-                        <div className="absolute inset-y-0 left-0 w-[460px] overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background shadow-lg">
-                            <WorkflowNodeDetailsPanel
-                                className="relative inset-auto z-0 size-full max-w-none rounded-none border-0"
-                                invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                                onClose={handleNodeDetailsPanelClose}
-                                panelOpen
-                                previousComponentDefinitions={previousComponentDefinitions}
-                                updateWorkflowMutation={updateWorkflowMutation}
-                                workflowNodeOutputs={workflowNodeOutputs}
-                            />
-                        </div>
+                        <>
+                            {dataPillPanelOpen && (
+                                <div className="absolute inset-y-0 -left-[405px] z-10 w-[400px] overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background shadow-lg">
+                                    <Suspense fallback={<DataPillPanelSkeleton />}>
+                                        <DataPillPanel
+                                            className="relative inset-auto z-0 size-full max-w-none animate-none rounded-none border-0"
+                                            previousComponentDefinitions={previousComponentDefinitions}
+                                            workflowNodeOutputs={workflowNodeOutputs}
+                                        />
+                                    </Suspense>
+                                </div>
+                            )}
+
+                            <div className="absolute inset-y-0 left-0 w-[460px] overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background shadow-lg">
+                                <WorkflowNodeDetailsPanel
+                                    className="relative inset-auto z-0 size-full max-w-none rounded-none border-0"
+                                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                                    onClose={handleNodeDetailsPanelClose}
+                                    panelOpen
+                                    previousComponentDefinitions={previousComponentDefinitions}
+                                    updateWorkflowMutation={updateWorkflowMutation}
+                                    workflowNodeOutputs={workflowNodeOutputs}
+                                />
+                            </div>
+                        </>
                     )}
                 </div>
             </div>
