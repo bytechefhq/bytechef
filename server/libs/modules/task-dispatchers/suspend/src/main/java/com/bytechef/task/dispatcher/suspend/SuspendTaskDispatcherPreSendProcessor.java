@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProce
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.component.definition.ActionDefinition.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
@@ -62,13 +63,13 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
 
         JobResumeId jobResumeId = JobResumeId.parse(jobResumeIdString);
 
-        Optional<Map<String, ?>> suspendDataOptional = taskStateService.fetchValue(jobResumeId);
+        Optional<Suspend> suspendOptional = taskStateService.fetchValue(jobResumeId);
 
-        if (suspendDataOptional.isEmpty()) {
+        if (suspendOptional.isEmpty()) {
             logger.warn("No suspend state found for jobResumeId={}", jobResumeId);
         }
 
-        suspendDataOptional.ifPresent(stringMap -> taskExecution.putMetadata(MetadataConstants.SUSPEND, stringMap));
+        suspendOptional.ifPresent(suspend -> taskExecution.putMetadata(MetadataConstants.SUSPEND, suspend));
 
         Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
 

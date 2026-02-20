@@ -45,7 +45,7 @@ public class DelaySleepAction {
                     .required(true)
                     .defaultValue(1))
             .suspendPerform(delaySleepAction::suspendPerform)
-            .resumPerform(delaySleepAction::resumePerform);
+            .resumePerform(delaySleepAction::resumePerform);
     }
 
     protected Suspend suspendPerform(

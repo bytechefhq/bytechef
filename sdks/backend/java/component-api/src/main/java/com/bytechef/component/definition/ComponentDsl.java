@@ -460,7 +460,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableActionDefinition resumPerform(ResumePerformFunction resumePerform) {
+        public ModifiableActionDefinition resumePerform(ResumePerformFunction resumePerform) {
             this.resumePerformFunction = resumePerform;
 
             return this;
