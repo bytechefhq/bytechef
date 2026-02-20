@@ -74,13 +74,10 @@ async function renderApp() {
         init(applicationInfoStore.getState().helpHub.commandBar.orgId!);
     }
 
-    // TODO: restore backend-driven config once /actuator/info exposes userGuiding
-    // const {userGuiding} = applicationInfoStore.getState();
-    // if (userGuiding.enabled && userGuiding.containerId) {
-    //     initUserGuiding(userGuiding.containerId);
-    // }
-    if (applicationInfoStore.getState().featureFlags['ff-298']) {
-        initUserGuiding('38U111210PF6ID');
+    const {userGuiding} = applicationInfoStore.getState();
+
+    if (userGuiding.enabled && userGuiding.containerId) {
+        initUserGuiding(userGuiding.containerId);
     }
 
     if (
