@@ -60,8 +60,8 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
     private ClusterElementContextImpl(Builder builder) {
         super(
             builder.componentName, builder.componentVersion, builder.clusterElementName, builder.componentConnection,
-            builder.editorEnvironment, builder.httpClientExecutor, builder.tempFileStorage,
-            builder.logFileStorageWriter, builder.jobId, builder.taskExecutionId);
+            builder.jobId, builder.taskExecutionId, builder.editorEnvironment, builder.httpClientExecutor,
+            builder.tempFileStorage, builder.logFileStorageWriter);
 
         this.cacheManager = builder.cacheManager;
         this.clusterElementResolver = builder.clusterElementResolver;

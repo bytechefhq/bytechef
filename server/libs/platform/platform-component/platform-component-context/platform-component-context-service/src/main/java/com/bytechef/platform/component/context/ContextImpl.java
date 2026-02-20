@@ -78,16 +78,16 @@ class ContextImpl implements Context {
         HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage) {
 
         this(
-            componentName, componentVersion, componentOperationName, componentConnection, editorEnvironment,
-            httpClientExecutor, tempFileStorage, null, null, 0);
+            componentName, componentVersion, componentOperationName, componentConnection, null, 0, editorEnvironment,
+            httpClientExecutor, tempFileStorage, null);
     }
 
     @SuppressFBWarnings("EI")
     ContextImpl(
         String componentName, int componentVersion, @Nullable String componentOperationName,
-        @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
-        HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
-        @Nullable LogFileStorageWriter logFileStorageWriter, @Nullable Long jobId, long taskExecutionId) {
+        @Nullable ComponentConnection componentConnection, @Nullable Long jobId, long taskExecutionId,
+        boolean editorEnvironment, HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
+        @Nullable LogFileStorageWriter logFileStorageWriter) {
 
         this.convert = new ConvertImpl();
         this.editorEnvironment = editorEnvironment;
