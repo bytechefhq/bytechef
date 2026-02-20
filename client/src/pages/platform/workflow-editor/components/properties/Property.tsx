@@ -27,7 +27,7 @@ import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/typ
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
 import {CircleQuestionMarkIcon, PlusIcon, XIcon} from 'lucide-react';
-import {ReactNode, useMemo, useState} from 'react';
+import {ReactNode, useMemo, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState, useFormContext, useWatch} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
@@ -59,18 +59,34 @@ interface ControlledArrayItemsProps {
     property: PropertyAllType;
 }
 
+/**
+ * Renders array items in controlled (react-hook-form) mode.
+ * Must be rendered within a FormProvider ancestor (e.g., shadcn's Form component).
+ */
 const ControlledArrayItems = ({control, controlPath, formState, property}: ControlledArrayItemsProps) => {
     const {setValue} = useFormContext();
     const watchedValue = useWatch({control, name: controlPath});
+    const itemKeysRef = useRef<string[]>([]);
 
     const items = Array.isArray(watchedValue) ? (watchedValue as unknown[]) : [];
     const itemDefinition = property.items?.[0];
+
+    // Sync stable keys with items (handles initial load and external resets)
+    while (itemKeysRef.current.length < items.length) {
+        itemKeysRef.current.push(crypto.randomUUID());
+    }
+
+    itemKeysRef.current.length = items.length;
+
+    if (!itemDefinition) {
+        return null;
+    }
 
     return (
         <>
             <ul className="ml-2 flex flex-col space-y-4 border-l border-l-border/50">
                 {items.map((item, index) => (
-                    <li className="flex items-center gap-1" key={`${controlPath}_${index}`}>
+                    <li className="flex items-center gap-1" key={itemKeysRef.current[index]}>
                         <Property
                             control={control}
                             controlPath={controlPath}
@@ -79,6 +95,8 @@ const ControlledArrayItems = ({control, controlPath, formState, property}: Contr
                                 <Button
                                     icon={<XIcon />}
                                     onClick={() => {
+                                        itemKeysRef.current.splice(index, 1);
+
                                         setValue(
                                             controlPath,
                                             items.filter((_, itemIndex) => itemIndex !== index)
@@ -107,7 +125,11 @@ const ControlledArrayItems = ({control, controlPath, formState, property}: Contr
                 className="mt-3 rounded-sm"
                 icon={<PlusIcon />}
                 label="Add item"
-                onClick={() => setValue(controlPath, [...items, ''])}
+                onClick={() => {
+                    itemKeysRef.current.push(crypto.randomUUID());
+
+                    setValue(controlPath, [...items, '']);
+                }}
                 size="sm"
                 variant="secondary"
             />
@@ -123,6 +145,10 @@ interface ControlledObjectEntriesProps {
     property: PropertyAllType;
 }
 
+/**
+ * Renders dynamic key-value entries for objects in controlled (react-hook-form) mode.
+ * Must be rendered within a FormProvider ancestor (e.g., shadcn's Form component).
+ */
 const ControlledObjectEntries = ({control, controlPath, formState, property}: ControlledObjectEntriesProps) => {
     const {setValue} = useFormContext();
     const watchedValue = useWatch({control, name: controlPath});
@@ -137,6 +163,27 @@ const ControlledObjectEntries = ({control, controlPath, formState, property}: Co
     }, [watchedValue]);
 
     const itemDefinition = property.additionalProperties?.[0];
+
+    const handleAddEntry = () => {
+        const trimmedKey = newEntryKey.trim();
+
+        if (!trimmedKey) {
+            return;
+        }
+
+        const currentObject = (watchedValue as Record<string, unknown>) || {};
+
+        if (trimmedKey in currentObject) {
+            return;
+        }
+
+        setValue(controlPath, {
+            ...currentObject,
+            [trimmedKey]: '',
+        });
+
+        setNewEntryKey('');
+    };
 
     return (
         <>
@@ -183,15 +230,10 @@ const ControlledObjectEntries = ({control, controlPath, formState, property}: Co
                     className="h-8 flex-1 rounded-md border bg-background px-2 text-sm"
                     onChange={(event) => setNewEntryKey(event.target.value)}
                     onKeyDown={(event) => {
-                        if (event.key === 'Enter' && newEntryKey.trim()) {
+                        if (event.key === 'Enter') {
                             event.preventDefault();
 
-                            setValue(controlPath, {
-                                ...((watchedValue as Record<string, unknown>) || {}),
-                                [newEntryKey.trim()]: '',
-                            });
-
-                            setNewEntryKey('');
+                            handleAddEntry();
                         }
                     }}
                     placeholder="Key name"
@@ -204,16 +246,7 @@ const ControlledObjectEntries = ({control, controlPath, formState, property}: Co
                     disabled={!newEntryKey.trim()}
                     icon={<PlusIcon />}
                     label="Add"
-                    onClick={() => {
-                        if (newEntryKey.trim()) {
-                            setValue(controlPath, {
-                                ...((watchedValue as Record<string, unknown>) || {}),
-                                [newEntryKey.trim()]: '',
-                            });
-
-                            setNewEntryKey('');
-                        }
-                    }}
+                    onClick={handleAddEntry}
                     size="sm"
                     variant="secondary"
                 />
@@ -487,7 +520,10 @@ const Property = ({
                             </ul>
                         )}
 
-                    {control && controlType === 'OBJECT_BUILDER' && calculatedPath && !property.properties?.length && (
+                    {control &&
+                        (controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') &&
+                        calculatedPath &&
+                        !property.properties?.length && (
                         <ControlledObjectEntries
                             control={control}
                             controlPath={calculatedPath}
@@ -523,7 +559,9 @@ const Property = ({
                         controlType === 'SELECT' &&
                         type !== 'BOOLEAN' &&
                         calculatedPath &&
-                        optionsDataSource && (
+                        optionsDataSource &&
+                        workflow.id &&
+                        currentNode?.name && (
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
@@ -553,7 +591,7 @@ const Property = ({
                                         required={required}
                                         value={fieldValue !== undefined ? fieldValue : selectValue}
                                         workflowId={workflow.id!}
-                                        workflowNodeName={currentNode?.name ?? ''}
+                                        workflowNodeName={currentNode!.name}
                                     />
                                 )}
                                 rules={{required}}
@@ -635,7 +673,7 @@ const Property = ({
                         />
                     )}
 
-                    {control && controlType === 'MULTI_SELECT' && calculatedPath && (
+                    {control && controlType === 'MULTI_SELECT' && calculatedPath && workflow.id && (
                         <Controller
                             control={control}
                             defaultValue={defaultValue || []}
@@ -645,10 +683,8 @@ const Property = ({
                                     defaultValue={(value as string[]) || []}
                                     deletePropertyButton={null}
                                     leadingIcon={typeIcon}
-                                    onChange={(newValue) => {
-                                        onChange(newValue);
-                                    }}
-                                    options={formattedOptions as MultiSelectOptionType[]}
+                                    onChange={onChange}
+                                    options={(formattedOptions as MultiSelectOptionType[]) || []}
                                     optionsDataSource={optionsDataSource}
                                     path={calculatedPath}
                                     property={property}
