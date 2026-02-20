@@ -212,7 +212,6 @@ type StringProperty implements Property {
     minLength: Int
     options: [Option!]
     optionsDataSource: OptionsDataSource
-    optionsLoadedDynamically: Boolean
     placeholder: String
     regex: String
 }

@@ -224,12 +224,6 @@ public interface BaseProperty {
          * @return
          */
         Optional<String> getRegex();
-
-        /**
-         *
-         * @return
-         */
-        Optional<Boolean> getOptionsLoadedDynamically();
     }
 
     /**
