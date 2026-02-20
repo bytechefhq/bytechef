@@ -46,10 +46,7 @@ public class LogFileGraphQlController {
 
     @QueryMapping
     public LogPage jobFileLogs(
-        @Argument long jobId,
-        @Argument LogFilterInput filter,
-        @Argument Integer page,
-        @Argument Integer size) {
+        @Argument long jobId, @Argument LogFilterInput filter, @Argument Integer page, @Argument Integer size) {
 
         List<LogEntry> allEntries = logFileStorage.readLogEntriesByJobId(jobId);
 
@@ -71,12 +68,7 @@ public class LogFileGraphQlController {
         int totalPages = (int) Math.ceil((double) filteredEntries.size() / pageSize);
 
         return new LogPage(
-            pageContent,
-            filteredEntries.size(),
-            totalPages,
-            pageNumber,
-            pageSize,
-            end < filteredEntries.size(),
+            pageContent, filteredEntries.size(), totalPages, pageNumber, pageSize, end < filteredEntries.size(),
             pageNumber > 0);
     }
 

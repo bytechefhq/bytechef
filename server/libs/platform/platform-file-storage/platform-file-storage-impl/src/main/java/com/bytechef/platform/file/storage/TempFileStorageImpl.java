@@ -27,7 +27,7 @@ import java.io.OutputStream;
  */
 public class TempFileStorageImpl implements TempFileStorage {
 
-    public static final String TEMP_DIR = "temp";
+    private static final String TEMP_DIR = "temp";
 
     private final FileStorageService fileStorageService;
 

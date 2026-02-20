@@ -85,11 +85,10 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         List<ToolExecutionEvent> toolExecutionEvents = new ArrayList<>();
 
         ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
-            context.log(
-                log -> log.info(
-                    "Tool execution: {} | Reasoning: {} | Confidence: {} | Inputs: {} | Output: {}",
-                    toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
-                    toolExecutionEvent.inputs(), toolExecutionEvent.output()));
+            context.log(log -> log.info(
+                "Tool execution: {} | Reasoning: {} | Confidence: {} | Inputs: {} | Output: {}",
+                toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
+                toolExecutionEvent.inputs(), toolExecutionEvent.output()));
 
             if (context.isEditorEnvironment() && ((ActionContextAware) context).getJobId() == null) {
                 toolExecutionEvents.add(toolExecutionEvent);

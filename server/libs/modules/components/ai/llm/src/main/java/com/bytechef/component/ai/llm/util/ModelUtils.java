@@ -55,6 +55,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.content.Media;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.boot.http.client.HttpClientSettings;
@@ -94,9 +95,13 @@ public class ModelUtils {
                 ChatResponse chatResponse = callResponseSpec.chatResponse();
 
                 if (chatResponse != null) {
-                    response = chatResponse.getResult()
-                        .getOutput()
-                        .getText();
+                    Generation result = chatResponse.getResult();
+
+                    if (result != null) {
+                        AssistantMessage output = result.getOutput();
+
+                        response = output.getText();
+                    }
                 }
             } catch (org.springframework.ai.retry.NonTransientAiException e) {
                 String message = e.getMessage();
