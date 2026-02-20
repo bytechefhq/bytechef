@@ -2,6 +2,13 @@
     border-color: #3b82f6 !important;
 }
 
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+}
+
 @keyframes slideInFromRight {
     from {
         opacity: 0;

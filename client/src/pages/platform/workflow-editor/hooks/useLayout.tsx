@@ -1,4 +1,13 @@
-import {EDGE_STYLES, FINAL_PLACEHOLDER_NODE_ID, LayoutDirectionType, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
+import {
+    DATA_PILL_PANEL_WIDTH,
+    EDGE_STYLES,
+    FINAL_PLACEHOLDER_NODE_ID,
+    LayoutDirectionType,
+    NODE_DETAILS_PANEL_WIDTH,
+    PROJECT_LEFT_SIDEBAR_WIDTH,
+    TASK_DISPATCHER_NAMES,
+} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
@@ -11,8 +20,10 @@ import {ComponentIcon} from 'lucide-react';
 import {useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import useDataPillPanelStore from '../stores/useDataPillPanelStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import animateNodePositions from '../utils/animateNodePositions';
 import createBranchEdges from '../utils/createBranchEdges';
 import createBranchNode from '../utils/createBranchNode';
@@ -435,6 +446,75 @@ export default function useLayout({
             setSavedPositionCrossAxisShift((canvasCrossDimension - initialCanvasCrossDimRef.current) / 2);
         }
     }, [canvasWidth, canvasHeight, layoutDirection, setSavedPositionCrossAxisShift]);
+
+    const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
+    const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
+    const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
+        (state) => state.workflowNodeDetailsPanelOpen
+    );
+
+    const previousDataPillPanelOpenRef = useRef<boolean | undefined>(undefined);
+    const previousNodeDetailsPanelOpenRef = useRef<boolean | undefined>(undefined);
+    const previousProjectLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
+
+    useEffect(() => {
+        if (!useWorkflowDataStore.getState().isWorkflowLoaded) {
+            previousDataPillPanelOpenRef.current = dataPillPanelOpen;
+            previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
+            previousProjectLeftSidebarOpenRef.current = projectLeftSidebarOpen;
+
+            return;
+        }
+
+        let widthDelta = 0;
+
+        if (
+            previousNodeDetailsPanelOpenRef.current !== undefined &&
+            previousNodeDetailsPanelOpenRef.current !== workflowNodeDetailsPanelOpen
+        ) {
+            widthDelta += workflowNodeDetailsPanelOpen ? NODE_DETAILS_PANEL_WIDTH : -NODE_DETAILS_PANEL_WIDTH;
+        }
+
+        if (
+            previousDataPillPanelOpenRef.current !== undefined &&
+            previousDataPillPanelOpenRef.current !== dataPillPanelOpen
+        ) {
+            widthDelta += dataPillPanelOpen ? DATA_PILL_PANEL_WIDTH : -DATA_PILL_PANEL_WIDTH;
+        }
+
+        if (
+            previousProjectLeftSidebarOpenRef.current !== undefined &&
+            previousProjectLeftSidebarOpenRef.current !== projectLeftSidebarOpen
+        ) {
+            widthDelta += projectLeftSidebarOpen ? PROJECT_LEFT_SIDEBAR_WIDTH : -PROJECT_LEFT_SIDEBAR_WIDTH;
+        }
+
+        previousDataPillPanelOpenRef.current = dataPillPanelOpen;
+        previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
+        previousProjectLeftSidebarOpenRef.current = projectLeftSidebarOpen;
+
+        if (widthDelta === 0) {
+            return;
+        }
+
+        const crossAxis = layoutDirection === 'TB' ? 'x' : 'y';
+        const positionDelta = -widthDelta / 2;
+        const currentNodes = useWorkflowDataStore.getState().nodes;
+
+        const targetNodes = currentNodes.map((node) => ({
+            ...node,
+            position: {
+                ...node.position,
+                [crossAxis]: node.position[crossAxis] + positionDelta,
+            },
+        }));
+
+        if (cancelAnimationRef.current) {
+            cancelAnimationRef.current();
+        }
+
+        cancelAnimationRef.current = animateNodePositions(currentNodes, targetNodes, setNodes);
+    }, [dataPillPanelOpen, layoutDirection, projectLeftSidebarOpen, setNodes, workflowNodeDetailsPanelOpen]);
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
