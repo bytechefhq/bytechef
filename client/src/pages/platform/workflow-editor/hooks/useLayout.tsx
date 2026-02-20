@@ -77,6 +77,10 @@ export default function useLayout({
     const isInitialLayoutRef = useRef(true);
     const initialCanvasCrossDimRef = useRef<number | undefined>(undefined);
     const initialDirectionRef = useRef<LayoutDirectionType | undefined>(undefined);
+    const canvasWidthRef = useRef(canvasWidth);
+    const canvasHeightRef = useRef(canvasHeight);
+    canvasWidthRef.current = canvasWidth;
+    canvasHeightRef.current = canvasHeight;
 
     const triggerComponentName = useMemo(() => triggers?.[0]?.type.split('/')[0], [triggers]);
 
@@ -421,6 +425,18 @@ export default function useLayout({
     const layoutResetCounter = useWorkflowDataStore((state) => state.layoutResetCounter);
 
     useEffect(() => {
+        const canvasCrossDimension = layoutDirection === 'LR' && canvasHeight ? canvasHeight : canvasWidth;
+
+        if (initialCanvasCrossDimRef.current === undefined || initialDirectionRef.current !== layoutDirection) {
+            initialCanvasCrossDimRef.current = canvasCrossDimension;
+            initialDirectionRef.current = layoutDirection;
+            setSavedPositionCrossAxisShift(0);
+        } else {
+            setSavedPositionCrossAxisShift((canvasCrossDimension - initialCanvasCrossDimRef.current) / 2);
+        }
+    }, [canvasWidth, canvasHeight, layoutDirection, setSavedPositionCrossAxisShift]);
+
+    useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
             return;
         }
@@ -466,25 +482,13 @@ export default function useLayout({
             }
         }
 
-        const canvasCrossDimension = layoutDirection === 'LR' && canvasHeight ? canvasHeight : canvasWidth;
-        let savedPositionCrossAxisShift = 0;
-
-        if (initialCanvasCrossDimRef.current !== undefined && initialDirectionRef.current === layoutDirection) {
-            savedPositionCrossAxisShift = (canvasCrossDimension - initialCanvasCrossDimRef.current) / 2;
-        }
-
-        if (initialCanvasCrossDimRef.current === undefined || initialDirectionRef.current !== layoutDirection) {
-            initialCanvasCrossDimRef.current = canvasCrossDimension;
-            initialDirectionRef.current = layoutDirection;
-        }
-
-        setSavedPositionCrossAxisShift(savedPositionCrossAxisShift);
+        const savedPositionCrossAxisShift = useWorkflowDataStore.getState().savedPositionCrossAxisShift;
 
         const preLayoutNodes = useWorkflowDataStore.getState().nodes;
 
         getLayoutElements({
-            canvasHeight,
-            canvasWidth,
+            canvasHeight: canvasHeightRef.current,
+            canvasWidth: canvasWidthRef.current,
             direction: layoutDirection,
             edges,
             nodes: layoutNodes,
@@ -499,7 +503,7 @@ export default function useLayout({
             if (readOnlyWorkflow) {
                 const SHEET_WIDTH = WIDTHS.WORKFLOW_READ_ONLY_SHEET_WIDTH;
 
-                const centeringOffsetX = (canvasWidth - SHEET_WIDTH) / 2;
+                const centeringOffsetX = (canvasWidthRef.current - SHEET_WIDTH) / 2;
 
                 targetNodes = elements.nodes.map((node) => ({
                     ...node,
@@ -548,11 +552,11 @@ export default function useLayout({
         };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canvasHeight, canvasWidth, layoutDirection, layoutResetCounter, tasks, triggers, isWorkflowLoaded]);
+    }, [layoutDirection, layoutResetCounter, tasks, triggers, isWorkflowLoaded]);
 
     useEffect(() => {
-        if (canvasWidth > 0) {
+        if (canvasWidth > 0 && !isWorkflowLoaded) {
             initializeWithCanvasWidth(canvasWidth);
         }
-    }, [canvasWidth, initializeWithCanvasWidth]);
+    }, [canvasWidth, initializeWithCanvasWidth, isWorkflowLoaded]);
 }
