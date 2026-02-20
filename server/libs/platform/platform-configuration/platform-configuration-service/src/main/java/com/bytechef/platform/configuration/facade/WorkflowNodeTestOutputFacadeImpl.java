@@ -125,18 +125,18 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         inputParameters = MapUtils.concat(inputParameters, Map.of("input", scriptInputParameters));
 
+        ClusterElement clusterElement = clusterElementTestContext.clusterElement();
+
         Map<String, ?> extensions = evaluator.evaluate(
-            clusterElementTestContext.clusterElement()
-                .getExtensions(),
-            clusterElementTestContext.outputs());
+            clusterElement.getExtensions(), clusterElementTestContext.outputs());
+
+        Workflow workflow = clusterElementTestContext.workflow();
 
         ComponentConnection componentConnection = getClusterElementComponentConnection(
             workflowId, workflowNodeName, clusterElementWorkflowNodeName, environmentId);
 
         return executeAndSaveTestOutput(
-            clusterElementTestContext.workflow()
-                .getId(),
-            clusterElementWorkflowNodeName,
+            workflow.getId(), clusterElementWorkflowNodeName,
             clusterElementTestContext.clusterElementWorkflowNodeType(), inputParameters,
             clusterElementTestContext.connectionIds(), extensions, environmentId,
             (

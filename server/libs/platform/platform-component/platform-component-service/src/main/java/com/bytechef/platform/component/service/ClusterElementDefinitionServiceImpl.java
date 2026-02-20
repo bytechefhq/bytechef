@@ -75,8 +75,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     @Override
     @WithTokenRefresh(
-        errorTypeClass = ClusterElementDefinitionErrorType.class,
-        errorTypeField = "EXECUTE_DYNAMIC_PROPERTIES")
+        errorTypeClass = ClusterElementDefinitionErrorType.class, errorTypeField = "EXECUTE_DYNAMIC_PROPERTIES")
     public List<Property> executeDynamicProperties(
         @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
         String propertyName, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
@@ -91,9 +90,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     @Override
-    @WithTokenRefresh(
-        errorTypeClass = ClusterElementDefinitionErrorType.class,
-        errorTypeField = "EXECUTE_OPTIONS")
+    @WithTokenRefresh(errorTypeClass = ClusterElementDefinitionErrorType.class, errorTypeField = "EXECUTE_OPTIONS")
     public List<Option> executeOptions(
         @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
         String propertyName, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
@@ -133,9 +130,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     @Override
-    @WithTokenRefresh(
-        errorTypeClass = ClusterElementDefinitionErrorType.class,
-        errorTypeField = "EXECUTE_PERFORM")
+    @WithTokenRefresh(errorTypeClass = ClusterElementDefinitionErrorType.class, errorTypeField = "EXECUTE_PERFORM")
     public Object executeTool(
         @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
         Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection,

@@ -88,8 +88,8 @@ public class TokenRefreshAspect {
         Method method = methodSignature.getMethod();
         Parameter[] parameters = method.getParameters();
 
-        String componentName =
-            findAnnotatedArgument(parameters, args, WithTokenRefresh.ComponentNameParam.class, String.class);
+        String componentName = findAnnotatedArgument(
+            parameters, args, WithTokenRefresh.ComponentNameParam.class, String.class);
 
         if (componentName == null) {
             throw new IllegalStateException(

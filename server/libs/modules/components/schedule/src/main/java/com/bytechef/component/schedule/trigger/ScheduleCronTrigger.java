@@ -98,9 +98,7 @@ public class ScheduleCronTrigger {
         String timezone = inputParameters.getRequiredString(TIMEZONE);
 
         triggerScheduler.scheduleScheduleTrigger(
-            "0 " + expression,
-            timezone,
-            Map.of(EXPRESSION, expression, TIMEZONE, timezone),
+            "0 " + expression, timezone, Map.of(EXPRESSION, expression, TIMEZONE, timezone),
             WorkflowExecutionId.parse(workflowExecutionId));
     }
 }

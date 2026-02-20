@@ -120,8 +120,7 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
                         .build();
                 }
             } else {
-                responseEntity = doProcessTrigger(
-                    workflowExecutionId, null, httpServletRequest, httpServletResponse);
+                responseEntity = doProcessTrigger(workflowExecutionId, null, httpServletRequest, httpServletResponse);
             }
 
             return responseEntity;

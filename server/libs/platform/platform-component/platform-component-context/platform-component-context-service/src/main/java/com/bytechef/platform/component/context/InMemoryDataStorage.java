@@ -36,6 +36,7 @@ class InMemoryDataStorage {
     private static final String CACHE = InMemoryDataStorage.class.getName() + ".dataStorage";
 
     private final CacheManager cacheManager;
+
     @Nullable
     private final String workflowUuid;
 
