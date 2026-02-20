@@ -70,9 +70,9 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        return taskExecution.getParentId() == null &&
-            taskExecution.getMetadata()
-                .containsKey(MetadataConstants.JOB_RESUME_ID);
+        Map<String, ?> metadata = taskExecution.getMetadata();
+
+        return taskExecution.getParentId() == null && metadata.containsKey(MetadataConstants.JOB_RESUME_ID);
     }
 
     @Override
@@ -113,8 +113,7 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
         }
 
         contextService.push(
-            jobId, Context.Classname.JOB,
-            taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, newContext));
+            jobId, Context.Classname.JOB, taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, newContext));
 
         String jobResumeIdString = MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.JOB_RESUME_ID);
 
