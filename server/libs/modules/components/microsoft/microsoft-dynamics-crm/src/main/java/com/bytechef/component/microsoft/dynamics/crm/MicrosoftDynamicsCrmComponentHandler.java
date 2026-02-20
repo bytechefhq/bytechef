@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.dynamics.crm.action.MicrosoftDynamicsCrmCreateRecordAction;
 import com.bytechef.component.microsoft.dynamics.crm.action.MicrosoftDynamicsCrmDeleteRecordAction;
 import com.bytechef.component.microsoft.dynamics.crm.action.MicrosoftDynamicsCrmGetRecordAction;
+import com.bytechef.component.microsoft.dynamics.crm.action.MicrosoftDynamicsCrmListRecordsAction;
 import com.bytechef.component.microsoft.dynamics.crm.action.MicrosoftDynamicsCrmUpdateRecordAction;
 import com.bytechef.component.microsoft.dynamics.crm.connection.MicrosoftDynamicsCrmConnection;
 import com.bytechef.component.microsoft.dynamics.crm.trigger.MicrosoftDynamicsCrmNewAccountTrigger;
@@ -51,11 +52,13 @@ public class MicrosoftDynamicsCrmComponentHandler implements ComponentHandler {
             MicrosoftDynamicsCrmCreateRecordAction.ACTION_DEFINITION,
             MicrosoftDynamicsCrmDeleteRecordAction.ACTION_DEFINITION,
             MicrosoftDynamicsCrmGetRecordAction.ACTION_DEFINITION,
+            MicrosoftDynamicsCrmListRecordsAction.ACTION_DEFINITION,
             MicrosoftDynamicsCrmUpdateRecordAction.ACTION_DEFINITION)
         .clusterElements(
             tool(MicrosoftDynamicsCrmCreateRecordAction.ACTION_DEFINITION),
             tool(MicrosoftDynamicsCrmDeleteRecordAction.ACTION_DEFINITION),
             tool(MicrosoftDynamicsCrmGetRecordAction.ACTION_DEFINITION),
+            tool(MicrosoftDynamicsCrmListRecordsAction.ACTION_DEFINITION),
             tool(MicrosoftDynamicsCrmUpdateRecordAction.ACTION_DEFINITION))
         .triggers(
             MicrosoftDynamicsCrmNewAccountTrigger.TRIGGER_DEFINITION,
