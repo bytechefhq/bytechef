@@ -90,7 +90,10 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
                 toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
                 toolExecutionEvent.inputs(), toolExecutionEvent.output()));
 
-            if (context.isEditorEnvironment() && ((ActionContextAware) context).getJobId() == null) {
+            if (context.isEditorEnvironment() &&
+                (!(context instanceof ActionContextAware actionContextAware) ||
+                    actionContextAware.getJobId() == null)) {
+
                 toolExecutionEvents.add(toolExecutionEvent);
             }
         };
