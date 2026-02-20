@@ -34,7 +34,10 @@ const WorkflowExecutionSheet = () => {
                 <SheetTitle>{`${workflowExecution?.project?.name}/${workflowExecution?.workflow?.label}`}</SheetTitle>
             </VisuallyHidden.Root>
 
-            <SheetContent className="absolute bottom-4 right-4 top-3 flex h-auto w-[90%] flex-row gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-[90%]">
+            <SheetContent
+                className="absolute bottom-4 right-4 top-3 flex h-auto w-[90%] flex-row gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-[90%]"
+                onPointerDownOutside={(event) => event.preventDefault()}
+            >
                 <div className="flex min-w-0 flex-1 flex-col">
                     {workflowExecutionLoading ? (
                         <div className="flex size-full items-center justify-center">
