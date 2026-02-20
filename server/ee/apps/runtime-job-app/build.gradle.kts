@@ -80,7 +80,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:data-mapper"))
     implementation(project(":server:libs:modules:components:data-storage"))
     implementation(project(":server:libs:modules:components:date-helper"))
-    implementation(project(":server:libs:modules:components:delay"))
+    implementation(project(":server:libs:modules:components:wait"))
     implementation(project(":server:libs:modules:components:discord"))
     implementation(project(":server:libs:modules:components:dropbox"))
     implementation(project(":server:libs:modules:components:email"))

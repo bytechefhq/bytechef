@@ -16,7 +16,6 @@
 
 package com.bytechef.component.workflow.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
@@ -60,14 +59,16 @@ public class WorkflowCallableTrigger {
         String inputSchema = inputParameters.getString(INPUT_SCHEMA);
         List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
-        ModifiableValueProperty<?, ?> input = (ModifiableValueProperty<?, ?>) context.outputSchema(
-            outputSchema -> outputSchema.getOutputSchema(INPUT_SCHEMA, inputSchema));
+        if (inputSchema != null) {
+            ModifiableValueProperty<?, ?> input = (ModifiableValueProperty<?, ?>) context.outputSchema(
+                outputSchema -> outputSchema.getOutputSchema(INPUT_SCHEMA, inputSchema));
 
-        if (input != null) {
-            properties.add(input);
+            if (input != null) {
+                return OutputResponse.of(input);
+            }
         }
 
-        return OutputResponse.of(object().properties(properties));
+        return null;
     }
 
     protected static Map<String, ?> webhookResult(

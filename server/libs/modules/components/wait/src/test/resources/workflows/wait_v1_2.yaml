@@ -1,0 +1,22 @@
+---
+label: "Hello Timeout"
+inputs:
+- name: "yourName"
+  label: "Your Name"
+  type: "string"
+  required: true
+tasks:
+- label: "Print a greeting"
+  type: "io/print"
+  parameters:
+    text: "Hello ${yourName}"
+- label: "Wait for 30 seconds"
+  type: "wait/v1/afterTimeInterval"
+  parameters:
+    timeout: "5s"
+    amount: 30
+    unit: "SECONDS"
+- label: "Print a farewell"
+  type: "io/print"
+  parameters:
+    text: "Goodbye ${yourName}"
