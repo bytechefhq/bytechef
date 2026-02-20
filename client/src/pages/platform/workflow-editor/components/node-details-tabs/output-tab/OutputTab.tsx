@@ -108,6 +108,7 @@ const OutputTab = ({
                             currentNode={currentNode}
                             handlePredefinedOutputSchemaClick={handlePredefinedOutputSchemaClick}
                             handleTestOperationClick={handleTestOperationClick}
+                            isClusterElement={!!clusterElementType}
                             outputSchema={outputSchema}
                             sampleOutput={sampleOutput}
                             saveWorkflowNodeTestOutputMutation={saveWorkflowNodeTestOutputMutation}
