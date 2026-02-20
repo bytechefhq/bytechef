@@ -329,6 +329,7 @@ public class ExampleComponentHandler implements ComponentHandler {
 
 **Checkstyle**:
 - Test method names must be camelCase without underscores (e.g., `testExecuteSuccess` not `testExecute_Success`)
+- `TODO:` comments are forbidden (`TodoComment` rule) — rewrite as plain comments describing intent, or implement the work
 
 ### Spring Boot Best Practices
 
@@ -482,6 +483,8 @@ npm run storybook
 5. **Test Actions Individually**: Use the component test feature to test individual actions
 
 ### Code Quality Workflow
+- When committing, only stage files directly modified by the current task — do not include pre-existing unstaged changes that are unrelated
+
 Before committing code, ensure:
 ```bash
 # Server-side
