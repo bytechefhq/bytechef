@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ServerApplication (Fast Dev)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="bytechef.server.apps.server-app.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.bytechef.server.ServerApplication" />
+    <option name="ACTIVE_PROFILES" value="dev,local,intellij" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <envs>
+      <env name="SPRING_OUTPUT_ANSI_ENABLED" value="always" />
+    </envs>
+    <option name="VM_PARAMETERS" value="-Xms512m -Xmx2g -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseStringDeduplication -XX:+TieredCompilation -XX:TieredStopAtLevel=1 --enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

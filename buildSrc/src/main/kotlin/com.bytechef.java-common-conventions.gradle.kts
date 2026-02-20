@@ -40,6 +40,11 @@ idea {
         excludeDirs.addAll(files("node_modules"))
         sourceDirs.add(file("build/generated/sources/annotationProcessor/java/main"))
         generatedSourceDirs.add(file("build/generated/sources/annotationProcessor/java/main"))
+
+        // Use JAR outputs instead of exploded class directories for the faster IntelliJ startup
+        // This is especially important for component modules loaded via ServiceLoader
+        // isDownloadSources = true
+        // isDownloadJavadoc = false
     }
 }
 
