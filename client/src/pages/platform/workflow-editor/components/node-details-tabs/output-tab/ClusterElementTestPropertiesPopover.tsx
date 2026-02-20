@@ -57,7 +57,7 @@ const ClusterElementTestPropertiesPopover = ({
                             <fieldset className="space-y-4 border-0 p-0">
                                 <Properties
                                     control={control}
-                                    controlPath="parameters"
+                                    controlPath=""
                                     formState={formState}
                                     properties={propertiesWithDefaults}
                                 />
