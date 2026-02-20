@@ -32,8 +32,6 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class WorkflowCallableTrigger {
@@ -57,7 +55,6 @@ public class WorkflowCallableTrigger {
         Parameters inputParameters, Parameters connectionParameters, TriggerContext context) {
 
         String inputSchema = inputParameters.getString(INPUT_SCHEMA);
-        List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
         if (inputSchema != null) {
             ModifiableValueProperty<?, ?> input = (ModifiableValueProperty<?, ?>) context.outputSchema(
