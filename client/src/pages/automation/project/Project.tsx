@@ -15,6 +15,7 @@ import {useCreateConnectionMutation} from '@/shared/mutations/automation/connect
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const Project = () => {
@@ -55,13 +56,20 @@ const Project = () => {
         <div className="flex w-full">
             <WorkflowTestRunLeaveDialog onCancel={cancelLeave} onConfirm={confirmLeave} open={showLeaveDialog} />
 
-            {projectLeftSidebarOpen && projects && (
-                <ProjectsLeftSidebar
-                    bottomResizablePanelRef={bottomResizablePanelRef}
-                    currentWorkflowId={workflow.id!}
-                    onProjectClick={handleProjectClick}
-                    projectId={projectId}
-                />
+            {projects && (
+                <div
+                    className={twMerge(
+                        'shrink-0 overflow-hidden transition-[width,opacity] duration-300 ease-out',
+                        projectLeftSidebarOpen ? 'w-96 opacity-100' : 'w-0 opacity-0'
+                    )}
+                >
+                    <ProjectsLeftSidebar
+                        bottomResizablePanelRef={bottomResizablePanelRef}
+                        currentWorkflowId={workflow.id!}
+                        onProjectClick={handleProjectClick}
+                        projectId={projectId}
+                    />
+                </div>
             )}
 
             <div className="flex w-full flex-col">
