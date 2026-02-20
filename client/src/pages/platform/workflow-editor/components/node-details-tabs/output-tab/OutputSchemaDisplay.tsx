@@ -11,6 +11,7 @@ import PropertyField from '@/pages/platform/workflow-editor/components/PropertyF
 import SchemaProperties from '@/pages/platform/workflow-editor/components/SchemaProperties';
 import {PropertyAllType} from '@/shared/types';
 import {MoreHorizontalIcon} from 'lucide-react';
+import {ReactNode} from 'react';
 
 interface OutputSchemaDisplayProps {
     connectionMissing: boolean;
@@ -23,6 +24,7 @@ interface OutputSchemaDisplayProps {
     sampleOutput?: object;
     saveWorkflowNodeTestOutputMutation: {isPending: boolean};
     setShowUploadDialog: (show: boolean) => void;
+    testActionButton?: ReactNode;
     variablePropertiesDefined?: boolean;
 }
 
@@ -37,6 +39,7 @@ const OutputSchemaDisplay = ({
     sampleOutput,
     saveWorkflowNodeTestOutputMutation,
     setShowUploadDialog,
+    testActionButton,
     variablePropertiesDefined,
 }: OutputSchemaDisplayProps) => {
     const hasProperties = Boolean(outputSchema && 'properties' in outputSchema && outputSchema.properties);
@@ -48,14 +51,15 @@ const OutputSchemaDisplay = ({
                 <h3 className="text-sm text-gray-500">Output Schema</h3>
 
                 <ButtonGroup>
-                    {!variablePropertiesDefined && (
-                        <Button
-                            disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
-                            label={`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
-                            onClick={handleTestOperationClick}
-                            variant="outline"
-                        />
-                    )}
+                    {!variablePropertiesDefined &&
+                        (testActionButton || (
+                            <Button
+                                disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
+                                label={`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
+                                onClick={handleTestOperationClick}
+                                variant="outline"
+                            />
+                        ))}
 
                     {variablePropertiesDefined && (
                         <Button
