@@ -131,6 +131,9 @@ include("server:libs:core:rest:rest-impl")
 include("server:libs:core:tenant:tenant-api")
 include("server:libs:core:tenant:tenant-single-service")
 
+include("server:libs:licence:licence-api")
+include("server:libs:licence:licence-impl")
+
 include("server:libs:platform:platform-api")
 include("server:libs:platform:platform-security:platform-security-api")
 include("server:libs:platform:platform-security:platform-security-graphql")
@@ -550,6 +553,8 @@ include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-coordinator
 include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-api")
 include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest")
 include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service")
+
+include("server:ee:libs:licence:licence-impl")
 
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-api")
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-graphql")
