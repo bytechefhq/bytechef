@@ -1,12 +1,14 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
+import {ReactNode} from 'react';
 
 interface OutputSchemaCreationControlsProps {
     handleTestOperationClick: () => void;
     outputDefined?: boolean;
-    setShowUploadDialog: (show: boolean) => void;
     saveWorkflowNodeTestOutputMutationPending: boolean;
+    setShowUploadDialog: (show: boolean) => void;
     showUploadSampleOutputButton?: boolean;
+    testActionButton?: ReactNode;
     trigger?: boolean;
     uploadSampleOutputRequestMutationPending: boolean;
     variablePropertiesDefined?: boolean;
@@ -18,6 +20,7 @@ const OutputSchemaCreationControls = ({
     saveWorkflowNodeTestOutputMutationPending,
     setShowUploadDialog,
     showUploadSampleOutputButton = false,
+    testActionButton,
     trigger = false,
     uploadSampleOutputRequestMutationPending,
     variablePropertiesDefined = false,
@@ -47,12 +50,14 @@ const OutputSchemaCreationControls = ({
             <div className="flex flex-col gap-4">
                 {!variablePropertiesDefined && (
                     <div className="flex w-full flex-col gap-3">
-                        <Button
-                            disabled={saveWorkflowNodeTestOutputMutationPending}
-                            label={`Test ${trigger ? 'Trigger' : 'Action'}`}
-                            onClick={handleTestOperationClick}
-                            type="button"
-                        />
+                        {testActionButton || (
+                            <Button
+                                disabled={saveWorkflowNodeTestOutputMutationPending}
+                                label={`Test ${trigger ? 'Trigger' : 'Action'}`}
+                                onClick={handleTestOperationClick}
+                                type="button"
+                            />
+                        )}
 
                         {showUploadSampleOutputButton && <span className="text-center">or</span>}
                     </div>

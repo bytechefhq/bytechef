@@ -4,11 +4,13 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Input} from '@/components/ui/input';
+import ClusterElementTestPropertiesPopover from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/ClusterElementTestPropertiesPopover';
 import OutputSchemaCreationControls from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaCreationControls';
 import OutputSchemaDisplay from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaDisplay';
 import OutputTabSampleDataDialog from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabSampleDataDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import DialogLoader from '@/shared/components/DialogLoader';
+import {useSaveClusterElementTestOutputMutation} from '@/shared/middleware/graphql';
 import {TriggerType} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteWorkflowNodeTestOutputMutation,
@@ -17,11 +19,12 @@ import {
 } from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
 import {
     WorkflowNodeOutputKeys,
+    useGetClusterElementOutputQuery,
     useGetWorkflowNodeOutputQuery,
 } from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useCheckWorkflowNodeTestOutputExistsQuery} from '@/shared/queries/platform/workflowNodeTestOutputs.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {NodeDataType} from '@/shared/types';
+import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {AlertCircleIcon, ClipboardIcon} from 'lucide-react';
@@ -29,27 +32,36 @@ import {Suspense, useCallback, useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface OutputTabProps {
+    clusterElementType?: string;
     connectionMissing: boolean;
     currentNode: NodeDataType;
+    currentOperationProperties?: PropertyAllType[];
     outputDefined?: boolean;
     outputFunctionDefined?: boolean;
+    parentWorkflowNodeName?: string;
     variablePropertiesDefined?: boolean;
     workflowId: string;
 }
 
 const OutputTab = ({
+    clusterElementType,
     connectionMissing,
     currentNode,
+    currentOperationProperties,
     outputDefined,
     outputFunctionDefined,
+    parentWorkflowNodeName,
     variablePropertiesDefined = false,
     workflowId,
 }: OutputTabProps) => {
+    const [testPropertiesPopoverOpen, setTestPropertiesPopoverOpen] = useState(false);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
     const [startWebhookTestDate, setStartWebhookTestDate] = useState(new Date());
     const [webhookTestCancelEnabled, setWebhookTestCancelEnabled] = useState(false);
     const [webhookTestUrl, setWebhookTestUrl] = useState<string | undefined>(undefined);
+
+    const isClusterElement = !!clusterElementType && !!parentWorkflowNodeName;
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -61,14 +73,38 @@ const OutputTab = ({
     const {webhookTriggerTestApi} = useWorkflowEditor();
 
     const {
-        data: workflowNodeOutput,
-        isFetching: workflowNodeOutputIsFetching,
-        refetch: workflowNodeOutputRefetch,
-    } = useGetWorkflowNodeOutputQuery({
-        environmentId: currentEnvironmentId,
-        id: workflowId!,
-        workflowNodeName: currentNode?.name as string,
-    });
+        data: clusterElementOutput,
+        isFetching: clusterElementOutputIsFetching,
+        refetch: clusterElementOutputRefetch,
+    } = useGetClusterElementOutputQuery(
+        {
+            clusterElementType: clusterElementType!,
+            clusterElementWorkflowNodeName: currentNode?.name as string,
+            environmentId: currentEnvironmentId,
+            id: workflowId!,
+            workflowNodeName: parentWorkflowNodeName!,
+        },
+        isClusterElement
+    );
+
+    const {
+        data: regularNodeOutput,
+        isFetching: regularNodeOutputIsFetching,
+        refetch: regularNodeOutputRefetch,
+    } = useGetWorkflowNodeOutputQuery(
+        {
+            environmentId: currentEnvironmentId,
+            id: workflowId!,
+            workflowNodeName: currentNode?.name as string,
+        },
+        !isClusterElement
+    );
+
+    const workflowNodeOutput = isClusterElement ? clusterElementOutput : regularNodeOutput;
+    const workflowNodeOutputIsFetching = isClusterElement
+        ? clusterElementOutputIsFetching
+        : regularNodeOutputIsFetching;
+    const workflowNodeOutputRefetch = isClusterElement ? clusterElementOutputRefetch : regularNodeOutputRefetch;
 
     const {outputSchema, placeholder, sampleOutput} =
         workflowNodeOutput?.outputResponse || workflowNodeOutput?.variableOutputResponse || {};
@@ -80,27 +116,27 @@ const OutputTab = ({
         workflowNodeName: currentNode?.name as string,
     });
 
+    const invalidateNodeOutputs = useCallback(() => {
+        queryClient.invalidateQueries({
+            queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId],
+        });
+    }, [queryClient, workflowId]);
+
     const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId],
-            });
-        },
+        onSuccess: invalidateNodeOutputs,
+    });
+
+    const saveClusterElementTestOutputMutation = useSaveClusterElementTestOutputMutation({
+        onSuccess: invalidateNodeOutputs,
     });
 
     const saveWorkflowNodeTestOutputMutation = useSaveWorkflowNodeTestOutputMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId],
-            });
-        },
+        onSuccess: invalidateNodeOutputs,
     });
 
     const uploadSampleOutputRequestMutation = useUploadSampleOutputRequestMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId],
-            });
+            invalidateNodeOutputs();
 
             setShowUploadDialog(false);
         },
@@ -126,8 +162,39 @@ const OutputTab = ({
         [currentEnvironmentId, currentNode.name, uploadSampleOutputRequestMutation, workflowId]
     );
 
+    const handleClusterElementTestSubmit = useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (inputParameters: Record<string, any>) => {
+            if (!clusterElementType || !parentWorkflowNodeName) {
+                return;
+            }
+
+            saveClusterElementTestOutputMutation.mutate(
+                {
+                    clusterElementType,
+                    clusterElementWorkflowNodeName: currentNode.name,
+                    environmentId: currentEnvironmentId,
+                    inputParameters,
+                    workflowId,
+                    workflowNodeName: parentWorkflowNodeName,
+                },
+                {
+                    onSuccess: () => setTestPropertiesPopoverOpen(false),
+                }
+            );
+        },
+        [
+            clusterElementType,
+            currentEnvironmentId,
+            currentNode.name,
+            parentWorkflowNodeName,
+            saveClusterElementTestOutputMutation,
+            workflowId,
+        ]
+    );
+
     const handleTestOperationClick = useCallback(() => {
-        if (!currentNode.trigger || (currentNode.trigger && currentNode?.triggerType === TriggerType.Polling)) {
+        if (!currentNode.trigger || currentNode.triggerType === TriggerType.Polling) {
             saveWorkflowNodeTestOutputMutation.mutate({
                 environmentId: currentEnvironmentId,
                 id: workflowId,
@@ -205,7 +272,34 @@ const OutputTab = ({
         });
     }, [currentEnvironmentId, webhookTriggerTestApi, workflowId, workflowNodeOutputRefetch]);
 
-    const testing = saveWorkflowNodeTestOutputMutation.isPending || startWebhookTest;
+    const hasClusterElementProperties = isClusterElement && !!currentOperationProperties?.length;
+
+    function renderClusterElementTestButton() {
+        if (!hasClusterElementProperties || !currentOperationProperties) {
+            return undefined;
+        }
+
+        return (
+            <ClusterElementTestPropertiesPopover
+                currentNode={currentNode}
+                onOpenChange={setTestPropertiesPopoverOpen}
+                onSubmit={handleClusterElementTestSubmit}
+                open={testPropertiesPopoverOpen}
+                properties={currentOperationProperties}
+            >
+                <Button
+                    disabled={connectionMissing || saveClusterElementTestOutputMutation.isPending}
+                    label="Test Action"
+                    variant="outline"
+                />
+            </ClusterElementTestPropertiesPopover>
+        );
+    }
+
+    const testing =
+        saveClusterElementTestOutputMutation.isPending ||
+        saveWorkflowNodeTestOutputMutation.isPending ||
+        startWebhookTest;
 
     useEffect(() => {
         return () => {
@@ -242,6 +336,7 @@ const OutputTab = ({
                             sampleOutput={sampleOutput}
                             saveWorkflowNodeTestOutputMutation={saveWorkflowNodeTestOutputMutation}
                             setShowUploadDialog={setShowUploadDialog}
+                            testActionButton={renderClusterElementTestButton()}
                             variablePropertiesDefined={variablePropertiesDefined}
                         />
                     )}
@@ -253,6 +348,7 @@ const OutputTab = ({
                             saveWorkflowNodeTestOutputMutationPending={saveWorkflowNodeTestOutputMutation.isPending}
                             setShowUploadDialog={setShowUploadDialog}
                             showUploadSampleOutputButton={outputDefined}
+                            testActionButton={renderClusterElementTestButton()}
                             trigger={currentNode.trigger}
                             uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutation.isPending}
                             variablePropertiesDefined={variablePropertiesDefined}
