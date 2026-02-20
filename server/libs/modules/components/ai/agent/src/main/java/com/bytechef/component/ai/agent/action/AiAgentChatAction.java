@@ -26,6 +26,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -87,7 +88,7 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
                     toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
                     toolExecutionEvent.inputs(), toolExecutionEvent.output()));
 
-            if (context.isEditorEnvironment()) {
+            if (context.isEditorEnvironment() && ((ActionContextAware) context).getJobId() == null) {
                 toolExecutionEvents.add(toolExecutionEvent);
             }
         };
