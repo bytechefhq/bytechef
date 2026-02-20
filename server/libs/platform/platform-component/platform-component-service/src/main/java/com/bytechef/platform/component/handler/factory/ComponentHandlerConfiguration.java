@@ -16,17 +16,22 @@
 
 package com.bytechef.platform.component.handler.factory;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 
 /**
  * @author Ivica Cardic
  */
-public class ComponentHandlerBeanFactoryPostProcessorTest {
+@Configuration(proxyBeanMethods = false)
+@Import(ComponentHandlerBeanRegistrar.class)
+class ComponentHandlerConfiguration {
 
-    @Disabled
-    @Test
-    public void testPostProcessBeanFactory() {
-        // TODO
+    @Async
+    @EventListener(ContextRefreshedEvent.class)
+    void onContextRefreshed() {
+        // ComponentHandlerBeanRegistrar.COMPONENT_HANDLER_ENTRIES_SUPPLIER.get();
     }
 }
