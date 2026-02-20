@@ -111,7 +111,7 @@ class MicrosoftUtilsTest {
             .thenReturn(Map.of("error", Map.of("message", "Something went wrong")));
 
         ProviderException providerException = MicrosoftUtils.processErrorResponse(
-            400, "{\"error\":{\"message\":\"Something went wrong\"}}", mockedContext);
+            400, "{\"error\":{\"message\":\"Something went wrong\"}}", Map.of(), mockedContext);
 
         assertEquals(400, providerException.getStatusCode());
         assertEquals("Something went wrong", providerException.getMessage());
@@ -122,7 +122,8 @@ class MicrosoftUtilsTest {
         when(mockedContext.json(any()))
             .thenReturn("not a map");
 
-        ProviderException providerException = MicrosoftUtils.processErrorResponse(500, "raw error", mockedContext);
+        ProviderException providerException = MicrosoftUtils.processErrorResponse(
+            500, "raw error", Map.of(), mockedContext);
 
         assertEquals(500, providerException.getStatusCode());
         assertEquals("raw error", providerException.getMessage());

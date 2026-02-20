@@ -49,7 +49,7 @@ public class GoogleSheetsClearSheetAction {
             SPREADSHEET_ID_PROPERTY,
             SHEET_ID_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY)
-        .processErrorResponse((statusCode, body, context) -> {
+        .processErrorResponse((statusCode, body, headers, context) -> {
             throw new RuntimeException("Google Sheets API returned status code " + statusCode + " with body " + body);
         })
         .perform(GoogleSheetsClearSheetAction::perform);

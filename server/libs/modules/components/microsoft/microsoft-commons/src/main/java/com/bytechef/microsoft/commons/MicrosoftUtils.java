@@ -82,15 +82,25 @@ public class MicrosoftUtils {
         return otherItems;
     }
 
-    public static ProviderException processErrorResponse(int statusCode, Object body, Context context) {
-        String message;
+    public static ProviderException processErrorResponse(
+        int statusCode, Object body, Map<String, List<String>> headers, Context context) {
 
-        Object json = context.json(json1 -> json1.read((String) body));
+        String message = body == null || body.toString()
+            .isEmpty() ? "" : body.toString();
 
-        if (json instanceof Map<?, ?> map && map.get("error") instanceof Map<?, ?> errorMap) {
-            message = (String) errorMap.get("message");
+        if (body == null || body.toString()
+            .isEmpty()) {
+            List<String> errorReasons = headers.get("401_error_reason");
+
+            if (errorReasons != null && !errorReasons.isEmpty()) {
+                message = errorReasons.getFirst();
+            }
         } else {
-            message = body == null ? null : body.toString();
+            Object json = context.json(json1 -> json1.read((String) body));
+
+            if (json instanceof Map<?, ?> map && map.get("error") instanceof Map<?, ?> errorMap) {
+                message = (String) errorMap.get("message");
+            }
         }
 
         return new ProviderException(statusCode, message);
