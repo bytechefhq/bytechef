@@ -128,6 +128,10 @@ Components are located in `server/libs/modules/components/` and follow this patt
 
 ### Enterprise Edition (EE) Microservices
 The `server/ee/` directory contains microservices for distributed deployment:
+
+**EE Code Conventions:**
+- Use ByteChef Enterprise license header (not Apache 2.0) for all files under `server/ee/`
+- Add `@version ee` Javadoc tag to all classes under `server/ee/`
 - `api-gateway-app/` - API Gateway with routing
 - `ai-copilot-app/` - AI Copilot service for workflow assistance
 - `config-server-app/` - Spring Cloud Config server
@@ -174,7 +178,7 @@ public class ExampleComponentHandler implements ComponentHandler {
 2. **Testing Pattern**:
     - Component tests are in `./src/test/java/com/bytechef/component/`
     - Running tests auto-generates `.json` definition files in `./src/test/resources/definition/`
-    - Delete existing `.json` files before running tests to regenerate them
+    - Delete existing `.json` files AND `build/resources/test/definition/` before running tests to regenerate them
 
 3. **Documentation**:
     - Component documentation goes in `./src/main/resources/README.md`
@@ -520,6 +524,8 @@ cd cli
 - Mock external dependencies using Mockito
 - Test component actions and triggers in isolation
 - Aim for high code coverage (target: 80%+)
+- Unit test class names must end with `Test` suffix only (NOT `IntTest`) — e.g., `KnowledgeBaseFileStorageTest`
+- Drop `Impl` from test class names — test the interface contract, not the implementation detail
 
 ### Integration Testing
 - All integration test classes must end with `IntTest` suffix
@@ -543,10 +549,29 @@ class WorkflowServiceIntTest {
 
 ### Component Testing
 - Component tests auto-generate JSON definition files in `src/test/resources/definition/`
-- Delete existing `.json` files before running tests to regenerate them
+- Delete existing `.json` files AND `build/resources/test/definition/` before running tests to regenerate them (classpath serves from build output)
 - Test both actions and triggers
 - Verify connection configurations
 - Test error handling and edge cases
+
+### Test ObjectMapper Setup
+- Use `@ExtendWith(ObjectMapperSetupExtension.class)` for tests that use `JsonUtils`, `MapUtils`, or `ConvertUtils` — do NOT manually call `setObjectMapper()` in test configurations
+
+### Task Dispatcher Definition Snapshot Tests
+- `DefinitionFactoryTest` classes use `JsonFileAssert` (snapshot pattern): if the JSON file is missing, it's auto-generated; if present, it's compared
+- When task dispatcher definition models change (new fields), delete snapshot JSON files from BOTH `src/test/resources/definition/` and `build/resources/test/definition/`, then rerun tests
+
+### EE Microservice Remote Client Pattern
+- EE apps (`server/ee/apps/`) use remote client stubs instead of local service implementations
+- When adding new SPI interfaces to platform modules, create corresponding `@Component @ConditionalOnEEVersion` stub classes in the relevant `*-remote-client` module (e.g., `automation-configuration-remote-client`)
+- Stubs throw `UnsupportedOperationException` — they satisfy Spring DI; actual work is done via REST calls
+- `@ConditionalOnEEVersion` requires `bytechef.edition=ee` in the app's config
+- For lightweight EE apps (e.g., `runtime-job-app`) that can't pull in full remote client modules, use `@TestConfiguration` with mock/stub beans in the integration test
+
+### Component Integration Test Configuration
+- Component integration tests use `@ComponentIntTest` → `ComponentTestIntConfiguration` in `platform-component-test-int-support`
+- `ComponentTestIntConfiguration` only scans `com.bytechef.platform.component` — beans from other packages (e.g., `com.bytechef.file.storage`) must be manually registered
+- `Base64FileStorageService.getType()` returns `"JDBC"`, so test property `bytechef.file-storage.provider=jdbc` must be set to match
 
 ### Client-Side Testing
 ```bash
