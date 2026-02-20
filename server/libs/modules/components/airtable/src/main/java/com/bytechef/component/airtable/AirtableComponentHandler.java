@@ -44,7 +44,7 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
     @Override
     public ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
         modifiableActionDefinition.processErrorResponse(
-            (statusCode, body, context) -> {
+            (statusCode, body, headers, context) -> {
                 String message;
 
                 if (body instanceof Map<?, ?> map) {

@@ -122,7 +122,9 @@ public class GoogleUtils {
             mimeType, isEqualMimetype, connectionParameters);
     }
 
-    public static ProviderException processErrorResponse(int statusCode, Object body, Context context) {
+    public static ProviderException processErrorResponse(
+        int statusCode, Object body, Map<String, List<String>> headers, Context context) {
+
         String message;
 
         Object json = context.json(json1 -> json1.read((String) body));

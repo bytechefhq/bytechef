@@ -196,7 +196,7 @@ class GoogleUtilsTest {
             .thenReturn(Map.of("error", Map.of("message", "Rate limit exceeded")));
 
         ProviderException providerException = GoogleUtils.processErrorResponse(
-            429, "{\"error\":{\"message\":\"...\"}}", mockedContext);
+            429, "{\"error\":{\"message\":\"...\"}}", Map.of(), mockedContext);
 
         assertEquals(429, providerException.getStatusCode());
         assertEquals("Rate limit exceeded", providerException.getMessage());
@@ -207,7 +207,8 @@ class GoogleUtilsTest {
         when(mockedContext.json(any()))
             .thenReturn("not a map");
 
-        ProviderException providerException = GoogleUtils.processErrorResponse(500, "raw-body-text", mockedContext);
+        ProviderException providerException = GoogleUtils.processErrorResponse(
+            500, "raw-body-text", Map.of(), mockedContext);
 
         assertEquals(500, providerException.getStatusCode());
         assertEquals("raw-body-text", providerException.getMessage());
