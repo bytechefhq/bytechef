@@ -10,7 +10,12 @@ import ConnectionTab from '@/pages/platform/workflow-editor/components/node-deta
 import OutputTab from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
-import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, TASK_DISPATCHER_DATA_KEY_MAP} from '@/shared/constants';
+import {
+    CLUSTER_ELEMENT_TYPE_TOOLS,
+    CONDITION_CASE_FALSE,
+    CONDITION_CASE_TRUE,
+    TASK_DISPATCHER_DATA_KEY_MAP,
+} from '@/shared/constants';
 import {
     ActionDefinition,
     ActionDefinitionApi,
@@ -370,11 +375,15 @@ const WorkflowNodeDetailsPanel = ({
             !!currentNodeName &&
             currentNodeName !== 'manual' &&
             currentNodeName === currentClusterElementName &&
-            !!currentNode?.clusterElementType
+            !!currentNode.clusterElementType
     );
 
     const {data: workflowNodeParameterDisplayConditions} = displayConditionsQuery;
     const {data: clusterElementParameterDisplayConditions} = clusterElementDisplayConditionsQuery;
+
+    const activeDisplayConditionsQuery = currentNode?.clusterElementType
+        ? clusterElementDisplayConditionsQuery
+        : displayConditionsQuery;
 
     const currentOperationDefinition = useMemo(() => {
         if (currentNode?.trigger) {
@@ -415,7 +424,14 @@ const WorkflowNodeDetailsPanel = ({
         currentClusterElementDefinition?.outputSchemaDefined;
 
     const showOutputTab = useMemo(() => {
-        if (currentNode?.clusterElementType && currentNode.clusterElementType !== 'tools') {
+        if (currentNode?.clusterElementType && currentNode.clusterElementType !== CLUSTER_ELEMENT_TYPE_TOOLS) {
+            return false;
+        }
+
+        if (
+            currentNode?.clusterElementType === CLUSTER_ELEMENT_TYPE_TOOLS &&
+            !rootClusterElementNodeData?.workflowNodeName
+        ) {
             return false;
         }
 
@@ -428,7 +444,7 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         return true;
-    }, [currentNode?.clusterElementType, currentOperationDefinition]);
+    }, [currentNode?.clusterElementType, currentOperationDefinition, rootClusterElementNodeData?.workflowNodeName]);
 
     const currentWorkflowTrigger = useMemo(
         () => workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName),
@@ -1438,11 +1454,7 @@ const WorkflowNodeDetailsPanel = ({
                                         (!operationDataMissing && currentOperationProperties?.length ? (
                                             <Properties
                                                 customClassName="p-4"
-                                                displayConditionsQuery={
-                                                    currentNode?.clusterElementType
-                                                        ? clusterElementDisplayConditionsQuery
-                                                        : displayConditionsQuery
-                                                }
+                                                displayConditionsQuery={activeDisplayConditionsQuery}
                                                 key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
                                                 operationName={currentOperationName}
                                                 properties={currentOperationProperties}
