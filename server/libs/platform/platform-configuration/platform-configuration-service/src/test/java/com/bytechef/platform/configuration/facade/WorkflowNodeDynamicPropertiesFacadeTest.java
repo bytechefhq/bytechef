@@ -38,12 +38,14 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,6 +75,9 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     private Evaluator evaluator;
 
     @Mock
+    private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+
+    @Mock
     private TriggerDefinitionFacade triggerDefinitionFacade;
 
     @Mock
@@ -90,7 +95,8 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     void setUp() {
         workflowNodeDynamicPropertiesFacade = new WorkflowNodeDynamicPropertiesFacadeImpl(
             actionDefinitionFacade, clusterElementDefinitionFacade, clusterElementDefinitionService, evaluator,
-            triggerDefinitionFacade, workflowService, workflowNodeOutputFacade, workflowTestConfigurationService);
+            taskDispatcherDefinitionService, triggerDefinitionFacade, workflowService, workflowNodeOutputFacade,
+            workflowTestConfigurationService);
     }
 
     @Test
@@ -272,7 +278,7 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.fetch(workflow, workflowNodeName))
                 .thenReturn(Optional.empty());
 
-            List<Property> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
+            List<? extends BaseProperty> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
                 workflowId, workflowNodeName, propertyName, List.of(), environmentId);
 
             assertEquals(expectedProperties, result);
@@ -317,7 +323,7 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.fetch(workflow, workflowNodeName))
                 .thenReturn(Optional.of(workflowTrigger));
 
-            List<Property> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
+            List<? extends BaseProperty> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
                 workflowId, workflowNodeName, propertyName, List.of(), environmentId);
 
             assertEquals(expectedProperties, result);
