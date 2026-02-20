@@ -114,6 +114,9 @@ public class ApplicationProperties {
     /** Multi-tenancy configuration */
     private Tenant tenant = new Tenant();
 
+    /** User guiding configuration */
+    private UserGuiding userGuiding = new UserGuiding();
+
     /** Webhook URL for external integrations */
     private String webhookUrl;
     private Worker worker = new Worker();
@@ -215,6 +218,10 @@ public class ApplicationProperties {
 
     public Tenant getTenant() {
         return tenant;
+    }
+
+    public UserGuiding getUserGuiding() {
+        return userGuiding;
     }
 
     public String getWebhookUrl() {
@@ -323,6 +330,10 @@ public class ApplicationProperties {
 
     public void setTenant(Tenant tenant) {
         this.tenant = tenant;
+    }
+
+    public void setUserGuiding(UserGuiding userGuiding) {
+        this.userGuiding = userGuiding;
     }
 
     public void setWebhookUrl(String webhookUrl) {
@@ -2952,6 +2963,34 @@ public class ApplicationProperties {
 
         public void setMode(Mode mode) {
             this.mode = mode;
+        }
+    }
+
+    /**
+     * User guiding configuration for in-application tutorials.
+     */
+    public static class UserGuiding {
+
+        /** Container ID for the UserGuiding SDK */
+        private String containerId;
+
+        /** Whether user guiding is enabled */
+        private boolean enabled;
+
+        public String getContainerId() {
+            return containerId;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setContainerId(String containerId) {
+            this.containerId = containerId;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
     }
 

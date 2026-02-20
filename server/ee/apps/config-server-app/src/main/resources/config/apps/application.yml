@@ -27,6 +27,9 @@ info:
   signUp:
     activationRequired: ${bytechef.signUp.activationRequired:false}
     enabled: ${bytechef.signUp.enabled}
+  userGuiding:
+    containerId: ${bytechef.userGuiding.containerId:}
+    enabled: ${bytechef.userGuiding.enabled:false}
 
 management:
   endpoints:

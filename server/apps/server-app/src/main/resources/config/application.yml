@@ -34,6 +34,9 @@ info:
     enabled: ${bytechef.sign-up.enabled}
   socialLogin:
     enabled: ${bytechef.security.social-login.enabled}
+  userGuiding:
+    containerId: ${bytechef.user-guiding.container-id:}
+    enabled: ${bytechef.user-guiding.enabled}
 
 logging:
   level:
