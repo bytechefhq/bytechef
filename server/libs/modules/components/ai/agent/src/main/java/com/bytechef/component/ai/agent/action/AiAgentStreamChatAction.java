@@ -92,6 +92,11 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
 
         ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
+            context.log(log -> log.info(
+                "Tool execution: {} | Reasoning: {} | Confidence: {} | Inputs: {} | Output: {}",
+                toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
+                toolExecutionEvent.inputs(), toolExecutionEvent.output()));
+
             Map<String, Object> eventData = new LinkedHashMap<>();
 
             eventData.put("__eventType", "tool_execution");
