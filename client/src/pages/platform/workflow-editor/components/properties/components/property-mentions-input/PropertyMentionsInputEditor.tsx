@@ -51,6 +51,7 @@ interface PropertyMentionsInputEditorProps {
     componentDefinitions: ComponentDefinitionBasic[];
     controlType?: string;
     dataPills: DataPillType[];
+    description?: string;
     elementId?: string;
     handleFromAiClick?: (fromAi: boolean) => void;
     isFormulaMode?: boolean;
@@ -76,6 +77,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             componentDefinitions,
             controlType,
             dataPills,
+            description,
             elementId,
             handleFromAiClick,
             isFormulaMode,
@@ -314,7 +316,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
 
             if (isFromAi) {
-                value = `fromAi(${path}, 'description')`;
+                value = description ? `fromAi('${path}', '${description}')` : `fromAi('${path}')`;
 
                 return;
             }
