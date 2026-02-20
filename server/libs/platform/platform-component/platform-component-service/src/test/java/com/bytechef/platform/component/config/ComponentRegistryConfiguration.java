@@ -26,6 +26,7 @@ import com.bytechef.component.petstore.PetstoreComponentHandler;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
@@ -89,7 +90,18 @@ public class ComponentRegistryConfiguration {
 
         applicationProperties.setComponent(component);
 
+        ApplicationProperties.FileStorage fileStorage = new ApplicationProperties.FileStorage();
+
+        fileStorage.setProvider(ApplicationProperties.FileStorage.Provider.JDBC);
+
+        applicationProperties.setFileStorage(fileStorage);
+
         return applicationProperties;
+    }
+
+    @Bean
+    FileStorageServiceRegistry fileStorageServiceRegistry() {
+        return new FileStorageServiceRegistry(List.of(new Base64FileStorageService()));
     }
 
     @Bean
