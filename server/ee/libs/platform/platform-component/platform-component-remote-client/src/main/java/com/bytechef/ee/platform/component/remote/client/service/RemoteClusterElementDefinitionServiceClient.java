@@ -117,7 +117,7 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, int connectionVersion, String componentOperationName,
-        int statusCode, Object body) {
+        int statusCode, Object body, Map<String, List<String>> headers) {
 
         throw new UnsupportedOperationException();
     }

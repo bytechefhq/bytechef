@@ -17,6 +17,8 @@
 package com.bytechef.platform.component.service;
 
 import com.bytechef.component.exception.ProviderException;
+import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -26,5 +28,5 @@ public interface OperationDefinitionService {
 
     ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,
-        int statusCode, Object body);
+        int statusCode, Object body, Map<String, List<String>> headers);
 }

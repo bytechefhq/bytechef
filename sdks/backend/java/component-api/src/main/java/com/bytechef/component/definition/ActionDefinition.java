@@ -395,7 +395,9 @@ public interface ActionDefinition {
          * @param actionContext
          * @return
          */
-        ProviderException apply(int statusCode, Object body, ActionContext actionContext) throws Exception;
+        ProviderException
+            apply(int statusCode, Object body, Map<String, List<String>> headers, ActionContext actionContext)
+                throws Exception;
 
     }
 

@@ -18,6 +18,7 @@ package com.bytechef.component.definition;
 
 import com.bytechef.component.exception.ProviderException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -124,7 +125,8 @@ public interface ConnectionDefinition {
          * @return a {@link ProviderException} (or subclass) representing the mapped remote error
          * @throws Exception if the error response cannot be mapped to a {@link ProviderException}
          */
-        ProviderException apply(int statusCode, Object body, Context context) throws Exception;
+        ProviderException apply(int statusCode, Object body, Map<String, List<String>> headers, Context context)
+            throws Exception;
 
     }
 }

@@ -133,7 +133,9 @@ public interface ClusterElementDefinition<T> {
          * @param context
          * @return
          */
-        ProviderException apply(int statusCode, Object body, ClusterElementContext context) throws Exception;
+        ProviderException
+            apply(int statusCode, Object body, Map<String, List<String>> headers, ClusterElementContext context)
+                throws Exception;
     }
 
     /**

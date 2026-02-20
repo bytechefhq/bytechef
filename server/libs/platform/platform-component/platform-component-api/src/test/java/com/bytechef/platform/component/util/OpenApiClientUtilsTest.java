@@ -168,7 +168,8 @@ class OpenApiClientUtilsTest {
             .thenReturn(Map.of("error", "bad"));
 
         ProcessErrorResponseFunction processErrorResponseFunction =
-            (status, body, context) -> new ProviderException(status, String.valueOf(((Map<?, ?>) body).get("error")));
+            (status, body, headers, context) -> new ProviderException(
+                status, String.valueOf(((Map<?, ?>) body).get("error")));
 
         ModifiableStringProperty idProp = string("id").metadata(Map.of("type", PropertyType.PATH));
         List<Property> properties = List.of(idProp);

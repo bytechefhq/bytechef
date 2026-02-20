@@ -222,7 +222,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, int connectionVersion, String componentOperationName,
-        int statusCode, Object body) {
+        int statusCode, Object body, Map<String, List<String>> headers) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, componentOperationName);
@@ -231,9 +231,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             return triggerDefinition.getProcessErrorResponse()
-                .orElseGet(() -> (statusCode1, body1, context1) -> ProviderException.getProviderException(
+                .orElseGet(() -> (statusCode1, body1, headers1, context1) -> ProviderException.getProviderException(
                     statusCode1, body1))
-                .apply(statusCode, body, triggerContext);
+                .apply(statusCode, body, headers, triggerContext);
         } catch (Exception e) {
             throw new ExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
         }

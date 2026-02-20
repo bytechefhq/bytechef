@@ -83,7 +83,8 @@ public class OpenApiClientUtils {
                 throw new ProviderException(response.getStatusCode(), body == null ? null : body.toString());
             } else {
                 try {
-                    throw processErrorResponseFunction.apply(response.getStatusCode(), body, context);
+                    throw processErrorResponseFunction.apply(
+                        response.getStatusCode(), body, response.getHeaders(), context);
                 } catch (Exception e) {
                     throw new ExecutionException(e, ActionDefinitionErrorType.ERROR_RESPONSE_NOT_PROCESSED);
                 }
