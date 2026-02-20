@@ -4,6 +4,7 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Input} from '@/components/ui/input';
+import {useToast} from '@/hooks/use-toast';
 import ClusterElementTestPropertiesPopover from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/ClusterElementTestPropertiesPopover';
 import OutputSchemaCreationControls from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaCreationControls';
 import OutputSchemaDisplay from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaDisplay';
@@ -63,6 +64,8 @@ const OutputTab = ({
 
     const isClusterElement = !!clusterElementType && !!parentWorkflowNodeName;
 
+    const {toast} = useToast();
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const startWebhookTestRef = useRef(false);
@@ -78,11 +81,11 @@ const OutputTab = ({
         refetch: clusterElementOutputRefetch,
     } = useGetClusterElementOutputQuery(
         {
-            clusterElementType: clusterElementType!,
+            clusterElementType: clusterElementType ?? '',
             clusterElementWorkflowNodeName: currentNode?.name as string,
             environmentId: currentEnvironmentId,
             id: workflowId!,
-            workflowNodeName: parentWorkflowNodeName!,
+            workflowNodeName: parentWorkflowNodeName ?? '',
         },
         isClusterElement
     );
@@ -127,6 +130,9 @@ const OutputTab = ({
     });
 
     const saveClusterElementTestOutputMutation = useSaveClusterElementTestOutputMutation({
+        onError: () => {
+            toast({description: 'Failed to test cluster element. Please try again.', variant: 'destructive'});
+        },
         onSuccess: invalidateNodeOutputs,
     });
 
@@ -166,6 +172,11 @@ const OutputTab = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (inputParameters: Record<string, any>) => {
             if (!clusterElementType || !parentWorkflowNodeName) {
+                console.warn('handleClusterElementTestSubmit called without required cluster element context:', {
+                    clusterElementType,
+                    parentWorkflowNodeName,
+                });
+
                 return;
             }
 
@@ -275,7 +286,7 @@ const OutputTab = ({
     const hasClusterElementProperties = isClusterElement && !!currentOperationProperties?.length;
 
     function renderClusterElementTestButton() {
-        if (!hasClusterElementProperties || !currentOperationProperties) {
+        if (!hasClusterElementProperties) {
             return undefined;
         }
 
@@ -285,7 +296,7 @@ const OutputTab = ({
                 onOpenChange={setTestPropertiesPopoverOpen}
                 onSubmit={handleClusterElementTestSubmit}
                 open={testPropertiesPopoverOpen}
-                properties={currentOperationProperties}
+                properties={currentOperationProperties!}
             >
                 <Button
                     disabled={connectionMissing || saveClusterElementTestOutputMutation.isPending}
