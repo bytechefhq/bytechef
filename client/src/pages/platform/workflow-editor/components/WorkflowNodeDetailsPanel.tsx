@@ -25,6 +25,8 @@ interface WorkflowNodeDetailsPanelProps {
     className?: string;
     closeButton?: ReactNode;
     invalidateWorkflowQueries: () => void;
+    onClose?: () => void;
+    panelOpen?: boolean;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
@@ -34,6 +36,8 @@ const WorkflowNodeDetailsPanel = ({
     className,
     closeButton,
     invalidateWorkflowQueries,
+    onClose,
+    panelOpen,
     previousComponentDefinitions,
     updateWorkflowMutation,
     workflowNodeOutputs,
@@ -73,7 +77,7 @@ const WorkflowNodeDetailsPanel = ({
         workflowNodeOutputs,
     });
 
-    if (!workflowNodeDetailsPanelOpen) {
+    if (!(panelOpen ?? workflowNodeDetailsPanelOpen)) {
         return <></>;
     }
 
@@ -135,7 +139,7 @@ const WorkflowNodeDetailsPanel = ({
                                 <Button
                                     aria-label="Close the node details dialog"
                                     icon={<XIcon aria-hidden="true" />}
-                                    onClick={handlePanelClose}
+                                    onClick={onClose || handlePanelClose}
                                     size="icon"
                                     variant="ghost"
                                 />

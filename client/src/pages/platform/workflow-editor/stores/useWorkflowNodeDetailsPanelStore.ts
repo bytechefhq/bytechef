@@ -8,6 +8,9 @@ interface WorkflowNodeDetailsPanelStoreI {
     activeTab: string;
     setActiveTab: (activeTab: string) => void;
 
+    aiAgentNodeDetailsPanelOpen: boolean;
+    setAiAgentNodeDetailsPanelOpen: (aiAgentNodeDetailsPanelOpen: boolean) => void;
+
     connectionDialogAllowed: boolean;
     setConnectionDialogAllowed: (connectionDialogAllowed: boolean) => void;
 
@@ -40,6 +43,10 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
             activeTab: 'description',
             setActiveTab: (activeTab) => set((state) => ({...state, activeTab})),
 
+            aiAgentNodeDetailsPanelOpen: false,
+            setAiAgentNodeDetailsPanelOpen: (aiAgentNodeDetailsPanelOpen) =>
+                set((state) => ({...state, aiAgentNodeDetailsPanelOpen})),
+
             connectionDialogAllowed: true,
             setConnectionDialogAllowed: (connectionDialogAllowed) =>
                 set((state) => ({...state, connectionDialogAllowed})),
@@ -66,6 +73,7 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
 
             reset: () =>
                 set(() => ({
+                    aiAgentNodeDetailsPanelOpen: false,
                     currentComponent: undefined,
                     currentComponentDefinition: undefined,
                     currentNode: undefined,

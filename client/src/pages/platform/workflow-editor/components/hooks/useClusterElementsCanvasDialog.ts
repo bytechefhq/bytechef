@@ -43,6 +43,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         (showAiAgent: boolean) => {
             setShowAiAgentEditor(showAiAgent);
             useTestingModeStore.getState().resetTestingMode();
+            useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
 
             if (agentNodeName) {
                 setEditorPreference(agentNodeName, showAiAgent);
