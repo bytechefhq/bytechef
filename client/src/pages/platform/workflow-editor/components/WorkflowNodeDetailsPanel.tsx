@@ -367,6 +367,7 @@ const WorkflowNodeDetailsPanel = ({
             workflowNodeName: rootClusterElementNodeData?.workflowNodeName as string,
         },
         !!currentNode &&
+            !!currentNodeName &&
             currentNodeName !== 'manual' &&
             currentNodeName === currentClusterElementName &&
             !!currentNode?.clusterElementType
@@ -414,7 +415,7 @@ const WorkflowNodeDetailsPanel = ({
         currentClusterElementDefinition?.outputSchemaDefined;
 
     const showOutputTab = useMemo(() => {
-        if (currentNode?.clusterElementType) {
+        if (currentNode?.clusterElementType && currentNode.clusterElementType !== 'tools') {
             return false;
         }
 
@@ -1290,7 +1291,7 @@ const WorkflowNodeDetailsPanel = ({
             >
                 {currentNode?.workflowNodeName && currentWorkflowNode && (
                     <div className="flex h-full flex-col divide-y divide-muted bg-background">
-                        <header className="flex items-start justify-between p-4 text-lg font-medium">
+                        <header className="flex items-center justify-between p-4 text-lg font-medium">
                             <div className="flex items-center gap-2">
                                 {currentWorkflowNode.icon && (
                                     <InlineSVG
@@ -1437,7 +1438,11 @@ const WorkflowNodeDetailsPanel = ({
                                         (!operationDataMissing && currentOperationProperties?.length ? (
                                             <Properties
                                                 customClassName="p-4"
-                                                displayConditionsQuery={displayConditionsQuery}
+                                                displayConditionsQuery={
+                                                    currentNode?.clusterElementType
+                                                        ? clusterElementDisplayConditionsQuery
+                                                        : displayConditionsQuery
+                                                }
                                                 key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
                                                 operationName={currentOperationName}
                                                 properties={currentOperationProperties}
@@ -1448,14 +1453,17 @@ const WorkflowNodeDetailsPanel = ({
 
                                     {activeTab === 'output' && (
                                         <OutputTab
+                                            clusterElementType={currentNode?.clusterElementType}
                                             connectionMissing={
                                                 (currentComponentDefinition?.connectionRequired ?? false) &&
                                                 !workflowTestConfigurationConnections?.length
                                             }
                                             currentNode={currentNode}
+                                            currentOperationProperties={currentOperationProperties}
                                             key={`${currentNode?.componentName}-${currentNode?.type}_output`}
                                             outputDefined={outputDefined}
                                             outputFunctionDefined={outputFunctionDefined}
+                                            parentWorkflowNodeName={rootClusterElementNodeData?.workflowNodeName}
                                             variablePropertiesDefined={
                                                 currentTaskDispatcherDefinition?.variablePropertiesDefined
                                             }
