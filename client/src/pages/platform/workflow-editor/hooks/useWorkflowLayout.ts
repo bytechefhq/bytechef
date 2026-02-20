@@ -5,9 +5,10 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import filterWorkflowNodeOutputs from '@/pages/platform/workflow-editor/utils/filterWorkflowNodeOutputs';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
@@ -117,44 +118,10 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     let previousComponentDefinitions: ComponentDefinitionBasic[] = [];
 
     if (!currentNode?.trigger && workflowNodeOutputs && componentDefinitions) {
-        const definitionsMap = new Map(
-            [...componentDefinitions, ...(taskDispatcherDefinitions ?? [])].map((def) => [def.name, def])
-        );
-
-        const result = workflowNodeOutputs.reduce(
-            (acc, output) => {
-                const {actionDefinition, taskDispatcherDefinition, triggerDefinition} = output;
-
-                if (
-                    !actionDefinition &&
-                    !triggerDefinition &&
-                    !taskDispatcherDefinition?.outputDefined &&
-                    !taskDispatcherDefinition?.variablePropertiesDefined
-                ) {
-                    return acc;
-                }
-
-                let componentName: string | undefined;
-
-                if (actionDefinition?.componentName) {
-                    componentName = actionDefinition.componentName;
-                } else if (triggerDefinition?.componentName) {
-                    componentName = triggerDefinition.componentName;
-                } else if (taskDispatcherDefinition?.name) {
-                    componentName = taskDispatcherDefinition.name;
-                }
-
-                const matchingDefinition = componentName ? definitionsMap.get(componentName) : undefined;
-
-                if (matchingDefinition) {
-                    acc.definitions.push(matchingDefinition);
-
-                    acc.outputs.push(output);
-                }
-
-                return acc;
-            },
-            {definitions: [] as ComponentDefinitionBasic[], outputs: [] as WorkflowNodeOutput[]}
+        const result = filterWorkflowNodeOutputs(
+            workflowNodeOutputs,
+            componentDefinitions,
+            taskDispatcherDefinitions ?? []
         );
 
         filteredWorkflowNodeOutputs = result.outputs;
