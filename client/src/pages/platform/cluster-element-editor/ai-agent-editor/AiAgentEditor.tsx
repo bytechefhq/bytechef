@@ -5,6 +5,7 @@ import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/component
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
+import {useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface AiAgentEditorProps {
@@ -26,17 +27,19 @@ export default function AiAgentEditor({
     previousComponentDefinitions,
     workflowNodeOutputs,
 }: AiAgentEditorProps) {
+    const aiAgentNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore((state) => state.aiAgentNodeDetailsPanelOpen);
     const currentNodeClusterElementType = useWorkflowNodeDetailsPanelStore(
         (state) => state.currentNode?.clusterElementType
-    );
-    const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
-        (state) => state.workflowNodeDetailsPanelOpen
     );
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
+    const handleNodeDetailsPanelClose = useCallback(() => {
+        useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
+    }, []);
+
     const showNodeDetailsPanel =
-        workflowNodeDetailsPanelOpen &&
+        aiAgentNodeDetailsPanelOpen &&
         (currentNodeClusterElementType === 'tools' || currentNodeClusterElementType === 'model') &&
         previousComponentDefinitions &&
         workflowNodeOutputs;
@@ -63,6 +66,8 @@ export default function AiAgentEditor({
                             <WorkflowNodeDetailsPanel
                                 className="relative inset-auto z-0 size-full max-w-none rounded-none border-0"
                                 invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                                onClose={handleNodeDetailsPanelClose}
+                                panelOpen
                                 previousComponentDefinitions={previousComponentDefinitions}
                                 updateWorkflowMutation={updateWorkflowMutation}
                                 workflowNodeOutputs={workflowNodeOutputs}

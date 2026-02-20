@@ -20,13 +20,13 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
     const setRootClusterElementNodeData = useWorkflowEditorStore((state) => state.setRootClusterElementNodeData);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const {setActiveTab, setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
+    const {setActiveTab, setAiAgentNodeDetailsPanelOpen, setCurrentComponent, setCurrentNode} =
         useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
                 setActiveTab: state.setActiveTab,
+                setAiAgentNodeDetailsPanelOpen: state.setAiAgentNodeDetailsPanelOpen,
                 setCurrentComponent: state.setCurrentComponent,
                 setCurrentNode: state.setCurrentNode,
-                setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
             }))
         );
 
@@ -50,7 +50,7 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
 
             setActiveTab('description');
             setCurrentNode({...toolNodeData, description: ''});
-            setWorkflowNodeDetailsPanelOpen(true);
+            setAiAgentNodeDetailsPanelOpen(true);
 
             setCurrentComponent((previousCurrentComponent) => ({
                 ...toolNodeData,
@@ -61,9 +61,9 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
         [
             rootClusterElementNodeData?.name,
             setActiveTab,
+            setAiAgentNodeDetailsPanelOpen,
             setCurrentComponent,
             setCurrentNode,
-            setWorkflowNodeDetailsPanelOpen,
         ]
     );
 

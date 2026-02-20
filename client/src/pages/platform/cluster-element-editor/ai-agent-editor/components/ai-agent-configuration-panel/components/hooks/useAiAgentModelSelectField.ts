@@ -34,13 +34,13 @@ export default function useAiAgentModelSelectField(): UseAiAgentModelSelectField
     const componentDefinitions = useWorkflowDataStore((state) => state.componentDefinitions);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const {setActiveTab, setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
+    const {setActiveTab, setAiAgentNodeDetailsPanelOpen, setCurrentComponent, setCurrentNode} =
         useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
                 setActiveTab: state.setActiveTab,
+                setAiAgentNodeDetailsPanelOpen: state.setAiAgentNodeDetailsPanelOpen,
                 setCurrentComponent: state.setCurrentComponent,
                 setCurrentNode: state.setCurrentNode,
-                setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
             }))
         );
 
@@ -143,7 +143,7 @@ export default function useAiAgentModelSelectField(): UseAiAgentModelSelectField
 
             setActiveTab('description');
             setCurrentNode({...modelNodeData, description: ''});
-            setWorkflowNodeDetailsPanelOpen(true);
+            setAiAgentNodeDetailsPanelOpen(true);
 
             setCurrentComponent((previousCurrentComponent) => ({
                 ...modelNodeData,
@@ -157,7 +157,7 @@ export default function useAiAgentModelSelectField(): UseAiAgentModelSelectField
             setActiveTab,
             setCurrentComponent,
             setCurrentNode,
-            setWorkflowNodeDetailsPanelOpen,
+            setAiAgentNodeDetailsPanelOpen,
         ]
     );
 
