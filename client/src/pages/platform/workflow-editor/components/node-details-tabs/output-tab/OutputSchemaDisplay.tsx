@@ -20,6 +20,7 @@ interface OutputSchemaDisplayProps {
     currentNode: {name: string; trigger?: boolean; action?: boolean};
     handlePredefinedOutputSchemaClick: () => void;
     handleTestOperationClick: () => void;
+    isClusterElement?: boolean;
     outputSchema: PropertyAllType;
     sampleOutput?: object;
     saveWorkflowNodeTestOutputMutation: {isPending: boolean};
@@ -35,6 +36,7 @@ const OutputSchemaDisplay = ({
     currentNode,
     handlePredefinedOutputSchemaClick,
     handleTestOperationClick,
+    isClusterElement,
     outputSchema,
     sampleOutput,
     saveWorkflowNodeTestOutputMutation,
@@ -61,7 +63,7 @@ const OutputSchemaDisplay = ({
                             />
                         ))}
 
-                    {variablePropertiesDefined && (
+                    {variablePropertiesDefined && !isClusterElement && (
                         <Button
                             disabled={saveWorkflowNodeTestOutputMutation.isPending}
                             label="Upload Sample Output"
@@ -83,7 +85,7 @@ const OutputSchemaDisplay = ({
 
                         <DropdownMenuContent align="end" className="w-52">
                             <DropdownMenuGroup>
-                                {!variablePropertiesDefined && (
+                                {!variablePropertiesDefined && !isClusterElement && (
                                     <DropdownMenuItem
                                         className="cursor-pointer"
                                         onClick={() => setShowUploadDialog(true)}
