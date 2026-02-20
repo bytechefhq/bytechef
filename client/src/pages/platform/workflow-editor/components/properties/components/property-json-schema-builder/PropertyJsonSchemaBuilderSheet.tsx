@@ -37,7 +37,7 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
             </VisuallyHidden.Root>
 
             <SheetContent
-                className="absolute bottom-4 right-4 top-3 flex h-auto w-11/12 flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-screen-lg"
+                className="bottom-4 right-4 top-3 flex h-auto w-11/12 flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-screen-lg"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
