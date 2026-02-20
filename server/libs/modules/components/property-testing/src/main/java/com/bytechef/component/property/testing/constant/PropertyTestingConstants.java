@@ -18,8 +18,17 @@ package com.bytechef.component.property.testing.constant;
 
 public class PropertyTestingConstants {
 
+    public static final String ARRAY_DEFAULT_VALUES = "arrayDefaultValues";
     public static final String ARRAY_MAX_ITEMS = "arrayMaxItems";
     public static final String ARRAY_MIN_ITEMS = "arrayMinItems";
+    public static final String ARRAY_NO_DEFAULT_VALUES = "arrayNoDefaultValues";
+    public static final String ARRAY_NO_PREDEFINED_PROPERTIES = "arrayNoPredefinedProperties";
+    public static final String ARRAY_PREDEFINED_PROPERTIES = "arrayPredefinedProperties";
+    public static final String BOOL = "bool";
+    public static final String DATE = "date";
+    public static final String DATE_TIME = "dateTime";
+    public static final String DYNAMIC = "dynamic";
+    public static final String FILE_ENTRY = "fileEntry";
     public static final String INTEGER_MAX_VALUE = "integerMaxValue";
     public static final String INTEGER_MIN_VALUE = "integerMinValue";
     public static final String NUMBER_MAX_PRECISION = "numberMaxNumPrecision";
@@ -27,6 +36,12 @@ public class PropertyTestingConstants {
     public static final String NUMBER_MAX_VALUE = "numberMaxValue";
     public static final String NUMBER_MIN_VALUE = "numberMinValue";
     public static final String NUMBER_PRECISION = "numberPrecision";
+    public static final String OBJECT_DEFAULT_VALUES = "objectDefaultValues";
+    public static final String OBJECT_NO_DEFAULT_VALUES = "objectNoDefaultValues";
+    public static final String OBJECT_NO_PREDEFINED_PROPERTIES = "objectNoPredefinedProperties";
+    public static final String OBJECT_PREDEFINED_PROPERTIES = "objectPredefinedProperties";
+    public static final String OPTION_MULTISELECT = "optionsMultiselect";
+    public static final String OPTION_NO_MULTISELECT = "optionsNoMultiselect";
     public static final String STRING_MAX_LENGTH = "stringMaxLength";
     public static final String STRING_MIN_LENGTH = "stringMinLength";
     public static final String STRING_REG_EX = "stringRegEx";
