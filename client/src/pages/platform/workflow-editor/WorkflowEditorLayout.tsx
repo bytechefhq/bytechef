@@ -14,7 +14,7 @@ import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/work
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {Suspense, lazy} from 'react';
+import {Suspense, lazy, useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
@@ -29,6 +29,7 @@ import WorkflowInputsSheet from './components/workflow-inputs/WorkflowInputsShee
 import useDataPillPanelStore from './stores/useDataPillPanelStore';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
+import {clearAllWorkflowMutations} from './utils/workflowMutationGuard';
 
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
 const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
@@ -84,6 +85,12 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
+
+    useEffect(() => {
+        return () => {
+            clearAllWorkflowMutations();
+        };
+    }, []);
 
     return (
         <ReactFlowProvider>
