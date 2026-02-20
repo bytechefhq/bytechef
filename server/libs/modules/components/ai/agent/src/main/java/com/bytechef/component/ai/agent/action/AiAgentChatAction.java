@@ -24,6 +24,7 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -43,12 +44,14 @@ import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
  */
 public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
-    public static ChatActionDefinitionWrapper of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return new AiAgentChatAction(clusterElementDefinitionService).build();
+    public static ChatActionDefinitionWrapper of(
+        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+
+        return new AiAgentChatAction(clusterElementDefinitionService, evaluator).build();
     }
 
-    private AiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
-        super(clusterElementDefinitionService);
+    private AiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+        super(clusterElementDefinitionService, evaluator);
     }
 
     private ChatActionDefinitionWrapper build() {

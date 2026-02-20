@@ -26,6 +26,7 @@ import com.bytechef.component.ai.agent.tool.AiAgentChatTool;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AiAgentComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -39,8 +40,11 @@ public class AiAgentComponentHandler implements ComponentHandler {
 
     private final AiAgentComponentDefinition componentDefinition;
 
-    public AiAgentComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
-        final ActionDefinition aiAgentChatActionDefinition = AiAgentChatAction.of(clusterElementDefinitionService);
+    public AiAgentComponentHandler(
+        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+
+        final ActionDefinition aiAgentChatActionDefinition =
+            AiAgentChatAction.of(clusterElementDefinitionService, evaluator);
 
         this.componentDefinition = new AiAgentComponentDefinitionImpl(
             component(AI_AGENT)
@@ -50,7 +54,7 @@ public class AiAgentComponentHandler implements ComponentHandler {
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
                     aiAgentChatActionDefinition,
-                    AiAgentStreamChatAction.of(clusterElementDefinitionService))
+                    AiAgentStreamChatAction.of(clusterElementDefinitionService, evaluator))
                 .clusterElements(AiAgentChatTool.of(aiAgentChatActionDefinition)));
     }
 

@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
@@ -47,12 +48,16 @@ import reactor.core.publisher.Flux;
  */
 public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
-    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return new AiAgentStreamChatAction(clusterElementDefinitionService).build();
+    public static ActionDefinition of(
+        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+
+        return new AiAgentStreamChatAction(clusterElementDefinitionService, evaluator).build();
     }
 
-    private AiAgentStreamChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
-        super(clusterElementDefinitionService);
+    private AiAgentStreamChatAction(
+        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+
+        super(clusterElementDefinitionService, evaluator);
     }
 
     private ChatActionDefinitionWrapper build() {

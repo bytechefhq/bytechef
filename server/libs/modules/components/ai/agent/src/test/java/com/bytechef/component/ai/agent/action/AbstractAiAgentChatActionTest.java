@@ -28,6 +28,7 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -49,6 +50,9 @@ class AbstractAiAgentChatActionTest {
 
     @Mock
     private ClusterElementDefinitionService clusterElementDefinitionService;
+
+    @Mock
+    private Evaluator evaluator;
 
     @Test
     void testGetChatClientRequestSpecWithNullParameterValues() throws Exception {
@@ -88,7 +92,7 @@ class AbstractAiAgentChatActionTest {
 
         ActionContext actionContext = mock(ActionContext.class);
 
-        TestAiAgentChatAction action = new TestAiAgentChatAction(clusterElementDefinitionService);
+        TestAiAgentChatAction action = new TestAiAgentChatAction(clusterElementDefinitionService, evaluator);
 
         try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
             modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
@@ -101,8 +105,8 @@ class AbstractAiAgentChatActionTest {
 
     private static class TestAiAgentChatAction extends AbstractAiAgentChatAction {
 
-        TestAiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
-            super(clusterElementDefinitionService);
+        TestAiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+            super(clusterElementDefinitionService, evaluator);
         }
     }
 }

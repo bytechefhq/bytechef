@@ -28,6 +28,7 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
@@ -67,9 +68,13 @@ import org.springframework.ai.util.json.JsonParser;
 public abstract class AbstractAiAgentChatAction {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final Evaluator evaluator;
 
-    protected AbstractAiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
+    protected AbstractAiAgentChatAction(
+        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+
         this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.evaluator = evaluator;
     }
 
     protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
@@ -311,18 +316,38 @@ public abstract class AbstractAiAgentChatAction {
         };
     }
 
-    private static List<FromAiResult> extractFromAiResults(Map<String, ?> parameters) {
+    private List<FromAiResult> extractFromAiResults(Map<String, ?> parameters) {
         List<FromAiResult> fromAiResults = new ArrayList<>();
 
         if (parameters != null) {
             for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                if (entry.getValue() instanceof FromAiResult fromAiResult) {
+                FromAiResult fromAiResult = toFromAiResult(entry.getValue());
+
+                if (fromAiResult != null) {
                     fromAiResults.add(fromAiResult);
                 }
             }
         }
 
         return fromAiResults;
+    }
+
+    private @Nullable FromAiResult toFromAiResult(Object value) {
+        if (value instanceof FromAiResult fromAiResult) {
+            return fromAiResult;
+        }
+
+        if (value instanceof String string && string.contains("fromAi(")) {
+            String expression = string.startsWith("=") ? string : "=" + string;
+
+            Map<String, Object> evaluated = evaluator.evaluate(Map.of("value", expression), Map.of());
+
+            if (evaluated.get("value") instanceof FromAiResult fromAiResult) {
+                return fromAiResult;
+            }
+        }
+
+        return null;
     }
 
     private Function<Map<String, Object>, Object> getToolCallbackFunction(
@@ -333,15 +358,15 @@ public abstract class AbstractAiAgentChatAction {
             Map<String, Object> resolvedParameters = new HashMap<>();
 
             for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                Object value = entry.getValue();
+                FromAiResult fromAiResult = toFromAiResult(entry.getValue());
 
-                if (value instanceof FromAiResult fromAiResult) {
+                if (fromAiResult != null) {
                     Object requestValue = request.get(fromAiResult.name());
 
                     resolvedParameters.put(
                         entry.getKey(), requestValue != null ? requestValue : fromAiResult.defaultValue());
                 } else {
-                    resolvedParameters.put(entry.getKey(), value);
+                    resolvedParameters.put(entry.getKey(), entry.getValue());
                 }
             }
 
