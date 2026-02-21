@@ -1,12 +1,12 @@
-import {render, screen} from '@/shared/util/test-utils';
 import {PropertyAllType} from '@/shared/types';
+import {render, screen} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import PropertyDynamicProperties from './PropertyDynamicProperties';
 
 const hoisted = vi.hoisted(() => ({
-    mockDynamicPropertiesQuery: vi.fn(),
     mockClusterElementQuery: vi.fn(),
+    mockDynamicPropertiesQuery: vi.fn(),
 }));
 
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
@@ -14,7 +14,7 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 }));
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
-    default: () => ({id: 'workflow-1', nodeNames: [], actionNames: []}),
+    default: () => ({actionNames: [], id: 'workflow-1', nodeNames: []}),
 }));
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore', () => ({
@@ -35,8 +35,8 @@ vi.mock('../../../stores/useWorkflowEditorStore', () => ({
 }));
 
 vi.mock('@/shared/queries/platform/workflowNodeDynamicProperties.queries', () => ({
-    useGetWorkflowNodeDynamicPropertiesQuery: hoisted.mockDynamicPropertiesQuery,
     useGetClusterElementDynamicPropertiesQuery: hoisted.mockClusterElementQuery,
+    useGetWorkflowNodeDynamicPropertiesQuery: hoisted.mockDynamicPropertiesQuery,
 }));
 
 vi.mock('../Property', () => ({
@@ -48,7 +48,7 @@ vi.mock('../Property', () => ({
 }));
 
 const sampleProperties = [
-    {name: 'field1', type: 'STRING', defaultValue: 'val1'},
+    {defaultValue: 'val1', name: 'field1', type: 'STRING'},
     {name: 'field2', type: 'INTEGER'},
 ] as PropertyAllType[];
 
