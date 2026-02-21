@@ -35,6 +35,7 @@ import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.tenant.TenantContext;
 import java.time.Instant;
 import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,6 +44,11 @@ import org.junit.jupiter.api.Test;
 class SuspendTaskExecutionPostOutputProcessorTest {
 
     private final TriggerScheduler triggerScheduler = mock(TriggerScheduler.class);
+
+    @AfterEach
+    void afterEach() {
+        TenantContext.resetCurrentTenantId();
+    }
 
     @Test
     void testProcessWithSuspendAndExpiresAtSchedulesTask() {

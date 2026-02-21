@@ -31,6 +31,7 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.tenant.TenantContext;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,6 +43,11 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
 
     private final SseStreamTaskExecutionPostOutputProcessor processor =
         new SseStreamTaskExecutionPostOutputProcessor(messageBroker);
+
+    @AfterEach
+    void afterEach() {
+        TenantContext.resetCurrentTenantId();
+    }
 
     @Test
     void testProcessWithNonSseOutputPassesThrough() {

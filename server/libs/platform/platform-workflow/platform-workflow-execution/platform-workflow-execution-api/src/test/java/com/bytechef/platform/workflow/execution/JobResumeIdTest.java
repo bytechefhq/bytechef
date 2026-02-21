@@ -24,12 +24,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.tenant.TenantContext;
+import java.nio.charset.StandardCharsets;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
 class JobResumeIdTest {
+
+    @AfterEach
+    void afterEach() {
+        TenantContext.resetCurrentTenantId();
+    }
 
     @Test
     void testOfCreatesValidInstance() {
@@ -88,7 +95,7 @@ class JobResumeIdTest {
     @Test
     void testParseThrowsForInvalidFormat() {
         String invalidBase64 = java.util.Base64.getEncoder()
-            .encodeToString("only:two:parts".getBytes());
+            .encodeToString("only:two:parts".getBytes(StandardCharsets.UTF_8));
 
         assertThrows(IllegalArgumentException.class, () -> JobResumeId.parse(invalidBase64));
     }
@@ -97,7 +104,7 @@ class JobResumeIdTest {
     void testParseThrowsForTooManyParts() {
         String tooManyParts = java.util.Base64.getEncoder()
             .encodeToString(
-                "a:b:c:d:e".getBytes());
+                "a:b:c:d:e".getBytes(StandardCharsets.UTF_8));
 
         assertThrows(IllegalArgumentException.class, () -> JobResumeId.parse(tooManyParts));
     }
