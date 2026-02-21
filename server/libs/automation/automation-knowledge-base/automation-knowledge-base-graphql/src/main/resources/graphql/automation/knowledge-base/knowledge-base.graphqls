@@ -1,5 +1,5 @@
 extend type Query {
-    knowledgeBases(workspaceId: ID!): [KnowledgeBase]
+    knowledgeBases(environmentId: ID!, workspaceId: ID!): [KnowledgeBase]
     knowledgeBase(id: ID!): KnowledgeBase
     knowledgeBaseTags: [Tag!]
     knowledgeBaseTagsByKnowledgeBase: [KnowledgeBaseTagsEntry!]
@@ -7,7 +7,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    createKnowledgeBase(knowledgeBase: KnowledgeBaseInput!, workspaceId: ID!): KnowledgeBase
+    createKnowledgeBase(knowledgeBase: KnowledgeBaseInput!, environmentId: ID!, workspaceId: ID!): KnowledgeBase
     updateKnowledgeBase(id: ID!, knowledgeBase: KnowledgeBaseInput!): KnowledgeBase
     deleteKnowledgeBase(id: ID!): Boolean
     updateKnowledgeBaseTags(input: UpdateKnowledgeBaseTagsInput!): Boolean!
