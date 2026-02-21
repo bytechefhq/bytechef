@@ -17,6 +17,7 @@
 package com.bytechef.automation.knowledgebase.repository;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
+import java.util.List;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface KnowledgeBaseRepository
     extends PagingAndSortingRepository<KnowledgeBase, Long>, ListCrudRepository<KnowledgeBase, Long> {
+
+    List<KnowledgeBase> findAllByEnvironment(int environment);
 }
