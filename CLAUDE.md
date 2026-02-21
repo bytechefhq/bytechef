@@ -204,6 +204,19 @@ public class ExampleComponentHandler implements ComponentHandler {
 - ESLint `--fix` does NOT auto-fix sort-keys - must be fixed manually
 - Example: `{content: 'x', id: 'y'}` not `{id: 'y', content: 'x'}`
 
+### Client Interface Naming Convention
+- Interface names must end with `I` or `Props` (enforced by `@typescript-eslint/naming-convention`)
+- Example: `EnvironmentConfigI`, `BadgePropsType` — not `EnvironmentConfig`
+
+### Client Import Destructure Sort Order
+- Named imports must be sorted alphabetically within `{}` (enforced by `bytechef/sort-import-destructures`)
+- `type` keyword imports sort by their name, not grouped separately
+- Example: `import {BoxIcon, CheckIcon, type LucideIcon, WrenchIcon} from 'lucide-react'`
+
+### Non-null Assertion on Optional Chain (Client)
+- `@typescript-eslint/no-non-null-asserted-optional-chain` forbids `obj?.prop!`
+- Instead, filter nulls first, then assert: `.filter((item) => item?.id != null).map((item) => { const id = item!.id!; ... })`
+
 ### Variable Naming
 - Do not use short or cryptic variable names on both the server and client sides; prefer clear, descriptive names that communicate intent.
 - This applies everywhere, including arrow function parameters and loop variables.
@@ -481,6 +494,12 @@ npm run storybook
 3. **Check Execution Logs**: View workflow execution logs in the UI or database
 4. **Inspect Variables**: Use the workflow editor to inspect variable values at each step
 5. **Test Actions Individually**: Use the component test feature to test individual actions
+
+### Commit Message Convention
+- Client-side changes: `<ticket_number> client - <description>`
+- Server-side changes: `<ticket_number> <description>`
+- Example client: `#2898 client - Add EnvironmentSelect dropdown to automation page headers`
+- Example server: `#2898 Add environment selection endpoint`
 
 ### Code Quality Workflow
 - When committing, only stage files directly modified by the current task — do not include pre-existing unstaged changes that are unrelated
