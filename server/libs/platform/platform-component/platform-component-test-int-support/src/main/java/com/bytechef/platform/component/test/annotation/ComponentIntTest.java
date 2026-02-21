@@ -27,6 +27,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(
     classes = ComponentTestIntConfiguration.class,
-    properties = "bytechef.workflow.repository.classpath.enabled=true")
+    properties = {
+        "bytechef.file-storage.provider=jdbc",
+        "bytechef.workflow.repository.classpath.enabled=true"
+    })
 public @interface ComponentIntTest {
 }

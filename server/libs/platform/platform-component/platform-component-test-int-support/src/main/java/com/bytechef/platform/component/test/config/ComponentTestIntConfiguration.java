@@ -28,6 +28,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.evaluator.SpelEvaluator;
+import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.message.broker.MessageBroker;
@@ -101,6 +102,11 @@ public class ComponentTestIntConfiguration {
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
+
+    @Bean
+    FileStorageServiceRegistry fileStorageServiceRegistry() {
+        return new FileStorageServiceRegistry(List.of(new Base64FileStorageService()));
     }
 
     @Bean
