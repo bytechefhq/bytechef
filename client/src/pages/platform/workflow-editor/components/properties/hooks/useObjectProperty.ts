@@ -399,10 +399,15 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         if (
             !subProperties ||
             !path ||
-            !currentComponent ||
             !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
             !workflow.id
         ) {
+            return;
+        }
+
+        const currentComponent = useWorkflowNodeDetailsPanelStore.getState().currentComponent;
+
+        if (!currentComponent) {
             return;
         }
 
