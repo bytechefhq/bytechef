@@ -669,13 +669,7 @@ export const useProperty = ({
 
         const parentParameterValue = resolvePath(encodeParameters(currentComponent.parameters ?? {}), encodePath(path));
 
-        if (mentionInput && !mentionInputValue) {
-            return;
-        } else if (!mentionInput && isNumericalInput && !inputValue) {
-            return;
-        } else if (!mentionInput && controlType === 'SELECT' && !selectValue) {
-            return;
-        } else if (!parentParameterValue) {
+        if (!parentParameterValue) {
             return;
         }
 
