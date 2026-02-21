@@ -24,6 +24,7 @@ import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.log.domain.LogEntry;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
  *
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class EditorLogFileStorageReaderTest {
 
     private static final String EDITOR_LOG_DIR = "editor/logs";
@@ -117,6 +120,61 @@ class EditorLogFileStorageReaderTest {
         List<LogEntry> result = editorLogFileStorageReader.readLogEntriesByJobId(jobId);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void testReadLogEntriesByJobIdParsesValidJsonl() {
+        long jobId = 5L;
+        FileEntry fileEntry = new FileEntry("5.jsonl", "file://test/5.jsonl");
+
+        String jsonlContent =
+            "{\"taskExecutionId\":100,\"level\":\"INFO\",\"componentName\":\"http\"," +
+                "\"message\":\"first\",\"timestamp\":\"2026-01-01T00:00:00Z\"}\n" +
+                "{\"taskExecutionId\":200,\"level\":\"WARN\",\"componentName\":\"http\"," +
+                "\"message\":\"second\",\"timestamp\":\"2026-01-01T00:00:01Z\"}\n" +
+                "{\"taskExecutionId\":100,\"level\":\"ERROR\",\"componentName\":\"http\"," +
+                "\"message\":\"third\",\"timestamp\":\"2026-01-01T00:00:02Z\"}\n";
+
+        when(fileStorageService.fileExists(EDITOR_LOG_DIR, jobId + ".jsonl")).thenReturn(true);
+        when(fileStorageService.getFileEntry(EDITOR_LOG_DIR, jobId + ".jsonl")).thenReturn(fileEntry);
+        when(fileStorageService.readFileToBytes(EDITOR_LOG_DIR, fileEntry))
+            .thenReturn(jsonlContent.getBytes(StandardCharsets.UTF_8));
+
+        List<LogEntry> allEntries = editorLogFileStorageReader.readLogEntriesByJobId(jobId);
+
+        assertThat(allEntries).hasSize(3);
+        assertThat(allEntries)
+            .extracting(LogEntry::taskExecutionId)
+            .containsExactly(100L, 200L, 100L);
+    }
+
+    @Test
+    void testReadLogEntriesFiltersByTaskExecutionIdWithValidData() {
+        long jobId = 6L;
+        FileEntry fileEntry = new FileEntry("6.jsonl", "file://test/6.jsonl");
+
+        String jsonlContent =
+            "{\"taskExecutionId\":100,\"level\":\"INFO\",\"componentName\":\"http\"," +
+                "\"message\":\"match\",\"timestamp\":\"2026-01-01T00:00:00Z\"}\n" +
+                "{\"taskExecutionId\":200,\"level\":\"INFO\",\"componentName\":\"http\"," +
+                "\"message\":\"no-match\",\"timestamp\":\"2026-01-01T00:00:01Z\"}\n" +
+                "{\"taskExecutionId\":100,\"level\":\"WARN\",\"componentName\":\"http\"," +
+                "\"message\":\"match-again\",\"timestamp\":\"2026-01-01T00:00:02Z\"}\n";
+
+        when(fileStorageService.fileExists(EDITOR_LOG_DIR, jobId + ".jsonl")).thenReturn(true);
+        when(fileStorageService.getFileEntry(EDITOR_LOG_DIR, jobId + ".jsonl")).thenReturn(fileEntry);
+        when(fileStorageService.readFileToBytes(EDITOR_LOG_DIR, fileEntry))
+            .thenReturn(jsonlContent.getBytes(StandardCharsets.UTF_8));
+
+        List<LogEntry> filteredEntries = editorLogFileStorageReader.readLogEntries(jobId, 100L);
+
+        assertThat(filteredEntries).hasSize(2);
+        assertThat(filteredEntries)
+            .extracting(LogEntry::taskExecutionId)
+            .containsOnly(100L);
+        assertThat(filteredEntries)
+            .extracting(LogEntry::message)
+            .containsExactly("match", "match-again");
     }
 
     @Test

@@ -40,6 +40,7 @@ import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -191,12 +192,12 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         return executeTestAndBuildResult(() -> {
             if (inputParameters == null) {
                 return workflowNodeTestOutputFacade.saveClusterElementTestOutput(
-                    workflowId, workflowNodeName, clusterElementType.toUpperCase(),
+                    workflowId, workflowNodeName, clusterElementType.toUpperCase(Locale.ROOT),
                     clusterElementWorkflowNodeName, environmentId);
             }
 
             return workflowNodeTestOutputFacade.saveClusterElementTestOutput(
-                workflowId, workflowNodeName, clusterElementType.toUpperCase(),
+                workflowId, workflowNodeName, clusterElementType.toUpperCase(Locale.ROOT),
                 clusterElementWorkflowNodeName, Map.of("input", inputParameters), environmentId);
         });
     }
