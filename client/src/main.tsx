@@ -14,32 +14,11 @@ import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 import {init} from 'commandbar';
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-import YamlWorker from 'monaco-yaml/yaml.worker?worker';
 import {StrictMode} from 'react';
 import {RouterProvider} from 'react-router-dom';
 
 import {initUserGuiding} from './hooks/useUserGuiding';
 import {getRouter as getMainRouter} from './routes';
-
-window.MonacoEnvironment = {
-    getWorker(moduleId: string, label: string) {
-        switch (label) {
-            case 'editorWorkerService':
-                return new EditorWorker();
-            case 'javascript':
-                return new TsWorker();
-            case 'json':
-                return new JsonWorker();
-            case 'yaml':
-                return new YamlWorker();
-            default:
-                throw new Error(`Unknown label ${label} for moduleId ${moduleId}`);
-        }
-    },
-};
 
 if (process.env.NODE_ENV === 'mock') {
     import('./mocks/server').then(({worker}) => {
