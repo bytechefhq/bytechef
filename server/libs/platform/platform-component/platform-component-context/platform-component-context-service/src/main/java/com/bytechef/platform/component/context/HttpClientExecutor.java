@@ -507,6 +507,10 @@ class HttpClientExecutor {
     }
 
     private boolean matches(ResponseType responseType, HttpHeaders httpHeaders) {
+        if (responseType.getType() == ResponseType.Type.BINARY) {
+            return true;
+        }
+
         Optional<String> contentTypeOptional = httpHeaders.firstValue("content-type");
 
         return contentTypeOptional
@@ -530,6 +534,10 @@ class HttpClientExecutor {
         String filename = configuration.getFilename();
 
         if (filename == null || filename.isEmpty()) {
+            filename = getFilenameFromContentDisposition(headers);
+        }
+
+        if (filename == null || filename.isEmpty()) {
             if (headers.containsKey("content-type")) {
                 List<String> values = headers.get("content-type");
 
@@ -540,6 +548,36 @@ class HttpClientExecutor {
         }
 
         return new FileEntryImpl(tempFileStorage.storeFileContent(filename, httpResponseBody));
+    }
+
+    @Nullable
+    private String getFilenameFromContentDisposition(Map<String, List<String>> headers) {
+        List<String> dispositionValues = headers.get("content-disposition");
+
+        if (dispositionValues == null || dispositionValues.isEmpty()) {
+            return null;
+        }
+
+        String disposition = dispositionValues.getFirst();
+        int filenameIndex = disposition.indexOf("filename=");
+
+        if (filenameIndex < 0) {
+            return null;
+        }
+
+        String filename = StringUtils.trim(disposition.substring(filenameIndex + "filename=".length()));
+
+        if (filename.startsWith("\"") && filename.endsWith("\"")) {
+            filename = filename.substring(1, filename.length() - 1);
+        }
+
+        int semicolonIndex = filename.indexOf(';');
+
+        if (semicolonIndex > 0) {
+            filename = StringUtils.trim(filename.substring(0, semicolonIndex));
+        }
+
+        return filename.isEmpty() ? null : filename;
     }
 
     private static class ResponseImpl implements Response {
