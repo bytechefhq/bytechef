@@ -125,7 +125,12 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
             (acc, output) => {
                 const {actionDefinition, taskDispatcherDefinition, triggerDefinition} = output;
 
-                if (!actionDefinition && !triggerDefinition && taskDispatcherDefinition?.name !== 'loop') {
+                if (
+                    !actionDefinition &&
+                    !triggerDefinition &&
+                    !taskDispatcherDefinition?.outputDefined &&
+                    !taskDispatcherDefinition?.variablePropertiesDefined
+                ) {
                     return acc;
                 }
 
@@ -135,8 +140,8 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
                     componentName = actionDefinition.componentName;
                 } else if (triggerDefinition?.componentName) {
                     componentName = triggerDefinition.componentName;
-                } else if (taskDispatcherDefinition?.name === 'loop') {
-                    componentName = 'loop';
+                } else if (taskDispatcherDefinition?.name) {
+                    componentName = taskDispatcherDefinition.name;
                 }
 
                 const matchingDefinition = componentName ? definitionsMap.get(componentName) : undefined;
