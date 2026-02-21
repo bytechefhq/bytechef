@@ -13,7 +13,7 @@ services:
     volumes:
       - "pgvector:/var/lib/postgresql/data"
     environment:
-      - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_PASSWORD=${PASSWORD_FROM_LOCAL_DOT_ENV_FILE}"
       - "POSTGRES_USER=postgres"
       - "POSTGRES_DB=bytechef_vectorstore"
   postgres:
@@ -24,7 +24,7 @@ services:
     volumes:
       - "db:/var/lib/postgresql/data"
     environment:
-      - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_PASSWORD=${PASSWORD_FROM_LOCAL_DOT_ENV_FILE}"
       - "POSTGRES_USER=postgres"
       - "POSTGRES_DB=bytechef"
 #  rabbitmq:
@@ -59,7 +59,7 @@ services:
       - SERVER_PORT=9555
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef
       - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_DATASOURCE_PASSWORD=${PASSWORD_FROM_LOCAL_DOT_ENV_FILE}
       - JAVA_TOOL_OPTIONS=--enable-native-access=ALL-UNNAMED
 #      - SPRING_RABBITMQ_HOST=rabbitmq
 #      - SPRING_RABBITMQ_PORT=5672
@@ -67,7 +67,7 @@ services:
 #      - WORKFLOW_MESSAGE_BROKER_PROVIDER=amqp
       - BYTECHEF_AI_VECTORSTORE_PGVECTOR_URL=jdbc:postgresql://pgvector:5432/bytechef_vectorstore
       - BYTECHEF_AI_VECTORSTORE_PGVECTOR_USERNAME=postgres
-      - BYTECHEF_AI_VECTORSTORE_PGVECTOR_PASSWORD=postgres
+      - BYTECHEF_AI_VECTORSTORE_PGVECTOR_PASSWORD=${PASSWORD_FROM_LOCAL_DOT_ENV_FILE}
     env_file:
       - local.env
     ports:

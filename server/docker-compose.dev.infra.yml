@@ -14,7 +14,7 @@ services:
     volumes:
       - "pgvector:/var/lib/postgresql/data"
     environment:
-      - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_PASSWORD=${PASSWORD_FROM_LOCAL_DOT_ENV_FILE}"
       - "POSTGRES_USER=postgres"
       - "POSTGRES_DB=bytechef_vectorstore"
   postgres:
@@ -25,7 +25,7 @@ services:
     volumes:
     - "db:/var/lib/postgresql/data"
     environment:
-    - "POSTGRES_PASSWORD=postgres"
+    - "POSTGRES_PASSWORD=${PASSWORD_FROM_LOCAL_DOT_ENV_FILE}"
     - "POSTGRES_USER=postgres"
     - "POSTGRES_DB=bytechef"
   rabbitmq:
