@@ -52,7 +52,12 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
     const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
     const workflow = useWorkflowDataStore((state) => state.workflow);
+
     const defaultValueSavedRef = useRef(false);
+
+    useEffect(() => {
+        defaultValueSavedRef.current = false;
+    }, [path]);
 
     const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
