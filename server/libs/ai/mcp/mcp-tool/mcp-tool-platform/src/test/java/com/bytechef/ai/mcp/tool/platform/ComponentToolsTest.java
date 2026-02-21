@@ -254,7 +254,7 @@ class ComponentToolsTest {
             actionDefinitionFacade
                 .executePerform(
                     eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(),
-                    isNull(), anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull()))
+                    anyMap(), anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull()))
                         .thenReturn(performResult);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
@@ -263,7 +263,7 @@ class ComponentToolsTest {
         verify(actionDefinitionFacade).executeOutput(eq(componentName), eq(version), eq(actionName), anyMap(),
             anyMap());
         verify(actionDefinitionFacade).executePerform(
-            eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
+            eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), anyMap(),
             anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull());
     }
 
