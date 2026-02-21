@@ -1,10 +1,20 @@
+import {Avatar, AvatarFallback} from '@/components/ui/avatar';
 import {Dialog, DialogContent} from '@/components/ui/dialog';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {AudioLinesIcon, User2Icon} from 'lucide-react';
 import {ForwardRefExoticComponent, SVGProps} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 import reactLogo from '../../assets/logo.svg';
 
 interface MobileSidebarProps {
-    user: {name: string; email: string; imageUrl: string};
     navigation: {
         name: string;
         href: string;
@@ -14,28 +24,35 @@ interface MobileSidebarProps {
     setMobileMenuOpen: (value: boolean) => void;
 }
 
-export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen, user}: MobileSidebarProps) {
+export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen}: MobileSidebarProps) {
+    const account = useAuthenticationStore((state) => state.account);
+    const edition = useApplicationInfoStore((state) => state.application?.edition);
+    const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore(
+        useShallow((state) => ({
+            currentEnvironmentId: state.currentEnvironmentId,
+            setCurrentEnvironmentId: state.setCurrentEnvironmentId,
+        }))
+    );
+    const currentType = usePlatformTypeStore((state) => state.currentType);
+
+    const navigate = useNavigate();
+
+    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+    const {data: environmentsQuery} = useEnvironmentsQuery();
+
+    const handleEnvironmentValueChange = (value: string) => {
+        setCurrentEnvironmentId(+value);
+
+        if (currentType === PlatformType.AUTOMATION) {
+            navigate(`/automation${+value === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
+        } else if (currentType === PlatformType.EMBEDDED) {
+            navigate(`/embedded${+value === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`);
+        }
+    };
+
     return (
         <Dialog onOpenChange={setMobileMenuOpen} open={mobileMenuOpen}>
             <DialogContent className="flex h-full flex-col bg-white p-0 focus:outline-none">
-                {/*<div className="absolute right-4 top-0 pt-4">*/}
-
-                {/*    <button*/}
-
-                {/*        className="ml-1 items-center justify-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"*/}
-
-                {/*        onClick={() => setMobileMenuOpen(false)}*/}
-
-                {/*    >*/}
-
-                {/*        <span className="sr-only">Close sidebar</span>*/}
-
-                {/*        <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />*/}
-
-                {/*    </button>*/}
-
-                {/*</div>*/}
-
                 <div className="pb-4 pt-5">
                     <div className="flex shrink-0 items-center px-4">
                         <img alt="ByteChef" className="h-8 w-auto" src={reactLogo} />
@@ -61,24 +78,42 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen, us
                     </nav>
                 </div>
 
-                <div className="flex shrink-0 border-t border-gray-200 p-4">
-                    <a className="group block shrink-0" href="#">
-                        <div className="flex items-center">
-                            <div>
-                                <img alt="" className="inline-block size-10 rounded-full" src={user.imageUrl} />
-                            </div>
+                {edition === 'EE' && environmentsQuery?.environments && (
+                    <div className="border-t border-gray-200 px-4 py-3">
+                        <div className="flex items-center space-x-2 pb-2">
+                            <AudioLinesIcon className="size-5 text-gray-500" />
 
-                            <div className="ml-3">
-                                <p className="text-base font-medium text-gray-700 group-hover:text-gray-900">
-                                    {user.name}
-                                </p>
-
-                                <p className="text-sm font-medium text-gray-500 group-hover:text-gray-700">
-                                    Account Settings
-                                </p>
-                            </div>
+                            <span className="text-sm font-semibold text-gray-700">Environment</span>
                         </div>
-                    </a>
+
+                        <Select onValueChange={handleEnvironmentValueChange} value={currentEnvironmentId?.toString()}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select environment" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {environmentsQuery.environments.map((environment) => (
+                                    <SelectItem key={environment?.id} value={environment?.id!}>
+                                        {environment?.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
+
+                <div className="mt-auto flex shrink-0 items-center space-x-3 border-t border-gray-200 p-4">
+                    <Avatar>
+                        <AvatarFallback className="bg-muted">
+                            <User2Icon className="size-6" />
+                        </AvatarFallback>
+                    </Avatar>
+
+                    <div>
+                        <p className="text-sm text-muted-foreground">Signed in as</p>
+
+                        <p className="text-sm font-medium text-gray-700">{account?.email}</p>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>
