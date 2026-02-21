@@ -30,6 +30,8 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,7 +95,7 @@ class EditorLogFileStorageWriterTest {
         when(fileStorageService.fileExists(EDITOR_LOG_DIR, jobId + ".jsonl")).thenReturn(true);
         when(fileStorageService.getFileEntry(EDITOR_LOG_DIR, jobId + ".jsonl")).thenReturn(existingFileEntry);
         when(fileStorageService.readFileToBytes(EDITOR_LOG_DIR, existingFileEntry))
-            .thenReturn("existing content\n".getBytes());
+            .thenReturn("existing content\n".getBytes(StandardCharsets.UTF_8));
 
         editorLogFileStorageWriter.storeLogEntry(jobId, 200L, logEntry);
 
