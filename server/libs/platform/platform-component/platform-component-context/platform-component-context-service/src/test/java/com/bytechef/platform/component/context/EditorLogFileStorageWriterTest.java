@@ -30,7 +30,6 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
