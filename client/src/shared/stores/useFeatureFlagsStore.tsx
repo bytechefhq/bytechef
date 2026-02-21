@@ -1,5 +1,4 @@
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useRef} from 'react';
 import {createStore, useStore} from 'zustand';
 import {devtools} from 'zustand/middleware';
 import {useShallow} from 'zustand/react/shallow';
@@ -33,6 +32,8 @@ const featureFlagsStore = createStore<FeatureFlagsI>()(
     )
 );
 
+const loadingFlags = new Set<string>();
+
 export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
     const {featureFlags, setFeatureFlag} = useStore(featureFlagsStore, (state) => state);
 
@@ -42,8 +43,6 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
             featureFlags: state.featureFlags,
         }))
     );
-
-    const loadingFlagsRef = useRef<Set<string>>(new Set());
 
     return (featureFlag: string): boolean => {
         // First check local feature flags from server
@@ -57,11 +56,11 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
         }
 
         // If already loading this specific flag, return current cached value
-        if (loadingFlagsRef.current.has(featureFlag)) {
+        if (loadingFlags.has(featureFlag)) {
             return featureFlags[featureFlag] ?? false;
         }
 
-        loadingFlagsRef.current.add(featureFlag);
+        loadingFlags.add(featureFlag);
 
         // Only try to use PostHog if analytics are enabled
         if (analytics.enabled && analytics.postHog.apiKey && analytics.postHog.host) {
@@ -74,14 +73,14 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
                     if (flagValue !== undefined) {
                         setTimeout(() => {
                             setFeatureFlag(featureFlag, !!flagValue);
-                            loadingFlagsRef.current.delete(featureFlag);
+                            loadingFlags.delete(featureFlag);
                         }, 0);
                     } else {
                         // Register callback for when flags finish loading
                         posthog.default.onFeatureFlags(function () {
                             setTimeout(() => {
                                 setFeatureFlag(featureFlag, !!posthog.default.isFeatureEnabled(featureFlag));
-                                loadingFlagsRef.current.delete(featureFlag);
+                                loadingFlags.delete(featureFlag);
                             }, 0);
                         });
                     }
@@ -90,14 +89,14 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
                     // If PostHog fails to load, default to false
                     setTimeout(() => {
                         setFeatureFlag(featureFlag, false);
-                        loadingFlagsRef.current.delete(featureFlag);
+                        loadingFlags.delete(featureFlag);
                     }, 0);
                 });
         } else {
             // If analytics are disabled, default to false
             setTimeout(() => {
                 setFeatureFlag(featureFlag, false);
-                loadingFlagsRef.current.delete(featureFlag);
+                loadingFlags.delete(featureFlag);
             }, 0);
         }
 
