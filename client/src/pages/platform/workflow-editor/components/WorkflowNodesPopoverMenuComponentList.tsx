@@ -1,4 +1,5 @@
 import {Input} from '@/components/ui/input';
+import {Spinner} from '@/components/ui/spinner';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workflow-nodes-tabs/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
@@ -60,7 +61,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         );
         const {nodes} = useWorkflowDataStore(useShallow((state) => ({nodes: state.nodes})));
 
-        const {componentsWithActions, filter, setFilter, trimmedFilter} =
+        const {componentsWithActions, filter, isSearchFetching, setFilter, trimmedFilter} =
             useFilteredComponentDefinitions(componentDefinitions);
 
         const getFeatureFlag = useFeatureFlagsStore();
@@ -134,14 +135,20 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>
                 <header className="flex items-center gap-1 rounded-t-lg px-3 pt-3 text-center">
-                    <Input
-                        className="bg-white shadow-none"
-                        id="filter-components"
-                        name="workflowNodeFilter"
-                        onChange={(event) => setFilter(event.target.value)}
-                        placeholder="Filter components"
-                        value={filter}
-                    />
+                    <div className="relative w-full">
+                        <Input
+                            className={twMerge('bg-white shadow-none', isSearchFetching && 'pr-8')}
+                            id="filter-components"
+                            name="workflowNodeFilter"
+                            onChange={(event) => setFilter(event.target.value)}
+                            placeholder="Filter components"
+                            value={filter}
+                        />
+
+                        {isSearchFetching && (
+                            <Spinner className="absolute right-2 top-1/2 -translate-y-1/2 text-content-neutral-secondary" />
+                        )}
+                    </div>
                 </header>
 
                 <div className="h-96 rounded-b-lg pb-3">
