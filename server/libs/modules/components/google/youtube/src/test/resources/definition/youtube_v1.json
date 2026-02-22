@@ -5,8 +5,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Uploads video to Youtube.",
-    "help": null,
+    "description": "Uploads video to YouTube.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/youtube_v1#upload-video"
+    },
     "metadata": null,
     "name": "uploadVideo",
     "outputDefinition": {
@@ -1405,7 +1408,7 @@
   } ],
   "clusterElements": [ {
     "name": "uploadVideo",
-    "description": "Uploads video to Youtube.",
+    "description": "Uploads video to YouTube.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -2888,22 +2891,28 @@
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "YouTube Data API documentation",
+    "learnMoreUrl": "https://developers.google.com/youtube/v3/docs"
+  },
   "description": "Enjoy the videos and music you love, upload original content, and share it all with friends, family, and the world on YouTube.",
   "icon": "path:assets/youtube.svg",
   "metadata": null,
-  "name": "youtube",
+  "name": "youTube",
   "resources": null,
   "tags": null,
-  "title": "Youtube",
+  "title": "YouTube",
   "triggers": [ {
     "batch": null,
     "deduplicate": null,
     "deprecated": null,
     "description": "Triggers when new video is added to a specific channel.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/youtube_v1#new-video"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newVideo",
@@ -3791,7 +3800,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Youtube username or a channel handle (e.g. @Youtube).",
+      "description": "YouTube username or a channel handle (e.g. @Youtube).",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,

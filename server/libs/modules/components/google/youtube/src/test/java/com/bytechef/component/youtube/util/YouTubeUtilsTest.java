@@ -37,7 +37,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Nikolina Spehar
  */
-class YoutubeUtilsTest {
+class YouTubeUtilsTest {
 
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
@@ -59,7 +59,7 @@ class YoutubeUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("items", List.of(Map.of("id", Map.of("channelId", "channelId")))));
 
-        String channelId = YoutubeUtils.getChannelId("mockedIdentifier", mockedTriggerContext);
+        String channelId = YouTubeUtils.getChannelId("mockedIdentifier", mockedTriggerContext);
 
         assertEquals("channelId", channelId);
 
@@ -86,7 +86,7 @@ class YoutubeUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("items", List.of(Map.of("id", "id", "snippet", Map.of("title", "title")))));
 
-        List<Option<String>> videoCategoryIdOptions = YoutubeUtils.getVideoCategoryIdOptions(
+        List<Option<String>> videoCategoryIdOptions = YouTubeUtils.getVideoCategoryIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(List.of(option("title", "id")), videoCategoryIdOptions);

@@ -19,7 +19,7 @@ package com.bytechef.component.youtube.constant;
 /**
  * @author Nikolina Spehar
  */
-public class YoutubeConstants {
+public class YouTubeConstants {
 
     public static final String CATEGORY_ID = "categoryId";
     public static final String DESCRIPTION = "description";
@@ -36,6 +36,6 @@ public class YoutubeConstants {
     public static final String TITLE = "title";
     public static final String VIDEO = "video";
 
-    private YoutubeConstants() {
+    private YouTubeConstants() {
     }
 }

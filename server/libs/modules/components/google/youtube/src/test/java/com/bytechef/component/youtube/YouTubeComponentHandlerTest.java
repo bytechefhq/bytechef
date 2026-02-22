@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Nikolina Spehar
  */
-class YoutubeComponentHandlerTest {
+class YouTubeComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/youtube_v1.json", new YoutubeComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/youtube_v1.json", new YouTubeComponentHandler().getDefinition());
     }
 }
