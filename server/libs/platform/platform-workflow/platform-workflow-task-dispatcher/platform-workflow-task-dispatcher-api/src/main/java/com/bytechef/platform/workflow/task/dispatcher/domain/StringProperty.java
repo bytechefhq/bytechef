@@ -88,14 +88,14 @@ public class StringProperty extends ValueProperty<String> {
             return false;
         }
 
-        return Objects.equals(regex, that.regex) && Objects.equals(options, that.options);
-            Objects.equals(options, that.options) &&
+        return Objects.equals(minLength, that.minLength) && Objects.equals(maxLength, that.maxLength) &&
+            Objects.equals(regex, that.regex) && Objects.equals(options, that.options) &&
             Objects.equals(optionsDataSource, that.optionsDataSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), regex, options, optionsDataSource);
+        return Objects.hash(super.hashCode(), minLength, maxLength, regex, options, optionsDataSource);
     }
 
     @Override

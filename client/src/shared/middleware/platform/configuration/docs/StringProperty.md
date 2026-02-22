@@ -15,7 +15,6 @@ Name | Type
 `regex` | string
 `options` | [Array&lt;Option&gt;](Option.md)
 `optionsDataSource` | [OptionsDataSource](OptionsDataSource.md)
-`optionsLoadedDynamically` | boolean
 
 ## Example
 
@@ -32,7 +31,6 @@ const example = {
   "regex": null,
   "options": null,
   "optionsDataSource": null,
-  "optionsLoadedDynamically": null,
 } satisfies StringProperty
 
 console.log(example)
