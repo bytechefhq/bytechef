@@ -14,21 +14,16 @@ export default function useFetchInterceptor() {
 
     const apiBasePath = import.meta.env.VITE_API_BASE_PATH;
 
-    const callbacksRef = useRef({
-        apiBasePath,
-        clearAuthentication,
-        clearCurrentEnvironmentId,
-        clearCurrentWorkspaceId,
-        toast,
-    });
-
-    callbacksRef.current = {
+    const latestCallbacks = {
         apiBasePath,
         clearAuthentication,
         clearCurrentEnvironmentId,
         clearCurrentWorkspaceId,
         toast,
     };
+    const callbacksRef = useRef(latestCallbacks);
+
+    callbacksRef.current = latestCallbacks;
 
     useEffect(() => {
         const unregister = fetchIntercept.register({

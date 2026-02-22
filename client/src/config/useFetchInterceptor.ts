@@ -15,9 +15,10 @@ export default function useFetchInterceptor() {
 
     const apiBasePath = import.meta.env.VITE_API_BASE_PATH;
 
-    const callbacksRef = useRef({apiBasePath, clearAuthentication, clearCurrentWorkspaceId, navigate, toast});
+    const latestCallbacks = {apiBasePath, clearAuthentication, clearCurrentWorkspaceId, navigate, toast};
+    const callbacksRef = useRef(latestCallbacks);
 
-    callbacksRef.current = {apiBasePath, clearAuthentication, clearCurrentWorkspaceId, navigate, toast};
+    callbacksRef.current = latestCallbacks;
 
     useEffect(() => {
         const unregister = fetchIntercept.register({
@@ -29,7 +30,7 @@ export default function useFetchInterceptor() {
                     url = apiBasePath + url;
                 }
 
-                if (url.includes('/internal/') || url.includes('graphql')) {
+                if (url.includes('/internal/') || url.includes('/graphql')) {
                     return [
                         url,
                         {
@@ -60,7 +61,38 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
-                if (response.status < 200 || response.status > 299) {
+                if (response.url.includes('/graphql')) {
+                    const clonedResponse = response.clone();
+
+                    clonedResponse
+                        .json()
+                        .then((data: {errors?: Array<{message?: string}>}) => {
+                            if (data.errors?.length) {
+                                const errorMessage = data.errors
+                                    .map((error) => error.message || 'Unknown error')
+                                    .join('\n');
+
+                                toast({
+                                    description: errorMessage,
+                                    title: 'GraphQL Error',
+                                    variant: 'destructive',
+                                });
+                            } else if (response.status < 200 || response.status > 299) {
+                                toast({
+                                    description: `Request failed with status ${response.status}`,
+                                    variant: 'destructive',
+                                });
+                            }
+                        })
+                        .catch(() => {
+                            if (response.status < 200 || response.status > 299) {
+                                toast({
+                                    description: `Request failed with status ${response.status}`,
+                                    variant: 'destructive',
+                                });
+                            }
+                        });
+                } else if (response.status < 200 || response.status > 299) {
                     const clonedResponse = response.clone();
 
                     clonedResponse
@@ -82,23 +114,6 @@ export default function useFetchInterceptor() {
                                 variant: 'destructive',
                             });
                         });
-                } else if (response.url.includes('graphql')) {
-                    const clonedResponse = response.clone();
-
-                    clonedResponse
-                        .json()
-                        .then((data: {errors?: Array<{message?: string}>}) => {
-                            if (data.errors?.length) {
-                                const errorMessage = data.errors.map((error) => error.message).join('\n');
-
-                                toast({
-                                    description: errorMessage,
-                                    title: 'GraphQL Error',
-                                    variant: 'destructive',
-                                });
-                            }
-                        })
-                        .catch(() => {});
                 }
 
                 return response;

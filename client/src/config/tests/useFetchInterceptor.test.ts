@@ -303,5 +303,66 @@ describe('useFetchInterceptor', () => {
 
             expect(hoisted.toast).not.toHaveBeenCalled();
         });
+
+        it('handles GraphQL errors with undefined or missing message properties', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {errors: [{message: undefined}, {}, {message: 'Valid error'}]},
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toast).toHaveBeenCalledWith({
+                description: 'Unknown error\nUnknown error\nValid error',
+                title: 'GraphQL Error',
+                variant: 'destructive',
+            });
+        });
+
+        it('shows fallback toast when GraphQL response has invalid JSON', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonRejects: true,
+                status: 500,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toast).toHaveBeenCalledWith({
+                description: 'Request failed with status 500',
+                variant: 'destructive',
+            });
+        });
+
+        it('does not show toast when GraphQL 2xx response has invalid JSON', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonRejects: true,
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toast).not.toHaveBeenCalled();
+        });
     });
 });
