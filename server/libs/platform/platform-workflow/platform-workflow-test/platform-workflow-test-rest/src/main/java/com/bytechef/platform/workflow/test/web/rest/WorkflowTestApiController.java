@@ -16,10 +16,12 @@
 
 package com.bytechef.platform.workflow.test.web.rest;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
@@ -67,19 +69,25 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     private final Cache<String, CompletableFuture<WorkflowTestExecutionDTO>> workflowExecutions = createCache();
     private final TempFileStorage tempFileStorage;
     private final TestWorkflowExecutor testWorkflowExecutor;
+    private final WorkflowService workflowService;
 
     @Autowired
     @SuppressFBWarnings("EI")
-    public WorkflowTestApiController(TempFileStorage tempFileStorage, TestWorkflowExecutor testWorkflowExecutor) {
-        this(tempFileStorage, testWorkflowExecutor, 100);
+    public WorkflowTestApiController(
+        TempFileStorage tempFileStorage, TestWorkflowExecutor testWorkflowExecutor,
+        WorkflowService workflowService) {
+
+        this(tempFileStorage, testWorkflowExecutor, workflowService, 100);
     }
 
     @SuppressFBWarnings("EI")
     public WorkflowTestApiController(
-        TempFileStorage tempFileStorage, TestWorkflowExecutor testWorkflowExecutor, int maxPendingEvents) {
+        TempFileStorage tempFileStorage, TestWorkflowExecutor testWorkflowExecutor,
+        WorkflowService workflowService, int maxPendingEvents) {
 
         this.tempFileStorage = tempFileStorage;
         this.testWorkflowExecutor = testWorkflowExecutor;
+        this.workflowService = workflowService;
         this.maxPendingEvents = Math.max(1, maxPendingEvents);
     }
 
@@ -214,21 +222,28 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         Map<String, Object> inputs = getInputs(testWorkflowRequest);
 
-        if (inputs.containsKey("trigger_1")) {
-            Map<String, Object> trigger1 = MapUtils.getRequiredMap(inputs, "trigger_1", new TypeReference<>() {});
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflowService.getWorkflow(id));
 
-            if (trigger1.containsKey("attachments")) {
-                try {
-                    trigger1.put(
-                        "attachments", TestAttachmentUtils.getFileEntries(tempFileStorage, trigger1));
-                } catch (Exception exception) {
-                    throw new IllegalArgumentException("Failed to process test attachments", exception);
+        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            String triggerName = workflowTrigger.getName();
+
+            if (inputs.containsKey(triggerName)) {
+                Map<String, Object> triggerInputs = MapUtils.getRequiredMap(
+                    inputs, triggerName, new TypeReference<>() {});
+
+                if (triggerInputs.containsKey("attachments")) {
+                    try {
+                        triggerInputs.put(
+                            "attachments", TestAttachmentUtils.getFileEntries(tempFileStorage, triggerInputs));
+                    } catch (Exception exception) {
+                        throw new IllegalArgumentException("Failed to process test attachments", exception);
+                    }
+                } else {
+                    triggerInputs.put("attachments", List.of());
                 }
-            } else {
-                trigger1.put("attachments", List.of());
-            }
 
-            inputs.put("trigger_1", trigger1);
+                inputs.put(triggerName, triggerInputs);
+            }
         }
 
         SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
