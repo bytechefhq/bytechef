@@ -157,15 +157,17 @@ public class DataTableServiceImpl implements DataTableService {
 
         jdbcTemplate.execute(sql);
 
-        dataTableRepository.findByName(baseName)
-            .ifPresent(dataTable -> {
-                List<WorkspaceDataTable> workspaceDataTables =
-                    workspaceDataTableRepository.findByDataTableId(dataTable.getId());
+        if (!hasPhysicalTablesForBaseName(baseName)) {
+            dataTableRepository.findByName(baseName)
+                .ifPresent(dataTable -> {
+                    List<WorkspaceDataTable> workspaceDataTables =
+                        workspaceDataTableRepository.findByDataTableId(dataTable.getId());
 
-                workspaceDataTableRepository.deleteAll(workspaceDataTables);
-            });
+                    workspaceDataTableRepository.deleteAll(workspaceDataTables);
+                });
 
-        dataTableRepository.deleteByName(baseName);
+            dataTableRepository.deleteByName(baseName);
+        }
     }
 
     /**
@@ -374,6 +376,18 @@ public class DataTableServiceImpl implements DataTableService {
         String normalizedBaseName = baseName.toLowerCase(Locale.ROOT);
 
         return "dt_" + environmentId + "_" + normalizedBaseName;
+    }
+
+    private boolean hasPhysicalTablesForBaseName(String baseName) {
+        String normalizedBaseName = baseName.toLowerCase(Locale.ROOT);
+        String regex = "^dt_[0-9]+_" + normalizedBaseName + "$";
+
+        String sql = "SELECT COUNT(*) FROM information_schema.tables " +
+            "WHERE table_schema = current_schema() AND table_type = 'BASE TABLE' AND table_name ~ ?";
+
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, regex);
+
+        return count != null && count > 0;
     }
 
     private long checkRegistry(String baseName, String description) {
