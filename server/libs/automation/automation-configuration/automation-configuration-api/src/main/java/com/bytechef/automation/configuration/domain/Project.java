@@ -274,7 +274,9 @@ public final class Project {
     }
 
     public void setTags(List<Tag> tags) {
-        if (!CollectionUtils.isEmpty(tags)) {
+        if (CollectionUtils.isEmpty(tags)) {
+            setTagIds(List.of());
+        } else {
             setTagIds(CollectionUtils.map(tags, Tag::getId));
         }
     }
