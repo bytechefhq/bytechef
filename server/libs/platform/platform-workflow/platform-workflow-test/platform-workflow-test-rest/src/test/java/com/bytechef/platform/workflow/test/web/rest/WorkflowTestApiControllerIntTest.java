@@ -20,16 +20,21 @@ import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.
 import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.STARTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -89,6 +94,9 @@ class WorkflowTestApiControllerIntTest {
     @MockitoBean
     private TestWorkflowExecutor testWorkflowExecutor;
 
+    @MockitoBean
+    private WorkflowService workflowService;
+
     @Autowired
     private WorkflowTestApiController controller;
 
@@ -97,6 +105,11 @@ class WorkflowTestApiControllerIntTest {
         JsonUtils.setObjectMapper(
             JsonMapper.builder()
                 .build());
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getExtensions(anyString(), any(), any())).thenReturn(List.of());
+        when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
     }
 
     @Test
@@ -636,11 +649,11 @@ class WorkflowTestApiControllerIntTest {
 
         @Bean
         WorkflowTestApiController workflowTestApiController(
-            TempFileStorage tempFileStorage,
-            TestWorkflowExecutor testWorkflowExecutor) {
+            TempFileStorage tempFileStorage, TestWorkflowExecutor testWorkflowExecutor,
+            WorkflowService workflowService) {
 
             // Use a small buffer to make bounded behavior easy to assert in tests
-            return new WorkflowTestApiController(tempFileStorage, testWorkflowExecutor, 3);
+            return new WorkflowTestApiController(tempFileStorage, testWorkflowExecutor, workflowService, 3);
         }
     }
 
