@@ -50,6 +50,7 @@ import com.bytechef.component.definition.Property.ControlType;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class HttpClientConnection {
 
@@ -188,9 +189,22 @@ public class HttpClientConnection {
                                         .disableAuthorization(true))
                                 .execute();
 
-                        Map<String, Object> responseBody = tokenResponse.getBody(Map.class);
+                        if (tokenResponse.getStatusCode() == 200) {
+                            Map<String, Object> responseBody = tokenResponse.getBody(Map.class);
 
-                        return (String) responseBody.get(ACCESS_TOKEN);
+                            return (String) responseBody.get(ACCESS_TOKEN);
+                        }
+
+                        context.log(log -> log.debug(
+                            "Access token request failed with status code: {}",
+                            tokenResponse.getStatusCode()));
+
+                        if (Objects.nonNull(tokenResponse.getBody())) {
+                            context.log(log -> log.trace("Response body: {}", tokenResponse.getBody()));
+                        }
+
+                        throw new RuntimeException("OAuth provider rejected access token request");
+
                     });
 
                     return Authorization.ApplyResponse.ofHeaders(

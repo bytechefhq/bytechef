@@ -7,13 +7,14 @@ ByteChef can be configured using environment variables. This page documents all 
 
 ## AI Configuration
 
-| Environment Variable | Description | Default Value |
-|---|---|---|
-| `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
-| `BYTECHEF_AI_COPILOT_PROVIDER` | The AI provider to use for copilot (OPENAI, ANTHROPIC) | `OPENAI` |
-| `BYTECHEF_AI_COPILOT_OPENAI_API_KEY` | OpenAI API key for copilot (sensitive) | - |
-| `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_MODEL` | OpenAI model to use for chat | `chatgpt-4o-latest` |
-| `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_TEMPERATURE` | Temperature setting for OpenAI chat | `0.4` |
+| Environment Variable                                  | Description                                       | Default Value |
+|-------------------------------------------------------|---------------------------------------------------|------------|
+| `BYTECHEF_AI_COPILOT_ENABLED`                         | Enable or disable the AI copilot feature          | `false`    |
+| `BYTECHEF_AI_COPILOT_PROVIDER`                        | The AI provider to use for copilot (OPENAI, ANTHROPIC) | `OPENAI`   |
+| `BYTECHEF_AI_COPILOT_OPENAI_API_KEY`                  | OpenAI API key for copilot (sensitive)            | -          |
+| `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_MODEL`       | OpenAI model to use for chat                      | `gpt-5.2`  |
+| `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_TEMPERATURE` | Temperature setting for OpenAI chat               | `0.5`      |
+| `BYTECHEF_AI_COPILOT_OPENAI_EMBEDDING_OPTIONS_MODEL`  | Embeddings for OpenAI                             | `text-embedding-3-small`  |
 
 ## AI Providers
 
@@ -35,7 +36,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_ANALYTICS_ENABLED` | Enable or disable analytics | `true` |
+| `BYTECHEF_ANALYTICS_ENABLED` | Enable or disable analytics | `false` |
 
 ## Cache Configuration
 
@@ -80,6 +81,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
+| `BYTECHEF_COORDINATOR_TRIGGER_POLLING_CHECK_PERIOD` | Trigger polling interval in minutes | `5` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SCHEDULER_PROVIDER` | Scheduler provider (AWS, QUARTZ) | `QUARTZ` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_APPLICATION_EVENTS` | Number of application event subscribers | `1` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_EXECUTION_COMPLETE_EVENTS` | Number of trigger execution complete event subscribers | `1` |
@@ -139,7 +141,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_HELP_HUB_ENABLED` | Enable or disable the help hub | `true` |
+| `BYTECHEF_HELP_HUB_ENABLED` | Enable or disable the help hub | `false` |
 
 ## Mail Configuration
 
@@ -162,7 +164,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_MESSAGE_BROKER_PROVIDER` | Message broker provider (AMQP, AWS, JMS, KAFKA, LOCAL, REDIS) | `JMS` |
+| `BYTECHEF_MESSAGE_BROKER_PROVIDER` | Message broker provider (AMQP, AWS, JMS, KAFKA, MEMORY, REDIS) | `MEMORY` |
 
 ## OAuth2 Configuration
 
@@ -190,6 +192,13 @@ ByteChef can be configured using environment variables. This page documents all 
 |---|---|---|
 | `BYTECHEF_SECURITY_CONTENT_SECURITY_POLICY` | Content Security Policy | `"default-src 'self'; frame-src 'self' https://.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://.command.ai https://.commandbar.com https://.i.posthog.com https://cdn.jsdelivr.net https://storage.googleapis.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://.commandbar.com https://cdn.jsdelivr.net https://.command.ai https://unpkg.com; img-src 'self' https://.command.ai data:; font-src 'self' data:; media-src 'self' https://.command.ai; connect-src 'self' https://.command.ai https://.i.posthog.com https://*.commandbar.com; worker-src blob: 'self';"` |
 | `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | Remember Me key (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_ENABLED` | Enable social login | `false` |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_ID` | Google OAuth2 client ID (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_ID` | GitHub OAuth2 client ID (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_SECRET` | GitHub OAuth2 client secret (sensitive) | - |
+| `BYTECHEF_SECURITY_SSO_ENABLED` | Enable Single Sign-On | `false` |
+| `BYTECHEF_SECURITY_TWO_FACTOR_AUTHENTICATION_ENABLED` | Enable two-factor authentication | `false` |
 | `BYTECHEF_SECURITY_SYSTEM_USERNAME` | System administrator username | `system_admin` |
 | `BYTECHEF_SECURITY_SYSTEM_PASSWORD` | System administrator password (sensitive) | - |
 
@@ -219,6 +228,9 @@ System administrator is used for accessing protected data reachable through /act
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_OBSERVABILITY_ENABLED` | Enable or disable OTel metrics, logging and tracing | `false` |
+| `BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT` | OTel logging endpoint URL | `http://localhost:4318/v1/logs` |
+| `BYTECHEF_OBSERVABILITY_METRICS_ENDPOINT` | OTel metrics endpoint URL | `http://localhost:4318/v1/metrics` |
+| `BYTECHEF_OBSERVABILITY_TRACING_ENDPOINT` | OTel tracing endpoint URL | `http://localhost:4318/v1/traces` |
 
 ## Worker Configuration
 
