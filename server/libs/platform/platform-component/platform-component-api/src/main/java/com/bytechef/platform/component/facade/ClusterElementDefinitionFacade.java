@@ -31,6 +31,12 @@ public interface ClusterElementDefinitionFacade {
         String componentName, int componentVersion, String clusterElementName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable Long connectionId);
 
+    List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,
+        @Nullable Long connectionId, Map<String, Long> clusterElementConnectionIds,
+        Map<String, Map<String, ?>> clusterElementInputParameters);
+
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,

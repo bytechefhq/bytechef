@@ -69,6 +69,30 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
     }
 
     @Override
+    public List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,
+        Long connectionId, Map<String, Long> clusterElementConnectionIds,
+        Map<String, Map<String, ?>> clusterElementInputParameters) {
+
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
+
+        Map<String, ComponentConnection> clusterElementConnections = clusterElementConnectionIds.entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() != null)
+            .collect(
+                java.util.stream.Collectors.toMap(
+                    Map.Entry::getKey, entry -> getComponentConnection(entry.getValue())));
+
+        ClusterElementResolverFunction clusterElementResolver = createClusterElementResolver(
+            extensions, clusterElementConnections, clusterElementInputParameters);
+
+        return clusterElementDefinitionService.executeDynamicProperties(
+            componentName, componentVersion, clusterElementName, propertyName, inputParameters,
+            lookupDependsOnPaths, componentConnection, clusterElementResolver);
+    }
+
+    @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String clusterElementName, String propertyName,
         Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,

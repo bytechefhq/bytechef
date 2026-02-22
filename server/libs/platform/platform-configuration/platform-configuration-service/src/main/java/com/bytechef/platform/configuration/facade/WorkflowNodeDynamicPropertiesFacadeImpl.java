@@ -85,8 +85,25 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         long environmentId) {
 
-        Long connectionId = getClusterElementConnectionId(
-            workflowId, clusterElementWorkflowNodeName, environmentId);
+        List<WorkflowTestConfigurationConnection> connections = workflowTestConfigurationService
+            .fetchWorkflowTestConfiguration(workflowId, environmentId)
+            .stream()
+            .flatMap(workflowTestConfiguration -> CollectionUtils.stream(
+                workflowTestConfiguration.getConnections()))
+            .toList();
+
+        Map<String, Long> clusterElementConnectionIds = connections.stream()
+            .collect(java.util.stream.Collectors.toMap(
+                WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+                WorkflowTestConfigurationConnection::getConnectionId));
+
+        Long connectionId = connections.stream()
+            .filter(connection -> Objects.equals(
+                connection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
+            .findFirst()
+            .map(WorkflowTestConfigurationConnection::getConnectionId)
+            .orElse(null);
+
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -105,15 +122,44 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                 workflowNodeType.name(), workflowNodeType.version(), clusterElementTypeName),
             clusterElementWorkflowNodeName);
 
+        Map<String, Object> context = MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs);
+
+        Map<String, Map<String, ?>> clusterElementInputParameters = evaluateClusterElementInputParameters(
+            clusterElementMap, context);
+
         WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
         return clusterElementDefinitionFacade.executeDynamicProperties(
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation(), propertyName,
-            evaluator.evaluate(
-                clusterElement.getParameters(),
-                MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
-            lookupDependsOnPaths, connectionId);
+            evaluator.evaluate(clusterElement.getParameters(), context),
+            workflowTask.getExtensions(), lookupDependsOnPaths, connectionId, clusterElementConnectionIds,
+            clusterElementInputParameters);
+    }
+
+    private Map<String, Map<String, ?>> evaluateClusterElementInputParameters(
+        ClusterElementMap clusterElementMap, Map<String, Object> context) {
+
+        Map<String, Map<String, ?>> result = new java.util.HashMap<>();
+
+        for (Map.Entry<String, Object> entry : clusterElementMap.entrySet()) {
+            Object value = entry.getValue();
+
+            if (value instanceof ClusterElement clusterElement) {
+                result.put(
+                    clusterElement.getWorkflowNodeName(), evaluator.evaluate(clusterElement.getParameters(), context));
+            } else if (value instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof ClusterElement clusterElement) {
+                        result.put(
+                            clusterElement.getWorkflowNodeName(),
+                            evaluator.evaluate(clusterElement.getParameters(), context));
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -159,21 +205,6 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                         MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
                     lookupDependsOnPaths, workflowId, connectionId);
             });
-    }
-
-    private Long getClusterElementConnectionId(
-        String workflowId, String clusterElementWorkflowNodeName, long environmentId) {
-
-        return workflowTestConfigurationService
-            .fetchWorkflowTestConfiguration(workflowId, environmentId)
-            .stream()
-            .flatMap(workflowTestConfiguration -> CollectionUtils.stream(
-                workflowTestConfiguration.getConnections()))
-            .filter(connection -> Objects.equals(
-                connection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
-            .findFirst()
-            .map(WorkflowTestConfigurationConnection::getConnectionId)
-            .orElse(null);
     }
 
     private Long getConnectionId(String workflowId, String workflowNodeName, long environmentId) {

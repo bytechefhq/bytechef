@@ -90,6 +90,23 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = ClusterElementDefinitionErrorType.class, errorTypeField = "EXECUTE_DYNAMIC_PROPERTIES")
+    public List<Property> executeDynamicProperties(
+        @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
+        String propertyName, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        @ConnectionParam @Nullable ComponentConnection componentConnection,
+        ClusterElementResolverFunction clusterElementResolver) {
+
+        ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
+            componentName, componentVersion, clusterElementName, componentConnection, true, clusterElementResolver);
+
+        return doExecuteDynamicProperties(
+            componentName, componentVersion, clusterElementName, propertyName, inputParameters,
+            lookupDependsOnPaths, componentConnection, clusterElementContext);
+    }
+
+    @Override
     @WithTokenRefresh(errorTypeClass = ClusterElementDefinitionErrorType.class, errorTypeField = "EXECUTE_OPTIONS")
     public List<Option> executeOptions(
         @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
