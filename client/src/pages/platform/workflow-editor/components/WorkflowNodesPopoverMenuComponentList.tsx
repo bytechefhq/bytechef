@@ -1,4 +1,5 @@
 import {Input} from '@/components/ui/input';
+import {Spinner} from '@/components/ui/spinner';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workflow-nodes-tabs/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
@@ -7,7 +8,6 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
-import {Loader2Icon} from 'lucide-react';
 import {memo, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -137,7 +137,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 <header className="flex items-center gap-1 rounded-t-lg px-3 pt-3 text-center">
                     <div className="relative w-full">
                         <Input
-                            className="bg-white shadow-none"
+                            className={twMerge('bg-white shadow-none', isSearchFetching && 'pr-8')}
                             id="filter-components"
                             name="workflowNodeFilter"
                             onChange={(event) => setFilter(event.target.value)}
@@ -146,11 +146,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         />
 
                         {isSearchFetching && (
-                            <Loader2Icon
-                                aria-label="Loading"
-                                className="absolute right-2 top-1/2 size-4 -translate-y-1/2 animate-spin text-content-neutral-secondary"
-                                role="status"
-                            />
+                            <Spinner className="absolute right-2 top-1/2 -translate-y-1/2 text-content-neutral-secondary" />
                         )}
                     </div>
                 </header>
