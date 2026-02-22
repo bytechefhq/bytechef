@@ -47,32 +47,37 @@ import java.util.Objects;
  */
 public class ApiPlatformResponseToApiRequestAction {
 
-    public final ModifiableActionDefinition actionDefinition = action(RESPONSE_TO_API_REQUEST)
-        .title("Response to API Request")
-        .description("Converts the response to API request.")
-        .properties(
-            string(RESPONSE_TYPE)
-                .label("Response Type")
-                .description("The type of the response.")
-                .options(
-                    option("Success Response", ResponseType.SUCCESS.name()),
-                    option("Internal Error Response", ResponseType.INTERNAL_ERROR.name()),
-                    option("Invalid Input Response", ResponseType.INVALID_INPUT.name()),
-                    option("Forbidden Response", ResponseType.FORBIDDEN.name()))
-                .required(true),
-            dynamicProperties(RESPONSE)
-                .description("The properties of the response.")
-                .propertiesLookupDependsOn(RESPONSE_TYPE)
-                .properties(this::responseProperties)
-                .required(true))
-        .output(this::output)
-        .perform(this::perform);
-
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ApiPlatformResponseToApiRequestAction(WorkflowService workflowService) {
         this.workflowService = workflowService;
+    }
+
+    public static ModifiableActionDefinition of(WorkflowService workflowService) {
+        ApiPlatformResponseToApiRequestAction apiPlatformResponseToApiRequestAction =
+            new ApiPlatformResponseToApiRequestAction(workflowService);
+
+        return action(RESPONSE_TO_API_REQUEST)
+            .title("Response to API Request")
+            .description("Converts the response to API request.")
+            .properties(
+                string(RESPONSE_TYPE)
+                    .label("Response Type")
+                    .description("The type of the response.")
+                    .options(
+                        option("Success Response", ResponseType.SUCCESS.name()),
+                        option("Internal Error Response", ResponseType.INTERNAL_ERROR.name()),
+                        option("Invalid Input Response", ResponseType.INVALID_INPUT.name()),
+                        option("Forbidden Response", ResponseType.FORBIDDEN.name()))
+                    .required(true),
+                dynamicProperties(RESPONSE)
+                    .description("The properties of the response.")
+                    .propertiesLookupDependsOn(RESPONSE_TYPE)
+                    .properties(apiPlatformResponseToApiRequestAction::responseProperties)
+                    .required(true))
+            .output(apiPlatformResponseToApiRequestAction::output)
+            .perform(apiPlatformResponseToApiRequestAction::perform);
     }
 
     protected OutputResponse output(
