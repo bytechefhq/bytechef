@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.apiplatform.handler.web.rest;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
@@ -25,7 +26,9 @@ import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
@@ -38,6 +41,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
@@ -66,11 +70,15 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
+    private static final String API_PLATFORM_TRIGGER_COMPONENT_NAME = "apiPlatform";
+    private static final String API_PLATFORM_TRIGGER_OPERATION_NAME = "newApiRequest";
+
     private final ApiCollectionService apiCollectionService;
     private final ApiCollectionEndpointService apiCollectionEndpointService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectWorkflowService projectWorkflowService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ApiPlatformHandlerController(
@@ -91,6 +99,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectWorkflowService = projectWorkflowService;
+        this.workflowService = workflowService;
     }
 
     @DeleteMapping(produces = "application/json")
@@ -180,14 +189,37 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                 webhookRequest.headers(), MapUtils.concat(webhookRequest.parameters(), variables),
                 webhookRequest.body(), webhookRequest.method());
 
+            String workflowId = projectDeploymentWorkflow.getWorkflowId();
+
             String workflowUuid = projectWorkflowService.getProjectWorkflowUuid(
-                projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId());
+                projectDeployment.getId(), workflowId);
+
+            String triggerName = getApiPlatformTriggerName(workflowId);
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                PlatformType.AUTOMATION, apiCollection.getProjectDeploymentId(), workflowUuid, "trigger_1");
+                PlatformType.AUTOMATION, apiCollection.getProjectDeploymentId(), workflowUuid, triggerName);
 
             return doProcessTrigger(workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse);
         });
+    }
+
+    private String getApiPlatformTriggerName(String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+
+        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+            if (Objects.equals(workflowNodeType.name(), API_PLATFORM_TRIGGER_COMPONENT_NAME) &&
+                Objects.equals(workflowNodeType.operation(), API_PLATFORM_TRIGGER_OPERATION_NAME)) {
+
+                return workflowTrigger.getName();
+            }
+        }
+
+        throw new IllegalStateException(
+            "No API Platform trigger found in workflow '%s'".formatted(workflowId));
     }
 
     private ApiCollectionEndpointResult getApiCollectionEndpoint(
