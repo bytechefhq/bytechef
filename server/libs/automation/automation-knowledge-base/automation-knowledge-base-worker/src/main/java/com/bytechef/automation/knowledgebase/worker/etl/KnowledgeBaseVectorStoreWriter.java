@@ -76,7 +76,7 @@ public class KnowledgeBaseVectorStoreWriter {
      * @param knowledgeBaseId the knowledge base ID
      * @param documentId      the knowledge base document ID
      * @param chunkId         the knowledge base document chunk ID
-     * @param environmentId   the environment ID of the knowledge base
+     * @param environmentId   the environment ordinal of the knowledge base
      * @param tagIds          the tag IDs associated with the document
      */
     public void writeChunk(

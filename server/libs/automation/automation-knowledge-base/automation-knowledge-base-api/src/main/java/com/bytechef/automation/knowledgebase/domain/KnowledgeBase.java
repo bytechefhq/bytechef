@@ -99,7 +99,13 @@ public class KnowledgeBase {
     }
 
     public Environment getEnvironment() {
-        return Environment.values()[environment];
+        Environment[] environments = Environment.values();
+
+        if (environment < 0 || environment >= environments.length) {
+            throw new IllegalStateException("Invalid environment value: " + environment);
+        }
+
+        return environments[environment];
     }
 
     public long getEnvironmentId() {

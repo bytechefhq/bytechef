@@ -14,5 +14,9 @@
         </update>
 
         <addNotNullConstraint tableName="knowledge_base" columnName="environment" columnDataType="INT"/>
+
+        <createIndex tableName="knowledge_base" indexName="idx_knowledge_base_environment">
+            <column name="environment"/>
+        </createIndex>
     </changeSet>
 </databaseChangeLog>
