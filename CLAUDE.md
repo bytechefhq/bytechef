@@ -204,6 +204,19 @@ public class ExampleComponentHandler implements ComponentHandler {
 - ESLint `--fix` does NOT auto-fix sort-keys - must be fixed manually
 - Example: `{content: 'x', id: 'y'}` not `{id: 'y', content: 'x'}`
 
+### Client Interface Naming Convention
+- Interface names must end with `I` or `Props` (enforced by `@typescript-eslint/naming-convention`)
+- Example: `EnvironmentConfigI`, `BadgePropsType` — not `EnvironmentConfig`
+
+### Client Import Destructure Sort Order
+- Named imports must be sorted alphabetically within `{}` (enforced by `bytechef/sort-import-destructures`)
+- `type` keyword imports sort by their name, not grouped separately
+- Example: `import {BoxIcon, CheckIcon, type LucideIcon, WrenchIcon} from 'lucide-react'`
+
+### Non-null Assertion on Optional Chain (Client)
+- `@typescript-eslint/no-non-null-asserted-optional-chain` forbids `obj?.prop!`
+- Instead, filter nulls first, then assert: `.filter((item) => item?.id != null).map((item) => { const id = item!.id!; ... })`
+
 ### Variable Naming
 - Do not use short or cryptic variable names on both the server and client sides; prefer clear, descriptive names that communicate intent.
 - This applies everywhere, including arrow function parameters and loop variables.
@@ -288,6 +301,9 @@ public class ExampleComponentHandler implements ComponentHandler {
   knowledgeBaseDocumentService.saveKnowledgeBaseDocument(document);
   ```
 
+### No Trailing Blank Line in Class Body (Java)
+- Do not add an empty line between the last method (or field) and the closing `}` of a class
+
 ### Method Chaining
 - Do not chain method calls except where this is natural and idiomatic
 - Allowed exceptions (non-exhaustive):
@@ -329,6 +345,7 @@ public class ExampleComponentHandler implements ComponentHandler {
 
 **Checkstyle**:
 - Test method names must be camelCase without underscores (e.g., `testExecuteSuccess` not `testExecute_Success`)
+- `TODO:` comments are forbidden (`TodoComment` rule) — rewrite as plain comments describing intent, or implement the work
 
 ### Spring Boot Best Practices
 
@@ -406,6 +423,12 @@ public class ExampleComponentHandler implements ComponentHandler {
     }
     ```
 
+16. **Spring 7 Programmatic Bean Registration**
+    - Use `BeanRegistrar` + `@Import` instead of `BeanFactoryPostProcessor` for programmatic bean registration
+    - Resolve collection dependencies via `context.beanProvider(Class).orderedStream().toList()` (replaces `beanFactory.getBeansOfType()`)
+    - Resolve named beans via `context.bean("beanName", Class)` in supplier
+    - Test `BeanRegistrar` specs by capturing `Consumer<Spec<T>>` with `ArgumentCaptor`, applying to mock `Spec`, and verifying fluent calls
+
 ## Access and Authentication
 
 ### Development Login Credentials
@@ -481,7 +504,15 @@ npm run storybook
 4. **Inspect Variables**: Use the workflow editor to inspect variable values at each step
 5. **Test Actions Individually**: Use the component test feature to test individual actions
 
+### Commit Message Convention
+- Client-side changes: `<ticket_number> client - <description>`
+- Server-side changes: `<ticket_number> <description>`
+- Example client: `#2898 client - Add EnvironmentSelect dropdown to automation page headers`
+- Example server: `#2898 Add environment selection endpoint`
+
 ### Code Quality Workflow
+- When committing, only stage files directly modified by the current task — do not include pre-existing unstaged changes that are unrelated
+
 Before committing code, ensure:
 ```bash
 # Server-side

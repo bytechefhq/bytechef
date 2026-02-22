@@ -92,7 +92,6 @@
             "options": { },
             "optionsLookupDependsOn": null
           },
-          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": true,
@@ -117,7 +116,6 @@
             "options": { },
             "optionsLookupDependsOn": null
           },
-          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": true,
@@ -139,7 +137,6 @@
           "name": "defaultValue",
           "options": null,
           "optionsDataSource": null,
-          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": null,

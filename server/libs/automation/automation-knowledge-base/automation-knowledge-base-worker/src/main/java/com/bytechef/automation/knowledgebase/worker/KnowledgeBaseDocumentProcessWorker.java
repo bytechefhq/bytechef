@@ -104,7 +104,7 @@ public class KnowledgeBaseDocumentProcessWorker {
 
                 String vectorStoreId = knowledgeBaseEtlPipeline.writeChunkToVectorStore(
                     document, knowledgeBase.getId(), knowledgeBaseDocumentId, knowledgeBaseDocumentChunk.getId(),
-                    tagIds);
+                    knowledgeBase.getEnvironmentId(), tagIds);
 
                 knowledgeBaseDocumentChunk.setVectorStoreId(vectorStoreId);
 
@@ -139,15 +139,34 @@ public class KnowledgeBaseDocumentProcessWorker {
             KnowledgeBaseDocument knowledgeBaseDocument = knowledgeBaseDocumentService.getKnowledgeBaseDocument(
                 chunk.getKnowledgeBaseDocumentId());
 
+            KnowledgeBase knowledgeBase = knowledgeBaseService.getKnowledgeBase(
+                knowledgeBaseDocument.getKnowledgeBaseId());
+
             List<Long> tagIds = knowledgeBaseDocument.getTagIds();
 
             knowledgeBaseEtlPipeline.processChunkUpdate(
                 event.getContent(), knowledgeBaseDocument.getKnowledgeBaseId(), knowledgeBaseDocument.getId(),
-                knowledgeBaseDocumentChunkId, tagIds);
+                knowledgeBaseDocumentChunkId, knowledgeBase.getEnvironmentId(), tagIds);
         } catch (RuntimeException exception) {
             logger.error(
                 "Error processing chunk update {}: {}", knowledgeBaseDocumentChunkId, exception.getMessage(),
                 exception);
+
+            try {
+                KnowledgeBaseDocumentChunk chunk = knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunk(
+                    knowledgeBaseDocumentChunkId);
+
+                KnowledgeBaseDocument knowledgeBaseDocument = knowledgeBaseDocumentService.getKnowledgeBaseDocument(
+                    chunk.getKnowledgeBaseDocumentId());
+
+                knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_ERROR);
+
+                knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);
+            } catch (RuntimeException statusException) {
+                logger.error(
+                    "Failed to update document status for chunk {}: {}", knowledgeBaseDocumentChunkId,
+                    statusException.getMessage(), statusException);
+            }
         }
     }
 

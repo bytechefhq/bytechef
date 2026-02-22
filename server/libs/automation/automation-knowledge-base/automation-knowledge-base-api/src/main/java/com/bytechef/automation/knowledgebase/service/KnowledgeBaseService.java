@@ -40,7 +40,8 @@ public interface KnowledgeBaseService {
      * Retrieves the knowledge base associated with the specified unique identifier.
      *
      * @param id the unique identifier of the knowledge base to retrieve
-     * @return the KnowledgeBase object associated with the given ID, or null if no such knowledge base exists
+     * @return the KnowledgeBase object associated with the given ID
+     * @throws RuntimeException if no knowledge base exists with the given ID
      */
     KnowledgeBase getKnowledgeBase(Long id);
 
@@ -50,6 +51,14 @@ public interface KnowledgeBaseService {
      * @return a list of {@code KnowledgeBase} objects representing the knowledge bases.
      */
     List<KnowledgeBase> getKnowledgeBases();
+
+    /**
+     * Retrieves a list of knowledge bases for the specified environment.
+     *
+     * @param environment the environment ordinal to filter by
+     * @return a list of {@code KnowledgeBase} objects in the given environment
+     */
+    List<KnowledgeBase> getKnowledgeBases(int environment);
 
     /**
      * Updates an existing KnowledgeBase identified by the given ID with the provided new values.

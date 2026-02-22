@@ -114,6 +114,12 @@ ByteChef can be configured using environment variables. This page documents all 
 |---|---|---|
 | `BYTECHEF_EDITION` | ByteChef edition (CE, EE) | `EE` |
 
+## Environment Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_ENVIRONMENT` | Restrict the instance to a single environment (DEVELOPMENT, STAGING, PRODUCTION) | - |
+
 ## Encryption Configuration
 
 | Environment Variable | Description | Default Value |

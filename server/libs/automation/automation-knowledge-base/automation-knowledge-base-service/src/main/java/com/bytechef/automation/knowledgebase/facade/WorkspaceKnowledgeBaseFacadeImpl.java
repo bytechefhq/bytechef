@@ -22,6 +22,7 @@ import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBase;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -58,18 +59,29 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
 
     @Override
     @Transactional(readOnly = true)
-    public List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId) {
+    public List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId) {
         List<WorkspaceKnowledgeBase> workspaceKnowledgeBases =
             workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId);
 
         return workspaceKnowledgeBases.stream()
             .map(workspaceKnowledgeBase -> knowledgeBaseService.getKnowledgeBase(
                 workspaceKnowledgeBase.getKnowledgeBaseId()))
+            .filter(knowledgeBase -> knowledgeBase.getEnvironmentId() == environmentId)
             .toList();
     }
 
     @Override
-    public KnowledgeBase createWorkspaceKnowledgeBase(KnowledgeBase knowledgeBase, Long workspaceId) {
+    public KnowledgeBase createWorkspaceKnowledgeBase(
+        KnowledgeBase knowledgeBase, Long workspaceId, long environmentId) {
+
+        Environment[] environments = Environment.values();
+
+        if (environmentId < 0 || environmentId >= environments.length) {
+            throw new IllegalArgumentException("Invalid environmentId: " + environmentId);
+        }
+
+        knowledgeBase.setEnvironment(environments[(int) environmentId]);
+
         KnowledgeBase createdKnowledgeBase = knowledgeBaseService.createKnowledgeBase(knowledgeBase);
 
         workspaceKnowledgeBaseService.assignKnowledgeBaseToWorkspace(createdKnowledgeBase.getId(), workspaceId);

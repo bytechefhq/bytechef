@@ -81,16 +81,18 @@ class KnowledgeBaseGraphQlControllerIntTest {
     @Test
     void testGetKnowledgeBases() {
         Long workspaceId = 1L;
+        long environmentId = 0L;
         List<KnowledgeBase> mockKnowledgeBases = List.of(
             createMockKnowledgeBase(1L, "KnowledgeBase 1"),
             createMockKnowledgeBase(2L, "KnowledgeBase 2"));
 
-        when(workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBases(workspaceId)).thenReturn(mockKnowledgeBases);
+        when(workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBases(workspaceId, environmentId))
+            .thenReturn(mockKnowledgeBases);
 
         this.graphQlTester
             .document("""
                 query {
-                    knowledgeBases(workspaceId: "1") {
+                    knowledgeBases(environmentId: "0", workspaceId: "1") {
                         id
                         name
                     }
@@ -101,7 +103,7 @@ class KnowledgeBaseGraphQlControllerIntTest {
             .entityList(Object.class)
             .hasSize(2);
 
-        verify(workspaceKnowledgeBaseFacade).getWorkspaceKnowledgeBases(workspaceId);
+        verify(workspaceKnowledgeBaseFacade).getWorkspaceKnowledgeBases(workspaceId, environmentId);
     }
 
     @Test
@@ -162,15 +164,21 @@ class KnowledgeBaseGraphQlControllerIntTest {
     @Test
     void testCreateKnowledgeBase() {
         Long workspaceId = 1L;
+        long environmentId = 0L;
         KnowledgeBase mockKnowledgeBase = createMockKnowledgeBase(1L, "New KnowledgeBase");
 
-        when(workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(any(KnowledgeBase.class), eq(workspaceId)))
-            .thenReturn(mockKnowledgeBase);
+        when(workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(
+            any(KnowledgeBase.class), eq(workspaceId), eq(environmentId)))
+                .thenReturn(mockKnowledgeBase);
 
         this.graphQlTester
             .document("""
                 mutation {
-                    createKnowledgeBase(knowledgeBase: {name: "New KnowledgeBase"}, workspaceId: "1") {
+                    createKnowledgeBase(
+                        knowledgeBase: {name: "New KnowledgeBase"},
+                        environmentId: "0",
+                        workspaceId: "1"
+                    ) {
                         id
                         name
                     }
@@ -184,7 +192,8 @@ class KnowledgeBaseGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("New KnowledgeBase");
 
-        verify(workspaceKnowledgeBaseFacade).createWorkspaceKnowledgeBase(any(KnowledgeBase.class), eq(workspaceId));
+        verify(workspaceKnowledgeBaseFacade).createWorkspaceKnowledgeBase(
+            any(KnowledgeBase.class), eq(workspaceId), eq(environmentId));
     }
 
     @Test

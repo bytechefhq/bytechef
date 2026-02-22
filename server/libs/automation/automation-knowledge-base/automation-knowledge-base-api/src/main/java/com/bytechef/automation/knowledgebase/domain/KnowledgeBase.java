@@ -17,6 +17,7 @@
 package com.bytechef.automation.knowledgebase.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.time.Instant;
 import java.util.HashSet;
@@ -29,6 +30,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -41,6 +43,9 @@ public class KnowledgeBase {
     private String name;
 
     private String description;
+
+    @Column
+    private int environment;
 
     private int maxChunkSize = 1024;
 
@@ -91,6 +96,26 @@ public class KnowledgeBase {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Environment getEnvironment() {
+        Environment[] environments = Environment.values();
+
+        if (environment < 0 || environment >= environments.length) {
+            throw new IllegalStateException("Invalid environment value: " + environment);
+        }
+
+        return environments[environment];
+    }
+
+    public long getEnvironmentId() {
+        return environment;
+    }
+
+    public void setEnvironment(Environment environment) {
+        if (environment != null) {
+            this.environment = environment.ordinal();
+        }
     }
 
     public int getMaxChunkSize() {
@@ -175,7 +200,9 @@ public class KnowledgeBase {
     }
 
     public void setTags(List<Tag> tags) {
-        if (!CollectionUtils.isEmpty(tags)) {
+        if (CollectionUtils.isEmpty(tags)) {
+            setTagIds(List.of());
+        } else {
             setTagIds(CollectionUtils.map(tags, Tag::getId));
         }
     }
@@ -204,6 +231,7 @@ public class KnowledgeBase {
             "id=" + id +
             ", name='" + name + '\'' +
             ", description='" + description + '\'' +
+            ", environment=" + environment +
             ", maxChunkSize=" + maxChunkSize +
             ", minChunkSizeChars=" + minChunkSizeChars +
             ", overlap=" + overlap +

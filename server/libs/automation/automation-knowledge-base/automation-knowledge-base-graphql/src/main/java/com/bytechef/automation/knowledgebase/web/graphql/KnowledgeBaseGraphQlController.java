@@ -23,6 +23,7 @@ import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,6 +38,7 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 class KnowledgeBaseGraphQlController {
 
+    private final EnvironmentService environmentService;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseFacade knowledgeBaseFacade;
     private final KnowledgeBaseService knowledgeBaseService;
@@ -44,9 +46,11 @@ class KnowledgeBaseGraphQlController {
 
     @SuppressFBWarnings("EI")
     KnowledgeBaseGraphQlController(
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFacade knowledgeBaseFacade,
-        KnowledgeBaseService knowledgeBaseService, WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
+        EnvironmentService environmentService, KnowledgeBaseDocumentService knowledgeBaseDocumentService,
+        KnowledgeBaseFacade knowledgeBaseFacade, KnowledgeBaseService knowledgeBaseService,
+        WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
 
+        this.environmentService = environmentService;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.knowledgeBaseFacade = knowledgeBaseFacade;
         this.knowledgeBaseService = knowledgeBaseService;
@@ -59,8 +63,10 @@ class KnowledgeBaseGraphQlController {
     }
 
     @QueryMapping
-    List<KnowledgeBase> knowledgeBases(@Argument Long workspaceId) {
-        return workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBases(workspaceId);
+    List<KnowledgeBase> knowledgeBases(@Argument Long environmentId, @Argument Long workspaceId) {
+        environmentService.getEnvironment(environmentId);
+
+        return workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBases(workspaceId, environmentId);
     }
 
     @QueryMapping
@@ -76,8 +82,12 @@ class KnowledgeBaseGraphQlController {
     }
 
     @MutationMapping
-    KnowledgeBase createKnowledgeBase(@Argument KnowledgeBase knowledgeBase, @Argument Long workspaceId) {
-        return workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(knowledgeBase, workspaceId);
+    KnowledgeBase createKnowledgeBase(
+        @Argument KnowledgeBase knowledgeBase, @Argument Long environmentId, @Argument Long workspaceId) {
+
+        environmentService.getEnvironment(environmentId);
+
+        return workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(knowledgeBase, workspaceId, environmentId);
     }
 
     @MutationMapping

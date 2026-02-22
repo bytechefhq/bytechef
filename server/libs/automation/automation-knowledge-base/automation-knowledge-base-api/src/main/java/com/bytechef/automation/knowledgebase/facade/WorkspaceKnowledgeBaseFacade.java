@@ -29,21 +29,25 @@ import java.util.List;
 public interface WorkspaceKnowledgeBaseFacade {
 
     /**
-     * Retrieves a list of knowledge bases associated with the specified workspace.
+     * Retrieves a list of knowledge bases associated with the specified workspace and environment.
      *
-     * @param workspaceId the unique identifier of the workspace for which the knowledge bases are to be retrieved
-     * @return a list of {@code KnowledgeBase} objects associated with the workspace
+     * @param workspaceId   the unique identifier of the workspace
+     * @param environmentId the environment ordinal
+     *                      ({@link com.bytechef.platform.configuration.domain.Environment#ordinal()}) to filter by
+     * @return a list of {@code KnowledgeBase} objects associated with the workspace and environment
      */
-    List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId);
+    List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId);
 
     /**
      * Creates a new knowledge base and assigns it to the specified workspace.
      *
      * @param knowledgeBase the knowledge base to create
      * @param workspaceId   the workspace ID to assign the knowledge base to
+     * @param environmentId the environment ordinal
+     *                      ({@link com.bytechef.platform.configuration.domain.Environment#ordinal()})
      * @return the created knowledge base
      */
-    KnowledgeBase createWorkspaceKnowledgeBase(KnowledgeBase knowledgeBase, Long workspaceId);
+    KnowledgeBase createWorkspaceKnowledgeBase(KnowledgeBase knowledgeBase, Long workspaceId, long environmentId);
 
     /**
      * Deletes a knowledge base and removes it from all workspaces.
