@@ -19,7 +19,6 @@
     "minLength": null,
     "name": "message",
     "options": null,
-    "optionsLoadedDynamically": null,
     "placeholder": null,
     "regex": null,
     "required": null,
