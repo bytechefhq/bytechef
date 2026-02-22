@@ -22,6 +22,7 @@ import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEM
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -50,7 +51,8 @@ class SnowflakeUpdateRowActionTest {
 
     @Test
     void perform() {
-        try (MockedStatic<SnowflakeUtils> snowflakeUtilsMockedStatic = mockStatic(SnowflakeUtils.class)) {
+        try (MockedStatic<SnowflakeUtils> snowflakeUtilsMockedStatic =
+            mockStatic(SnowflakeUtils.class, CALLS_REAL_METHODS)) {
             snowflakeUtilsMockedStatic
                 .when(() -> SnowflakeUtils.executeStatement(
                     contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
@@ -61,7 +63,7 @@ class SnowflakeUpdateRowActionTest {
             assertEquals(mockedObject, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals(
-                "UPDATE database.schema.table SET col2=5,col1=5 WHERE col1 = 2",
+                "UPDATE \"database\".\"schema\".\"table\" SET \"col2\"=5,\"col1\"=5 WHERE col1 = 2",
                 stringArgumentCaptor.getValue());
         }
     }

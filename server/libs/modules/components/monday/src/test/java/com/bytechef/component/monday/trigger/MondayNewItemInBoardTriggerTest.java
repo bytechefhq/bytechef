@@ -59,7 +59,7 @@ class MondayNewItemInBoardTriggerTest {
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Parameters parameters = MockParametersFactory.create(Map.of(BOARD_ID, "board"));
+    private final Parameters parameters = MockParametersFactory.create(Map.of(BOARD_ID, "12345"));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
@@ -77,7 +77,7 @@ class MondayNewItemInBoardTriggerTest {
 
             assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
             assertEquals(
-                "mutation{create_webhook(board_id: board, url: \"testWebhookUrl\", event: create_item){id}}",
+                "mutation{create_webhook(board_id: 12345, url: \"testWebhookUrl\", event: create_item){id}}",
                 stringArgumentCaptor.getValue());
             assertEquals(mockedTriggerContext, contextArgumentCaptor.getValue());
         }

@@ -26,6 +26,7 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.util.SqlUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,9 @@ import tools.jackson.core.type.TypeReference;
 public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> {
 
     @Override
+    @SuppressFBWarnings(
+        value = "SQL_INJECTION_SPRING_JDBC",
+        justification = "Identifiers are quoted; values use named parameters via NamedParameterJdbcTemplate")
     public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         List<Map<String, ?>> columns = MapUtils.getList(inputParameters, COLUMNS, new TypeReference<>() {}, List.of());
         Map<Object, ?> valuesMap = MapUtils.getMap(inputParameters, VALUES);
@@ -55,6 +59,10 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
             .map(columnMap -> (String) columnMap.get(NAME))
             .collect(Collectors.toList());
 
+        String quotedColumns = columnNames.stream()
+            .map(SqlUtils::quoteIdentifier)
+            .collect(Collectors.joining(","));
+
         String values = columnNames.stream()
             .map(column -> ":" + column)
             .collect(Collectors.joining(","));
@@ -62,7 +70,9 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         SqlUtils.checkColumnTypes(schema, table, rows, dataSource);
 
         int[] rowsAffected = JdbcExecutor.batchUpdate(
-            String.format("INSERT INTO %s.%s (%s) VALUES(%s)", schema, table, String.join(",", columnNames), values),
+            String.format(
+                "INSERT INTO %s.%s (%s) VALUES(%s)",
+                SqlUtils.quoteIdentifier(schema), SqlUtils.quoteIdentifier(table), quotedColumns, values),
             SqlParameterSourceUtils.createBatch(rows.toArray()), dataSource);
 
         IntStream stream = Arrays.stream(rowsAffected);

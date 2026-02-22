@@ -51,13 +51,25 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Monika Kušter
  */
 public class SalesforceUtils {
 
+    private static final Pattern SAFE_SOQL_IDENTIFIER = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_]*(__[a-zA-Z])?$");
+
     private SalesforceUtils() {
+    }
+
+    private static String validateSoqlIdentifier(String identifier) {
+        if (!SAFE_SOQL_IDENTIFIER.matcher(identifier)
+            .matches()) {
+            throw new IllegalArgumentException("Invalid Salesforce object name: " + identifier);
+        }
+
+        return identifier;
     }
 
     public static FileEntry combineFieldsAndCreateJsonFile(Parameters inputParameters, ActionContext actionContext) {
@@ -202,9 +214,11 @@ public class SalesforceUtils {
 
         String formattedStartDate = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
             .withZone(zoneId));
+        String objectName = validateSoqlIdentifier(inputParameters.getRequiredString(OBJECT));
+
         String query = String.format(
             "SELECT FIELDS(ALL) FROM %s WHERE %s > %s ORDER BY %s ASC LIMIT 200 OFFSET 0",
-            inputParameters.getRequiredString(OBJECT), dateFieldName, formattedStartDate, dateFieldName);
+            objectName, dateFieldName, formattedStartDate, dateFieldName);
 
         Map<String, ?> responseBody = executeSOQLQuery(triggerContext, query);
 
@@ -219,7 +233,7 @@ public class SalesforceUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext actionContext) {
 
-        String query = "SELECT Id FROM " + inputParameters.getRequiredString(OBJECT);
+        String query = "SELECT Id FROM " + validateSoqlIdentifier(inputParameters.getRequiredString(OBJECT));
 
         Map<String, ?> body = executeSOQLQuery(actionContext, query);
 

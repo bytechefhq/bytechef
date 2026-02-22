@@ -32,6 +32,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Nikolina Spehar
@@ -55,11 +56,14 @@ public class SnowflakeDeleteRowAction {
     private SnowflakeDeleteRowAction() {
     }
 
+    @SuppressFBWarnings(
+        value = "SQL_INJECTION_SPRING_JDBC",
+        justification = "Identifiers are quoted; CONDITION is a user-provided WHERE clause by workflow creator, not end user")
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String sqlStatement = "DELETE FROM %s.%s.%s WHERE %s".formatted(
-            inputParameters.getRequiredString(DATABASE),
-            inputParameters.getRequiredString(SCHEMA),
-            inputParameters.getRequiredString(TABLE),
+            SnowflakeUtils.quoteIdentifier(inputParameters.getRequiredString(DATABASE)),
+            SnowflakeUtils.quoteIdentifier(inputParameters.getRequiredString(SCHEMA)),
+            SnowflakeUtils.quoteIdentifier(inputParameters.getRequiredString(TABLE)),
             inputParameters.getRequiredString(CONDITION));
 
         return SnowflakeUtils.executeStatement(context, sqlStatement);

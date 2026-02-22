@@ -35,6 +35,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -62,11 +63,14 @@ public class SnowflakeUpdateRowAction {
     private SnowflakeUpdateRowAction() {
     }
 
+    @SuppressFBWarnings(
+        value = "SQL_INJECTION_SPRING_JDBC",
+        justification = "Identifiers are quoted; CONDITION is a user-provided WHERE clause by workflow creator, not end user")
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String sqlStatement = "UPDATE %s.%s.%s SET %s WHERE %s".formatted(
-            inputParameters.getRequiredString(DATABASE),
-            inputParameters.getRequiredString(SCHEMA),
-            inputParameters.getRequiredString(TABLE),
+            SnowflakeUtils.quoteIdentifier(inputParameters.getRequiredString(DATABASE)),
+            SnowflakeUtils.quoteIdentifier(inputParameters.getRequiredString(SCHEMA)),
+            SnowflakeUtils.quoteIdentifier(inputParameters.getRequiredString(TABLE)),
             getColumnUpdateStatement(inputParameters.getRequiredMap(VALUES)),
             inputParameters.getRequiredString(CONDITION));
 
@@ -81,7 +85,9 @@ public class SnowflakeUpdateRowAction {
                 String columnName = entry.getKey();
                 Object value = entry.getValue();
 
-                return "%s=%s".formatted(columnName, value instanceof String ? "'" + value + "'" : value);
+                return "%s=%s".formatted(
+                    SnowflakeUtils.quoteIdentifier(columnName),
+                    value instanceof String ? "'" + SnowflakeUtils.escapeStringLiteral((String) value) + "'" : value);
             })
             .collect(Collectors.joining(","));
     }

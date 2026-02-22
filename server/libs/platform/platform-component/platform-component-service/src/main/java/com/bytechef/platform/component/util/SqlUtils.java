@@ -69,6 +69,14 @@ public class SqlUtils {
         DateTimeFormatter.ofPattern("MMMM dd yyyy"),
         DateTimeFormatter.ofPattern("MMM dd yyyy"));
 
+    /**
+     * Quotes a SQL identifier (table, column, schema name) using double quotes to prevent SQL injection. Any embedded
+     * double quotes are escaped by doubling them per the SQL standard.
+     */
+    public static String quoteIdentifier(String identifier) {
+        return "\"" + identifier.replace("\"", "\"\"") + "\"";
+    }
+
     @SuppressFBWarnings("ODR")
     public static void checkColumnTypes(
         String schema, String table, List<Map<String, Object>> rows, DataSource dataSource) {

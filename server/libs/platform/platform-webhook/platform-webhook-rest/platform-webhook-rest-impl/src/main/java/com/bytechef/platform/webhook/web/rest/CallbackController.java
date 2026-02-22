@@ -19,6 +19,8 @@ package com.bytechef.platform.webhook.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.config.ApplicationProperties;
 import jakarta.servlet.http.HttpServletRequest;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,9 +63,9 @@ public class CallbackController {
                         sb.append('&');
                     }
 
-                    sb.append(key)
+                    sb.append(URLEncoder.encode(key, StandardCharsets.UTF_8))
                         .append('=')
-                        .append(value);
+                        .append(URLEncoder.encode(value, StandardCharsets.UTF_8));
 
                     first = false;
                 }

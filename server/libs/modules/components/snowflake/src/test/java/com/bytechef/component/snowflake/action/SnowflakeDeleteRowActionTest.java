@@ -21,6 +21,7 @@ import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATAB
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -47,7 +48,8 @@ class SnowflakeDeleteRowActionTest {
 
     @Test
     void perform() {
-        try (MockedStatic<SnowflakeUtils> snowflakeUtilsMockedStatic = mockStatic(SnowflakeUtils.class)) {
+        try (MockedStatic<SnowflakeUtils> snowflakeUtilsMockedStatic =
+            mockStatic(SnowflakeUtils.class, CALLS_REAL_METHODS)) {
             snowflakeUtilsMockedStatic
                 .when(() -> SnowflakeUtils.executeStatement(
                     contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
@@ -56,7 +58,9 @@ class SnowflakeDeleteRowActionTest {
             Object result = SnowflakeDeleteRowAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedObject, result);
-            assertEquals("DELETE FROM database.schema.table WHERE col1 = 2", stringArgumentCaptor.getValue());
+            assertEquals(
+                "DELETE FROM \"database\".\"schema\".\"table\" WHERE col1 = 2",
+                stringArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
         }
     }
