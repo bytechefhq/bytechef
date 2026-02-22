@@ -345,6 +345,8 @@ public class ExampleComponentHandler implements ComponentHandler {
 
 **Checkstyle**:
 - Test method names must be camelCase without underscores (e.g., `testExecuteSuccess` not `testExecute_Success`)
+- Naming rule applies to ALL methods in test sources (including private helpers), not just `@Test` methods
+- Empty blocks are forbidden — a comment alone doesn't satisfy the `EmptyBlock` rule; add an executable statement
 - `TODO:` comments are forbidden (`TodoComment` rule) — rewrite as plain comments describing intent, or implement the work
 
 ### Spring Boot Best Practices
