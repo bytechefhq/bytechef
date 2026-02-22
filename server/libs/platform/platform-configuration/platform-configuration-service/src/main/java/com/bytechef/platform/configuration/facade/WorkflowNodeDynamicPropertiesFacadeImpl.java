@@ -37,9 +37,11 @@ import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
@@ -93,7 +95,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
             .toList();
 
         Map<String, Long> clusterElementConnectionIds = connections.stream()
-            .collect(java.util.stream.Collectors.toMap(
+            .collect(Collectors.toMap(
                 WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
                 WorkflowTestConfigurationConnection::getConnectionId));
 
@@ -113,7 +115,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowNodeType.name(), environmentId);
+            workflowId, workflowTask.getName(), environmentId);
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
 
@@ -140,7 +142,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     private Map<String, Map<String, ?>> evaluateClusterElementInputParameters(
         ClusterElementMap clusterElementMap, Map<String, Object> context) {
 
-        Map<String, Map<String, ?>> result = new java.util.HashMap<>();
+        Map<String, Map<String, ?>> result = new HashMap<>();
 
         for (Map.Entry<String, Object> entry : clusterElementMap.entrySet()) {
             Object value = entry.getValue();

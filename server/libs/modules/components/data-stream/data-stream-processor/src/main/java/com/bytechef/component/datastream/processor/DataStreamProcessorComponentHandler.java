@@ -31,7 +31,7 @@ import com.google.auto.service.AutoService;
 public class DataStreamProcessorComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("dataStreamProcessor")
-        .title("Data Stream Processor")
+        .title("Processor")
         .description("Processes and transforms data in data streams.")
         .icon("path:assets/data-stream-processor.svg")
         .categories(ComponentCategory.HELPERS)
