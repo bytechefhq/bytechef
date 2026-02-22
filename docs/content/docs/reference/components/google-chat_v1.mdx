@@ -49,6 +49,23 @@ Creation of OAuth 2.0 application is documented [here](/reference/components/goo
     <iframe src="https://www.guidejar.com/embed/4840c5c7-bb9a-4c7d-8035-772d3162398a?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
 
+### Configure Chat Application
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/)
+2. Click on **APIs & Services**
+3. Click on **Google Chat API**
+4. Click on **Configuration**
+5. Add App name, Avatar URL and Description
+6. Enable "Join spaces and group conversations"
+7. Click on "Use a common HTTP endpoint URL for all triggers" and add some HTTPS URL, we won't use that feature.
+8. Click on "Enter email addresses to add individuals and group" and add your email address.
+9. Click on **Save**
+10. Done 🚀
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/3e1f4f00-5257-4be0-9932-aecb66544aed?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
 
 
 <hr />
@@ -66,7 +83,7 @@ Name: createMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| SPACE | Space | STRING | Space in which the message will be created. | true |
+| spaceName | Space Name | STRING | Space name of the space in which the message will be created. | true |
 | text | Message Text | STRING | Text of the message. | true |
 
 #### Example JSON Structure
@@ -75,7 +92,7 @@ Name: createMessage
   "label" : "Create Message",
   "name" : "createMessage",
   "parameters" : {
-    "SPACE" : "",
+    "spaceName" : "",
     "text" : ""
   },
   "type" : "googleChat/v1/createMessage"
@@ -126,6 +143,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Space Name
+
+To find the Space Name, click [here](/reference/components/google-chat_v1#how-to-find-space-name)
 
 
 
@@ -166,14 +186,15 @@ Type: OBJECT
 | name | STRING | Name of the space that was created. |
 | type | STRING | Type of the space. |
 | displayName | STRING | Name of the space that will be displayed. |
-| spaceThreadingState | STRING |  |
-| spaceType | STRING |  |
-| spaceHistoryState | STRING |  |
-| createTime | STRING |  |
-| lastActiveTime | STRING |  |
-| membershipCount | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
-| accessSettings | OBJECT <details> <summary> Properties </summary> &#123;STRING\(accessSettings)&#125; </details> |  |
-| spaceUri | STRING |  |
+| spaceThreadingState | STRING | The threading state in the Chat space. |
+| spaceType | STRING | The type of space. |
+| spaceHistoryState | STRING | The message history state for messages and threads in this space. |
+| createTime | STRING | For spaces created in Chat, the time the space was created. |
+| lastActiveTime | STRING | Timestamp of the last message in the space. |
+| membershipCount | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The count of joined memberships grouped by member type. |
+| accessSettings | OBJECT <details> <summary> Properties </summary> &#123;STRING\(accessSettings)&#125; </details> | Specifies the access setting of the space. |
+| customer | STRING | Customer that created the space. |
+| spaceUri | STRING | The URI for a user to access the space. |
 
 
 
@@ -193,6 +214,7 @@ Type: OBJECT
   "accessSettings" : {
     "accessSettings" : ""
   },
+  "customer" : "",
   "spaceUri" : ""
 }
 ```
@@ -202,9 +224,20 @@ Type: OBJECT
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
 <hr />
 
 # Additional Instructions
+
+### How to find Space Name
+
+To retrieve the Space Name, use the **Google Chat API** `spaces.list` method.
+Its endpoint is `GET https://chat.googleapis.com/v1/spaces`.
 
 ## Troubleshooting
 

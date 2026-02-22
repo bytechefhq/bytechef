@@ -43,6 +43,7 @@ public class GoogleChatConnection {
             map.put("https://www.googleapis.com/auth/chat.app.messages.readonly", false);
             map.put("https://www.googleapis.com/auth/chat.app.spaces", false);
             map.put("https://www.googleapis.com/auth/chat.app.spaces.create", false);
+            map.put("https://www.googleapis.com/auth/chat.bot", false);
             map.put("https://www.googleapis.com/auth/chat.customemojis", false);
             map.put("https://www.googleapis.com/auth/chat.customemojis.readonly", false);
             map.put("https://www.googleapis.com/auth/chat.delete", false);
@@ -62,6 +63,8 @@ public class GoogleChatConnection {
             map.put("https://www.googleapis.com/auth/chat.users.readstate", false);
             map.put("https://www.googleapis.com/auth/chat.users.readstate.readonly", false);
             map.put("https://www.googleapis.com/auth/chat.users.spacesettings", false);
+            map.put("https://www.googleapis.com/auth/chat.users.sections", false);
+            map.put("https://www.googleapis.com/auth/chat.users.sections.readonly", false);
 
             return map;
         });

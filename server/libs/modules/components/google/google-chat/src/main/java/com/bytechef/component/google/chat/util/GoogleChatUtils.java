@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class GoogleChatUtils {
 
-    public static List<Option<String>> getSpaceOptions(
+    public static List<Option<String>> getSpaceNameOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
