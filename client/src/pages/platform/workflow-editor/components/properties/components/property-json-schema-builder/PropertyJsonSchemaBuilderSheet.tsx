@@ -6,7 +6,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {SPACE} from '@/shared/constants';
 import {MessageCircleQuestionIcon} from 'lucide-react';
-import {Suspense, lazy, useCallback, useRef, useState} from 'react';
+import {Suspense, lazy, useCallback, useEffect, useRef, useState} from 'react';
 
 import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
@@ -21,6 +21,10 @@ interface PropertyJsonSchemaBuilderSheetProps {
 
 const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: PropertyJsonSchemaBuilderSheetProps) => {
     const [localSchema, setLocalSchema] = useState<SchemaRecordType | undefined>(schema);
+
+    useEffect(() => {
+        setLocalSchema(schema);
+    }, [schema]);
 
     const editorRef = useRef<StandaloneCodeEditorType | null>(null);
 

@@ -70,7 +70,7 @@ const SchemaInput = ({
                 className="text-ellipsis"
                 onBlur={onChangeValue}
                 onChange={(event) => setLocalValue(event.target.value)}
-                onKeyPress={handleEnterPress(onChangeValue)}
+                onKeyDown={handleEnterPress(onChangeValue)}
                 placeholder={placeholder}
                 type={type}
                 value={localValue}
