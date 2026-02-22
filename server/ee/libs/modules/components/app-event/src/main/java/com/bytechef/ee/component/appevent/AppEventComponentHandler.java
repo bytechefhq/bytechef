@@ -48,7 +48,7 @@ public class AppEventComponentHandler implements ComponentHandler {
                 .description("Use one event from your app tot trigger workflows across any integrations.")
                 .icon("path:assets/app-event.svg")
                 .categories(ComponentCategory.HELPERS)
-                .triggers(new AppEventTrigger(appEventService).triggerDefinition));
+                .triggers(AppEventTrigger.of(appEventService)));
         }
     }
 }
