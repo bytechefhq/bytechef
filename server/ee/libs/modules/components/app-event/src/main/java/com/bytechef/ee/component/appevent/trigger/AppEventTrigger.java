@@ -12,6 +12,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.platform.component.definition.AppEventComponentDefinition.NEW_EVENT;
 
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -38,21 +39,25 @@ public class AppEventTrigger {
 
     private final AppEventService appEventService;
 
-    public final TriggerDefinition triggerDefinition = trigger(NEW_EVENT)
-        .title("New Event")
-        .description("Triggers when new app event is sent.")
-        .type(TriggerDefinition.TriggerType.STATIC_WEBHOOK)
-        .properties(
-            integer(APP_EVENT_ID)
-                .label("App Event Id")
-                .description("The Id of an app event.")
-                .options((TriggerDefinition.OptionsFunction<Long>) this::getOptions))
-        .output(this::output)
-        .webhookRequest(this::webhookRequest);
-
     @SuppressFBWarnings("EI")
     public AppEventTrigger(AppEventService appEventService) {
         this.appEventService = appEventService;
+    }
+
+    public static ModifiableTriggerDefinition of(AppEventService appEventService) {
+        AppEventTrigger appEventTrigger = new AppEventTrigger(appEventService);
+
+        return trigger(NEW_EVENT)
+            .title("New Event")
+            .description("Triggers when new app event is sent.")
+            .type(TriggerDefinition.TriggerType.STATIC_WEBHOOK)
+            .properties(
+                integer(APP_EVENT_ID)
+                    .label("App Event Id")
+                    .description("The Id of an app event.")
+                    .options((TriggerDefinition.OptionsFunction<Long>) appEventTrigger::getOptions))
+            .output(appEventTrigger::output)
+            .webhookRequest(appEventTrigger::webhookRequest);
     }
 
     protected List<? extends Option<Long>> getOptions(
