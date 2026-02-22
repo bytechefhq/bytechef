@@ -387,7 +387,11 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         }
 
         return new WorkflowTestParameters(
-            new JobParametersDTO(workflowId, inputs, Map.of(MetadataConstants.CONNECTION_IDS, connectionIdsMap)),
+            new JobParametersDTO(
+                workflowId, inputs,
+                Map.of(
+                    MetadataConstants.CONNECTION_IDS, connectionIdsMap,
+                    MetadataConstants.EDITOR_ENVIRONMENT, true)),
             triggerExecutionDTO);
     }
 

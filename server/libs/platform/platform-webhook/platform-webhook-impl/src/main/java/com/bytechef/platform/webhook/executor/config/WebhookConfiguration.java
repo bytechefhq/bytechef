@@ -48,6 +48,8 @@ import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutorImpl;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowSyncExecutor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalCreator;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.task.dispatcher.approval.WaitForApprovalTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
@@ -87,11 +89,13 @@ public class WebhookConfiguration {
 
     @Bean
     WebhookWorkflowExecutor webhookExecutor(
-        ContextService contextService, CounterService counterService, Environment environment, Evaluator evaluator,
+        ChildJobPrincipalCreator childJobPrincipalCreator, ContextService contextService,
+        CounterService counterService, Environment environment, Evaluator evaluator,
         ApplicationEventPublisher eventPublisher, JobFacade jobFacade,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        SseStreamBridgeRegistry sseStreamBridgeRegistry, TaskExecutionService taskExecutionService,
+        SseStreamBridgeRegistry sseStreamBridgeRegistry, SubflowResolver subflowResolver,
+        TaskExecutionService taskExecutionService,
         TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
         WebhookWorkflowSyncExecutor triggerSyncExecutor, WorkflowService workflowService) {
 
@@ -111,8 +115,8 @@ public class WebhookConfiguration {
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, coordinatorEventPublisher, evaluator, jobFacade, jobService,
-                    taskExecutionService, taskFileStorage),
+                    childJobPrincipalCreator, contextService, counterService, coordinatorEventPublisher, evaluator,
+                    jobFacade, jobService, subflowResolver, taskExecutionService, taskFileStorage),
                 taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             principalJobFacade, sseStreamBridgeRegistry, triggerSyncExecutor, taskFileStorage);
     }
@@ -179,12 +183,14 @@ public class WebhookConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, ApplicationEventPublisher eventPublisher,
-        Evaluator evaluator, JobFacade jobFacade, JobService jobService, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage) {
+        ChildJobPrincipalCreator childJobPrincipalCreator, ContextService contextService,
+        CounterService counterService, ApplicationEventPublisher eventPublisher, Evaluator evaluator,
+        JobFacade jobFacade, JobService jobService, SubflowResolver subflowResolver,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         return List.of(
-            (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade),
+            (taskDispatcher) -> new SubflowTaskDispatcher(
+                childJobPrincipalCreator, jobFacade, jobService, subflowResolver),
             (taskDispatcher) -> new WaitForApprovalTaskDispatcher(
                 eventPublisher, jobService, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(

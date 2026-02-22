@@ -16,20 +16,25 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.bool;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.date;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.dateTime;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.integer;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.number;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.INPUTS;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.dynamicProperties;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.option;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.string;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.time;
+import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants.SUBFLOW;
+import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants.WORKFLOW_UUID;
 
-import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
-import com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
+import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,23 +43,88 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(
-        SubflowTaskDispatcherConstants.SUBFLOW)
+    private final TaskDispatcherDefinition taskDispatcherDefinition;
+
+    SubflowTaskDispatcherDefinitionFactory(SubflowDataSource subflowDataSource) {
+        this.taskDispatcherDefinition = taskDispatcher(SUBFLOW)
             .title("Subflow")
             .description(
                 "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task.")
             .icon("path:assets/subflow.svg")
             .properties(
-                string(WorkflowConstants.WORKFLOW_ID)
-                    .label("Workflow Id")
-                    .description("The id of sub-workflow to execute."),
-                object(WorkflowConstants.INPUTS)
+                string(WORKFLOW_UUID)
+                    .label("Workflow")
+                    .description("The sub-workflow to execute.")
+                    .optionsFunction(
+                        search -> subflowDataSource
+                            .getSubWorkflows(PlatformType.AUTOMATION, search)
+                            .stream()
+                            .map(
+                                subWorkflowEntry -> option(
+                                    subWorkflowEntry.name(), subWorkflowEntry.workflowUuid()))
+                            .toList()),
+                dynamicProperties(INPUTS)
                     .label("Inputs")
-                    .description("The inputs of a workflow.")
-                    .additionalProperties(bool(), date(), dateTime(), integer(), number(), string(), time()));
+                    .description("The input parameters for the sub-workflow.")
+                    .propertiesLookupDependsOn(WORKFLOW_UUID)
+                    .propertiesFunction(inputParameters -> inputs(inputParameters, subflowDataSource)))
+            .output(inputParameters -> output(inputParameters, subflowDataSource))
+            .variableProperties(inputParameters -> variableProperties(inputParameters, subflowDataSource));
+    }
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
-        return TASK_DISPATCHER_DEFINITION;
+        return taskDispatcherDefinition;
+    }
+
+    private static List<? extends Property> inputs(
+        Map<String, ?> inputParameters, SubflowDataSource subflowDataSource) {
+
+        String workflowUuid = MapUtils.getString(inputParameters, WORKFLOW_UUID);
+
+        if (workflowUuid == null || workflowUuid.isEmpty()) {
+            return List.of();
+        }
+
+        OutputResponse outputResponse = subflowDataSource.getSubWorkflowInputSchema(workflowUuid);
+
+        if (outputResponse == null) {
+            return List.of();
+        }
+
+        if (!(outputResponse.getOutputSchema() instanceof ObjectProperty objectProperty)) {
+            return List.of();
+        }
+
+        return objectProperty.getProperties()
+            .orElse(List.of());
+    }
+
+    private static OutputResponse output(Map<String, ?> inputParameters, SubflowDataSource subflowDataSource) {
+        String workflowUuid = MapUtils.getString(inputParameters, WORKFLOW_UUID);
+
+        if (workflowUuid == null || workflowUuid.isEmpty()) {
+            return null;
+        }
+
+        return subflowDataSource.getSubWorkflowOutputSchema(workflowUuid);
+    }
+
+    private static OutputResponse variableProperties(
+        Map<String, ?> inputParameters, SubflowDataSource subflowDataSource) {
+
+        String workflowUuid = MapUtils.getString(inputParameters, WORKFLOW_UUID);
+
+        if (workflowUuid == null || workflowUuid.isEmpty()) {
+            return OutputResponse.of(object());
+        }
+
+        OutputResponse outputResponse = subflowDataSource.getSubWorkflowInputSchema(workflowUuid);
+
+        if (outputResponse == null) {
+            return OutputResponse.of(object());
+        }
+
+        return outputResponse;
     }
 }

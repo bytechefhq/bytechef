@@ -20,12 +20,14 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProce
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
-import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
@@ -33,21 +35,24 @@ import tools.jackson.core.type.TypeReference;
 public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSendProcessor {
 
     private final JobService jobService;
+    private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
-    @SuppressFBWarnings
-    public TestTaskDispatcherPreSendProcessor(JobService jobService) {
+    @SuppressFBWarnings("EI")
+    public TestTaskDispatcherPreSendProcessor(
+        JobService jobService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+
         this.jobService = jobService;
+        this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
-        Map<String, Map<String, Long>> connectionIdsMap = MapUtils.getMap(
-            job.getMetadata(), MetadataConstants.CONNECTION_IDS, new TypeReference<>() {}, Map.of());
+        Map<String, Long> connectionIdMap = getConnectionIdMap(job.getWorkflowId(), taskExecution.getName());
 
-        if (connectionIdsMap.containsKey(taskExecution.getName())) {
-            taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdsMap.get(taskExecution.getName()));
+        if (!connectionIdMap.isEmpty()) {
+            taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
 
         taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, 0);
@@ -60,5 +65,18 @@ public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSend
     @Override
     public boolean canProcess(TaskExecution taskExecution) {
         return true;
+    }
+
+    private Map<String, Long> getConnectionIdMap(String workflowId, String workflowNodeName) {
+        List<WorkflowTestConfigurationConnection> connections =
+            workflowTestConfigurationService.getWorkflowTestConfigurationConnections(workflowId, workflowNodeName, 0);
+
+        Map<String, Long> connectionIdMap = new HashMap<>();
+
+        for (WorkflowTestConfigurationConnection connection : connections) {
+            connectionIdMap.put(connection.getWorkflowConnectionKey(), connection.getConnectionId());
+        }
+
+        return connectionIdMap;
     }
 }

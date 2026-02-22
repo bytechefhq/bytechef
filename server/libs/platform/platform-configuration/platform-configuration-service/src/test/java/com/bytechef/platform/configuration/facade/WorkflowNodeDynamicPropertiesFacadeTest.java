@@ -44,6 +44,8 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,6 +75,9 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     private Evaluator evaluator;
 
     @Mock
+    private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+
+    @Mock
     private TriggerDefinitionFacade triggerDefinitionFacade;
 
     @Mock
@@ -90,7 +95,8 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     void setUp() {
         workflowNodeDynamicPropertiesFacade = new WorkflowNodeDynamicPropertiesFacadeImpl(
             actionDefinitionFacade, clusterElementDefinitionFacade, clusterElementDefinitionService, evaluator,
-            triggerDefinitionFacade, workflowService, workflowNodeOutputFacade, workflowTestConfigurationService);
+            taskDispatcherDefinitionService, triggerDefinitionFacade, workflowService, workflowNodeOutputFacade,
+            workflowTestConfigurationService);
     }
 
     @Test
@@ -272,7 +278,7 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.fetch(workflow, workflowNodeName))
                 .thenReturn(Optional.empty());
 
-            List<Property> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
+            List<? extends BaseProperty> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
                 workflowId, workflowNodeName, propertyName, List.of(), environmentId);
 
             assertEquals(expectedProperties, result);
@@ -317,13 +323,56 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.fetch(workflow, workflowNodeName))
                 .thenReturn(Optional.of(workflowTrigger));
 
-            List<Property> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
+            List<? extends BaseProperty> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
                 workflowId, workflowNodeName, propertyName, List.of(), environmentId);
 
             assertEquals(expectedProperties, result);
 
             verify(triggerDefinitionFacade).executeDynamicProperties(
                 eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), eq(connectionId));
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testGetWorkflowNodeDynamicPropertiesForTaskDispatcher() {
+        String workflowId = "workflow1";
+        String workflowNodeName = "subflow1";
+        String propertyName = "inputs";
+        long environmentId = 1L;
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfigurationConnectionId(
+            workflowId, workflowNodeName, environmentId))
+                .thenReturn(Optional.empty());
+        doReturn(Map.of()).when(workflowTestConfigurationService)
+            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+
+        Workflow workflow = mock(Workflow.class);
+        WorkflowTask workflowTask = mock(WorkflowTask.class);
+
+        when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+        when(workflow.getTask(workflowNodeName)).thenReturn(workflowTask);
+        when(workflowTask.getType()).thenReturn("subflow/v1");
+        doReturn(Map.of()).when(workflowTask)
+            .evaluateParameters(anyMap(), any(Evaluator.class));
+
+        List<com.bytechef.platform.workflow.task.dispatcher.domain.Property> expectedProperties = List.of();
+
+        when(taskDispatcherDefinitionService.executeDynamicProperties(
+            eq("subflow"), eq(1), eq(propertyName), anyMap()))
+                .thenReturn(expectedProperties);
+
+        try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.fetch(workflow, workflowNodeName))
+                .thenReturn(Optional.empty());
+
+            List<? extends BaseProperty> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
+                workflowId, workflowNodeName, propertyName, List.of(), environmentId);
+
+            assertEquals(expectedProperties, result);
+
+            verify(taskDispatcherDefinitionService).executeDynamicProperties(
+                eq("subflow"), eq(1), eq(propertyName), anyMap());
         }
     }
 }
