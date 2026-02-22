@@ -18,6 +18,7 @@ package com.bytechef.automation.data.table.configuration.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -75,6 +76,7 @@ class DataTableServiceTest {
 
         dataTableService.dropTable("mytable", 1L);
 
+        verify(jdbcTemplate).execute(contains("DROP TABLE IF EXISTS"));
         verify(workspaceDataTableRepository).deleteAll(List.of(workspaceDataTable));
         verify(dataTableRepository).deleteByName("mytable");
     }
@@ -87,6 +89,7 @@ class DataTableServiceTest {
 
         dataTableService.dropTable("mytable", 1L);
 
+        verify(jdbcTemplate).execute(contains("DROP TABLE IF EXISTS"));
         verify(dataTableRepository, never()).findByName(anyString());
         verify(workspaceDataTableRepository, never()).deleteAll(any());
         verify(dataTableRepository, never()).deleteByName(anyString());
