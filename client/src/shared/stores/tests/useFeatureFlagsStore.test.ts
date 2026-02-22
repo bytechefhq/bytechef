@@ -322,6 +322,26 @@ describe('useFeatureFlagsStore', () => {
             expect(featureFlagsStore.getState().featureFlags['ff-deferred']).toBe(true);
             expect(featureFlagsStore.getState().loadingFlags['ff-deferred']).toBeUndefined();
         });
+
+        it('unsubscribes from onFeatureFlags after first invocation to prevent leaks', async () => {
+            const unsubscribe = vi.fn();
+
+            vi.mocked(posthog.onFeatureFlags).mockImplementation((callback) => {
+                (callback as () => void)();
+
+                return unsubscribe;
+            });
+
+            const {result} = renderHook(() => useFeatureFlagsStore());
+
+            result.current('ff-unsub');
+
+            await act(async () => {
+                await flushAsync();
+            });
+
+            expect(unsubscribe).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe('PostHog import failure', () => {

@@ -98,9 +98,14 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
                 .then((posthog) => {
                     // Use onFeatureFlags as the explicit "loaded" signal — it fires
                     // immediately if flags are already loaded, avoiding the unreliable
-                    // getFeatureFlag() !== undefined check
-                    posthog.default.onFeatureFlags(function () {
+                    // getFeatureFlag() !== undefined check. Unsubscribe after the first
+                    // invocation to prevent callback accumulation on flag reload events.
+                    // Note: unsubscribe() must be inside setTimeout to avoid TDZ — the
+                    // callback can fire synchronously before the const assignment completes.
+                    const unsubscribe = posthog.default.onFeatureFlags(function () {
                         setTimeout(() => {
+                            unsubscribe();
+
                             setFeatureFlag(featureFlag, !!posthog.default.isFeatureEnabled(featureFlag));
 
                             featureFlagsStore.getState().setLoadingFlag(featureFlag, false);
