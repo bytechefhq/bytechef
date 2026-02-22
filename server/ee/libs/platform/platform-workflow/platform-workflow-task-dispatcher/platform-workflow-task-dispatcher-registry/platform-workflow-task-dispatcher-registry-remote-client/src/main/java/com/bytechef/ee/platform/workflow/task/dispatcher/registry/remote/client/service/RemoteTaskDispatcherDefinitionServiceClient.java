@@ -9,6 +9,8 @@ package com.bytechef.ee.platform.workflow.task.dispatcher.registry.remote.client
 
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.domain.Option;
+import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,6 +37,18 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     @SuppressFBWarnings("EI")
     public RemoteTaskDispatcherDefinitionServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
         this.loadBalancedRestClient = loadBalancedRestClient;
+    }
+
+    @Override
+    public List<Property> executeDynamicProperties(
+        String name, int version, String propertyName, Map<String, ?> inputParameters) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Option> executeOptions(String name, int version, String propertyName, String search) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

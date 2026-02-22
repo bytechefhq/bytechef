@@ -33,6 +33,7 @@ import java.util.Objects;
     @JsonSubTypes.Type(value = BooleanProperty.class, name = "BOOLEAN"),
     @JsonSubTypes.Type(value = DateProperty.class, name = "DATE"),
     @JsonSubTypes.Type(value = DateTimeProperty.class, name = "DATE_TIME"),
+    @JsonSubTypes.Type(value = DynamicPropertiesProperty.class, name = "DYNAMIC_PROPERTIES"),
     @JsonSubTypes.Type(value = IntegerProperty.class, name = "INTEGER"),
     @JsonSubTypes.Type(value = NumberProperty.class, name = "NUMBER"),
     @JsonSubTypes.Type(value = NullProperty.class, name = "NULL"),
@@ -68,6 +69,8 @@ public abstract class Property extends BaseProperty {
             case DATE_TIME ->
                 (P) toDateTimeProperty(
                     (com.bytechef.platform.workflow.task.dispatcher.definition.Property.DateTimeProperty) property);
+            case DYNAMIC_PROPERTIES -> (P) toDynamicPropertiesProperty(
+                (com.bytechef.platform.workflow.task.dispatcher.definition.Property.DynamicPropertiesProperty) property);
             case FILE_ENTRY -> (P) toFileEntryProperty(
                 (com.bytechef.platform.workflow.task.dispatcher.definition.Property.FileEntryProperty) property);
             case INTEGER -> (P) toIntegerProperty(
@@ -134,6 +137,12 @@ public abstract class Property extends BaseProperty {
         return new DateTimeProperty(dateTimeProperty);
     }
 
+    private static DynamicPropertiesProperty toDynamicPropertiesProperty(
+        com.bytechef.platform.workflow.task.dispatcher.definition.Property.DynamicPropertiesProperty dynamicPropertiesProperty) {
+
+        return new DynamicPropertiesProperty(dynamicPropertiesProperty);
+    }
+
     private static FileEntryProperty toFileEntryProperty(
         com.bytechef.platform.workflow.task.dispatcher.definition.Property.FileEntryProperty fileEntryProperty) {
 
@@ -191,6 +200,8 @@ public abstract class Property extends BaseProperty {
         Object visit(DateProperty dateProperty);
 
         Object visit(DateTimeProperty dateTimeProperty);
+
+        Object visit(DynamicPropertiesProperty dynamicPropertiesProperty);
 
         Object visit(IntegerProperty integerProperty);
 
