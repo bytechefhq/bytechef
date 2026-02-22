@@ -16,6 +16,7 @@
 
 package com.bytechef.config;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +72,9 @@ public class ApplicationProperties {
 
     /** Application edition (CE or EE) */
     private Edition edition = Edition.EE;
+
+    /** Optional environment override (DEVELOPMENT, STAGING, PRODUCTION) */
+    private Environment environment;
 
     /** Encryption configuration */
     private Encryption encryption;
@@ -162,6 +166,10 @@ public class ApplicationProperties {
 
     public Edition getEdition() {
         return edition;
+    }
+
+    public Environment getEnvironment() {
+        return environment;
     }
 
     public Encryption getEncryption() {
@@ -274,6 +282,10 @@ public class ApplicationProperties {
 
     public void setEdition(Edition edition) {
         this.edition = edition;
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 
     public void setEncryption(Encryption encryption) {

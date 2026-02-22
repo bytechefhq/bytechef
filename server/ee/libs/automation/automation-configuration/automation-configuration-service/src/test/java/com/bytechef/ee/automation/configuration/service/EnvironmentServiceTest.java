@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
@@ -19,14 +20,29 @@ import org.junit.jupiter.api.Test;
  *
  * @author Ivica Cardic
  */
-public class EnvironmentServiceTest {
-
-    private final EnvironmentService environmentService = new EnvironmentServiceImpl();
+class EnvironmentServiceTest {
 
     @Test
-    public void testGetEnvironments() {
+    void testGetEnvironmentsReturnsAllWhenNoOverride() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        EnvironmentService environmentService = new EnvironmentServiceImpl(applicationProperties);
+
         List<Environment> environments = environmentService.getEnvironments();
 
         assertThat(environments).containsExactly(Environment.DEVELOPMENT, Environment.STAGING, Environment.PRODUCTION);
+    }
+
+    @Test
+    void testGetEnvironmentsReturnsSingleWhenOverrideSet() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.setEnvironment(Environment.STAGING);
+
+        EnvironmentService environmentService = new EnvironmentServiceImpl(applicationProperties);
+
+        List<Environment> environments = environmentService.getEnvironments();
+
+        assertThat(environments).containsExactly(Environment.STAGING);
     }
 }
