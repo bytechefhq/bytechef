@@ -19,7 +19,7 @@ package com.bytechef.platform.worker.task;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
-import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
+import com.bytechef.platform.component.constant.MetadataConstants;
 
 /**
  * @author Ivica Cardic
@@ -29,7 +29,7 @@ public class WebhookResponseTaskExecutionPostOutputProcessor implements TaskExec
     @Override
     public Object process(TaskExecution taskExecution, Object output) {
         if (output instanceof WebhookResponse) {
-            taskExecution.putMetadata(WebhookConstants.WEBHOOK_RESPONSE, true);
+            taskExecution.putMetadata(MetadataConstants.WEBHOOK_RESPONSE, true);
         }
 
         return output;

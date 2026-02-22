@@ -25,12 +25,12 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
-import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent.WebhookParameters;
@@ -160,7 +160,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
                     job.setOutputs(
                         taskFileStorage.storeJobOutputs(
-                            jobId, Map.of(WebhookConstants.WEBHOOK_RESPONSE, webhookResponse)));
+                            jobId, Map.of(MetadataConstants.WEBHOOK_RESPONSE, webhookResponse)));
                 }
 
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
@@ -185,7 +185,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
                 job.setOutputs(
                     taskFileStorage.storeJobOutputs(
-                        jobId, Map.of(WebhookConstants.WEBHOOK_RESPONSE, webhookResponse)));
+                        jobId, Map.of(MetadataConstants.WEBHOOK_RESPONSE, webhookResponse)));
 
                 outputs = taskFileStorage.readJobOutputs(job.getOutputs());
             } else {
@@ -227,7 +227,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
         Map<String, ?> metadata = taskExecution.getMetadata();
 
-        if (metadata.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
+        if (metadata.containsKey(MetadataConstants.WEBHOOK_RESPONSE)) {
             FileEntry outputFileEntry = taskExecution.getOutput();
 
             if (outputFileEntry != null) {
