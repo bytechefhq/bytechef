@@ -37,6 +37,8 @@ public interface ProjectWorkflowService {
 
     ProjectWorkflow getLastProjectWorkflow(long projectId, String workflowUuid);
 
+    String getLastPublishedWorkflowId(String workflowUuid);
+
     String getLastWorkflowId(String workflowUuid);
 
     List<ProjectWorkflow> getLatestProjectWorkflows();
