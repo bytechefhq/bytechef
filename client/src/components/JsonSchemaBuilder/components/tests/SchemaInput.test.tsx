@@ -53,7 +53,7 @@ describe('SchemaInput', () => {
         const input = screen.getByRole('textbox');
 
         fireEvent.change(input, {target: {value: 'updated'}});
-        fireEvent.keyPress(input, {charCode: 13, key: 'Enter'});
+        fireEvent.keyDown(input, {code: 'Enter', key: 'Enter', keyCode: 13});
 
         expect(onChangeMock).toHaveBeenCalledWith('updated');
     });
