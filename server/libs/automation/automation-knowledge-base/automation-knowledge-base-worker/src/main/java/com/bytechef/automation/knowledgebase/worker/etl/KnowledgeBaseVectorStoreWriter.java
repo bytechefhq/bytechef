@@ -53,7 +53,7 @@ public class KnowledgeBaseVectorStoreWriter {
      * @param documents               the documents to write
      * @param knowledgeBaseId         the knowledge base ID
      * @param knowledgeBaseDocumentId the knowledge base document ID
-     * @param environmentId           the environment ID of the knowledge base
+     * @param environmentId           the environment ordinal of the knowledge base
      * @param tagIds                  the tag IDs associated with the document
      */
     public void write(

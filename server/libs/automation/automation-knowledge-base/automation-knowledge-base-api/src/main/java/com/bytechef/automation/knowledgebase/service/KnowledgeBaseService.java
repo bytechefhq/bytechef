@@ -40,7 +40,8 @@ public interface KnowledgeBaseService {
      * Retrieves the knowledge base associated with the specified unique identifier.
      *
      * @param id the unique identifier of the knowledge base to retrieve
-     * @return the KnowledgeBase object associated with the given ID, or null if no such knowledge base exists
+     * @return the KnowledgeBase object associated with the given ID
+     * @throws RuntimeException if no knowledge base exists with the given ID
      */
     KnowledgeBase getKnowledgeBase(Long id);
 

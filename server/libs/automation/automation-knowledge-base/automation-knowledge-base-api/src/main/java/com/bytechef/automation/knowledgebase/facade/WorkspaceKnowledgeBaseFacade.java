@@ -32,7 +32,8 @@ public interface WorkspaceKnowledgeBaseFacade {
      * Retrieves a list of knowledge bases associated with the specified workspace and environment.
      *
      * @param workspaceId   the unique identifier of the workspace
-     * @param environmentId the environment ordinal to filter by
+     * @param environmentId the environment ordinal
+     *                      ({@link com.bytechef.platform.configuration.domain.Environment#ordinal()}) to filter by
      * @return a list of {@code KnowledgeBase} objects associated with the workspace and environment
      */
     List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId);
@@ -43,6 +44,7 @@ public interface WorkspaceKnowledgeBaseFacade {
      * @param knowledgeBase the knowledge base to create
      * @param workspaceId   the workspace ID to assign the knowledge base to
      * @param environmentId the environment ordinal
+     *                      ({@link com.bytechef.platform.configuration.domain.Environment#ordinal()})
      * @return the created knowledge base
      */
     KnowledgeBase createWorkspaceKnowledgeBase(KnowledgeBase knowledgeBase, Long workspaceId, long environmentId);
