@@ -36,6 +36,12 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
         @Nullable ComponentConnection componentConnection);
 
+    List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        @Nullable ComponentConnection componentConnection,
+        ClusterElementResolverFunction clusterElementResolver);
+
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,

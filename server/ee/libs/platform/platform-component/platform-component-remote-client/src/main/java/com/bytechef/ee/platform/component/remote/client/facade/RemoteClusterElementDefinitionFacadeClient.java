@@ -32,6 +32,16 @@ public class RemoteClusterElementDefinitionFacadeClient implements ClusterElemen
     }
 
     @Override
+    public List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,
+        @Nullable Long connectionId, Map<String, Long> clusterElementConnectionIds,
+        Map<String, Map<String, ?>> clusterElementInputParameters) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,

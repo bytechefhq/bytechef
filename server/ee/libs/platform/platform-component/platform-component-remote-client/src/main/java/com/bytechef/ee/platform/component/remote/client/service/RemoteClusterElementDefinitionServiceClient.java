@@ -38,6 +38,16 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
+    public List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        @Nullable ComponentConnection componentConnection,
+        ClusterElementResolverFunction clusterElementResolver) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
