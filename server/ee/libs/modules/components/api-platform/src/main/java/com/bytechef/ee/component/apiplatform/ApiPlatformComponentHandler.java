@@ -37,8 +37,8 @@ public class ApiPlatformComponentHandler implements ComponentHandler {
                 .description("Actions and triggers for using with API platform.")
                 .icon("path:assets/api-platform.svg")
                 .categories(ComponentCategory.HELPERS)
-                .triggers(new ApiPlatformNewApiRequestTrigger().triggerDefinition)
-                .actions(new ApiPlatformResponseToApiRequestAction(workflowService).actionDefinition));
+                .triggers(ApiPlatformNewApiRequestTrigger.of())
+                .actions(ApiPlatformResponseToApiRequestAction.of(workflowService)));
     }
 
     @Override

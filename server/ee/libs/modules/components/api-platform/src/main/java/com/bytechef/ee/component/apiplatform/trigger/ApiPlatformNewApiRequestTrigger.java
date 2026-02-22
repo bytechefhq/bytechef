@@ -46,70 +46,71 @@ import java.util.stream.Collectors;
  */
 public class ApiPlatformNewApiRequestTrigger {
 
-    public final ModifiableTriggerDefinition triggerDefinition = trigger(NEW_API_REQUEST)
-        .title("New API Request")
-        .description(
-            "It allows you to customize success and failure responses within the workflow and deliver relevant data payloads for the requester to process.")
-        .type(TriggerType.STATIC_WEBHOOK)
-        .workflowSyncExecution(true)
-        .properties(
-            object(ApiPlatformConstants.REQUEST)
-                .label("Request")
-                .description("The schema definition for the request input.")
-                .required(true)
-                .expressionEnabled(false)
-                .properties(
-                    string(HEADERS)
-                        .label("Headers")
-                        .placeholder("Edit Headers schema")
-                        .description(
-                            "The schema definition for headers of the request. The properties of the schema can only be strings or string arrays. The field only expects custom headers, standard headers like Content-Type do not need to be specified.")
-                        .controlType(JSON_SCHEMA_BUILDER),
-                    string(PARAMETERS)
-                        .label("Parameters")
-                        .placeholder("Edit Parameters schema")
-                        .description("The schema definition for parameters of the request.")
-                        .controlType(JSON_SCHEMA_BUILDER),
-                    string(BODY)
-                        .label("Body")
-                        .placeholder("Edit Body schema")
-                        .description("The schema definition for body of the request.")
-                        .controlType(JSON_SCHEMA_BUILDER)),
-            object(ApiPlatformConstants.RESPONSE)
-                .label("Response")
-                .description("The schema definition for the response output.")
-                .required(true)
-                .expressionEnabled(false)
-                .properties(
-                    string(SUCCESS)
-                        .label("Success")
-                        .placeholder("Edit Success schema")
-                        .description("The schema definition for a successful response.")
-                        .controlType(JSON_SCHEMA_BUILDER),
-                    string(INVALID_INPUT)
-                        .label("Invalid Input")
-                        .placeholder("Edit Invalid Input schema")
-                        .description("The schema definition for the invalid input error response.")
-                        .controlType(JSON_SCHEMA_BUILDER),
-                    string(INTERNAL_ERROR)
-                        .label("Internal Error")
-                        .placeholder("Edit Internal Error schema")
-                        .description("The schema definition for the internal error response.")
-                        .controlType(JSON_SCHEMA_BUILDER),
-                    string(FORBIDDEN)
-                        .label("Forbidden")
-                        .placeholder("Edit Forbidden schema")
-                        .description("The schema definition for the forbidden error response.")
-                        .controlType(JSON_SCHEMA_BUILDER)),
-            integer(ApiPlatformConstants.TIMEOUT)
-                .label("Timeout (ms)")
-                .description(
-                    "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes."))
-        .workflowSyncExecution(true)
-        .output(this::output)
-        .webhookRequest(this::webhookResult);
+    public static ModifiableTriggerDefinition of() {
+        ApiPlatformNewApiRequestTrigger apiPlatformNewApiRequestTrigger = new ApiPlatformNewApiRequestTrigger();
 
-    public ApiPlatformNewApiRequestTrigger() {
+        return trigger(NEW_API_REQUEST)
+            .title("New API Request")
+            .description(
+                "It allows you to customize success and failure responses within the workflow and deliver relevant data payloads for the requester to process.")
+            .type(TriggerType.STATIC_WEBHOOK)
+            .workflowSyncExecution(true)
+            .properties(
+                object(ApiPlatformConstants.REQUEST)
+                    .label("Request")
+                    .description("The schema definition for the request input.")
+                    .required(true)
+                    .expressionEnabled(false)
+                    .properties(
+                        string(HEADERS)
+                            .label("Headers")
+                            .placeholder("Edit Headers schema")
+                            .description(
+                                "The schema definition for headers of the request. The properties of the schema can only be strings or string arrays. The field only expects custom headers, standard headers like Content-Type do not need to be specified.")
+                            .controlType(JSON_SCHEMA_BUILDER),
+                        string(PARAMETERS)
+                            .label("Parameters")
+                            .placeholder("Edit Parameters schema")
+                            .description("The schema definition for parameters of the request.")
+                            .controlType(JSON_SCHEMA_BUILDER),
+                        string(BODY)
+                            .label("Body")
+                            .placeholder("Edit Body schema")
+                            .description("The schema definition for body of the request.")
+                            .controlType(JSON_SCHEMA_BUILDER)),
+                object(ApiPlatformConstants.RESPONSE)
+                    .label("Response")
+                    .description("The schema definition for the response output.")
+                    .required(true)
+                    .expressionEnabled(false)
+                    .properties(
+                        string(SUCCESS)
+                            .label("Success")
+                            .placeholder("Edit Success schema")
+                            .description("The schema definition for a successful response.")
+                            .controlType(JSON_SCHEMA_BUILDER),
+                        string(INVALID_INPUT)
+                            .label("Invalid Input")
+                            .placeholder("Edit Invalid Input schema")
+                            .description("The schema definition for the invalid input error response.")
+                            .controlType(JSON_SCHEMA_BUILDER),
+                        string(INTERNAL_ERROR)
+                            .label("Internal Error")
+                            .placeholder("Edit Internal Error schema")
+                            .description("The schema definition for the internal error response.")
+                            .controlType(JSON_SCHEMA_BUILDER),
+                        string(FORBIDDEN)
+                            .label("Forbidden")
+                            .placeholder("Edit Forbidden schema")
+                            .description("The schema definition for the forbidden error response.")
+                            .controlType(JSON_SCHEMA_BUILDER)),
+                integer(ApiPlatformConstants.TIMEOUT)
+                    .label("Timeout (ms)")
+                    .description(
+                        "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes."))
+            .workflowSyncExecution(true)
+            .output(apiPlatformNewApiRequestTrigger::output)
+            .webhookRequest(apiPlatformNewApiRequestTrigger::webhookResult);
     }
 
     protected OutputResponse output(
