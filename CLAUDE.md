@@ -310,6 +310,11 @@ public class ExampleComponentHandler implements ComponentHandler {
   - Keep declarative chains (queries, reactive pipelines) as one logical block; prefer one operation per line
   - Avoid chaining when side effects are involved or intermediate values deserve names for clarity/debugging
 
+### Temporal Dead Zone (TDZ) with Synchronous Callbacks
+- `const x = fn(callback)` — if `fn` calls `callback` synchronously, `x` is not yet assigned inside `callback`
+- Accessing `x` inside such a callback throws `ReferenceError: Cannot access 'x' before initialization`
+- Fix: defer access to `x` via `setTimeout` or store in a mutable ref before the call
+
 ### Code Quality Tool Patterns
 
 **SpotBugs**:
@@ -586,6 +591,18 @@ npm run test:coverage
 # Run all quality checks (includes tests)
 npm run check
 ```
+
+#### Zustand Store Testing
+- Reset store state in `beforeEach` via `store.setState({...initial...})` — avoids cross-test leakage
+- Access store imperatively via `store.getState()` for assertions (no hook needed)
+- Export stores (e.g., `export const featureFlagsStore`) to enable direct state manipulation in tests
+- Use `renderHook` from `@testing-library/react` for hooks that wrap stores
+- Flush async store updates with `await act(async () => { await new Promise(r => setTimeout(r, 10)); })`
+
+#### PostHog Mock
+- Global mock in `.vitest/setup.ts` — `onFeatureFlags: vi.fn()`, `isFeatureEnabled: vi.fn().mockReturnValue(false)`
+- `onFeatureFlags` returns `() => void` (unsubscribe); mock overrides must return a function: `return () => {}`
+- `import('posthog-js')` dynamic imports resolve to the same mock; multiple synchronous calls share one Promise
 
 ### End-to-End Testing
 - Test complete workflows through the UI
