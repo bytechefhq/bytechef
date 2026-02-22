@@ -53,7 +53,7 @@ public class FirecrawlTools {
             .getFirecrawl();
 
         this.restClient = restClientBuilder
-            .baseUrl(firecrawl.getBaseUrl())
+            .baseUrl("https://api.firecrawl.dev/v2")
             .defaultHeader("Authorization", "Bearer " + firecrawl.getApiKey())
             .build();
     }
