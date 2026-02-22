@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.accessor;
+package com.bytechef.platform.workflow.execution.accessor;
 
 import com.bytechef.platform.constant.PlatformType;
 import java.util.Map;
