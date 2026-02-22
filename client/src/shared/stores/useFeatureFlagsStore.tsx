@@ -5,14 +5,17 @@ import {useShallow} from 'zustand/react/shallow';
 
 export interface FeatureFlagsI {
     featureFlags: Record<string, boolean>;
+    loadingFlags: Record<string, boolean>;
     setFeatureFlag: (featureFlag: string, value: boolean) => void;
+    setLoadingFlag: (featureFlag: string, loading: boolean) => void;
 }
 
-const featureFlagsStore = createStore<FeatureFlagsI>()(
+export const featureFlagsStore = createStore<FeatureFlagsI>()(
     devtools(
         (set) => {
             return {
                 featureFlags: {},
+                loadingFlags: {},
                 setFeatureFlag: (featureFlag: string, value: boolean) => {
                     set((state) => {
                         return {
@@ -24,6 +27,28 @@ const featureFlagsStore = createStore<FeatureFlagsI>()(
                         };
                     });
                 },
+                setLoadingFlag: (featureFlag: string, loading: boolean) => {
+                    set((state) => {
+                        if (loading) {
+                            return {
+                                ...state,
+                                loadingFlags: {
+                                    ...state.loadingFlags,
+                                    [featureFlag]: true,
+                                },
+                            };
+                        }
+
+                        const remainingFlags = {...state.loadingFlags};
+
+                        delete remainingFlags[featureFlag];
+
+                        return {
+                            ...state,
+                            loadingFlags: remainingFlags,
+                        };
+                    });
+                },
             };
         },
         {
@@ -32,10 +57,14 @@ const featureFlagsStore = createStore<FeatureFlagsI>()(
     )
 );
 
-const loadingFlags = new Set<string>();
-
 export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
-    const {featureFlags, setFeatureFlag} = useStore(featureFlagsStore, (state) => state);
+    const {featureFlags, setFeatureFlag} = useStore(
+        featureFlagsStore,
+        useShallow((state) => ({
+            featureFlags: state.featureFlags,
+            setFeatureFlag: state.setFeatureFlag,
+        }))
+    );
 
     const {analytics, featureFlags: localFeatureFlags} = useApplicationInfoStore(
         useShallow((state) => ({
@@ -56,47 +85,42 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
         }
 
         // If already loading this specific flag, return current cached value
-        if (loadingFlags.has(featureFlag)) {
+        if (featureFlagsStore.getState().loadingFlags[featureFlag]) {
             return featureFlags[featureFlag] ?? false;
         }
 
-        loadingFlags.add(featureFlag);
+        featureFlagsStore.getState().setLoadingFlag(featureFlag, true);
 
         // Only try to use PostHog if analytics are enabled
         if (analytics.enabled && analytics.postHog.apiKey && analytics.postHog.host) {
             // Dynamically import PostHog only when needed
             import('posthog-js')
                 .then((posthog) => {
-                    const flagValue = posthog.default.getFeatureFlag(featureFlag);
-
-                    // If flags are already loaded, use the value directly
-                    if (flagValue !== undefined) {
+                    // Use onFeatureFlags as the explicit "loaded" signal — it fires
+                    // immediately if flags are already loaded, avoiding the unreliable
+                    // getFeatureFlag() !== undefined check
+                    posthog.default.onFeatureFlags(function () {
                         setTimeout(() => {
-                            setFeatureFlag(featureFlag, !!flagValue);
-                            loadingFlags.delete(featureFlag);
+                            setFeatureFlag(featureFlag, !!posthog.default.isFeatureEnabled(featureFlag));
+
+                            featureFlagsStore.getState().setLoadingFlag(featureFlag, false);
                         }, 0);
-                    } else {
-                        // Register callback for when flags finish loading
-                        posthog.default.onFeatureFlags(function () {
-                            setTimeout(() => {
-                                setFeatureFlag(featureFlag, !!posthog.default.isFeatureEnabled(featureFlag));
-                                loadingFlags.delete(featureFlag);
-                            }, 0);
-                        });
-                    }
+                    });
                 })
                 .catch(() => {
                     // If PostHog fails to load, default to false
                     setTimeout(() => {
                         setFeatureFlag(featureFlag, false);
-                        loadingFlags.delete(featureFlag);
+
+                        featureFlagsStore.getState().setLoadingFlag(featureFlag, false);
                     }, 0);
                 });
         } else {
             // If analytics are disabled, default to false
             setTimeout(() => {
                 setFeatureFlag(featureFlag, false);
-                loadingFlags.delete(featureFlag);
+
+                featureFlagsStore.getState().setLoadingFlag(featureFlag, false);
             }, 0);
         }
 
