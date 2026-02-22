@@ -301,6 +301,9 @@ public class ExampleComponentHandler implements ComponentHandler {
   knowledgeBaseDocumentService.saveKnowledgeBaseDocument(document);
   ```
 
+### No Trailing Blank Line in Class Body (Java)
+- Do not add an empty line between the last method (or field) and the closing `}` of a class
+
 ### Method Chaining
 - Do not chain method calls except where this is natural and idiomatic
 - Allowed exceptions (non-exhaustive):
@@ -419,6 +422,12 @@ public class ExampleComponentHandler implements ComponentHandler {
         logger.debug("Detailed state: {}", computeExpensiveDetails());
     }
     ```
+
+16. **Spring 7 Programmatic Bean Registration**
+    - Use `BeanRegistrar` + `@Import` instead of `BeanFactoryPostProcessor` for programmatic bean registration
+    - Resolve collection dependencies via `context.beanProvider(Class).orderedStream().toList()` (replaces `beanFactory.getBeansOfType()`)
+    - Resolve named beans via `context.bean("beanName", Class)` in supplier
+    - Test `BeanRegistrar` specs by capturing `Consumer<Spec<T>>` with `ArgumentCaptor`, applying to mock `Spec`, and verifying fluent calls
 
 ## Access and Authentication
 
