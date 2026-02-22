@@ -46,7 +46,6 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
-import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
@@ -196,7 +195,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
             long id = Validate.notNull(job.getId(), "id");
 
             job.setOutputs(
-                taskFileStorage.storeJobOutputs(id, Map.of(WebhookConstants.WEBHOOK_RESPONSE, webhookResponse)));
+                taskFileStorage.storeJobOutputs(id, Map.of(MetadataConstants.WEBHOOK_RESPONSE, webhookResponse)));
         }
 
         try {
@@ -261,7 +260,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
         Map<String, ?> metadata = taskExecution.getMetadata();
 
-        if (metadata.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
+        if (metadata.containsKey(MetadataConstants.WEBHOOK_RESPONSE)) {
             FileEntry outputFileEntry = taskExecution.getOutput();
 
             if (outputFileEntry != null) {
@@ -277,9 +276,9 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         if (job.getOutputs() != null) {
             outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-            if (outputs.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
+            if (outputs.containsKey(MetadataConstants.WEBHOOK_RESPONSE)) {
                 ActionDefinition.WebhookResponse webhookResponse = MapUtils.getRequired(
-                    outputs, WebhookConstants.WEBHOOK_RESPONSE, new TypeReference<>() {});
+                    outputs, MetadataConstants.WEBHOOK_RESPONSE, new TypeReference<>() {});
 
                 outputs = (Map<String, ?>) webhookResponse.getBody();
             } else {

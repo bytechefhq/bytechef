@@ -23,6 +23,7 @@ import com.bytechef.commons.util.RedirectValidator;
 import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -30,7 +31,6 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
-import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -115,7 +115,7 @@ public abstract class AbstractWebhookTriggerController {
             Object outputs = webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
 
             if (outputs instanceof Map<?, ?> responseMap &&
-                responseMap.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
+                responseMap.containsKey(MetadataConstants.WEBHOOK_RESPONSE)) {
 
                 responseEntity = processWebhookResponse(httpServletRequest, httpServletResponse, responseMap);
             } else {
@@ -207,7 +207,7 @@ public abstract class AbstractWebhookTriggerController {
 
         @SuppressWarnings("unchecked")
         WebhookResponse webhookResponse = MapUtils.getRequired(
-            (Map<String, ?>) responseMap, WebhookConstants.WEBHOOK_RESPONSE, new TypeReference<>() {});
+            (Map<String, ?>) responseMap, MetadataConstants.WEBHOOK_RESPONSE, new TypeReference<>() {});
 
         Map<String, String> headers = webhookResponse.getHeaders();
 
