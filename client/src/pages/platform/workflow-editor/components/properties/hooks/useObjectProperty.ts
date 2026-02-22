@@ -5,7 +5,7 @@ import {ControlType, PropertyType} from '@/shared/middleware/platform/configurat
 import {PropertyAllType, SubPropertyType} from '@/shared/types';
 import isObject from 'isobject';
 import resolvePath from 'object-resolve-path';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
 import {decodePath, encodeParameters, encodePath} from '../../../utils/encodingUtils';
@@ -52,6 +52,12 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
     const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
     const workflow = useWorkflowDataStore((state) => state.workflow);
+
+    const defaultValueSavedRef = useRef(false);
+
+    useEffect(() => {
+        defaultValueSavedRef.current = false;
+    }, [path]);
 
     const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
@@ -399,10 +405,19 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         if (
             !subProperties ||
             !path ||
-            !currentComponent ||
             !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
             !workflow.id
         ) {
+            return;
+        }
+
+        if (defaultValueSavedRef.current) {
+            return;
+        }
+
+        const currentComponent = useWorkflowNodeDetailsPanelStore.getState().currentComponent;
+
+        if (!currentComponent) {
             return;
         }
 
@@ -440,6 +455,8 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         const defaultValueObject = buildObject(subProperties);
 
         const timeoutId = setTimeout(() => {
+            defaultValueSavedRef.current = true;
+
             saveProperty({
                 path,
                 type: 'OBJECT',

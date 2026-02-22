@@ -134,7 +134,10 @@ const PropertyDynamicProperties = ({
         [parameterValue]
     );
 
-    if ((isLoading || isClusterElementPropertiesLoading || isPending) && queryEnabled) {
+    const hasLoadedData =
+        (properties && properties.length > 0) || (clusterElementProperties && clusterElementProperties.length > 0);
+
+    if ((isLoading || isClusterElementPropertiesLoading || isPending) && queryEnabled && !hasLoadedData) {
         return (
             <ul className="flex flex-col gap-4">
                 {Array.from({length: 3}).map((_, index) => (
