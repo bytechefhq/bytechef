@@ -16,17 +16,13 @@
 
 package com.bytechef.platform.component.handler.factory;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-public class ComponentHandlerBeanFactoryPostProcessorTest {
-
-    @Disabled
-    @Test
-    public void testPostProcessBeanFactory() {
-        // TODO
-    }
+@Configuration(proxyBeanMethods = false)
+@Import(ComponentHandlerBeanRegistrar.class)
+class ComponentHandlerConfiguration {
 }
