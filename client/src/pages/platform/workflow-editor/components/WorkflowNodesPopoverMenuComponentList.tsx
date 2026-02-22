@@ -7,6 +7,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
+import {Loader2Icon} from 'lucide-react';
 import {memo, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -60,7 +61,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         );
         const {nodes} = useWorkflowDataStore(useShallow((state) => ({nodes: state.nodes})));
 
-        const {componentsWithActions, filter, setFilter, trimmedFilter} =
+        const {componentsWithActions, filter, isSearchFetching, setFilter, trimmedFilter} =
             useFilteredComponentDefinitions(componentDefinitions);
 
         const getFeatureFlag = useFeatureFlagsStore();
@@ -134,14 +135,24 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>
                 <header className="flex items-center gap-1 rounded-t-lg px-3 pt-3 text-center">
-                    <Input
-                        className="bg-white shadow-none"
-                        id="filter-components"
-                        name="workflowNodeFilter"
-                        onChange={(event) => setFilter(event.target.value)}
-                        placeholder="Filter components"
-                        value={filter}
-                    />
+                    <div className="relative w-full">
+                        <Input
+                            className="bg-white shadow-none"
+                            id="filter-components"
+                            name="workflowNodeFilter"
+                            onChange={(event) => setFilter(event.target.value)}
+                            placeholder="Filter components"
+                            value={filter}
+                        />
+
+                        {isSearchFetching && (
+                            <Loader2Icon
+                                aria-label="Loading"
+                                className="absolute right-2 top-1/2 size-4 -translate-y-1/2 animate-spin text-content-neutral-secondary"
+                                role="status"
+                            />
+                        )}
+                    </div>
                 </header>
 
                 <div className="h-96 rounded-b-lg pb-3">
