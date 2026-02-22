@@ -22,6 +22,7 @@ import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.tag.service.TagService;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -37,7 +38,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    KnowledgeBaseDocumentChunkFacade.class, KnowledgeBaseDocumentFacade.class,
+    EnvironmentService.class, KnowledgeBaseDocumentChunkFacade.class, KnowledgeBaseDocumentFacade.class,
     KnowledgeBaseDocumentService.class, KnowledgeBaseFacade.class, KnowledgeBaseService.class,
     TagService.class, WorkspaceKnowledgeBaseFacade.class
 })

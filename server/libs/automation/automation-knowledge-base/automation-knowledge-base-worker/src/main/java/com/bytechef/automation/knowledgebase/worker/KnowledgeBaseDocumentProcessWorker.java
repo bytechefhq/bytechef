@@ -151,6 +151,22 @@ public class KnowledgeBaseDocumentProcessWorker {
             logger.error(
                 "Error processing chunk update {}: {}", knowledgeBaseDocumentChunkId, exception.getMessage(),
                 exception);
+
+            try {
+                KnowledgeBaseDocumentChunk chunk = knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunk(
+                    knowledgeBaseDocumentChunkId);
+
+                KnowledgeBaseDocument knowledgeBaseDocument = knowledgeBaseDocumentService.getKnowledgeBaseDocument(
+                    chunk.getKnowledgeBaseDocumentId());
+
+                knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_ERROR);
+
+                knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);
+            } catch (RuntimeException statusException) {
+                logger.error(
+                    "Failed to update document status for chunk {}: {}", knowledgeBaseDocumentChunkId,
+                    statusException.getMessage(), statusException);
+            }
         }
     }
 

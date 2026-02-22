@@ -74,7 +74,13 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     public KnowledgeBase createWorkspaceKnowledgeBase(
         KnowledgeBase knowledgeBase, Long workspaceId, long environmentId) {
 
-        knowledgeBase.setEnvironment(Environment.values()[(int) environmentId]);
+        Environment[] environments = Environment.values();
+
+        if (environmentId < 0 || environmentId >= environments.length) {
+            throw new IllegalArgumentException("Invalid environmentId: " + environmentId);
+        }
+
+        knowledgeBase.setEnvironment(environments[(int) environmentId]);
 
         KnowledgeBase createdKnowledgeBase = knowledgeBaseService.createKnowledgeBase(knowledgeBase);
 
