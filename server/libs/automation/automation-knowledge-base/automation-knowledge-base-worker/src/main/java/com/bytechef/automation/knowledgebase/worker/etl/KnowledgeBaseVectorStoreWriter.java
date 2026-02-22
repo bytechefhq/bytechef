@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseVectorStoreWriter {
 
+    public static final String METADATA_ENVIRONMENT = "environment";
     public static final String METADATA_KNOWLEDGE_BASE_ID = "knowledge_base_id";
     public static final String METADATA_KNOWLEDGE_BASE_DOCUMENT_ID = "knowledge_base_document_id";
     public static final String METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID = "knowledge_base_document_chunk_id";
@@ -52,13 +53,17 @@ public class KnowledgeBaseVectorStoreWriter {
      * @param documents               the documents to write
      * @param knowledgeBaseId         the knowledge base ID
      * @param knowledgeBaseDocumentId the knowledge base document ID
+     * @param environmentId           the environment ID of the knowledge base
      * @param tagIds                  the tag IDs associated with the document
      */
     public void write(
-        List<Document> documents, long knowledgeBaseId, long knowledgeBaseDocumentId, List<Long> tagIds) {
+        List<Document> documents, long knowledgeBaseId, long knowledgeBaseDocumentId, long environmentId,
+        List<Long> tagIds) {
 
         List<Document> sanitizedDocuments = documents.stream()
-            .map(document -> sanitizeDocument(document, knowledgeBaseId, knowledgeBaseDocumentId, -1, tagIds))
+            .map(
+                document -> sanitizeDocument(
+                    document, knowledgeBaseId, knowledgeBaseDocumentId, -1, environmentId, tagIds))
             .toList();
 
         vectorStore.add(sanitizedDocuments);
@@ -71,12 +76,15 @@ public class KnowledgeBaseVectorStoreWriter {
      * @param knowledgeBaseId the knowledge base ID
      * @param documentId      the knowledge base document ID
      * @param chunkId         the knowledge base document chunk ID
+     * @param environmentId   the environment ID of the knowledge base
      * @param tagIds          the tag IDs associated with the document
      */
     public void writeChunk(
-        Document document, Long knowledgeBaseId, Long documentId, Long chunkId, List<Long> tagIds) {
+        Document document, Long knowledgeBaseId, Long documentId, Long chunkId, long environmentId,
+        List<Long> tagIds) {
 
-        Document sanitizedDocument = sanitizeDocument(document, knowledgeBaseId, documentId, chunkId, tagIds);
+        Document sanitizedDocument = sanitizeDocument(
+            document, knowledgeBaseId, documentId, chunkId, environmentId, tagIds);
 
         vectorStore.add(List.of(sanitizedDocument));
     }
@@ -106,7 +114,7 @@ public class KnowledgeBaseVectorStoreWriter {
      */
     private Document sanitizeDocument(
         Document document, long knowledgeBaseId, long knowledgeBaseDocumentId, long knowledgeBaseDocumentChunkId,
-        List<Long> tagIds) {
+        long environmentId, List<Long> tagIds) {
 
         String content = document.getText();
 
@@ -116,6 +124,7 @@ public class KnowledgeBaseVectorStoreWriter {
 
         Map<String, Object> metadata = new java.util.HashMap<>(document.getMetadata());
 
+        metadata.put(METADATA_ENVIRONMENT, environmentId);
         metadata.put(METADATA_KNOWLEDGE_BASE_ID, knowledgeBaseId);
         metadata.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_ID, knowledgeBaseDocumentId);
 
