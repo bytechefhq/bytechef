@@ -115,6 +115,32 @@ public interface TaskDispatcherDefinition {
      *
      */
     @FunctionalInterface
+    interface PropertiesFunction {
+
+        /**
+         * @param inputParameters
+         * @return
+         */
+        List<? extends Property> apply(Map<String, ?> inputParameters) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface OptionsFunction {
+
+        /**
+         * @param search
+         * @return
+         */
+        List<? extends Option<String>> apply(String search) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
     interface VariablePropertiesFunction {
 
         /**

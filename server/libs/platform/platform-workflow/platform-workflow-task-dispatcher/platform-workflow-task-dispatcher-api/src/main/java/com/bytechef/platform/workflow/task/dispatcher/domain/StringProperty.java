@@ -31,6 +31,7 @@ public class StringProperty extends ValueProperty<String> {
     private Integer minLength;
     private String regex;
     private List<Option> options;
+    private OptionsDataSource optionsDataSource;
 
     private StringProperty() {
     }
@@ -44,6 +45,8 @@ public class StringProperty extends ValueProperty<String> {
         this.minLength = OptionalUtils.orElse(stringProperty.getMinLength(), null);
         this.regex = OptionalUtils.orElse(stringProperty.getRegex(), null);
         this.options = CollectionUtils.map(OptionalUtils.orElse(stringProperty.getOptions(), List.of()), Option::new);
+        this.optionsDataSource = OptionalUtils.mapOrElse(
+            stringProperty.getOptionsFunction(), optionsFunction -> new OptionsDataSource(), null);
     }
 
     @Override
@@ -67,6 +70,10 @@ public class StringProperty extends ValueProperty<String> {
         return Collections.unmodifiableList(options);
     }
 
+    public OptionsDataSource getOptionsDataSource() {
+        return optionsDataSource;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -82,11 +89,13 @@ public class StringProperty extends ValueProperty<String> {
         }
 
         return Objects.equals(regex, that.regex) && Objects.equals(options, that.options);
+            Objects.equals(options, that.options) &&
+            Objects.equals(optionsDataSource, that.optionsDataSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), regex, options);
+        return Objects.hash(super.hashCode(), regex, options, optionsDataSource);
     }
 
     @Override
@@ -104,6 +113,7 @@ public class StringProperty extends ValueProperty<String> {
             ", exampleValue=" + exampleValue +
             ", defaultValue=" + defaultValue +
             ", options=" + options +
+            ", optionsDataSource=" + optionsDataSource +
             ", minLength=" + minLength +
             ", maxLength=" + maxLength +
             ", regex='" + regex + '\'' +

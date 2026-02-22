@@ -17,16 +17,22 @@
 package com.bytechef.platform.workflow.task.dispatcher.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.definition.PropertiesDataSource;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
+import com.bytechef.platform.workflow.task.dispatcher.domain.Option;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.exception.TaskDispatcherDefinitionErrorType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -45,6 +51,75 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
+    public List<com.bytechef.platform.workflow.task.dispatcher.domain.Property> executeDynamicProperties(
+        String name, int version, String propertyName, Map<String, ?> inputParameters) {
+
+        com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
+            taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
+
+        List<? extends Property> properties = taskDispatcherDefinition.getProperties()
+            .orElse(List.of());
+
+        for (Property property : properties) {
+            if (property instanceof Property.DynamicPropertiesProperty dynamicPropertiesProperty &&
+                Objects.equals(property.getName(), propertyName)) {
+
+                return dynamicPropertiesProperty.getDynamicPropertiesDataSource()
+                    .flatMap(PropertiesDataSource::getPropertiesFunction)
+                    .map(propertiesFunction -> {
+                        try {
+                            return propertiesFunction.apply(inputParameters);
+                        } catch (Exception exception) {
+                            throw new ConfigurationException(
+                                exception, inputParameters,
+                                TaskDispatcherDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
+                        }
+                    })
+                    .map(resultProperties -> resultProperties.stream()
+                        .map(
+                            resultProperty -> (com.bytechef.platform.workflow.task.dispatcher.domain.Property) com.bytechef.platform.workflow.task.dispatcher.domain.Property
+                                .toProperty(
+                                    resultProperty))
+                        .toList())
+                    .orElse(List.of());
+            }
+        }
+
+        return List.of();
+    }
+
+    @Override
+    public List<Option> executeOptions(String name, int version, String propertyName, String search) {
+        com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
+            taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
+
+        List<? extends Property> properties = taskDispatcherDefinition.getProperties()
+            .orElse(List.of());
+
+        for (Property property : properties) {
+            if (property instanceof Property.StringProperty stringProperty &&
+                Objects.equals(property.getName(), propertyName)) {
+
+                return stringProperty.getOptionsFunction()
+                    .map(optionsFunction -> {
+                        try {
+                            return optionsFunction.apply(search);
+                        } catch (Exception exception) {
+                            throw new ConfigurationException(
+                                exception, TaskDispatcherDefinitionErrorType.EXECUTE_OPTIONS);
+                        }
+                    })
+                    .map(options -> options.stream()
+                        .map(Option::new)
+                        .toList())
+                    .orElse(List.of());
+            }
+        }
+
+        return List.of();
+    }
+
+    @Override
     public @Nullable OutputResponse executeOutput(String name, int version, Map<String, ?> inputParameters) {
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
@@ -56,8 +131,9 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
             .map(outputFunction -> {
                 try {
                     return outputFunction.apply(inputParameters);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                } catch (Exception exception) {
+                    throw new ConfigurationException(
+                        exception, inputParameters, TaskDispatcherDefinitionErrorType.EXECUTE_OUTPUT);
                 }
             })
             .map(curOutputResponse -> SchemaUtils.toOutput(
@@ -68,6 +144,7 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     @Override
     public @Nullable OutputResponse
         executeVariableProperties(String name, int version, Map<String, ?> inputParameters) {
+
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
 
@@ -75,8 +152,9 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
             .map(variablePropertiesFunction -> {
                 try {
                     return variablePropertiesFunction.apply(inputParameters);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                } catch (Exception exception) {
+                    throw new ConfigurationException(
+                        exception, inputParameters, TaskDispatcherDefinitionErrorType.EXECUTE_VARIABLE_PROPERTIES);
                 }
             })
             .map(curOutputResponse -> SchemaUtils.toOutput(

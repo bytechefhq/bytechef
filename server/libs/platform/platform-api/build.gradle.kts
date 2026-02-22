@@ -8,4 +8,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
+
+    testImplementation(project(":sdks:backend:java:component-api"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

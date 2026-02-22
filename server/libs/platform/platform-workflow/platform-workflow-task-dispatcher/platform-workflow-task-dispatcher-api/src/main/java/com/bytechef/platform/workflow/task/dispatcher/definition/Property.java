@@ -63,6 +63,7 @@ public interface Property extends BaseProperty {
         BOOLEAN,
         DATE,
         DATE_TIME,
+        DYNAMIC_PROPERTIES,
         FILE_ENTRY,
         INTEGER,
         NULL,
@@ -100,6 +101,16 @@ public interface Property extends BaseProperty {
      *
      */
     interface DateProperty extends BaseDateProperty, OptionsProperty<LocalDate>, ValueProperty<LocalDate> {
+    }
+
+    /**
+     *
+     */
+    interface DynamicPropertiesProperty extends Property {
+
+        Optional<String> getHeader();
+
+        Optional<PropertiesDataSource> getDynamicPropertiesDataSource();
     }
 
     /**
@@ -162,6 +173,8 @@ public interface Property extends BaseProperty {
      *
      */
     interface StringProperty extends BaseStringProperty, OptionsProperty<String>, ValueProperty<String> {
+
+        Optional<TaskDispatcherDefinition.OptionsFunction> getOptionsFunction();
     }
 
     /**
