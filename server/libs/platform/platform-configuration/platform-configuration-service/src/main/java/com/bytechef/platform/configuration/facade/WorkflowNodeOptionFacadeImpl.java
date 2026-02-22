@@ -34,6 +34,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
@@ -62,6 +64,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         Evaluator evaluator, ActionDefinitionFacade actionDefinitionFacade,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
@@ -70,6 +73,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
@@ -188,9 +192,18 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                 () -> {
                     WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
+                    WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+                    if (workflowNodeType.operation() == null) {
+                        return taskDispatcherDefinitionService.executeOptions(
+                            workflowNodeType.name(), workflowNodeType.version(), propertyName, searchText)
+                            .stream()
+                            .map(Option::new)
+                            .toList();
+                    }
+
                     Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
                         workflowId, workflowTask.getName(), environmentId);
-                    WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
                     return actionDefinitionFacade.executeOptions(
                         workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), propertyName,
