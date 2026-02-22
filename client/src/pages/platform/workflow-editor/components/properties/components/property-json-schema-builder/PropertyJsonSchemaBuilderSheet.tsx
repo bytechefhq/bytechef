@@ -6,7 +6,9 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {SPACE} from '@/shared/constants';
 import {MessageCircleQuestionIcon} from 'lucide-react';
-import {Suspense, lazy} from 'react';
+import {Suspense, lazy, useCallback, useRef, useState} from 'react';
+
+import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
@@ -18,6 +20,28 @@ interface PropertyJsonSchemaBuilderSheetProps {
 }
 
 const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: PropertyJsonSchemaBuilderSheetProps) => {
+    const [localSchema, setLocalSchema] = useState<SchemaRecordType | undefined>(schema);
+
+    const editorRef = useRef<StandaloneCodeEditorType | null>(null);
+
+    const handleSchemaChange = useCallback(
+        (newSchema: SchemaRecordType) => {
+            setLocalSchema(newSchema);
+
+            onChange?.(newSchema);
+        },
+        [onChange]
+    );
+
+    const handleTabChange = useCallback((value: string) => {
+        if (value === 'editor' && editorRef.current) {
+            requestAnimationFrame(() => {
+                editorRef.current?.layout();
+                editorRef.current?.focus();
+            });
+        }
+    }, []);
+
     return (
         <Sheet onOpenChange={onClose} open>
             <SheetContent
@@ -25,7 +49,7 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
-                <Tabs className="flex size-full flex-col" defaultValue="designer">
+                <Tabs className="flex size-full flex-col" defaultValue="designer" onValueChange={handleTabChange}>
                     <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                         <div className="flex flex-col">
                             <SheetTitle>{title ? `${title} Builder` : 'JSON Schema Builder'}</SheetTitle>
@@ -51,33 +75,33 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                     <div className="flex-1 space-y-4 overflow-y-auto px-3">
                         {title === 'Response Schema' && (
                             <Note
-                                content="Define how you’d like the LLM to structure its responses — essentially a template for its output."
+                                content="Define how you'd like the LLM to structure its responses — essentially a template for its output."
                                 icon={<MessageCircleQuestionIcon />}
                             />
                         )}
 
                         <TabsContent value="designer">
-                            <JsonSchemaBuilder onChange={onChange} schema={schema} />
+                            <JsonSchemaBuilder onChange={handleSchemaChange} schema={localSchema} />
                         </TabsContent>
 
-                        <TabsContent className="h-full" value="editor">
+                        <TabsContent className="h-full data-[state=inactive]:hidden" forceMount value="editor">
                             <Suspense fallback={<MonacoEditorLoader />}>
                                 <MonacoEditor
                                     className="size-full"
                                     defaultLanguage="json"
                                     onChange={(value) => {
-                                        if (value && onChange) {
+                                        if (value) {
                                             try {
-                                                onChange(JSON.parse(value));
-                                            } catch (e) {
-                                                console.error('Invalid JSON:', e);
+                                                handleSchemaChange(JSON.parse(value));
+                                            } catch {
+                                                // Invalid JSON while typing — ignore until valid
                                             }
                                         }
                                     }}
                                     onMount={(editor) => {
-                                        editor.focus();
+                                        editorRef.current = editor;
                                     }}
-                                    value={JSON.stringify(schema, null, SPACE)}
+                                    value={JSON.stringify(localSchema, null, SPACE)}
                                 />
                             </Suspense>
                         </TabsContent>
