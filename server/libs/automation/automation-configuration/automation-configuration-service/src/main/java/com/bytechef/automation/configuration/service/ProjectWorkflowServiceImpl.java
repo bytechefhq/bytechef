@@ -67,6 +67,15 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public String getLastPublishedWorkflowId(String workflowUuid) {
+        return projectWorkflowRepository
+            .findLastPublishedByUuid(UUID.fromString(workflowUuid))
+            .map(ProjectWorkflow::getWorkflowId)
+            .orElseThrow(
+                () -> new IllegalArgumentException("No published workflow found for workflow uuid " + workflowUuid));
+    }
+
+    @Override
     public String getLastWorkflowId(String workflowUuid) {
         return projectWorkflowRepository
             .findLastByUuid(UUID.fromString(workflowUuid))
