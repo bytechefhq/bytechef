@@ -92,8 +92,16 @@ public class MondayNewItemInBoardTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
+        String boardId = inputParameters.getRequiredString(BOARD_ID);
+
+        if (!boardId.matches("\\d+")) {
+            throw new IllegalArgumentException("Invalid board ID: " + boardId);
+        }
+
+        String sanitizedWebhookUrl = webhookUrl.replace("\"", "\\\"");
+
         String query = "mutation{create_webhook(board_id: %s, url: \"%s\", event: create_item){id}}"
-            .formatted(inputParameters.getRequiredString(BOARD_ID), webhookUrl);
+            .formatted(boardId, sanitizedWebhookUrl);
 
         Map<String, Object> body = executeGraphQLQuery(query, context);
 
@@ -108,7 +116,13 @@ public class MondayNewItemInBoardTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        String query = "mutation{delete_webhook(id: " + outputParameters.getString(ID) + "){id}}";
+        String webhookId = outputParameters.getString(ID);
+
+        if (webhookId == null || !webhookId.matches("\\d+")) {
+            throw new IllegalArgumentException("Invalid webhook ID: " + webhookId);
+        }
+
+        String query = "mutation{delete_webhook(id: " + webhookId + "){id}}";
 
         executeGraphQLQuery(query, context);
     }
@@ -121,8 +135,21 @@ public class MondayNewItemInBoardTrigger {
 
         Map<String, Object> event = content.get("event");
 
-        String query = "query{boards(ids:" + event.get("boardId") + ")" +
-            "{items_page(query_params:{ids: " + event.get("pulseId") + "})" +
+        Object boardIdValue = event.get("boardId");
+        Object pulseIdValue = event.get("pulseId");
+
+        if (boardIdValue == null || !boardIdValue.toString()
+            .matches("\\d+")) {
+            throw new IllegalArgumentException("Invalid board ID from webhook event: " + boardIdValue);
+        }
+
+        if (pulseIdValue == null || !pulseIdValue.toString()
+            .matches("\\d+")) {
+            throw new IllegalArgumentException("Invalid pulse ID from webhook event: " + pulseIdValue);
+        }
+
+        String query = "query{boards(ids:" + boardIdValue + ")" +
+            "{items_page(query_params:{ids: " + pulseIdValue + "})" +
             "{items{id name column_values {column{id title} id type value text " +
             "... on WeekValue{start_date end_date}}}}}}";
 

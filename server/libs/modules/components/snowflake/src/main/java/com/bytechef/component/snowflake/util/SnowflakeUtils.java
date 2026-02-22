@@ -43,6 +43,21 @@ import java.util.regex.Pattern;
  */
 public class SnowflakeUtils {
 
+    /**
+     * Quotes a SQL identifier (table, column, schema, database name) using double quotes to prevent SQL injection. Any
+     * embedded double quotes are escaped by doubling them per the SQL standard.
+     */
+    public static String quoteIdentifier(String identifier) {
+        return "\"" + identifier.replace("\"", "\"\"") + "\"";
+    }
+
+    /**
+     * Escapes a SQL string literal value by replacing single quotes with doubled single quotes.
+     */
+    public static String escapeStringLiteral(String value) {
+        return value.replace("'", "''");
+    }
+
     public static Object executeStatement(Context context, String sqlStatement) {
         return context.http(http -> http.post("/statements"))
             .body(Http.Body.of(Map.of(STATEMENT, sqlStatement)))

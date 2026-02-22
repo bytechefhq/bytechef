@@ -95,7 +95,7 @@ public class CryptoHelperPgpEncryptAction {
 
         byte[] inputFileBytes = context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE)));
 
-        PGPDataEncryptorBuilder pgpDataEncryptorBuilder = new JcePGPDataEncryptorBuilder(PGPEncryptedData.CAST5)
+        PGPDataEncryptorBuilder pgpDataEncryptorBuilder = new JcePGPDataEncryptorBuilder(PGPEncryptedData.AES_256)
             .setProvider(BouncyCastleProvider.PROVIDER_NAME)
             .setSecureRandom(new SecureRandom())
             .setWithIntegrityPacket(true);

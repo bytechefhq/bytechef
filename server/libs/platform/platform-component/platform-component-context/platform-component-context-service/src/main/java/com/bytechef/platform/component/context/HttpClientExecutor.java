@@ -52,6 +52,7 @@ import java.net.InetSocketAddress;
 import java.net.ProxySelector;
 import java.net.Socket;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
@@ -318,7 +319,8 @@ class HttpClientExecutor {
                 .stream()
                 .flatMap(entry -> entry.getValue()
                     .stream()
-                    .map(value -> entry.getKey() + "=" + value))
+                    .map(value -> URLEncoder.encode(entry.getKey(), java.nio.charset.StandardCharsets.UTF_8) + "=" +
+                        URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8)))
                 .collect(Collectors.joining("&"));
 
             uri = URI.create(urlString + '?' + parameter);

@@ -21,6 +21,7 @@ import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEM
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -48,7 +49,8 @@ class SnowflakeInsertRowActionTest {
 
     @Test
     void testPerform() {
-        try (MockedStatic<SnowflakeUtils> snowflakeUtilsMockedStatic = mockStatic(SnowflakeUtils.class)) {
+        try (MockedStatic<SnowflakeUtils> snowflakeUtilsMockedStatic =
+            mockStatic(SnowflakeUtils.class, CALLS_REAL_METHODS)) {
             snowflakeUtilsMockedStatic
                 .when(() -> SnowflakeUtils.executeStatement(
                     contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
@@ -59,7 +61,7 @@ class SnowflakeInsertRowActionTest {
             assertEquals(mockedObject, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals(
-                "INSERT INTO database.schema.table(col2,col1) VALUES('abc',5)",
+                "INSERT INTO \"database\".\"schema\".\"table\"(\"col2\",\"col1\") VALUES('abc',5)",
                 stringArgumentCaptor.getValue());
         }
     }

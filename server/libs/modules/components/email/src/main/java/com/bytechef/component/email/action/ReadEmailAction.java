@@ -50,8 +50,6 @@ import jakarta.mail.Store;
 import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.search.FlagTerm;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -245,11 +243,10 @@ public class ReadEmailAction {
                 stringBuilder.append("\n");
             } else if (bodyPart.getDisposition() != null && bodyPart.getDisposition()
                 .equalsIgnoreCase(Part.ATTACHMENT)) {
-                System.out.println("Attachment: " + bodyPart.getFileName());
-                try (InputStream is = bodyPart.getInputStream()) {
-                    System.out.println(
-                        "Attachment content: " + new String(is.readAllBytes(), Charset.forName("UTF-8")));
-                }
+
+                stringBuilder.append("[Attachment: ");
+                stringBuilder.append(bodyPart.getFileName());
+                stringBuilder.append("]\n");
             } else if (bodyPart.getContent() instanceof MimeMultipart) {
                 stringBuilder.append(getMultipartContent((MimeMultipart) bodyPart.getContent()));
             }

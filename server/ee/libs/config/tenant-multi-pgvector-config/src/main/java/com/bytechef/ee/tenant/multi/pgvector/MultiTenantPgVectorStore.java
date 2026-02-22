@@ -204,12 +204,10 @@ public class MultiTenantPgVectorStore extends AbstractObservationVectorStore imp
     protected void doDelete(Filter.Expression filterExpression) {
         String nativeFilterExpression = this.filterExpressionConverter.convertExpression(filterExpression);
 
-        String sql = "DELETE FROM " + getFullyQualifiedTableName() + " WHERE metadata::jsonb @@ '" +
-            nativeFilterExpression + "'::jsonpath";
+        String sql = "DELETE FROM " + getFullyQualifiedTableName() + " WHERE metadata::jsonb @@ ?::jsonpath";
 
-        // Execute the delete
         try {
-            this.jdbcTemplate.update(sql);
+            this.jdbcTemplate.update(sql, nativeFilterExpression);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to delete documents by filter", e);
         }

@@ -1455,7 +1455,7 @@ public class HttpClientExecutorTest {
             String uri = httpRequest.uri()
                 .toString();
 
-            assertTrue(uri.contains("filter=name=John"));
+            assertTrue(uri.contains("filter=name%3DJohn"));
         }
 
         @Test
@@ -2435,42 +2435,45 @@ public class HttpClientExecutorTest {
     class QueryParameterEncodingTests {
 
         @Test
-        @DisplayName("Should handle pre-encoded query parameter with spaces")
+        @DisplayName("Should URL-encode query parameter with spaces")
         void testQueryParamWithSpaces() {
-            // Note: HttpClientExecutor expects callers to provide URL-encoded values
             HttpRequest httpRequest = httpClientExecutor.createHttpRequest(
-                "http://localhost:8080/api", Http.RequestMethod.GET, Map.of(),
-                Map.of("name", List.of("John%20Doe")),
-                null, "componentName", null, Mockito.mock(Context.class));
-
-            String uri = httpRequest.uri()
-                .toString();
-
-            assertTrue(uri.contains("name=John%20Doe"));
-        }
-
-        @Test
-        @DisplayName("Should handle pre-encoded query parameter with ampersand")
-        void testQueryParamWithAmpersand() {
-            // Note: HttpClientExecutor expects callers to provide URL-encoded values
-            HttpRequest httpRequest = httpClientExecutor.createHttpRequest(
-                "http://localhost:8080/api", Http.RequestMethod.GET, Map.of(),
-                Map.of("company", List.of("A%26B%20Corp")),
-                null, "componentName", null, Mockito.mock(Context.class));
-
-            String uri = httpRequest.uri()
-                .toString();
-
-            assertTrue(uri.contains("company=A%26B%20Corp"));
-        }
-
-        @Test
-        @DisplayName("Should throw exception for unencoded query parameter with spaces")
-        void testUnencodedQueryParamWithSpacesThrowsException() {
-            assertThrows(IllegalArgumentException.class, () -> httpClientExecutor.createHttpRequest(
                 "http://localhost:8080/api", Http.RequestMethod.GET, Map.of(),
                 Map.of("name", List.of("John Doe")),
-                null, "componentName", null, Mockito.mock(Context.class)));
+                null, "componentName", null, Mockito.mock(Context.class));
+
+            String uri = httpRequest.uri()
+                .toString();
+
+            assertTrue(uri.contains("name=John+Doe"));
+        }
+
+        @Test
+        @DisplayName("Should URL-encode query parameter with ampersand")
+        void testQueryParamWithAmpersand() {
+            HttpRequest httpRequest = httpClientExecutor.createHttpRequest(
+                "http://localhost:8080/api", Http.RequestMethod.GET, Map.of(),
+                Map.of("company", List.of("A&B Corp")),
+                null, "componentName", null, Mockito.mock(Context.class));
+
+            String uri = httpRequest.uri()
+                .toString();
+
+            assertTrue(uri.contains("company=A%26B+Corp"));
+        }
+
+        @Test
+        @DisplayName("Should URL-encode query parameter key")
+        void testQueryParamKeyEncoding() {
+            HttpRequest httpRequest = httpClientExecutor.createHttpRequest(
+                "http://localhost:8080/api", Http.RequestMethod.GET, Map.of(),
+                Map.of("my key", List.of("value")),
+                null, "componentName", null, Mockito.mock(Context.class));
+
+            String uri = httpRequest.uri()
+                .toString();
+
+            assertTrue(uri.contains("my+key=value"));
         }
     }
 

@@ -386,20 +386,27 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             Object lastItem = closureParameters.get(LAST_ITEM);
             String queryStatement;
 
+            String quotedSchema = SqlUtils.quoteIdentifier(schema);
+            String quotedTable = SqlUtils.quoteIdentifier(table);
+            String quotedOrderBy = SqlUtils.quoteIdentifier(orderBy);
+
             if (lastItem == null) {
-                queryStatement = "SELECT * FROM %s.%s ORDER BY %s %s".formatted(schema, table, orderBy, orderDirection);
+                queryStatement = "SELECT * FROM %s.%s ORDER BY %s %s".formatted(
+                    quotedSchema, quotedTable, quotedOrderBy, orderDirection);
             } else {
                 if (Objects.equals(orderDirection, "ASC")) {
-                    queryStatement = "SELECT * FROM %s.%s WHERE %s < %s ORDER BY %s ASC".formatted(
-                        schema, table, orderBy, lastItem, orderBy);
+                    queryStatement = "SELECT * FROM %s.%s WHERE %s < :lastItem ORDER BY %s ASC".formatted(
+                        quotedSchema, quotedTable, quotedOrderBy, quotedOrderBy);
                 } else {
-                    queryStatement = "SELECT * FROM %s.%s WHERE %s > %s ORDER BY %s DESC".formatted(
-                        schema, table, orderBy, lastItem, orderBy);
+                    queryStatement = "SELECT * FROM %s.%s WHERE %s > :lastItem ORDER BY %s DESC".formatted(
+                        quotedSchema, quotedTable, quotedOrderBy, quotedOrderBy);
                 }
             }
 
+            Map<String, Object> queryParams = lastItem != null ? Map.of("lastItem", lastItem) : Map.of();
+
             List<Map<String, Object>> query = JdbcExecutor.query(
-                queryStatement, Map.of(), (ResultSet rs, int rowNum) -> {
+                queryStatement, queryParams, (ResultSet rs, int rowNum) -> {
                     Map<String, Object> row = new LinkedHashMap<>();
                     ResultSetMetaData rsMetaData = rs.getMetaData();
 

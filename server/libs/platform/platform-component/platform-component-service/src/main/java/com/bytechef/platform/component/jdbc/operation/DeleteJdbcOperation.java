@@ -23,6 +23,8 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TABLE;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
+import com.bytechef.platform.component.util.SqlUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import javax.sql.DataSource;
 
@@ -33,13 +35,18 @@ import javax.sql.DataSource;
 public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> {
 
     @Override
+    @SuppressFBWarnings(
+        value = "SQL_INJECTION_SPRING_JDBC",
+        justification = "Identifiers are quoted; CONDITION is a user-provided WHERE clause by workflow creator, not end user")
     public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         String schema = MapUtils.getString(inputParameters, SCHEMA, "public");
         String table = MapUtils.getRequiredString(inputParameters, TABLE);
         String condition = MapUtils.getRequiredString(inputParameters, CONDITION);
 
         int rowsAffected = JdbcExecutor.update(
-            "DELETE FROM %s.%s WHERE %s".formatted(schema, table, condition), Map.of(), dataSource);
+            "DELETE FROM %s.%s WHERE %s".formatted(
+                SqlUtils.quoteIdentifier(schema), SqlUtils.quoteIdentifier(table), condition),
+            Map.of(), dataSource);
 
         return Map.of(ROWS, rowsAffected);
     }

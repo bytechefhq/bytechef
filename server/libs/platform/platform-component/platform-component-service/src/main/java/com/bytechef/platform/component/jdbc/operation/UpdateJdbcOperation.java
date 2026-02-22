@@ -27,6 +27,7 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.util.SqlUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,9 @@ import tools.jackson.core.type.TypeReference;
 public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> {
 
     @Override
+    @SuppressFBWarnings(
+        value = "SQL_INJECTION_SPRING_JDBC",
+        justification = "Identifiers are quoted; CONDITION is a user-provided WHERE clause by workflow creator, not end user")
     public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         List<Map<String, ?>> columns = MapUtils.getList(inputParameters, COLUMNS, new TypeReference<>() {}, List.of());
         Map<Object, ?> valuesMap = MapUtils.getMap(inputParameters, VALUES);
@@ -53,13 +57,15 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String set = String.join(
             " AND ",
             columns.stream()
-                .map(column -> column.get(NAME) + "=:" + column.get(NAME))
+                .map(column -> SqlUtils.quoteIdentifier((String) column.get(NAME)) + "=:" + column.get(NAME))
                 .toList());
 
         SqlUtils.checkColumnTypes(schema, table, rows, dataSource);
 
         int[] rowsAffected = JdbcExecutor.batchUpdate(
-            String.format("UPDATE %s.%s SET %s WHERE %s", schema, table, set, condition),
+            String.format(
+                "UPDATE %s.%s SET %s WHERE %s",
+                SqlUtils.quoteIdentifier(schema), SqlUtils.quoteIdentifier(table), set, condition),
             SqlParameterSourceUtils.createBatch(rows.toArray()), dataSource);
 
         IntStream stream = Arrays.stream(rowsAffected);
