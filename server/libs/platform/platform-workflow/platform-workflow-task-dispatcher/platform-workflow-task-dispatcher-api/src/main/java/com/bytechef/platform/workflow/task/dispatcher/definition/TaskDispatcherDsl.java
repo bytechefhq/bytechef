@@ -1192,7 +1192,6 @@ public final class TaskDispatcherDsl {
         private Integer maxLength;
         private Integer minLength;
         private TaskDispatcherDefinition.OptionsFunction optionsFunction;
-        private Boolean optionsLoadedDynamically;
         private String regex;
 
         private ModifiableStringProperty() {
@@ -1245,12 +1244,6 @@ public final class TaskDispatcherDsl {
             return this;
         }
 
-        public ModifiableStringProperty optionsLoadedDynamically(boolean optionsLoadedDynamically) {
-            this.optionsLoadedDynamically = optionsLoadedDynamically;
-
-            return this;
-        }
-
         @SafeVarargs
         public final ModifiableStringProperty options(Option<String>... options) {
             if (options != null) {
@@ -1269,7 +1262,7 @@ public final class TaskDispatcherDsl {
         @Override
         public ControlType getControlType() {
             if (this.controlType == null) {
-                if (optionsFunction != null || Boolean.TRUE.equals(optionsLoadedDynamically)) {
+                if (optionsFunction != null) {
                     return ControlType.SELECT;
                 }
 
@@ -1308,10 +1301,6 @@ public final class TaskDispatcherDsl {
             return Optional.ofNullable(optionsFunction);
         }
 
-        @Override
-        public Optional<Boolean> getOptionsLoadedDynamically() {
-            return Optional.ofNullable(optionsLoadedDynamically);
-        }
     }
 
     public static final class ModifiableTaskDispatcherDefinition implements TaskDispatcherDefinition {
