@@ -19,10 +19,10 @@ package com.bytechef.platform.configuration.web.rest;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.web.rest.config.PlatformConfigurationRestTestConfiguration;
 import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfigurationSharedMocks;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;

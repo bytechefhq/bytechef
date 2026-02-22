@@ -32,6 +32,8 @@ import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -144,6 +146,13 @@ public class ConnectionIntTestConfiguration {
                 return 1;
             }
         };
+    }
+
+    @Bean
+    JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry(
+        List<JobPrincipalAccessor> jobPrincipalAccessors) {
+
+        return new JobPrincipalAccessorRegistry(jobPrincipalAccessors);
     }
 
     @Bean

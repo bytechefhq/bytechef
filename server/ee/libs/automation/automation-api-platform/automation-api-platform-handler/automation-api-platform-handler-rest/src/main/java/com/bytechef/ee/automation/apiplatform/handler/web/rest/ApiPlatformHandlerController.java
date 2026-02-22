@@ -24,13 +24,13 @@ import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectio
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;

@@ -18,11 +18,11 @@ package com.bytechef.platform.workflow.coordinator.trigger.completion;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;

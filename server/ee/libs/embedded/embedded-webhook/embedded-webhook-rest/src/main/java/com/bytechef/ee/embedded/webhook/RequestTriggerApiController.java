@@ -22,7 +22,6 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentMode
 import com.bytechef.ee.embedded.webhook.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -33,6 +32,7 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

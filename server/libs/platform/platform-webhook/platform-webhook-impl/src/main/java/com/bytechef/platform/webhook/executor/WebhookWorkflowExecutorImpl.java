@@ -27,8 +27,6 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookValidateRespon
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
@@ -36,6 +34,8 @@ import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent.WebhookParameters;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

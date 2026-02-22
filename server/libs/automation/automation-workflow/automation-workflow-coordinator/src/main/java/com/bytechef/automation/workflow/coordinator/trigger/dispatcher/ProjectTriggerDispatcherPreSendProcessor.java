@@ -20,10 +20,10 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
