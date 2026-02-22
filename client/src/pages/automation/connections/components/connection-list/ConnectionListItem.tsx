@@ -20,6 +20,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useToast} from '@/hooks/use-toast';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -58,7 +59,15 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
     const queryClient = useQueryClient();
 
+    const {toast} = useToast();
+
     const deleteConnectionMutation = useDeleteConnectionMutation({
+        onError: () => {
+            toast({
+                description: `Failed to delete "${connection.name}". Please try again.`,
+                variant: 'destructive',
+            });
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
@@ -68,14 +77,23 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
             });
             queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connectionTags,
+            });
+
+            setShowDeleteDialog(false);
+
+            toast({
+                description: `Connection "${connection.name}" has been successfully deleted.`,
             });
         },
     });
 
     const disconnectConnectionMutation = useDisconnectConnectionMutation({
-        onError: (error) => {
-            console.error('Failed to disconnect connection:', error);
+        onError: () => {
             setShowDisconnectDialog(false);
+            toast({
+                description: `Failed to disconnect "${connection.name}". Please try again.`,
+                variant: 'destructive',
+            });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -89,6 +107,10 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
             });
 
             setShowDisconnectDialog(false);
+
+            toast({
+                description: `"${connection.name}" was successfully disconnected from all workflows.`,
+            });
         },
     });
 
@@ -106,8 +128,6 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const handleAlertDeleteDialogClick = () => {
         if (connection.id) {
             deleteConnectionMutation.mutate(connection.id);
-
-            setShowDeleteDialog(false);
         }
     };
 
@@ -208,7 +228,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
                                     <DropdownMenuSeparator className="m-0" />
 
-                                    {connection.active && (
+                                    {connection.active === true && (
                                         <DropdownMenuItem
                                             className="dropdown-menu-item"
                                             onClick={() => setShowDisconnectDialog(true)}
@@ -226,12 +246,12 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                     >
                                         <DropdownMenuItem
                                             className={
-                                                connection.active
+                                                connection.active === true
                                                     ? 'dropdown-menu-item-destructive-disabled'
                                                     : 'dropdown-menu-item-destructive'
                                             }
-                                            disabled={connection.active === true}
-                                            onClick={() => connection.active !== true && setShowDeleteDialog(true)}
+                                            disabled={connection.active}
+                                            onClick={() => setShowDeleteDialog(true)}
                                         >
                                             <Trash2Icon /> Delete
                                         </DropdownMenuItem>
@@ -266,27 +286,20 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                 </AlertDialog>
 
                 <AlertDialog open={showDisconnectDialog}>
-                    <AlertDialogContent className="flex w-full max-w-lg flex-col items-end gap-4 rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-primary p-6 shadow-lg">
-                        <AlertDialogHeader className="w-full">
-                            <AlertDialogTitle className="self-stretch text-lg font-normal leading-7 text-content-neutral-primary">
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
                                 Disconnect <strong>{connection.name}</strong> from all workflows?
                             </AlertDialogTitle>
 
-                            <AlertDialogDescription className="self-stretch text-sm font-normal leading-5 text-content-neutral-secondary">
-                                This action cannot be undone.
-                            </AlertDialogDescription>
+                            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
                         </AlertDialogHeader>
 
-                        <AlertDialogFooter className="gap-2">
-                            <AlertDialogCancel
-                                className="flex h-9 items-center justify-center gap-2 rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary px-4 py-2"
-                                onClick={() => setShowDisconnectDialog(false)}
-                            >
-                                Cancel
-                            </AlertDialogCancel>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setShowDisconnectDialog(false)}>Cancel</AlertDialogCancel>
 
                             <AlertDialogAction
-                                className="flex h-9 items-center justify-center gap-2 rounded-md bg-surface-destructive-primary px-4 py-2 text-content-onsurface-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
+                                className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
                                 onClick={handleDisconnectFromAllClick}
                             >
                                 <Link2OffIcon className="size-4" />
