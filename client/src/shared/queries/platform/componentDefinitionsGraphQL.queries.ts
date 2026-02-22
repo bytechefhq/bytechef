@@ -1,5 +1,6 @@
 import {useComponentDefinitionSearchQuery} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {keepPreviousData} from '@tanstack/react-query';
 import {useMemo} from 'react';
 
 export interface ComponentDefinitionWithActionsProps extends ComponentDefinitionBasic {
@@ -29,6 +30,7 @@ export const useGetComponentDefinitionsWithActionsQuery = (searchQuery?: string)
         {
             enabled: hasSearchQuery,
             gcTime: 30 * 60 * 1000,
+            placeholderData: keepPreviousData,
             staleTime: 10 * 60 * 1000,
         }
     );
@@ -44,5 +46,6 @@ export const useGetComponentDefinitionsWithActionsQuery = (searchQuery?: string)
     return {
         ...result,
         data: transformedData,
+        isFetching: result.isFetching,
     };
 };

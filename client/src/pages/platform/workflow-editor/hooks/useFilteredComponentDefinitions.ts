@@ -9,7 +9,7 @@ import {useDebounce} from 'use-debounce';
 type UseFilteredComponentDefinitionsReturnType = {
     componentsWithActions: Array<ComponentDefinitionBasic | ComponentDefinitionWithActionsProps>;
     filter: string;
-    isSearchLoading: boolean;
+    isSearchFetching: boolean;
     setFilter: Dispatch<SetStateAction<string>>;
     trimmedFilter: string;
 };
@@ -23,15 +23,16 @@ export const useFilteredComponentDefinitions = (
 
     const trimmedFilter = debouncedFilter.trim();
 
-    const {data: searchedComponentDefinitions, isLoading: isSearchLoading} =
+    const {data: searchedComponentDefinitions, isFetching: isSearchFetching} =
         useGetComponentDefinitionsWithActionsQuery(trimmedFilter);
 
     const componentsWithActions = useMemo(() => {
-        if (trimmedFilter && searchedComponentDefinitions && !isSearchLoading) {
+        if (trimmedFilter && searchedComponentDefinitions) {
             return searchedComponentDefinitions;
         }
-        return componentDefinitions;
-    }, [trimmedFilter, searchedComponentDefinitions, isSearchLoading, componentDefinitions]);
 
-    return {componentsWithActions, filter, isSearchLoading, setFilter, trimmedFilter};
+        return componentDefinitions;
+    }, [trimmedFilter, searchedComponentDefinitions, componentDefinitions]);
+
+    return {componentsWithActions, filter, isSearchFetching, setFilter, trimmedFilter};
 };
