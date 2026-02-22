@@ -21,7 +21,6 @@ import static com.bytechef.component.datastream.processor.constant.DataStreamPro
 import static com.bytechef.component.datastream.processor.constant.DataStreamProcessorConstants.MAPPINGS;
 import static com.bytechef.component.datastream.processor.constant.DataStreamProcessorConstants.SOURCE_FIELD;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -65,7 +64,6 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
     public static final String DESTINATION_SCHEMA = "destinationSchema";
     public static final String SCHEMAS = "schemas";
     public static final String SOURCE_SCHEMA = "sourceSchema";
-    public static final String USE_JSON_SCHEMA = "useJsonSchema";
 
     public static final ModifiableClusterElementDefinition<FieldMapperItemProcessor> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<FieldMapperItemProcessor>clusterElement("fieldMapper")
@@ -74,14 +72,8 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
             .type(PROCESSOR)
             .object(FieldMapperItemProcessor::new)
             .properties(
-                bool(USE_JSON_SCHEMA)
-                    .label("Use JSON Schema")
-                    .description("Enable to manually define field schemas using JSON Schema format.")
-                    .expressionEnabled(false)
-                    .defaultValue(false),
                 dynamicProperties(SCHEMAS)
                     .header("Field Schemas")
-                    .propertiesLookupDependsOn(USE_JSON_SCHEMA)
                     .properties(FieldMapperItemProcessor::getSchemaProperties),
                 array(MAPPINGS)
                     .label("Field Mappings")
@@ -116,10 +108,6 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
     public static List<? extends ValueProperty<?>> getSchemaProperties(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ClusterElementContext context) {
-
-        if (!inputParameters.getBoolean(USE_JSON_SCHEMA, false)) {
-            return List.of();
-        }
 
         List<ValueProperty<?>> properties = new ArrayList<>();
 

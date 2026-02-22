@@ -128,9 +128,10 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
         when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
         when(workflow.getTask(workflowNodeName)).thenReturn(workflowTask);
         when(workflowTask.getType()).thenReturn("aiAgent/v1/chat");
+        when(workflowTask.getName()).thenReturn(workflowNodeName);
 
         doReturn(Map.of()).when(workflowNodeOutputFacade)
-            .getPreviousWorkflowNodeSampleOutputs(eq(workflowId), eq("aiAgent"), eq(environmentId));
+            .getPreviousWorkflowNodeSampleOutputs(eq(workflowId), eq(workflowNodeName), eq(environmentId));
 
         ClusterElementType clusterElementType = new ClusterElementType("model", "model", "Model");
 
@@ -152,12 +153,21 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
         doReturn(Map.of()).when(workflowTask)
             .getExtensions();
 
+        Map<String, ClusterElement> model = Map.of("model", clusterElement);
+
+        doReturn(model.entrySet()).when(clusterElementMap)
+            .entrySet();
+
         List<Property> expectedProperties = List.of(mock(Property.class));
+        List<String> lookupDependsOnPaths = List.of("connectionId");
+        Map<String, Long> expectedConnectionIds = Map.of(
+            clusterElementWorkflowNodeName, expectedConnectionId, "otherElement", 200L);
 
         doReturn(clusterElementParameters).when(evaluator)
             .evaluate(anyMap(), anyMap());
         when(clusterElementDefinitionFacade.executeDynamicProperties(
-            eq("openai"), eq(1), eq("chat"), eq(propertyName), anyMap(), anyList(), eq(expectedConnectionId)))
+            eq("openai"), eq(1), eq("chat"), eq(propertyName), anyMap(), anyMap(), eq(lookupDependsOnPaths),
+            eq(expectedConnectionId), eq(expectedConnectionIds), anyMap()))
                 .thenReturn(expectedProperties);
 
         try (MockedStatic<ClusterElementMap> mockedClusterElementMap = mockStatic(ClusterElementMap.class)) {
@@ -166,12 +176,16 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
 
             List<Property> result = workflowNodeDynamicPropertiesFacade.getClusterElementDynamicProperties(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
-                propertyName, List.of(), environmentId);
+                propertyName, lookupDependsOnPaths, environmentId);
 
             assertEquals(expectedProperties, result);
 
             verify(clusterElementDefinitionFacade).executeDynamicProperties(
-                eq("openai"), eq(1), eq("chat"), eq(propertyName), anyMap(), anyList(), eq(expectedConnectionId));
+                eq("openai"), eq(1), eq("chat"), eq(propertyName), anyMap(), anyMap(), eq(lookupDependsOnPaths),
+                eq(expectedConnectionId), eq(expectedConnectionIds), anyMap());
+
+            verify(workflowNodeOutputFacade).getPreviousWorkflowNodeSampleOutputs(
+                workflowId, workflowNodeName, environmentId);
         }
     }
 
@@ -195,9 +209,10 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
         when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
         when(workflow.getTask(workflowNodeName)).thenReturn(workflowTask);
         when(workflowTask.getType()).thenReturn("aiAgent/v1/chat");
+        when(workflowTask.getName()).thenReturn(workflowNodeName);
 
         doReturn(Map.of()).when(workflowNodeOutputFacade)
-            .getPreviousWorkflowNodeSampleOutputs(eq(workflowId), eq("aiAgent"), eq(environmentId));
+            .getPreviousWorkflowNodeSampleOutputs(eq(workflowId), eq(workflowNodeName), eq(environmentId));
 
         ClusterElementType clusterElementType = new ClusterElementType("model", "model", "Model");
 
@@ -216,13 +231,17 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             .thenReturn(clusterElement);
         doReturn(Map.of()).when(workflowTask)
             .getExtensions();
+        doReturn(Map.of("model", clusterElement)
+            .entrySet()).when(clusterElementMap)
+                .entrySet();
 
         List<Property> expectedProperties = List.of(mock(Property.class));
 
         doReturn(Map.of()).when(evaluator)
             .evaluate(anyMap(), anyMap());
         when(clusterElementDefinitionFacade.executeDynamicProperties(
-            eq("openai"), eq(1), eq("chat"), eq(propertyName), anyMap(), anyList(), isNull()))
+            eq("openai"), eq(1), eq("chat"), eq(propertyName), anyMap(), anyMap(), anyList(), isNull(), anyMap(),
+            anyMap()))
                 .thenReturn(expectedProperties);
 
         try (MockedStatic<ClusterElementMap> mockedClusterElementMap = mockStatic(ClusterElementMap.class)) {
@@ -236,7 +255,80 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             assertEquals(expectedProperties, result);
 
             verify(clusterElementDefinitionFacade).executeDynamicProperties(
-                eq("openai"), eq(1), eq("chat"), eq(propertyName), anyMap(), anyList(), isNull());
+                eq("openai"), eq(1), eq("chat"), eq(propertyName), anyMap(), anyMap(), anyList(), isNull(), anyMap(),
+                anyMap());
+        }
+    }
+
+    @Test
+    void testGetClusterElementDynamicPropertiesUsesWorkflowNodeNameForOutputLookup() {
+        String workflowId = "workflow1";
+        String workflowNodeName = "dataStream_1";
+        String clusterElementTypeName = "processor";
+        String clusterElementWorkflowNodeName = "fieldMapper_1";
+        String propertyName = "useJsonSchema";
+        long environmentId = 1L;
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId))
+            .thenReturn(Optional.empty());
+        doReturn(Map.of()).when(workflowTestConfigurationService)
+            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+
+        Workflow workflow = mock(Workflow.class);
+        WorkflowTask workflowTask = mock(WorkflowTask.class);
+
+        when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+        when(workflow.getTask(workflowNodeName)).thenReturn(workflowTask);
+        when(workflowTask.getType()).thenReturn("dataStream/v1/sync");
+        when(workflowTask.getName()).thenReturn(workflowNodeName);
+
+        doReturn(Map.of()).when(workflowNodeOutputFacade)
+            .getPreviousWorkflowNodeSampleOutputs(eq(workflowId), eq(workflowNodeName), eq(environmentId));
+
+        ClusterElementType clusterElementType = new ClusterElementType("processor", "processor", "Processor");
+
+        when(clusterElementDefinitionService.getClusterElementType("dataStream", 1, clusterElementTypeName))
+            .thenReturn(clusterElementType);
+
+        ClusterElement clusterElement = mock(ClusterElement.class);
+
+        when(clusterElement.getType()).thenReturn("fieldMapper/v1/map");
+        doReturn(Map.of()).when(clusterElement)
+            .getParameters();
+
+        ClusterElementMap clusterElementMap = mock(ClusterElementMap.class);
+
+        when(clusterElementMap.getClusterElement(clusterElementType, clusterElementWorkflowNodeName))
+            .thenReturn(clusterElement);
+        doReturn(Map.of()).when(workflowTask)
+            .getExtensions();
+
+        Map<String, ClusterElement> processor = Map.of("processor", clusterElement);
+
+        doReturn(processor.entrySet()).when(clusterElementMap)
+            .entrySet();
+
+        List<Property> expectedProperties = List.of(mock(Property.class));
+
+        doReturn(Map.of()).when(evaluator)
+            .evaluate(anyMap(), anyMap());
+        when(clusterElementDefinitionFacade.executeDynamicProperties(
+            eq("fieldMapper"), eq(1), eq("map"), eq(propertyName), anyMap(), anyMap(), anyList(), isNull(), anyMap(),
+            anyMap()))
+                .thenReturn(expectedProperties);
+
+        try (MockedStatic<ClusterElementMap> mockedClusterElementMap = mockStatic(ClusterElementMap.class)) {
+            mockedClusterElementMap.when(() -> ClusterElementMap.of(anyMap()))
+                .thenReturn(clusterElementMap);
+
+            List<Property> result = workflowNodeDynamicPropertiesFacade.getClusterElementDynamicProperties(
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
+                propertyName, List.of(), environmentId);
+
+            assertEquals(expectedProperties, result);
+
+            verify(workflowNodeOutputFacade).getPreviousWorkflowNodeSampleOutputs(
+                workflowId, workflowNodeName, environmentId);
         }
     }
 
@@ -334,7 +426,6 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testGetWorkflowNodeDynamicPropertiesForTaskDispatcher() {
         String workflowId = "workflow1";
         String workflowNodeName = "subflow1";
