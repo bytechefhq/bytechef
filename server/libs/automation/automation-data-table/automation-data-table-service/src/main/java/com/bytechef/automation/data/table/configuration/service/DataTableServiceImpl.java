@@ -380,14 +380,19 @@ public class DataTableServiceImpl implements DataTableService {
 
     private boolean hasPhysicalTablesForBaseName(String baseName) {
         String normalizedBaseName = baseName.toLowerCase(Locale.ROOT);
-        String regex = "^dt_[0-9]+_" + normalizedBaseName + "$";
+        String regex = "^dt_[0-9]+_" + java.util.regex.Pattern.quote(normalizedBaseName) + "$";
 
         String sql = "SELECT COUNT(*) FROM information_schema.tables " +
             "WHERE table_schema = current_schema() AND table_type = 'BASE TABLE' AND table_name ~ ?";
 
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, regex);
 
-        return count != null && count > 0;
+        if (count == null) {
+            throw new IllegalStateException(
+                "Unexpected null result from COUNT(*) query for base name: " + baseName);
+        }
+
+        return count > 0;
     }
 
     private long checkRegistry(String baseName, String description) {
