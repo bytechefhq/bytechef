@@ -250,6 +250,10 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Use `useMemo` for computed values instead of IIFEs in JSX
 - Prefer `||` over `??` for JSX fallbacks (e.g., `trigger || defaultTrigger`)
 
+### React Hook Ordering (Client)
+- Order hooks in components/custom hooks: `useState` → `useRef` → custom store hooks → other custom hooks → derived values/`useMemo`/`useCallback` → `useEffect` → `return`
+- All `useEffect` calls go last, immediately before the `return` statement
+
 ### GraphQL Conventions
 - Enum values must use SCREAMING_SNAKE_CASE (e.g., `DELETE`, `GET`, `QUERY`, `PATH`)
 - Consistent with HttpMethod and other enums in `*.graphqls` files
