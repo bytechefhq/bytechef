@@ -8,8 +8,6 @@ import {Suspense, lazy, useEffect, useState} from 'react';
 
 import type {EditorOptionsType, StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
-// Worker constructors are tiny Vite-generated wrappers — safe to import statically.
-// The actual worker scripts are code-split and only fetched when instantiated.
 window.MonacoEnvironment = {
     getWorker(_moduleId: string, label: string) {
         switch (label) {
@@ -32,8 +30,6 @@ window.MonacoEnvironment = {
     },
 };
 
-// Lazily load the Monaco core library so that importing this module
-// does not pull in the full ~2 MB Monaco bundle at parse time.
 let monacoConfigured = false;
 
 async function ensureMonacoConfigured(): Promise<void> {
