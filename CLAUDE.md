@@ -253,6 +253,7 @@ public class ExampleComponentHandler implements ComponentHandler {
 ### React Hook Ordering (Client)
 - Order hooks in components/custom hooks: `useState` → `useRef` → custom store hooks → other custom hooks → derived values/`useMemo`/`useCallback` → `useEffect` → `return`
 - All `useEffect` calls go last, immediately before the `return` statement
+- Group multiple declarations of the same hook type consecutively (e.g., all `useRef` calls together, then `.current` assignments in a separate block)
 
 ### GraphQL Conventions
 - Enum values must use SCREAMING_SNAKE_CASE (e.g., `DELETE`, `GET`, `QUERY`, `PATH`)
