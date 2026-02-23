@@ -56,15 +56,6 @@ Example Expression: ${order_1.total} > 1000 && ${order_1.status} == "pending"
 
 **Using Condition Builder (Raw Expression = FALSE):**
 
-The condition builder provides a grid-based interface showing supported operations for each data type:
-
-| Data Type | Greater | Less | Equal | Ignore Case | Contains | Starts With | Ends With | Regex |
-|------------|:--------:|:------:|:------:|:-----------:|:----------:|:---------:|:------:|
-| **String** | No | No | Yes | Yes | Yes | Yes | Yes | Yes |
-| **Number** | Yes | Yes | Yes | No | No | No | No |
-| **Date** | Yes | Yes | Yes | No | No | No | No |
-| **Boolean** | No | No | Yes | No | No | No | No |
-
 ### Example: Building `${order_1.total} > 1000 && ${order_1.status} == "pending"`
 
 To build this expression using the Condition Builder:
@@ -86,28 +77,6 @@ To build this expression using the Condition Builder:
 
 4. **Result**: The condition builder will automatically generate: `${order_1.total} > 1000 && ${order_1.status} == "pending"`
 
-**For Number Expression:**
-1. Select **Number Expression** as type
-2. **Value 1**: Select the number value to compare with the second one.
-3. **Operation**: Select from supported operations: Greater, Less, Equal, Not equals, Greater or equals, Less or equals, Empty
-
-**For String Expression:**
-1. Select **String Expression** as type
-2. **Value 1**: Could be any string value based on an expression. For example: `${user_1.email}` - this is the string value to compare with the second one.
-3. **Operation**: Select from supported operations: Contains, Starts with, Ends with, Equals, Not equals, Regex, Not Contains, Equals ignore case
-
-**For Boolean Expression:**
-1. Select **Boolean Expression** as type
-2. **Value 1**: Select `true` or `false` depending on your requirement
-3. **Operation**: Select `equals` or `not equals`
-4. **Value 2**: Also select `true` or `false` based on the operation you selected
-
-**For Date & Time Expression:**
-1. Select **Date & Time Expression** as type
-2. **Value 1**: Select the date/time value to compare with the second one
-3. **Operation**: Select comparison operation where you want to map the data
-4. **Value 2**: Select the date/time value to compare with the first one
-
 ### Step 4: Build True and False Paths
 1. Add components to the **True** path for when condition evaluates to true
 2. Add components to the **False** path for when it evaluates to false
@@ -116,28 +85,20 @@ You can refer to this [json file](https://www.npoint.io/docs/73d362abb3b15527463
 
 ## Available Operations
 
-### String Operations
-- `equals` - Exact match
-- `not equals` - Not equal to
-- `equals ignore case` - Case-insensitive match
-- `regex` - Regular expression match
-- `contains` - Value 1 includes Value 2
-- `not contains` - Value 1 doesn't include Value 2
-- `starts with` - Value 1 begins with Value 2
-- `ends with` - Value 1 ends with Value 2
-
-### Number Operations
-- `equals` - Exactly equal
-- `not equals` - Not equal
-- `greater than` - Value 1 > Value 2
-- `less than` - Value 1 < Value 2
-- `greater than or equal` - Value 1 \>= Value 2
-- `less than or equal` - Value 1 \<= Value 2
-
-### Boolean Operations
-- `equals` - Value equals specified boolean
-- `not equals` - Value does not equal specified boolean
-
-### Date Time Operations
-- `after` - Value 1 is after Value 2
-- `before` - Value 1 is before Value 2
+| Operation | String | Number | Boolean | Date & Time |
+|:----------|:------:|:------:|:-------:|:-----------:|
+| Equals | Yes | Yes | Yes | No |
+| Not Equals | Yes | Yes | Yes | No |
+| Equals Ignore Case | Yes | No | No | No |
+| Contains | Yes | No | No | No |
+| Not Contains | Yes | No | No | No |
+| Starts With | Yes | No | No | No |
+| Ends With | Yes | No | No | No |
+| Regex | Yes | No | No | No |
+| Greater Than | No | Yes | No | No |
+| Less Than | No | Yes | No | No |
+| Greater Than or Equal | No | Yes | No | No |
+| Less Than or Equal | No | Yes | No | No |
+| Empty | No | Yes | No | No |
+| After | No | No | No | Yes |
+| Before | No | No | No | Yes |
