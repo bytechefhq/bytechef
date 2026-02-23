@@ -18,6 +18,8 @@ package com.bytechef.message.broker.memory;
 
 import com.bytechef.message.Retryable;
 import com.bytechef.message.route.MessageRoute;
+import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -69,8 +71,17 @@ public class AsyncMessageBroker extends AbstractMessageBroker {
             return;
         }
 
+        ContextSnapshot contextSnapshot = ContextSnapshotFactory.builder()
+            .build()
+            .captureAll();
+
         for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
-            executor.execute(() -> receiver.receive(message));
+            executor.execute(
+                () -> {
+                    try (ContextSnapshot.Scope scope = contextSnapshot.setThreadLocals()) {
+                        receiver.receive(message);
+                    }
+                });
         }
     }
 
