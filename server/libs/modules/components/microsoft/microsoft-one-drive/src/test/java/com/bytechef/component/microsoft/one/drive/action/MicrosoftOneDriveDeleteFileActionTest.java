@@ -16,43 +16,40 @@
 
 package com.bytechef.component.microsoft.one.drive.action;
 
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.MIME_TYPE;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class MicrosoftOneDriveDeleteFileActionTest {
 
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Parameters parameters = MockParametersFactory.create(
-        Map.of(NAME, "testFile", PARENT_ID, "testFolder", MIME_TYPE, "plain/text"));
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, "xy"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedContext.http(any()))
+    void testPerform(Context mockedContext, Executor mockedExecutor, Http mockedHttp) {
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
-        Object result = MicrosoftOneDriveDeleteFileAction.perform(parameters, parameters, mockedContext);
+        Object result = MicrosoftOneDriveDeleteFileAction.perform(mockedParameters, null, mockedContext);
 
         assertNull(result);
+        assertEquals("/me/drive/items/xy", stringArgumentCaptor.getValue());
     }
 }
