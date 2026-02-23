@@ -3675,8 +3675,8 @@ public final class ComponentDsl {
             return Objects.hash(batch, deduplicateFunction, deprecated, description, webhookDisableConsumer,
                 webhookEnableFunction, dynamicWebhookRefreshFunction, webhookRequestFunction, help,
                 listenerDisableConsumer, listenerEnableConsumer, name, outputDefinition, pollFunction, properties,
-                title, type, webhookRawBody, webhookValidateFunction, webhookValidateOnEnableFunction,
-                workflowNodeDescriptionFunction, workflowSyncExecution);
+                title, type, webhookRawBody, webhookValidateFunction,
+                webhookValidateOnEnableFunction, workflowNodeDescriptionFunction, workflowSyncExecution);
         }
 
         @Override

@@ -21,6 +21,7 @@ package com.bytechef.platform.component.constant;
  */
 public class MetadataConstants {
 
+    public static final String CALLABLE_RESPONSE = "__callableResponse";
     public static final String CONNECTION_IDS = "connectionIds";
     public static final String WEBHOOK_RESPONSE = "__webhookResponse";
     public static final String EDITOR_ENVIRONMENT = "editorEnvironment";

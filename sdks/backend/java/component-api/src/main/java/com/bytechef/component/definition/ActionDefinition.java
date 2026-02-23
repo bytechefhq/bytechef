@@ -516,6 +516,28 @@ public interface ActionDefinition {
 
     /**
      * A functional interface that extends PerformFunction. Represents a specific type of function designed to handle
+     * callable workflow responses. This interface defines a single abstract method that takes input parameters,
+     * connection parameters, and an action context to produce a CallableResponse to be returned to the calling
+     * workflow.
+     */
+    @FunctionalInterface
+    interface CallableResponsePerformFunction extends PerformFunction {
+
+        /**
+         * Applies the given input parameters, connection parameters, and action context to produce a CallableResponse.
+         *
+         * @param inputParameters      the input parameters required for processing
+         * @param connectionParameters the connection-specific parameters necessary for execution
+         * @param context              the context of the action that provides additional environmental details
+         * @return a CallableResponse object containing the output to return to the calling workflow
+         * @throws Exception if an error occurs during processing
+         */
+        CallableResponse apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+            throws Exception;
+    }
+
+    /**
+     * A functional interface that extends PerformFunction. Represents a specific type of function designed to handle
      * webhook responses within the context of an action. This interface defines a single abstract method that takes
      * input parameters, connection parameters, and an action context to produce a WebhookResponse.
      */
@@ -547,6 +569,15 @@ public interface ActionDefinition {
          * @return
          */
         String apply(Parameters inputParameters, ActionContext context) throws Exception;
+    }
+
+    /**
+     * Represents a response returned by a callable workflow action, wrapping the output value to be sent back to the
+     * calling (parent) workflow.
+     *
+     * @param output the output value to return to the calling workflow
+     */
+    record CallableResponse(Object output) {
     }
 
     /**

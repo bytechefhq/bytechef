@@ -27,7 +27,6 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.context.util.JsonSchemaUtils;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.component.log.domain.LogEntry;
@@ -818,13 +817,15 @@ class ContextImpl implements Context {
     private record OutputSchemaImpl() implements OutputSchema {
 
         @Override
-        public ValueProperty<?> getOutputSchema(String jsonSchema) {
-            return JsonSchemaUtils.getProperty(jsonSchema);
+        public @Nullable ValueProperty<?> getOutputSchema(String jsonSchema) {
+            return (ValueProperty<?>) SchemaUtils.getJsonSchemaProperty(
+                jsonSchema, PropertyFactory.JSON_SCHEMA_PROPERTY_FACTORY);
         }
 
         @Override
-        public ValueProperty<?> getOutputSchema(String propertyName, String jsonSchema) {
-            return JsonSchemaUtils.getProperty(propertyName, jsonSchema);
+        public @Nullable ValueProperty<?> getOutputSchema(String propertyName, String jsonSchema) {
+            return (ValueProperty<?>) SchemaUtils.getJsonSchemaProperty(
+                propertyName, jsonSchema, PropertyFactory.JSON_SCHEMA_PROPERTY_FACTORY);
         }
 
         @Override

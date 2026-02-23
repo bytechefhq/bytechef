@@ -26,6 +26,12 @@ public class Option extends BaseOption {
     private Option() {
     }
 
+    public Option(BaseOption baseOption) {
+        this.description = baseOption.getDescription();
+        this.label = baseOption.getLabel();
+        this.value = baseOption.getValue();
+    }
+
     public Option(com.bytechef.component.definition.Option<?> option) {
         super(option);
     }

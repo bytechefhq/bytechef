@@ -35,6 +35,7 @@ public interface TriggerDefinition {
      *
      */
     enum TriggerType {
+        CALLABLE,
         DYNAMIC_WEBHOOK,
         HYBRID,
         LISTENER,

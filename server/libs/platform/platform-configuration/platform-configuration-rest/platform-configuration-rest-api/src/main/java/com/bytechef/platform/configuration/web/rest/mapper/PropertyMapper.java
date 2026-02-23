@@ -278,6 +278,13 @@ public class PropertyMapper {
         }
 
         @Override
+        default DynamicPropertiesPropertyModel visit(
+            com.bytechef.platform.workflow.task.dispatcher.domain.DynamicPropertiesProperty dynamicPropertiesProperty) {
+
+            return map(dynamicPropertiesProperty);
+        }
+
+        @Override
         default TimePropertyModel visit(
             com.bytechef.platform.workflow.task.dispatcher.domain.TimeProperty timeProperty) {
 
@@ -317,9 +324,17 @@ public class PropertyMapper {
             com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty);
 
         @Mapping(target = "languageId", ignore = true)
-        @Mapping(target = "optionsDataSource", ignore = true)
         StringPropertyModel map(
             com.bytechef.platform.workflow.task.dispatcher.domain.StringProperty stringProperty);
+
+        OptionsDataSourceModel map(
+            com.bytechef.platform.workflow.task.dispatcher.domain.OptionsDataSource optionsDataSource);
+
+        DynamicPropertiesPropertyModel map(
+            com.bytechef.platform.workflow.task.dispatcher.domain.DynamicPropertiesProperty dynamicPropertiesProperty);
+
+        com.bytechef.platform.configuration.web.rest.model.PropertiesDataSourceModel map(
+            com.bytechef.platform.workflow.task.dispatcher.domain.PropertiesDataSource propertiesDataSource);
 
         TaskPropertyModel map(TaskProperty taskProperty);
 
