@@ -95,6 +95,13 @@ This action does not produce any output.
 
 
 
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/microsoft-one-drive_v1#how-to-find-file-id).
+
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/microsoft-one-drive_v1#how-to-find-folder-id).
 
 
 
@@ -264,6 +271,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/microsoft-one-drive_v1#how-to-find-folder-id).
 
 
 
@@ -296,6 +306,9 @@ This action does not produce any output.
 
 
 
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/microsoft-one-drive_v1#how-to-find-file-id).
 
 
 
@@ -351,6 +364,9 @@ Type: FILE_ENTRY
 }
 ```
 
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/microsoft-one-drive_v1#how-to-find-file-id).
 
 
 
@@ -433,6 +449,9 @@ Type: OBJECT
 }
 ```
 
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/microsoft-one-drive_v1#how-to-find-file-id).
 
 
 
@@ -518,6 +537,9 @@ Items Type: OBJECT
 } ]
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/microsoft-one-drive_v1#how-to-find-folder-id).
 
 
 
@@ -600,6 +622,9 @@ Items Type: OBJECT
 } ]
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/microsoft-one-drive_v1#how-to-find-folder-id).
 
 
 
@@ -689,6 +714,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/microsoft-one-drive_v1#how-to-find-folder-id).
 
 
 
@@ -707,7 +735,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| parentId | Parent Folder ID | STRING | If no folder is specified, the root folder will be used. | false |
+| parentId | Parent Folder ID | STRING | ID of the folder to watch for new files. If no folder is specified, the root folder will be used. | false |
 
 
 #### Output
@@ -757,3 +785,25 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find File ID
+
+The best way to find a file ID is to use the output of one of the Microsoft OneDrive actions or triggers. In the output, you will find an `id` property, which represents the file ID.
+
+Some actions and triggers that return a file ID:
+* **Create New Text File**
+* **Get File**
+* **List Files**
+* **Upload File**
+* **New File** trigger
+
+### How to find Folder ID
+
+The best way to find a folder ID is to use the output of one of the Microsoft OneDrive actions. In the output, you will find an `id` property, which represents the folder ID.
+
+Some actions that return a folder ID:
+* **Create Folder**
+* **List Folders**
