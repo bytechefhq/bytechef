@@ -21,26 +21,28 @@ export function appendToLastAssistantMessage(messages: ThreadMessageLike[], delt
     for (let i = updatedMessages.length - 1; i >= 0; i--) {
         const message = updatedMessages[i];
 
-        if (message && message.role === 'assistant') {
-            if (Array.isArray(message.content)) {
-                const contentArray = [...message.content] as ContentPartType[];
-                const lastPart = contentArray[contentArray.length - 1];
+        if (!message || message.role !== 'assistant') {
+            continue;
+        }
 
-                if (lastPart && lastPart.type === 'text') {
-                    contentArray[contentArray.length - 1] = {...lastPart, text: String(lastPart.text || '') + delta};
-                } else {
-                    contentArray.push({text: delta, type: 'text'});
-                }
+        if (Array.isArray(message.content)) {
+            const contentArray = [...message.content] as ContentPartType[];
+            const lastPart = contentArray[contentArray.length - 1];
 
-                updatedMessages[i] = {...message, content: contentArray} as unknown as ThreadMessageLike;
+            if (lastPart && lastPart.type === 'text') {
+                contentArray[contentArray.length - 1] = {...lastPart, text: String(lastPart.text || '') + delta};
             } else {
-                const current = typeof message.content === 'string' ? message.content : '';
-
-                updatedMessages[i] = {...message, content: current + delta};
+                contentArray.push({text: delta, type: 'text'});
             }
 
-            return updatedMessages;
+            updatedMessages[i] = {...message, content: contentArray} as unknown as ThreadMessageLike;
+        } else {
+            const current = typeof message.content === 'string' ? message.content : '';
+
+            updatedMessages[i] = {...message, content: current + delta};
         }
+
+        return updatedMessages;
     }
 
     return [...updatedMessages, {content: delta, role: 'assistant'} as ThreadMessageLike];
@@ -57,24 +59,26 @@ export function setLastAssistantMessageContent(messages: ThreadMessageLike[], co
     for (let i = updatedMessages.length - 1; i >= 0; i--) {
         const message = updatedMessages[i];
 
-        if (message && message.role === 'assistant') {
-            if (Array.isArray(message.content)) {
-                const contentArray = [...message.content] as ContentPartType[];
-                const textIndex = contentArray.findLastIndex((part) => part.type === 'text');
+        if (!message || message.role !== 'assistant') {
+            continue;
+        }
 
-                if (textIndex >= 0) {
-                    contentArray[textIndex] = {...contentArray[textIndex], text: content};
-                } else {
-                    contentArray.push({text: content, type: 'text'});
-                }
+        if (Array.isArray(message.content)) {
+            const contentArray = [...message.content] as ContentPartType[];
+            const textIndex = contentArray.findLastIndex((part) => part.type === 'text');
 
-                updatedMessages[i] = {...message, content: contentArray} as unknown as ThreadMessageLike;
+            if (textIndex >= 0) {
+                contentArray[textIndex] = {...contentArray[textIndex], text: content};
             } else {
-                updatedMessages[i] = {...message, content};
+                contentArray.push({text: content, type: 'text'});
             }
 
-            return updatedMessages;
+            updatedMessages[i] = {...message, content: contentArray} as unknown as ThreadMessageLike;
+        } else {
+            updatedMessages[i] = {...message, content};
         }
+
+        return updatedMessages;
     }
 
     return [...updatedMessages, {content, role: 'assistant'} as ThreadMessageLike];
@@ -93,29 +97,31 @@ export function addToolExecutionToLastAssistantMessage(
     for (let i = updatedMessages.length - 1; i >= 0; i--) {
         const message = updatedMessages[i];
 
-        if (message && message.role === 'assistant') {
-            const contentArray = Array.isArray(message.content)
-                ? ([...message.content] as ContentPartType[])
-                : message.content
-                  ? [{text: String(message.content), type: 'text'}]
-                  : [];
-
-            contentArray.push({
-                args: toolExecution.inputs,
-                result: {
-                    confidence: toolExecution.confidence,
-                    output: toolExecution.output,
-                    reasoning: toolExecution.reasoning,
-                },
-                toolCallId: `tc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-                toolName: toolExecution.toolName,
-                type: 'tool-call',
-            });
-
-            updatedMessages[i] = {...message, content: contentArray} as unknown as ThreadMessageLike;
-
-            return updatedMessages;
+        if (!message || message.role !== 'assistant') {
+            continue;
         }
+
+        const contentArray = Array.isArray(message.content)
+            ? ([...message.content] as ContentPartType[])
+            : message.content
+              ? [{text: String(message.content), type: 'text'}]
+              : [];
+
+        contentArray.push({
+            args: toolExecution.inputs,
+            result: {
+                confidence: toolExecution.confidence,
+                output: toolExecution.output,
+                reasoning: toolExecution.reasoning,
+            },
+            toolCallId: `tc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            toolName: toolExecution.toolName,
+            type: 'tool-call',
+        });
+
+        updatedMessages[i] = {...message, content: contentArray} as unknown as ThreadMessageLike;
+
+        return updatedMessages;
     }
 
     return updatedMessages;

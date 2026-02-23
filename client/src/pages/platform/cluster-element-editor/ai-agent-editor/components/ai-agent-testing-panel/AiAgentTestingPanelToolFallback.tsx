@@ -1,7 +1,9 @@
+import Button from '@/components/Button/Button';
 import useAiAgentTools from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/components/hooks/useAiAgentTools';
 import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {ChevronDownIcon, ChevronUpIcon, WrenchIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
+import InlineSVG from 'react-inlinesvg';
 
 import type {ToolCallMessagePartComponent} from '@assistant-ui/react';
 
@@ -53,6 +55,7 @@ export const AiAgentTestingPanelToolFallback: ToolCallMessagePartComponent = ({a
         typeof result === 'object' && result !== null
             ? (result as {confidence?: string; output?: unknown; reasoning?: string})
             : {output: result};
+
     const {confidence, output, reasoning} = toolResult;
 
     let inputs: unknown;
@@ -69,13 +72,18 @@ export const AiAgentTestingPanelToolFallback: ToolCallMessagePartComponent = ({a
 
     return (
         <div className="my-2 overflow-hidden rounded-lg border bg-muted/30">
-            <button
-                className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-muted/50"
+            <Button
+                className="flex h-auto w-full items-center justify-between rounded-none px-4 py-3"
                 onClick={() => setIsExpanded(!isExpanded)}
+                variant="ghost"
             >
                 <div className="flex items-center gap-2">
                     {displayIcon ? (
-                        <img alt="" className="size-5" src={displayIcon} />
+                        <InlineSVG
+                            className="size-5"
+                            loader={<WrenchIcon className="size-4 text-muted-foreground" />}
+                            src={displayIcon}
+                        />
                     ) : (
                         <WrenchIcon className="size-4 text-muted-foreground" />
                     )}
@@ -92,7 +100,7 @@ export const AiAgentTestingPanelToolFallback: ToolCallMessagePartComponent = ({a
                 ) : (
                     <ChevronDownIcon className="size-4 text-muted-foreground" />
                 )}
-            </button>
+            </Button>
 
             {isExpanded && (
                 <div className="space-y-3 border-t px-4 py-3">

@@ -4,6 +4,29 @@ import AiAgentTools from '@/pages/platform/cluster-element-editor/ai-agent-edito
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useShallow} from 'zustand/shallow';
 
+const PROMPT_FIELDS = [
+    {
+        containerClassName: 'min-h-0 overflow-hidden',
+        editorClassName: 'min-h-[200px]',
+        path: 'systemPrompt',
+        placeholder:
+            "System instructions that define the agent's behavior, role, and constraints. Use '$' to insert data pills.",
+        title: 'Instructions to follow:',
+    },
+    {
+        editorClassName: 'min-h-[100px]',
+        path: 'userPrompt',
+        placeholder: "The message sent to the agent on each execution. Use '$' to insert data pills.",
+        title: 'User input:',
+    },
+    {
+        editorClassName: 'p-2',
+        path: 'attachments',
+        placeholder: "File data pill references to attach to the message. Use '$' to insert data pills.",
+        title: 'Attachments:',
+    },
+];
+
 export function AiAgentConfigurationPanel() {
     const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -20,39 +43,20 @@ export function AiAgentConfigurationPanel() {
 
             <AiAgentModelSelectField />
 
-            <AiAgentPromptField
-                componentDefinitions={componentDefinitions}
-                containerClassName="min-h-0 overflow-hidden"
-                dataPills={dataPills}
-                editorClassName="min-h-[200px]"
-                path="systemPrompt"
-                placeholder="System instructions that define the agent's behavior, role, and constraints. Use '$' to insert data pills."
-                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                title="Instructions to follow:"
-                workflow={workflow}
-            />
-
-            <AiAgentPromptField
-                componentDefinitions={componentDefinitions}
-                dataPills={dataPills}
-                editorClassName="min-h-[100px]"
-                path="userPrompt"
-                placeholder="The message sent to the agent on each execution. Use '$' to insert data pills."
-                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                title="User input:"
-                workflow={workflow}
-            />
-
-            <AiAgentPromptField
-                componentDefinitions={componentDefinitions}
-                dataPills={dataPills}
-                editorClassName="p-2"
-                path="attachments"
-                placeholder="File data pill references to attach to the message. Use '$' to insert data pills."
-                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                title="Attachments:"
-                workflow={workflow}
-            />
+            {PROMPT_FIELDS.map((field) => (
+                <AiAgentPromptField
+                    componentDefinitions={componentDefinitions}
+                    containerClassName={field.containerClassName}
+                    dataPills={dataPills}
+                    editorClassName={field.editorClassName}
+                    key={field.path}
+                    path={field.path}
+                    placeholder={field.placeholder}
+                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                    title={field.title}
+                    workflow={workflow}
+                />
+            ))}
 
             <AiAgentTools />
         </div>
