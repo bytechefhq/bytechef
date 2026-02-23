@@ -2,6 +2,7 @@ import {
     appendToLastAssistantMessage as appendHelper,
     setLastAssistantMessageContent as setContentHelper,
 } from '@/shared/util/assistant-message-utils';
+import {generateRandomId} from '@/shared/util/random-utils';
 import {ThreadMessageLike} from '@assistant-ui/react';
 
 /* eslint-disable sort-keys */
@@ -27,15 +28,7 @@ const useWorkflowTestChatStore = create<WorkflowTestChatStateI>()(
         (set) => ({
             conversationId: undefined,
             generateConversationId: () => {
-                set((state) => {
-                    return {
-                        ...state,
-                        conversationId: Array(32)
-                            .fill(0)
-                            .map(() => Math.random().toString(36).charAt(2))
-                            .join(''),
-                    };
-                });
+                set({conversationId: generateRandomId()});
             },
 
             messages: [],

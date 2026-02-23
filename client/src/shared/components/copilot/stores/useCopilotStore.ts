@@ -1,3 +1,4 @@
+import {generateRandomId} from '@/shared/util/random-utils';
 import {ThreadMessageLike} from '@assistant-ui/react';
 
 /* eslint-disable sort-keys */
@@ -57,20 +58,9 @@ interface CopilotStateI {
 
 export const useCopilotStore = create<CopilotStateI>()(
     devtools((set) => ({
-        conversationId: Array(32)
-            .fill(0)
-            .map(() => Math.random().toString(36).charAt(2))
-            .join(''),
+        conversationId: generateRandomId(),
         generateConversationId: () => {
-            set((state) => {
-                return {
-                    ...state,
-                    conversationId: Array(32)
-                        .fill(0)
-                        .map(() => Math.random().toString(36).charAt(2))
-                        .join(''),
-                };
-            });
+            set({conversationId: generateRandomId()});
         },
 
         context: {

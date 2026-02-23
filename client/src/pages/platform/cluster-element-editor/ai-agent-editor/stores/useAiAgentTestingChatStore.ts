@@ -4,6 +4,7 @@ import {
     appendToLastAssistantMessage as appendHelper,
     setLastAssistantMessageContent as setContentHelper,
 } from '@/shared/util/assistant-message-utils';
+import {generateRandomId} from '@/shared/util/random-utils';
 import {ThreadMessageLike} from '@assistant-ui/react';
 
 /* eslint-disable sort-keys */
@@ -21,13 +22,6 @@ interface AiAgentTestingChatStateI {
     setLastAssistantMessageContent: (content: string) => void;
     setLastAssistantMessageError: (errorMessage: string) => void;
     resetMessages: () => void;
-}
-
-function generateRandomId(): string {
-    return Array(32)
-        .fill(0)
-        .map(() => Math.random().toString(36).charAt(2))
-        .join('');
 }
 
 const useAiAgentTestingChatStore = create<AiAgentTestingChatStateI>()(
