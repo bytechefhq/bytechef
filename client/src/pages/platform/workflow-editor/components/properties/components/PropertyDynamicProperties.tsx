@@ -72,6 +72,7 @@ const PropertyDynamicProperties = ({
                 clusterElementWorkflowNodeName: currentNode?.workflowNodeName ?? '',
                 environmentId: currentEnvironmentId,
                 id: workflow.id!,
+                lookupDependsOnPaths: lookupDependsOnPaths as string[] | undefined,
                 propertyName: name!,
                 workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
             },
@@ -82,6 +83,7 @@ const PropertyDynamicProperties = ({
             currentNode?.workflowNodeName,
             currentEnvironmentId,
             workflow.id,
+            lookupDependsOnPaths,
             name,
             rootClusterElementNodeData?.workflowNodeName,
         ]
