@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -43,11 +44,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableScheduling
 public class AsyncConfiguration implements AsyncConfigurer {
 
+    private final ContextPropagatingTaskDecorator contextPropagatingTaskDecorator;
     private final Environment environment;
     private final TaskExecutionProperties taskExecutionProperties;
 
     @SuppressFBWarnings("EI")
-    public AsyncConfiguration(Environment environment, TaskExecutionProperties taskExecutionProperties) {
+    public AsyncConfiguration(
+        ContextPropagatingTaskDecorator contextPropagatingTaskDecorator,
+        Environment environment, TaskExecutionProperties taskExecutionProperties) {
+
+        this.contextPropagatingTaskDecorator = contextPropagatingTaskDecorator;
         this.environment = environment;
         this.taskExecutionProperties = taskExecutionProperties;
     }
@@ -63,6 +69,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
         executor.setMaxPoolSize(pool.getMaxSize());
         executor.setQueueCapacity(pool.getQueueCapacity());
         executor.setVirtualThreads(Threading.VIRTUAL.isActive(environment));
+        executor.setTaskDecorator(contextPropagatingTaskDecorator);
         executor.setThreadNamePrefix(taskExecutionProperties.getThreadNamePrefix());
 
         return executor;
