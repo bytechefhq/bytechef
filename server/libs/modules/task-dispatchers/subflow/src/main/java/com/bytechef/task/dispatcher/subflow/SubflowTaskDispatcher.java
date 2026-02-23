@@ -52,6 +52,7 @@ import java.util.Objects;
  */
 public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
+    @Nullable
     private final ChildJobPrincipalCreator childJobPrincipalCreator;
     private final JobFacade jobFacade;
     private final JobService jobService;
