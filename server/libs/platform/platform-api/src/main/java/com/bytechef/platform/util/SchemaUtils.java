@@ -114,7 +114,7 @@ public class SchemaUtils {
                 sampleOutput = JsonUtils.readMap(string);
             } catch (Exception exception) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Failed to parse sample output as JSON map: {}", exception.getMessage());
+                    logger.debug("Failed to parse sample output as JSON map: {}", exception.getMessage(), exception);
                 }
             }
         }
