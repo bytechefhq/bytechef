@@ -62,10 +62,8 @@ public class YouTubeUtils {
     }
 
     public static List<Option<String>> getVideoCategoryIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
-
-        List<Option<String>> options = new ArrayList<>();
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         Map<String, Object> response = context
             .http(http -> http.get("https://www.googleapis.com/youtube/v3/videoCategories"))
@@ -75,6 +73,8 @@ public class YouTubeUtils {
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
 
         if (response.get(ITEMS) instanceof List<?> items) {
             for (Object item : items) {

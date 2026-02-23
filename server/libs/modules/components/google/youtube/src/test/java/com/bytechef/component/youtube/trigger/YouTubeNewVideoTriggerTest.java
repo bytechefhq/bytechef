@@ -20,16 +20,20 @@ import static com.bytechef.component.youtube.constant.YouTubeConstants.IDENTIFIE
 import static com.bytechef.component.youtube.constant.YouTubeConstants.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
@@ -54,25 +58,35 @@ import org.mockito.MockedStatic;
 @ExtendWith(MockContextSetupExtension.class)
 class YouTubeNewVideoTriggerTest {
 
-    private final LocalDateTime mockLocalDate = LocalDateTime.of(2025, 6, 16, 15, 5);
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(IDENTIFIER, "testIdentifier", LAST_TIME_CHECKED, mockLocalDate));
+    private final LocalDateTime mockedLocalDateTime = LocalDateTime.of(2025, 6, 16, 15, 5);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(
+        Map.of(IDENTIFIER, "testIdentifier"));
+    private final Parameters mockedClosureParameters = MockParametersFactory.create(
+        Map.of(LAST_TIME_CHECKED, mockedLocalDateTime));
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
     private final Map<String, Object> responseMap = Map.of("items", List.of(
-        Map.of("id", Map.of("videoId", "1"), "snippet", Map.of())));
+        Map.of("id", Map.of("videoId", "1"), "snippet", Map.of("title", "videoTitle"))));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor = forClass(TriggerContext.class);
 
     @Test
     void testPoll(
-        TriggerContext mockedContext, Http mockedHttp, Http.Executor mockedExecutor, Http.Response mockedResponse,
-        ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
+        TriggerContext mockedContext, Http mockedHttp, Executor mockedExecutor, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        try (MockedStatic<YouTubeUtils> youtubeUtilsMockedStatic = mockStatic(YouTubeUtils.class)) {
+        LocalDateTime now = LocalDateTime.of(2025, 6, 16, 16, 5);
+
+        try (MockedStatic<YouTubeUtils> youtubeUtilsMockedStatic = mockStatic(YouTubeUtils.class);
+            MockedStatic<LocalDateTime> localDateTimeMockedStatic =
+                mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+
             youtubeUtilsMockedStatic.when(() -> YouTubeUtils.getChannelId(
                 stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()))
                 .thenReturn("channelId");
+
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
+                .thenReturn(now);
 
             when(mockedHttp.get(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
@@ -82,18 +96,17 @@ class YouTubeNewVideoTriggerTest {
                 .thenReturn(responseMap);
 
             PollOutput pollOutput = YouTubeNewVideoTrigger.poll(
-                mockedParameters, mockedParameters, mockedParameters, mockedContext);
+                mockedInputParameters, null, mockedClosureParameters, mockedContext);
 
-            assertEquals(List.of(Map.of()), pollOutput.records());
-            assertFalse(pollOutput.pollImmediately());
-
+            assertEquals(
+                new PollOutput(List.of(Map.of("title", "videoTitle")), Map.of(LAST_TIME_CHECKED, now), false),
+                pollOutput);
             assertEquals(List.of("testIdentifier", "/search"), stringArgumentCaptor.getAllValues());
             assertEquals(mockedContext, triggerContextArgumentCaptor.getValue());
 
             ZoneId zoneId = ZoneId.systemDefault();
-            ZonedDateTime startZonedDate = mockLocalDate.atZone(zoneId);
+            ZonedDateTime startZonedDate = mockedLocalDateTime.atZone(zoneId);
 
-            Object[] queryArguments = queryArgumentCaptor.getValue();
             Object[] expectedQueryArguments = {
                 "part", "snippet",
                 "channelId", "channelId",
@@ -102,18 +115,17 @@ class YouTubeNewVideoTriggerTest {
                 "publishedAfter", startZonedDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
             };
 
-            assertArrayEquals(expectedQueryArguments, queryArguments);
+            assertArrayEquals(expectedQueryArguments, queryArgumentCaptor.getValue());
 
-            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+            ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
             assertNotNull(capturedFunction);
 
-            Http.Configuration.ConfigurationBuilder configurationBuilder =
-                configurationBuilderArgumentCaptor.getValue();
-            Http.Configuration configuration = configurationBuilder.build();
-            Http.ResponseType responseType = configuration.getResponseType();
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+            ResponseType responseType = configuration.getResponseType();
 
-            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+            assertEquals(ResponseType.JSON, responseType);
         }
     }
 }
