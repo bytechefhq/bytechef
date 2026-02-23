@@ -22,10 +22,6 @@ interface PropertyJsonSchemaBuilderSheetProps {
 const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: PropertyJsonSchemaBuilderSheetProps) => {
     const [localSchema, setLocalSchema] = useState<SchemaRecordType | undefined>(schema);
 
-    useEffect(() => {
-        setLocalSchema(schema);
-    }, [schema]);
-
     const editorRef = useRef<StandaloneCodeEditorType | null>(null);
 
     const handleSchemaChange = useCallback(
@@ -45,6 +41,10 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
             });
         }
     }, []);
+
+    useEffect(() => {
+        setLocalSchema(schema);
+    }, [schema]);
 
     return (
         <Sheet onOpenChange={onClose} open>
