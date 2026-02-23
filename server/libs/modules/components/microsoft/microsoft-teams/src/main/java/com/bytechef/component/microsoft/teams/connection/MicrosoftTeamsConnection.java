@@ -28,6 +28,8 @@ import java.util.Map;
 public class MicrosoftTeamsConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
+        1,
+        "https://docs.bytechef.io/reference/components/microsoft-teams_v1#connection-setup",
         (connection, context) -> {
             Map<String, Boolean> map = new HashMap<>();
 

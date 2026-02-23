@@ -26,6 +26,8 @@ import java.util.Map;
 public class MicrosoftToDoConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
+        1,
+        "https://docs.bytechef.io/reference/components/microsoft-excel_v1#connection-setup",
         (connection, context) -> Map.of(
             "Tasks.Read", false,
             "Tasks.Read.All", false,
