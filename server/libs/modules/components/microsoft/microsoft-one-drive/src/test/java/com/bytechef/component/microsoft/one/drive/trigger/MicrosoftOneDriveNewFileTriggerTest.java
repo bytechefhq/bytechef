@@ -18,46 +18,61 @@ package com.bytechef.component.microsoft.one.drive.trigger;
 
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.component.microsoft.one.drive.trigger.MicrosoftOneDriveNewFileTrigger.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class MicrosoftOneDriveNewFileTriggerTest {
 
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Parameters parameters = mock(Parameters.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(PARENT_ID, "xy"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPoll() {
+    void testPoll(
+        TriggerContext mockedTriggerContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, String> fileMap =
             Map.of(NAME, "some name", ID, "abc", "createdDateTime", "2024-01-01T14:28:23Z", "file", "file");
 
         LocalDateTime startDate = LocalDateTime.of(2024, 1, 1, 0, 0, 0);
         LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
+
+        Parameters mockedClosureParameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
 
         try (MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
             LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
@@ -65,22 +80,28 @@ class MicrosoftOneDriveNewFileTriggerTest {
             localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
                 .thenReturn(endDate);
 
-            when(parameters.getLocalDateTime(eq(LAST_TIME_CHECKED), any()))
-                .thenReturn(startDate);
-            when(mockedTriggerContext.http(any()))
+            when(mockedHttp.get(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-            when(mockedExecutor.configuration(any()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.execute())
-                .thenReturn(mockedResponse);
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(Map.of(VALUE, List.of(fileMap)));
 
-            PollOutput pollOutput =
-                MicrosoftOneDriveNewFileTrigger.poll(parameters, parameters, parameters, mockedTriggerContext);
+            PollOutput pollOutput = MicrosoftOneDriveNewFileTrigger.poll(
+                mockedInputParameters, null, mockedClosureParameters, mockedTriggerContext);
 
-            assertEquals(List.of(fileMap), pollOutput.records());
-            assertFalse(pollOutput.pollImmediately());
+            PollOutput expectedPollOutput = new PollOutput(List.of(fileMap), Map.of(LAST_TIME_CHECKED, endDate), false);
+
+            assertEquals(expectedPollOutput, pollOutput);
+
+            ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+            ResponseType responseType = configuration.getResponseType();
+
+            assertEquals(ResponseType.JSON, responseType);
+            assertEquals("/me/drive/items/xy/children", stringArgumentCaptor.getValue());
         }
     }
 }

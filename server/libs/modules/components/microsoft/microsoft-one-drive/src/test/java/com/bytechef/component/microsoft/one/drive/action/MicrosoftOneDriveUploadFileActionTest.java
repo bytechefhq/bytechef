@@ -17,59 +17,108 @@
 package com.bytechef.component.microsoft.one.drive.action;
 
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class MicrosoftOneDriveUploadFileActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(PARENT_ID, "xy", FILE, mockedFileEntry));
+
         Map<String, String> map = Map.of("key", "value");
 
-        when(mockedParameters.getRequiredFileEntry(FILE))
-            .thenReturn(mockedFileEntry);
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedFileEntry.getName())
+            .thenReturn("file.pdf");
+        when(mockedHttp.put(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(map);
 
-        Object result = MicrosoftOneDriveUploadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = MicrosoftOneDriveUploadFileAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(map, result);
 
-        Http.Body body = Http.Body.of(mockedFileEntry);
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-        Http.Body value = bodyArgumentCaptor.getValue();
+        assertNotNull(capturedFunction);
 
-        assertEquals(body.getContent(), value.getContent());
-        assertEquals(body.getContentType(), value.getContentType());
-        assertEquals(body.getMimeType(), value.getMimeType());
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.JSON, responseType);
+        assertEquals("/me/drive/items/xy:/file.pdf:/content", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(mockedFileEntry), bodyArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testPerformWithoutParentId(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters parametersWithEmptyParentId = MockParametersFactory.create(Map.of(FILE, mockedFileEntry));
+        Map<String, String> map = Map.of("key", "value");
+
+        when(mockedFileEntry.getName())
+            .thenReturn("file.pdf");
+        when(mockedHttp.put(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(map);
+
+        Object result = MicrosoftOneDriveUploadFileAction.perform(parametersWithEmptyParentId, null, mockedContext);
+
+        assertEquals(map, result);
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.JSON, responseType);
+        assertEquals("/me/drive/items/root:/file.pdf:/content", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(mockedFileEntry), bodyArgumentCaptor.getValue());
     }
 }
