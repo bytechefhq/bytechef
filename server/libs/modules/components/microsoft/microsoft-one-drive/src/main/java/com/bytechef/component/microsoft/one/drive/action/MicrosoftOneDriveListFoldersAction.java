@@ -47,6 +47,7 @@ public class MicrosoftOneDriveListFoldersAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listFolders")
         .title("List Folders")
         .description("List folders in a OneDrive folder.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-one-drive_v1#list-folders")
         .properties(
             string(PARENT_ID)
                 .label("Parent Folder ID")
