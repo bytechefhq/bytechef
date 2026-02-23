@@ -50,14 +50,10 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
     );
 
-    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
-    const workflow = useWorkflowDataStore((state) => state.workflow);
-
     const defaultValueSavedRef = useRef(false);
 
-    useEffect(() => {
-        defaultValueSavedRef.current = false;
-    }, [path]);
+    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+    const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
@@ -477,6 +473,10 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             setSubProperties(properties as Array<PropertyAllType>);
         }
     }, [properties]);
+
+    useEffect(() => {
+        defaultValueSavedRef.current = false;
+    }, [path]);
 
     return {
         availablePropertyTypes,
