@@ -54,6 +54,10 @@ public class GoogleSheetsComponentHandler implements ComponentHandler {
         .icon("path:assets/google-sheets.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp(
+            "Google Sheets API documentation",
+            "https://developers.google.com/workspace/sheets/api/guides/concepts")
         .actions(
             GoogleSheetsClearSheetAction.ACTION_DEFINITION,
             GoogleSheetsCreateColumnAction.ACTION_DEFINITION,
@@ -82,7 +86,8 @@ public class GoogleSheetsComponentHandler implements ComponentHandler {
             tool(GoogleSheetsInsertRowAction.ACTION_DEFINITION),
             tool(GoogleSheetsListSheetsAction.ACTION_DEFINITION),
             tool(GoogleSheetsUpdateRowAction.ACTION_DEFINITION))
-        .triggers(GoogleSheetsNewRowTrigger.TRIGGER_DEFINITION);
+        .triggers(GoogleSheetsNewRowTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

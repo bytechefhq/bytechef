@@ -74,7 +74,8 @@ public class GoogleSheetsNewRowTrigger {
         .output()
         .webhookEnable(GoogleSheetsNewRowTrigger::webhookEnable)
         .webhookDisable(GoogleSheetsNewRowTrigger::webhookDisable)
-        .webhookRequest(GoogleSheetsNewRowTrigger::webhookRequest);
+        .webhookRequest(GoogleSheetsNewRowTrigger::webhookRequest)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#new-row");
 
     private GoogleSheetsNewRowTrigger() {
     }

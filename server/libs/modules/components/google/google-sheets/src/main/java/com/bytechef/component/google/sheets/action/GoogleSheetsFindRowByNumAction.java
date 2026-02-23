@@ -52,7 +52,8 @@ public class GoogleSheetsFindRowByNumAction {
                 .required(true)
                 .description("The row number to get from the sheet."))
         .output()
-        .perform(GoogleSheetsFindRowByNumAction::perform);
+        .perform(GoogleSheetsFindRowByNumAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#find-row-by-number");
 
     private GoogleSheetsFindRowByNumAction() {
     }

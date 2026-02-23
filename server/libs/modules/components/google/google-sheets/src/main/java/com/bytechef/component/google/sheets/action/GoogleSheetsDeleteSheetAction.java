@@ -45,7 +45,8 @@ public class GoogleSheetsDeleteSheetAction {
         .properties(
             SPREADSHEET_ID_PROPERTY,
             SHEET_ID_PROPERTY)
-        .perform(GoogleSheetsDeleteSheetAction::perform);
+        .perform(GoogleSheetsDeleteSheetAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#delete-sheet");
 
     private GoogleSheetsDeleteSheetAction() {
     }

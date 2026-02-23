@@ -50,7 +50,8 @@ public class GoogleSheetsListSheetsAction {
                 array()
                     .description("List of sheets in the spreadsheet.")
                     .items(SHEET_RECORD_OUTPUT_PROPERTY)))
-        .perform(GoogleSheetsListSheetsAction::perform);
+        .perform(GoogleSheetsListSheetsAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#list-sheets");
 
     private GoogleSheetsListSheetsAction() {
     }

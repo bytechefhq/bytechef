@@ -71,7 +71,8 @@ public class GoogleSheetsUpdateRowAction {
                 .properties(GoogleSheetsUtils::createPropertiesToUpdateRow)
                 .required(true))
         .output()
-        .perform(GoogleSheetsUpdateRowAction::perform);
+        .perform(GoogleSheetsUpdateRowAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#update-row");
 
     private GoogleSheetsUpdateRowAction() {
     }

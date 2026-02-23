@@ -54,7 +54,8 @@ public class GoogleSheetsCreateColumnAction {
                 .description("Name of the new column.")
                 .required(true))
         .output(outputSchema(SHEET_RECORD_OUTPUT_PROPERTY))
-        .perform(GoogleSheetsCreateColumnAction::perform);
+        .perform(GoogleSheetsCreateColumnAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#create-column");
 
     private GoogleSheetsCreateColumnAction() {
     }

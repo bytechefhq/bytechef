@@ -63,7 +63,8 @@ public class GoogleSheetsInsertMultipleRowsAction {
                 .properties(GoogleSheetsUtils.createPropertiesForNewRows(false))
                 .required(true))
         .output()
-        .perform(GoogleSheetsInsertMultipleRowsAction::perform);
+        .perform(GoogleSheetsInsertMultipleRowsAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#insert-multiple-rows");
 
     private GoogleSheetsInsertMultipleRowsAction() {
     }
