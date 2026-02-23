@@ -30,15 +30,11 @@ const SchemaInput = ({
     const [localValue, setLocalValue] = useState<string>(value);
 
     const localValueRef = useRef(localValue);
-
-    localValueRef.current = localValue;
-
     const onChangeRef = useRef(onChange);
-
-    onChangeRef.current = onChange;
-
     const valueRef = useRef(value);
 
+    localValueRef.current = localValue;
+    onChangeRef.current = onChange;
     valueRef.current = value;
 
     const onChangeValue = () => {
