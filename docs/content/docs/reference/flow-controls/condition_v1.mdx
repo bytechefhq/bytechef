@@ -56,36 +56,51 @@ Example Expression: ${order_1.total} > 1000 && ${order_1.status} == "pending"
 
 **Using Condition Builder (Raw Expression = FALSE):**
 
+The condition builder provides a grid-based interface showing supported operations for each data type:
+
+| Data Type | Greater | Less | Equal | Ignore Case | Contains | Starts With | Ends With | Regex |
+|------------|:--------:|:------:|:------:|:-----------:|:----------:|:---------:|:------:|
+| **String** | No | No | Yes | Yes | Yes | Yes | Yes | Yes |
+| **Number** | Yes | Yes | Yes | No | No | No | No |
+| **Date** | Yes | Yes | Yes | No | No | No | No |
+| **Boolean** | No | No | Yes | No | No | No | No |
+
+### Example: Building `${order_1.total} > 1000 && ${order_1.status} == "pending"`
+
+To build this expression using the Condition Builder:
+
+1. **Set Raw Expression to FALSE** to use the visual builder
+2. **Add OR Condition** - Click to create the first OR group
+3. **Add AND Conditions** within the OR group:
+   - **First AND Condition:**
+     - Type: **Number Expression**
+     - Value 1: `${order_1.total}` (select from data pills)
+     - Operation: **Greater**
+     - Value 2: `1000`
+   
+   - **Second AND Condition:**
+     - Type: **String Expression**
+     - Value 1: `${order_1.status}` (select from data pills)
+     - Operation: **Equals**
+     - Value 2: `"pending"`
+
+4. **Result**: The condition builder will automatically generate: `${order_1.total} > 1000 && ${order_1.status} == "pending"`
+
 **For Number Expression:**
 1. Select **Number Expression** as type
-2. **Value 1**:  Select the number value to compare with the second one.
-3. **Operation**: Select the operation type. In ByteChef,we have different operation types such as:
-   - Greater
-   - Less
-   - Equal to
-   - Not equals
-   - Greater or equals
-   - Less or equals
-   - Empty
+2. **Value 1**: Select the number value to compare with the second one.
+3. **Operation**: Select from supported operations: Greater, Less, Equal, Not equals, Greater or equals, Less or equals, Empty
 
 **For String Expression:**
 1. Select **String Expression** as type
-2. **Value 1**: Could be any string value based on an expression. For example:`${user_1.email}` - this is the string value to compare with the second one.
-3. **Operation**: Select operation to decide how to compare the values. In ByteChef, we have different operation types such as:
-   - Contains
-   - Starts with
-   - Ends with
-   - Equals
-   - Not equals
-   - Regex
-   - Not Contains
-   - Equals ignore case
+2. **Value 1**: Could be any string value based on an expression. For example: `${user_1.email}` - this is the string value to compare with the second one.
+3. **Operation**: Select from supported operations: Contains, Starts with, Ends with, Equals, Not equals, Regex, Not Contains, Equals ignore case
 
 **For Boolean Expression:**
 1. Select **Boolean Expression** as type
 2. **Value 1**: Select `true` or `false` depending on your requirement
 3. **Operation**: Select `equals` or `not equals`
-4. **Value 2**: Also slect `true` or `false` based on the operation you selected
+4. **Value 2**: Also select `true` or `false` based on the operation you selected
 
 **For Date & Time Expression:**
 1. Select **Date & Time Expression** as type
