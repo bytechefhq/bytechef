@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -1367,8 +1368,10 @@ public interface Context {
 
     interface OutputSchema {
 
+        @Nullable
         ValueProperty<?> getOutputSchema(String jsonSchema);
 
+        @Nullable
         ValueProperty<?> getOutputSchema(String propertyName, String jsonSchema);
 
         ValueProperty<?> getOutputSchema(Object value);

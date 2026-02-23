@@ -484,8 +484,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @SuppressWarnings("unchecked")
     private TriggerOutput doExecuteTrigger(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        @Nullable Object triggerState, WebhookRequest webhookRequest, ComponentConnection componentConnection,
-        TriggerContext context) {
+        @Nullable Object triggerState, @Nullable WebhookRequest webhookRequest,
+        @Nullable ComponentConnection componentConnection, TriggerContext context) {
 
         TriggerOutput triggerOutput;
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =

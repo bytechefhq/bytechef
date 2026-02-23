@@ -2855,6 +2855,7 @@ components:
     TriggerType:
       type: "string"
       enum:
+      - "CALLABLE"
       - "STATIC_WEBHOOK"
       - "HYBRID"
       - "LISTENER"
