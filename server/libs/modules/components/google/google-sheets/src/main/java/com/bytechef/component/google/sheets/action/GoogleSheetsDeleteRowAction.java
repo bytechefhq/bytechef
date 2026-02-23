@@ -42,7 +42,8 @@ public class GoogleSheetsDeleteRowAction {
                 .label("Row Number")
                 .description("The row number to delete.")
                 .required(true))
-        .perform(GoogleSheetsDeleteRowAction::perform);
+        .perform(GoogleSheetsDeleteRowAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#delete-row");
 
     private GoogleSheetsDeleteRowAction() {
     }

@@ -52,7 +52,8 @@ public class GoogleSheetsClearSheetAction {
         .processErrorResponse((statusCode, body, headers, context) -> {
             throw new RuntimeException("Google Sheets API returned status code " + statusCode + " with body " + body);
         })
-        .perform(GoogleSheetsClearSheetAction::perform);
+        .perform(GoogleSheetsClearSheetAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#clear-sheet");
 
     private GoogleSheetsClearSheetAction() {
     }

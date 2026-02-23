@@ -54,7 +54,8 @@ public class GoogleSheetsCreateSpreadsheetAction {
                 .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
                 .required(false))
         .output()
-        .perform(GoogleSheetsCreateSpreadsheetAction::perform);
+        .perform(GoogleSheetsCreateSpreadsheetAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#create-spreadsheet");
 
     private GoogleSheetsCreateSpreadsheetAction() {
     }

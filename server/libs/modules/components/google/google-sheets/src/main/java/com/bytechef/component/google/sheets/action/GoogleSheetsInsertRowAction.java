@@ -60,7 +60,8 @@ public class GoogleSheetsInsertRowAction {
                 .properties(GoogleSheetsUtils.createPropertiesForNewRows(true))
                 .required(true))
         .output()
-        .perform(GoogleSheetsInsertRowAction::perform);
+        .perform(GoogleSheetsInsertRowAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#insert-row");
 
     private GoogleSheetsInsertRowAction() {
     }

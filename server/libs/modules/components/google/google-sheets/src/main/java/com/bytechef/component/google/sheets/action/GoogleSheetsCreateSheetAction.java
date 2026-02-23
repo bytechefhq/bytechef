@@ -64,7 +64,8 @@ public class GoogleSheetsCreateSheetAction {
                 .items(string())
                 .required(false))
         .output(outputSchema(SHEET_RECORD_OUTPUT_PROPERTY))
-        .perform(GoogleSheetsCreateSheetAction::perform);
+        .perform(GoogleSheetsCreateSheetAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#create-sheet");
 
     private GoogleSheetsCreateSheetAction() {
     }

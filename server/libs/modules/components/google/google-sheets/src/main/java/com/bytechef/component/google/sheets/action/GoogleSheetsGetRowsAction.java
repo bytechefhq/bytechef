@@ -48,7 +48,8 @@ public class GoogleSheetsGetRowsAction {
             SHEET_NAME_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY)
         .output()
-        .perform(GoogleSheetsGetRowsAction::perform);
+        .perform(GoogleSheetsGetRowsAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#get-rows");
 
     private GoogleSheetsGetRowsAction() {
     }

@@ -44,7 +44,8 @@ public class GoogleSheetsDeleteColumnAction {
                 .description("The label of the column to be deleted.")
                 .exampleValue("A")
                 .required(true))
-        .perform(GoogleSheetsDeleteColumnAction::perform);
+        .perform(GoogleSheetsDeleteColumnAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#delete-column");
 
     private GoogleSheetsDeleteColumnAction() {
     }
