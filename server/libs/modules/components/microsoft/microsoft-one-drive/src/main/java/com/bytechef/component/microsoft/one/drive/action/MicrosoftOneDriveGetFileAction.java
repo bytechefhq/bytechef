@@ -38,6 +38,7 @@ public class MicrosoftOneDriveGetFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFile")
         .title("Get File")
         .description("Retrieve a specified file from your Microsoft OneDrive.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-one-drive_v1#get-file")
         .properties(
             string(ID)
                 .label("File ID")

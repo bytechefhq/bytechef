@@ -45,6 +45,7 @@ public class MicrosoftOneDriveCreateNewTextFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createNewTextFile")
         .title("Create New Text File")
         .description("Creates a new text file in Microsoft OneDrive.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-one-drive_v1#create-new-text-file")
         .properties(
             string(NAME)
                 .label("File Name")

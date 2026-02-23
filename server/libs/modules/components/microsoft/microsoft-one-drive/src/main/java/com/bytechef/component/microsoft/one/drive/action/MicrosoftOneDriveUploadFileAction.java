@@ -31,7 +31,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
@@ -43,6 +42,7 @@ public class MicrosoftOneDriveUploadFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
         .title("Upload File")
         .description("Upload a file to your Microsoft OneDrive.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-one-drive_v1#upload-file")
         .properties(
             string(PARENT_ID)
                 .label("Parent Folder ID")
@@ -72,6 +72,6 @@ public class MicrosoftOneDriveUploadFileAction {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(fileEntry))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

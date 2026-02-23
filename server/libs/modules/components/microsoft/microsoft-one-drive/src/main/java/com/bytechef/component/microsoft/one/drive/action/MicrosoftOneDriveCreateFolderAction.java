@@ -41,6 +41,7 @@ public class MicrosoftOneDriveCreateFolderAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createNewFolder")
         .title("Create New Folder")
         .description("Creates a new empty folder in Microsoft OneDrive.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-one-drive_v1#create-new-folder")
         .properties(
             string(NAME)
                 .label("Folder Name")

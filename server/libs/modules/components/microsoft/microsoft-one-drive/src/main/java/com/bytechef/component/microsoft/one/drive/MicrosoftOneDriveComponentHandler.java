@@ -47,6 +47,8 @@ public class MicrosoftOneDriveComponentHandler implements ComponentHandler {
             "Microsoft OneDrive is a cloud storage service provided by Microsoft for storing, accessing, and sharing " +
                 "files online.")
         .customAction(true)
+        .customActionHelp(
+            "", "https://learn.microsoft.com/en-us/onedrive/developer/rest-api/getting-started/?view=odsp-graph-online")
         .icon("path:assets/microsoft-one-drive.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(MicrosoftOneDriveConnection.CONNECTION_DEFINITION)
@@ -70,7 +72,8 @@ public class MicrosoftOneDriveComponentHandler implements ComponentHandler {
             tool(MicrosoftOneDriveListFilesAction.ACTION_DEFINITION),
             tool(MicrosoftOneDriveListFoldersAction.ACTION_DEFINITION),
             tool(MicrosoftOneDriveUploadFileAction.ACTION_DEFINITION))
-        .triggers(MicrosoftOneDriveNewFileTrigger.TRIGGER_DEFINITION);
+        .triggers(MicrosoftOneDriveNewFileTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

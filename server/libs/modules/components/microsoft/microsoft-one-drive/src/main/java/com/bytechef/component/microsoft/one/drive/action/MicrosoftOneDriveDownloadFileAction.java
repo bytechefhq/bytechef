@@ -38,6 +38,7 @@ public class MicrosoftOneDriveDownloadFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
         .title("Download File")
         .description("Download a file from your Microsoft OneDrive.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-one-drive_v1#download-file")
         .properties(
             string(ID)
                 .label("File ID")
@@ -57,11 +58,10 @@ public class MicrosoftOneDriveDownloadFileAction {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
-        Http.Response fileResponse = context
+        return context
             .http(http -> http.get(response.getFirstHeader("location")))
             .configuration(Http.responseType(Http.ResponseType.binary("text/plain")))
-            .execute();
-
-        return fileResponse.getBody();
+            .execute()
+            .getBody();
     }
 }

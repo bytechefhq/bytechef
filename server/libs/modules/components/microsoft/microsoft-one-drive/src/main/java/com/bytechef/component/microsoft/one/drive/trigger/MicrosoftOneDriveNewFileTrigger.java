@@ -50,10 +50,12 @@ public class MicrosoftOneDriveNewFileTrigger {
         .title("New File")
         .description("Triggers when file is uploaded to folder.")
         .type(TriggerType.POLLING)
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-one-drive_v1#new-file")
         .properties(
             string(PARENT_ID)
                 .label("Parent Folder ID")
-                .description("If no folder is specified, the root folder will be used.")
+                .description(
+                    "ID of the folder to watch for new files. If no folder is specified, the root folder will be used.")
                 .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))

@@ -41,6 +41,7 @@ public class MicrosoftOneDriveCopyFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("copyFile")
         .title("Copy File")
         .description("Copy a selected file to a different location within Microsoft OneDrive.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-one-drive_v1#copy-file")
         .properties(
             string(ID)
                 .label("File ID")
@@ -66,12 +67,12 @@ public class MicrosoftOneDriveCopyFileAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Http.Response response = context
-            .http(http -> http.post(
-                "/me/drive/items/%s/copy".formatted(inputParameters.getRequiredString(ID))))
+            .http(http -> http.post("/me/drive/items/%s/copy".formatted(inputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
-            .body(Http.Body.of(
-                NAME, inputParameters.getString(NAME),
-                "parentReference", Map.of(ID, getFolderId(inputParameters.getString(PARENT_ID)))))
+            .body(
+                Http.Body.of(
+                    NAME, inputParameters.getString(NAME),
+                    "parentReference", Map.of(ID, getFolderId(inputParameters.getString(PARENT_ID)))))
             .execute();
 
         int statusCode = response.getStatusCode();

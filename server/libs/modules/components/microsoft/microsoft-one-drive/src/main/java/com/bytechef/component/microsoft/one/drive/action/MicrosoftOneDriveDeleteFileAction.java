@@ -35,6 +35,7 @@ public class MicrosoftOneDriveDeleteFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteFile")
         .title("Delete File")
         .description("Delete a selected file from Microsoft One Drive.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-one-drive_v1#delete-file")
         .properties(
             string(ID)
                 .label("File ID")
