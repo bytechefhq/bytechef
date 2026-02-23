@@ -26,6 +26,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
+import com.bytechef.message.event.tracing.MessageEventTracing;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -51,9 +52,11 @@ public class TaskWorkerMessageBrokerConfigurerConfiguration {
 
     @Bean
     MessageBrokerConfigurer<?> taskWorkerMessageBrokerConfigurer(
-        TaskWorker taskWorker, ApplicationProperties applicationProperties) {
+        MessageEventTracing messageEventTracing, TaskWorker taskWorker,
+        ApplicationProperties applicationProperties) {
 
-        TaskWorkerDelegate taskWorkerDelegate = new TaskWorkerDelegate(messageEventPostReceiveProcessors, taskWorker);
+        TaskWorkerDelegate taskWorkerDelegate = new TaskWorkerDelegate(
+            messageEventPostReceiveProcessors, messageEventTracing, taskWorker);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             Map<String, Integer> subscriptions = applicationProperties.getWorker()
@@ -71,18 +74,23 @@ public class TaskWorkerMessageBrokerConfigurerConfiguration {
     }
 
     private record TaskWorkerDelegate(
-        List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors, TaskWorker taskWorker) {
+        List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors,
+        MessageEventTracing messageEventTracing, TaskWorker taskWorker) {
 
         public void onTaskExecutionEvent(TaskExecutionEvent taskExecutionEvent) {
             TenantContext.runWithTenantId(
                 (String) taskExecutionEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> taskWorker.onTaskExecutionEvent((TaskExecutionEvent) process(taskExecutionEvent)));
+                () -> messageEventTracing.runWithTraceContext(
+                    taskExecutionEvent, "task.execute",
+                    () -> taskWorker.onTaskExecutionEvent((TaskExecutionEvent) process(taskExecutionEvent))));
         }
 
         public void onCancelControlTaskEvent(MessageEvent<?> messageEvent) {
             TenantContext.runWithTenantId(
                 (String) messageEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> taskWorker.onCancelControlTaskEvent(process(messageEvent)));
+                () -> messageEventTracing.runWithTraceContext(
+                    messageEvent, "task.cancel",
+                    () -> taskWorker.onCancelControlTaskEvent(process(messageEvent))));
         }
 
         private MessageEvent<?> process(MessageEvent<?> messageEvent) {

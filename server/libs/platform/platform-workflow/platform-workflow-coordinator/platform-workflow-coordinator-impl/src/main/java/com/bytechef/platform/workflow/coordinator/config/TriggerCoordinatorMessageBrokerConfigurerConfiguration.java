@@ -24,6 +24,7 @@ import com.bytechef.config.ApplicationProperties.Coordinator.Trigger.Subscriptio
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
+import com.bytechef.message.event.tracing.MessageEventTracing;
 import com.bytechef.platform.workflow.coordinator.TriggerCoordinator;
 import com.bytechef.platform.workflow.coordinator.event.ApplicationEvent;
 import com.bytechef.platform.workflow.coordinator.event.ErrorEvent;
@@ -56,10 +57,11 @@ public class TriggerCoordinatorMessageBrokerConfigurerConfiguration {
 
     @Bean
     MessageBrokerConfigurer<?> triggerCoordinatorMessageBrokerConfigurer(
-        TriggerCoordinator triggerCoordinator, ApplicationProperties applicationProperties) {
+        MessageEventTracing messageEventTracing, TriggerCoordinator triggerCoordinator,
+        ApplicationProperties applicationProperties) {
 
         TriggerCoordinatorDelegate triggerCoordinatorDelegate = new TriggerCoordinatorDelegate(
-            messageEventPostReceiveProcessors, triggerCoordinator);
+            messageEventPostReceiveProcessors, messageEventTracing, triggerCoordinator);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             Subscriptions subscriptions = applicationProperties.getCoordinator()
@@ -95,43 +97,57 @@ public class TriggerCoordinatorMessageBrokerConfigurerConfiguration {
 
     private record TriggerCoordinatorDelegate(
         List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors,
-        TriggerCoordinator triggerCoordinator) {
+        MessageEventTracing messageEventTracing, TriggerCoordinator triggerCoordinator) {
 
         public void onApplicationEvent(ApplicationEvent applicationEvent) {
             TenantContext.runWithTenantId(
                 (String) applicationEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> triggerCoordinator.onApplicationEvent(applicationEvent));
+                () -> messageEventTracing.runWithTraceContext(
+                    applicationEvent, "trigger.application",
+                    () -> triggerCoordinator.onApplicationEvent(applicationEvent)));
         }
 
         public void onErrorEvent(ErrorEvent errorEvent) {
             TenantContext.runWithTenantId(
                 (String) errorEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> triggerCoordinator.onErrorEvent((ErrorEvent) process(errorEvent)));
+                () -> messageEventTracing.runWithTraceContext(
+                    errorEvent, "trigger.error",
+                    () -> triggerCoordinator.onErrorEvent((ErrorEvent) process(errorEvent))));
         }
 
         public void onTriggerExecutionCompleteEvent(TriggerExecutionCompleteEvent triggerExecutionCompleteEvent) {
             TenantContext.runWithTenantId(
                 (String) triggerExecutionCompleteEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> triggerCoordinator.onTriggerExecutionCompleteEvent(
-                    (TriggerExecutionCompleteEvent) process(triggerExecutionCompleteEvent)));
+                () -> messageEventTracing.runWithTraceContext(
+                    triggerExecutionCompleteEvent, "trigger.complete",
+                    () -> triggerCoordinator.onTriggerExecutionCompleteEvent(
+                        (TriggerExecutionCompleteEvent) process(triggerExecutionCompleteEvent))));
         }
 
         public void onTriggerListenerEvent(TriggerListenerEvent triggerListenerEvent) {
             TenantContext.runWithTenantId(
                 (String) triggerListenerEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> triggerCoordinator.onTriggerListenerEvent((TriggerListenerEvent) process(triggerListenerEvent)));
+                () -> messageEventTracing.runWithTraceContext(
+                    triggerListenerEvent, "trigger.listener",
+                    () -> triggerCoordinator.onTriggerListenerEvent(
+                        (TriggerListenerEvent) process(triggerListenerEvent))));
         }
 
         public void onTriggerPollEvent(TriggerPollEvent triggerPollEvent) {
             TenantContext.runWithTenantId(
                 (String) triggerPollEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> triggerCoordinator.onTriggerPollEvent((TriggerPollEvent) process(triggerPollEvent)));
+                () -> messageEventTracing.runWithTraceContext(
+                    triggerPollEvent, "trigger.poll",
+                    () -> triggerCoordinator.onTriggerPollEvent((TriggerPollEvent) process(triggerPollEvent))));
         }
 
         public void onTriggerWebhookEvent(TriggerWebhookEvent triggerWebhookEvent) {
             TenantContext.runWithTenantId(
                 (String) triggerWebhookEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> triggerCoordinator.onTriggerWebhookEvent((TriggerWebhookEvent) process(triggerWebhookEvent)));
+                () -> messageEventTracing.runWithTraceContext(
+                    triggerWebhookEvent, "trigger.webhook",
+                    () -> triggerCoordinator.onTriggerWebhookEvent(
+                        (TriggerWebhookEvent) process(triggerWebhookEvent))));
         }
 
         private MessageEvent<?> process(MessageEvent<?> messageEvent) {

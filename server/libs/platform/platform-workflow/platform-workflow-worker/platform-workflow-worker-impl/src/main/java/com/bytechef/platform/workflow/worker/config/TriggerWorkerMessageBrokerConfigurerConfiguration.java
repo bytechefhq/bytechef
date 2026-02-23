@@ -22,6 +22,7 @@ import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
+import com.bytechef.message.event.tracing.MessageEventTracing;
 import com.bytechef.platform.workflow.worker.TriggerWorker;
 import com.bytechef.platform.workflow.worker.event.TriggerExecutionEvent;
 import com.bytechef.platform.workflow.worker.message.route.TriggerWorkerMessageRoute;
@@ -48,9 +49,11 @@ public class TriggerWorkerMessageBrokerConfigurerConfiguration {
     }
 
     @Bean
-    MessageBrokerConfigurer<?> triggerWorkerMessageBrokerConfigurer(TriggerWorker triggerWorker) {
+    MessageBrokerConfigurer<?> triggerWorkerMessageBrokerConfigurer(
+        MessageEventTracing messageEventTracing, TriggerWorker triggerWorker) {
+
         TriggerWorkerDelegate triggerWorkerDelegate =
-            new TriggerWorkerDelegate(messageEventPostReceiveProcessors, triggerWorker);
+            new TriggerWorkerDelegate(messageEventPostReceiveProcessors, messageEventTracing, triggerWorker);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             messageBrokerListenerRegistrar.registerListenerEndpoint(
@@ -64,18 +67,24 @@ public class TriggerWorkerMessageBrokerConfigurerConfiguration {
     }
 
     private record TriggerWorkerDelegate(
-        List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors, TriggerWorker triggerWorker) {
+        List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors,
+        MessageEventTracing messageEventTracing, TriggerWorker triggerWorker) {
 
         public void onCancelControlTriggerEvent(MessageEvent<?> messageEvent) {
             TenantContext.runWithTenantId(
                 (String) messageEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> triggerWorker.onCancelControlTriggerEvent(process(messageEvent)));
+                () -> messageEventTracing.runWithTraceContext(
+                    messageEvent, "trigger.cancel",
+                    () -> triggerWorker.onCancelControlTriggerEvent(process(messageEvent))));
         }
 
         public void onTriggerExecutionEvent(TriggerExecutionEvent triggerExecutionEvent) {
             TenantContext.runWithTenantId(
                 (String) triggerExecutionEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> triggerWorker.onTriggerExecutionEvent((TriggerExecutionEvent) process(triggerExecutionEvent)));
+                () -> messageEventTracing.runWithTraceContext(
+                    triggerExecutionEvent, "trigger.execute",
+                    () -> triggerWorker.onTriggerExecutionEvent(
+                        (TriggerExecutionEvent) process(triggerExecutionEvent))));
         }
 
         private MessageEvent<?> process(MessageEvent<?> messageEvent) {
