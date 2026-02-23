@@ -22,8 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization.ScopesFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 /**
@@ -33,9 +33,10 @@ public class MicrosoftConnection {
 
     private static final String TENANT_ID = "tenantId";
 
-    public static ModifiableConnectionDefinition createConnection(Authorization.ScopesFunction scopes) {
+    public static ModifiableConnectionDefinition createConnection(int version, String helpLink, ScopesFunction scopes) {
         return connection()
             .baseUri((connectionParameters, context) -> "https://graph.microsoft.com/v1.0")
+            .help("", helpLink)
             .authorizations(authorization(
                 AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                     .title("OAuth2 Authorization Code")
@@ -59,7 +60,8 @@ public class MicrosoftConnection {
                     .refreshUrl(
                         (parameters, context) -> "https://login.microsoftonline.com/" + parameters.getString(TENANT_ID)
                             + "/oauth2/v2.0/token")
-                    .scopes(scopes));
+                    .scopes(scopes))
+            .version(version);
     }
 
     private MicrosoftConnection() {

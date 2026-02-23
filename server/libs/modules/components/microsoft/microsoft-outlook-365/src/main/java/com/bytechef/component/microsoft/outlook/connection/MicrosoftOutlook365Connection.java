@@ -29,6 +29,8 @@ import java.util.Map;
 public class MicrosoftOutlook365Connection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
+        1,
+        "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#connection-setup",
         (connection, context) -> {
             Map<String, Boolean> map = new HashMap<>();
 
