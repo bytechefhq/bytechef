@@ -34,7 +34,7 @@ public class GoogleSheetsDeleteRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
         .title("Delete Row")
-        .description("Delete row on an existing sheet.")
+        .description("Deletes row on an existing sheet. Remaining rows will be shifted up.")
         .properties(
             SPREADSHEET_ID_PROPERTY,
             SHEET_ID_PROPERTY,

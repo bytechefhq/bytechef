@@ -19,6 +19,7 @@ package com.bytechef.component.google.sheets.trigger;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -35,6 +36,10 @@ import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Channels;
+import com.google.api.services.drive.Drive.Channels.Stop;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.Drive.Files.Watch;
 import com.google.api.services.drive.model.Channel;
 import com.google.api.services.sheets.v4.Sheets;
 import java.io.IOException;
@@ -51,26 +56,26 @@ import org.mockito.MockedStatic;
  */
 class GoogleSheetsNewRowTriggerTest {
 
-    private final ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<Channel> channelArgumentCaptor = forClass(Channel.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     @SuppressWarnings("rawtypes")
-    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
-    private final Drive.Channels mockedChannels = mock(Drive.Channels.class);
+    private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
+    private final Channels mockedChannels = mock(Channels.class);
     private final Drive mockedDrive = mock(Drive.class);
-    private final Drive.Files mockedFiles = mock(Drive.Files.class);
+    private final Files mockedFiles = mock(Files.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private Parameters mockedParameters;
     private final Sheets mockedSheets = mock(Sheets.class);
-    private final Drive.Channels.Stop mockedStop = mock(Drive.Channels.Stop.class);
+    private final Stop mockedStop = mock(Stop.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Drive.Files.Watch mockedWatch = mock(Drive.Files.Watch.class);
+    private final Watch mockedWatch = mock(Watch.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = ArgumentCaptor.forClass(Sheets.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = forClass(Sheets.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testWebhookEnable() throws IOException {
@@ -146,7 +151,7 @@ class GoogleSheetsNewRowTriggerTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void testWebhookRequest() throws Exception {
+    void testWebhookRequest() {
         mockedParameters = MockParametersFactory.create(Map.of(SPREADSHEET_ID, "123", SHEET_NAME, "abc"));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);

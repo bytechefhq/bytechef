@@ -35,7 +35,7 @@ public class GoogleSheetsDeleteColumnAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteColumn")
         .title("Delete Column")
-        .description("Delete column on an existing sheet.")
+        .description("Deletes column on an existing sheet. Remaining columns will be shifted to the left.")
         .properties(
             SPREADSHEET_ID_PROPERTY,
             SHEET_ID_PROPERTY,
