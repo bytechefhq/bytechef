@@ -36,6 +36,8 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
             const showAiAgent = preference ?? true;
 
             setShowAiAgentEditor(showAiAgent);
+        } else {
+            setShowAiAgentEditor(false);
         }
     }, [isAiAgentClusterRoot, agentNodeName, setShowAiAgentEditor]);
 
