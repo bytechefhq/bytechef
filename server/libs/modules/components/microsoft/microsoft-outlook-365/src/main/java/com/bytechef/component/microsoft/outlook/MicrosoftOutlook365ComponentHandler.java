@@ -24,9 +24,9 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365CreateEventAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365DeleteEventAction;
+import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetEmailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetEventsAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetFreeTimeSlotsAction;
-import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetMailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365MoveEmailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365ReplyToEmailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365SearchEmailAction;
@@ -56,9 +56,9 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
         .actions(
             MicrosoftOutlook365CreateEventAction.ACTION_DEFINITION,
             MicrosoftOutlook365DeleteEventAction.ACTION_DEFINITION,
+            MicrosoftOutlook365GetEmailAction.ACTION_DEFINITION,
             MicrosoftOutlook365GetEventsAction.ACTION_DEFINITION,
             MicrosoftOutlook365GetFreeTimeSlotsAction.ACTION_DEFINITION,
-            MicrosoftOutlook365GetMailAction.ACTION_DEFINITION,
             MicrosoftOutlook365MoveEmailAction.ACTION_DEFINITION,
             MicrosoftOutlook365ReplyToEmailAction.ACTION_DEFINITION,
             MicrosoftOutlook365SearchEmailAction.ACTION_DEFINITION,
@@ -66,9 +66,9 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(MicrosoftOutlook365CreateEventAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365DeleteEventAction.ACTION_DEFINITION),
+            tool(MicrosoftOutlook365GetEmailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365GetEventsAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365GetFreeTimeSlotsAction.ACTION_DEFINITION),
-            tool(MicrosoftOutlook365GetMailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365MoveEmailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365ReplyToEmailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365SearchEmailAction.ACTION_DEFINITION),

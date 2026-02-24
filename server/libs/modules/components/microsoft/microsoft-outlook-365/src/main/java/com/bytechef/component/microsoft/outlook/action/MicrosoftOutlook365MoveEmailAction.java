@@ -42,7 +42,7 @@ public class MicrosoftOutlook365MoveEmailAction {
         .properties(
             string(ID)
                 .label("Message ID")
-                .description("ID of the message to move.")
+                .description("The ID of the message to move.")
                 .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
                 .required(true),
             string(DESTINATION_ID)

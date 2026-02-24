@@ -63,8 +63,8 @@ public class MicrosoftOutlook365CustomEventUtils {
         List<String> attendees = new ArrayList<>();
         if (eventMap.get(ATTENDEES) instanceof List<?> list) {
             for (Object o : list) {
-                if (o instanceof Map<?, ?> map1 && map1.get(EMAIL_ADDRESS) instanceof Map<?, ?> map2) {
-                    attendees.add((String) map2.get(ADDRESS));
+                if (o instanceof Map<?, ?> map && map.get(EMAIL_ADDRESS) instanceof Map<?, ?> map1) {
+                    attendees.add((String) map1.get(ADDRESS));
                 }
             }
         }

@@ -39,24 +39,24 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class MicrosoftOutlook365GetMailAction {
+public class MicrosoftOutlook365GetEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getMail")
-        .title("Get Mail")
-        .description("Get a specific message")
-        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#get-mail")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getEmail")
+        .title("Get Email")
+        .description("Gets the specified email message.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#get-email")
         .properties(
             string(ID)
-                .label("Message Id")
-                .description("Id of the message.")
+                .label("Message ID")
+                .description("The ID of the message to retrieve.")
                 .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
                 .required(true),
             FORMAT_PROPERTY)
         .output(MicrosoftOutlook365Utils::getMessageOutput)
-        .perform(MicrosoftOutlook365GetMailAction::perform)
+        .perform(MicrosoftOutlook365GetEmailAction::perform)
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
-    private MicrosoftOutlook365GetMailAction() {
+    private MicrosoftOutlook365GetEmailAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {

@@ -21,16 +21,19 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR_ID_PROPERTY;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.DATE_RANGE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,10 +48,14 @@ public class MicrosoftOutlook365GetFreeTimeSlotsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFreeTimeSlots")
         .title("Get Free Time Slots")
-        .description("Get free time slots from the Microsoft Outlook 365 calendar.")
+        .description("Gets the free time slots from the specified calendar.")
         .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#get-free-time-slots")
         .properties(
-            CALENDAR_ID_PROPERTY,
+            string(CALENDAR)
+                .label("Calendar ID")
+                .description("The ID of the calendar to retrieve free time slots from.")
+                .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCalendarIdOptions)
+                .required(true),
             object(DATE_RANGE)
                 .label("Date Range")
                 .description("Date range to find free time.")

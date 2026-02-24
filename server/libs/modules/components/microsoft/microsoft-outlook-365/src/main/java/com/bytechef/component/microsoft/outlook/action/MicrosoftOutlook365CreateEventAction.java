@@ -28,7 +28,6 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ALL_DAY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ATTENDEES;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CUSTOM_EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.DATE_TIME;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
@@ -41,12 +40,14 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.createCustomEvent;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getMailboxTimeZone;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -60,16 +61,21 @@ public class MicrosoftOutlook365CreateEventAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createEvent")
         .title("Create Event")
-        .description("Creates an event in the specified calendar.")
+        .description("Creates a new event in the specified calendar.")
         .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#create-event")
         .properties(
-            CALENDAR_ID_PROPERTY,
+            string(CALENDAR)
+                .label("Calendar ID")
+                .description("The ID of the calendar to create the event in.")
+                .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCalendarIdOptions)
+                .required(true),
             string(SUBJECT)
                 .label("Subject")
                 .description("The subject of the event.")
                 .required(false),
             bool(ALL_DAY)
                 .label("All Day Event?")
+                .description("Is the event all day?")
                 .defaultValue(false)
                 .required(true),
             date(START)

@@ -61,7 +61,7 @@ class MicrosoftOutlook365OptionUtilsTest {
     }
 
     @Test
-    void testGetCalendarOptions() {
+    void testGetCalendarIdOptions() {
         List<Map<String, String>> mails = List.of(Map.of(ID, "abc", NAME, "abc"));
 
         Map<String, Object> body = Map.of(VALUE, mails, ODATA_NEXT_LINK, "link");
@@ -69,7 +69,7 @@ class MicrosoftOutlook365OptionUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body, Map.of(VALUE, List.of(Map.of(ID, "cde", NAME, "cde"))));
 
-        List<Option<String>> categoryOptions = MicrosoftOutlook365OptionUtils.getCalendarOptions(
+        List<Option<String>> categoryOptions = MicrosoftOutlook365OptionUtils.getCalendarIdOptions(
             null, null, Map.of(), anyString(), mockedActionContext);
 
         assertEquals(expectedOptions, categoryOptions);
@@ -91,7 +91,7 @@ class MicrosoftOutlook365OptionUtilsTest {
     }
 
     @Test
-    void testGetEventOptions() {
+    void testGetEventIdOptions() {
         List<Map<String, String>> mails = List.of(Map.of(ID, "abc", SUBJECT, "abc"));
 
         Map<String, Object> body = Map.of(VALUE, mails, ODATA_NEXT_LINK, "link");
@@ -99,7 +99,7 @@ class MicrosoftOutlook365OptionUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body, Map.of(VALUE, List.of(Map.of(ID, "cde", SUBJECT, "cde"))));
 
-        List<Option<String>> categoryOptions = MicrosoftOutlook365OptionUtils.getEventOptions(
+        List<Option<String>> categoryOptions = MicrosoftOutlook365OptionUtils.getEventIdOptions(
             null, null, Map.of(), anyString(), mockedActionContext);
 
         assertEquals(expectedOptions, categoryOptions);

@@ -51,25 +51,25 @@ public class MicrosoftOutlook365SearchEmailAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchEmail")
         .title("Search Email")
-        .description("Get the messages in the signed-in user's mailbox")
+        .description("Lists the email messages in the signed-in user's mailbox.")
         .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#search-email")
         .properties(
             FORMAT_PROPERTY,
             string(FROM)
                 .label("From")
-                .description("The address sending the mail")
+                .description("The email address sending the mail.")
                 .required(false),
             string(TO)
                 .label("To")
-                .description("The address receiving the new mail")
+                .description("The email address receiving the new mail.")
                 .required(false),
             string(SUBJECT)
                 .label("Subject")
-                .description("Words in the subject line")
+                .description("Words in the subject line.")
                 .required(false),
             string(CATEGORY)
                 .label("Category")
-                .description("Messages in a certain category")
+                .description("Messages in a certain category.")
                 .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCategoryOptions)
                 .required(false))
         .output(MicrosoftOutlook365Utils::getArrayMessageOutput)
@@ -79,9 +79,7 @@ public class MicrosoftOutlook365SearchEmailAction {
     private MicrosoftOutlook365SearchEmailAction() {
     }
 
-    public static List<?> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static List<?> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         StringBuilder stringBuilder = new StringBuilder();
 
         addParameter(stringBuilder, FROM, inputParameters.getString(FROM));
