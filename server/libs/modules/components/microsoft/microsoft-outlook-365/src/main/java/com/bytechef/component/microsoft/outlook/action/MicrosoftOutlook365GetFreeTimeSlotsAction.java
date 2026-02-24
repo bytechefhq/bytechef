@@ -46,6 +46,7 @@ public class MicrosoftOutlook365GetFreeTimeSlotsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFreeTimeSlots")
         .title("Get Free Time Slots")
         .description("Get free time slots from the Microsoft Outlook 365 calendar.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#get-free-time-slots")
         .properties(
             CALENDAR_ID_PROPERTY,
             object(DATE_RANGE)

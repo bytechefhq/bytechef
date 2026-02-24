@@ -47,6 +47,9 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
             "Microsoft Outlook 365 is a comprehensive email and productivity platform that integrates email, " +
                 "calendar, contacts, and tasks to streamline communication and organization.")
         .customAction(true)
+        .customActionHelp(
+            "",
+            "https://learn.microsoft.com/en-us/graph/api/resources/mail-api-overview?view=graph-rest-1.0")
         .icon("path:assets/microsoft-outlook-365.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.CALENDARS_AND_SCHEDULING)
         .connection(MicrosoftOutlook365Connection.CONNECTION_DEFINITION)
@@ -70,7 +73,8 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
             tool(MicrosoftOutlook365ReplyToEmailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365SearchEmailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365SendEmailAction.ACTION_DEFINITION))
-        .triggers(MicrosoftOutlook365NewEmailTrigger.TRIGGER_DEFINITION);
+        .triggers(MicrosoftOutlook365NewEmailTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

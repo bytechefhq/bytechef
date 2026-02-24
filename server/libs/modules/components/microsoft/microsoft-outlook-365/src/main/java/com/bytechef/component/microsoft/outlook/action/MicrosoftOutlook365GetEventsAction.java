@@ -43,6 +43,7 @@ public class MicrosoftOutlook365GetEventsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getEvents")
         .title("Get Events")
         .description("Gets a list of events in specified calendar.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#get-events")
         .properties(
             CALENDAR_ID_PROPERTY,
             object(DATE_RANGE)
