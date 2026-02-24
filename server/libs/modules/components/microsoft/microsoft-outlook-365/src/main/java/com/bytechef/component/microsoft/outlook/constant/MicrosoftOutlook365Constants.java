@@ -241,6 +241,8 @@ public class MicrosoftOutlook365Constants {
                 .description("The HTML content of the message body."),
             array(ATTACHMENTS)
                 .items(fileEntry()),
+            array("inlineAttachments")
+                .items(fileEntry()),
             string("webLink")
                 .description("The URL to open the message in Outlook on the web."));
 
