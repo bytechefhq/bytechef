@@ -46,16 +46,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
@@ -191,7 +188,7 @@ public abstract class AbstractAiAgentChatAction {
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
         boolean editorEnvironment, @Nullable ToolExecutionListener toolExecutionListener, ActionContext context) {
 
-        List<ToolCallback> rawToolCallbacks = new ArrayList<>();
+        List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         for (ClusterElement clusterElement : toolClusterElements) {
             ClusterElementDefinition clusterElementDefinition =
@@ -231,89 +228,50 @@ public abstract class AbstractAiAgentChatAction {
                 }
             }
 
-            rawToolCallbacks.add(builder.build());
+            toolCallbacks.add(builder.build());
         }
 
         if (toolExecutionListener == null) {
-            return rawToolCallbacks;
+            return toolCallbacks;
         }
-
-        AtomicReference<AgentThinking> thinkingReference = new AtomicReference<>();
-
-        List<ToolCallback> observableToolCallbacks = rawToolCallbacks.stream()
-            .map(
-                toolCallback -> createObservableToolCallback(
-                    toolCallback, thinkingReference, toolExecutionListener, context))
-            .toList();
 
         AugmentedToolCallbackProvider<AgentThinking> augmentedToolCallbackProvider =
             AugmentedToolCallbackProvider.<AgentThinking>builder()
-                .delegate(() -> observableToolCallbacks.toArray(ToolCallback[]::new))
+                .delegate(() -> toolCallbacks.toArray(ToolCallback[]::new))
                 .argumentType(AgentThinking.class)
-                .argumentConsumer(event -> thinkingReference.set(event.arguments()))
+                .argumentConsumer(event -> {
+                    Map<String, Object> inputs;
+
+                    ToolDefinition toolDefinition = event.toolDefinition();
+
+                    try {
+                        inputs = JsonParser.fromJson(event.rawInput(), new TypeReference<>() {});
+                    } catch (Exception exception) {
+                        context.log(
+                            log -> log.debug(
+                                "Failed to parse tool input as JSON for '{}': {}", toolDefinition.name(),
+                                exception.getMessage()));
+
+                        inputs = Map.of("rawInput", event.rawInput());
+                    }
+
+                    AgentThinking agentThinking = event.arguments();
+
+                    try {
+                        toolExecutionListener.onToolExecution(
+                            new ToolExecutionEvent(
+                                toolDefinition.name(), inputs, agentThinking.reasoning(), agentThinking.confidence()));
+                    } catch (Exception exception) {
+                        context.log(
+                            log -> log.debug(
+                                "Tool execution listener failed for '{}': {}", toolDefinition.name(),
+                                exception.getMessage(), exception));
+                    }
+                })
                 .removeExtraArgumentsAfterProcessing(true)
                 .build();
 
         return Arrays.asList(augmentedToolCallbackProvider.getToolCallbacks());
-    }
-
-    private static ToolCallback createObservableToolCallback(
-        ToolCallback delegate, AtomicReference<AgentThinking> thinkingReference,
-        ToolExecutionListener toolExecutionListener, ActionContext context) {
-
-        return new ToolCallback() {
-
-            private final ToolDefinition toolDefinition = delegate.getToolDefinition();
-
-            @Override
-            public ToolDefinition getToolDefinition() {
-                return toolDefinition;
-            }
-
-            @Override
-            public String call(String toolInput) {
-                return observeAndCall(toolInput, () -> delegate.call(toolInput));
-            }
-
-            @Override
-            public String call(String toolInput, @Nullable ToolContext toolContext) {
-                return observeAndCall(toolInput, () -> delegate.call(toolInput, toolContext));
-            }
-
-            private String observeAndCall(String toolInput, Supplier<String> execution) {
-                Map<String, Object> inputs;
-
-                try {
-                    inputs = JsonParser.fromJson(toolInput, new TypeReference<>() {});
-                } catch (Exception exception) {
-                    context.log(
-                        log -> log.debug(
-                            "Failed to parse tool input as JSON for '{}': {}", toolDefinition.name(),
-                            exception.getMessage()));
-
-                    inputs = Map.of("rawInput", toolInput);
-                }
-
-                String result = execution.get();
-
-                AgentThinking agentThinking = thinkingReference.getAndSet(null);
-
-                try {
-                    toolExecutionListener.onToolExecution(
-                        new ToolExecutionEvent(
-                            toolDefinition.name(), inputs, result,
-                            agentThinking != null ? agentThinking.reasoning() : null,
-                            agentThinking != null ? agentThinking.confidence() : null));
-                } catch (Exception exception) {
-                    context.log(
-                        log -> log.debug(
-                            "Tool execution listener failed for '{}': {}", toolDefinition.name(),
-                            exception.getMessage(), exception));
-                }
-
-                return result;
-            }
-        };
     }
 
     private List<FromAiResult> extractFromAiResults(Map<String, ?> parameters) {
