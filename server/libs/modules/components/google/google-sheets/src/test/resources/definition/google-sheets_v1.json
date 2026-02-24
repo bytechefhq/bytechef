@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Clear a sheet of all values while preserving formats.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#clear-sheet"
+    },
     "metadata": null,
     "name": "clearSheet",
     "outputDefinition": null,
@@ -94,7 +97,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Append a new column to the end of the sheet.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#create-column"
+    },
     "metadata": null,
     "name": "createColumn",
     "outputDefinition": {
@@ -398,7 +404,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a blank sheet with title. Optionally, provide headers.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#create-sheet"
+    },
     "metadata": null,
     "name": "createSheet",
     "outputDefinition": {
@@ -720,7 +729,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new spreadsheet in a specified folder.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#create-spreadsheet"
+    },
     "metadata": null,
     "name": "createSpreadsheet",
     "outputDefinition": {
@@ -787,8 +799,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Delete column on an existing sheet.",
-    "help": null,
+    "description": "Deletes column on an existing sheet. Remaining columns will be shifted to the left.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#delete-column"
+    },
     "metadata": null,
     "name": "deleteColumn",
     "outputDefinition": null,
@@ -872,8 +887,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Delete row on an existing sheet.",
-    "help": null,
+    "description": "Deletes row on an existing sheet. Remaining rows will be shifted up.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#delete-row"
+    },
     "metadata": null,
     "name": "deleteRow",
     "outputDefinition": null,
@@ -956,7 +974,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete a specified sheet from a spreadsheet.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#delete-sheet"
+    },
     "metadata": null,
     "name": "deleteSheet",
     "outputDefinition": null,
@@ -1020,7 +1041,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get a row in a Google Sheet by row number.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#find-row-by-number"
+    },
     "metadata": null,
     "name": "findRowByNum",
     "outputDefinition": {
@@ -1134,7 +1158,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get all rows from a Google Sheet.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#get-rows"
+    },
     "metadata": null,
     "name": "getRows",
     "outputDefinition": {
@@ -1229,7 +1256,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Append rows to the end of the spreadsheet.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#insert-multiple-rows"
+    },
     "metadata": null,
     "name": "insertMultipleRows",
     "outputDefinition": {
@@ -1368,7 +1398,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Append a row of values to an existing sheet.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#insert-row"
+    },
     "metadata": null,
     "name": "insertRow",
     "outputDefinition": {
@@ -1507,7 +1540,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get all sheets from the spreadsheet.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#list-sheets"
+    },
     "metadata": null,
     "name": "listSheets",
     "outputDefinition": {
@@ -1808,7 +1844,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Overwrite values in an existing row.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#update-row"
+    },
     "metadata": null,
     "name": "updateRow",
     "outputDefinition": {
@@ -2735,7 +2774,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "deleteColumn",
-    "description": "Delete column on an existing sheet.",
+    "description": "Deletes column on an existing sheet. Remaining columns will be shifted to the left.",
     "element": { },
     "help": null,
     "outputDefinition": null,
@@ -2819,7 +2858,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "deleteRow",
-    "description": "Delete row on an existing sheet.",
+    "description": "Deletes row on an existing sheet. Remaining rows will be shifted up.",
     "element": { },
     "help": null,
     "outputDefinition": null,
@@ -3979,7 +4018,10 @@
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "Google Sheets API documentation",
+    "learnMoreUrl": "https://developers.google.com/workspace/sheets/api/guides/concepts"
+  },
   "description": "Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate on spreadsheets in real-time.",
   "icon": "path:assets/google-sheets.svg",
   "metadata": null,
@@ -3993,7 +4035,10 @@
     "deprecated": null,
     "description": "Triggers when a new row is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v1#new-row"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newRow",
