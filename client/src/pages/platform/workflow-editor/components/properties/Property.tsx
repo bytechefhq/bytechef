@@ -171,7 +171,10 @@ const ControlledObjectEntries = ({control, controlPath, formState, property}: Co
             return;
         }
 
-        const currentObject = (watchedValue as Record<string, unknown>) || {};
+        const currentObject =
+            watchedValue && typeof watchedValue === 'object' && !Array.isArray(watchedValue)
+                ? (watchedValue as Record<string, unknown>)
+                : {};
 
         if (trimmedKey in currentObject) {
             return;
@@ -607,7 +610,7 @@ const Property = ({
                                 control={control}
                                 defaultValue={defaultValue}
                                 name={calculatedPath}
-                                render={({field: {name, onChange}}) => (
+                                render={({field: {name, onChange, value: fieldValue}}) => (
                                     <PropertySelect
                                         description={description}
                                         label={label || name}
@@ -620,7 +623,7 @@ const Property = ({
                                         }}
                                         options={options as Array<SelectOptionType>}
                                         required={required}
-                                        value={selectValue}
+                                        value={fieldValue !== undefined ? fieldValue : selectValue}
                                     />
                                 )}
                                 rules={{required}}
@@ -632,7 +635,7 @@ const Property = ({
                             control={control}
                             defaultValue={defaultValue}
                             name={calculatedPath}
-                            render={({field: {name, onChange}}) => (
+                            render={({field: {name, onChange, value: fieldValue}}) => (
                                 <PropertySelect
                                     description={description}
                                     label={label || name}
@@ -647,6 +650,7 @@ const Property = ({
                                         {label: 'True', value: 'true'},
                                         {label: 'False', value: 'false'},
                                     ]}
+                                    value={fieldValue !== undefined ? fieldValue : selectValue}
                                 />
                             )}
                             rules={{required}}
