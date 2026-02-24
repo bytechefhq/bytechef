@@ -54,6 +54,7 @@ public class AsyncMessageBroker extends AbstractMessageBroker {
     }
 
     @Override
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     public void send(MessageRoute messageRoute, Object message) {
         Assert.notNull(messageRoute, "'messageRoute' must not be null");
 

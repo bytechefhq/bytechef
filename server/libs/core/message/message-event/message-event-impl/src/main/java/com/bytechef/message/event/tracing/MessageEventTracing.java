@@ -54,6 +54,7 @@ public class MessageEventTracing {
      * Extracts trace context from the message event metadata, creates a child span with the given name, and runs the
      * action within that span's scope. If no trace context is present, the action runs without tracing.
      */
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     public void runWithTraceContext(MessageEvent<?> messageEvent, String spanName, Runnable action) {
         Span.Builder spanBuilder = propagator.extract(messageEvent, MESSAGE_EVENT_GETTER);
 
