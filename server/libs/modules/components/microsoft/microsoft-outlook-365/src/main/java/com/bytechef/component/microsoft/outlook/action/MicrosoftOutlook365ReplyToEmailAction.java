@@ -52,12 +52,12 @@ public class MicrosoftOutlook365ReplyToEmailAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("replyToEmail")
         .title("Reply to Email")
-        .description("Creates a new reply to email.")
+        .description("Sends a reply to an email message.")
         .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#reply-to-email")
         .properties(
             string(ID)
                 .label("Message ID")
-                .description("Id of the message to reply to.")
+                .description("The ID of the message to reply to.")
                 .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
                 .required(true),
             array(BCC_RECIPIENTS)
@@ -113,7 +113,6 @@ public class MicrosoftOutlook365ReplyToEmailAction {
                 Http.Body.of(
                     "message", message,
                     COMMENT, inputParameters.getString(CONTENT)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
         return null;

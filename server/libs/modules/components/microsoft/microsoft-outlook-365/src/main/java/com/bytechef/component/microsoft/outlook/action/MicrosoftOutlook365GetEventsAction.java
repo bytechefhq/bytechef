@@ -21,17 +21,20 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR_ID_PROPERTY;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CUSTOM_EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.DATE_RANGE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.List;
 
@@ -45,7 +48,11 @@ public class MicrosoftOutlook365GetEventsAction {
         .description("Gets a list of events in specified calendar.")
         .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#get-events")
         .properties(
-            CALENDAR_ID_PROPERTY,
+            string(CALENDAR)
+                .label("Calendar ID")
+                .description("The ID of the calendar to retrieve events from.")
+                .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCalendarIdOptions)
+                .required(true),
             object(DATE_RANGE)
                 .label("Date Range")
                 .description("Date range to find events that exist in this range.")

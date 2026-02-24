@@ -41,7 +41,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Kušter
  */
-class MicrosoftOutlook365GetMailActionTest {
+class MicrosoftOutlook365GetEmailActionTest {
 
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final ArgumentCaptor<Map> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
@@ -64,7 +64,7 @@ class MicrosoftOutlook365GetMailActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Object result = MicrosoftOutlook365GetMailAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = MicrosoftOutlook365GetEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
     }
@@ -95,7 +95,8 @@ class MicrosoftOutlook365GetMailActionTest {
                     contextArgumentCaptor.capture(), mapArgumentCaptor.capture()))
                 .thenReturn(simpleMessage);
 
-            Object result = MicrosoftOutlook365GetMailAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Object result =
+                MicrosoftOutlook365GetEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(simpleMessage, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());

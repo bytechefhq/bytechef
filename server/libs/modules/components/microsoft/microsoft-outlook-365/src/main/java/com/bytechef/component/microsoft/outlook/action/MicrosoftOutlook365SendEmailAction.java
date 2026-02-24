@@ -50,7 +50,7 @@ public class MicrosoftOutlook365SendEmailAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
         .title("Send Email")
-        .description("Send the message.")
+        .description("Sends a new email message from the signed-in user's mailbox.")
         .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#send-email")
         .properties(
             array(TO_RECIPIENTS)
@@ -127,7 +127,6 @@ public class MicrosoftOutlook365SendEmailAction {
                         REPLY_TO, createRecipientList(inputParameters.getList(REPLY_TO, String.class)),
                         ATTACHMENTS, getAttachments(context, inputParameters.getList(ATTACHMENTS, FileEntry.class))
                     }))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
         return null;

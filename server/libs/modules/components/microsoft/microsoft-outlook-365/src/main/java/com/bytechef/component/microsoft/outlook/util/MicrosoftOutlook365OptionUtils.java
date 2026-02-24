@@ -39,8 +39,8 @@ public class MicrosoftOutlook365OptionUtils {
     private MicrosoftOutlook365OptionUtils() {
     }
 
-    public static List<Option<String>> getCalendarOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+    public static List<Option<String>> getCalendarIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext actionContext) {
 
         Map<String, Object> body = actionContext
@@ -53,7 +53,7 @@ public class MicrosoftOutlook365OptionUtils {
     }
 
     public static List<Option<String>> getCategoryOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext actionContext) {
 
         Map<String, Object> body = actionContext
@@ -65,8 +65,8 @@ public class MicrosoftOutlook365OptionUtils {
         return getOptions(actionContext, body, DISPLAY_NAME, DISPLAY_NAME);
     }
 
-    public static List<Option<String>> getEventOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+    public static List<Option<String>> getEventIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext actionContext) {
 
         Map<String, Object> body = actionContext
@@ -79,7 +79,7 @@ public class MicrosoftOutlook365OptionUtils {
     }
 
     public static List<Option<String>> getFolderIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext actionContext) {
 
         Map<String, Object> body = actionContext.http(http -> http.get("/me/mailFolders"))
@@ -92,7 +92,7 @@ public class MicrosoftOutlook365OptionUtils {
     }
 
     public static List<Option<String>> getMessageIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext actionContext) {
 
         Map<String, Object> body = actionContext.http(http -> http.get("/me/messages"))
