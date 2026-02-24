@@ -98,7 +98,8 @@ public class MondayNewItemInBoardTrigger {
             throw new IllegalArgumentException("Invalid board ID: " + boardId);
         }
 
-        String sanitizedWebhookUrl = webhookUrl.replace("\"", "\\\"");
+        String sanitizedWebhookUrl = webhookUrl.replace("\\", "\\\\")
+            .replace("\"", "\\\"");
 
         String query = "mutation{create_webhook(board_id: %s, url: \"%s\", event: create_item){id}}"
             .formatted(boardId, sanitizedWebhookUrl);

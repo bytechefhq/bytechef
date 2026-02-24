@@ -383,6 +383,10 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             String orderBy = MapUtils.getRequiredString(inputParameters, ORDER_BY);
             String orderDirection = MapUtils.getRequiredString(inputParameters, ORDER_DIRECTION);
 
+            if (!orderDirection.equals("ASC") && !orderDirection.equals("DESC")) {
+                throw new IllegalArgumentException("Invalid order direction: " + orderDirection);
+            }
+
             Object lastItem = closureParameters.get(LAST_ITEM);
             String queryStatement;
 
