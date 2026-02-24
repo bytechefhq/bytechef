@@ -17,8 +17,12 @@ export const WorkflowNodeTestOutputKeys = {
     workflowNodeTestOutputs: ['workflowNodeTestOutputs'] as const,
 };
 
-export const useCheckWorkflowNodeTestOutputExistsQuery = (request: CheckWorkflowNodeTestOutputExistsRequest) =>
+export const useCheckWorkflowNodeTestOutputExistsQuery = (
+    request: CheckWorkflowNodeTestOutputExistsRequest,
+    enabled?: boolean
+) =>
     useQuery<CheckWorkflowNodeTestOutputExists200Response, Error>({
         queryKey: WorkflowNodeTestOutputKeys.workflowNodeTestOutputExists(request),
         queryFn: () => new WorkflowNodeTestOutputApi().checkWorkflowNodeTestOutputExists(request),
+        enabled: enabled ?? true,
     });

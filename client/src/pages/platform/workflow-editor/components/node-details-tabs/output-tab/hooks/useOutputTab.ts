@@ -61,7 +61,7 @@ export default function useOutputTab({
     } = useGetClusterElementOutputQuery(
         {
             clusterElementType: clusterElementType ?? '',
-            clusterElementWorkflowNodeName: currentNode?.name as string,
+            clusterElementWorkflowNodeName: currentNode?.workflowNodeName,
             environmentId: currentEnvironmentId,
             id: workflowId!,
             workflowNodeName: parentWorkflowNodeName ?? '',
@@ -91,12 +91,15 @@ export default function useOutputTab({
     const {outputSchema, placeholder, sampleOutput} =
         workflowNodeOutput?.outputResponse || workflowNodeOutput?.variableOutputResponse || {};
 
-    const {refetch: workflowNodeTestOutputExistsRefetch} = useCheckWorkflowNodeTestOutputExistsQuery({
-        createdDate: startWebhookTestDate,
-        environmentId: currentEnvironmentId,
-        id: workflowId!,
-        workflowNodeName: currentNode?.name as string,
-    });
+    const {refetch: workflowNodeTestOutputExistsRefetch} = useCheckWorkflowNodeTestOutputExistsQuery(
+        {
+            createdDate: startWebhookTestDate,
+            environmentId: currentEnvironmentId,
+            id: workflowId!,
+            workflowNodeName: currentNode?.name as string,
+        },
+        !isClusterElement
+    );
 
     const invalidateNodeOutputs = useCallback(() => {
         queryClient.invalidateQueries({
@@ -162,7 +165,7 @@ export default function useOutputTab({
             saveClusterElementTestOutputMutation.mutate(
                 {
                     clusterElementType,
-                    clusterElementWorkflowNodeName: currentNode.name,
+                    clusterElementWorkflowNodeName: currentNode.workflowNodeName,
                     environmentId: currentEnvironmentId,
                     inputParameters,
                     workflowId,
@@ -176,7 +179,7 @@ export default function useOutputTab({
         [
             clusterElementType,
             currentEnvironmentId,
-            currentNode.name,
+            currentNode.workflowNodeName,
             parentWorkflowNodeName,
             saveClusterElementTestOutputMutation,
             workflowId,
