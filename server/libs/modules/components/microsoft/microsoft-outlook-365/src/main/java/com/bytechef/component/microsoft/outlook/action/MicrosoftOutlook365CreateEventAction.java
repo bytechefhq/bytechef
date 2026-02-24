@@ -61,6 +61,7 @@ public class MicrosoftOutlook365CreateEventAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createEvent")
         .title("Create Event")
         .description("Creates an event in the specified calendar.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#create-event")
         .properties(
             CALENDAR_ID_PROPERTY,
             string(SUBJECT)

@@ -44,6 +44,7 @@ public class MicrosoftOutlook365GetMailAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getMail")
         .title("Get Mail")
         .description("Get a specific message")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#get-mail")
         .properties(
             string(ID)
                 .label("Message Id")

@@ -50,6 +50,7 @@ public class MicrosoftOutlook365NewEmailTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newEmail")
         .title("New Email")
         .description("Triggers when new mail is received.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#new-email")
         .type(TriggerType.POLLING)
         .properties(FORMAT_PROPERTY)
         .output(MicrosoftOutlook365Utils::getMessageOutput)

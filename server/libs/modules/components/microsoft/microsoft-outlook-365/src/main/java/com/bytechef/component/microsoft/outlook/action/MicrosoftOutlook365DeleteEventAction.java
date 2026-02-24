@@ -38,6 +38,7 @@ public class MicrosoftOutlook365DeleteEventAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteEvent")
         .title("Delete Event")
         .description("Deletes an event from the specified calendar.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#delete-event")
         .properties(
             CALENDAR_ID_PROPERTY,
             string(EVENT)

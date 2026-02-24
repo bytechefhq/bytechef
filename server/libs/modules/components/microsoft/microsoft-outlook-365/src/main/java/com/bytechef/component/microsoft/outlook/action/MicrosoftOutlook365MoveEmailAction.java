@@ -38,6 +38,7 @@ public class MicrosoftOutlook365MoveEmailAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("moveEmail")
         .title("Move Email")
         .description("Moves a email to another folder within the user's mailbox. ")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#move-email")
         .properties(
             string(ID)
                 .label("Message ID")

@@ -53,6 +53,7 @@ public class MicrosoftOutlook365ReplyToEmailAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("replyToEmail")
         .title("Reply to Email")
         .description("Creates a new reply to email.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#reply-to-email")
         .properties(
             string(ID)
                 .label("Message ID")

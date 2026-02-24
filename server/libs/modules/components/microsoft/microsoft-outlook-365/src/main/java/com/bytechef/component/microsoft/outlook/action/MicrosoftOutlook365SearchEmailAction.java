@@ -52,6 +52,7 @@ public class MicrosoftOutlook365SearchEmailAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchEmail")
         .title("Search Email")
         .description("Get the messages in the signed-in user's mailbox")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#search-email")
         .properties(
             FORMAT_PROPERTY,
             string(FROM)
