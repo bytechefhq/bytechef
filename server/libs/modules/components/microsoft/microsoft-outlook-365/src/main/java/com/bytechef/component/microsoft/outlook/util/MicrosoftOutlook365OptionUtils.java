@@ -101,6 +101,6 @@ public class MicrosoftOutlook365OptionUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(actionContext, body, ID, ID);
+        return getOptions(actionContext, body, SUBJECT, ID);
     }
 }
