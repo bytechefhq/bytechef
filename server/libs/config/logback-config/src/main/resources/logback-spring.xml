@@ -13,6 +13,9 @@
     </SpringProfile>
 
     <SpringProfile name="dev">
+        <property name="CONSOLE_LOG_PATTERN"
+                  value="%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}){} %clr(${PID:-}){magenta} %clr(--- %esb(){APPLICATION_NAME}%esb{APPLICATION_GROUP}[%15.15t] ${LOG_CORRELATION_PATTERN:-}%mdc{tenantId} ){faint}%clr(%-40.40logger{39}){cyan}
+  %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
     </SpringProfile>
 
