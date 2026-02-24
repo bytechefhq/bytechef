@@ -55,7 +55,7 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String condition = MapUtils.getRequiredString(inputParameters, CONDITION);
 
         String set = String.join(
-            " AND ",
+            ", ",
             columns.stream()
                 .map(column -> SqlUtils.quoteIdentifier((String) column.get(NAME)) + "=:" + column.get(NAME))
                 .toList());
