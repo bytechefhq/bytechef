@@ -28,5 +28,6 @@ import org.jspecify.annotations.Nullable;
  */
 @SuppressFBWarnings("EI")
 record ToolExecutionEvent(
-    String toolName, Map<String, Object> inputs, @Nullable String reasoning, @Nullable String confidence) {
+    String toolName, Map<String, Object> inputs, @Nullable Object output, @Nullable String reasoning,
+    @Nullable String confidence) {
 }
