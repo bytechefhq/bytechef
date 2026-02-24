@@ -28,14 +28,12 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalCreator;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,20 +50,16 @@ import java.util.Objects;
  */
 public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    @Nullable
-    private final ChildJobPrincipalCreator childJobPrincipalCreator;
-    private final JobFacade jobFacade;
     private final JobService jobService;
+    private final PrincipalJobFacade principalJobFacade;
     private final SubflowResolver subflowResolver;
 
     @SuppressFBWarnings("EI")
     public SubflowTaskDispatcher(
-        @Nullable ChildJobPrincipalCreator childJobPrincipalCreator, JobFacade jobFacade, JobService jobService,
-        SubflowResolver subflowResolver) {
+        JobService jobService, PrincipalJobFacade principalJobFacade, SubflowResolver subflowResolver) {
 
-        this.childJobPrincipalCreator = childJobPrincipalCreator;
-        this.jobFacade = jobFacade;
         this.jobService = jobService;
+        this.principalJobFacade = principalJobFacade;
         this.subflowResolver = subflowResolver;
     }
 
@@ -95,11 +89,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         JobParametersDTO jobParametersDTO = new JobParametersDTO(
             workflowId, taskExecution.getId(), inputs, null, null, List.of(), childMetadata);
 
-        long childJobId = jobFacade.createJob(jobParametersDTO);
-
-        if (childJobPrincipalCreator != null) {
-            childJobPrincipalCreator.createPrincipalForChildJob(Objects.requireNonNull(job.getId()), childJobId);
-        }
+        principalJobFacade.createChildJob(Objects.requireNonNull(job.getId()), jobParametersDTO);
     }
 
     @Override

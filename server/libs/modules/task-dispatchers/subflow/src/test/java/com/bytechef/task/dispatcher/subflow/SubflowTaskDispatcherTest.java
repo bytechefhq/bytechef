@@ -18,6 +18,7 @@ package com.bytechef.task.dispatcher.subflow;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,9 +26,9 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -51,10 +52,10 @@ class SubflowTaskDispatcherTest {
     private static final String WORKFLOW_UUID = "test-workflow-uuid";
 
     @Mock
-    private JobFacade jobFacade;
+    private JobService jobService;
 
     @Mock
-    private JobService jobService;
+    private PrincipalJobFacade principalJobFacade;
 
     @Mock
     private SubflowResolver subflowResolver;
@@ -63,7 +64,7 @@ class SubflowTaskDispatcherTest {
 
     @BeforeEach
     void setUp() {
-        subflowTaskDispatcher = new SubflowTaskDispatcher(null, jobFacade, jobService, subflowResolver);
+        subflowTaskDispatcher = new SubflowTaskDispatcher(jobService, principalJobFacade, subflowResolver);
     }
 
     @Test
@@ -76,6 +77,7 @@ class SubflowTaskDispatcherTest {
 
         Job job = new Job();
 
+        job.setId(1L);
         job.setMetadata(Map.of());
 
         when(jobService.getJob(1L)).thenReturn(job);
@@ -85,7 +87,7 @@ class SubflowTaskDispatcherTest {
         subflowTaskDispatcher.dispatch(taskExecution);
 
         verify(subflowResolver).resolveSubflow(WORKFLOW_UUID, false);
-        verify(jobFacade).createJob(any(JobParametersDTO.class));
+        verify(principalJobFacade).createChildJob(anyLong(), any(JobParametersDTO.class));
     }
 
     @Test
@@ -98,6 +100,7 @@ class SubflowTaskDispatcherTest {
 
         Job job = new Job();
 
+        job.setId(1L);
         job.setMetadata(Map.of(MetadataConstants.EDITOR_ENVIRONMENT, true));
 
         when(jobService.getJob(1L)).thenReturn(job);
@@ -107,7 +110,7 @@ class SubflowTaskDispatcherTest {
         subflowTaskDispatcher.dispatch(taskExecution);
 
         verify(subflowResolver).resolveSubflow(WORKFLOW_UUID, true);
-        verify(jobFacade).createJob(any(JobParametersDTO.class));
+        verify(principalJobFacade).createChildJob(anyLong(), any(JobParametersDTO.class));
     }
 
     @Test
@@ -120,6 +123,7 @@ class SubflowTaskDispatcherTest {
 
         Job job = new Job();
 
+        job.setId(1L);
         job.setMetadata(Map.of());
 
         when(jobService.getJob(1L)).thenReturn(job);

@@ -23,6 +23,8 @@ import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -51,8 +53,10 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
@@ -207,6 +211,24 @@ public class WorkflowTestConfiguration {
         JobFacade jobFacade = new JobFacadeImpl(
             eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
 
+        PrincipalJobFacade principalJobFacade = new PrincipalJobFacade() {
+
+            @Override
+            public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO) {
+                return jobFacade.createJob(jobParametersDTO);
+            }
+
+            @Override
+            public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
+                return jobFacade.createJob(jobParametersDTO);
+            }
+
+            @Override
+            public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
+                throw new UnsupportedOperationException();
+            }
+        };
+
         return List.of(
             (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
@@ -231,7 +253,7 @@ public class WorkflowTestConfiguration {
             (taskDispatcher) -> new ParallelTaskDispatcher(
                 contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
-            (taskDispatcher) -> new SubflowTaskDispatcher(null, jobFacade, jobService, subflowResolver),
+            (taskDispatcher) -> new SubflowTaskDispatcher(jobService, principalJobFacade, subflowResolver),
             (taskDispatcher) -> new TerminateTaskDispatcher(eventPublisher, taskExecutionService));
     }
 }
