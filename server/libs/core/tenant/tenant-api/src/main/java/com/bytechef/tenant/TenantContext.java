@@ -19,6 +19,7 @@ package com.bytechef.tenant;
 import com.bytechef.tenant.constant.TenantConstants;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import org.slf4j.MDC;
 import org.springframework.util.Assert;
 
 /**
@@ -85,6 +86,8 @@ public class TenantContext {
         Assert.notNull(tenantId, "tenantId must not be null");
 
         currentTenant.set(tenantId);
+
+        MDC.put("tenantId", tenantId);
     }
 
     @FunctionalInterface
