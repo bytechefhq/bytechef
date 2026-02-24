@@ -85,11 +85,13 @@ public class MicrosoftUtils {
     public static ProviderException processErrorResponse(
         int statusCode, Object body, Map<String, List<String>> headers, Context context) {
 
-        String message = body == null || body.toString()
-            .isEmpty() ? "" : body.toString();
+        String bodyString = body == null ? null : body.toString();
 
-        if (body == null || body.toString()
-            .isEmpty()) {
+        boolean bodyEmpty = bodyString == null || bodyString.isEmpty();
+
+        String message = bodyEmpty ? "" : bodyString;
+
+        if (bodyEmpty) {
             List<String> errorReasons = headers.get("401_error_reason");
 
             if (errorReasons != null && !errorReasons.isEmpty()) {
