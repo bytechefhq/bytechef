@@ -19,6 +19,7 @@ package com.bytechef.component.google.sheets.action;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -38,11 +39,11 @@ import org.mockito.stubbing.Answer;
  */
 class GoogleSheetsDeleteRowActionTest {
 
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ROW_NUMBER, 2));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void perform() throws Exception {

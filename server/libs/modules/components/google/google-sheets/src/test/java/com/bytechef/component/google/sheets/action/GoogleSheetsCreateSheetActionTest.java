@@ -22,6 +22,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -32,6 +33,8 @@ import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.BatchUpdate;
 import com.google.api.services.sheets.v4.model.AddSheetResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
@@ -51,19 +54,19 @@ import org.mockito.stubbing.Answer;
 class GoogleSheetsCreateSheetActionTest {
 
     private final ArgumentCaptor<BatchUpdateSpreadsheetRequest> batchUpdateSpreadsheetRequestArgumentCaptor =
-        ArgumentCaptor.forClass(BatchUpdateSpreadsheetRequest.class);
+        forClass(BatchUpdateSpreadsheetRequest.class);
     private final List<Object> headers = List.of("header1", "header2");
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Sheets.Spreadsheets.BatchUpdate mockedBatchUpdate = mock(Sheets.Spreadsheets.BatchUpdate.class);
+    private final BatchUpdate mockedBatchUpdate = mock(BatchUpdate.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_ID, 123, SHEET_NAME, "sheetName", HEADERS, headers));
     private final Sheets mockedSheets = mock(Sheets.class);
-    private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = ArgumentCaptor.forClass(Sheets.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
+    private final Spreadsheets mockedSpreadsheets = mock(Spreadsheets.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = forClass(Sheets.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = forClass(ValueRange.class);
 
     @Test
     void perform() throws Exception {

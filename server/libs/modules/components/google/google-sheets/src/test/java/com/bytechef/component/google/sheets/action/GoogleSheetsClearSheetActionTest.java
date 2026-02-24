@@ -21,6 +21,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -30,6 +31,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.BatchUpdate;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.GridRange;
@@ -47,17 +50,17 @@ import org.mockito.MockedStatic;
 class GoogleSheetsClearSheetActionTest {
 
     private final ArgumentCaptor<BatchUpdateSpreadsheetRequest> batchUpdateSpreadsheetRequestArgumentCaptor =
-        ArgumentCaptor.forClass(BatchUpdateSpreadsheetRequest.class);
+        forClass(BatchUpdateSpreadsheetRequest.class);
     private final BatchUpdateSpreadsheetResponse mockedBatchUpdateSpreadsheetResponse =
         mock(BatchUpdateSpreadsheetResponse.class);
-    private final Sheets.Spreadsheets.BatchUpdate mockedBatchUpdate = mock(Sheets.Spreadsheets.BatchUpdate.class);
+    private final BatchUpdate mockedBatchUpdate = mock(BatchUpdate.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Sheets mockedSheets = mock(Sheets.class);
-    private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
+    private final Spreadsheets mockedSpreadsheets = mock(Spreadsheets.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_ID, 123, IS_THE_FIRST_ROW_HEADER, true));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void perform() throws Exception {

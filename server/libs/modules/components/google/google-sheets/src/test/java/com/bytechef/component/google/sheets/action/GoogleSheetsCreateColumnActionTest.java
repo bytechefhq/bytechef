@@ -21,6 +21,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -44,15 +45,15 @@ import org.mockito.stubbing.Answer;
  */
 class GoogleSheetsCreateColumnActionTest {
 
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "name", COLUMN_NAME, "new column"));
     private final Sheets mockedSheets = mock(Sheets.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = ArgumentCaptor.forClass(Sheets.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = forClass(Sheets.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = forClass(ValueRange.class);
 
     @Test
     void perform() throws Exception {

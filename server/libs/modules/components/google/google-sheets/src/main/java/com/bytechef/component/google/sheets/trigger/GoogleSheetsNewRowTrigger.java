@@ -61,8 +61,7 @@ public class GoogleSheetsNewRowTrigger {
             string(SPREADSHEET_ID)
                 .label("Spreadsheet")
                 .description("The spreadsheet to apply the updates to.")
-                .options(
-                    GoogleUtils.getFileOptionsByMimeTypeForTriggers(APPLICATION_VND_GOOGLE_APPS_SPREADSHEET, true))
+                .options(GoogleUtils.getFileOptionsByMimeTypeForTriggers(APPLICATION_VND_GOOGLE_APPS_SPREADSHEET, true))
                 .required(true),
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
             string(SHEET_NAME)

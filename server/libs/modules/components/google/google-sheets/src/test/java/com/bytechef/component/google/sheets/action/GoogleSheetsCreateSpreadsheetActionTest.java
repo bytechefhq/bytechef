@@ -19,6 +19,7 @@ package com.bytechef.component.google.sheets.action;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.FOLDER_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -29,8 +30,13 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.Drive.Files.Get;
+import com.google.api.services.drive.Drive.Files.Update;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Create;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
 import java.util.List;
@@ -44,20 +50,20 @@ import org.mockito.MockedStatic;
  */
 class GoogleSheetsCreateSpreadsheetActionTest {
 
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Spreadsheet> spreadsheetArgumentCaptor = ArgumentCaptor.forClass(Spreadsheet.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Sheets mockedSheets = mock(Sheets.class);
-    private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
-    private final Sheets.Spreadsheets.Create mockCreateRequest = mock(Sheets.Spreadsheets.Create.class);
-    private final Drive mockedDrive = mock(Drive.class);
-    private final Drive.Files mockedFiles = mock(Drive.Files.class);
-    private final Drive.Files.Update mockedUpdate = mock(Drive.Files.Update.class);
-    private final Drive.Files.Get mockedGet = mock(Drive.Files.Get.class);
     private final File file = new File().setParents(List.of("previous-folder-id"));
+    private final Create mockCreateRequest = mock(Create.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Drive mockedDrive = mock(Drive.class);
+    private final Files mockedFiles = mock(Files.class);
+    private final Get mockedGet = mock(Get.class);
     private Parameters mockedParameters;
+    private final Sheets mockedSheets = mock(Sheets.class);
+    private final Spreadsheets mockedSpreadsheets = mock(Spreadsheets.class);
+    private final Update mockedUpdate = mock(Update.class);
     private final Spreadsheet newSpreadSheet = new Spreadsheet().setSpreadsheetId("123");
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<Spreadsheet> spreadsheetArgumentCaptor = forClass(Spreadsheet.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void performWhenFolderIdIsNotSet() throws Exception {

@@ -19,6 +19,7 @@ package com.bytechef.component.google.sheets.action;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -49,8 +50,8 @@ class GoogleSheetsListSheetsActionTest {
     private final Sheets mockedSheets = mock(Sheets.class);
     private final Spreadsheet mockedSpreadsheet = mock(Spreadsheet.class);
     private final Spreadsheets mockedSpreadsheets = mock(Spreadsheets.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void perform() throws Exception {

@@ -23,6 +23,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE_INPUT_OPTION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -33,6 +34,9 @@ import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values.Append;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.util.List;
 import java.util.Map;
@@ -45,18 +49,18 @@ import org.mockito.MockedStatic;
  */
 class GoogleSheetsInsertMultipleRowsActionTest {
 
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     @SuppressWarnings("rawtypes")
-    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Sheets.Spreadsheets.Values.Append mockedAppend = mock(Sheets.Spreadsheets.Values.Append.class);
+    private final Append mockedAppend = mock(Append.class);
     private final Sheets mockedSheets = mock(Sheets.class);
-    private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
-    private final Sheets.Spreadsheets.Values mockedValues = mock(Sheets.Spreadsheets.Values.class);
-    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = ArgumentCaptor.forClass(Sheets.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
+    private final Spreadsheets mockedSpreadsheets = mock(Spreadsheets.class);
+    private final Values mockedValues = mock(Values.class);
+    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = forClass(Sheets.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = forClass(ValueRange.class);
 
     @Test
     @SuppressWarnings("unchecked")

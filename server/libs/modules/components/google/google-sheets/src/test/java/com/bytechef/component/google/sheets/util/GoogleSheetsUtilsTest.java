@@ -33,6 +33,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -49,6 +50,11 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.BatchUpdate;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Get;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values.Append;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
@@ -75,25 +81,25 @@ import org.mockito.MockedStatic;
 class GoogleSheetsUtilsTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Sheets.Spreadsheets.Values.Append mockedAppend = mock(Sheets.Spreadsheets.Values.Append.class);
-    private final Sheets.Spreadsheets.Get mockedGet = mock(Sheets.Spreadsheets.Get.class);
+    private final Append mockedAppend = mock(Append.class);
+    private final Get mockedGet = mock(Get.class);
     private Parameters mockedParameters;
     private final Sheets mockedSheets = mock(Sheets.class);
     private final Spreadsheet mockedSpreadsheet = mock(Spreadsheet.class);
-    private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
-    private final Sheets.Spreadsheets.Values mockedValues = mock(Sheets.Spreadsheets.Values.class);
-    private final Sheets.Spreadsheets.Values.Get mockedValuesGet = mock(Sheets.Spreadsheets.Values.Get.class);
+    private final Spreadsheets mockedSpreadsheets = mock(Spreadsheets.class);
+    private final Values mockedValues = mock(Values.class);
+    private final Values.Get mockedValuesGet = mock(Values.Get.class);
     private final ValueRange mockedValueRange = mock(ValueRange.class);
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = ArgumentCaptor.forClass(Sheets.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
+    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = forClass(Sheets.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final ArgumentCaptor<BatchUpdateSpreadsheetRequest> batchUpdateSpreadsheetRequestArgumentCaptor =
-        ArgumentCaptor.forClass(BatchUpdateSpreadsheetRequest.class);
+        forClass(BatchUpdateSpreadsheetRequest.class);
     private final BatchUpdateSpreadsheetResponse mockedBatchUpdateSpreadsheetResponse =
         mock(BatchUpdateSpreadsheetResponse.class);
-    private final Sheets.Spreadsheets.BatchUpdate mockedBatchUpdate = mock(Sheets.Spreadsheets.BatchUpdate.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
+    private final BatchUpdate mockedBatchUpdate = mock(BatchUpdate.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = forClass(ValueRange.class);
 
     @Test
     void appendValues() throws IOException {
