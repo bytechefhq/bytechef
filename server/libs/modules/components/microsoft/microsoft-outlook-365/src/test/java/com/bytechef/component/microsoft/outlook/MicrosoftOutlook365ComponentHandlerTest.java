@@ -26,7 +26,7 @@ class MicrosoftOutlook365ComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/microsoft-outlook-365_v1.json",
-            new MicrosoftOutlook365ComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/microsoft-outlook-365_v1.json", new MicrosoftOutlook365ComponentHandler().getDefinition());
     }
 }

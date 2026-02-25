@@ -17,15 +17,17 @@
 package com.bytechef.component.microsoft.outlook.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -33,9 +35,11 @@ import org.mockito.MockedStatic;
  */
 class MicrosoftOutlook365GetEventsActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final Context mockedContext = mock(Context.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
     private final Parameters mockedParameters = mock(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() {
@@ -43,14 +47,16 @@ class MicrosoftOutlook365GetEventsActionTest {
             mockStatic(MicrosoftOutlook365CustomEventUtils.class)) {
 
             microsoftOutlook365CustomEventUtilsMockedStatic
-                .when(() -> MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents(mockedParameters,
-                    mockedActionContext))
+                .when(() -> MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents(
+                    parametersArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(List.of(mockedCustomEvent));
 
             List<CustomEvent> result =
-                MicrosoftOutlook365GetEventsAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+                MicrosoftOutlook365GetEventsAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(List.of(mockedCustomEvent), result);
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
         }
     }
 }

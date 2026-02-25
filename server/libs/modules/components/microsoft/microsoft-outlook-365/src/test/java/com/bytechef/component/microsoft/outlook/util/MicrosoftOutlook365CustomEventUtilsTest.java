@@ -18,6 +18,7 @@ package com.bytechef.component.microsoft.outlook.util;
 
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ATTENDEES;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.DATE_RANGE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.DATE_TIME;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
@@ -26,6 +27,7 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.IS_ONLINE_MEETING;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.I_CAL_UID;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.REMINDER_MINUTES_BEFORE_START;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.START;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
@@ -33,23 +35,33 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.createCustomEvent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
@@ -58,10 +70,8 @@ import org.mockito.MockedStatic;
  */
 class MicrosoftOutlook365CustomEventUtilsTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testCreateCustomEvent() {
@@ -72,7 +82,7 @@ class MicrosoftOutlook365CustomEventUtilsTest {
             ATTENDEES, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "attendee1"))), "onlineMeeting",
             Map.of("joinUrl", "url"));
 
-        MicrosoftOutlook365CustomEventUtils.CustomEvent customEvent = createCustomEvent(eventmap);
+        CustomEvent customEvent = createCustomEvent(eventmap);
 
         assertEquals(eventmap.get(I_CAL_UID), customEvent.iCalUId());
         assertEquals(eventmap.get(ID), customEvent.id());
@@ -85,10 +95,16 @@ class MicrosoftOutlook365CustomEventUtilsTest {
         assertEquals(eventmap.get(REMINDER_MINUTES_BEFORE_START), customEvent.reminderMinutesBeforeStart());
     }
 
+    @ExtendWith(MockContextSetupExtension.class)
     @Test
-    void testRetrieveCustomEvents() {
+    void testRetrieveCustomEvents(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(
+                CALENDAR, "xy",
                 DATE_RANGE,
                 Map.of(
                     FROM, LocalDateTime.of(2024, Month.SEPTEMBER, 3, 12, 0, 0),
@@ -142,38 +158,42 @@ class MicrosoftOutlook365CustomEventUtilsTest {
             START, Map.of(DATE_TIME, "2024-09-05T11:00:00.0000000"),
             END, Map.of(DATE_TIME, "2024-09-05T12:00:00.0000000"));
 
-        Map<String, Object> body = Map.of(VALUE, List.of(e1, e2, e3, e4, e5, e6, e7, e8));
-
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+            .thenReturn(Map.of(VALUE, List.of(e1, e2, e3, e4, e5, e6, e7, e8), ODATA_NEXT_LINK, "link"));
 
         try (MockedStatic<MicrosoftOutlook365Utils> microsoftOutlook365UtilsMockedStatic =
-            mockStatic(MicrosoftOutlook365Utils.class)) {
+            mockStatic(MicrosoftOutlook365Utils.class);
+            MockedStatic<MicrosoftUtils> microsoftUtilsMockedStatic = mockStatic(MicrosoftUtils.class)) {
 
             microsoftOutlook365UtilsMockedStatic
-                .when(() -> MicrosoftOutlook365Utils.getMailboxTimeZone(mockedActionContext))
+                .when(() -> MicrosoftOutlook365Utils.getMailboxTimeZone(contextArgumentCaptor.capture()))
                 .thenReturn("zone");
 
-            microsoftOutlook365UtilsMockedStatic
-                .when(() -> MicrosoftUtils.getItemsFromNextPage("link", mockedActionContext))
+            microsoftUtilsMockedStatic
+                .when(() -> MicrosoftUtils.getItemsFromNextPage(
+                    stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(List.of());
 
-            List<MicrosoftOutlook365CustomEventUtils.CustomEvent> customEvents =
-                MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents(mockedParameters, mockedActionContext);
+            List<CustomEvent> customEvents = MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents(
+                mockedParameters, mockedContext);
 
             assertEquals(
                 List.of(createCustomEvent(e1), createCustomEvent(e2), createCustomEvent(e3), createCustomEvent(e4)),
                 customEvents);
 
-            assertEquals(List.of("Prefer", "outlook.timezone=\"zone\""), stringArgumentCaptor.getAllValues());
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
+            assertEquals(
+                List.of("/me/calendars/xy/events", "Prefer", "outlook.timezone=\"zone\"", "link"),
+                stringArgumentCaptor.getAllValues());
         }
     }
 }

@@ -20,10 +20,11 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetFreeTimeSlotsAction.Interval;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -41,10 +43,13 @@ import org.mockito.MockedStatic;
  */
 class MicrosoftOutlook365GetFreeTimeSlotsActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final Context mockedContext = mock(Context.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(DATE_RANGE,
+        Map.of(
+            DATE_RANGE,
             Map.of(FROM, LocalDateTime.of(2000, 1, 14, 8, 0, 0), TO, LocalDateTime.of(2000, 1, 20, 8, 0, 0))));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() {
@@ -54,22 +59,21 @@ class MicrosoftOutlook365GetFreeTimeSlotsActionTest {
             mockStatic(MicrosoftOutlook365CustomEventUtils.class)) {
 
             microsoftOutlook365CustomEventUtilsMockedStatic
-                .when(() -> MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents(mockedParameters,
-                    mockedActionContext))
+                .when(() -> MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents(
+                    parametersArgumentCaptor.capture(),
+                    contextArgumentCaptor.capture()))
                 .thenReturn(customEvents);
 
-            List<Interval> result =
-                MicrosoftOutlook365GetFreeTimeSlotsAction.perform(mockedParameters, mockedParameters,
-                    mockedActionContext);
+            List<Interval> result = MicrosoftOutlook365GetFreeTimeSlotsAction.perform(
+                mockedParameters, null, mockedContext);
 
-            List<Interval> expectedIntervals = new ArrayList<>();
-
-            expectedIntervals
-                .add(new Interval(LocalDateTime.of(2000, 1, 16, 9, 30, 0), LocalDateTime.of(2000, 1, 16, 9, 45, 0)));
-            expectedIntervals
-                .add(new Interval(LocalDateTime.of(2000, 1, 16, 10, 45, 0), LocalDateTime.of(2000, 1, 19, 8, 0, 0)));
+            List<Interval> expectedIntervals = List.of(
+                new Interval(LocalDateTime.of(2000, 1, 16, 9, 30, 0), LocalDateTime.of(2000, 1, 16, 9, 45, 0)),
+                new Interval(LocalDateTime.of(2000, 1, 16, 10, 45, 0), LocalDateTime.of(2000, 1, 19, 8, 0, 0)));
 
             assertEquals(expectedIntervals, result);
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
         }
     }
 
