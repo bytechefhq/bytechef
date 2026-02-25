@@ -725,42 +725,46 @@ public class ComponentInitOpenApiGenerator {
 
         List<CodeBlock> codeBlocks = new ArrayList<>();
 
-        for (Map.Entry<String, List<OperationItem>> operationItemsEntry : operationsMap.entrySet()) {
-            for (OperationItem operationItem : operationItemsEntry.getValue()) {
-                CodeBlock actionCodeBlock = getActionCodeBlock(operationItem, openAPI);
+        List<OperationItem> sortedOperationItems = operationsMap.values()
+            .stream()
+            .flatMap(List::stream)
+            .sorted((a, b) -> String.CASE_INSENSITIVE_ORDER.compare(a.getOperationId(), b.getOperationId()))
+            .toList();
 
-                if (operationItem.operation()
-                    .getSecurity() != null) {
-                    List<SecurityRequirement> securityRequirements = operationItem.operation()
-                        .getSecurity();
+        for (OperationItem operationItem : sortedOperationItems) {
+            CodeBlock actionCodeBlock = getActionCodeBlock(operationItem, openAPI);
 
-                    for (SecurityRequirement securityRequirement : securityRequirements) {
-                        if (securityRequirement.containsKey("oauth2")) {
-                            List<String> scopes = securityRequirement.get("oauth2");
-                            requiredScopes.addAll(scopes);
-                        }
+            if (operationItem.operation()
+                .getSecurity() != null) {
+                List<SecurityRequirement> securityRequirements = operationItem.operation()
+                    .getSecurity();
+
+                for (SecurityRequirement securityRequirement : securityRequirements) {
+                    if (securityRequirement.containsKey("oauth2")) {
+                        List<String> scopes = securityRequirement.get("oauth2");
+                        requiredScopes.addAll(scopes);
                     }
                 }
+            }
 
-                ClassName className = ClassName.get(
-                    getPackageName() + ".action",
-                    getComponentClassName(componentName) + StringUtils.capitalize(operationItem.getOperationId()) +
-                        "Action");
+            ClassName className = ClassName.get(
+                getPackageName() + ".action",
+                getComponentClassName(componentName) + StringUtils.capitalize(operationItem.getOperationId()) +
+                    "Action");
 
-                writeComponentActionSource(className, actionCodeBlock, componentHandlerDirPath);
+            writeComponentActionSource(className, actionCodeBlock, componentHandlerDirPath);
 
-                codeBlocks.add(CodeBlock.of("$T.ACTION_DEFINITION", className));
+            codeBlocks.add(CodeBlock.of("$T.ACTION_DEFINITION", className));
 
-                if (generatorConfig.openApi.oAuth2Scopes.isEmpty() && operationItem.operation.getSecurity() != null) {
-                    collectOAuthScopes(operationItem.operation.getSecurity());
-                }
+            if (generatorConfig.openApi.oAuth2Scopes.isEmpty() && operationItem.operation.getSecurity() != null) {
+                collectOAuthScopes(operationItem.operation.getSecurity());
+            }
 
-                Operation operation = operationItem.operation();
-                Map<String, Object> extensions = operation.getExtensions();
+            Operation operation = operationItem.operation();
+            Map<String, Object> extensions = operation.getExtensions();
 
-                if (extensions != null && Boolean.TRUE.equals(extensions.get("x-ai-agent-tool"))) {
-                    aiAgentTools.add(className);
-                }
+            if (extensions != null && Boolean.TRUE.equals(extensions.get("x-ai-agent-tool"))) {
+                aiAgentTools.add(className);
             }
         }
 
