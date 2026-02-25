@@ -32,60 +32,104 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Encoder;
+import com.bytechef.component.definition.Context.File;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.definition.Format;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.SimpleMessage;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
 class MicrosoftOutlook365UtilsTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Context mockedContext = mock(Context.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<File, ?>> fileFunctionArgumentCaptor = forClass(ContextFunction.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Encoder, ?>> encderFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final File mockedFile = mock(File.class);
+    private final Encoder mockedEncoder = mock(Encoder.class);
+    private final Context mockedContext = mock(Context.class);
+    private final ArgumentCaptor<FileEntry> fileEntryArgumentCaptor = forClass(FileEntry.class);
+    private final ArgumentCaptor<byte[]> bytesArgumentCaptor = forClass(byte[].class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<InputStream> inputStreamArgumentCaptor = forClass(InputStream.class);
 
     @Test
     void testCreateRecipientList() {
-        List<Map<String, Map<String, String>>> result =
-            MicrosoftOutlook365Utils.createRecipientList(List.of("address1", "address2"));
+        List<Map<String, Map<String, String>>> result = MicrosoftOutlook365Utils.createRecipientList(
+            List.of("address1", "address2"));
 
         assertEquals(
-            List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1")),
+            List.of(
+                Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1")),
                 Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address2"))),
             result);
     }
 
+    @ExtendWith(MockContextSetupExtension.class)
     @Test
-    void testCreateSimpleMessage() {
-        when(mockedContext.file(any()))
-            .thenReturn(mockedFileEntry);
-        when(mockedContext.http(any()))
+    void testCreateSimpleMessage(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) throws IOException {
+
+        byte[] fileContent = new byte[] {
+            1, 2, 3
+        };
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(VALUE, List.of(
-                Map.of(CONTENT_BYTES, "encode", "isInline", false),
-                Map.of(CONTENT_BYTES, "encode", "isInline", true))));
+                Map.of(CONTENT_BYTES, "encode", "isInline", false, NAME, "file1"),
+                Map.of(CONTENT_BYTES, "encode", "isInline", true, NAME, "file2"))));
+
+        when(mockedContext.encoder(encderFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Encoder, ?> value = encderFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedEncoder);
+            });
+        when(mockedEncoder.base64Decode(stringArgumentCaptor.capture()))
+            .thenReturn(fileContent);
+        when(mockedContext.file(fileFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<File, ?> value = fileFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedFile);
+            });
+        when(mockedFile.storeContent(stringArgumentCaptor.capture(), inputStreamArgumentCaptor.capture()))
+            .thenReturn(mockedFileEntry);
 
         Map<String, Object> messageBody = new HashMap<>(
             Map.of(
@@ -102,11 +146,10 @@ class MicrosoftOutlook365UtilsTest {
 
         messageBody.put("conversationId", "conversationId");
 
-        MicrosoftOutlook365Utils.SimpleMessage result = MicrosoftOutlook365Utils.createSimpleMessage(
-            mockedContext, messageBody);
+        SimpleMessage result = MicrosoftOutlook365Utils.createSimpleMessage(mockedContext, messageBody);
 
         assertEquals(
-            new MicrosoftOutlook365Utils.SimpleMessage(
+            new SimpleMessage(
                 "messageId",
                 "conversationId",
                 "Test Subject",
@@ -120,26 +163,57 @@ class MicrosoftOutlook365UtilsTest {
                 List.of(mockedFileEntry),
                 "https://example.com"),
             result);
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertNotNull(fileFunctionArgumentCaptor.getValue());
+        assertNotNull(encderFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            List.of("/me/messages/messageId/attachments", "encode", "file1", "encode", "file2"),
+            stringArgumentCaptor.getAllValues());
+
+        List<InputStream> allValues = inputStreamArgumentCaptor.getAllValues();
+
+        for (InputStream inputStream : allValues) {
+            assertArrayEquals(fileContent, inputStream.readAllBytes());
+        }
     }
 
     @Test
-    void testGetAttachments() {
+    void testGetAttachments() throws IOException {
         List<FileEntry> fileEntries = List.of(mockedFileEntry);
 
         byte[] fileContent = new byte[] {
             1, 2, 3
         };
 
-        String encodedToString = EncodingUtils.base64EncodeToString(fileContent);
-
         when(mockedFileEntry.getName())
             .thenReturn("file.txt");
         when(mockedFileEntry.getMimeType())
             .thenReturn("text/plain");
-        when(mockedContext.file(any()))
+
+        when(mockedContext.file(fileFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<File, ?> value = fileFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedFile);
+            });
+        when(mockedFile.readAllBytes(fileEntryArgumentCaptor.capture()))
             .thenReturn(fileContent);
-        when(mockedContext.encoder(any()))
-            .thenReturn(encodedToString);
+
+        when(mockedContext.encoder(encderFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Encoder, ?> value = encderFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedEncoder);
+            });
+        String encodeToString = EncodingUtils.base64EncodeToString(fileContent);
+        when(mockedEncoder.base64Encode(bytesArgumentCaptor.capture()))
+            .thenReturn(encodeToString);
 
         List<Map<String, Object>> attachments = MicrosoftOutlook365Utils.getAttachments(mockedContext, fileEntries);
 
@@ -149,24 +223,37 @@ class MicrosoftOutlook365UtilsTest {
                     "@odata.type", "#microsoft.graph.fileAttachment",
                     NAME, "file.txt",
                     CONTENT_TYPE, "text/plain",
-                    CONTENT_BYTES, encodedToString)),
+                    CONTENT_BYTES, encodeToString)),
             attachments);
+
+        assertNotNull(fileFunctionArgumentCaptor.getValue());
+        assertNotNull(encderFunctionArgumentCaptor.getValue());
+        assertEquals(mockedFileEntry, fileEntryArgumentCaptor.getValue());
+        assertEquals(fileContent, bytesArgumentCaptor.getValue());
     }
 
+    @ExtendWith(MockContextSetupExtension.class)
     @Test
-    void testGetMailboxTImeZone() {
-        when(mockedActionContext.http(any()))
+    void testGetMailboxTImeZone(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(VALUE, "zone"));
 
-        String result = MicrosoftOutlook365Utils.getMailboxTimeZone(mockedActionContext);
+        String result = MicrosoftOutlook365Utils.getMailboxTimeZone(mockedContext);
 
         assertEquals("zone", result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/me/mailboxSettings/timeZone", stringArgumentCaptor.getValue());
     }
 
     @Test
