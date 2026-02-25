@@ -11,6 +11,7 @@ import {useShallow} from 'zustand/react/shallow';
 export interface ProjectDeploymentDialogWorkflowListItemProps {
     control: Control<ProjectDeployment>;
     formState: FormState<ProjectDeployment>;
+    groupConnections?: boolean;
     label?: string;
     setValue: UseFormSetValue<ProjectDeployment>;
     switchHidden?: boolean;
@@ -21,6 +22,7 @@ export interface ProjectDeploymentDialogWorkflowListItemProps {
 const ProjectDeploymentDialogWorkflowsStepItem = ({
     control,
     formState,
+    groupConnections,
     label,
     setValue,
     switchHidden = false,
@@ -99,6 +101,8 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                         <ProjectDeploymentDialogWorkflowsStepItemConnections
                             componentConnections={componentConnections}
                             control={control}
+                            groupConnections={groupConnections}
+                            setValue={setValue}
                             workflowIndex={workflowIndex}
                             workflowNodeLabelMap={workflowNodeLabelMap}
                         />

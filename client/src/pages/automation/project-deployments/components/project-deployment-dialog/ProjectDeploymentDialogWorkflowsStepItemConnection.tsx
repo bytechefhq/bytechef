@@ -15,13 +15,19 @@ import {
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PlusIcon} from 'lucide-react';
-import {Control} from 'react-hook-form';
+import {Control, UseFormSetValue} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
+type ConnectionGroupingType = {
+    indices: number[];
+    setValue: UseFormSetValue<ProjectDeployment>;
+};
+
 export interface ProjectDeploymentDialogWorkflowsStepItemConnectionProps {
-    control: Control<ProjectDeployment>;
     componentConnection: ComponentConnection;
     componentConnectionIndex: number;
+    connectionGrouping?: ConnectionGroupingType;
+    control: Control<ProjectDeployment>;
     workflowIndex: number;
     workflowNodeLabel?: string;
 }
@@ -29,6 +35,7 @@ export interface ProjectDeploymentDialogWorkflowsStepItemConnectionProps {
 const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
     componentConnection,
     componentConnectionIndex,
+    connectionGrouping,
     control,
     workflowIndex,
     workflowNodeLabel,
@@ -54,84 +61,106 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
     );
 
     return (
-        <>
-            <FormField
-                control={control}
-                name={`projectDeploymentWorkflows.${workflowIndex!}.connections.${componentConnectionIndex}.connectionId`}
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel className="flex items-center space-x-1">
-                            {componentDefinition?.icon && (
-                                <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
-                            )}
+        <FormField
+            control={control}
+            name={`projectDeploymentWorkflows.${workflowIndex!}.connections.${componentConnectionIndex}.connectionId`}
+            render={({field}) => (
+                <FormItem>
+                    <FormLabel className="flex items-center space-x-1">
+                        {componentDefinition?.icon && (
+                            <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
+                        )}
 
-                            <span>{workflowNodeLabel || `${componentDefinition?.title} Connection`}</span>
+                        <span>{workflowNodeLabel || `${componentDefinition?.title} Connection`}</span>
 
+                        {!connectionGrouping && (
                             <span className="text-xs text-gray-500">({componentConnection.workflowNodeName})</span>
-                        </FormLabel>
+                        )}
+                    </FormLabel>
 
-                        <Select onValueChange={field.onChange} value={field.value ? field.value.toString() : undefined}>
-                            <FormControl>
-                                <div className="flex space-x-2">
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Choose Connection..." />
-                                    </SelectTrigger>
+                    <Select
+                        onValueChange={(value) => {
+                            field.onChange(Number(value));
 
-                                    {componentDefinitions && (
-                                        <ConnectionDialog
-                                            componentDefinition={componentDefinition}
-                                            componentDefinitions={componentDefinitions!}
-                                            connectionTagsQueryKey={ConnectionKeys.connectionTags}
-                                            connectionsQueryKey={ConnectionKeys.connections}
-                                            onClose={() => {}}
-                                            triggerNode={
-                                                <Button
-                                                    icon={<PlusIcon />}
-                                                    size="icon"
-                                                    title="Create a new connection"
-                                                    type="button"
-                                                    variant="outline"
-                                                />
-                                            }
-                                            useCreateConnectionMutation={useCreateConnectionMutation}
-                                            useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                                        />
-                                    )}
-                                </div>
-                            </FormControl>
+                            if (connectionGrouping) {
+                                for (const index of connectionGrouping.indices) {
+                                    if (index !== componentConnectionIndex) {
+                                        connectionGrouping.setValue(
+                                            `projectDeploymentWorkflows.${workflowIndex}.connections.${index}.connectionId`,
+                                            Number(value)
+                                        );
+                                    }
+                                }
+                            }
+                        }}
+                        value={field.value ? field.value.toString() : undefined}
+                    >
+                        <FormControl>
+                            <div className="flex space-x-2">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Choose Connection..." />
+                                </SelectTrigger>
 
-                            <SelectContent>
-                                {connections &&
-                                    connections.map((connection) => (
-                                        <SelectItem key={connection.id} value={connection.id!.toString()}>
-                                            <div className="flex items-center space-x-1">
-                                                <span>{connection.name}</span>
+                                {componentDefinitions && (
+                                    <ConnectionDialog
+                                        componentDefinition={componentDefinition}
+                                        componentDefinitions={componentDefinitions!}
+                                        connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                                        connectionsQueryKey={ConnectionKeys.connections}
+                                        onClose={() => {}}
+                                        triggerNode={
+                                            <Button
+                                                icon={<PlusIcon />}
+                                                size="icon"
+                                                title="Create a new connection"
+                                                type="button"
+                                                variant="outline"
+                                            />
+                                        }
+                                        useCreateConnectionMutation={useCreateConnectionMutation}
+                                        useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                                    />
+                                )}
+                            </div>
+                        </FormControl>
 
-                                                <span className="text-xs text-gray-500">
-                                                    {connection?.tags?.map((tag) => tag.name).join(', ')}
-                                                </span>
+                        <SelectContent>
+                            {connections &&
+                                connections.map((connection) => (
+                                    <SelectItem key={connection.id} value={connection.id!.toString()}>
+                                        <div className="flex items-center space-x-1">
+                                            <span>{connection.name}</span>
 
-                                                <EnvironmentBadge environmentId={connection.environmentId!} />
-                                            </div>
-                                        </SelectItem>
-                                    ))}
-                            </SelectContent>
-                        </Select>
+                                            <span className="text-xs text-gray-500">
+                                                {connection?.tags?.map((tag) => tag.name).join(', ')}
+                                            </span>
 
-                        <FormDescription>
-                            <span>{`Choose connection for the ${componentDefinition?.title}`}</span>
+                                            <EnvironmentBadge environmentId={connection.environmentId!} />
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                        </SelectContent>
+                    </Select>
 
+                    <FormDescription>
+                        <span>{`Choose connection for the ${componentDefinition?.title}`}</span>
+
+                        {connectionGrouping ? (
+                            <span className="mx-1 text-xs text-gray-500">
+                                (applies to {connectionGrouping.indices.length} nodes)
+                            </span>
+                        ) : (
                             <span className="mx-1 text-xs text-gray-500">({componentConnection.key})</span>
+                        )}
 
-                            <span>component.</span>
-                        </FormDescription>
+                        <span>component.</span>
+                    </FormDescription>
 
-                        <FormMessage />
-                    </FormItem>
-                )}
-                rules={{required: componentConnection.required}}
-            />
-        </>
+                    <FormMessage />
+                </FormItem>
+            )}
+            rules={{required: componentConnection.required}}
+        />
     );
 };
 
