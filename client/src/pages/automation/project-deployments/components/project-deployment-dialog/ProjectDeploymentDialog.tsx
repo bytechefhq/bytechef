@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
+import Switch from '@/components/Switch/Switch';
 import {
     Dialog,
     DialogClose,
@@ -11,6 +12,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -31,6 +33,7 @@ import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/pr
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
+import {InfoIcon} from 'lucide-react';
 import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -54,12 +57,13 @@ const ProjectDeploymentDialog = ({
     updateProjectVersion = false,
 }: ProjectDeploymentDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
+    const [groupConnections, setGroupConnections] = useState(false);
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-    const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
-        useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
+    const [resetWorkflowsEnabledStore, setWorkflowEnabled, workflowEnabledMap] = useWorkflowsEnabledStore(
+        useShallow(({reset, setWorkflowEnabled, workflowEnabledMap}) => [reset, setWorkflowEnabled, workflowEnabledMap])
     );
 
     const {captureProjectDeploymentCreated} = useAnalytics();
@@ -88,6 +92,22 @@ const ProjectDeploymentDialog = ({
         true,
         !!getValues().projectId && !!getValues().projectVersion
     );
+
+    const hasVisibleConnections = workflows?.some((workflow) => {
+        const isEnabled = workflowEnabledMap.get(workflow.id!);
+
+        if (!isEnabled) {
+            return false;
+        }
+
+        const hasTaskConnections = (workflow?.tasks ?? []).some((task) => (task.connections?.length ?? 0) > 0);
+
+        const hasTriggerConnections = (workflow?.triggers ?? []).some(
+            (trigger) => (trigger.connections?.length ?? 0) > 0
+        );
+
+        return hasTaskConnections || hasTriggerConnections;
+    });
 
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -148,6 +168,7 @@ const ProjectDeploymentDialog = ({
                 <ProjectDeploymentDialogWorkflowsStep
                     control={control}
                     formState={formState}
+                    groupConnections={groupConnections}
                     setValue={setValue}
                     workflows={workflows}
                 />
@@ -169,6 +190,8 @@ const ProjectDeploymentDialog = ({
             }
 
             resetWorkflowsEnabledStore();
+
+            setGroupConnections(false);
         }, 300);
     };
 
@@ -333,6 +356,22 @@ const ProjectDeploymentDialog = ({
 
                         {(activeStepIndex === 1 || (projectDeployment?.id && !updateProjectVersion)) && (
                             <>
+                                {activeStepIndex === 1 && hasVisibleConnections && (
+                                    <div className="mr-auto flex items-center gap-2">
+                                        <Switch checked={groupConnections} onCheckedChange={setGroupConnections} />
+
+                                        <span className="text-sm text-gray-700">Group Connections</span>
+
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <InfoIcon className="size-4 cursor-default text-gray-400" />
+                                            </TooltipTrigger>
+
+                                            <TooltipContent>Connections grouped by their app.</TooltipContent>
+                                        </Tooltip>
+                                    </div>
+                                )}
+
                                 {activeStepIndex === 1 && (
                                     <Button
                                         label="Previous"

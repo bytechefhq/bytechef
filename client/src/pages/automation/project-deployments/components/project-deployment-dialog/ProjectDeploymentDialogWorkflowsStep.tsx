@@ -5,6 +5,7 @@ import {Control, FormState, UseFormSetValue} from 'react-hook-form';
 export interface ProjectDeploymentDialogWorkflowsStepProps {
     control: Control<ProjectDeployment>;
     formState: FormState<ProjectDeployment>;
+    groupConnections?: boolean;
     setValue: UseFormSetValue<ProjectDeployment>;
     workflows: Workflow[];
 }
@@ -12,6 +13,7 @@ export interface ProjectDeploymentDialogWorkflowsStepProps {
 const ProjectDeploymentDialogWorkflowsStep = ({
     control,
     formState,
+    groupConnections,
     setValue,
     workflows,
 }: ProjectDeploymentDialogWorkflowsStepProps) => {
@@ -21,6 +23,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
                 <ProjectDeploymentDialogWorkflowsStepItem
                     control={control}
                     formState={formState}
+                    groupConnections={groupConnections}
                     key={workflow.id!}
                     label={workflow.label!}
                     setValue={setValue}
