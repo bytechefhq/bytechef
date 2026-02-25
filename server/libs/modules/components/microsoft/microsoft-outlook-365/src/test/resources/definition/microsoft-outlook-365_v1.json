@@ -5,8 +5,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Creates an event in the specified calendar.",
-    "help": null,
+    "description": "Creates a new event in the specified calendar.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#create-event"
+    },
     "metadata": null,
     "name": "createEvent",
     "outputDefinition": {
@@ -481,7 +484,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the calendar to create the event in.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -526,7 +529,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": false,
-      "description": null,
+      "description": "Is the event all day?",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -711,7 +714,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes an event from the specified calendar.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#delete-event"
+    },
     "metadata": null,
     "name": "deleteEvent",
     "outputDefinition": null,
@@ -721,7 +727,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the calendar to delete the event from.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -745,7 +751,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Id of the event to delete.",
+      "description": "ID of the event to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -776,8 +782,90 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
+    "description": "Gets the specified email message.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#get-email"
+    },
+    "metadata": null,
+    "name": "getEmail",
+    "outputDefinition": {
+      "output": { },
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": { },
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The ID of the message to retrieve.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Message ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "id",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "SIMPLE",
+      "description": "The format to return the message in.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "format",
+      "options": [ {
+        "description": "Returns email message's from, to, subject, body and attachments.",
+        "label": "Simple",
+        "value": "SIMPLE"
+      }, {
+        "description": "Returns all properties of the email message.",
+        "label": "Full",
+        "value": "FULL"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "suspendPerform": null,
+    "title": "Get Email",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
     "description": "Gets a list of events in specified calendar.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#get-events"
+    },
     "metadata": null,
     "name": "getEvents",
     "outputDefinition": {
@@ -1294,7 +1382,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the calendar to retrieve events from.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1379,8 +1467,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Get free time slots from the Microsoft Outlook 365 calendar.",
-    "help": null,
+    "description": "Gets the free time slots from the specified calendar.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#get-free-time-slots"
+    },
     "metadata": null,
     "name": "getFreeTimeSlots",
     "outputDefinition": {
@@ -1549,7 +1640,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the calendar to retrieve free time slots from.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1634,84 +1725,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Get a specific message",
-    "help": null,
-    "metadata": null,
-    "name": "getMail",
-    "outputDefinition": {
-      "output": { },
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
-    },
-    "perform": { },
-    "processErrorResponse": { },
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "Id of the message.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Message Id",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "id",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": "SIMPLE",
-      "description": "The format to return the message in.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Format",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "format",
-      "options": [ {
-        "description": "Returns email message's from, to, subject, body and attachments.",
-        "label": "Simple",
-        "value": "SIMPLE"
-      }, {
-        "description": "Returns all properties of the email message.",
-        "label": "Full",
-        "value": "FULL"
-      } ],
-      "optionsDataSource": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "resumePerform": null,
-    "suspendPerform": null,
-    "title": "Get Mail",
-    "workflowNodeDescription": null
-  }, {
-    "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
-    "deprecated": null,
     "description": "Moves a email to another folder within the user's mailbox. ",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#move-email"
+    },
     "metadata": null,
     "name": "moveEmail",
     "outputDefinition": {
@@ -1726,7 +1744,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "ID of the message to move.",
+      "description": "The ID of the message to move.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1781,8 +1799,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Creates a new reply to email.",
-    "help": null,
+    "description": "Sends a reply to an email message.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#reply-to-email"
+    },
     "metadata": null,
     "name": "replyToEmail",
     "outputDefinition": null,
@@ -1792,7 +1813,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Id of the message to reply to.",
+      "description": "The ID of the message to reply to.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2099,8 +2120,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Get the messages in the signed-in user's mailbox",
-    "help": null,
+    "description": "Lists the email messages in the signed-in user's mailbox.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#search-email"
+    },
     "metadata": null,
     "name": "searchEmail",
     "outputDefinition": {
@@ -2144,7 +2168,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The address sending the mail",
+      "description": "The email address sending the mail.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2165,7 +2189,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The address receiving the new mail",
+      "description": "The email address receiving the new mail.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2186,7 +2210,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Words in the subject line",
+      "description": "Words in the subject line.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2207,7 +2231,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Messages in a certain category",
+      "description": "Messages in a certain category.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2238,8 +2262,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Send the message.",
-    "help": null,
+    "description": "Sends a new email message from the signed-in user's mailbox.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#send-email"
+    },
     "metadata": null,
     "name": "sendEmail",
     "outputDefinition": null,
@@ -2654,7 +2681,7 @@
   } ],
   "clusterElements": [ {
     "name": "createEvent",
-    "description": "Creates an event in the specified calendar.",
+    "description": "Creates a new event in the specified calendar.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -3128,7 +3155,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the calendar to create the event in.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -3173,7 +3200,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": false,
-      "description": null,
+      "description": "Is the event all day?",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -3367,7 +3394,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the calendar to delete the event from.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -3391,7 +3418,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Id of the event to delete.",
+      "description": "ID of the event to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -3413,6 +3440,81 @@
       "type": "STRING"
     } ],
     "title": "Delete Event",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "getEmail",
+    "description": "Gets the specified email message.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": { },
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The ID of the message to retrieve.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Message ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "id",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "SIMPLE",
+      "description": "The format to return the message in.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "format",
+      "options": [ {
+        "description": "Returns email message's from, to, subject, body and attachments.",
+        "label": "Simple",
+        "value": "SIMPLE"
+      }, {
+        "description": "Returns all properties of the email message.",
+        "label": "Full",
+        "value": "FULL"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Get Email",
     "type": {
       "name": "TOOLS",
       "key": "tools",
@@ -3939,7 +4041,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the calendar to retrieve events from.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4025,7 +4127,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "getFreeTimeSlots",
-    "description": "Get free time slots from the Microsoft Outlook 365 calendar.",
+    "description": "Gets the free time slots from the specified calendar.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -4193,7 +4295,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the calendar to retrieve free time slots from.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4278,81 +4380,6 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "getMail",
-    "description": "Get a specific message",
-    "element": { },
-    "help": null,
-    "outputDefinition": {
-      "output": { },
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
-    },
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "Id of the message.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Message Id",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "id",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": "SIMPLE",
-      "description": "The format to return the message in.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Format",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "format",
-      "options": [ {
-        "description": "Returns email message's from, to, subject, body and attachments.",
-        "label": "Simple",
-        "value": "SIMPLE"
-      }, {
-        "description": "Returns all properties of the email message.",
-        "label": "Full",
-        "value": "FULL"
-      } ],
-      "optionsDataSource": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "title": "Get Mail",
-    "type": {
-      "name": "TOOLS",
-      "key": "tools",
-      "label": "Tools",
-      "multipleElements": true,
-      "required": false
-    },
-    "workflowNodeDescription": null
-  }, {
     "name": "moveEmail",
     "description": "Moves a email to another folder within the user's mailbox. ",
     "element": { },
@@ -4368,7 +4395,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "ID of the message to move.",
+      "description": "The ID of the message to move.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4424,7 +4451,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "replyToEmail",
-    "description": "Creates a new reply to email.",
+    "description": "Sends a reply to an email message.",
     "element": { },
     "help": null,
     "outputDefinition": null,
@@ -4433,7 +4460,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Id of the message to reply to.",
+      "description": "The ID of the message to reply to.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4741,7 +4768,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "searchEmail",
-    "description": "Get the messages in the signed-in user's mailbox",
+    "description": "Lists the email messages in the signed-in user's mailbox.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -4784,7 +4811,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The address sending the mail",
+      "description": "The email address sending the mail.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4805,7 +4832,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The address receiving the new mail",
+      "description": "The email address receiving the new mail.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4826,7 +4853,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Words in the subject line",
+      "description": "Words in the subject line.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4847,7 +4874,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Messages in a certain category",
+      "description": "Messages in a certain category.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4879,7 +4906,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "sendEmail",
-    "description": "Send the message.",
+    "description": "Sends a new email message from the signed-in user's mailbox.",
     "element": { },
     "help": null,
     "outputDefinition": null,
@@ -5401,7 +5428,10 @@
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://learn.microsoft.com/en-us/graph/api/resources/mail-api-overview?view=graph-rest-1.0"
+  },
   "description": "Microsoft Outlook 365 is a comprehensive email and productivity platform that integrates email, calendar, contacts, and tasks to streamline communication and organization.",
   "icon": "path:assets/microsoft-outlook-365.svg",
   "metadata": null,
@@ -5413,9 +5443,12 @@
     "batch": null,
     "deduplicate": null,
     "deprecated": null,
-    "description": "Triggers when new mail is received.",
+    "description": "Triggers when new email is received.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#new-email"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newEmail",
