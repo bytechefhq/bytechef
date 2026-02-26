@@ -87,12 +87,11 @@ const ProjectDeployments = () => {
     return (
         <LayoutContainer
             header={
-                projectDeployments &&
-                projectDeployments?.length > 0 && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    right={
+                        projectDeployments && projectDeployments.length > 0 ? (
                             <div className="flex items-center gap-4">
                                 <EnvironmentSelect />
 
@@ -105,10 +104,18 @@ const ProjectDeployments = () => {
                                     triggerNode={<Button label="New Deployment" />}
                                 />
                             </div>
-                        }
-                        title={<ProjectDeploymentFilterTitle filterData={filterData} projects={projects} tags={tags} />}
-                    />
-                )
+                        ) : (
+                            <EnvironmentSelect />
+                        )
+                    }
+                    title={
+                        projectDeployments && projectDeployments.length > 0 ? (
+                            <ProjectDeploymentFilterTitle filterData={filterData} projects={projects} tags={tags} />
+                        ) : (
+                            ''
+                        )
+                    }
+                />
             }
             leftSidebarBody={
                 <>

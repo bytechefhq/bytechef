@@ -75,11 +75,11 @@ const McpServers = () => {
     return (
         <LayoutContainer
             header={
-                validMcpServers.length > 0 && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    right={
+                        validMcpServers.length > 0 ? (
                             <div className="flex items-center gap-4">
                                 <EnvironmentSelect />
 
@@ -88,10 +88,14 @@ const McpServers = () => {
                                     triggerNode={<Button label="New MCP Server" />}
                                 />
                             </div>
-                        }
-                        title={<McpServersFilterTitle filterData={filterData} tags={tags} />}
-                    />
-                )
+                        ) : (
+                            <EnvironmentSelect />
+                        )
+                    }
+                    title={
+                        validMcpServers.length > 0 ? <McpServersFilterTitle filterData={filterData} tags={tags} /> : ''
+                    }
+                />
             }
             leftSidebarBody={<McpServersLeftSidebarNav />}
             leftSidebarHeader={<Header position="sidebar" title="MCP Servers" />}

@@ -296,19 +296,20 @@ export const WorkflowExecutions = () => {
                 )
             }
             header={
-                workflowExecutionPage?.content &&
-                workflowExecutionPage.content.length > 0 && (
-                    <Header
-                        centerTitle
-                        position="main"
-                        right={<EnvironmentSelect />}
-                        title={
+                <Header
+                    centerTitle
+                    position="main"
+                    right={<EnvironmentSelect />}
+                    title={
+                        workflowExecutionPage?.content && workflowExecutionPage.content.length > 0 ? (
                             <WorkflowExecutionsFilterTitle
                                 filterData={{environment: currentEnvironmentId, status: filterStatus}}
                             />
-                        }
-                    />
-                )
+                        ) : (
+                            ''
+                        )
+                    }
+                />
             }
             leftSidebarBody={
                 <div className="space-y-4 px-4">
