@@ -4,10 +4,10 @@ import Button from '@/components/Button/Button';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import {Form, FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
-import {toast} from '@/hooks/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
 import * as React from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import * as z from 'zod';
 
 const formSchema = z.object({
@@ -28,13 +28,12 @@ const IntegrationPortalConfigurationOverviewForm = () => {
     });
 
     function handleSubmit(data: z.infer<typeof formSchema>) {
-        toast({
+        toast('You submitted the following values:', {
             description: (
                 <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
                     <code className="text-white">{JSON.stringify(data, null, 4)}</code>
                 </pre>
             ),
-            title: 'You submitted the following values:',
         });
     }
 

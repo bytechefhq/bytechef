@@ -1,11 +1,11 @@
 import Button from '@/components/Button/Button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {useToast} from '@/hooks/use-toast';
 import {usePasswordStore} from '@/pages/account/settings/stores/usePasswordStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -22,8 +22,6 @@ const AccountProfilePassword = () => {
             updateSuccess: state.updateSuccess,
         }))
     );
-
-    const {toast} = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -47,10 +45,8 @@ const AccountProfilePassword = () => {
 
     useEffect(() => {
         if (updateSuccess) {
-            toast({description: 'Password has been changed.'});
+            toast('Password has been changed.');
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [updateSuccess]);
 
     return (

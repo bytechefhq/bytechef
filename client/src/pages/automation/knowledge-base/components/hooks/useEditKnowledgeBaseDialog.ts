@@ -1,7 +1,7 @@
-import {useToast} from '@/hooks/use-toast';
 import {KnowledgeBase, useUpdateKnowledgeBaseMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
+import {toast} from 'sonner';
 
 interface UseEditKnowledgeBaseDialogProps {
     knowledgeBase: KnowledgeBase;
@@ -22,17 +22,16 @@ export default function useEditKnowledgeBaseDialog({
     const open = isControlled ? controlledOpen : internalOpen;
 
     const queryClient = useQueryClient();
-    const {toast} = useToast();
 
     const updateMutation = useUpdateKnowledgeBaseMutation({
         onError: () => {
-            toast({description: 'Failed to save settings. Please try again.', variant: 'destructive'});
+            toast.error('Failed to save settings. Please try again.');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBase.id}]});
             queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
 
-            toast({description: 'Settings saved successfully.'});
+            toast('Settings saved successfully.');
 
             handleOpenChange(false);
         },

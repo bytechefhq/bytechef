@@ -1,7 +1,7 @@
-import {useToast} from '@/hooks/use-toast';
 import {useDeleteKnowledgeBaseMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
+import {toast} from 'sonner';
 
 interface UseKnowledgeBaseDeleteAlertDialogProps {
     knowledgeBaseId: string;
@@ -12,18 +12,17 @@ export default function useKnowledgeBaseDeleteAlertDialog({
     knowledgeBaseId,
     onClose,
 }: UseKnowledgeBaseDeleteAlertDialogProps) {
-    const {toast} = useToast();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const deleteKnowledgeBaseMutation = useDeleteKnowledgeBaseMutation({
         onError: () => {
-            toast({description: 'Failed to delete knowledge base.', variant: 'destructive'});
+            toast.error('Failed to delete knowledge base.');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
 
-            toast({description: 'Knowledge base deleted successfully.'});
+            toast('Knowledge base deleted successfully.');
 
             navigate('/automation/knowledge-bases');
         },

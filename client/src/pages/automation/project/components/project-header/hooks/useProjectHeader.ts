@@ -1,4 +1,3 @@
-import {useToast} from '@/hooks/use-toast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -19,6 +18,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useCallback, useEffect, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
+import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
 const workflowTestApi = new WorkflowTestApi();
@@ -63,8 +63,6 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
-    const {toast} = useToast();
-
     const {data: project} = useGetProjectQuery(projectId, useLoaderData() as Project);
 
     const {data: projectWorkflows} = useGetProjectWorkflowsQuery(projectId, !!projectId);
@@ -108,9 +106,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
                 queryKey: ProjectKeys.filteredProjects({id: currentWorkspaceId!}),
             });
 
-            toast({
-                description: 'The project has been published.',
-            });
+            toast('The project has been published.');
         },
     });
 

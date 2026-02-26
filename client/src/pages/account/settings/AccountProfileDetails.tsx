@@ -1,12 +1,12 @@
 import Button from '@/components/Button/Button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {useToast} from '@/hooks/use-toast';
 import {useAccountStore} from '@/pages/account/settings/stores/useAccountStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -30,8 +30,6 @@ const AccountProfileDetails = () => {
             getAccount: state.getAccount,
         }))
     );
-
-    const {toast} = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -61,7 +59,7 @@ const AccountProfileDetails = () => {
 
     useEffect(() => {
         if (updateSuccess) {
-            toast({description: 'Account has been updated.'});
+            toast('Account has been updated.');
 
             getAccount();
         }

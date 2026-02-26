@@ -2,7 +2,6 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useToast} from '@/hooks/use-toast';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
 import {getPageUrl} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/pageUrl-utils';
@@ -17,6 +16,7 @@ import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, FormIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
 import {MouseEvent, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
 
 const projectDeploymentApi = new ProjectDeploymentApi();
@@ -53,7 +53,6 @@ const ProjectDeploymentWorkflowListItem = ({
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
     const navigate = useNavigate();
-    const {toast} = useToast();
     const queryClient = useQueryClient();
 
     const formTrigger =
@@ -90,11 +89,7 @@ const ProjectDeploymentWorkflowListItem = ({
                 id: projectDeploymentId,
                 workflowId: workflow.id!,
             })
-            .then(() =>
-                toast({
-                    description: 'Workflow request sent.',
-                })
-            );
+            .then(() => toast('Workflow request sent.'));
     };
 
     interface HandleEnableProjectDeploymentWorkflowProps {

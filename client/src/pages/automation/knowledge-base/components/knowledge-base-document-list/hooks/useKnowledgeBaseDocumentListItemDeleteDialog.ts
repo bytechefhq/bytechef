@@ -1,7 +1,7 @@
-import {useToast} from '@/hooks/use-toast';
 import {useKnowledgeBaseDocumentDeleteDialogStore} from '@/pages/automation/knowledge-base/stores/useKnowledgeBaseDocumentDeleteDialogStore';
 import {useDeleteKnowledgeBaseDocumentMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
+import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
 interface UseKnowledgeBaseDocumentListItemDeleteDialogProps {
@@ -18,19 +18,17 @@ export default function useKnowledgeBaseDocumentListItemDeleteDialog({
             setDocumentId: state.setDocumentId,
         }))
     );
-
-    const {toast} = useToast();
     const queryClient = useQueryClient();
 
     const deleteMutation = useDeleteKnowledgeBaseDocumentMutation({
         onError: () => {
-            toast({description: 'Failed to delete document. Please try again.', variant: 'destructive'});
+            toast.error('Failed to delete document. Please try again.');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBaseId}]});
             queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
 
-            toast({description: 'Document deleted successfully.'});
+            toast('Document deleted successfully.');
 
             clearDialog();
         },

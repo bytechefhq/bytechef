@@ -16,7 +16,6 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {useToast} from '@/hooks/use-toast';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -45,6 +44,7 @@ import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, RocketIcon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
 
 import ComponentSelectionInput from './ComponentSelectionInput';
@@ -106,8 +106,6 @@ const ConnectionDialog = ({
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentType = usePlatformTypeStore((state) => state.currentType);
-
-    const {toast} = useToast();
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -178,10 +176,7 @@ const ConnectionDialog = ({
             });
 
             if (!connection?.id) {
-                toast({
-                    description: `${getValues().name} connection was successfully created`,
-                    title: 'Connection created',
-                });
+                toast('Connection created', {description: `${getValues().name} connection was successfully created`});
 
                 if (connectionId && onConnectionCreate) {
                     onConnectionCreate(connectionId);

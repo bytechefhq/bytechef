@@ -1,7 +1,7 @@
-import {toast} from '@/hooks/use-toast';
 import {HttpMethod} from '@/shared/middleware/graphql';
 import {useCallback, useEffect, useState} from 'react';
 import {UseFormReturn, useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import {v4 as uuidv4} from 'uuid';
 import {parse as yamlParse, stringify as yamlStringify} from 'yaml';
 
@@ -162,10 +162,8 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
             const parsed = yamlParse(yaml);
 
             if (!parsed.paths) {
-                toast({
+                toast.error('Invalid OpenAPI structure', {
                     description: 'The YAML must contain a "paths" section with endpoint definitions.',
-                    title: 'Invalid OpenAPI structure',
-                    variant: 'destructive',
                 });
 
                 return null;
@@ -174,10 +172,8 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
             const pathEntries = Object.entries(parsed.paths);
 
             if (pathEntries.length === 0) {
-                toast({
+                toast.error('No endpoints found', {
                     description: 'The "paths" section is empty. Add at least one endpoint path.',
-                    title: 'No endpoints found',
-                    variant: 'destructive',
                 });
 
                 return null;
@@ -187,10 +183,8 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
             const methodEntries = Object.entries(methods as Record<string, Record<string, unknown>>);
 
             if (methodEntries.length === 0) {
-                toast({
+                toast.error('No methods found', {
                     description: `The path "${path}" has no HTTP methods defined. Add at least one method (get, post, etc.).`,
-                    title: 'No methods found',
-                    variant: 'destructive',
                 });
 
                 return null;
@@ -281,10 +275,8 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
         } catch (error) {
             console.error('Failed to parse YAML in EndpointForm.parseYamlData:', error);
 
-            toast({
+            toast.error('Invalid YAML', {
                 description: 'Unable to parse the YAML. Please check that your YAML syntax is valid.',
-                title: 'Invalid YAML',
-                variant: 'destructive',
             });
 
             return null;
@@ -322,21 +314,17 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
                 try {
                     parsed = yamlParse(yamlValue);
                 } catch {
-                    toast({
+                    toast.error('Invalid YAML', {
                         description:
                             'Fix the YAML syntax errors before switching to form view, or your changes may be lost.',
-                        title: 'Invalid YAML',
-                        variant: 'destructive',
                     });
 
                     return;
                 }
 
                 if (!parsed.paths) {
-                    toast({
+                    toast.error('Invalid OpenAPI structure', {
                         description: 'The YAML must contain a "paths" section to switch to form view.',
-                        title: 'Invalid OpenAPI structure',
-                        variant: 'destructive',
                     });
 
                     return;

@@ -1,6 +1,6 @@
-import {toast} from '@/hooks/use-toast';
 import {ApiConnectorEndpoint} from '@/shared/middleware/graphql';
 import {useCallback, useMemo} from 'react';
+import {toast} from 'sonner';
 import {parse as yamlParse, stringify as yamlStringify} from 'yaml';
 
 import {useEndpointDetailPanelStore} from '../../stores/useEndpointDetailPanelStore';
@@ -61,10 +61,8 @@ export default function useApiConnectorEndpointDetailPanel(): UseApiConnectorEnd
         } catch (error) {
             console.error('Failed to parse YAML specification when extracting endpoint spec:', error);
 
-            toast({
+            toast.error('Failed to parse specification', {
                 description: 'Could not extract endpoint details. Showing full specification instead.',
-                title: 'Failed to parse specification',
-                variant: 'destructive',
             });
 
             return specification;

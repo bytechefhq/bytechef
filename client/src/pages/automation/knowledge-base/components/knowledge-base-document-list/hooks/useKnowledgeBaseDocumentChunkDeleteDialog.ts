@@ -1,9 +1,9 @@
-import {useToast} from '@/hooks/use-toast';
 import {useKnowledgeBaseDocumentChunkDeleteDialogStore} from '@/pages/automation/knowledge-base/stores/useKnowledgeBaseDocumentChunkDeleteDialogStore';
 import {useKnowledgeBaseDocumentChunkSelectionStore} from '@/pages/automation/knowledge-base/stores/useKnowledgeBaseDocumentChunkSelectionStore';
 import {useDeleteKnowledgeBaseDocumentChunkMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
+import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
 interface UseKnowledgeBaseDocumentChunkDeleteDialogProps {
@@ -29,8 +29,6 @@ export default function useKnowledgeBaseDocumentChunkDeleteDialog({
             selectedChunks: state.selectedChunks,
         }))
     );
-
-    const {toast} = useToast();
     const queryClient = useQueryClient();
 
     const deleteMutation = useDeleteKnowledgeBaseDocumentChunkMutation({
@@ -71,16 +69,11 @@ export default function useKnowledgeBaseDocumentChunkDeleteDialog({
             const successCount = results.filter((result) => result.status === 'fulfilled').length;
 
             if (failedCount > 0) {
-                toast({
-                    description: `Failed to delete ${failedCount} chunk${failedCount > 1 ? 's' : ''}. Please try again.`,
-                    variant: 'destructive',
-                });
+                toast.error(`Failed to delete ${failedCount} chunk${failedCount > 1 ? 's' : ''}. Please try again.`);
             }
 
             if (successCount > 0) {
-                toast({
-                    description: `${successCount} chunk${successCount > 1 ? 's' : ''} deleted successfully.`,
-                });
+                toast(`${successCount} chunk${successCount > 1 ? 's' : ''} deleted successfully.`);
             }
         } finally {
             setIsDeleting(false);

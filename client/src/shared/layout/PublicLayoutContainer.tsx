@@ -1,5 +1,5 @@
 import reactLogo from '@/assets/logo.svg';
-import {Toaster} from '@/components/ui/toaster';
+import {Toaster} from '@/components/ui/sonner';
 import {PropsWithChildren} from 'react';
 
 const PublicLayoutContainer = ({children}: PropsWithChildren) => {

@@ -3,9 +3,9 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Switch} from '@/components/ui/switch';
-import {toast} from '@/hooks/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import * as z from 'zod';
 
 const formSchema = z.object({
@@ -22,13 +22,12 @@ export function IntegrationPortalConfigurationSettingForm() {
     });
 
     function handleSubmit(data: z.infer<typeof formSchema>) {
-        toast({
+        toast('You submitted the following values:', {
             description: (
                 <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
                     <code className="text-white">{JSON.stringify(data, null, 4)}</code>
                 </pre>
             ),
-            title: 'You submitted the following values:',
         });
     }
 

@@ -1,4 +1,3 @@
-import {useToast} from '@/hooks/use-toast';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useSaveClusterElementTestOutputMutation} from '@/shared/middleware/graphql';
 import {TriggerType} from '@/shared/middleware/platform/configuration';
@@ -18,6 +17,7 @@ import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {useCallback, useEffect, useRef, useState} from 'react';
+import {toast} from 'sonner';
 
 interface UseOutputTabProps {
     clusterElementType?: string;
@@ -41,8 +41,6 @@ export default function useOutputTab({
     const [webhookTestUrl, setWebhookTestUrl] = useState<string | undefined>(undefined);
 
     const isClusterElement = !!clusterElementType && !!parentWorkflowNodeName;
-
-    const {toast} = useToast();
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -112,7 +110,7 @@ export default function useOutputTab({
 
     const saveClusterElementTestOutputMutation = useSaveClusterElementTestOutputMutation({
         onError: () => {
-            toast({description: 'Failed to test cluster element. Please try again.', variant: 'destructive'});
+            toast.error('Failed to test cluster element. Please try again.');
         },
         onSuccess: invalidateNodeOutputs,
     });

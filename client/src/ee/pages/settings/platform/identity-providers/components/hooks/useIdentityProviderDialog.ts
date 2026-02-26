@@ -1,5 +1,4 @@
 import {useIdentityProviderDialogStore} from '@/ee/pages/settings/platform/identity-providers/stores/useIdentityProviderDialogStore';
-import {useToast} from '@/hooks/use-toast';
 import {
     IdentityProviderInput,
     IdentityProviderType,
@@ -8,6 +7,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
+import {toast} from 'sonner';
 
 interface UseIdentityProviderDialogI {
     clientId: string;
@@ -77,11 +77,10 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
     const [mfaMethod, setMfaMethod] = useState('TOTP');
 
     const queryClient = useQueryClient();
-    const {toast} = useToast();
 
     const createMutation = useCreateIdentityProviderMutation({
         onError: () => {
-            toast({description: 'Failed to create identity provider. Please try again.', variant: 'destructive'});
+            toast.error('Failed to create identity provider. Please try again.');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['identityProviders']});
@@ -91,7 +90,7 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
 
     const updateMutation = useUpdateIdentityProviderMutation({
         onError: () => {
-            toast({description: 'Failed to update identity provider. Please try again.', variant: 'destructive'});
+            toast.error('Failed to update identity provider. Please try again.');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['identityProviders']});
