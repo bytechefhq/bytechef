@@ -18,26 +18,44 @@ interface ClusterElementsCanvasDialogActionsI {
 
 type ClusterElementsCanvasDialogStoreType = ClusterElementsCanvasDialogActionsI & ClusterElementsCanvasDialogStateI;
 
+const initialState: ClusterElementsCanvasDialogStateI = {
+    copilotPanelOpen: false,
+    editorPreferences: {},
+    showAiAgentEditor: false,
+    testingPanelOpen: false,
+};
+
 export const useClusterElementsCanvasDialogStore = create<ClusterElementsCanvasDialogStoreType>()(
     devtools(
         persist(
             (set, get) => ({
-                copilotPanelOpen: false,
-                editorPreferences: {},
+                ...initialState,
+
                 reset: () =>
-                    set({
-                        copilotPanelOpen: false,
+                    set(() => ({
+                        ...initialState,
                         editorPreferences: get().editorPreferences,
-                        showAiAgentEditor: false,
-                        testingPanelOpen: false,
-                    }),
-                setCopilotPanelOpen: (open) => set({copilotPanelOpen: open}),
+                    })),
+
+                setCopilotPanelOpen: (open) =>
+                    set(() => ({
+                        copilotPanelOpen: open,
+                    })),
+
                 setEditorPreference: (agentNodeName, showAiAgent) =>
-                    set({editorPreferences: {...get().editorPreferences, [agentNodeName]: showAiAgent}}),
-                setShowAiAgentEditor: (show) => set({showAiAgentEditor: show}),
-                setTestingPanelOpen: (open) => set({testingPanelOpen: open}),
-                showAiAgentEditor: false,
-                testingPanelOpen: false,
+                    set(() => ({
+                        editorPreferences: {...get().editorPreferences, [agentNodeName]: showAiAgent},
+                    })),
+
+                setShowAiAgentEditor: (show) =>
+                    set(() => ({
+                        showAiAgentEditor: show,
+                    })),
+
+                setTestingPanelOpen: (open) =>
+                    set(() => ({
+                        testingPanelOpen: open,
+                    })),
             }),
             {
                 name: 'bytechef.cluster-elements-canvas-dialog-store',
