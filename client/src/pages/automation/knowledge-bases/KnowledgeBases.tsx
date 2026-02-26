@@ -7,6 +7,7 @@ import KnowledgeBasesLeftSidebarNav from '@/pages/automation/knowledge-bases/com
 import useKnowledgeBases from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBases';
 import KnowledgeBaseList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {DatabaseIcon} from 'lucide-react';
@@ -25,10 +26,14 @@ const KnowledgeBases = () => {
                         centerTitle={true}
                         position="main"
                         right={
-                            <CreateKnowledgeBaseDialog
-                                trigger={<Button>New Knowledge Base</Button>}
-                                workspaceId={currentWorkspaceId}
-                            />
+                            <div className="flex items-center gap-4">
+                                <EnvironmentSelect />
+
+                                <CreateKnowledgeBaseDialog
+                                    trigger={<Button>New Knowledge Base</Button>}
+                                    workspaceId={currentWorkspaceId}
+                                />
+                            </div>
                         }
                         title={
                             <KnowledgeBasesFilterTitle
