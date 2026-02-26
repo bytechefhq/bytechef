@@ -97,10 +97,11 @@ describe('DataTablesLeftSidebarNav', () => {
             });
         });
 
-        it('should not render anything when no tags exist', () => {
-            const {container} = renderWithRouter();
+        it('should show empty message when no tags exist', () => {
+            renderWithRouter();
 
-            expect(container).toBeEmptyDOMElement();
+            expect(screen.getByText('Tags')).toBeInTheDocument();
+            expect(screen.getByText('No defined tags.')).toBeInTheDocument();
         });
     });
 
