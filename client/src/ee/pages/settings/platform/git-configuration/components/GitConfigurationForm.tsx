@@ -4,12 +4,12 @@ import {Input} from '@/components/ui/input';
 import {GitConfiguration} from '@/ee/shared/middleware/platform/configuration';
 import {useUpdateWorkspaceGitConfigurationMutation} from '@/ee/shared/mutations/platform/gitConfiguration.mutations';
 import {GitConfigurationKeys} from '@/ee/shared/queries/platform/gitConfiguration.queries';
-import {useToast} from '@/hooks/use-toast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import {z} from 'zod';
 
 const formSchema = z.object({
@@ -36,8 +36,6 @@ const GitConfigurationForm = ({gitConfiguration}: {gitConfiguration?: GitConfigu
         resolver: zodResolver(formSchema),
     });
 
-    const {toast} = useToast();
-
     const queryClient = useQueryClient();
 
     const updateGitConfigurationMutation = useUpdateWorkspaceGitConfigurationMutation({
@@ -46,7 +44,7 @@ const GitConfigurationForm = ({gitConfiguration}: {gitConfiguration?: GitConfigu
                 queryKey: GitConfigurationKeys.gitConfiguration,
             });
 
-            toast({description: 'Git configuration has been updated.'});
+            toast('Git configuration has been updated.');
         },
     });
 

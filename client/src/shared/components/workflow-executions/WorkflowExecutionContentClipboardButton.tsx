@@ -1,9 +1,9 @@
 import Button from '@/components/Button/Button';
-import {useToast} from '@/hooks/use-toast';
 import {SPACE} from '@/shared/constants';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {CheckIcon, ClipboardCopyIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
+import {toast} from 'sonner';
 const RESET_DELAY = 2000;
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
@@ -11,7 +11,6 @@ const WorkflowExecutionContentClipboardButton = ({value}: {value: any}) => {
     const [lastCopiedValue, setLastCopiedValue] = useState<string | null>(null);
 
     const [, copyToClipboard] = useCopyToClipboard();
-    const {toast} = useToast();
 
     const valueToCopy = typeof value === 'object' ? JSON.stringify(value, null, SPACE) : value;
     const isCurrentlyCopied = lastCopiedValue === valueToCopy;
@@ -22,20 +21,13 @@ const WorkflowExecutionContentClipboardButton = ({value}: {value: any}) => {
 
             setLastCopiedValue(valueToCopy);
         } catch {
-            toast({
-                description: 'Failed to copy to clipboard. Please try again.',
-                title: 'Copy failed',
-                variant: 'destructive',
-            });
+            toast.error('Copy failed', {description: 'Failed to copy to clipboard. Please try again.'});
         }
     };
 
     useEffect(() => {
         if (lastCopiedValue !== null) {
-            toast({
-                description: 'The value has been copied to your clipboard.',
-                title: 'Copied to clipboard',
-            });
+            toast('Copied to clipboard', {description: 'The value has been copied to your clipboard.'});
 
             const timer = setTimeout(() => {
                 setLastCopiedValue(null);
@@ -43,7 +35,7 @@ const WorkflowExecutionContentClipboardButton = ({value}: {value: any}) => {
 
             return () => clearTimeout(timer);
         }
-    }, [lastCopiedValue, toast]);
+    }, [lastCopiedValue]);
 
     return (
         value &&

@@ -1,6 +1,5 @@
 import {usePublishConnectedUserProjectWorkflowMutation} from '@/ee/shared/mutations/embedded/connectedUserProjectWorkflows.mutations';
 import {ConnectedUserProjectWorkflowKeys} from '@/ee/shared/queries/embedded/connectedUserProjectWorkflows.queries';
-import {useToast} from '@/hooks/use-toast';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -15,6 +14,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useCallback, useEffect, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
+import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
 const workflowTestApi = new WorkflowTestApi();
@@ -58,8 +58,6 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
     const {workflowUuid} = useParams();
     const [searchParams] = useSearchParams();
 
-    const {toast} = useToast();
-
     const queryClient = useQueryClient();
 
     const publishConnectedUserProjectWorkflowMutation = usePublishConnectedUserProjectWorkflowMutation({
@@ -72,9 +70,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
                 });
             }
 
-            toast({
-                description: 'The workflow has been published.',
-            });
+            toast('The workflow has been published.');
         },
     });
 

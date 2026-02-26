@@ -1,6 +1,6 @@
-import {useToast} from '@/hooks/use-toast';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {useCallback, useEffect, useState} from 'react';
+import {toast} from 'sonner';
 
 interface MfaSetupResponseI {
     qrCodeDataUrl: string;
@@ -22,8 +22,6 @@ export function useAccountProfileMfa() {
     const [secret, setSecret] = useState('');
     const [verifyCode, setVerifyCode] = useState('');
 
-    const {toast} = useToast();
-
     const fetchMfaStatus = useCallback(async () => {
         try {
             const response = await fetch('/api/account/mfa/status');
@@ -33,12 +31,12 @@ export function useAccountProfileMfa() {
 
                 setMfaState(data.totpEnabled ? 'enabled' : 'disabled');
             } else {
-                toast({description: 'Failed to load MFA status.', variant: 'destructive'});
+                toast.error('Failed to load MFA status.');
             }
         } catch {
-            toast({description: 'Failed to load MFA status.', variant: 'destructive'});
+            toast.error('Failed to load MFA status.');
         }
-    }, [toast]);
+    }, []);
 
     const handleSetup = async () => {
         setLoading(true);
@@ -56,10 +54,10 @@ export function useAccountProfileMfa() {
                 setSecret(data.secret);
                 setMfaState('setup');
             } else {
-                toast({description: 'Failed to start MFA setup.', variant: 'destructive'});
+                toast.error('Failed to start MFA setup.');
             }
         } catch {
-            toast({description: 'Failed to start MFA setup.', variant: 'destructive'});
+            toast.error('Failed to start MFA setup.');
         } finally {
             setLoading(false);
         }
@@ -79,17 +77,17 @@ export function useAccountProfileMfa() {
             });
 
             if (response.ok) {
-                toast({description: 'Two-factor authentication has been enabled.'});
+                toast('Two-factor authentication has been enabled.');
 
                 setVerifyCode('');
                 setQrCodeDataUrl('');
                 setSecret('');
                 setMfaState('enabled');
             } else {
-                toast({description: 'Invalid verification code. Please try again.', variant: 'destructive'});
+                toast.error('Invalid verification code. Please try again.');
             }
         } catch {
-            toast({description: 'Failed to enable two-factor authentication.', variant: 'destructive'});
+            toast.error('Failed to enable two-factor authentication.');
         } finally {
             setLoading(false);
         }
@@ -109,16 +107,16 @@ export function useAccountProfileMfa() {
             });
 
             if (response.ok) {
-                toast({description: 'Two-factor authentication has been disabled.'});
+                toast('Two-factor authentication has been disabled.');
 
                 setDisableCode('');
                 setDisablePassword('');
                 setMfaState('disabled');
             } else {
-                toast({description: 'Failed to disable 2FA. Check your password and code.', variant: 'destructive'});
+                toast.error('Failed to disable 2FA. Check your password and code.');
             }
         } catch {
-            toast({description: 'Failed to disable two-factor authentication.', variant: 'destructive'});
+            toast.error('Failed to disable two-factor authentication.');
         } finally {
             setLoading(false);
         }

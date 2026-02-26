@@ -1,16 +1,14 @@
-import {useToast} from '@/hooks/use-toast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import fetchIntercept from 'fetch-intercept';
 import {useEffect, useRef} from 'react';
+import {toast} from 'sonner';
 
 export default function useFetchInterceptor() {
     const clearAuthentication = useAuthenticationStore((state) => state.clearAuthentication);
     const clearCurrentEnvironmentId = useEnvironmentStore((state) => state.clearCurrentEnvironmentId);
     const clearCurrentWorkspaceId = useWorkspaceStore((state) => state.clearCurrentWorkspaceId);
-
-    const {toast} = useToast();
 
     const apiBasePath = import.meta.env.VITE_API_BASE_PATH;
 
@@ -19,7 +17,6 @@ export default function useFetchInterceptor() {
         clearAuthentication,
         clearCurrentEnvironmentId,
         clearCurrentWorkspaceId,
-        toast,
     };
     const callbacksRef = useRef(latestCallbacks);
 
@@ -54,8 +51,7 @@ export default function useFetchInterceptor() {
 
             /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
             response: function (response: any) {
-                const {clearAuthentication, clearCurrentEnvironmentId, clearCurrentWorkspaceId, toast} =
-                    callbacksRef.current;
+                const {clearAuthentication, clearCurrentEnvironmentId, clearCurrentWorkspaceId} = callbacksRef.current;
 
                 if (response.status === 403 || response.status === 401) {
                     clearAuthentication();

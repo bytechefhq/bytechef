@@ -1,6 +1,6 @@
-import {toast} from '@/hooks/use-toast';
 import {HttpMethod} from '@/shared/middleware/graphql';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {toast} from 'sonner';
 import {parse as yamlParse, stringify as yamlStringify} from 'yaml';
 
 import {useApiConnectorWizardStore} from '../../../stores/useApiConnectorWizardStore';
@@ -171,11 +171,9 @@ export default function useApiConnectorWizardReviewStep({
             if (!specParseErrorShownRef.current) {
                 specParseErrorShownRef.current = true;
 
-                toast({
+                toast.error('Failed to parse specification', {
                     description:
                         'The specification could not be parsed. Please check that it is valid YAML/OpenAPI format.',
-                    title: 'Failed to parse specification',
-                    variant: 'destructive',
                 });
             }
 

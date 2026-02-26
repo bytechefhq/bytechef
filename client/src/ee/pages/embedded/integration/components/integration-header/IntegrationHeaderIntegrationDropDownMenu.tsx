@@ -9,11 +9,11 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useCreateIntegrationWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
-import {useToast} from '@/hooks/use-toast';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useQueryClient} from '@tanstack/react-query';
 import {SettingsIcon} from 'lucide-react';
 import {ChangeEvent, useRef} from 'react';
+import {toast} from 'sonner';
 
 const IntegrationHeaderIntegrationDropDownMenu = ({
     integrationId,
@@ -28,8 +28,6 @@ const IntegrationHeaderIntegrationDropDownMenu = ({
 
     const {captureIntegrationWorkflowImported} = useAnalytics();
 
-    const {toast} = useToast();
-
     const queryClient = useQueryClient();
 
     const importIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
@@ -42,9 +40,7 @@ const IntegrationHeaderIntegrationDropDownMenu = ({
                 hiddenFileInputRef.current.value = '';
             }
 
-            toast({
-                description: 'Workflow is imported.',
-            });
+            toast('Workflow is imported.');
         },
     });
 

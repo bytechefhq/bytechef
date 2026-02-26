@@ -13,12 +13,12 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import useApiKeys from '@/ee/shared/components/api-keys/hooks/useApiKeys';
 import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
-import {useToast} from '@/hooks/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -49,7 +49,6 @@ const ApiKeyDialog = ({triggerNode}: ApiKeyDialogProps) => {
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
-    const {toast} = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -116,7 +115,7 @@ const ApiKeyDialog = ({triggerNode}: ApiKeyDialogProps) => {
 
                                             copyToClipboard(secretKey);
 
-                                            toast({description: 'The secret API key is copied.'});
+                                            toast('The secret API key is copied.');
                                         }}
                                     >
                                         <ClipboardIcon className="h-4" /> Copy

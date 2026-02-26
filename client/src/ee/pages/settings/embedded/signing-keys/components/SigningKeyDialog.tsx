@@ -18,13 +18,13 @@ import {
     useUpdateSigningKeyMutation,
 } from '@/ee/shared/mutations/embedded/signingKeys.mutations';
 import {SigningKeyKeys} from '@/ee/shared/queries/embedded/signingKeys.queries';
-import {useToast} from '@/hooks/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import {z} from 'zod';
 
 const formSchema = z.object({
@@ -45,7 +45,6 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
-    const {toast} = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -144,7 +143,7 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
                                             onClick={() => {
                                                 copyToClipboard(privateKey);
 
-                                                toast({description: 'The Signing Key is copied.'});
+                                                toast('The Signing Key is copied.');
                                             }}
                                         >
                                             <ClipboardIcon className="h-4" /> Copy

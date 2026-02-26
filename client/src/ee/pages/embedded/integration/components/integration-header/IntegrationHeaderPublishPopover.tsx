@@ -7,13 +7,13 @@ import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/ee/shared/mutations/embedded/integrations.mutations';
 import {IntegrationVersionKeys} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
-import {useToast} from '@/hooks/use-toast';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {CircleDotIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import * as z from 'zod';
 
 const formSchema = z.object({
@@ -24,8 +24,6 @@ const IntegrationHeaderPublishPopover = ({integration}: {integration: Integratio
     const [open, setOpen] = useState(false);
 
     const {captureIntegrationPublished} = useAnalytics();
-
-    const {toast} = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -51,9 +49,7 @@ const IntegrationHeaderPublishPopover = ({integration}: {integration: Integratio
                 queryKey: IntegrationVersionKeys.integrationIntegrationVersions(integration.id!),
             });
 
-            toast({
-                description: 'The integration has been published.',
-            });
+            toast('The integration has been published.');
 
             reset({description: undefined});
 

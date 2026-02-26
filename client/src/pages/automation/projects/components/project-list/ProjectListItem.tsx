@@ -27,7 +27,6 @@ import {
     useUpdateProjectGitConfigurationMutation,
 } from '@/ee/shared/mutations/automation/projectGit.mutations';
 import {ProjectGitConfigurationKeys} from '@/ee/shared/mutations/automation/projectGit.queries';
-import {useToast} from '@/hooks/use-toast';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
@@ -64,6 +63,7 @@ import {
 } from 'lucide-react';
 import {MouseEvent, useCallback, useRef, useState} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
+import {toast} from 'sonner';
 
 import TagList from '../../../../../shared/components/TagList';
 import ProjectDialog from '../ProjectDialog';
@@ -90,7 +90,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const {toast} = useToast();
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
     const ff_1041 = useFeatureFlagsStore()('ff-1041');
@@ -125,17 +124,12 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
         onError: () => {
-            toast({
-                description: 'Project duplication failed.',
-                variant: 'destructive',
-            });
+            toast.error('Project duplication failed.');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            toast({
-                description: 'Project duplicated successfully.',
-            });
+            toast('Project duplicated successfully.');
         },
     });
 
@@ -150,9 +144,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 hiddenFileInputRef.current.value = '';
             }
 
-            toast({
-                description: 'Workflow is imported.',
-            });
+            toast('Workflow is imported.');
         },
     });
 
@@ -160,7 +152,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            toast({description: 'Project pulled from git repository successfully.'});
+            toast('Project pulled from git repository successfully.');
         },
     });
 
