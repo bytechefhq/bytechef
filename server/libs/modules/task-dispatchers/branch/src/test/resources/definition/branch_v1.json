@@ -6,7 +6,7 @@
   "outputDefinition": null,
   "properties": [ {
     "advancedOption": null,
-    "controlType": "TEXT",
+    "controlType": "FORMULA_MODE",
     "defaultValue": null,
     "description": "Defines expression upon which evaluation the proper branch continues execution.",
     "displayCondition": null,
