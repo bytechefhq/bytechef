@@ -71,7 +71,7 @@ type UsePropertyReturnType = {
     defaultValue: string;
     description?: string;
     displayCondition?: string;
-    editorRef: RefObject<Editor>;
+    editorRef: RefObject<Editor | null>;
     errorMessage: string;
     formattedOptions: Array<Option> | undefined;
     handleCodeEditorChange: (value?: string) => void;
@@ -85,7 +85,7 @@ type UsePropertyReturnType = {
     handleSelectChange: (value: string, name: string) => void;
     hasError: boolean;
     hidden: boolean | undefined;
-    inputRef: RefObject<HTMLInputElement>;
+    inputRef: RefObject<HTMLInputElement | null>;
     inputValue: string;
     isDisplayConditionsPending: boolean;
     isFetchingCurrentDisplayCondition: boolean;

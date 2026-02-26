@@ -8,7 +8,7 @@ interface UseIconFieldProps<T extends FieldValues, K extends FieldPath<T>> {
 
 interface UseIconFieldI {
     handleUploadedFile: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
-    hiddenInputRef: React.RefObject<HTMLInputElement>;
+    hiddenInputRef: React.RefObject<HTMLInputElement | null>;
     onUpload: () => void;
     preview: string | undefined;
     uploadButtonLabel: string;
