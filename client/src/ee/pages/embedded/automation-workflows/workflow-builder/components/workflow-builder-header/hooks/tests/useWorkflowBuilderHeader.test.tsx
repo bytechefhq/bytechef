@@ -81,7 +81,7 @@ vi.mock('@/pages/platform/workflow-editor/stores/useDataPillPanelStore', () => {
 vi.mock('@/shared/hooks/useAnalytics', () => ({useAnalytics: () => hoisted.analyticsSpies}));
 
 // Toast (unused in these tests but required)
-vi.mock('@/hooks/use-toast', () => ({useToast: () => ({toast: vi.fn()})}));
+vi.mock('sonner', () => ({toast: vi.fn()}));
 
 // React Router hooks used inside the hook
 vi.mock('react-router-dom', () => ({

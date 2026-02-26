@@ -11,10 +11,8 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock('@/hooks/use-toast', () => ({
-    useToast: vi.fn(() => ({
-        toast: hoisted.toast,
-    })),
+vi.mock('sonner', () => ({
+    toast: hoisted.toast,
 }));
 
 vi.mock('@tanstack/react-query', () => ({

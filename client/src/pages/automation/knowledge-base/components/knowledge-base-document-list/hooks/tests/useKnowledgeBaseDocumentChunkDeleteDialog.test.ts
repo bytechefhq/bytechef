@@ -20,10 +20,8 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock('@/hooks/use-toast', () => ({
-    useToast: vi.fn(() => ({
-        toast: hoisted.toast,
-    })),
+vi.mock('sonner', () => ({
+    toast: hoisted.toast,
 }));
 
 vi.mock('@/pages/automation/knowledge-base/stores/useKnowledgeBaseDocumentChunkDeleteDialogStore', () => ({
@@ -166,9 +164,7 @@ describe('useKnowledgeBaseDocumentChunkDeleteDialog', () => {
                 await result.current.handleConfirm();
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({
-                description: '1 chunk deleted successfully.',
-            });
+            expect(hoisted.toast).toHaveBeenCalledWith('1 chunk deleted successfully.');
         });
 
         it('clears dialog after confirmation', async () => {

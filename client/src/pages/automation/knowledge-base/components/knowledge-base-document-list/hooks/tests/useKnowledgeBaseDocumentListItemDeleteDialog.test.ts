@@ -16,10 +16,8 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock('@/hooks/use-toast', () => ({
-    useToast: vi.fn(() => ({
-        toast: hoisted.toast,
-    })),
+vi.mock('sonner', () => ({
+    toast: hoisted.toast,
 }));
 
 vi.mock('@/pages/automation/knowledge-base/stores/useKnowledgeBaseDocumentDeleteDialogStore', () => ({
@@ -120,9 +118,7 @@ describe('useKnowledgeBaseDocumentListItemDeleteDialog', () => {
                 result.current.handleConfirm();
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({
-                description: 'Document deleted successfully.',
-            });
+            expect(hoisted.toast).toHaveBeenCalledWith('Document deleted successfully.');
         });
 
         it('invalidates queries after deletion', () => {

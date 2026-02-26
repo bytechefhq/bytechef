@@ -18,10 +18,8 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock('@/hooks/use-toast', () => ({
-    useToast: vi.fn(() => ({
-        toast: hoisted.toast,
-    })),
+vi.mock('sonner', () => ({
+    toast: hoisted.toast,
 }));
 
 vi.mock('@/pages/automation/knowledge-base/stores/useKnowledgeBaseDocumentChunkEditDialogStore', () => ({
@@ -157,9 +155,7 @@ describe('useKnowledgeBaseDocumentChunkEditDialog', () => {
                 result.current.handleSave();
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({
-                description: 'Chunk updated successfully.',
-            });
+            expect(hoisted.toast).toHaveBeenCalledWith('Chunk updated successfully.');
         });
 
         it('invalidates queries and clears dialog on success', () => {
