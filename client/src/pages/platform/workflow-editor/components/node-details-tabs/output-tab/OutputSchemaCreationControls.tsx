@@ -1,26 +1,38 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {ReactNode} from 'react';
+import ClusterElementTestButton from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/ClusterElementTestButton';
+import {NodeDataType, PropertyAllType} from '@/shared/types';
 
 interface OutputSchemaCreationControlsProps {
+    connectionMissing?: boolean;
+    currentNode?: NodeDataType;
+    currentOperationProperties?: PropertyAllType[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handleClusterElementTestSubmit?: (inputParameters: Record<string, any>, onSuccess?: () => void) => void;
     handleTestOperationClick: () => void;
     outputDefined?: boolean;
+    saveClusterElementTestOutputMutationPending?: boolean;
     saveWorkflowNodeTestOutputMutationPending: boolean;
     setShowUploadDialog: (show: boolean) => void;
+    showClusterElementTestButton?: boolean;
     showUploadSampleOutputButton?: boolean;
-    testActionButton?: ReactNode;
     trigger?: boolean;
     uploadSampleOutputRequestMutationPending: boolean;
     variablePropertiesDefined?: boolean;
 }
 
 const OutputSchemaCreationControls = ({
+    connectionMissing,
+    currentNode,
+    currentOperationProperties,
+    handleClusterElementTestSubmit,
     handleTestOperationClick,
     outputDefined,
+    saveClusterElementTestOutputMutationPending,
     saveWorkflowNodeTestOutputMutationPending,
     setShowUploadDialog,
+    showClusterElementTestButton,
     showUploadSampleOutputButton = false,
-    testActionButton,
     trigger = false,
     uploadSampleOutputRequestMutationPending,
     variablePropertiesDefined = false,
@@ -50,7 +62,18 @@ const OutputSchemaCreationControls = ({
             <div className="flex flex-col gap-4">
                 {!variablePropertiesDefined && (
                     <div className="flex w-full flex-col gap-3">
-                        {testActionButton || (
+                        {showClusterElementTestButton &&
+                        currentNode &&
+                        currentOperationProperties &&
+                        handleClusterElementTestSubmit ? (
+                            <ClusterElementTestButton
+                                connectionMissing={!!connectionMissing}
+                                currentNode={currentNode}
+                                onSubmit={handleClusterElementTestSubmit}
+                                properties={currentOperationProperties}
+                                saving={!!saveClusterElementTestOutputMutationPending}
+                            />
+                        ) : (
                             <Button
                                 disabled={saveWorkflowNodeTestOutputMutationPending}
                                 label={`Test ${trigger ? 'Trigger' : 'Action'}`}

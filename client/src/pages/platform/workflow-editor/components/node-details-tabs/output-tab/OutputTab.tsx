@@ -4,7 +4,6 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Input} from '@/components/ui/input';
-import ClusterElementTestPropertiesPopover from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/ClusterElementTestPropertiesPopover';
 import OutputSchemaCreationControls from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaCreationControls';
 import OutputSchemaDisplay from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaDisplay';
 import OutputTabSampleDataDialog from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabSampleDataDialog';
@@ -56,9 +55,7 @@ const OutputTab = ({
         saveWorkflowNodeTestOutputMutation,
         saveWorkflowNodeTestOutputMutationPending,
         setShowUploadDialog,
-        setTestPropertiesPopoverOpen,
         showUploadDialog,
-        testPropertiesPopoverOpen,
         testing,
         uploadSampleOutputRequestMutationPending,
         webhookTestCancelEnabled,
@@ -71,22 +68,6 @@ const OutputTab = ({
         parentWorkflowNodeName,
         workflowId,
     });
-
-    const clusterElementTestButton = hasClusterElementProperties ? (
-        <ClusterElementTestPropertiesPopover
-            currentNode={currentNode}
-            onOpenChange={setTestPropertiesPopoverOpen}
-            onSubmit={handleClusterElementTestSubmit}
-            open={testPropertiesPopoverOpen}
-            properties={currentOperationProperties!}
-        >
-            <Button
-                disabled={connectionMissing || saveClusterElementTestOutputMutationPending}
-                label="Test Action"
-                variant="outline"
-            />
-        </ClusterElementTestPropertiesPopover>
-    ) : undefined;
 
     if (!testing && workflowNodeOutputIsFetching) {
         return <></>;
@@ -106,26 +87,34 @@ const OutputTab = ({
                             copiedValue={copiedValue}
                             copyToClipboard={copyToClipboard}
                             currentNode={currentNode}
+                            currentOperationProperties={currentOperationProperties}
+                            handleClusterElementTestSubmit={handleClusterElementTestSubmit}
                             handlePredefinedOutputSchemaClick={handlePredefinedOutputSchemaClick}
                             handleTestOperationClick={handleTestOperationClick}
                             isClusterElement={!!clusterElementType}
                             outputSchema={outputSchema}
                             sampleOutput={sampleOutput}
+                            saveClusterElementTestOutputMutationPending={saveClusterElementTestOutputMutationPending}
                             saveWorkflowNodeTestOutputMutation={saveWorkflowNodeTestOutputMutation}
                             setShowUploadDialog={setShowUploadDialog}
-                            testActionButton={clusterElementTestButton}
+                            showClusterElementTestButton={hasClusterElementProperties}
                             variablePropertiesDefined={variablePropertiesDefined}
                         />
                     )}
 
                     {!outputSchema && (
                         <OutputSchemaCreationControls
+                            connectionMissing={connectionMissing}
+                            currentNode={currentNode}
+                            currentOperationProperties={currentOperationProperties}
+                            handleClusterElementTestSubmit={handleClusterElementTestSubmit}
                             handleTestOperationClick={handleTestOperationClick}
                             outputDefined={outputDefined}
+                            saveClusterElementTestOutputMutationPending={saveClusterElementTestOutputMutationPending}
                             saveWorkflowNodeTestOutputMutationPending={saveWorkflowNodeTestOutputMutationPending}
                             setShowUploadDialog={setShowUploadDialog}
+                            showClusterElementTestButton={hasClusterElementProperties}
                             showUploadSampleOutputButton={outputDefined}
-                            testActionButton={clusterElementTestButton}
                             trigger={currentNode.trigger}
                             uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutationPending}
                             variablePropertiesDefined={variablePropertiesDefined}

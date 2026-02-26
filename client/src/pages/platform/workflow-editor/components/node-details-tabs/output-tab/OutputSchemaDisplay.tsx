@@ -9,23 +9,28 @@ import {
 } from '@/components/ui/dropdown-menu';
 import PropertyField from '@/pages/platform/workflow-editor/components/PropertyField';
 import SchemaProperties from '@/pages/platform/workflow-editor/components/SchemaProperties';
-import {PropertyAllType} from '@/shared/types';
+import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {MoreHorizontalIcon} from 'lucide-react';
-import {ReactNode} from 'react';
+
+import ClusterElementTestButton from './ClusterElementTestButton';
 
 interface OutputSchemaDisplayProps {
     connectionMissing: boolean;
     copiedValue: string | null;
     copyToClipboard: (value: string) => Promise<void>;
-    currentNode: {name: string; trigger?: boolean; action?: boolean};
+    currentNode: NodeDataType;
+    currentOperationProperties?: PropertyAllType[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handleClusterElementTestSubmit?: (inputParameters: Record<string, any>, onSuccess?: () => void) => void;
     handlePredefinedOutputSchemaClick: () => void;
     handleTestOperationClick: () => void;
     isClusterElement?: boolean;
     outputSchema: PropertyAllType;
     sampleOutput?: object;
+    saveClusterElementTestOutputMutationPending?: boolean;
     saveWorkflowNodeTestOutputMutation: {isPending: boolean};
     setShowUploadDialog: (show: boolean) => void;
-    testActionButton?: ReactNode;
+    showClusterElementTestButton?: boolean;
     variablePropertiesDefined?: boolean;
 }
 
@@ -34,14 +39,17 @@ const OutputSchemaDisplay = ({
     copiedValue = null,
     copyToClipboard,
     currentNode,
+    currentOperationProperties,
+    handleClusterElementTestSubmit,
     handlePredefinedOutputSchemaClick,
     handleTestOperationClick,
     isClusterElement,
     outputSchema,
     sampleOutput,
+    saveClusterElementTestOutputMutationPending,
     saveWorkflowNodeTestOutputMutation,
     setShowUploadDialog,
-    testActionButton,
+    showClusterElementTestButton,
     variablePropertiesDefined,
 }: OutputSchemaDisplayProps) => {
     const hasProperties = Boolean(outputSchema && 'properties' in outputSchema && outputSchema.properties);
@@ -54,7 +62,17 @@ const OutputSchemaDisplay = ({
 
                 <ButtonGroup>
                     {!variablePropertiesDefined &&
-                        (testActionButton || (
+                        (showClusterElementTestButton &&
+                        currentOperationProperties &&
+                        handleClusterElementTestSubmit ? (
+                            <ClusterElementTestButton
+                                connectionMissing={connectionMissing}
+                                currentNode={currentNode}
+                                onSubmit={handleClusterElementTestSubmit}
+                                properties={currentOperationProperties}
+                                saving={!!saveClusterElementTestOutputMutationPending}
+                            />
+                        ) : (
                             <Button
                                 disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
                                 label={`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
