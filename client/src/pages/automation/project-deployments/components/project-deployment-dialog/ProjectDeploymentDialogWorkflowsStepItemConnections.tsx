@@ -47,19 +47,19 @@ const ProjectDeploymentDialogWorkflowsStepItemConnections = ({
         );
     }
 
-    const groupMap = new Map<string, ComponentConnectionWithIndexType[]>();
+    const connectionGroupMap = new Map<string, ComponentConnectionWithIndexType[]>();
 
     for (const [index, connection] of componentConnections.entries()) {
-        const key = connection.componentName;
+        const componentName = connection.componentName;
 
-        if (!groupMap.has(key)) {
-            groupMap.set(key, []);
+        if (!connectionGroupMap.has(componentName)) {
+            connectionGroupMap.set(componentName, []);
         }
 
-        groupMap.get(key)!.push({connection, originalIndex: index});
+        connectionGroupMap.get(componentName)!.push({connection, originalIndex: index});
     }
 
-    const connectionGroups = Array.from(groupMap.values());
+    const connectionGroups = Array.from(connectionGroupMap.values());
 
     return (
         <ul className="space-y-4">

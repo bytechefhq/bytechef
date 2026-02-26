@@ -18,7 +18,6 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
-    ComponentConnection,
     ProjectDeployment,
     ProjectDeploymentWorkflow,
     ProjectDeploymentWorkflowConnection,
@@ -42,6 +41,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import ProjectDeploymentDialogBasicStep from './ProjectDeploymentDialogBasicStep';
 import ProjectDeploymentDialogWorkflowsStep from './ProjectDeploymentDialogWorkflowsStep';
+import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
 
 interface ProjectDeploymentDialogProps {
     onClose?: () => void;
@@ -100,13 +100,7 @@ const ProjectDeploymentDialog = ({
             return false;
         }
 
-        const hasTaskConnections = (workflow?.tasks ?? []).some((task) => (task.connections?.length ?? 0) > 0);
-
-        const hasTriggerConnections = (workflow?.triggers ?? []).some(
-            (trigger) => (trigger.connections?.length ?? 0) > 0
-        );
-
-        return hasTaskConnections || hasTriggerConnections;
+        return getWorkflowComponentConnections(workflow).length > 0;
     });
 
     const queryClient = useQueryClient();
@@ -247,10 +241,7 @@ const ProjectDeploymentDialog = ({
 
             setWorkflowEnabled(workflow.id!, !!(projectDeploymentWorkflow && projectDeploymentWorkflow.enabled));
 
-            const componentConnections: ComponentConnection[] = [
-                ...(workflow?.tasks ?? []).flatMap((task) => task.connections ?? []),
-                ...(workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []),
-            ];
+            const componentConnections = getWorkflowComponentConnections(workflow);
 
             const newProjectDeploymentWorkflowConnections: ProjectDeploymentWorkflowConnection[] =
                 componentConnections.map((componentConnection) => {
