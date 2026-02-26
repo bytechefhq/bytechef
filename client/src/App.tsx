@@ -39,13 +39,6 @@ import {useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
-const user = {
-    email: 'emily.selman@example.com',
-    imageUrl:
-        'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    name: 'Emily Selman',
-};
-
 type NavigationType = {
     name: string;
     href: string;
@@ -311,7 +304,6 @@ function App() {
                 mobileMenuOpen={mobileMenuOpen}
                 navigation={navigation}
                 setMobileMenuOpen={setMobileMenuOpen}
-                user={user}
             />
 
             <DesktopSidebar navigation={navigation} />
