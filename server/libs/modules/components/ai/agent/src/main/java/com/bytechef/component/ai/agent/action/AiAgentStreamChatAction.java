@@ -93,9 +93,9 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
         ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
             context.log(log -> log.info(
-                "Tool execution: {} | Reasoning: {} | Confidence: {} | Inputs: {} | Output: {}",
+                "Tool execution: {} | Reasoning: {} | Confidence: {} | Inputs: {}",
                 toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
-                toolExecutionEvent.inputs(), toolExecutionEvent.output()));
+                toolExecutionEvent.inputs()));
 
             Map<String, Object> eventData = new LinkedHashMap<>();
 
