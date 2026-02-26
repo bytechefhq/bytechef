@@ -61,6 +61,8 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
+                const toastId = `${response.url}-${response.status}`;
+
                 if (response.status < 200 || response.status > 299) {
                     const clonedResponse = response.clone();
 
@@ -71,17 +73,10 @@ export default function useFetchInterceptor() {
                                 return;
                             }
 
-                            toast({
-                                description: data.detail,
-                                title: data.title,
-                                variant: 'destructive',
-                            });
+                            toast.error(data.title, {description: data.detail, id: toastId});
                         })
                         .catch(() => {
-                            toast({
-                                description: `Request failed with status ${response.status}`,
-                                variant: 'destructive',
-                            });
+                            toast.error(`Request failed with status ${response.status}`, {id: toastId});
                         });
                 }
 
