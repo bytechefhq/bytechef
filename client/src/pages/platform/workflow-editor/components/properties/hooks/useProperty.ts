@@ -335,11 +335,11 @@ export const useProperty = ({
         (value: string | number): boolean => {
             const stringValue = typeof value === 'string' ? value : String(value);
 
-            if (typeof value === 'string' && (value.startsWith('=') || value.startsWith('${'))) {
+            if (typeof value === 'string' && (value.startsWith('=') || value.includes('${'))) {
                 return true;
             }
 
-            if ((type === 'INTEGER' || type === 'NUMBER') && typeof value === 'string' && !value.startsWith('${')) {
+            if ((type === 'INTEGER' || type === 'NUMBER') && typeof value === 'string' && !value.includes('${')) {
                 const numericValue = parseFloat(value);
 
                 if (minValue != null && numericValue < minValue) {
