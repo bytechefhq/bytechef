@@ -73,18 +73,6 @@ public class ToolFacadeImpl implements ToolFacade {
     }
 
     @Override
-    public List<ToolDTO> getTools() {
-        return clusterElementDefinitionService.getClusterElementDefinitions(BaseToolFunction.TOOLS)
-            .stream()
-            .map(clusterElementDefinition -> new ToolDTO(
-                getToolName(
-                    clusterElementDefinition.getComponentName(), clusterElementDefinition.getName()),
-                clusterElementDefinition.getDescription(),
-                JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties())))
-            .toList();
-    }
-
-    @Override
     public Map<String, List<ToolDTO>> getTools(
         String externalUserId, List<String> categoryNames, List<String> componentNames,
         List<String> clusterElementNames, Environment environment) {
