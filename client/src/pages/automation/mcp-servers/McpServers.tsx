@@ -3,6 +3,7 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -79,7 +80,14 @@ const McpServers = () => {
                         centerTitle={true}
                         position="main"
                         right={
-                            <McpServerDialog mcpServer={undefined} triggerNode={<Button label="New MCP Server" />} />
+                            <div className="flex items-center gap-4">
+                                <EnvironmentSelect />
+
+                                <McpServerDialog
+                                    mcpServer={undefined}
+                                    triggerNode={<Button label="New MCP Server" />}
+                                />
+                            </div>
                         }
                         title={<McpServersFilterTitle filterData={filterData} tags={tags} />}
                     />

@@ -6,6 +6,7 @@ import DataTableList from '@/pages/automation/datatables/components/DataTableLis
 import DataTablesFilterTitle from '@/pages/automation/datatables/components/DataTablesFilterTitle';
 import DataTablesLeftSidebarNav from '@/pages/automation/datatables/components/DataTablesLeftSidebarNav';
 import useDataTables from '@/pages/automation/datatables/components/hooks/useDataTables';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Table2Icon} from 'lucide-react';
@@ -20,7 +21,13 @@ const DataTables = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        right={<CreateDataTableDialog trigger={<Button>New Table</Button>} />}
+                        right={
+                            <div className="flex items-center gap-4">
+                                <EnvironmentSelect />
+
+                                <CreateDataTableDialog trigger={<Button>New Table</Button>} />
+                            </div>
+                        }
                         title={<DataTablesFilterTitle allTags={allTags} tagsByTableData={tagsByTableData} />}
                     />
                 )

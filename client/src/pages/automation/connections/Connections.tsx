@@ -3,6 +3,7 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import ConnectionsFilterTitle from '@/pages/automation/connections/components/ConnectionsFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -78,19 +79,23 @@ export const Connections = () => {
                         centerTitle={true}
                         position="main"
                         right={
-                            <ConnectionDialog
-                                componentDefinitions={componentDefinitions}
-                                connection={
-                                    {
-                                        environmentId: currentEnvironmentId,
-                                    } as Connection
-                                }
-                                connectionTagsQueryKey={ConnectionKeys.connectionTags}
-                                connectionsQueryKey={ConnectionKeys.connections}
-                                triggerNode={<Button label="New Connection" />}
-                                useCreateConnectionMutation={useCreateConnectionMutation}
-                                useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                            />
+                            <div className="flex items-center gap-4">
+                                <EnvironmentSelect />
+
+                                <ConnectionDialog
+                                    componentDefinitions={componentDefinitions}
+                                    connection={
+                                        {
+                                            environmentId: currentEnvironmentId,
+                                        } as Connection
+                                    }
+                                    connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                                    connectionsQueryKey={ConnectionKeys.connections}
+                                    triggerNode={<Button label="New Connection" />}
+                                    useCreateConnectionMutation={useCreateConnectionMutation}
+                                    useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                                />
+                            </div>
                         }
                         title={
                             <ConnectionsFilterTitle

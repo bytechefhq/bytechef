@@ -1,5 +1,6 @@
 import WorkflowChatSidebar from '@/pages/automation/workflow-chat/components/WorkflowChatSidebar';
 import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEffect} from 'react';
@@ -19,6 +20,7 @@ const WorkflowChatContainer = () => {
     return (
         <LayoutContainer
             className="bg-surface-main"
+            header={<Header centerTitle position="main" right={<EnvironmentSelect />} title="Workflow Chat" />}
             leftSidebarBody={<WorkflowChatSidebar />}
             leftSidebarHeader={<Header position="sidebar" title="Workflow Chat" />}
             leftSidebarWidth="72"

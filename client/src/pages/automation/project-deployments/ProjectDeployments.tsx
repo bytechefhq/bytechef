@@ -4,6 +4,7 @@ import PageLoader from '@/components/PageLoader';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -92,14 +93,18 @@ const ProjectDeployments = () => {
                         centerTitle={true}
                         position="main"
                         right={
-                            <ProjectDeploymentDialog
-                                projectDeployment={
-                                    {
-                                        environmentId: currentEnvironmentId,
-                                    } as ProjectDeployment
-                                }
-                                triggerNode={<Button label="New Deployment" />}
-                            />
+                            <div className="flex items-center gap-4">
+                                <EnvironmentSelect />
+
+                                <ProjectDeploymentDialog
+                                    projectDeployment={
+                                        {
+                                            environmentId: currentEnvironmentId,
+                                        } as ProjectDeployment
+                                    }
+                                    triggerNode={<Button label="New Deployment" />}
+                                />
+                            </div>
                         }
                         title={<ProjectDeploymentFilterTitle filterData={filterData} projects={projects} tags={tags} />}
                     />

@@ -6,6 +6,7 @@ import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowExecutionsFilterTitle from '@/pages/automation/workflow-executions/components/WorkflowExecutionsFilterTitle';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -300,6 +301,7 @@ export const WorkflowExecutions = () => {
                     <Header
                         centerTitle
                         position="main"
+                        right={<EnvironmentSelect />}
                         title={
                             <WorkflowExecutionsFilterTitle
                                 filterData={{environment: currentEnvironmentId, status: filterStatus}}
