@@ -212,7 +212,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "baseId", "tableId", "recordId" ]
+        "propertiesLookupDependsOn": [ "baseId", "tableId" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -772,7 +772,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "baseId", "tableId", "recordId" ]
+        "propertiesLookupDependsOn": [ "baseId", "tableId" ]
       },
       "expressionEnabled": null,
       "header": null,
