@@ -12,10 +12,8 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock('@/hooks/use-toast', () => ({
-    useToast: vi.fn(() => ({
-        toast: hoisted.toast,
-    })),
+vi.mock('sonner', () => ({
+    toast: hoisted.toast,
 }));
 
 vi.mock('react-router-dom', () => ({
@@ -122,7 +120,7 @@ describe('useKnowledgeBaseDeleteAlertDialog', () => {
                 result.current.handleDeleteClick();
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({description: 'Knowledge base deleted successfully.'});
+            expect(hoisted.toast).toHaveBeenCalledWith('Knowledge base deleted successfully.');
         });
 
         it('navigates to knowledge bases list after delete', () => {

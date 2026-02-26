@@ -13,15 +13,15 @@ const hoisted = vi.hoisted(() => {
             request: (url: string, config: Record<string, unknown>) => unknown;
             response: (response: Record<string, unknown>) => unknown;
         } | null,
-        toast: vi.fn(),
+        toastError: vi.fn(),
         unregister: vi.fn(),
     };
 });
 
-vi.mock('@/hooks/use-toast', () => ({
-    useToast: vi.fn(() => ({
-        toast: hoisted.toast,
-    })),
+vi.mock('sonner', () => ({
+    toast: {
+        error: hoisted.toastError,
+    },
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
@@ -200,10 +200,9 @@ describe('useFetchInterceptor', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({
+            expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Something went wrong',
-                title: 'Error',
-                variant: 'destructive',
+                id: 'http://localhost/internal/api/test-500',
             });
         });
 
@@ -221,7 +220,7 @@ describe('useFetchInterceptor', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).not.toHaveBeenCalled();
+            expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
         it('shows fallback error toast when response body is not JSON', async () => {
@@ -238,9 +237,8 @@ describe('useFetchInterceptor', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({
-                description: 'Request failed with status 502',
-                variant: 'destructive',
+            expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 502', {
+                id: 'http://localhost/internal/api/test-502',
             });
         });
     });
@@ -261,10 +259,9 @@ describe('useFetchInterceptor', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({
+            expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Field not found\nPermission denied',
-                title: 'GraphQL Error',
-                variant: 'destructive',
+                id: 'http://localhost/graphql-200',
             });
         });
 
@@ -283,7 +280,7 @@ describe('useFetchInterceptor', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).not.toHaveBeenCalled();
+            expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
         it('does not check GraphQL errors for non-graphql URLs', async () => {
@@ -301,7 +298,7 @@ describe('useFetchInterceptor', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).not.toHaveBeenCalled();
+            expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
         it('handles GraphQL errors with undefined or missing message properties', async () => {
@@ -319,10 +316,9 @@ describe('useFetchInterceptor', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({
-                description: 'Unknown error\nUnknown error\nValid error',
-                title: 'GraphQL Error',
-                variant: 'destructive',
+            expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
+                description: 'Unknown error\nValid error',
+                id: 'http://localhost/graphql-200',
             });
         });
 
@@ -341,9 +337,8 @@ describe('useFetchInterceptor', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({
-                description: 'Request failed with status 500',
-                variant: 'destructive',
+            expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 500', {
+                id: 'http://localhost/graphql-500',
             });
         });
 
@@ -362,7 +357,7 @@ describe('useFetchInterceptor', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).not.toHaveBeenCalled();
+            expect(hoisted.toastError).not.toHaveBeenCalled();
         });
     });
 });
