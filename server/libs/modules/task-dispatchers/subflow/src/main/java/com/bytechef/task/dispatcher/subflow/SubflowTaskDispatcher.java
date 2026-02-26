@@ -31,8 +31,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalCreator;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -51,15 +50,15 @@ import java.util.Objects;
  */
 public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final ChildJobPrincipalCreator childJobPrincipalCreator;
+    private final ChildJobPrincipalFactory childJobPrincipalFactory;
     private final JobService jobService;
     private final SubflowResolver subflowResolver;
 
     @SuppressFBWarnings("EI")
     public SubflowTaskDispatcher(
-        ChildJobPrincipalCreator childJobPrincipalCreator, JobService jobService, SubflowResolver subflowResolver) {
+        ChildJobPrincipalFactory childJobPrincipalFactory, JobService jobService, SubflowResolver subflowResolver) {
 
-        this.childJobPrincipalCreator = childJobPrincipalCreator;
+        this.childJobPrincipalFactory = childJobPrincipalFactory;
         this.jobService = jobService;
         this.subflowResolver = subflowResolver;
     }
@@ -90,11 +89,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         JobParametersDTO jobParametersDTO = new JobParametersDTO(
             workflowId, taskExecution.getId(), inputs, null, null, List.of(), childMetadata);
 
-        PlatformType platformType = MapUtils.get(
-            taskExecution.getMetadata(), MetadataConstants.TYPE, PlatformType.class);
-
-        childJobPrincipalCreator.createChildJob(
-            Objects.requireNonNull(job.getId()), jobParametersDTO, platformType);
+        childJobPrincipalFactory.createChildJob(Objects.requireNonNull(job.getId()), jobParametersDTO);
     }
 
     @Override
