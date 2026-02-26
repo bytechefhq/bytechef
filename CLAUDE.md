@@ -514,8 +514,8 @@ npm run storybook
 ### Commit Message Convention
 - Client-side changes: `<ticket_number> client - <description>`
 - Server-side changes: `<ticket_number> <description>`
-- Example client: `#2898 client - Add EnvironmentSelect dropdown to automation page headers`
-- Example server: `#2898 Add environment selection endpoint`
+- Example client: `2898 client - Add EnvironmentSelect dropdown to automation page headers`
+- Example server: `2898 Add environment selection endpoint`
 
 ### Code Quality Workflow
 - When committing, only stage files directly modified by the current task — do not include pre-existing unstaged changes that are unrelated
