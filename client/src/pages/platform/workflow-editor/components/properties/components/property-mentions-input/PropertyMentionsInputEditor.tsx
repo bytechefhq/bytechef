@@ -296,7 +296,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 !isFormulaMode &&
                 (type === 'INTEGER' || type === 'NUMBER') &&
                 typeof transformedValue === 'string' &&
-                !transformedValue.startsWith('${')
+                !transformedValue.includes('${')
             ) {
                 transformedValue = parseInt(transformedValue);
             }
