@@ -69,9 +69,9 @@ export default function useFetchInterceptor() {
                         .json()
                         .then((data: {errors?: Array<{message?: string}>}) => {
                             if (data.errors?.length) {
-                                const errorMessage = data.errors
-                                    .map((error) => error.message || 'Unknown error')
-                                    .join('\n');
+                                const errorMessage = [
+                                    ...new Set(data.errors.map((error) => error.message || 'Unknown error')),
+                                ].join('\n');
 
                                 toast.error('Error', {description: errorMessage, id: toastId});
                             } else if (response.status < 200 || response.status > 299) {
