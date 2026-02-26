@@ -1,11 +1,12 @@
 import JsonSchemaBuilder from '@/components/JsonSchemaBuilder/JsonSchemaBuilder';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {Note} from '@/components/Note';
-import {Sheet, SheetCloseButton, SheetContent, SheetDescription, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {SPACE} from '@/shared/constants';
 import {MessageCircleQuestionIcon} from 'lucide-react';
+import {VisuallyHidden} from 'radix-ui';
 import {Suspense, lazy, useCallback, useEffect, useRef, useState} from 'react';
 
 import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
@@ -48,24 +49,26 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
 
     return (
         <Sheet onOpenChange={onClose} open>
+            <VisuallyHidden.Root>
+                <SheetTitle>{title ? `${title} Builder` : 'JSON Schema Builder'}</SheetTitle>
+            </VisuallyHidden.Root>
+
             <SheetContent
-                className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg"
+                className="absolute bottom-4 right-4 top-3 flex h-auto w-11/12 flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-screen-lg"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
                 <Tabs className="flex size-full flex-col" defaultValue="designer" onValueChange={handleTabChange}>
-                    <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
+                    <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
                         <div className="flex flex-col">
-                            <SheetTitle>{title ? `${title} Builder` : 'JSON Schema Builder'}</SheetTitle>
+                            <span className="text-lg font-semibold">
+                                {title ? `${title} Builder` : 'JSON Schema Builder'}
+                            </span>
 
-                            <SheetDescription>{`Define desired structure for the ${title}.`}</SheetDescription>
+                            <span className="text-sm text-muted-foreground">{`Define desired structure for the ${title}.`}</span>
                         </div>
 
                         <div className="flex items-center gap-1">
-                            {/*TODO Fix refresh doesn't not work properly, backend does not always return correct schema*/}
-
-                            {/*<PropertyJsonSchemaBuilderSampleDataDialog onChange={onChange} />*/}
-
                             <TabsList>
                                 <TabsTrigger value="designer">Designer</TabsTrigger>
 
@@ -74,9 +77,9 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
 
                             <SheetCloseButton />
                         </div>
-                    </SheetHeader>
+                    </header>
 
-                    <div className="flex-1 space-y-4 overflow-y-auto px-3">
+                    <div className="flex-1 space-y-4 overflow-y-auto p-3">
                         {title === 'Response Schema' && (
                             <Note
                                 content="Define how you'd like the LLM to structure its responses — essentially a template for its output."
