@@ -24,7 +24,6 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/wor
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 
 import '@/shared/styles/dropdownMenu.css';
-import {useToast} from '@/hooks/use-toast';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -42,6 +41,7 @@ import {
 import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link, useSearchParams} from 'react-router-dom';
+import {toast} from 'sonner';
 
 type TriggerDataType = {
     componentName: string;
@@ -79,8 +79,6 @@ const ProjectWorkflowListItem = ({
     const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const queryClient = useQueryClient();
-
-    const {toast} = useToast();
 
     const triggerComponentName = workflow.workflowTriggerComponentNames?.[0];
     const triggerType = workflow.triggers?.[0]?.type;
@@ -146,17 +144,12 @@ const ProjectWorkflowListItem = ({
         onError: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            toast({
-                description: 'Workflow duplication failed.',
-                variant: 'destructive',
-            });
+            toast.error('Workflow duplication failed.');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            toast({
-                description: 'Workflow duplicated successfully.',
-            });
+            toast('Workflow duplicated successfully.');
         },
     });
 

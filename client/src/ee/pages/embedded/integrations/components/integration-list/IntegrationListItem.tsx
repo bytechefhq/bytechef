@@ -31,7 +31,6 @@ import {useCreateIntegrationWorkflowMutation} from '@/ee/shared/mutations/embedd
 import {IntegrationCategoryKeys} from '@/ee/shared/queries/embedded/integrationCategories.queries';
 import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
-import {useToast} from '@/hooks/use-toast';
 import TagList from '@/shared/components/TagList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -50,6 +49,7 @@ import {
 import {ChangeEvent, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
+import {toast} from 'sonner';
 
 interface IntegrationItemProps {
     integration: Integration;
@@ -69,8 +69,6 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
     const navigate = useNavigate();
 
     const [searchParams] = useSearchParams();
-
-    const {toast} = useToast();
 
     const queryClient = useQueryClient();
 
@@ -112,9 +110,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                 hiddenFileInputRef.current.value = '';
             }
 
-            toast({
-                description: 'Workflow is imported.',
-            });
+            toast('Workflow is imported.');
         },
     });
 

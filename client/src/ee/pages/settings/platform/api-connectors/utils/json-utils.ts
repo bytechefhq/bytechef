@@ -1,4 +1,4 @@
-import {toast} from '@/hooks/use-toast';
+import {toast} from 'sonner';
 
 interface SafeJsonParseResultI {
     /** The parsed JSON data, or an empty object if parsing failed */
@@ -44,12 +44,10 @@ export const safeJsonParse = (
         console.error(`Failed to parse JSON${context ? ` for ${context}` : ''}:`, error);
 
         if (showToast) {
-            toast({
+            toast.error('Invalid JSON', {
                 description: context
                     ? `Invalid JSON in ${context}. Using empty object.`
                     : 'Invalid JSON format. Using empty object.',
-                title: 'Invalid JSON',
-                variant: 'destructive',
             });
         }
 

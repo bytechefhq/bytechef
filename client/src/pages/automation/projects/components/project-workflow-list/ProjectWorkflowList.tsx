@@ -3,7 +3,6 @@ import EmptyList from '@/components/EmptyList';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Skeleton} from '@/components/ui/skeleton';
-import {useToast} from '@/hooks/use-toast';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
@@ -21,13 +20,13 @@ import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, LayoutTemplateIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
 import {useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {toast} from 'sonner';
 
 const ProjectWorkflowList = ({project, queryEnabled}: {project: Project; queryEnabled?: boolean}) => {
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowImported} = useAnalytics();
     const navigate = useNavigate();
-    const {toast} = useToast();
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -75,9 +74,7 @@ const ProjectWorkflowList = ({project, queryEnabled}: {project: Project; queryEn
                 hiddenFileInputRef.current.value = '';
             }
 
-            toast({
-                description: 'Workflow is imported.',
-            });
+            toast('Workflow is imported.');
         },
     });
 

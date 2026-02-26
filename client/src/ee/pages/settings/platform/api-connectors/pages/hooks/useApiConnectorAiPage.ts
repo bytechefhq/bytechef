@@ -1,4 +1,3 @@
-import {toast} from '@/hooks/use-toast';
 import {
     HttpMethod,
     useCancelGenerationJobMutation,
@@ -9,6 +8,7 @@ import {
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {toast} from 'sonner';
 import {parse as yamlParse, stringify as yamlStringify} from 'yaml';
 
 import {useApiConnectorWizardStore} from '../../stores/useApiConnectorWizardStore';
@@ -185,10 +185,8 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         } catch (error) {
             console.error('Failed to parse specification for endpoint discovery:', error);
 
-            toast({
+            toast.error('Failed to parse specification', {
                 description: 'The generated specification could not be parsed. Please try again.',
-                title: 'Failed to parse specification',
-                variant: 'destructive',
             });
 
             return [];
@@ -292,11 +290,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
             }
 
             if (!isValidUrl(documentationUrl)) {
-                toast({
-                    description: 'Please enter a valid URL starting with http:// or https://',
-                    title: 'Invalid URL',
-                    variant: 'destructive',
-                });
+                toast.error('Invalid URL', {description: 'Please enter a valid URL starting with http:// or https://'});
 
                 return;
             }
@@ -323,11 +317,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         }
 
         if (selectedEndpointIds.length === 0) {
-            toast({
-                description: 'Please select at least one endpoint before saving.',
-                title: 'No endpoints selected',
-                variant: 'destructive',
-            });
+            toast.error('No endpoints selected', {description: 'Please select at least one endpoint before saving.'});
 
             return;
         }
@@ -335,11 +325,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         const filteredSpecification = getSpecificationFilteredBySelectedEndpoints();
 
         if (!filteredSpecification) {
-            toast({
-                description: 'Failed to filter endpoints. Please try again.',
-                title: 'Error',
-                variant: 'destructive',
-            });
+            toast.error('Error', {description: 'Failed to filter endpoints. Please try again.'});
 
             return;
         }
@@ -360,10 +346,8 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
             } catch (error) {
                 console.error('Failed to cancel generation job:', error);
 
-                toast({
+                toast.error('Failed to cancel generation', {
                     description: 'The generation job may still be running on the server. You can try again later.',
-                    title: 'Failed to cancel generation',
-                    variant: 'destructive',
                 });
             }
         }

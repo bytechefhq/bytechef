@@ -1,4 +1,4 @@
-import {Toaster} from '@/components/ui/toaster';
+import {Toaster} from '@/components/ui/sonner';
 import useFetchInterceptor from '@/ee/pages/embedded/automation-workflows/workflow-builder/config/useFetchInterceptor';
 import {Outlet} from 'react-router-dom';
 

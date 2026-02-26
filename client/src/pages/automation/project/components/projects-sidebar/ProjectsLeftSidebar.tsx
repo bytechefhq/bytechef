@@ -4,7 +4,6 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useToast} from '@/hooks/use-toast';
 import ProjectSelect from '@/pages/automation/project/components/projects-sidebar/components/ProjectSelect';
 import ProjectWorkflowsList from '@/pages/automation/project/components/projects-sidebar/components/ProjectWorkflowsList';
 import WorkflowsListFilter from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListFilter';
@@ -28,6 +27,7 @@ import {ChevronDownIcon, LayoutTemplateIcon, PlusIcon, UploadIcon} from 'lucide-
 import {RefObject, useEffect, useMemo, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useNavigate} from 'react-router-dom';
+import {toast} from 'sonner';
 
 interface ProjectsLeftSidebarProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
@@ -52,8 +52,6 @@ const ProjectsLeftSidebar = ({
     const projectHiddenFileInputRef = useRef<HTMLInputElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const workflowHiddenFileInputRef = useRef<HTMLInputElement>(null);
-
-    const {toast} = useToast();
     const navigate = useNavigate();
 
     const {captureProjectWorkflowImported} = useAnalytics();
@@ -99,9 +97,7 @@ const ProjectsLeftSidebar = ({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            toast({
-                description: 'Project is imported.',
-            });
+            toast('Project is imported.');
         },
     });
 
@@ -116,9 +112,7 @@ const ProjectsLeftSidebar = ({
                 workflowHiddenFileInputRef.current.value = '';
             }
 
-            toast({
-                description: 'Workflow is imported.',
-            });
+            toast('Workflow is imported.');
         },
     });
 

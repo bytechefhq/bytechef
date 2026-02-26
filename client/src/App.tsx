@@ -1,5 +1,5 @@
 import GlobalSearchDialog from '@/components/GlobalSearch/GlobalSearchDialog';
-import {Toaster} from '@/components/ui/toaster';
+import {Toaster} from '@/components/ui/sonner';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {useUserGuiding} from '@/hooks/useUserGuiding';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';

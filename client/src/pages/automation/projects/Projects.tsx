@@ -4,7 +4,6 @@ import PageLoader from '@/components/PageLoader';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
-import {useToast} from '@/hooks/use-toast';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import ProjectsLeftSidebarNav from '@/pages/automation/projects/components/ProjectsLeftSidebarNav';
@@ -21,6 +20,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, FolderIcon, LayoutTemplateIcon, UploadIcon} from 'lucide-react';
 import {useRef} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
+import {toast} from 'sonner';
 
 import ProjectDialog from './components/ProjectDialog';
 import ProjectList from './components/project-list/ProjectList';
@@ -38,17 +38,13 @@ const Projects = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
-    const {toast} = useToast();
-
     const queryClient = useQueryClient();
 
     const importProjectMutation = useImportProjectMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            toast({
-                description: 'Project is imported.',
-            });
+            toast('Project is imported.');
         },
     });
 

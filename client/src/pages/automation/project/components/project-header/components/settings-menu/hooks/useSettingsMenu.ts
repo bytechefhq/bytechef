@@ -6,7 +6,6 @@ import {
     ProjectGitConfigurationKeys,
     useGetProjectGitConfigurationQuery,
 } from '@/ee/shared/mutations/automation/projectGit.queries';
-import {useToast} from '@/hooks/use-toast';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {
@@ -21,6 +20,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useNavigate, useSearchParams} from 'react-router-dom';
+import {toast} from 'sonner';
 
 export const useSettingsMenu = ({project, workflow}: {project: Project; workflow: Workflow}) => {
     const {data: projectGitConfiguration} = useGetProjectGitConfigurationQuery(project.id!);
@@ -29,7 +29,6 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const {toast} = useToast();
 
     const {data: projectVersions} = useGetProjectVersionsQuery(project.id!);
 
@@ -54,19 +53,14 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
         onError: () => {
-            toast({
-                description: `Project duplication failed.`,
-                variant: 'destructive',
-            });
+            toast.error(`Project duplication failed.`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             navigate(`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`);
 
-            toast({
-                description: 'Project duplicated successfully.',
-            });
+            toast('Project duplicated successfully.');
         },
     });
 
@@ -74,17 +68,12 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         onError: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            toast({
-                description: 'Workflow duplication failed.',
-                variant: 'destructive',
-            });
+            toast.error('Workflow duplication failed.');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            toast({
-                description: 'Workflow duplicated successfully.',
-            });
+            toast('Workflow duplicated successfully.');
         },
     });
 
@@ -96,7 +85,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
                 queryKey: ProjectVersionKeys.projectProjectVersions(project.id!),
             });
 
-            toast({description: 'Project pulled from git repository successfully.'});
+            toast('Project pulled from git repository successfully.');
         },
     });
 

@@ -11,9 +11,9 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import {useToast} from '@/hooks/use-toast';
 import {LinkIcon, UnlinkIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
+import {toast} from 'sonner';
 
 interface LinkedAccountI {
     authProvider: string;
@@ -23,7 +23,6 @@ interface LinkedAccountI {
 
 const AccountProfileLinkedAccounts = () => {
     const [linkedAccount, setLinkedAccount] = useState<LinkedAccountI | null>(null);
-    const {toast} = useToast();
 
     const fetchLinkedAccounts = useCallback(async () => {
         try {
@@ -34,12 +33,12 @@ const AccountProfileLinkedAccounts = () => {
 
                 setLinkedAccount(data);
             } else {
-                toast({description: 'Failed to fetch linked accounts.', variant: 'destructive'});
+                toast.error('Failed to fetch linked accounts.');
             }
         } catch {
-            toast({description: 'Failed to fetch linked accounts.', variant: 'destructive'});
+            toast.error('Failed to fetch linked accounts.');
         }
-    }, [toast]);
+    }, []);
 
     useEffect(() => {
         fetchLinkedAccounts();
@@ -51,11 +50,11 @@ const AccountProfileLinkedAccounts = () => {
         });
 
         if (response.ok) {
-            toast({description: 'Provider has been unlinked.'});
+            toast('Provider has been unlinked.');
 
             fetchLinkedAccounts();
         } else {
-            toast({description: 'Failed to unlink provider.', variant: 'destructive'});
+            toast.error('Failed to unlink provider.');
         }
     };
 
