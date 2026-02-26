@@ -24,7 +24,10 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
+
+    private static final Logger log = LoggerFactory.getLogger(PrincipalJobFacadeImpl.class);
 
     private final PrincipalJobService principalJobService;
     private final JobFacade jobFacade;
@@ -48,6 +53,23 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
         this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.workflowService = workflowService;
+    }
+
+    @Override
+    public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
+        long childJobId = jobFacade.createJob(jobParametersDTO);
+
+        Optional<Long> principalId = principalJobService.fetchJobPrincipalId(parentJobId, platformType);
+
+        if (principalId.isPresent()) {
+            principalJobService.create(childJobId, principalId.get(), platformType);
+        } else {
+            log.warn(
+                "No principal found for parent job {} -- child job {} will have no principal association",
+                parentJobId, childJobId);
+        }
+
+        return childJobId;
     }
 
     @Override

@@ -16,10 +16,13 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.subflow;
 
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.platform.constant.PlatformType;
+
 /**
  * @author Ivica Cardic
  */
 public interface ChildJobPrincipalCreator {
 
-    void createPrincipalForChildJob(long parentJobId, long childJobId);
+    long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType);
 }

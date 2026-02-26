@@ -34,6 +34,16 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
     }
 
     @Override
+    public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
+        return loadBalancedRestClient.post(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(PRINCIPAL_JOB_FACADE + "/create-child-job")
+                .build(),
+            new CreateChildJobRequest(parentJobId, jobParametersDTO, platformType), Long.class);
+    }
+
+    @Override
     public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
@@ -51,6 +61,10 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
                 .path(PRINCIPAL_JOB_FACADE + "/create-sync-job")
                 .build(),
             new CreateJobRequest(jobParametersDTO, jobPrincipalId, type), Job.class);
+    }
+
+    @SuppressFBWarnings("EI")
+    public record CreateChildJobRequest(long parentJobId, JobParametersDTO jobParameters, PlatformType platformType) {
     }
 
     @SuppressFBWarnings("EI")

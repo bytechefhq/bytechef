@@ -18,7 +18,6 @@ package com.bytechef.task.dispatcher.subflow.config;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
@@ -40,11 +39,11 @@ public class SubflowTaskDispatcherConfiguration {
 
     @Bean("subflowTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory(
-        ChildJobPrincipalCreator childJobPrincipalCreator, JobFacade jobFacade, JobService jobService,
+        ChildJobPrincipalCreator childJobPrincipalCreator, JobService jobService,
         SubflowResolver subflowResolver) {
 
         return (taskDispatcher) -> new SubflowTaskDispatcher(
-            childJobPrincipalCreator, jobFacade, jobService, subflowResolver);
+            childJobPrincipalCreator, jobService, subflowResolver);
     }
 
     @Configuration

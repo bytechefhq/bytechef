@@ -25,6 +25,8 @@ import com.bytechef.platform.constant.PlatformType;
  */
 public interface PrincipalJobFacade {
 
+    long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType);
+
     long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type);
 
     Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type);

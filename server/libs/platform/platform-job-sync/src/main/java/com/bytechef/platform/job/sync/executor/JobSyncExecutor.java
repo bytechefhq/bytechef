@@ -457,8 +457,8 @@ public class JobSyncExecutor {
         Consumer<TaskExecutionCompleteEvent> taskExecutionCompleteCallback) {
 
         JobFacade jobFacade = new JobFacadeImpl(
-            coordinatorEventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction), taskExecutionService,
-            taskFileStorage, workflowService);
+            coordinatorEventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction),
+            taskExecutionService, taskFileStorage, workflowService);
 
         return executeWithCallback(jobParametersDTO, jobFacade, checkForError, taskExecutionCompleteCallback);
     }
