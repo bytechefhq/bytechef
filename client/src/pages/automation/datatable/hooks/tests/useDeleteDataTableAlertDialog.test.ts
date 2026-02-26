@@ -17,6 +17,7 @@ const hoisted = vi.hoisted(() => {
                 {baseName: 'Gamma', id: 'table-3'},
             ],
             environmentId: 2,
+            pathname: '/automation/datatables/table-1',
             tableIdToDelete: null as string | null,
             tableNameToDelete: '',
             workspaceId: 1049,
@@ -69,6 +70,7 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
 });
 
 vi.mock('react-router-dom', () => ({
+    useLocation: () => ({pathname: hoisted.storeState.pathname}),
     useNavigate: () => hoisted.mockNavigate,
 }));
 
@@ -84,6 +86,7 @@ vi.mock('../../stores/useDeleteDataTableAlertDialogStore', () => ({
 beforeEach(() => {
     hoisted.storeState.tableIdToDelete = null;
     hoisted.storeState.tableNameToDelete = '';
+    hoisted.storeState.pathname = '/automation/datatables/table-1';
     hoisted.storeState.dataTables = [
         {baseName: 'Alpha', id: 'table-1'},
         {baseName: 'Beta', id: 'table-2'},
@@ -199,7 +202,8 @@ describe('useDeleteDataTableAlertDialog', () => {
             });
         });
 
-        it('should navigate to next table after deletion', () => {
+        it('should navigate to next table after deletion from detail page', () => {
+            hoisted.storeState.pathname = '/automation/datatables/table-1';
             hoisted.storeState.tableIdToDelete = 'table-1';
 
             const {result} = renderHook(() => useDeleteDataTableAlertDialog());
@@ -211,7 +215,8 @@ describe('useDeleteDataTableAlertDialog', () => {
             expect(hoisted.mockNavigate).toHaveBeenCalledWith('/automation/datatables/table-2');
         });
 
-        it('should navigate to datatables list when deleting last table', () => {
+        it('should navigate to datatables list when deleting last table from detail page', () => {
+            hoisted.storeState.pathname = '/automation/datatables/table-3';
             hoisted.storeState.tableIdToDelete = 'table-3';
 
             const {result} = renderHook(() => useDeleteDataTableAlertDialog());
@@ -223,7 +228,35 @@ describe('useDeleteDataTableAlertDialog', () => {
             expect(hoisted.mockNavigate).toHaveBeenCalledWith('/automation/datatables');
         });
 
-        it('should navigate to datatables list when no tables remain', () => {
+        it('should navigate to datatables list when no tables remain from detail page', () => {
+            hoisted.storeState.pathname = '/automation/datatables/table-only';
+            hoisted.storeState.dataTables = [{baseName: 'OnlyTable', id: 'table-only'}];
+            hoisted.storeState.tableIdToDelete = 'table-only';
+
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
+
+            act(() => {
+                result.current.handleDelete();
+            });
+
+            expect(hoisted.mockNavigate).toHaveBeenCalledWith('/automation/datatables');
+        });
+
+        it('should stay on list page after deletion from list page', () => {
+            hoisted.storeState.pathname = '/automation/datatables';
+            hoisted.storeState.tableIdToDelete = 'table-1';
+
+            const {result} = renderHook(() => useDeleteDataTableAlertDialog());
+
+            act(() => {
+                result.current.handleDelete();
+            });
+
+            expect(hoisted.mockNavigate).toHaveBeenCalledWith('/automation/datatables');
+        });
+
+        it('should stay on list page when deleting last table from list page', () => {
+            hoisted.storeState.pathname = '/automation/datatables';
             hoisted.storeState.dataTables = [{baseName: 'OnlyTable', id: 'table-only'}];
             hoisted.storeState.tableIdToDelete = 'table-only';
 
