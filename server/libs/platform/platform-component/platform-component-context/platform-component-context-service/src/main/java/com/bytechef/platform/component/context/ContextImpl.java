@@ -36,8 +36,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -319,7 +317,7 @@ class ContextImpl implements Context {
                     .collect(
                         HashMap::new,
                         (map, i) -> map.put(String.valueOf(keyValueArray[i * 2]),
-                            List.of(URLEncoder.encode(keyValueArray[i * 2 + 1].toString(), StandardCharsets.UTF_8))),
+                            List.of(keyValueArray[i * 2 + 1].toString())),
                         HashMap::putAll);
 
                 return this;
