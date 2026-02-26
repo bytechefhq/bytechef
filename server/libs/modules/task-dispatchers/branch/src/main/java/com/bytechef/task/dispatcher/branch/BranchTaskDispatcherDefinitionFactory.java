@@ -29,6 +29,7 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.TASKS;
 
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +46,8 @@ public class BranchTaskDispatcherDefinitionFactory implements TaskDispatcherDefi
         .properties(
             string(EXPRESSION)
                 .label("Expression")
-                .description("Defines expression upon which evaluation the proper branch continues execution."))
+                .description("Defines expression upon which evaluation the proper branch continues execution.")
+                .controlType(Property.ControlType.FORMULA_MODE))
         .taskProperties(
             array(CASES)
                 .description("The list of tasks to execute if the result of expression matches the 'key' value.")
