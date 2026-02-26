@@ -847,8 +847,10 @@ export const useProperty = ({
 
             if (fromAi) {
                 if (editorRef.current) {
-                    const fromAi = description
-                        ? `=fromAi('${property.name}', '${description}')`
+                    const escapedDescription = description?.replace(/'/g, "''");
+
+                    const fromAi = escapedDescription
+                        ? `=fromAi('${property.name}', '${escapedDescription}')`
                         : `=fromAi('${property.name}')`;
 
                     editorRef.current.commands.setContent(fromAi);
