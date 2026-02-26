@@ -68,15 +68,15 @@ Creation of OAuth 2.0 application is documented [here](/reference/components/mic
 ### Create Event
 Name: createEvent
 
-`Creates an event in the specified calendar.`
+`Creates a new event in the specified calendar.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| calendar | Calendar ID | STRING |  | true |
+| calendar | Calendar ID | STRING | The ID of the calendar to create the event in. | true |
 | subject | Subject | STRING | The subject of the event. | false |
-| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | true |
+| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Is the event all day? | true |
 | start | Start Date | DATE | The start date of the event. | true |
 | end | End Date | DATE | The end date of the event. | true |
 | start | Start Date Time | DATE_TIME | The start time of the event. | true |
@@ -155,8 +155,8 @@ Name: deleteEvent
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| calendar | Calendar ID | STRING |  | true |
-| event | Event ID | STRING <details> <summary> Depends On </summary> calendar </details> | Id of the event to delete. | true |
+| calendar | Calendar ID | STRING | The ID of the calendar to delete the event from. | true |
+| event | Event ID | STRING <details> <summary> Depends On </summary> calendar </details> | ID of the event to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -180,6 +180,40 @@ This action does not produce any output.
 
 
 
+### Get Email
+Name: getEmail
+
+`Gets the specified email message.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Message ID | STRING | The ID of the message to retrieve. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns all properties of the email message.">FULL</span> </details> | The format to return the message in. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Email",
+  "name" : "getEmail",
+  "parameters" : {
+    "id" : "",
+    "format" : ""
+  },
+  "type" : "microsoftOutlook365/v1/getEmail"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
 ### Get Events
 Name: getEvents
 
@@ -189,7 +223,7 @@ Name: getEvents
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| calendar | Calendar ID | STRING |  | true |
+| calendar | Calendar ID | STRING | The ID of the calendar to retrieve events from. | true |
 | dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | Date range to find events that exist in this range. | false |
 
 #### Example JSON Structure
@@ -256,13 +290,13 @@ Items Type: OBJECT
 ### Get Free Time Slots
 Name: getFreeTimeSlots
 
-`Get free time slots from the Microsoft Outlook 365 calendar.`
+`Gets the free time slots from the specified calendar.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| calendar | Calendar ID | STRING |  | true |
+| calendar | Calendar ID | STRING | The ID of the calendar to retrieve free time slots from. | true |
 | dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | Date range to find free time. | true |
 
 #### Example JSON Structure
@@ -312,40 +346,6 @@ Items Type: OBJECT
 
 
 
-### Get Mail
-Name: getMail
-
-`Get a specific message`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Message Id | STRING | Id of the message. | true |
-| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns all properties of the email message.">FULL</span> </details> | The format to return the message in. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Mail",
-  "name" : "getMail",
-  "parameters" : {
-    "id" : "",
-    "format" : ""
-  },
-  "type" : "microsoftOutlook365/v1/getMail"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
 ### Move Email
 Name: moveEmail
 
@@ -355,7 +355,7 @@ Name: moveEmail
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Message ID | STRING | ID of the message to move. | true |
+| id | Message ID | STRING | The ID of the message to move. | true |
 | destinationId | Folder ID | STRING | The destination folder ID. | true |
 
 #### Example JSON Structure
@@ -383,13 +383,13 @@ The output for this action is dynamic and may vary depending on the input parame
 ### Reply to Email
 Name: replyToEmail
 
-`Creates a new reply to email.`
+`Sends a reply to an email message.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Message ID | STRING | Id of the message to reply to. | true |
+| id | Message ID | STRING | The ID of the message to reply to. | true |
 | bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Bcc recipients for the message. | false |
 | ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Cc recipients for the message. | false |
 | contentType | Content Type | STRING <details> <summary> Options </summary> <span>TEXT</span>, <span>HTML</span> </details> | The type of the content. | false |
@@ -431,17 +431,17 @@ This action does not produce any output.
 ### Search Email
 Name: searchEmail
 
-`Get the messages in the signed-in user's mailbox`
+`Lists the email messages in the signed-in user's mailbox.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns all properties of the email message.">FULL</span> </details> | The format to return the message in. | true |
-| from | From | STRING | The address sending the mail | false |
-| to | To | STRING | The address receiving the new mail | false |
-| subject | Subject | STRING | Words in the subject line | false |
-| category | Category | STRING | Messages in a certain category | false |
+| from | From | STRING | The email address sending the mail. | false |
+| to | To | STRING | The email address receiving the new mail. | false |
+| subject | Subject | STRING | Words in the subject line. | false |
+| category | Category | STRING | Messages in a certain category. | false |
 
 #### Example JSON Structure
 ```json
@@ -471,7 +471,7 @@ The output for this action is dynamic and may vary depending on the input parame
 ### Send Email
 Name: sendEmail
 
-`Send the message.`
+`Sends a new email message from the signed-in user's mailbox.`
 
 #### Properties
 
@@ -527,7 +527,7 @@ This action does not produce any output.
 ### New Email
 Name: newEmail
 
-`Triggers when new mail is received.`
+`Triggers when new email is received.`
 
 Type: POLLING
 
