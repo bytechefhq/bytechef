@@ -7,10 +7,12 @@ import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-provid
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {BotMessageSquareIcon, MessageSquareOffIcon, XIcon} from 'lucide-react';
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useLocation} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
+
+const ANIMATION_DURATION_MS = 300;
 
 interface CopilotPanelProps {
     className?: string;
@@ -114,10 +116,55 @@ const CopilotPanelContent = ({className, onClose}: Omit<CopilotPanelProps, 'open
     );
 };
 
-const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => (
-    <CopilotPanelBoundary open={open}>
-        {open && <CopilotPanelContent className={className} onClose={onClose} />}
-    </CopilotPanelBoundary>
-);
+const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => {
+    const [shouldRender, setShouldRender] = useState(open);
+    const [isVisible, setIsVisible] = useState(open);
+
+    const isFixedPosition = className?.split(/\s+/).includes('fixed');
+
+    useEffect(() => {
+        let outerRafId: number;
+        let innerRafId: number;
+        let timerId: ReturnType<typeof setTimeout>;
+
+        if (open) {
+            setShouldRender(true);
+
+            outerRafId = requestAnimationFrame(() => {
+                innerRafId = requestAnimationFrame(() => {
+                    setIsVisible(true);
+                });
+            });
+        } else {
+            setIsVisible(false);
+
+            timerId = setTimeout(() => setShouldRender(false), ANIMATION_DURATION_MS);
+        }
+
+        return () => {
+            cancelAnimationFrame(outerRafId);
+            cancelAnimationFrame(innerRafId);
+            clearTimeout(timerId);
+        };
+    }, [open]);
+
+    const contentClassName = isFixedPosition
+        ? twMerge('transition-transform duration-300 ease-in-out', isVisible ? 'translate-x-0' : 'translate-x-full', className)
+        : className;
+
+    return (
+        <CopilotPanelBoundary open={open}>
+            <div
+                className={twMerge(
+                    'h-full overflow-hidden',
+                    !isFixedPosition && 'transition-[width] duration-300 ease-in-out',
+                    !isFixedPosition && (isVisible ? 'w-[450px]' : 'w-0')
+                )}
+            >
+                {shouldRender && <CopilotPanelContent className={contentClassName} onClose={onClose} />}
+            </div>
+        </CopilotPanelBoundary>
+    );
+};
 
 export default CopilotPanel;
