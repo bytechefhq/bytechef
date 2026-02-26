@@ -1,6 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
-import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent} from '@/components/ui/sheet';
 import {ProjectStatus, ProjectVersion} from '@/shared/middleware/automation/configuration';
 
 interface ProjectVersionHistorySheetProps {
@@ -17,17 +17,17 @@ const ProjectVersionHistorySheet = ({
     return (
         <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>
             <SheetContent
-                className="flex flex-col p-4 sm:max-w-workflow-sidebar-project-version-history-sheet-width"
+                className="bottom-4 right-4 top-3 flex h-auto flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-workflow-sidebar-project-version-history-sheet-width"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
-                <SheetHeader className="flex flex-row items-center justify-between space-y-0">
-                    <SheetTitle>Project Version History</SheetTitle>
+                <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
+                    <span className="text-lg font-semibold">Project Version History</span>
 
                     <SheetCloseButton />
-                </SheetHeader>
+                </header>
 
-                <div className="overflow-y-auto">
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
                     {projectVersions && (
                         <Accordion
                             defaultValue={projectVersions.length > 1 ? [projectVersions[1]!.version!.toString()] : []}
