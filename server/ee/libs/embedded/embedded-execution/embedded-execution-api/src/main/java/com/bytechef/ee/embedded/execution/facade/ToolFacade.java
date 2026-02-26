@@ -20,8 +20,6 @@ import java.util.Map;
  */
 public interface ToolFacade {
 
-    List<ToolDTO> getTools();
-
     Object executeTool(
         String externalUserId, String toolName, Map<String, Object> inputParameters, @Nullable Long instanceId,
         Environment environment);
