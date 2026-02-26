@@ -189,7 +189,7 @@ const SchemaCheckbox = ({autoFocus, label, onChange, value}: SchemaCheckboxProps
         };
 
     return (
-        <div className="flex flex-row">
+        <div className="flex flex-row items-center">
             <Label>{label}</Label>
 
             <Toggle autoFocus={autoFocus} className="ml-2" defaultChecked={value} onChange={handleChange(onChange)} />
