@@ -34,7 +34,6 @@ export default function useOutputTab({
     parentWorkflowNodeName,
     workflowId,
 }: UseOutputTabProps) {
-    const [testPropertiesPopoverOpen, setTestPropertiesPopoverOpen] = useState(false);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
     const [startWebhookTestDate, setStartWebhookTestDate] = useState(new Date());
@@ -152,7 +151,7 @@ export default function useOutputTab({
 
     const handleClusterElementTestSubmit = useCallback(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (inputParameters: Record<string, any>) => {
+        (inputParameters: Record<string, any>, onSuccess?: () => void) => {
             if (!clusterElementType || !parentWorkflowNodeName) {
                 console.warn('handleClusterElementTestSubmit called without required cluster element context:', {
                     clusterElementType,
@@ -172,7 +171,7 @@ export default function useOutputTab({
                     workflowNodeName: parentWorkflowNodeName,
                 },
                 {
-                    onSuccess: () => setTestPropertiesPopoverOpen(false),
+                    onSuccess,
                 }
             );
         },
@@ -299,9 +298,7 @@ export default function useOutputTab({
         saveWorkflowNodeTestOutputMutation,
         saveWorkflowNodeTestOutputMutationPending: saveWorkflowNodeTestOutputMutation.isPending,
         setShowUploadDialog,
-        setTestPropertiesPopoverOpen,
         showUploadDialog,
-        testPropertiesPopoverOpen,
         testing,
         uploadSampleOutputRequestMutationPending: uploadSampleOutputRequestMutation.isPending,
         webhookTestCancelEnabled,
