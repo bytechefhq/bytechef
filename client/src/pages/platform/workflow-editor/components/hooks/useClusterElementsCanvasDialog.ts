@@ -13,9 +13,10 @@ interface UseClusterElementsCanvasDialogProps {
 }
 
 export default function useClusterElementsCanvasDialog({onOpenChange}: UseClusterElementsCanvasDialogProps) {
+    const editorPreferences = useClusterElementsCanvasDialogStore((state) => state.editorPreferences);
     const setCopilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setCopilotPanelOpen);
-    const setShowAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.setShowAiAgentEditor);
     const setEditorPreference = useClusterElementsCanvasDialogStore((state) => state.setEditorPreference);
+    const setShowAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.setShowAiAgentEditor);
     const setTestingPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setTestingPanelOpen);
 
     const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
@@ -29,17 +30,6 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
     const copilotEnabled = ai.copilot.enabled && ff_1570;
-
-    useEffect(() => {
-        if (isAiAgentClusterRoot && agentNodeName) {
-            const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[agentNodeName];
-            const showAiAgent = preference ?? true;
-
-            setShowAiAgentEditor(showAiAgent);
-        } else {
-            setShowAiAgentEditor(false);
-        }
-    }, [isAiAgentClusterRoot, agentNodeName, setShowAiAgentEditor]);
 
     const handleToggleEditor = useCallback(
         (showAiAgent: boolean) => {
@@ -111,6 +101,16 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     const handleClose = useCallback(() => {
         handleOpenChange(false);
     }, [handleOpenChange]);
+
+    useEffect(() => {
+        if (isAiAgentClusterRoot && agentNodeName) {
+            const showAiAgent = editorPreferences[agentNodeName] ?? true;
+
+            setShowAiAgentEditor(showAiAgent);
+        } else {
+            setShowAiAgentEditor(false);
+        }
+    }, [agentNodeName, editorPreferences, isAiAgentClusterRoot, setShowAiAgentEditor]);
 
     return {
         copilotEnabled,
