@@ -48,9 +48,10 @@ public class FromAiInputSchemaUtils {
 
             parameterObjectNode.put("type", getJsonSchemaType(fromAiResult.type()));
 
-            if (fromAiResult.description() != null && !fromAiResult.description()
-                .isEmpty()) {
-                parameterObjectNode.put("description", fromAiResult.description());
+            String description = fromAiResult.description();
+
+            if (description != null && !description.isEmpty()) {
+                parameterObjectNode.put("description", description);
             }
 
             Object defaultValue = fromAiResult.defaultValue();
