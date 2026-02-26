@@ -289,7 +289,6 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             componentDefinitions={componentDefinitions}
                             controlType={controlType}
                             dataPills={dataPills}
-                            description={description}
                             elementId={elementId}
                             handleFromAiClick={handleFromAiClick}
                             isFormulaMode={isFormulaMode}
