@@ -138,15 +138,18 @@ public class MicrosoftOutlook365Utils {
             for (Object attachment : attachments) {
                 if (attachment instanceof Map<?, ?> map) {
                     String contentBytes = (String) map.get(CONTENT_BYTES);
-                    byte[] decodedBytes = context.encoder(encoder -> encoder.base64Decode(contentBytes));
 
-                    FileEntry fileEntry = context.file(
-                        file -> file.storeContent((String) map.get(NAME), new ByteArrayInputStream(decodedBytes)));
+                    if (contentBytes != null) {
+                        byte[] decodedBytes = context.encoder(encoder -> encoder.base64Decode(contentBytes));
 
-                    if ((Boolean) map.get("isInline")) {
-                        inlineFileEntries.add(fileEntry);
-                    } else {
-                        fileEntries.add(fileEntry);
+                        FileEntry fileEntry = context.file(
+                            file -> file.storeContent((String) map.get(NAME), new ByteArrayInputStream(decodedBytes)));
+
+                        if ((Boolean) map.get("isInline")) {
+                            inlineFileEntries.add(fileEntry);
+                        } else {
+                            fileEntries.add(fileEntry);
+                        }
                     }
                 }
             }
