@@ -114,6 +114,7 @@
     "remark-gfm": "^4.0.1",
     "requireindex": "^1.2.0",
     "sanitize-html": "^2.17.0",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
     "tippy.js": "^6.3.7",
