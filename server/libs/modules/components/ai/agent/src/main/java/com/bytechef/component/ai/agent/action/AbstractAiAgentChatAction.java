@@ -22,6 +22,7 @@ import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.ai.agent.util.FromAiExpressionUtils;
 import com.bytechef.component.ai.agent.util.FromAiInputSchemaUtils;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
 import com.bytechef.component.ai.llm.util.ModelUtils;
@@ -44,6 +45,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -316,35 +318,36 @@ public abstract class AbstractAiAgentChatAction {
         };
     }
 
-    private List<FromAiResult> extractFromAiResults(Map<String, ?> parameters) {
-        List<FromAiResult> fromAiResults = new ArrayList<>();
+    List<FromAiResult> extractFromAiResults(Map<String, ?> parameters) {
+        Map<String, FromAiResult> fromAiResultsByName = new LinkedHashMap<>();
 
         if (parameters != null) {
             for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                FromAiResult fromAiResult = toFromAiResult(entry.getValue());
+                Object value = entry.getValue();
 
-                if (fromAiResult != null) {
-                    fromAiResults.add(fromAiResult);
+                if (value instanceof FromAiResult fromAiResult) {
+                    fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
+                } else if (value instanceof String expression && expression.contains("fromAi(")) {
+                    for (String fromAiCall : FromAiExpressionUtils.extractFromAiCallStrings(expression)) {
+                        FromAiResult fromAiResult = evaluateSingleFromAi(fromAiCall);
+
+                        if (fromAiResult != null) {
+                            fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
+                        }
+                    }
                 }
             }
         }
 
-        return fromAiResults;
+        return new ArrayList<>(fromAiResultsByName.values());
     }
 
-    private @Nullable FromAiResult toFromAiResult(Object value) {
-        if (value instanceof FromAiResult fromAiResult) {
+    @Nullable
+    FromAiResult evaluateSingleFromAi(String fromAiCall) {
+        Map<String, Object> evaluated = evaluator.evaluate(Map.of("value", "=" + fromAiCall), Map.of());
+
+        if (evaluated.get("value") instanceof FromAiResult fromAiResult) {
             return fromAiResult;
-        }
-
-        if (value instanceof String string && string.contains("fromAi(")) {
-            String expression = string.startsWith("=") ? string : "=" + string;
-
-            Map<String, Object> evaluated = evaluator.evaluate(Map.of("value", expression), Map.of());
-
-            if (evaluated.get("value") instanceof FromAiResult fromAiResult) {
-                return fromAiResult;
-            }
         }
 
         return null;
@@ -358,22 +361,72 @@ public abstract class AbstractAiAgentChatAction {
             Map<String, Object> resolvedParameters = new HashMap<>();
 
             for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                FromAiResult fromAiResult = toFromAiResult(entry.getValue());
-
-                if (fromAiResult != null) {
-                    Object requestValue = request.get(fromAiResult.name());
-
-                    resolvedParameters.put(
-                        entry.getKey(), requestValue != null ? requestValue : fromAiResult.defaultValue());
-                } else {
-                    resolvedParameters.put(entry.getKey(), entry.getValue());
-                }
+                resolvedParameters.put(entry.getKey(), resolveParameterValue(entry.getValue(), request));
             }
 
             return clusterElementDefinitionService.executeTool(
                 componentName, componentVersion, clusterElementName, MapUtils.concat(request, resolvedParameters),
                 componentConnection, editorEnvironment);
         };
+    }
+
+    Object resolveParameterValue(Object value, Map<String, Object> request) {
+        if (value instanceof FromAiResult fromAiResult) {
+            Object requestValue = request.get(fromAiResult.name());
+
+            return requestValue != null ? requestValue : fromAiResult.defaultValue();
+        }
+
+        if (!(value instanceof String expression) || !expression.contains("fromAi(")) {
+            return value;
+        }
+
+        List<String> fromAiCalls = FromAiExpressionUtils.extractFromAiCallStrings(expression);
+
+        if (fromAiCalls.isEmpty()) {
+            return value;
+        }
+
+        // Pure fromAi expression — direct mapping preserves type fidelity for non-string types
+
+        String strippedExpression = expression.startsWith("=") ? expression.substring(1)
+            .trim() : expression.trim();
+
+        if (fromAiCalls.size() == 1 && strippedExpression.equals(fromAiCalls.getFirst())) {
+            FromAiResult fromAiResult = evaluateSingleFromAi(fromAiCalls.getFirst());
+
+            if (fromAiResult != null) {
+                Object requestValue = request.get(fromAiResult.name());
+
+                return requestValue != null ? requestValue : fromAiResult.defaultValue();
+            }
+
+            return value;
+        }
+
+        // Composite expression — replace all fromAi() calls with resolved values and re-evaluate
+
+        String resolvedExpression = expression;
+
+        for (String fromAiCall : fromAiCalls) {
+            FromAiResult fromAiResult = evaluateSingleFromAi(fromAiCall);
+
+            if (fromAiResult != null) {
+                Object requestValue = request.get(fromAiResult.name());
+                Object resolvedValue = requestValue != null ? requestValue : fromAiResult.defaultValue();
+
+                resolvedExpression = resolvedExpression.replace(
+                    fromAiCall, FromAiExpressionUtils.toSpelLiteral(resolvedValue));
+            }
+        }
+
+        if (!resolvedExpression.startsWith("=")) {
+            resolvedExpression = "=" + resolvedExpression;
+        }
+
+        Map<String, Object> evaluated = evaluator.evaluate(Map.of("value", resolvedExpression), Map.of());
+
+        return evaluated.get("value");
     }
 
     private static @Nullable String getToolDescription(ClusterElement clusterElement) {
