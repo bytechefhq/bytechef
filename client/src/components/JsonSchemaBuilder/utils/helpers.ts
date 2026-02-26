@@ -86,7 +86,19 @@ export const deleteSchemaField = (path: string | string[], obj: any) => {
     return obj;
 };
 
-export const deleteSchemaProperty = (key: string, obj: any) => deleteSchemaField(['properties', key], obj);
+export const deleteSchemaProperty = (key: string, obj: any) => {
+    deleteSchemaField(['properties', key], obj);
+
+    const required = getSchemaRequired(obj);
+
+    if (Array.isArray(required)) {
+        const filtered = required.filter((requiredKey: string) => requiredKey !== key);
+
+        setSchemaField('required', filtered, obj);
+    }
+
+    return obj;
+};
 
 export const addSchemaProperty = (schema: SchemaRecordType) => setSchemaProperty(`__${Date.now()}__`, {}, schema);
 
@@ -104,7 +116,18 @@ export const renameSchemaField = (oldKey: string, newKey: string) => (obj: Recor
 export const renameSchemaProperty = (oldKey: string, newKey: string, schema: SchemaRecordType) => {
     const properties = getSchemaProperties(schema);
     const renamedProperties = renameSchemaField(oldKey, newKey)(properties);
-    return setSchemaProperties(renamedProperties, schema);
+
+    setSchemaProperties(renamedProperties, schema);
+
+    const required = getSchemaRequired(schema);
+
+    if (Array.isArray(required) && required.includes(oldKey)) {
+        const updated = required.map((key: string) => (key === oldKey ? newKey : key));
+
+        setSchemaField('required', updated, schema);
+    }
+
+    return schema;
 };
 
 export const isEmpty = (value: any) => {
