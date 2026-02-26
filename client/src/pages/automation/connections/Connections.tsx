@@ -72,13 +72,11 @@ export const Connections = () => {
     return (
         <LayoutContainer
             header={
-                connections &&
-                connections.length > 0 &&
-                componentDefinitions && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    right={
+                        connections && connections.length > 0 && componentDefinitions ? (
                             <div className="flex items-center gap-4">
                                 <EnvironmentSelect />
 
@@ -96,16 +94,22 @@ export const Connections = () => {
                                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                                 />
                             </div>
-                        }
-                        title={
+                        ) : (
+                            <EnvironmentSelect />
+                        )
+                    }
+                    title={
+                        connections && connections.length > 0 && componentDefinitions ? (
                             <ConnectionsFilterTitle
                                 componentDefinitions={componentDefinitions}
                                 filterData={filterData}
                                 tags={tags}
                             />
-                        }
-                    />
-                )
+                        ) : (
+                            ''
+                        )
+                    }
+                />
             }
             leftSidebarBody={
                 <>

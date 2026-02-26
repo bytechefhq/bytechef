@@ -17,20 +17,28 @@ const DataTables = () => {
     return (
         <LayoutContainer
             header={
-                tables.length > 0 && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    right={
+                        tables.length > 0 ? (
                             <div className="flex items-center gap-4">
                                 <EnvironmentSelect />
 
                                 <CreateDataTableDialog trigger={<Button>New Table</Button>} />
                             </div>
-                        }
-                        title={<DataTablesFilterTitle allTags={allTags} tagsByTableData={tagsByTableData} />}
-                    />
-                )
+                        ) : (
+                            <EnvironmentSelect />
+                        )
+                    }
+                    title={
+                        tables.length > 0 ? (
+                            <DataTablesFilterTitle allTags={allTags} tagsByTableData={tagsByTableData} />
+                        ) : (
+                            ''
+                        )
+                    }
+                />
             }
             leftSidebarBody={<DataTablesLeftSidebarNav />}
             leftSidebarHeader={<Header position="sidebar" title="Data Tables" />}

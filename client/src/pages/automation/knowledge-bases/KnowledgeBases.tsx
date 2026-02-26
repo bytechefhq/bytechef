@@ -21,11 +21,11 @@ const KnowledgeBases = () => {
     return (
         <LayoutContainer
             header={
-                knowledgeBases.length > 0 && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    right={
+                        knowledgeBases.length > 0 ? (
                             <div className="flex items-center gap-4">
                                 <EnvironmentSelect />
 
@@ -34,15 +34,21 @@ const KnowledgeBases = () => {
                                     workspaceId={currentWorkspaceId}
                                 />
                             </div>
-                        }
-                        title={
+                        ) : (
+                            <EnvironmentSelect />
+                        )
+                    }
+                    title={
+                        knowledgeBases.length > 0 ? (
                             <KnowledgeBasesFilterTitle
                                 allTags={allTags}
                                 tagsByKnowledgeBaseData={tagsByKnowledgeBaseData}
                             />
-                        }
-                    />
-                )
+                        ) : (
+                            ''
+                        )
+                    }
+                />
             }
             leftSidebarBody={<KnowledgeBasesLeftSidebarNav />}
             leftSidebarHeader={<Header position="sidebar" title="Knowledge Base" />}
