@@ -60,6 +60,8 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
+                const toastId = `${response.url}-${response.status}`;
+
                 if (response.url.includes('/graphql')) {
                     const clonedResponse = response.clone();
 
@@ -71,24 +73,14 @@ export default function useFetchInterceptor() {
                                     .map((error) => error.message || 'Unknown error')
                                     .join('\n');
 
-                                toast({
-                                    description: errorMessage,
-                                    title: 'GraphQL Error',
-                                    variant: 'destructive',
-                                });
+                                toast.error('Error', {description: errorMessage, id: toastId});
                             } else if (response.status < 200 || response.status > 299) {
-                                toast({
-                                    description: `Request failed with status ${response.status}`,
-                                    variant: 'destructive',
-                                });
+                                toast.error(`Request failed with status ${response.status}`, {id: toastId});
                             }
                         })
                         .catch(() => {
                             if (response.status < 200 || response.status > 299) {
-                                toast({
-                                    description: `Request failed with status ${response.status}`,
-                                    variant: 'destructive',
-                                });
+                                toast.error(`Request failed with status ${response.status}`, {id: toastId});
                             }
                         });
                 } else if (response.status < 200 || response.status > 299) {
@@ -101,17 +93,10 @@ export default function useFetchInterceptor() {
                                 return;
                             }
 
-                            toast({
-                                description: data.detail,
-                                title: data.title,
-                                variant: 'destructive',
-                            });
+                            toast.error(data.title, {description: data.detail, id: toastId});
                         })
                         .catch(() => {
-                            toast({
-                                description: `Request failed with status ${response.status}`,
-                                variant: 'destructive',
-                            });
+                            toast.error(`Request failed with status ${response.status}`, {id: toastId});
                         });
                 }
 
