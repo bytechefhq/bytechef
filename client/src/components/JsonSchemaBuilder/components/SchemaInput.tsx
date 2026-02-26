@@ -63,7 +63,7 @@ const SchemaInput = ({
 
             <Input
                 autoFocus={autoFocus}
-                className="text-ellipsis"
+                className="text-ellipsis bg-background"
                 onBlur={onChangeValue}
                 onChange={(event) => setLocalValue(event.target.value)}
                 onKeyDown={handleEnterPress(onChangeValue)}

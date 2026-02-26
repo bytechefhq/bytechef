@@ -29,7 +29,7 @@ const SchemaTypesSelect = ({onChange, root = false, type}: SchemaTypesSelectProp
                 onValueChange={(option: SchemaType) => onChange(option)}
                 value={helpers.findOption(type)(schemaTypes)?.value}
             >
-                <SelectTrigger className="flex w-full min-w-48">
+                <SelectTrigger className="flex w-full min-w-48 bg-background">
                     <SelectValue className="flex" placeholder="Type" />
                 </SelectTrigger>
 
