@@ -23,7 +23,7 @@ interface WorkflowInputsEditDialogProps {
     currentInputIndex?: number;
     form: UseFormReturn<WorkflowInputType, unknown, WorkflowInputType>;
     isEditDialogOpen: boolean;
-    nameInputRef: RefObject<HTMLInputElement>;
+    nameInputRef: RefObject<HTMLInputElement | null>;
     openEditDialog: (index?: number) => void;
     saveWorkflowInput: (input: WorkflowInputType) => void;
 }
