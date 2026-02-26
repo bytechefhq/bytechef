@@ -3,10 +3,12 @@ import {Switch} from '@/components/ui/switch';
 import ProjectDeploymentDialogWorkflowsStepItemConnections from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItemConnections';
 import ProjectDeploymentDialogWorkflowsStepItemInputs from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
-import {ComponentConnection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
+import {ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
 import {Control, FormState, UseFormSetValue} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
+
+import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
 
 export interface ProjectDeploymentDialogWorkflowListItemProps {
     control: Control<ProjectDeployment>;
@@ -33,9 +35,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
         useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [setWorkflowEnabled, workflowEnabledMap])
     );
 
-    const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
-        .flatMap((task) => task.connections ?? [])
-        .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
+    const componentConnections = getWorkflowComponentConnections(workflow);
 
     const workflowNodeLabelMap = new Map<string, string>();
 
