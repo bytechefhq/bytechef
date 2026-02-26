@@ -177,3 +177,4 @@ rebel.xml
 # Docker
 ######################
 **/local.env
+*.env
