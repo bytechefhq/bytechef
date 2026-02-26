@@ -19,23 +19,23 @@ package com.bytechef.automation.configuration.subflow;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalCreator;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-class ChildJobPrincipalCreatorImpl implements ChildJobPrincipalCreator {
+class ChildJobPrincipalFactoryImpl implements ChildJobPrincipalFactory {
 
     private final PrincipalJobFacade principalJobFacade;
 
-    ChildJobPrincipalCreatorImpl(PrincipalJobFacade principalJobFacade) {
+    ChildJobPrincipalFactoryImpl(PrincipalJobFacade principalJobFacade) {
         this.principalJobFacade = principalJobFacade;
     }
 
     @Override
-    public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
-        return principalJobFacade.createChildJob(parentJobId, jobParametersDTO, platformType);
+    public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO) {
+        return principalJobFacade.createChildJob(parentJobId, jobParametersDTO, PlatformType.AUTOMATION);
     }
 }

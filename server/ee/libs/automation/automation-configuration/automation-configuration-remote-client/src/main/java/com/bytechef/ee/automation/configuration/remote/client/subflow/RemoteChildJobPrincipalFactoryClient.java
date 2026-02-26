@@ -5,11 +5,11 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.runtime.job.task.dispatcher.subflow;
+package com.bytechef.ee.automation.configuration.remote.client.subflow;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalCreator;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,10 +18,11 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-class RuntimeJobChildJobPrincipalCreator implements ChildJobPrincipalCreator {
+@ConditionalOnEEVersion
+public class RemoteChildJobPrincipalFactoryClient implements ChildJobPrincipalFactory {
 
     @Override
-    public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
+    public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO) {
         throw new UnsupportedOperationException();
     }
 }

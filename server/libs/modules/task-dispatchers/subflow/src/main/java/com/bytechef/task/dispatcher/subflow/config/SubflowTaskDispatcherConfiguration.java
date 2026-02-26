@@ -22,7 +22,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.evaluator.Evaluator;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalCreator;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
@@ -39,11 +39,11 @@ public class SubflowTaskDispatcherConfiguration {
 
     @Bean("subflowTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory(
-        ChildJobPrincipalCreator childJobPrincipalCreator, JobService jobService,
+        ChildJobPrincipalFactory childJobPrincipalFactory, JobService jobService,
         SubflowResolver subflowResolver) {
 
         return (taskDispatcher) -> new SubflowTaskDispatcher(
-            childJobPrincipalCreator, jobService, subflowResolver);
+            childJobPrincipalFactory, jobService, subflowResolver);
     }
 
     @Configuration

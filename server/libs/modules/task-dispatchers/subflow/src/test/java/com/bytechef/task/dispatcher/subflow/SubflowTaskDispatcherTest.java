@@ -28,7 +28,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalCreator;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -55,7 +55,7 @@ class SubflowTaskDispatcherTest {
     private JobService jobService;
 
     @Mock
-    private ChildJobPrincipalCreator childJobPrincipalCreator;
+    private ChildJobPrincipalFactory childJobPrincipalFactory;
 
     @Mock
     private SubflowResolver subflowResolver;
@@ -64,7 +64,7 @@ class SubflowTaskDispatcherTest {
 
     @BeforeEach
     void setUp() {
-        subflowTaskDispatcher = new SubflowTaskDispatcher(childJobPrincipalCreator, jobService, subflowResolver);
+        subflowTaskDispatcher = new SubflowTaskDispatcher(childJobPrincipalFactory, jobService, subflowResolver);
     }
 
     @Test
@@ -87,7 +87,7 @@ class SubflowTaskDispatcherTest {
         subflowTaskDispatcher.dispatch(taskExecution);
 
         verify(subflowResolver).resolveSubflow(WORKFLOW_UUID, false);
-        verify(childJobPrincipalCreator).createChildJob(anyLong(), any(JobParametersDTO.class), any());
+        verify(childJobPrincipalFactory).createChildJob(anyLong(), any(JobParametersDTO.class));
     }
 
     @Test
@@ -110,7 +110,7 @@ class SubflowTaskDispatcherTest {
         subflowTaskDispatcher.dispatch(taskExecution);
 
         verify(subflowResolver).resolveSubflow(WORKFLOW_UUID, true);
-        verify(childJobPrincipalCreator).createChildJob(anyLong(), any(JobParametersDTO.class), any());
+        verify(childJobPrincipalFactory).createChildJob(anyLong(), any(JobParametersDTO.class));
     }
 
     @Test
