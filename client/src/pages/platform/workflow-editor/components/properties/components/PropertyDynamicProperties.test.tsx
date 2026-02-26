@@ -7,6 +7,8 @@ import PropertyDynamicProperties from './PropertyDynamicProperties';
 const hoisted = vi.hoisted(() => ({
     mockClusterElementQuery: vi.fn(),
     mockDynamicPropertiesQuery: vi.fn(),
+    mockNodeDetailsPanelStore: vi.fn(),
+    mockWorkflowEditorStore: vi.fn(),
 }));
 
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
@@ -18,20 +20,11 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
 }));
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore', () => ({
-    default: () => ({
-        currentNode: {
-            clusterElementType: undefined,
-            name: 'httpClient_1',
-            workflowNodeName: 'httpClient_1',
-        },
-        operationChangeInProgress: false,
-    }),
+    default: (...args: unknown[]) => hoisted.mockNodeDetailsPanelStore(...args),
 }));
 
 vi.mock('../../../stores/useWorkflowEditorStore', () => ({
-    default: () => ({
-        rootClusterElementNodeData: undefined,
-    }),
+    default: () => hoisted.mockWorkflowEditorStore(),
 }));
 
 vi.mock('@/shared/queries/platform/workflowNodeDynamicProperties.queries', () => ({
@@ -64,6 +57,19 @@ const defaultProps = {
 beforeEach(() => {
     hoisted.mockDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: false});
     hoisted.mockClusterElementQuery.mockReturnValue({data: undefined, isLoading: false});
+
+    hoisted.mockNodeDetailsPanelStore.mockReturnValue({
+        currentNode: {
+            clusterElementType: undefined,
+            name: 'httpClient_1',
+            workflowNodeName: 'httpClient_1',
+        },
+        operationChangeInProgress: false,
+    });
+
+    hoisted.mockWorkflowEditorStore.mockReturnValue({
+        rootClusterElementNodeData: undefined,
+    });
 });
 
 afterEach(() => {
@@ -197,6 +203,80 @@ describe('PropertyDynamicProperties', () => {
             const queryCall = hoisted.mockDynamicPropertiesQuery.mock.calls[0];
 
             expect(queryCall[1]).toBe(true);
+        });
+    });
+
+    describe('cluster element query', () => {
+        beforeEach(() => {
+            hoisted.mockNodeDetailsPanelStore.mockReturnValue({
+                currentNode: {
+                    clusterElementType: 'processor',
+                    name: 'fieldMapper_1',
+                    workflowNodeName: 'fieldMapper_1',
+                },
+                operationChangeInProgress: false,
+            });
+
+            hoisted.mockWorkflowEditorStore.mockReturnValue({
+                rootClusterElementNodeData: {
+                    workflowNodeName: 'dataStream_1',
+                },
+            });
+        });
+
+        it('should pass lookupDependsOnPaths in cluster element query request', () => {
+            hoisted.mockClusterElementQuery.mockReturnValue({data: sampleProperties, isLoading: false});
+
+            const lookupDependsOnPaths = ['useJsonSchema'];
+
+            render(
+                <PropertyDynamicProperties
+                    {...defaultProps}
+                    lookupDependsOnPaths={lookupDependsOnPaths}
+                    lookupDependsOnValues={[true]}
+                />
+            );
+
+            const queryCall = hoisted.mockClusterElementQuery.mock.calls[0];
+            const queryOptions = queryCall[0];
+
+            expect(queryOptions.request.lookupDependsOnPaths).toEqual(lookupDependsOnPaths);
+        });
+
+        it('should include cluster element type and workflow node names in request', () => {
+            hoisted.mockClusterElementQuery.mockReturnValue({data: sampleProperties, isLoading: false});
+
+            render(<PropertyDynamicProperties {...defaultProps} />);
+
+            const queryCall = hoisted.mockClusterElementQuery.mock.calls[0];
+            const queryOptions = queryCall[0];
+
+            expect(queryOptions.request.clusterElementType).toBe('processor');
+            expect(queryOptions.request.clusterElementWorkflowNodeName).toBe('fieldMapper_1');
+            expect(queryOptions.request.workflowNodeName).toBe('dataStream_1');
+        });
+
+        it('should use cluster element query when clusterElementType is set', () => {
+            hoisted.mockClusterElementQuery.mockReturnValue({data: sampleProperties, isLoading: false});
+
+            render(<PropertyDynamicProperties {...defaultProps} />);
+
+            const clusterQueryCall = hoisted.mockClusterElementQuery.mock.calls[0];
+
+            expect(clusterQueryCall[1]).toBe(true);
+
+            const regularQueryCall = hoisted.mockDynamicPropertiesQuery.mock.calls[0];
+
+            expect(regularQueryCall[1]).toBe(false);
+        });
+
+        it('should render cluster element properties', () => {
+            hoisted.mockClusterElementQuery.mockReturnValue({data: sampleProperties, isLoading: false});
+
+            render(<PropertyDynamicProperties {...defaultProps} />);
+
+            expect(screen.getByTestId('property-field1')).toBeInTheDocument();
+            expect(screen.getByTestId('property-field2')).toBeInTheDocument();
         });
     });
 });
