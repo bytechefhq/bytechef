@@ -743,11 +743,12 @@ public class JobSyncExecutor {
         }
 
         var listeners = taskExecutionCompleteListeners.getIfPresent(getKey(jobId));
+
         if (listeners == null) {
             return;
         }
-        for (var listener : listeners) {
 
+        for (var listener : listeners) {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
