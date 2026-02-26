@@ -144,9 +144,7 @@ vi.mock('@/shared/hooks/useAnalytics', () => ({
     useAnalytics: () => ({captureProjectWorkflowImported: vi.fn()}),
 }));
 
-vi.mock('@/hooks/use-toast', () => ({
-    useToast: () => ({toast: vi.fn()}),
-}));
+vi.mock('sonner', () => ({toast: vi.fn()}));
 
 vi.mock('@tanstack/react-query', async () => {
     const actual = await vi.importActual<typeof import('@tanstack/react-query')>('@tanstack/react-query');

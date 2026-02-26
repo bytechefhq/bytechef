@@ -81,9 +81,7 @@ vi.mock('@/shared/mutations/automation/projects.mutations', async () => {
     };
 });
 
-vi.mock('@/hooks/use-toast', () => ({
-    useToast: () => ({toast: vi.fn()}),
-}));
+vi.mock('sonner', () => ({toast: vi.fn()}));
 
 const createTestQueryClient = () =>
     new QueryClient({

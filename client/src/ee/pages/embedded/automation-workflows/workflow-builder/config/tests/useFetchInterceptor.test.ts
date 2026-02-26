@@ -12,15 +12,15 @@ const hoisted = vi.hoisted(() => {
             request: (url: string, config: Record<string, unknown>) => unknown;
             response: (response: Record<string, unknown>) => unknown;
         } | null,
-        toast: vi.fn(),
+        toastError: vi.fn(),
         unregister: vi.fn(),
     };
 });
 
-vi.mock('@/hooks/use-toast', () => ({
-    useToast: vi.fn(() => ({
-        toast: hoisted.toast,
-    })),
+vi.mock('sonner', () => ({
+    toast: {
+        error: hoisted.toastError,
+    },
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
@@ -164,10 +164,9 @@ describe('useFetchInterceptor (embedded)', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({
+            expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Something went wrong',
-                title: 'Error',
-                variant: 'destructive',
+                id: 'http://localhost/internal/api/test-500',
             });
         });
 
@@ -185,7 +184,7 @@ describe('useFetchInterceptor (embedded)', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).not.toHaveBeenCalled();
+            expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
         it('shows fallback error toast when response body is not JSON', async () => {
@@ -202,9 +201,8 @@ describe('useFetchInterceptor (embedded)', () => {
                 await new Promise((resolve) => setTimeout(resolve, 0));
             });
 
-            expect(hoisted.toast).toHaveBeenCalledWith({
-                description: 'Request failed with status 502',
-                variant: 'destructive',
+            expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 502', {
+                id: 'http://localhost/internal/api/test-502',
             });
         });
     });
