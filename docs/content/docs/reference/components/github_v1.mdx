@@ -846,6 +846,90 @@ Items Type: OBJECT
 
 
 
+### Search Code
+Name: searchCode
+
+`Searches the code in repository and returns up to 100 results per page.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | The repository in which to search for matching code. | true |
+| query | Query | STRING | Query of the code in the repository. | true |
+| extension | Extension | STRING | Matches code files with a certain file extension. | false |
+| filename | Filename | STRING | Matches code files with a certain filename. | false |
+| path | Path | STRING | Searches for source code that appears at a specific location in a repository. | false |
+| in | In | STRING <details> <summary> Options </summary> <span>file</span>, <span>path</span>, <span>file,path</span> </details> | Restricts your search to the contents of the source code file, the file path, or both. | false |
+| page | Page | INTEGER | The page number of the results to fetch. | false |
+| per_page | Per page | INTEGER | The number of results per page (max 100). | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Code",
+  "name" : "searchCode",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "query" : "",
+    "extension" : "",
+    "filename" : "",
+    "path" : "",
+    "in" : "",
+    "page" : 1,
+    "per_page" : 1
+  },
+  "type" : "github/v1/searchCode"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| total_count | INTEGER | Total number of matching results. |
+| incomplete_results | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the results are incomplete. |
+| items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(path), STRING\(sha), STRING\(url), STRING\(git_url), STRING\(html_url), NUMBER\(score), &#123;INTEGER\(id), STRING\(name), STRING\(full_name), STRING\(html_url), STRING\(url)&#125;\(repository)&#125;] </details> | List of code search results. |
+
+
+
+
+#### Output Example
+```json
+{
+  "total_count" : 1,
+  "incomplete_results" : false,
+  "items" : [ {
+    "name" : "",
+    "path" : "",
+    "sha" : "",
+    "url" : "",
+    "git_url" : "",
+    "html_url" : "",
+    "score" : 0.0,
+    "repository" : {
+      "id" : 1,
+      "name" : "",
+      "full_name" : "",
+      "html_url" : "",
+      "url" : ""
+    }
+  } ]
+}
+```
+
+
+
+
 ### Star Repository
 Name: starRepository
 
