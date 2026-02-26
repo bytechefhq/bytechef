@@ -20,6 +20,7 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
                 setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
             }))
         );
+
     const setRightSidebarOpen = useRightSidebarStore((state) => state.setRightSidebarOpen);
     const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
 
@@ -49,25 +50,35 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
             return;
         }
 
+        const {currentNode: existingCurrentNode, workflowNodeDetailsPanelOpen: isPanelOpen} =
+            useWorkflowNodeDetailsPanelStore.getState();
+
+        const isNodeAlreadyOpen = isPanelOpen && existingCurrentNode?.workflowNodeName === data.workflowNodeName;
+
         setRightSidebarOpen(false);
         setWorkflowTestChatPanelOpen(false);
         setActiveTab(activeTab ?? 'description');
-        setCurrentNode({...data, description: ''});
 
-        if (!!data.clusterRoot && !clusterElementsCanvasOpen) {
-            setClusterElementsCanvasOpen(true);
+        if (!isNodeAlreadyOpen) {
+            setCurrentNode({...data, description: ''});
+
+            if (!!data.clusterRoot && !clusterElementsCanvasOpen) {
+                setClusterElementsCanvasOpen(true);
+            }
+
+            if (data.type) {
+                setCurrentComponent((previousCurrentComponent) => ({
+                    ...data,
+                    displayConditions: previousCurrentComponent?.displayConditions,
+                    workflowNodeName: data.name,
+                }));
+            }
         }
 
         setWorkflowNodeDetailsPanelOpen(true);
-
-        if (data.type) {
-            setCurrentComponent((previousCurrentComponent) => ({
-                ...data,
-                displayConditions: previousCurrentComponent?.displayConditions,
-                workflowNodeName: data.name,
-            }));
-        }
     }, [
+        data,
+        id,
         nodes,
         clusterElementsCanvasNodes,
         clusterElementsCanvasOpen,
@@ -76,8 +87,6 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         setActiveTab,
         activeTab,
         setCurrentNode,
-        data,
-        id,
         setClusterElementsCanvasOpen,
         setCurrentComponent,
         setWorkflowNodeDetailsPanelOpen,
