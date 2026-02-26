@@ -86,9 +86,9 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
             context.log(log -> log.info(
-                "Tool execution: {} | Reasoning: {} | Confidence: {} | Inputs: {}",
+                "Tool execution: {} | Reasoning: {} | Confidence: {} | Inputs: {} | Output: {}",
                 toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
-                toolExecutionEvent.inputs()));
+                toolExecutionEvent.inputs(), toolExecutionEvent.output()));
 
             if (context.isEditorEnvironment() &&
                 (!(context instanceof ActionContextAware actionContextAware) ||
@@ -116,6 +116,7 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
                     eventData.put("confidence", toolExecutionEvent.confidence());
                     eventData.put("inputs", toolExecutionEvent.inputs());
+                    eventData.put("output", toolExecutionEvent.output());
                     eventData.put("reasoning", toolExecutionEvent.reasoning());
                     eventData.put("toolName", toolExecutionEvent.toolName());
 
