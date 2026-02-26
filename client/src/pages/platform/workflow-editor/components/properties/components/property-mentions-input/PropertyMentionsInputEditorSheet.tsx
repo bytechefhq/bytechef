@@ -57,7 +57,7 @@ const PropertyMentionsInputEditorSheet = ({
                 <SheetTitle>{title}</SheetTitle>
             </VisuallyHidden.Root>
 
-            <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md bg-surface-neutral-primary p-3">
+            <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
                 <div className="flex items-center gap-x-2">
                     <TextIcon />
 
