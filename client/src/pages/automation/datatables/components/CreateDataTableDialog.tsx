@@ -151,6 +151,8 @@ const CreateDataTableDialog = ({trigger}: {trigger?: ReactNode}) => {
                 </div>
 
                 <DialogFooter>
+                    <Button label="Cancel" onClick={() => handleOpenChange(false)} variant="outline" />
+
                     <Button
                         disabled={!canSubmit || isPending}
                         label={isPending ? 'Creating...' : 'Create'}
