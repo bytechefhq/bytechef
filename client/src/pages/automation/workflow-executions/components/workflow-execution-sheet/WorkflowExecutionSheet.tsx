@@ -36,6 +36,7 @@ const WorkflowExecutionSheet = () => {
 
             <SheetContent
                 className="bottom-4 right-4 top-3 flex h-auto w-[90%] flex-row gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-[90%]"
+                onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
                 <div className="flex min-w-0 flex-1 flex-col">
@@ -45,7 +46,7 @@ const WorkflowExecutionSheet = () => {
                         </div>
                     ) : (
                         <>
-                            <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md bg-surface-neutral-primary p-3">
+                            <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
                                 <div className="flex items-center gap-x-2">
                                     <WorkflowIcon />
 
