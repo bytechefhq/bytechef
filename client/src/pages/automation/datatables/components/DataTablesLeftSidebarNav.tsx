@@ -5,7 +5,7 @@ import {TagIcon} from 'lucide-react';
 const DataTablesLeftSidebarNav = () => {
     const {isLoading, tagId, tags} = useDataTablesLeftSidebarNav();
 
-    if (isLoading || tags.length === 0) {
+    if (isLoading) {
         return <></>;
     }
 
