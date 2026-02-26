@@ -1,4 +1,5 @@
 import {useCreateKnowledgeBaseMutation} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent, useState} from 'react';
 
@@ -22,6 +23,8 @@ export default function useCreateKnowledgeBaseDialog({workspaceId}: UseCreateKno
     const [overlapSize, setOverlapSize] = useState('200');
     const [selectedFiles, setSelectedFiles] = useState<SelectedFileI[]>([]);
     const [uploading, setUploading] = useState(false);
+
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();
 
@@ -109,6 +112,7 @@ export default function useCreateKnowledgeBaseDialog({workspaceId}: UseCreateKno
 
     const handleSubmit = () => {
         createMutation.mutate({
+            environmentId: String(environmentId),
             knowledgeBase: {
                 description: description.trim() || undefined,
                 maxChunkSize: parseInt(maxChunkSize),

@@ -1,5 +1,5 @@
-query knowledgeBases($workspaceId: ID!) {
-    knowledgeBases(workspaceId: $workspaceId) {
+query knowledgeBases($environmentId: ID!, $workspaceId: ID!) {
+    knowledgeBases(environmentId: $environmentId, workspaceId: $workspaceId) {
         id
         name
         description

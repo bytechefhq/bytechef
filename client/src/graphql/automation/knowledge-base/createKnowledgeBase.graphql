@@ -1,5 +1,5 @@
-mutation createKnowledgeBase($knowledgeBase: KnowledgeBaseInput!, $workspaceId: ID!) {
-    createKnowledgeBase(knowledgeBase: $knowledgeBase, workspaceId: $workspaceId) {
+mutation createKnowledgeBase($knowledgeBase: KnowledgeBaseInput!, $environmentId: ID!, $workspaceId: ID!) {
+    createKnowledgeBase(knowledgeBase: $knowledgeBase, environmentId: $environmentId, workspaceId: $workspaceId) {
         id
         name
     }

@@ -7,6 +7,7 @@ import {
     useKnowledgeBaseTagsQuery,
     useKnowledgeBasesQuery,
 } from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -21,9 +22,13 @@ interface UseKnowledgeBasesResultI {
 }
 
 export default function useKnowledgeBases(): UseKnowledgeBasesResultI {
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const {data, error, isLoading} = useKnowledgeBasesQuery({workspaceId: String(workspaceId)});
+    const {data, error, isLoading} = useKnowledgeBasesQuery({
+        environmentId: String(environmentId),
+        workspaceId: String(workspaceId),
+    });
 
     const knowledgeBases = useMemo(
         () =>

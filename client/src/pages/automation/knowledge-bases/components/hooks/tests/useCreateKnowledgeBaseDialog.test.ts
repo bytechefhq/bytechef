@@ -24,6 +24,10 @@ vi.mock('@/shared/middleware/graphql', () => ({
     })),
 }));
 
+vi.mock('@/shared/stores/useEnvironmentStore', () => ({
+    useEnvironmentStore: vi.fn(() => 0),
+}));
+
 describe('useCreateKnowledgeBaseDialog', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -224,6 +228,7 @@ describe('useCreateKnowledgeBaseDialog', () => {
             });
 
             expect(hoisted.mutate).toHaveBeenCalledWith({
+                environmentId: '0',
                 knowledgeBase: {
                     description: 'Test description',
                     maxChunkSize: 2048,
