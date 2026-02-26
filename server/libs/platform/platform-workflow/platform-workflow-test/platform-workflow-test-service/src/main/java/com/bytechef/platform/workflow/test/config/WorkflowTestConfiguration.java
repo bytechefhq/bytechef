@@ -54,6 +54,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalCreator;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
@@ -207,6 +208,9 @@ public class WorkflowTestConfiguration {
         JobFacade jobFacade = new JobFacadeImpl(
             eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
 
+        ChildJobPrincipalCreator childJobPrincipalCreator =
+            (parentJobId, jobParametersDTO, platformType) -> jobFacade.createJob(jobParametersDTO);
+
         return List.of(
             (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
@@ -231,7 +235,7 @@ public class WorkflowTestConfiguration {
             (taskDispatcher) -> new ParallelTaskDispatcher(
                 contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
-            (taskDispatcher) -> new SubflowTaskDispatcher(null, jobFacade, jobService, subflowResolver),
+            (taskDispatcher) -> new SubflowTaskDispatcher(childJobPrincipalCreator, jobService, subflowResolver),
             (taskDispatcher) -> new TerminateTaskDispatcher(eventPublisher, taskExecutionService));
     }
 }

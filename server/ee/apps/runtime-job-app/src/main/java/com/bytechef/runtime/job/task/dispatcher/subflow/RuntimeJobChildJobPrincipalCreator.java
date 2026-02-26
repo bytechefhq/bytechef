@@ -7,6 +7,8 @@
 
 package com.bytechef.runtime.job.task.dispatcher.subflow;
 
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalCreator;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +21,7 @@ import org.springframework.stereotype.Component;
 class RuntimeJobChildJobPrincipalCreator implements ChildJobPrincipalCreator {
 
     @Override
-    public void createPrincipalForChildJob(long parentJobId, long childJobId) {
+    public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
         throw new UnsupportedOperationException();
     }
 }

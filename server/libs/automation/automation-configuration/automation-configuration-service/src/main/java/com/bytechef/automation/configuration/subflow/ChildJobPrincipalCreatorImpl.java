@@ -16,12 +16,10 @@
 
 package com.bytechef.automation.configuration.subflow;
 
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalCreator;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,24 +28,14 @@ import org.springframework.stereotype.Component;
 @Component
 class ChildJobPrincipalCreatorImpl implements ChildJobPrincipalCreator {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChildJobPrincipalCreatorImpl.class);
+    private final PrincipalJobFacade principalJobFacade;
 
-    private final PrincipalJobService principalJobService;
-
-    ChildJobPrincipalCreatorImpl(PrincipalJobService principalJobService) {
-        this.principalJobService = principalJobService;
+    ChildJobPrincipalCreatorImpl(PrincipalJobFacade principalJobFacade) {
+        this.principalJobFacade = principalJobFacade;
     }
 
     @Override
-    public void createPrincipalForChildJob(long parentJobId, long childJobId) {
-        Optional<Long> principalId = principalJobService.fetchJobPrincipalId(parentJobId, PlatformType.AUTOMATION);
-
-        if (principalId.isPresent()) {
-            principalJobService.create(childJobId, principalId.get(), PlatformType.AUTOMATION);
-        } else {
-            logger.warn(
-                "No principal found for parent job {} -- child job {} will have no principal association",
-                parentJobId, childJobId);
-        }
+    public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
+        return principalJobFacade.createChildJob(parentJobId, jobParametersDTO, platformType);
     }
 }
