@@ -35,13 +35,14 @@ public abstract class AbstractGitlabComponentHandler implements OpenApiComponent
         component("gitlab")
             .title("GitLab")
             .description(
-                "GitLab is a web-based DevOps lifecycle tool that provides a Git repository manager, CI/CD pipelines, issue tracking, and more in a single application."))
-                    .actions(modifyActions(GitlabCreateIssueAction.ACTION_DEFINITION,
-                        GitlabCreateCommentOnIssueAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(GitlabConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(GitlabCreateIssueAction.ACTION_DEFINITION),
-                        tool(GitlabCreateCommentOnIssueAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "GitLab is a web-based DevOps lifecycle tool that provides a Git repository manager, CI/CD pipelines, issue tracking, and more in a single application.")
+            .version(1))
+                .actions(modifyActions(GitlabCreateCommentOnIssueAction.ACTION_DEFINITION,
+                    GitlabCreateIssueAction.ACTION_DEFINITION))
+                .connection(modifyConnection(GitlabConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(GitlabCreateCommentOnIssueAction.ACTION_DEFINITION),
+                    tool(GitlabCreateIssueAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

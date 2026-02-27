@@ -35,13 +35,14 @@ public abstract class AbstractWebflowComponentHandler implements OpenApiComponen
         component("webflow")
             .title("Webflow")
             .description(
-                "Webflow is a web design and development platform that allows users to build responsive websites visually without writing code."))
-                    .actions(modifyActions(WebflowFulfillOrderAction.ACTION_DEFINITION,
-                        WebflowGetCollectionItemAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(WebflowConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(WebflowFulfillOrderAction.ACTION_DEFINITION),
-                        tool(WebflowGetCollectionItemAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Webflow is a web design and development platform that allows users to build responsive websites visually without writing code.")
+            .version(1))
+                .actions(modifyActions(WebflowFulfillOrderAction.ACTION_DEFINITION,
+                    WebflowGetCollectionItemAction.ACTION_DEFINITION))
+                .connection(modifyConnection(WebflowConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(WebflowFulfillOrderAction.ACTION_DEFINITION),
+                    tool(WebflowGetCollectionItemAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

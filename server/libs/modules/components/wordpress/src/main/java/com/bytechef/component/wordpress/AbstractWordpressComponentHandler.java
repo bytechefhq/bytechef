@@ -36,15 +36,15 @@ public abstract class AbstractWordpressComponentHandler implements OpenApiCompon
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("wordpress")
             .title("Wordpress")
-            .description("WordPress is a web content management system."))
-                .actions(
-                    modifyActions(WordpressGetPostAction.ACTION_DEFINITION, WordpressUpdatePostAction.ACTION_DEFINITION,
-                        WordpressCreatePostAction.ACTION_DEFINITION, WordpressCreatePageAction.ACTION_DEFINITION))
+            .description("WordPress is a web content management system.")
+            .version(1))
+                .actions(modifyActions(WordpressCreatePageAction.ACTION_DEFINITION,
+                    WordpressCreatePostAction.ACTION_DEFINITION, WordpressGetPostAction.ACTION_DEFINITION,
+                    WordpressUpdatePostAction.ACTION_DEFINITION))
                 .connection(modifyConnection(WordpressConnection.CONNECTION_DEFINITION))
-                .clusterElements(modifyClusterElements(tool(WordpressGetPostAction.ACTION_DEFINITION),
-                    tool(WordpressUpdatePostAction.ACTION_DEFINITION),
-                    tool(WordpressCreatePostAction.ACTION_DEFINITION),
-                    tool(WordpressCreatePageAction.ACTION_DEFINITION)))
+                .clusterElements(modifyClusterElements(tool(WordpressCreatePageAction.ACTION_DEFINITION),
+                    tool(WordpressCreatePostAction.ACTION_DEFINITION), tool(WordpressGetPostAction.ACTION_DEFINITION),
+                    tool(WordpressUpdatePostAction.ACTION_DEFINITION)))
                 .triggers(getTriggers());
 
     @Override

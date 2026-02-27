@@ -34,11 +34,12 @@ public abstract class AbstractCalendlyComponentHandler implements OpenApiCompone
         component("calendly")
             .title("Calendly")
             .description(
-                "Calendly is a scheduling tool that allows users to easily set up and manage appointments and meetings."))
-                    .actions(modifyActions(CalendlyCancelEventAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(CalendlyConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(CalendlyCancelEventAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Calendly is a scheduling tool that allows users to easily set up and manage appointments and meetings.")
+            .version(1))
+                .actions(modifyActions(CalendlyCancelEventAction.ACTION_DEFINITION))
+                .connection(modifyConnection(CalendlyConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(CalendlyCancelEventAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

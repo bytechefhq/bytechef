@@ -37,12 +37,13 @@ public abstract class AbstractNiftyComponentHandler implements OpenApiComponentH
         component("nifty")
             .title("Nifty")
             .description(
-                "Nifty Project Management is a software tool that streamlines team collaboration and project tracking with features like task management, timelines, and communication tools to enhance productivity."))
-                    .actions(modifyActions(NiftyCreateProjectAction.ACTION_DEFINITION,
-                        NiftyCreateTaskAction.ACTION_DEFINITION, NiftyGetTaskAction.ACTION_DEFINITION,
-                        NiftyCreateStatusAction.ACTION_DEFINITION, NiftyGetTrackedTimeReportAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(NiftyConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Nifty Project Management is a software tool that streamlines team collaboration and project tracking with features like task management, timelines, and communication tools to enhance productivity.")
+            .version(1))
+                .actions(modifyActions(NiftyCreateProjectAction.ACTION_DEFINITION,
+                    NiftyCreateStatusAction.ACTION_DEFINITION, NiftyCreateTaskAction.ACTION_DEFINITION,
+                    NiftyGetTaskAction.ACTION_DEFINITION, NiftyGetTrackedTimeReportAction.ACTION_DEFINITION))
+                .connection(modifyConnection(NiftyConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -36,14 +36,15 @@ public abstract class AbstractTodoistComponentHandler implements OpenApiComponen
         component("todoist")
             .title("Todoist")
             .description(
-                "Todoist is a task management application that helps users organize and prioritize their to-do lists."))
-                    .actions(modifyActions(TodoistCreateTaskAction.ACTION_DEFINITION,
-                        TodoistMarkTaskCompletedAction.ACTION_DEFINITION, TodoistCreateProjectAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(TodoistConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(TodoistCreateTaskAction.ACTION_DEFINITION),
-                        tool(TodoistMarkTaskCompletedAction.ACTION_DEFINITION),
-                        tool(TodoistCreateProjectAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Todoist is a task management application that helps users organize and prioritize their to-do lists.")
+            .version(1))
+                .actions(modifyActions(TodoistCreateProjectAction.ACTION_DEFINITION,
+                    TodoistCreateTaskAction.ACTION_DEFINITION, TodoistMarkTaskCompletedAction.ACTION_DEFINITION))
+                .connection(modifyConnection(TodoistConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(TodoistCreateProjectAction.ACTION_DEFINITION),
+                    tool(TodoistCreateTaskAction.ACTION_DEFINITION),
+                    tool(TodoistMarkTaskCompletedAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

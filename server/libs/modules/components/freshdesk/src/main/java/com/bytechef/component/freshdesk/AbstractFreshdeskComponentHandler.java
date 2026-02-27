@@ -36,14 +36,15 @@ public abstract class AbstractFreshdeskComponentHandler implements OpenApiCompon
         component("freshdesk")
             .title("Freshdesk")
             .description(
-                "Freshdesk is a cloud-based customer support software that helps businesses manage customer queries and tickets efficiently."))
-                    .actions(modifyActions(FreshdeskCreateCompanyAction.ACTION_DEFINITION,
-                        FreshdeskCreateContactAction.ACTION_DEFINITION, FreshdeskCreateTicketAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(FreshdeskConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(FreshdeskCreateCompanyAction.ACTION_DEFINITION),
-                        tool(FreshdeskCreateContactAction.ACTION_DEFINITION),
-                        tool(FreshdeskCreateTicketAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Freshdesk is a cloud-based customer support software that helps businesses manage customer queries and tickets efficiently.")
+            .version(1))
+                .actions(modifyActions(FreshdeskCreateCompanyAction.ACTION_DEFINITION,
+                    FreshdeskCreateContactAction.ACTION_DEFINITION, FreshdeskCreateTicketAction.ACTION_DEFINITION))
+                .connection(modifyConnection(FreshdeskConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(FreshdeskCreateCompanyAction.ACTION_DEFINITION),
+                    tool(FreshdeskCreateContactAction.ACTION_DEFINITION),
+                    tool(FreshdeskCreateTicketAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -48,17 +48,18 @@ public abstract class AbstractPetstoreComponentHandler implements OpenApiCompone
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("petstore")
             .title("Petstore")
-            .description("This is a sample Pet Store Server based on the OpenAPI 3.0 specification."))
-                .actions(modifyActions(PetstoreAddPetAction.ACTION_DEFINITION,
-                    PetstoreUpdatePetAction.ACTION_DEFINITION, PetstoreFindPetsByStatusAction.ACTION_DEFINITION,
-                    PetstoreFindPetsByTagsAction.ACTION_DEFINITION, PetstoreDeletePetAction.ACTION_DEFINITION,
-                    PetstoreGetPetByIdAction.ACTION_DEFINITION, PetstoreUpdatePetWithFormAction.ACTION_DEFINITION,
-                    PetstoreUploadFileAction.ACTION_DEFINITION, PetstoreGetInventoryAction.ACTION_DEFINITION,
-                    PetstorePlaceOrderAction.ACTION_DEFINITION, PetstoreDeleteOrderAction.ACTION_DEFINITION,
-                    PetstoreGetOrderByIdAction.ACTION_DEFINITION, PetstoreCreateUserAction.ACTION_DEFINITION,
-                    PetstoreCreateUsersWithListInputAction.ACTION_DEFINITION,
-                    PetstoreDeleteUserAction.ACTION_DEFINITION, PetstoreGetUserByNameAction.ACTION_DEFINITION,
-                    PetstoreUpdateUserAction.ACTION_DEFINITION))
+            .description("This is a sample Pet Store Server based on the OpenAPI 3.0 specification.")
+            .version(1))
+                .actions(
+                    modifyActions(PetstoreAddPetAction.ACTION_DEFINITION, PetstoreCreateUserAction.ACTION_DEFINITION,
+                        PetstoreCreateUsersWithListInputAction.ACTION_DEFINITION,
+                        PetstoreDeleteOrderAction.ACTION_DEFINITION, PetstoreDeletePetAction.ACTION_DEFINITION,
+                        PetstoreDeleteUserAction.ACTION_DEFINITION, PetstoreFindPetsByStatusAction.ACTION_DEFINITION,
+                        PetstoreFindPetsByTagsAction.ACTION_DEFINITION, PetstoreGetInventoryAction.ACTION_DEFINITION,
+                        PetstoreGetOrderByIdAction.ACTION_DEFINITION, PetstoreGetPetByIdAction.ACTION_DEFINITION,
+                        PetstoreGetUserByNameAction.ACTION_DEFINITION, PetstorePlaceOrderAction.ACTION_DEFINITION,
+                        PetstoreUpdatePetAction.ACTION_DEFINITION, PetstoreUpdatePetWithFormAction.ACTION_DEFINITION,
+                        PetstoreUpdateUserAction.ACTION_DEFINITION, PetstoreUploadFileAction.ACTION_DEFINITION))
                 .connection(modifyConnection(PetstoreConnection.CONNECTION_DEFINITION))
                 .triggers(getTriggers());
 

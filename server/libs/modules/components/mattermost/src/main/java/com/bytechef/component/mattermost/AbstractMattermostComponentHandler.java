@@ -34,11 +34,12 @@ public abstract class AbstractMattermostComponentHandler implements OpenApiCompo
         component("mattermost")
             .title("Mattermost")
             .description(
-                "Mattermost is an open-source, self-hosted messaging platform designed for secure team collaboration and communication."))
-                    .actions(modifyActions(MattermostSendMessageAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(MattermostConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(MattermostSendMessageAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Mattermost is an open-source, self-hosted messaging platform designed for secure team collaboration and communication.")
+            .version(1))
+                .actions(modifyActions(MattermostSendMessageAction.ACTION_DEFINITION))
+                .connection(modifyConnection(MattermostConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(MattermostSendMessageAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

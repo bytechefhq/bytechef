@@ -34,7 +34,8 @@ public abstract class AbstractReckonComponentHandler implements OpenApiComponent
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("reckon")
             .title("Reckon")
-            .description("Reckon is an accounting software used for financial management and bookkeeping tasks."))
+            .description("Reckon is an accounting software used for financial management and bookkeeping tasks.")
+            .version(1))
                 .actions(modifyActions(ReckonCreateContactAction.ACTION_DEFINITION,
                     ReckonCreateInvoiceAction.ACTION_DEFINITION, ReckonCreatePaymentAction.ACTION_DEFINITION))
                 .connection(modifyConnection(ReckonConnection.CONNECTION_DEFINITION))

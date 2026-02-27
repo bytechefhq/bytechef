@@ -33,10 +33,11 @@ public abstract class AbstractJotformComponentHandler implements OpenApiComponen
         component("jotform")
             .title("JotForm")
             .description(
-                "JotForm is an online form builder that enables users to create customized forms for various purposes without needing coding skills."))
-                    .actions(modifyActions(JotformGetFormSubmissionsAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(JotformConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "JotForm is an online form builder that enables users to create customized forms for various purposes without needing coding skills.")
+            .version(1))
+                .actions(modifyActions(JotformGetFormSubmissionsAction.ACTION_DEFINITION))
+                .connection(modifyConnection(JotformConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

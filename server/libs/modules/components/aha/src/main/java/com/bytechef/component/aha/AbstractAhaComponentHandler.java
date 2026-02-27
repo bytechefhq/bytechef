@@ -34,11 +34,11 @@ public abstract class AbstractAhaComponentHandler implements OpenApiComponentHan
         component("aha")
             .title("Aha!")
             .description(
-                "Aha! is a comprehensive product management software platform that helps teams set strategy, capture ideas, and plan, prioritize, and track work to build products customers love."))
-                    .actions(
-                        modifyActions(AhaCreateFeatureAction.ACTION_DEFINITION, AhaCreateIdeaAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(AhaConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Aha! is a comprehensive product management software platform that helps teams set strategy, capture ideas, and plan, prioritize, and track work to build products customers love.")
+            .version(1))
+                .actions(modifyActions(AhaCreateFeatureAction.ACTION_DEFINITION, AhaCreateIdeaAction.ACTION_DEFINITION))
+                .connection(modifyConnection(AhaConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

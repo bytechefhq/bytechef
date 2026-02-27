@@ -36,15 +36,16 @@ public abstract class AbstractActiveCampaignComponentHandler implements OpenApiC
         component("activeCampaign")
             .title("ActiveCampaign")
             .description(
-                "ActiveCampaign is a customer experience automation platform that offers email marketing, marketing automation, sales automation, and CRM tools."))
-                    .actions(modifyActions(ActiveCampaignCreateAccountAction.ACTION_DEFINITION,
-                        ActiveCampaignCreateContactAction.ACTION_DEFINITION,
-                        ActiveCampaignCreateTaskAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(ActiveCampaignConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(ActiveCampaignCreateAccountAction.ACTION_DEFINITION),
-                        tool(ActiveCampaignCreateContactAction.ACTION_DEFINITION),
-                        tool(ActiveCampaignCreateTaskAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "ActiveCampaign is a customer experience automation platform that offers email marketing, marketing automation, sales automation, and CRM tools.")
+            .version(1))
+                .actions(modifyActions(ActiveCampaignCreateAccountAction.ACTION_DEFINITION,
+                    ActiveCampaignCreateContactAction.ACTION_DEFINITION,
+                    ActiveCampaignCreateTaskAction.ACTION_DEFINITION))
+                .connection(modifyConnection(ActiveCampaignConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(ActiveCampaignCreateAccountAction.ACTION_DEFINITION),
+                    tool(ActiveCampaignCreateContactAction.ACTION_DEFINITION),
+                    tool(ActiveCampaignCreateTaskAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

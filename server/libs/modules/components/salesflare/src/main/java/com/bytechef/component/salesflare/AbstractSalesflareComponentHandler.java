@@ -35,12 +35,12 @@ public abstract class AbstractSalesflareComponentHandler implements OpenApiCompo
         component("salesflare")
             .title("Salesflare")
             .description(
-                "Salesflare is a CRM software designed to help small businesses and startups manage their customer relationships efficiently."))
-                    .actions(modifyActions(SalesflareCreateAccountAction.ACTION_DEFINITION,
-                        SalesflareCreateContactsAction.ACTION_DEFINITION,
-                        SalesflareCreateTasksAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(SalesflareConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Salesflare is a CRM software designed to help small businesses and startups manage their customer relationships efficiently.")
+            .version(1))
+                .actions(modifyActions(SalesflareCreateAccountAction.ACTION_DEFINITION,
+                    SalesflareCreateContactsAction.ACTION_DEFINITION, SalesflareCreateTasksAction.ACTION_DEFINITION))
+                .connection(modifyConnection(SalesflareConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {
