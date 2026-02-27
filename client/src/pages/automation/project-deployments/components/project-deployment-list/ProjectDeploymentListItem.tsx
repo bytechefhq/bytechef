@@ -100,6 +100,14 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
         workflowsCollapsibleTriggerRef.current?.click();
     }, []);
 
+    const enabledProjectDeploymentWorkflows =
+        projectDeployment.projectDeploymentWorkflows?.filter((workflow) => workflow.enabled) ?? [];
+
+    const enabledWorkflowCount = enabledProjectDeploymentWorkflows.length;
+
+    const isDeploymentSwitchDisabled =
+        enableProjectDeploymentMutation.isPending || (enabledWorkflowCount < 1 && !projectDeployment.enabled);
+
     return (
         <>
             <div
@@ -176,7 +184,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
 
                                 <Switch
                                     checked={projectDeployment.enabled}
-                                    disabled={enableProjectDeploymentMutation.isPending}
+                                    disabled={isDeploymentSwitchDisabled}
                                     onCheckedChange={handleOnCheckedChange}
                                     onClick={(event) => event.stopPropagation()}
                                 />
