@@ -42,6 +42,10 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     ),
 }));
 
+vi.mock('@/shared/stores/useEnvironmentStore', () => ({
+    useEnvironmentStore: vi.fn(() => 0),
+}));
+
 vi.mock('@/shared/middleware/graphql', () => ({
     useKnowledgeBaseTagsByKnowledgeBaseQuery: vi.fn(() => ({
         data: hoisted.tagsByKnowledgeBaseData,
