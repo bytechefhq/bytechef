@@ -208,6 +208,7 @@ public class PropertyTestingAction {
         .output(outputSchema(object()))
         .perform(PropertyTestingAction::perform);
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private static List<ValueProperty<?>> createDynamicParameters(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         Context context) {
@@ -219,6 +220,7 @@ public class PropertyTestingAction {
                 .label("Dynamic Property 2"));
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private static List<? extends Option<String>> getOptionsLookup(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
