@@ -7,6 +7,7 @@ import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useCallback, useEffect} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 interface UseClusterElementsCanvasDialogProps {
     onOpenChange: (open: boolean) => void;
@@ -20,6 +21,12 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     const setTestingPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setTestingPanelOpen);
 
     const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
+    const {resetNodeDetailsPanel, setAiAgentNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            resetNodeDetailsPanel: state.reset,
+            setAiAgentNodeDetailsPanelOpen: state.setAiAgentNodeDetailsPanelOpen,
+        }))
+    );
 
     const isAiAgentClusterRoot = rootClusterElementNodeData?.componentName === 'aiAgent';
     const agentNodeName = rootClusterElementNodeData?.workflowNodeName;
@@ -35,13 +42,13 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         (showAiAgent: boolean) => {
             setShowAiAgentEditor(showAiAgent);
             useTestingModeStore.getState().resetTestingMode();
-            useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
+            setAiAgentNodeDetailsPanelOpen(false);
 
             if (agentNodeName) {
                 setEditorPreference(agentNodeName, showAiAgent);
             }
         },
-        [agentNodeName, setEditorPreference, setShowAiAgentEditor]
+        [agentNodeName, setAiAgentNodeDetailsPanelOpen, setEditorPreference, setShowAiAgentEditor]
     );
 
     const handleCopilotClick = useCallback(() => {
@@ -93,10 +100,10 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
                 useCopilotStore.getState().restoreConversationState();
                 useClusterElementsCanvasDialogStore.getState().reset();
                 useTestingModeStore.getState().resetTestingMode();
-                useWorkflowNodeDetailsPanelStore.getState().reset();
+                resetNodeDetailsPanel();
             }
         },
-        [onOpenChange]
+        [onOpenChange, resetNodeDetailsPanel]
     );
 
     const handleClose = useCallback(() => {
