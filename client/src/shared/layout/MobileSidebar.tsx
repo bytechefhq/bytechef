@@ -4,11 +4,11 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {AudioLinesIcon, User2Icon} from 'lucide-react';
-import {ForwardRefExoticComponent, SVGProps, useEffect} from 'react';
+import {ForwardRefExoticComponent, SVGProps, useCallback, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -37,32 +37,40 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen}: M
 
     const navigate = useNavigate();
 
-    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: environmentsQuery} = useEnvironmentsQuery();
 
-    const handleEnvironmentValueChange = (value: string) => {
-        setCurrentEnvironmentId(+value);
+    const handleEnvironmentValueChange = useCallback(
+        (value: string) => {
+            setCurrentEnvironmentId(+value);
 
-        if (currentType === PlatformType.AUTOMATION) {
-            navigate(`/automation${+value === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
-        } else if (currentType === PlatformType.EMBEDDED) {
-            navigate(`/embedded${+value === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`);
-        }
-    };
+            if (currentType === PlatformType.AUTOMATION) {
+                navigate(`/automation${+value === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
+            } else if (currentType === PlatformType.EMBEDDED) {
+                navigate(`/embedded${+value === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`);
+            }
+        },
+        [currentType, navigate, setCurrentEnvironmentId]
+    );
 
     useEffect(() => {
         const environments = environmentsQuery?.environments;
 
-        if (environments && environments.length > 0) {
-            if (currentEnvironmentId) {
-                if (!environments.map((environment) => environment?.id!).find((id) => +id === currentEnvironmentId)) {
-                    if (environments[0]?.id) {
-                        setCurrentEnvironmentId(+environments[0]?.id);
-                    }
-                }
-            } else if (environments[0]?.id && !currentEnvironmentId) {
-                setCurrentEnvironmentId(+environments[0]?.id);
+        if (!environments || environments.length === 0) {
+            return;
+        }
+
+        const firstEnvironmentId = environments[0]?.id;
+
+        if (currentEnvironmentId) {
+            const environmentExists = environments.some(
+                (environment) => environment?.id != null && +environment.id === currentEnvironmentId
+            );
+
+            if (!environmentExists && firstEnvironmentId) {
+                setCurrentEnvironmentId(+firstEnvironmentId);
             }
+        } else if (firstEnvironmentId) {
+            setCurrentEnvironmentId(+firstEnvironmentId);
         }
     }, [currentEnvironmentId, environmentsQuery?.environments, setCurrentEnvironmentId]);
 
@@ -94,7 +102,7 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen}: M
                     </nav>
                 </div>
 
-                {edition === 'EE' && environmentsQuery?.environments && (
+                {edition === EditionType.EE && environmentsQuery?.environments && (
                     <div className="border-t border-gray-200 px-4 py-3">
                         <div className="flex items-center space-x-2 pb-2">
                             <AudioLinesIcon className="size-5 text-gray-500" />
@@ -108,11 +116,13 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen}: M
                             </SelectTrigger>
 
                             <SelectContent>
-                                {environmentsQuery.environments.map((environment) => (
-                                    <SelectItem key={environment?.id} value={environment?.id!}>
-                                        {environment?.name}
-                                    </SelectItem>
-                                ))}
+                                {environmentsQuery.environments
+                                    .filter((environment) => environment?.id != null)
+                                    .map((environment) => (
+                                        <SelectItem key={environment!.id} value={environment!.id!}>
+                                            {environment!.name}
+                                        </SelectItem>
+                                    ))}
                             </SelectContent>
                         </Select>
                     </div>
