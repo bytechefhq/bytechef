@@ -36,12 +36,13 @@ public abstract class AbstractHunterComponentHandler implements OpenApiComponent
         component("hunter")
             .title("Hunter")
             .description(
-                "Hunter is a tool that helps users find and verify professional email addresses, enabling effective outreach and communication."))
-                    .actions(modifyActions(HunterEmailEnrichmentAction.ACTION_DEFINITION,
-                        HunterCompanyEnrichmentAction.ACTION_DEFINITION,
-                        HunterCombinedEnrichmentAction.ACTION_DEFINITION, HunterCreateLeadAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(HunterConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Hunter is a tool that helps users find and verify professional email addresses, enabling effective outreach and communication.")
+            .version(1))
+                .actions(modifyActions(HunterCombinedEnrichmentAction.ACTION_DEFINITION,
+                    HunterCompanyEnrichmentAction.ACTION_DEFINITION, HunterCreateLeadAction.ACTION_DEFINITION,
+                    HunterEmailEnrichmentAction.ACTION_DEFINITION))
+                .connection(modifyConnection(HunterConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

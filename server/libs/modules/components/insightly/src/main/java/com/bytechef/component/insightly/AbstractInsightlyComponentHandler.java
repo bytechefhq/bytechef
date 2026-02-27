@@ -35,12 +35,12 @@ public abstract class AbstractInsightlyComponentHandler implements OpenApiCompon
         component("insightly")
             .title("Insightly")
             .description(
-                "Insightly is a customer relationship management (CRM) software that helps businesses manage contacts, sales, projects, and tasks in one platform."))
-                    .actions(modifyActions(InsightlyCreateContactAction.ACTION_DEFINITION,
-                        InsightlyCreateOrganizationAction.ACTION_DEFINITION,
-                        InsightlyCreateTaskAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(InsightlyConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Insightly is a customer relationship management (CRM) software that helps businesses manage contacts, sales, projects, and tasks in one platform.")
+            .version(1))
+                .actions(modifyActions(InsightlyCreateContactAction.ACTION_DEFINITION,
+                    InsightlyCreateOrganizationAction.ACTION_DEFINITION, InsightlyCreateTaskAction.ACTION_DEFINITION))
+                .connection(modifyConnection(InsightlyConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

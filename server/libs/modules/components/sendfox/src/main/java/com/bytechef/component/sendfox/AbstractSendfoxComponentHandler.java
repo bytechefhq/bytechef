@@ -36,14 +36,15 @@ public abstract class AbstractSendfoxComponentHandler implements OpenApiComponen
         component("sendfox")
             .title("SendFox")
             .description(
-                "SendFox lets you automate email campaigns, complete with custom opt-in forms and landing pages, so you're not tanking your budget to get new subscribers."))
-                    .actions(modifyActions(SendfoxCreateContactAction.ACTION_DEFINITION,
-                        SendfoxCreateListAction.ACTION_DEFINITION, SendfoxUnsubscribeContactAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(SendfoxConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(SendfoxCreateContactAction.ACTION_DEFINITION),
-                        tool(SendfoxCreateListAction.ACTION_DEFINITION),
-                        tool(SendfoxUnsubscribeContactAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "SendFox lets you automate email campaigns, complete with custom opt-in forms and landing pages, so you're not tanking your budget to get new subscribers.")
+            .version(1))
+                .actions(modifyActions(SendfoxCreateContactAction.ACTION_DEFINITION,
+                    SendfoxCreateListAction.ACTION_DEFINITION, SendfoxUnsubscribeContactAction.ACTION_DEFINITION))
+                .connection(modifyConnection(SendfoxConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(SendfoxCreateContactAction.ACTION_DEFINITION),
+                    tool(SendfoxCreateListAction.ACTION_DEFINITION),
+                    tool(SendfoxUnsubscribeContactAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

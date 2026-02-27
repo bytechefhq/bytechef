@@ -35,13 +35,14 @@ public abstract class AbstractFigmaComponentHandler implements OpenApiComponentH
         component("figma")
             .title("Figma")
             .description(
-                "Figma is a cloud-based design and prototyping tool that enables teams to collaborate in real-time on user interface and user experience projects."))
-                    .actions(modifyActions(FigmaGetCommentsAction.ACTION_DEFINITION,
-                        FigmaPostCommentAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(FigmaConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(FigmaGetCommentsAction.ACTION_DEFINITION),
-                        tool(FigmaPostCommentAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Figma is a cloud-based design and prototyping tool that enables teams to collaborate in real-time on user interface and user experience projects.")
+            .version(1))
+                .actions(
+                    modifyActions(FigmaGetCommentsAction.ACTION_DEFINITION, FigmaPostCommentAction.ACTION_DEFINITION))
+                .connection(modifyConnection(FigmaConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(FigmaGetCommentsAction.ACTION_DEFINITION),
+                    tool(FigmaPostCommentAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -34,11 +34,12 @@ public abstract class AbstractApifyComponentHandler implements OpenApiComponentH
         component("apify")
             .title("Apify")
             .description(
-                "Apify is the largest ecosystem where developers build, deploy, and publish data extraction and web automation tools."))
-                    .actions(modifyActions(ApifyGetLastRunAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(ApifyConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(ApifyGetLastRunAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Apify is the largest ecosystem where developers build, deploy, and publish data extraction and web automation tools.")
+            .version(1))
+                .actions(modifyActions(ApifyGetLastRunAction.ACTION_DEFINITION))
+                .connection(modifyConnection(ApifyConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(ApifyGetLastRunAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

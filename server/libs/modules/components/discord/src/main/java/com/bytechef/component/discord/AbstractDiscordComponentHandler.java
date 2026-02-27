@@ -35,13 +35,14 @@ public abstract class AbstractDiscordComponentHandler implements OpenApiComponen
         component("discord")
             .title("Discord")
             .description(
-                "Discord is a communication platform designed for creating communities, chatting with friends, and connecting with others through text, voice, and video channels."))
-                    .actions(modifyActions(DiscordSendChannelMessageAction.ACTION_DEFINITION,
-                        DiscordCreateChannelAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(DiscordConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(DiscordSendChannelMessageAction.ACTION_DEFINITION),
-                        tool(DiscordCreateChannelAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Discord is a communication platform designed for creating communities, chatting with friends, and connecting with others through text, voice, and video channels.")
+            .version(1))
+                .actions(modifyActions(DiscordCreateChannelAction.ACTION_DEFINITION,
+                    DiscordSendChannelMessageAction.ACTION_DEFINITION))
+                .connection(modifyConnection(DiscordConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(DiscordCreateChannelAction.ACTION_DEFINITION),
+                    tool(DiscordSendChannelMessageAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -37,16 +37,16 @@ public abstract class AbstractApolloComponentHandler implements OpenApiComponent
         component("apollo")
             .title("Apollo")
             .description(
-                "Apollo.io is a sales intelligence and engagement platform that provides tools for prospecting, lead generation, and sales automation to help businesses improve their sales processes and outreach efforts."))
-                    .actions(modifyActions(ApolloUpdateDealAction.ACTION_DEFINITION,
-                        ApolloCreateDealAction.ACTION_DEFINITION, ApolloEnrichPersonAction.ACTION_DEFINITION,
-                        ApolloEnrichCompanyAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(ApolloConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(ApolloUpdateDealAction.ACTION_DEFINITION),
-                        tool(ApolloCreateDealAction.ACTION_DEFINITION),
-                        tool(ApolloEnrichPersonAction.ACTION_DEFINITION),
-                        tool(ApolloEnrichCompanyAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Apollo.io is a sales intelligence and engagement platform that provides tools for prospecting, lead generation, and sales automation to help businesses improve their sales processes and outreach efforts.")
+            .version(1))
+                .actions(
+                    modifyActions(ApolloCreateDealAction.ACTION_DEFINITION, ApolloEnrichCompanyAction.ACTION_DEFINITION,
+                        ApolloEnrichPersonAction.ACTION_DEFINITION, ApolloUpdateDealAction.ACTION_DEFINITION))
+                .connection(modifyConnection(ApolloConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(ApolloCreateDealAction.ACTION_DEFINITION),
+                    tool(ApolloEnrichCompanyAction.ACTION_DEFINITION), tool(ApolloEnrichPersonAction.ACTION_DEFINITION),
+                    tool(ApolloUpdateDealAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

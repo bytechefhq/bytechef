@@ -35,13 +35,14 @@ public abstract class AbstractZoomComponentHandler implements OpenApiComponentHa
         component("zoom")
             .title("Zoom")
             .description(
-                "Zoom is a cloud-based video conferencing platform that enables virtual meetings, webinars, and collaboration through video, audio, and chat."))
-                    .actions(modifyActions(ZoomCreateMeetingAction.ACTION_DEFINITION,
-                        ZoomAddMeetingRegistrantAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(ZoomConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(ZoomCreateMeetingAction.ACTION_DEFINITION),
-                        tool(ZoomAddMeetingRegistrantAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Zoom is a cloud-based video conferencing platform that enables virtual meetings, webinars, and collaboration through video, audio, and chat.")
+            .version(1))
+                .actions(modifyActions(ZoomAddMeetingRegistrantAction.ACTION_DEFINITION,
+                    ZoomCreateMeetingAction.ACTION_DEFINITION))
+                .connection(modifyConnection(ZoomConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(ZoomAddMeetingRegistrantAction.ACTION_DEFINITION),
+                    tool(ZoomCreateMeetingAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -35,13 +35,14 @@ public abstract class AbstractStripeComponentHandler implements OpenApiComponent
         component("stripe")
             .title("Stripe")
             .description(
-                "Stripe is a payment processing platform that allows businesses to accept online payments and manage transactions securely."))
-                    .actions(modifyActions(StripeCreateCustomerAction.ACTION_DEFINITION,
-                        StripeCreateInvoiceAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(StripeConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(StripeCreateCustomerAction.ACTION_DEFINITION),
-                        tool(StripeCreateInvoiceAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Stripe is a payment processing platform that allows businesses to accept online payments and manage transactions securely.")
+            .version(1))
+                .actions(modifyActions(StripeCreateCustomerAction.ACTION_DEFINITION,
+                    StripeCreateInvoiceAction.ACTION_DEFINITION))
+                .connection(modifyConnection(StripeConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(StripeCreateCustomerAction.ACTION_DEFINITION),
+                    tool(StripeCreateInvoiceAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

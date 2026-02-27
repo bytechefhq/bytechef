@@ -34,11 +34,12 @@ public abstract class AbstractDhlComponentHandler implements OpenApiComponentHan
         component("dhl")
             .title("DHL")
             .description(
-                "DHL is the global leader in the logistics industry. Specializing in international shipping, courier services and transportation."))
-                    .actions(modifyActions(DhlTrackShipmentAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(DhlConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(DhlTrackShipmentAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "DHL is the global leader in the logistics industry. Specializing in international shipping, courier services and transportation.")
+            .version(1))
+                .actions(modifyActions(DhlTrackShipmentAction.ACTION_DEFINITION))
+                .connection(modifyConnection(DhlConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(DhlTrackShipmentAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

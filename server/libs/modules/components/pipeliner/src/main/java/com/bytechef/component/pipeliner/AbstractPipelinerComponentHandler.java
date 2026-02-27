@@ -35,11 +35,12 @@ public abstract class AbstractPipelinerComponentHandler implements OpenApiCompon
         component("pipeliner")
             .title("Pipeliner")
             .description(
-                "Pipeliner CRM is a comprehensive sales management tool that helps streamline sales processes through visual pipline management, contact organization, sales forecasting, and reporting."))
-                    .actions(modifyActions(PipelinerCreateAccountAction.ACTION_DEFINITION,
-                        PipelinerCreateContactAction.ACTION_DEFINITION, PipelinerCreateTaskAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(PipelinerConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Pipeliner CRM is a comprehensive sales management tool that helps streamline sales processes through visual pipline management, contact organization, sales forecasting, and reporting.")
+            .version(1))
+                .actions(modifyActions(PipelinerCreateAccountAction.ACTION_DEFINITION,
+                    PipelinerCreateContactAction.ACTION_DEFINITION, PipelinerCreateTaskAction.ACTION_DEFINITION))
+                .connection(modifyConnection(PipelinerConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

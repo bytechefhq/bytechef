@@ -34,11 +34,12 @@ public abstract class AbstractRssComponentHandler implements OpenApiComponentHan
         component("rss")
             .title("RSS")
             .description(
-                "RSS.app is a web-based tool that helps you create, customize, and manage RSS feeds—even from websites that don’t provide them natively."))
-                    .actions(modifyActions(RssCreateFeedAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(RssConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(RssCreateFeedAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "RSS.app is a web-based tool that helps you create, customize, and manage RSS feeds—even from websites that don’t provide them natively.")
+            .version(1))
+                .actions(modifyActions(RssCreateFeedAction.ACTION_DEFINITION))
+                .connection(modifyConnection(RssConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(RssCreateFeedAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

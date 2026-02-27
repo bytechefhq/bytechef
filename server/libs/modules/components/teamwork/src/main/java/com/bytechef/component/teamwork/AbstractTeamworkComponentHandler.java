@@ -34,11 +34,12 @@ public abstract class AbstractTeamworkComponentHandler implements OpenApiCompone
         component("teamwork")
             .title("Teamwork")
             .description(
-                "Teamwork is a project management software that helps teams collaborate, organize tasks, and track progress efficiently."))
-                    .actions(modifyActions(TeamworkCreateCompanyAction.ACTION_DEFINITION,
-                        TeamworkCreateTaskAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(TeamworkConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Teamwork is a project management software that helps teams collaborate, organize tasks, and track progress efficiently.")
+            .version(1))
+                .actions(modifyActions(TeamworkCreateCompanyAction.ACTION_DEFINITION,
+                    TeamworkCreateTaskAction.ACTION_DEFINITION))
+                .connection(modifyConnection(TeamworkConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

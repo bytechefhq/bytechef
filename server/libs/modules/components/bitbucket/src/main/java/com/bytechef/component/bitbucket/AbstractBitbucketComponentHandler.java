@@ -35,13 +35,14 @@ public abstract class AbstractBitbucketComponentHandler implements OpenApiCompon
         component("bitbucket")
             .title("Bitbucket")
             .description(
-                "Elevate your software delivery from planning to production and beyond, with built-in AI, CI/CD, and a best-in-class Jira integration."))
-                    .actions(modifyActions(BitbucketCreateRepositoryAction.ACTION_DEFINITION,
-                        BitbucketCreateProjectAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(BitbucketConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(BitbucketCreateRepositoryAction.ACTION_DEFINITION),
-                        tool(BitbucketCreateProjectAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Elevate your software delivery from planning to production and beyond, with built-in AI, CI/CD, and a best-in-class Jira integration.")
+            .version(1))
+                .actions(modifyActions(BitbucketCreateProjectAction.ACTION_DEFINITION,
+                    BitbucketCreateRepositoryAction.ACTION_DEFINITION))
+                .connection(modifyConnection(BitbucketConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(BitbucketCreateProjectAction.ACTION_DEFINITION),
+                    tool(BitbucketCreateRepositoryAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

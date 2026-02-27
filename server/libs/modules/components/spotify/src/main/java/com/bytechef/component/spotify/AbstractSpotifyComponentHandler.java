@@ -35,13 +35,14 @@ public abstract class AbstractSpotifyComponentHandler implements OpenApiComponen
         component("spotify")
             .title("Spotify")
             .description(
-                "Spotify is a popular music streaming service that offers a vast library of songs, podcasts, and playlists for users to enjoy."))
-                    .actions(modifyActions(SpotifyStartResumePlaybackAction.ACTION_DEFINITION,
-                        SpotifyAddItemsToPlaylistAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(SpotifyConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(SpotifyStartResumePlaybackAction.ACTION_DEFINITION),
-                        tool(SpotifyAddItemsToPlaylistAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Spotify is a popular music streaming service that offers a vast library of songs, podcasts, and playlists for users to enjoy.")
+            .version(1))
+                .actions(modifyActions(SpotifyAddItemsToPlaylistAction.ACTION_DEFINITION,
+                    SpotifyStartResumePlaybackAction.ACTION_DEFINITION))
+                .connection(modifyConnection(SpotifyConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(SpotifyAddItemsToPlaylistAction.ACTION_DEFINITION),
+                    tool(SpotifyStartResumePlaybackAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

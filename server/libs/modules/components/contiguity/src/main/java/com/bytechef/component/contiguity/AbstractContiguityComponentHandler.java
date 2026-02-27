@@ -34,12 +34,13 @@ public abstract class AbstractContiguityComponentHandler implements OpenApiCompo
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("contiguity")
             .title("Contiguity")
-            .description("Contiguity is an SMS service for your needs - quick and simple."))
-                .actions(modifyActions(ContiguitySendSmsAction.ACTION_DEFINITION,
-                    ContiguitySendEmailAction.ACTION_DEFINITION))
+            .description("Contiguity is an SMS service for your needs - quick and simple.")
+            .version(1))
+                .actions(modifyActions(ContiguitySendEmailAction.ACTION_DEFINITION,
+                    ContiguitySendSmsAction.ACTION_DEFINITION))
                 .connection(modifyConnection(ContiguityConnection.CONNECTION_DEFINITION))
-                .clusterElements(modifyClusterElements(tool(ContiguitySendSmsAction.ACTION_DEFINITION),
-                    tool(ContiguitySendEmailAction.ACTION_DEFINITION)))
+                .clusterElements(modifyClusterElements(tool(ContiguitySendEmailAction.ACTION_DEFINITION),
+                    tool(ContiguitySendSmsAction.ACTION_DEFINITION)))
                 .triggers(getTriggers());
 
     @Override
