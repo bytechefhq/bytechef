@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Lists the user's Search Console sites.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-search-console_v1#list-sites"
+    },
     "metadata": {
       "method": "GET",
       "path": "/sites"
@@ -292,7 +295,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Removes a site from the set of the user's Search Console sites.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-search-console_v1#delete-site"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/sites/{siteUrl}"
@@ -339,7 +345,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieves information about specific site.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-search-console_v1#get-site"
+    },
     "metadata": {
       "method": "GET",
       "path": "/sites/{siteUrl}"
@@ -569,7 +578,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a site to the set of the user's sites in Search Console.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-search-console_v1#add-site"
+    },
     "metadata": {
       "method": "PUT",
       "path": "/sites/{siteUrl}"
@@ -613,7 +625,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Query your data with filters and parameters that you define.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-search-console_v1#search-analytics"
+    },
     "metadata": {
       "path": "/sites/{siteUrl}/searchAnalytics/query",
       "mimeType": "application/json",
@@ -1679,7 +1694,10 @@
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "Google Search Console API documentation",
+    "learnMoreUrl": "https://developers.google.com/webmaster-tools/"
+  },
   "description": "The Search Console API provides access to both Search Console data (verified users only) and to public information on an URL basis (anyone).",
   "icon": "path:assets/google-search-console.svg",
   "metadata": null,
