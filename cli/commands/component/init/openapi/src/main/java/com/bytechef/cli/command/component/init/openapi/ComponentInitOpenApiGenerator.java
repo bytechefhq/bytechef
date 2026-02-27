@@ -1278,12 +1278,14 @@ public class ComponentInitOpenApiGenerator {
                     component($S)
                         .title($S)
                         .description($S)
+                        .version($L)
                     )
                     .actions(modifyActions($L))
                 """,
 
             StringUtils.uncapitalize(name),
             title, info.getDescription(),
+            version,
             getActionsCodeBlock(componentHandlerDirPath, openAPI));
 
         CodeBlock codeBlock = getConnectionCodeBlock(openAPI, componentHandlerDirPath);
@@ -2286,7 +2288,8 @@ public class ComponentInitOpenApiGenerator {
                     .addAnnotation(ClassName.get("org.junit.jupiter.api", "Test"))
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement(
-                        "$T.assertEquals(\"definition/" + componentName + "_v1.json\", new $T().getDefinition())",
+                        "$T.assertEquals(\"definition/" + componentName + "_v" + version
+                            + ".json\", new $T().getDefinition())",
                         ClassName.get("com.bytechef.test.jsonasssert", "JsonFileAssert"),
                         ClassName.get(getPackageName(), componentHandlerClassName))
                     .build())
