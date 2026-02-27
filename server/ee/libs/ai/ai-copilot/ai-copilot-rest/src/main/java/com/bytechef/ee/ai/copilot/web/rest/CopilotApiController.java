@@ -53,17 +53,22 @@ public class CopilotApiController {
     public SseEmitter chat(
         @NonNull @PathVariable("agentId") String agentId, @NonNull @RequestBody() AgUiParameters agUiParameters) {
 
+        State state = agUiParameters.getState();
+        Map<String, Object> stateMap = state.getState();
+        Object mode = stateMap.get("mode");
+
         if (agentId.equals("workflow_editor")) {
-            State state = agUiParameters.getState();
-
-            Map<String, Object> stateMap = state.getState();
-
-            Object mode = stateMap.get("mode");
-
             if (Mode.valueOf((String) mode) == Mode.BUILD) {
                 agentId = "workflow_editor_build";
             } else {
                 agentId = "workflow_editor_ask";
+            }
+        }
+        else if(agentId.equals("code_editor")){
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "code_editor_build";
+            } else {
+                agentId = "code_editor_ask";
             }
         }
 
