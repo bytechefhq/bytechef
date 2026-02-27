@@ -21,16 +21,7 @@ import {twMerge} from 'tailwind-merge';
 
 const projectDeploymentApi = new ProjectDeploymentApi();
 
-const ProjectDeploymentWorkflowListItem = ({
-    environmentId,
-    filteredComponentNames,
-    projectDeploymentEnabled,
-    projectDeploymentId,
-    projectDeploymentWorkflow,
-    workflow,
-    workflowComponentDefinitions,
-    workflowTaskDispatcherDefinitions,
-}: {
+interface ProjectDeploymentWorkflowListItemProps {
     environmentId: number;
     filteredComponentNames?: string[];
     projectDeploymentEnabled: boolean;
@@ -43,7 +34,18 @@ const ProjectDeploymentWorkflowListItem = ({
     workflowTaskDispatcherDefinitions: {
         [key: string]: ComponentDefinitionBasic | undefined;
     };
-}) => {
+}
+
+const ProjectDeploymentWorkflowListItem = ({
+    environmentId,
+    filteredComponentNames,
+    projectDeploymentEnabled,
+    projectDeploymentId,
+    projectDeploymentWorkflow,
+    workflow,
+    workflowComponentDefinitions,
+    workflowTaskDispatcherDefinitions,
+}: ProjectDeploymentWorkflowListItemProps) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
     const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
@@ -95,12 +97,22 @@ const ProjectDeploymentWorkflowListItem = ({
             );
     };
 
-    const handleEnableProjectDeploymentWorkflow = (value: boolean) => {
+    interface HandleEnableProjectDeploymentWorkflowProps {
+        projectDeploymentId: number;
+        value: boolean;
+        workflowId: string;
+    }
+
+    const handleEnableProjectDeploymentWorkflow = ({
+        projectDeploymentId,
+        value,
+        workflowId,
+    }: HandleEnableProjectDeploymentWorkflowProps) => {
         enableProjectDeploymentWorkflowMutation.mutate(
             {
                 enable: value,
                 id: projectDeploymentId,
-                workflowId: workflow.id!,
+                workflowId: workflowId,
             },
             {
                 onSuccess: () => {
@@ -227,7 +239,13 @@ const ProjectDeploymentWorkflowListItem = ({
                             checked={projectDeploymentWorkflow.enabled}
                             className="mr-2"
                             disabled={enableProjectDeploymentWorkflowMutation.isPending}
-                            onCheckedChange={handleEnableProjectDeploymentWorkflow}
+                            onCheckedChange={(value) =>
+                                handleEnableProjectDeploymentWorkflow({
+                                    projectDeploymentId,
+                                    value,
+                                    workflowId: workflow.id!,
+                                })
+                            }
                             onClick={(event) => event.stopPropagation()}
                         />
                     </div>

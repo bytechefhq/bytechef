@@ -1,10 +1,12 @@
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Skeleton} from '@/components/ui/skeleton';
 import ProjectDeploymentWorkflowListItem from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItem';
-import {ProjectDeploymentWorkflow} from '@/shared/middleware/automation/configuration';
+import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
+import {ChevronDownIcon} from 'lucide-react';
 
 const ProjectDeploymentWorkflowList = ({
     environmentId,
@@ -66,61 +68,131 @@ const ProjectDeploymentWorkflowList = ({
         );
     }
 
+    const sortedWorkflows =
+        workflows?.sort((firstWorkflow, secondWorkflow) => firstWorkflow.label!.localeCompare(secondWorkflow.label!)) ??
+        [];
+
+    const enabledWorkflows = sortedWorkflows
+        .map((workflow) => {
+            const projectDeploymentWorkflow = projectDeploymentWorkflows.find(
+                (deploymentWorkflow) => deploymentWorkflow.workflowId === workflow?.id
+            );
+
+            return projectDeploymentWorkflow?.enabled ? {projectDeploymentWorkflow, workflow} : null;
+        })
+        .filter((data): data is NonNullable<typeof data> => data != null);
+
+    const disabledWorkflows = sortedWorkflows
+        .map((workflow) => {
+            const projectDeploymentWorkflow = projectDeploymentWorkflows.find(
+                (deploymentWorkflow) => deploymentWorkflow.workflowId === workflow?.id
+            );
+
+            return projectDeploymentWorkflow?.enabled ? null : {projectDeploymentWorkflow, workflow};
+        })
+        .filter(
+            (data): data is {projectDeploymentWorkflow: ProjectDeploymentWorkflow; workflow: Workflow} =>
+                data != null && data.projectDeploymentWorkflow != null
+        );
+
+    const allRenderedWorkflows = [...enabledWorkflows, ...disabledWorkflows];
+
+    allRenderedWorkflows.forEach(({workflow}) => {
+        const componentNames = [
+            ...(workflow.workflowTriggerComponentNames ?? []),
+            ...(workflow.workflowTaskComponentNames ?? []),
+        ];
+
+        componentNames?.forEach((componentName) => {
+            if (!workflowComponentDefinitions[componentName]) {
+                workflowComponentDefinitions[componentName] = componentDefinitions?.find(
+                    (componentDefinition) => componentDefinition.name === componentName
+                );
+            }
+
+            if (!workflowTaskDispatcherDefinitions[componentName]) {
+                workflowTaskDispatcherDefinitions[componentName] = taskDispatcherDefinitions?.find(
+                    (taskDispatcherDefinition) => taskDispatcherDefinition.name === componentName
+                );
+            }
+        });
+    });
+
     return (
         <div className="border-b border-b-gray-100 py-3 pl-4">
             <h3 className="heading-tertiary flex justify-start pl-2 text-sm">Workflows</h3>
 
-            <ul className="divide-y divide-gray-100">
-                {workflows &&
-                    workflows
-                        .sort((a, b) => a.label!.localeCompare(b.label!))
-                        .map((workflow) => {
-                            const componentNames = [
-                                ...(workflow.workflowTriggerComponentNames ?? []),
-                                ...(workflow.workflowTaskComponentNames ?? []),
-                            ];
+            {enabledWorkflows.length === 0 ? (
+                <p className="py-4 pl-2 text-sm text-muted-foreground">
+                    No enabled workflows. Enable a workflow in the project to run it in this deployment.
+                </p>
+            ) : (
+                <ul className="divide-y divide-gray-100">
+                    {enabledWorkflows.map(({projectDeploymentWorkflow, workflow}) => {
+                        const componentNames = [
+                            ...(workflow.workflowTriggerComponentNames ?? []),
+                            ...(workflow.workflowTaskComponentNames ?? []),
+                        ];
 
-                            componentNames?.forEach((componentName) => {
-                                if (!workflowComponentDefinitions[componentName]) {
-                                    workflowComponentDefinitions[componentName] = componentDefinitions?.find(
-                                        (componentDefinition) => componentDefinition.name === componentName
-                                    );
-                                }
+                        const filteredComponentNames = componentNames?.filter(
+                            (item, index) => componentNames?.indexOf(item) === index
+                        );
 
-                                if (!workflowTaskDispatcherDefinitions[componentName]) {
-                                    workflowTaskDispatcherDefinitions[componentName] = taskDispatcherDefinitions?.find(
-                                        (taskDispatcherDefinition) => taskDispatcherDefinition.name === componentName
-                                    );
-                                }
-                            });
+                        return (
+                            <ProjectDeploymentWorkflowListItem
+                                environmentId={environmentId}
+                                filteredComponentNames={filteredComponentNames}
+                                key={workflow.id}
+                                projectDeploymentEnabled={projectDeploymentEnabled}
+                                projectDeploymentId={projectDeploymentId}
+                                projectDeploymentWorkflow={projectDeploymentWorkflow}
+                                workflow={workflow}
+                                workflowComponentDefinitions={workflowComponentDefinitions}
+                                workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                            />
+                        );
+                    })}
+                </ul>
+            )}
 
-                            const filteredComponentNames = componentNames?.filter(
-                                (item, index) => componentNames?.indexOf(item) === index
-                            );
+            {disabledWorkflows.length > 0 && (
+                <Collapsible className="group p-2">
+                    <CollapsibleTrigger className="flex w-full items-center space-x-2 rounded-md p-2 hover:bg-surface-neutral-primary-hover [&[data-state=open]>svg]:rotate-180">
+                        <h3 className="flex justify-start pl-2 text-sm text-muted-foreground">Disabled Workflows</h3>
 
-                            const projectDeploymentWorkflow = projectDeploymentWorkflows.find(
-                                (projectDeploymentWorkflow) => projectDeploymentWorkflow.workflowId === workflow?.id
-                            );
+                        <ChevronDownIcon className="size-4 shrink-0 transition-transform duration-300" />
+                    </CollapsibleTrigger>
 
-                            if (!projectDeploymentWorkflow) {
-                                return <></>;
-                            }
+                    <CollapsibleContent className="p-2">
+                        <ul className="divide-y divide-gray-100">
+                            {disabledWorkflows.map(({projectDeploymentWorkflow, workflow}) => {
+                                const componentNames = [
+                                    ...(workflow.workflowTriggerComponentNames ?? []),
+                                    ...(workflow.workflowTaskComponentNames ?? []),
+                                ];
 
-                            return (
-                                <ProjectDeploymentWorkflowListItem
-                                    environmentId={environmentId}
-                                    filteredComponentNames={filteredComponentNames}
-                                    key={workflow.id}
-                                    projectDeploymentEnabled={projectDeploymentEnabled}
-                                    projectDeploymentId={projectDeploymentId}
-                                    projectDeploymentWorkflow={projectDeploymentWorkflow}
-                                    workflow={workflow}
-                                    workflowComponentDefinitions={workflowComponentDefinitions}
-                                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                                />
-                            );
-                        })}
-            </ul>
+                                const filteredComponentNames = componentNames?.filter(
+                                    (item, index) => componentNames?.indexOf(item) === index
+                                );
+
+                                return (
+                                    <ProjectDeploymentWorkflowListItem
+                                        environmentId={environmentId}
+                                        filteredComponentNames={filteredComponentNames}
+                                        key={workflow.id}
+                                        projectDeploymentEnabled={projectDeploymentEnabled}
+                                        projectDeploymentId={projectDeploymentId}
+                                        projectDeploymentWorkflow={projectDeploymentWorkflow}
+                                        workflow={workflow}
+                                        workflowComponentDefinitions={workflowComponentDefinitions}
+                                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                                    />
+                                );
+                            })}
+                        </ul>
+                    </CollapsibleContent>
+                </Collapsible>
+            )}
         </div>
     );
 };
