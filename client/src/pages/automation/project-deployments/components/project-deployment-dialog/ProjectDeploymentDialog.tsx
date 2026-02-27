@@ -84,7 +84,10 @@ const ProjectDeploymentDialog = ({
         },
     });
 
-    const {control, formState, getValues, handleSubmit, reset, setValue} = form;
+    const {control, formState, getValues, handleSubmit, reset, setValue, watch} = form;
+
+    const watchedProjectDeploymentWorkflows = watch('projectDeploymentWorkflows');
+    const hasEnabledWorkflows = watchedProjectDeploymentWorkflows?.some((workflow) => workflow.enabled) ?? false;
 
     const {data: workflows} = useGetProjectVersionWorkflowsQuery(
         getValues().projectId!,
@@ -143,6 +146,9 @@ const ProjectDeploymentDialog = ({
     const updateProjectDeploymentMutation = useUpdateProjectDeploymentMutation({
         onSuccess,
     });
+
+    const isSaveDisabled =
+        !hasEnabledWorkflows || createProjectDeploymentMutation.isPending || updateProjectDeploymentMutation.isPending;
 
     const projectDeploymentDialogSteps = [
         {
@@ -371,20 +377,41 @@ const ProjectDeploymentDialog = ({
                                     />
                                 )}
 
-                                <Button
-                                    disabled={
-                                        createProjectDeploymentMutation.isPending ||
-                                        updateProjectDeploymentMutation.isPending
-                                    }
-                                    icon={
-                                        createProjectDeploymentMutation.isPending ||
-                                        updateProjectDeploymentMutation.isPending ? (
-                                            <LoadingIcon />
-                                        ) : undefined
-                                    }
-                                    label="Save"
-                                    onClick={handleSubmit(handleSaveClick)}
-                                />
+                                {!hasEnabledWorkflows ? (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <span className="inline-flex">
+                                                <Button
+                                                    disabled={isSaveDisabled}
+                                                    icon={
+                                                        createProjectDeploymentMutation.isPending ||
+                                                        updateProjectDeploymentMutation.isPending ? (
+                                                            <LoadingIcon />
+                                                        ) : undefined
+                                                    }
+                                                    label="Save"
+                                                    onClick={handleSubmit(handleSaveClick)}
+                                                />
+                                            </span>
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>
+                                            Enable at least one workflow to save this deployment
+                                        </TooltipContent>
+                                    </Tooltip>
+                                ) : (
+                                    <Button
+                                        disabled={isSaveDisabled}
+                                        icon={
+                                            createProjectDeploymentMutation.isPending ||
+                                            updateProjectDeploymentMutation.isPending ? (
+                                                <LoadingIcon />
+                                            ) : undefined
+                                        }
+                                        label="Save"
+                                        onClick={handleSubmit(handleSaveClick)}
+                                    />
+                                )}
                             </>
                         )}
                     </DialogFooter>
