@@ -83,7 +83,7 @@ const Properties = ({
             </ul>
 
             {!!advancedProperties.length && (
-                <Collapsible className="group flex w-full flex-col justify-center">
+                <Collapsible className="group mt-2 flex w-full flex-col justify-center">
                     <CollapsibleTrigger asChild>
                         <Button className="mx-4" variant="outline">
                             <span>Show Advanced Properties</span>

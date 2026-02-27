@@ -93,6 +93,7 @@ export function createSingleElementsNode({
             clusterElementTypeIndex,
             clusterElementTypesCount: currentNestedRootElementTypesCount,
             componentName: typeSegments[0],
+            connections: [],
             icon: (
                 <InlineSVG
                     className="size-9 flex-none text-gray-900"
@@ -157,6 +158,7 @@ export function createMultipleElementsNode({
             clusterElementTypeIndex,
             clusterElementTypesCount: currentNestedRootElementTypesCount,
             componentName: typeSegments[0],
+            connections: [],
             icon: (
                 <InlineSVG
                     className="size-9 flex-none text-gray-900"
