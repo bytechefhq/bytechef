@@ -20,6 +20,7 @@ package com.bytechef.task.dispatcher.branch.completion;
 
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.BRANCH;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.CASES;
+import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.DEFAULT;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.EXPRESSION;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.KEY;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.TASKS;
@@ -176,7 +177,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
         return MapUtils
             .getList(
-                taskExecution.getParameters(), TASKS, new TypeReference<Map<String, ?>>() {}, List.of())
+                taskExecution.getParameters(), DEFAULT, new TypeReference<Map<String, ?>>() {}, List.of())
             .stream()
             .map(WorkflowTask::new)
             .toList();
