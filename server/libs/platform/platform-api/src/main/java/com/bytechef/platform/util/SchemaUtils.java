@@ -109,12 +109,26 @@ public class SchemaUtils {
 
         if (sampleOutput == null && outputResponse.getOutputSchema() != null) {
             sampleOutput = getSampleOutput(outputResponse.getOutputSchema());
-        } else if (sampleOutput instanceof String string) {
-            try {
-                sampleOutput = JsonUtils.readMap(string);
-            } catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Failed to parse sample output as JSON map: {}", exception.getMessage(), exception);
+        } else if (sampleOutput instanceof String string && !string.isBlank()) {
+            String trimmedString = string.trim();
+
+            if (trimmedString.startsWith("{")) {
+                try {
+                    sampleOutput = JsonUtils.readMap(string);
+                } catch (Exception exception) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                            "Failed to parse sample output as JSON map: {}", exception.getMessage(), exception);
+                    }
+                }
+            } else if (trimmedString.startsWith("[")) {
+                try {
+                    sampleOutput = JsonUtils.readList(string);
+                } catch (Exception exception) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                            "Failed to parse sample output as JSON list: {}", exception.getMessage(), exception);
+                    }
                 }
             }
         }
