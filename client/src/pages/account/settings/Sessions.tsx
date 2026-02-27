@@ -48,7 +48,7 @@ const Sessions = () => {
         }
 
         if (updateFailure) {
-            toast('The session could not be invalidated.');
+            toast.error('The session could not be invalidated.');
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
