@@ -78,15 +78,19 @@ public class CopilotConfiguration {
     private final String openAiChatModel;
     private final Double openAiChatTemperature;
     private final String openAiEmbeddingModel;
-    private final Resource systemPromptAskResource;
-    private final Resource systemPromptBuildResource;
+    private final Resource promptWorkflowEditorAskResource;
+    private final Resource promptWorkflowEditorBuildResource;
+    private final Resource promptCodeEditorAskResource;
+    private final Resource promptCodeEditorBuildResource;
     private final State state = new State();
 
     @SuppressFBWarnings("EI")
     public CopilotConfiguration(
         ApplicationProperties applicationProperties,
-        @Value("classpath:system_prompt_ask.txt") Resource systemPromptAskResource,
-        @Value("classpath:system_prompt_build.txt") Resource systemPromptBuildResource) {
+        @Value("classpath:prompt_workflow_editor_ask.txt") Resource promptWorkflowEditorAskResource,
+        @Value("classpath:prompt_workflow_editor_build.txt") Resource promptWorkflowEditorBuildResource,
+        @Value("classpath:prompt_code_editor_ask.txt") Resource promptCodeEditorAskResource,
+        @Value("classpath:prompt_code_editor_build.txt") Resource promptCodeEditorBuildResource) {
 
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
@@ -121,8 +125,10 @@ public class CopilotConfiguration {
 
         this.openAiEmbeddingModel = openAiEmbeddingOptions.getModel();
 
-        this.systemPromptAskResource = systemPromptAskResource;
-        this.systemPromptBuildResource = systemPromptBuildResource;
+        this.promptWorkflowEditorAskResource = promptWorkflowEditorAskResource;
+        this.promptWorkflowEditorBuildResource = promptWorkflowEditorBuildResource;
+        this.promptCodeEditorAskResource = promptCodeEditorAskResource;
+        this.promptCodeEditorBuildResource = promptCodeEditorBuildResource;
     }
 
     @Bean
@@ -170,13 +176,29 @@ public class CopilotConfiguration {
     }
 
     @Bean
-    CodeEditorSpringAIAgent codeEditorSpringAIAgent(ChatMemory chatMemory, ChatModel chatModel) throws AGUIException {
-        String name = Source.CODE_EDITOR.name();
+    CodeEditorSpringAIAgent codeEditorAskSpringAIAgent(ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools) throws AGUIException {
+        String name = Source.CODE_EDITOR.name() + "_" + Mode.ASK.name();
 
         return CodeEditorSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptCodeEditorAskResource))
+            .tool(readProjectWorkflowTools)
+            .state(new State())
+            .build();
+    }
+
+    @Bean
+    CodeEditorSpringAIAgent codeEditorBuildSpringAIAgent(ChatMemory chatMemory, ChatModel chatModel, ProjectWorkflowToolsImpl projectWorkflowTools) throws AGUIException {
+        String name = Source.CODE_EDITOR.name() + "_" + Mode.BUILD.name();
+
+        return CodeEditorSpringAIAgent.builder()
+            .agentId(name.toLowerCase())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptCodeEditorBuildResource))
+            .tool(projectWorkflowTools)
             .state(new State())
             .build();
     }
@@ -238,7 +260,7 @@ public class CopilotConfiguration {
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
-            .systemMessage(getSystemPrompt(systemPromptAskResource))
+            .systemMessage(getSystemPrompt(promptWorkflowEditorAskResource))
             .state(state)
             .tools(tools)
             .advisor(questionAnswerAdvisor)
@@ -261,7 +283,7 @@ public class CopilotConfiguration {
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
-            .systemMessage(getSystemPrompt(systemPromptBuildResource))
+            .systemMessage(getSystemPrompt(promptWorkflowEditorBuildResource))
             .state(state)
             .tools(List.of(projectTools, projectWorkflowTools, componentTools, taskTools))
             .workflowService(workflowService)
