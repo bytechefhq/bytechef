@@ -44,8 +44,8 @@ public class GoogleSearchConsoleConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://accounts.google.com/o/oauth2/auth")
-            .scopes((connection, context) -> Map.of("https://www.googleapis.com/auth/webmasters", true,
-                "https://www.googleapis.com/auth/webmasters.readonly", true))
+            .scopes((connectionParameters, context) -> Map.of("https://www.googleapis.com/auth/webmasters", true,
+                "https://www.googleapis.com/auth/webmasters.readonly", false))
             .tokenUrl((connectionParameters, context) -> "https://accounts.google.com/o/oauth2/token"));
 
     private GoogleSearchConsoleConnection() {

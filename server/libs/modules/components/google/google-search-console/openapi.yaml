@@ -13,6 +13,9 @@ paths:
       summary: "List Sites"
       description: "Lists the user's Search Console sites."
       operationId: "listSites"
+      security:
+        - "oauth2":
+            - "https://www.googleapis.com/auth/webmasters"
       responses:
         "200":
           content:
@@ -25,6 +28,9 @@ paths:
       summary: "Delete Site"
       description: "Removes a site from the set of the user's Search Console sites."
       operationId: "deleteSite"
+      security:
+        - "oauth2":
+            - "https://www.googleapis.com/auth/webmasters"
       parameters:
         - description: "The URI of the property as defined in Search Console. **Examples:** `http://www.example.com/` or `sc-domain:example.com`."
           in: "path"
@@ -41,6 +47,9 @@ paths:
       summary: "Get Site"
       description: "Retrieves information about specific site."
       operationId: "getSite"
+      security:
+        - "oauth2":
+            - "https://www.googleapis.com/auth/webmasters"
       parameters:
         - description: "The URI of the property as defined in Search Console. **Examples:** `http://www.example.com/` or `sc-domain:example.com`."
           in: "path"
@@ -61,6 +70,9 @@ paths:
       summary: "Add Site"
       description: "Adds a site to the set of the user's sites in Search Console."
       operationId: "addSite"
+      security:
+        - "oauth2":
+            - "https://www.googleapis.com/auth/webmasters"
       parameters:
         - description: "The URL of the site to add."
           in: "path"
@@ -77,6 +89,9 @@ paths:
       summary: "Search Analytics"
       description: "Query your data with filters and parameters that you define."
       operationId: "searchAnalytics"
+      security:
+        - "oauth2":
+            - "https://www.googleapis.com/auth/webmasters"
       parameters:
         - description: "The site's URL, including protocol. For example: `http://www.example.com/`."
           in: "path"
