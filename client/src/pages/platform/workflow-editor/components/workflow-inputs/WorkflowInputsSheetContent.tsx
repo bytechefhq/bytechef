@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {SheetCloseButton, SheetTitle} from '@/components/ui/sheet';
+import {SheetCloseButton} from '@/components/ui/sheet';
 import {WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {PlusIcon, SlidersIcon} from 'lucide-react';
 
@@ -35,7 +35,7 @@ const WorkflowInputsSheetContent = ({
     return (
         <>
             <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
-                <SheetTitle>Workflow Inputs</SheetTitle>
+                <span className="text-lg font-semibold">Workflow Inputs</span>
 
                 <div className="flex items-center gap-1">
                     {!!workflow.inputs?.length && (
