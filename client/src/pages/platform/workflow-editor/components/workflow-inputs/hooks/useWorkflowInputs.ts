@@ -36,7 +36,7 @@ export default function useWorkflowInputs({
         }))
     );
 
-    const nameInputRef = useRef<HTMLInputElement>(null);
+    const nameInputRef = useRef<HTMLInputElement>(null!);
 
     const currentInput = workflow?.inputs?.[currentInputIndex];
 

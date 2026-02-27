@@ -47,7 +47,7 @@ const ConnectionTabConnectionSelect = ({
     const [currentConnection, setCurrentConnection] = useState<ConnectionI>();
     const [showConnectionDialog, setShowConnectionDialog] = useState<boolean>(false);
 
-    const connectionIdRef = useRef<number | undefined>();
+    const connectionIdRef = useRef<number | undefined>(undefined);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 

@@ -126,10 +126,10 @@ const useOAuth2 = ({
     }>({error: null, loading: false});
 
     const extraQueryParametersRef = useRef(extraQueryParameters);
-    const popupRef = useRef<Window | null>();
+    const popupRef = useRef<Window | null>(null);
     const curStateRef = useRef(undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const intervalRef = useRef<any>();
+    const intervalRef = useRef<any>(undefined);
 
     const getAuth = useCallback(() => {
         setUI({

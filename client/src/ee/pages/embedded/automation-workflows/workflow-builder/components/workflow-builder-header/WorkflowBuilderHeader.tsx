@@ -17,7 +17,7 @@ import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectHeaderProps {
-    bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
+    bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
     chatTrigger?: boolean;
     projectId: number;
     runDisabled: boolean;

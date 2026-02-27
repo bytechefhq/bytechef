@@ -180,8 +180,8 @@ export const useProperty = ({
     );
     const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(true);
 
-    const editorRef = useRef<Editor>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const editorRef = useRef<Editor>(null!);
+    const inputRef = useRef<HTMLInputElement>(null!);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
 

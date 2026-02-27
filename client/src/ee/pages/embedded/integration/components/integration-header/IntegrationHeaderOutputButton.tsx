@@ -9,7 +9,7 @@ import {useShallow} from 'zustand/react/shallow';
 const IntegrationHeaderOutputButton = ({
     bottomResizablePanelRef,
 }: {
-    bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
+    bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
 }) => {
     const {setShowBottomPanelOpen, showBottomPanel} = useWorkflowEditorStore(
         useShallow((state) => ({

@@ -95,9 +95,9 @@ export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProp
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
                     isMulti
-                    noOptionsMessage={t`No options`}
-                    onChange={(options: {value: string}[]) =>
-                        onChange(setSchemaField(field.value, optionsToStrings(options), schema))
+                    noOptionsMessage={() => t`No options`}
+                    onChange={(options: readonly {value: string}[]) =>
+                        onChange(setSchemaField(field.value, optionsToStrings([...options]), schema))
                     }
                     options={allOptions}
                     placeholder={t`Options`}
@@ -131,7 +131,7 @@ export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
                     autoFocus
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
-                    noOptionsMessage={t`No options`}
+                    noOptionsMessage={() => t`No options`}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onChange={(option: any) => onChange(setSchemaField(field.value, option.value, schema))}
                     options={options}
@@ -161,9 +161,9 @@ export const RequiredMultiSelectItem: FunctionComponent<ItemTypeProps> = ({field
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
                     isMulti
-                    noOptionsMessage={t`No options`}
-                    onChange={(options: {value: string}[]) =>
-                        onChange(setSchemaField(field.value, optionsToStrings(options), schema))
+                    noOptionsMessage={() => t`No options`}
+                    onChange={(options: readonly {value: string}[]) =>
+                        onChange(setSchemaField(field.value, optionsToStrings([...options]), schema))
                     }
                     options={allOptions}
                     placeholder={t`Options`}

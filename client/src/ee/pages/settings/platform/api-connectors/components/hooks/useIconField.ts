@@ -18,7 +18,7 @@ export default function useIconField<T extends FieldValues, K extends FieldPath<
     field,
     onIconChange,
 }: UseIconFieldProps<T, K>): UseIconFieldI {
-    const hiddenInputRef = useRef<HTMLInputElement>(null);
+    const hiddenInputRef = useRef<HTMLInputElement>(null!);
     const [preview, setPreview] = useState<string>();
 
     useEffect(() => {
