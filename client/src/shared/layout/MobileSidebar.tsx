@@ -8,7 +8,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {AudioLinesIcon, User2Icon} from 'lucide-react';
-import {ForwardRefExoticComponent, SVGProps} from 'react';
+import {ForwardRefExoticComponent, SVGProps, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -49,6 +49,22 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen}: M
             navigate(`/embedded${+value === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`);
         }
     };
+
+    useEffect(() => {
+        const environments = environmentsQuery?.environments;
+
+        if (environments && environments.length > 0) {
+            if (currentEnvironmentId) {
+                if (!environments.map((environment) => environment?.id!).find((id) => +id === currentEnvironmentId)) {
+                    if (environments[0]?.id) {
+                        setCurrentEnvironmentId(+environments[0]?.id);
+                    }
+                }
+            } else if (environments[0]?.id && !currentEnvironmentId) {
+                setCurrentEnvironmentId(+environments[0]?.id);
+            }
+        }
+    }, [currentEnvironmentId, environmentsQuery?.environments, setCurrentEnvironmentId]);
 
     return (
         <Dialog onOpenChange={setMobileMenuOpen} open={mobileMenuOpen}>
