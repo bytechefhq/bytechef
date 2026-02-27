@@ -16,7 +16,7 @@ export interface UseApprovalTaskSearchReturnI {
     handleKeyDown: (event: KeyboardEvent) => void;
     handleSearchChange: (value: string) => void;
     handleSuggestionClick: (suggestion: string) => void;
-    searchInputRef: RefObject<HTMLInputElement>;
+    searchInputRef: RefObject<HTMLInputElement | null>;
     searchQuery: string;
     selectedSuggestionIndex: number;
     showSuggestions: boolean;

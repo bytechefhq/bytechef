@@ -28,9 +28,15 @@ interface SchemaMenuListProps {
 
 const SchemaMenuList = ({fields, onChange, schema}: SchemaMenuListProps) => (
     <ul className="mb-4 grid gap-2">
-        {fields.map((field) => (
-            <li key={field.value}>{typeToItem[field.type]({field, onChange, schema})}</li>
-        ))}
+        {fields.map((field) => {
+            const Component = typeToItem[field.type];
+
+            return (
+                <li key={field.value}>
+                    <Component field={field} onChange={onChange} schema={schema} />
+                </li>
+            );
+        })}
     </ul>
 );
 

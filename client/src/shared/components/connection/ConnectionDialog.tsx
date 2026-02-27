@@ -660,11 +660,13 @@ const ConnectionDialog = ({
                                                                 },
                                                             ]);
                                                         }}
-                                                        options={remainingTags?.map((tag: Tag) => ({
-                                                            label: tag.name,
-                                                            value: tag.name.toLowerCase().replace(/\W/g, ''),
-                                                            ...tag,
-                                                        }))}
+                                                        options={
+                                                            remainingTags?.map((tag: Tag) => ({
+                                                                label: tag.name,
+                                                                value: tag.name.toLowerCase().replace(/\W/g, ''),
+                                                                ...tag,
+                                                            })) ?? []
+                                                        }
                                                     />
                                                 </FormControl>
 

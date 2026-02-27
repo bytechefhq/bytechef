@@ -7,7 +7,7 @@ interface UseOpenApiSpecificationFieldProps<T extends FieldValues, K extends Fie
 
 interface UseOpenApiSpecificationFieldI {
     handleUploadedFile: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
-    hiddenInputRef: React.RefObject<HTMLInputElement>;
+    hiddenInputRef: React.RefObject<HTMLInputElement | null>;
     name: string | undefined;
     onUpload: () => void;
     uploadButtonLabel: string;

@@ -30,7 +30,7 @@ afterEach(() => {
 });
 
 const mockProps = {
-    hiddenFileInputRef: {current: null} as React.RefObject<HTMLInputElement>,
+    hiddenFileInputRef: {current: null} as React.RefObject<HTMLInputElement | null>,
     onCloseDropdownMenuClick: vi.fn(),
     onDeleteProjectClick: vi.fn(),
     onDuplicateProjectClick: vi.fn(),
