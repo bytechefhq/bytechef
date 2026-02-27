@@ -5,6 +5,78 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
+    "description": "Add tag(s) to an existing user.",
+    "help": null,
+    "metadata": {
+      "path": "/tags",
+      "mimeType": "application/json",
+      "method": "POST",
+      "bodyContentType": "JSON"
+    },
+    "name": "addTag",
+    "outputDefinition": null,
+    "perform": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Tag(s) to add. To add multiple tags, use a comma-separated list, e.g. tag1,tag2",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Tag",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "minLength": null,
+      "name": "tag",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Email of the person.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Email",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "minLength": null,
+      "name": "email",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "suspendPerform": null,
+    "title": "Add Tag",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
     "description": "Create email template",
     "help": null,
     "metadata": {
@@ -1045,78 +1117,6 @@
     "resumePerform": null,
     "suspendPerform": null,
     "title": "Create People",
-    "workflowNodeDescription": null
-  }, {
-    "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
-    "deprecated": null,
-    "description": "Add tag(s) to an existing user.",
-    "help": null,
-    "metadata": {
-      "path": "/tags",
-      "mimeType": "application/json",
-      "method": "POST",
-      "bodyContentType": "JSON"
-    },
-    "name": "addTag",
-    "outputDefinition": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "TEXT",
-      "defaultValue": null,
-      "description": "Tag(s) to add. To add multiple tags, use a comma-separated list, e.g. tag1,tag2",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Tag",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "minLength": null,
-      "name": "tag",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "Email of the person.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Email",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "minLength": null,
-      "name": "email",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "resumePerform": null,
-    "suspendPerform": null,
-    "title": "Add Tag",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,

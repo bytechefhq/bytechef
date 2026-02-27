@@ -5,6 +5,242 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
+    "description": "Adds a comment to the specified issue.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gitlab_v1#create-comment-on-issue"
+    },
+    "metadata": {
+      "method": "POST",
+      "path": "/projects/{projectId}/issues/{issueId}/notes"
+    },
+    "name": "createCommentOnIssue",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": {
+            "responseType": {
+              "contentType": "application/json",
+              "type": "JSON"
+            }
+          },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "The ID of the comment.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "id",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": false,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The body of the comment.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "body",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": {
+          "responseType": {
+            "contentType": "application/json",
+            "type": "JSON"
+          }
+        },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "The ID of the comment.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "id",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": false,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The body of the comment.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "body",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
+    "perform": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": null,
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Project ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "PATH"
+      },
+      "minLength": null,
+      "name": "projectId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the issue to comment on.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Issue ID",
+      "maxValue": null,
+      "metadata": {
+        "type": "PATH"
+      },
+      "minValue": null,
+      "name": "issueId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "projectId" ]
+      },
+      "placeholder": null,
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The comment to add to the issue.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Comment",
+      "languageId": null,
+      "maxLength": 1000000,
+      "metadata": {
+        "type": "QUERY"
+      },
+      "minLength": null,
+      "name": "body",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "suspendPerform": null,
+    "title": "Create Comment on Issue",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
     "description": "Creates a new project issue.",
     "help": {
       "body": "",
@@ -394,22 +630,12 @@
     "suspendPerform": null,
     "title": "Create Issue",
     "workflowNodeDescription": null
-  }, {
-    "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
-    "deprecated": null,
-    "description": "Adds a comment to the specified issue.",
-    "help": {
-      "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gitlab_v1#create-comment-on-issue"
-    },
-    "metadata": {
-      "method": "POST",
-      "path": "/projects/{projectId}/issues/{issueId}/notes"
-    },
+  } ],
+  "clusterElements": [ {
     "name": "createCommentOnIssue",
+    "description": "Adds a comment to the specified issue.",
+    "element": null,
+    "help": null,
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -550,7 +776,6 @@
       },
       "sampleOutput": null
     },
-    "perform": null,
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
@@ -626,12 +851,16 @@
       "required": true,
       "type": "STRING"
     } ],
-    "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Comment on Issue",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
     "workflowNodeDescription": null
-  } ],
-  "clusterElements": [ {
+  }, {
     "name": "createIssue",
     "description": "Creates a new project issue.",
     "element": null,
@@ -1011,235 +1240,6 @@
       "type": "STRING"
     } ],
     "title": "Create Issue",
-    "type": {
-      "name": "TOOLS",
-      "key": "tools",
-      "label": "Tools",
-      "multipleElements": true,
-      "required": false
-    },
-    "workflowNodeDescription": null
-  }, {
-    "name": "createCommentOnIssue",
-    "description": "Adds a comment to the specified issue.",
-    "element": null,
-    "help": null,
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": {
-        "outputSchema": {
-          "additionalProperties": null,
-          "advancedOption": null,
-          "controlType": "OBJECT_BUILDER",
-          "defaultValue": null,
-          "description": null,
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "metadata": {
-            "responseType": {
-              "contentType": "application/json",
-              "type": "JSON"
-            }
-          },
-          "multipleValues": null,
-          "name": null,
-          "options": null,
-          "optionsDataSource": null,
-          "placeholder": null,
-          "properties": [ {
-            "advancedOption": null,
-            "controlType": "INTEGER",
-            "defaultValue": null,
-            "description": "The ID of the comment.",
-            "displayCondition": null,
-            "exampleValue": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "label": null,
-            "maxValue": null,
-            "metadata": { },
-            "minValue": null,
-            "name": "id",
-            "options": null,
-            "optionsDataSource": null,
-            "placeholder": null,
-            "required": false,
-            "type": "INTEGER"
-          }, {
-            "advancedOption": null,
-            "controlType": "TEXT",
-            "defaultValue": null,
-            "description": "The body of the comment.",
-            "displayCondition": null,
-            "exampleValue": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "label": null,
-            "languageId": null,
-            "maxLength": null,
-            "metadata": { },
-            "minLength": null,
-            "name": "body",
-            "options": null,
-            "optionsDataSource": null,
-            "placeholder": null,
-            "regex": null,
-            "required": false,
-            "type": "STRING"
-          } ],
-          "required": null,
-          "type": "OBJECT"
-        },
-        "placeholder": null,
-        "sampleOutput": null
-      },
-      "outputSchema": {
-        "additionalProperties": null,
-        "advancedOption": null,
-        "controlType": "OBJECT_BUILDER",
-        "defaultValue": null,
-        "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": {
-          "responseType": {
-            "contentType": "application/json",
-            "type": "JSON"
-          }
-        },
-        "multipleValues": null,
-        "name": null,
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "properties": [ {
-          "advancedOption": null,
-          "controlType": "INTEGER",
-          "defaultValue": null,
-          "description": "The ID of the comment.",
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "maxValue": null,
-          "metadata": { },
-          "minValue": null,
-          "name": "id",
-          "options": null,
-          "optionsDataSource": null,
-          "placeholder": null,
-          "required": false,
-          "type": "INTEGER"
-        }, {
-          "advancedOption": null,
-          "controlType": "TEXT",
-          "defaultValue": null,
-          "description": "The body of the comment.",
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "languageId": null,
-          "maxLength": null,
-          "metadata": { },
-          "minLength": null,
-          "name": "body",
-          "options": null,
-          "optionsDataSource": null,
-          "placeholder": null,
-          "regex": null,
-          "required": false,
-          "type": "STRING"
-        } ],
-        "required": null,
-        "type": "OBJECT"
-      },
-      "sampleOutput": null
-    },
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": null,
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Project ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "projectId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the issue to comment on.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Issue ID",
-      "maxValue": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minValue": null,
-      "name": "issueId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "projectId" ]
-      },
-      "placeholder": null,
-      "required": true,
-      "type": "INTEGER"
-    }, {
-      "advancedOption": null,
-      "controlType": "TEXT",
-      "defaultValue": null,
-      "description": "The comment to add to the issue.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Comment",
-      "languageId": null,
-      "maxLength": 1000000,
-      "metadata": {
-        "type": "QUERY"
-      },
-      "minLength": null,
-      "name": "body",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "title": "Create Comment on Issue",
     "type": {
       "name": "TOOLS",
       "key": "tools",

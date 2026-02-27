@@ -5,288 +5,46 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Lists the user's Search Console sites.",
+    "description": "Adds a site to the set of the user's sites in Search Console.",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-search-console_v1#list-sites"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-search-console_v1#add-site"
     },
     "metadata": {
-      "method": "GET",
-      "path": "/sites"
+      "method": "PUT",
+      "path": "/sites/{siteUrl}"
     },
-    "name": "listSites",
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": {
-        "outputSchema": {
-          "additionalProperties": null,
-          "advancedOption": null,
-          "controlType": "OBJECT_BUILDER",
-          "defaultValue": null,
-          "description": "List of sites with access level information.",
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "metadata": {
-            "responseType": {
-              "contentType": "application/json",
-              "type": "JSON"
-            }
-          },
-          "multipleValues": null,
-          "name": null,
-          "options": null,
-          "optionsDataSource": null,
-          "placeholder": null,
-          "properties": [ {
-            "advancedOption": null,
-            "controlType": "ARRAY_BUILDER",
-            "defaultValue": null,
-            "description": "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999).",
-            "displayCondition": null,
-            "exampleValue": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "items": [ {
-              "additionalProperties": null,
-              "advancedOption": null,
-              "controlType": "OBJECT_BUILDER",
-              "defaultValue": null,
-              "description": "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999).",
-              "displayCondition": null,
-              "exampleValue": null,
-              "expressionEnabled": null,
-              "hidden": null,
-              "label": null,
-              "metadata": { },
-              "multipleValues": null,
-              "name": null,
-              "options": null,
-              "optionsDataSource": null,
-              "placeholder": null,
-              "properties": [ {
-                "advancedOption": null,
-                "controlType": "SELECT",
-                "defaultValue": null,
-                "description": "The user's permission level for the site.",
-                "displayCondition": null,
-                "exampleValue": null,
-                "expressionEnabled": null,
-                "hidden": null,
-                "label": "Permission Level",
-                "languageId": null,
-                "maxLength": null,
-                "metadata": { },
-                "minLength": null,
-                "name": "permissionLevel",
-                "options": [ {
-                  "description": null,
-                  "label": "SITE_PERMISSION_LEVEL_UNSPECIFIED",
-                  "value": "SITE_PERMISSION_LEVEL_UNSPECIFIED"
-                }, {
-                  "description": null,
-                  "label": "SITE_OWNER",
-                  "value": "SITE_OWNER"
-                }, {
-                  "description": null,
-                  "label": "SITE_FULL_USER",
-                  "value": "SITE_FULL_USER"
-                }, {
-                  "description": null,
-                  "label": "SITE_RESTRICTED_USER",
-                  "value": "SITE_RESTRICTED_USER"
-                }, {
-                  "description": null,
-                  "label": "SITE_UNVERIFIED_USER",
-                  "value": "SITE_UNVERIFIED_USER"
-                } ],
-                "optionsDataSource": null,
-                "placeholder": null,
-                "regex": null,
-                "required": false,
-                "type": "STRING"
-              }, {
-                "advancedOption": null,
-                "controlType": "TEXT",
-                "defaultValue": null,
-                "description": "The URL of the site.",
-                "displayCondition": null,
-                "exampleValue": null,
-                "expressionEnabled": null,
-                "hidden": null,
-                "label": "Site Url",
-                "languageId": null,
-                "maxLength": null,
-                "metadata": { },
-                "minLength": null,
-                "name": "siteUrl",
-                "options": null,
-                "optionsDataSource": null,
-                "placeholder": null,
-                "regex": null,
-                "required": false,
-                "type": "STRING"
-              } ],
-              "required": null,
-              "type": "OBJECT"
-            } ],
-            "label": "Site Entry",
-            "maxItems": null,
-            "metadata": { },
-            "minItems": null,
-            "multipleValues": null,
-            "name": "siteEntry",
-            "options": null,
-            "optionsDataSource": null,
-            "placeholder": "Add to Site Entry",
-            "required": false,
-            "type": "ARRAY"
-          } ],
-          "required": null,
-          "type": "OBJECT"
-        },
-        "placeholder": null,
-        "sampleOutput": null
-      },
-      "outputSchema": {
-        "additionalProperties": null,
-        "advancedOption": null,
-        "controlType": "OBJECT_BUILDER",
-        "defaultValue": null,
-        "description": "List of sites with access level information.",
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": {
-          "responseType": {
-            "contentType": "application/json",
-            "type": "JSON"
-          }
-        },
-        "multipleValues": null,
-        "name": null,
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "properties": [ {
-          "advancedOption": null,
-          "controlType": "ARRAY_BUILDER",
-          "defaultValue": null,
-          "description": "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999).",
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "items": [ {
-            "additionalProperties": null,
-            "advancedOption": null,
-            "controlType": "OBJECT_BUILDER",
-            "defaultValue": null,
-            "description": "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999).",
-            "displayCondition": null,
-            "exampleValue": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "label": null,
-            "metadata": { },
-            "multipleValues": null,
-            "name": null,
-            "options": null,
-            "optionsDataSource": null,
-            "placeholder": null,
-            "properties": [ {
-              "advancedOption": null,
-              "controlType": "SELECT",
-              "defaultValue": null,
-              "description": "The user's permission level for the site.",
-              "displayCondition": null,
-              "exampleValue": null,
-              "expressionEnabled": null,
-              "hidden": null,
-              "label": "Permission Level",
-              "languageId": null,
-              "maxLength": null,
-              "metadata": { },
-              "minLength": null,
-              "name": "permissionLevel",
-              "options": [ {
-                "description": null,
-                "label": "SITE_PERMISSION_LEVEL_UNSPECIFIED",
-                "value": "SITE_PERMISSION_LEVEL_UNSPECIFIED"
-              }, {
-                "description": null,
-                "label": "SITE_OWNER",
-                "value": "SITE_OWNER"
-              }, {
-                "description": null,
-                "label": "SITE_FULL_USER",
-                "value": "SITE_FULL_USER"
-              }, {
-                "description": null,
-                "label": "SITE_RESTRICTED_USER",
-                "value": "SITE_RESTRICTED_USER"
-              }, {
-                "description": null,
-                "label": "SITE_UNVERIFIED_USER",
-                "value": "SITE_UNVERIFIED_USER"
-              } ],
-              "optionsDataSource": null,
-              "placeholder": null,
-              "regex": null,
-              "required": false,
-              "type": "STRING"
-            }, {
-              "advancedOption": null,
-              "controlType": "TEXT",
-              "defaultValue": null,
-              "description": "The URL of the site.",
-              "displayCondition": null,
-              "exampleValue": null,
-              "expressionEnabled": null,
-              "hidden": null,
-              "label": "Site Url",
-              "languageId": null,
-              "maxLength": null,
-              "metadata": { },
-              "minLength": null,
-              "name": "siteUrl",
-              "options": null,
-              "optionsDataSource": null,
-              "placeholder": null,
-              "regex": null,
-              "required": false,
-              "type": "STRING"
-            } ],
-            "required": null,
-            "type": "OBJECT"
-          } ],
-          "label": "Site Entry",
-          "maxItems": null,
-          "metadata": { },
-          "minItems": null,
-          "multipleValues": null,
-          "name": "siteEntry",
-          "options": null,
-          "optionsDataSource": null,
-          "placeholder": "Add to Site Entry",
-          "required": false,
-          "type": "ARRAY"
-        } ],
-        "required": null,
-        "type": "OBJECT"
-      },
-      "sampleOutput": null
-    },
+    "name": "addSite",
+    "outputDefinition": null,
     "perform": null,
     "processErrorResponse": null,
-    "properties": [ ],
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The URL of the site to add.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Site URL",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "PATH"
+      },
+      "minLength": null,
+      "name": "siteUrl",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
     "resumePerform": null,
     "suspendPerform": null,
-    "title": "List Sites",
+    "title": "Add Site",
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -577,46 +335,288 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Adds a site to the set of the user's sites in Search Console.",
+    "description": "Lists the user's Search Console sites.",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-search-console_v1#add-site"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-search-console_v1#list-sites"
     },
     "metadata": {
-      "method": "PUT",
-      "path": "/sites/{siteUrl}"
+      "method": "GET",
+      "path": "/sites"
     },
-    "name": "addSite",
-    "outputDefinition": null,
+    "name": "listSites",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": "List of sites with access level information.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": {
+            "responseType": {
+              "contentType": "application/json",
+              "type": "JSON"
+            }
+          },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "ARRAY_BUILDER",
+            "defaultValue": null,
+            "description": "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999).",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "items": [ {
+              "additionalProperties": null,
+              "advancedOption": null,
+              "controlType": "OBJECT_BUILDER",
+              "defaultValue": null,
+              "description": "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999).",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "metadata": { },
+              "multipleValues": null,
+              "name": null,
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "properties": [ {
+                "advancedOption": null,
+                "controlType": "SELECT",
+                "defaultValue": null,
+                "description": "The user's permission level for the site.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": "Permission Level",
+                "languageId": null,
+                "maxLength": null,
+                "metadata": { },
+                "minLength": null,
+                "name": "permissionLevel",
+                "options": [ {
+                  "description": null,
+                  "label": "SITE_PERMISSION_LEVEL_UNSPECIFIED",
+                  "value": "SITE_PERMISSION_LEVEL_UNSPECIFIED"
+                }, {
+                  "description": null,
+                  "label": "SITE_OWNER",
+                  "value": "SITE_OWNER"
+                }, {
+                  "description": null,
+                  "label": "SITE_FULL_USER",
+                  "value": "SITE_FULL_USER"
+                }, {
+                  "description": null,
+                  "label": "SITE_RESTRICTED_USER",
+                  "value": "SITE_RESTRICTED_USER"
+                }, {
+                  "description": null,
+                  "label": "SITE_UNVERIFIED_USER",
+                  "value": "SITE_UNVERIFIED_USER"
+                } ],
+                "optionsDataSource": null,
+                "placeholder": null,
+                "regex": null,
+                "required": false,
+                "type": "STRING"
+              }, {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The URL of the site.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": "Site Url",
+                "languageId": null,
+                "maxLength": null,
+                "metadata": { },
+                "minLength": null,
+                "name": "siteUrl",
+                "options": null,
+                "optionsDataSource": null,
+                "placeholder": null,
+                "regex": null,
+                "required": false,
+                "type": "STRING"
+              } ],
+              "required": null,
+              "type": "OBJECT"
+            } ],
+            "label": "Site Entry",
+            "maxItems": null,
+            "metadata": { },
+            "minItems": null,
+            "multipleValues": null,
+            "name": "siteEntry",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": "Add to Site Entry",
+            "required": false,
+            "type": "ARRAY"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": "List of sites with access level information.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": {
+          "responseType": {
+            "contentType": "application/json",
+            "type": "JSON"
+          }
+        },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "ARRAY_BUILDER",
+          "defaultValue": null,
+          "description": "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999).",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "items": [ {
+            "additionalProperties": null,
+            "advancedOption": null,
+            "controlType": "OBJECT_BUILDER",
+            "defaultValue": null,
+            "description": "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999).",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "multipleValues": null,
+            "name": null,
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "properties": [ {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": null,
+              "description": "The user's permission level for the site.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": "Permission Level",
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "permissionLevel",
+              "options": [ {
+                "description": null,
+                "label": "SITE_PERMISSION_LEVEL_UNSPECIFIED",
+                "value": "SITE_PERMISSION_LEVEL_UNSPECIFIED"
+              }, {
+                "description": null,
+                "label": "SITE_OWNER",
+                "value": "SITE_OWNER"
+              }, {
+                "description": null,
+                "label": "SITE_FULL_USER",
+                "value": "SITE_FULL_USER"
+              }, {
+                "description": null,
+                "label": "SITE_RESTRICTED_USER",
+                "value": "SITE_RESTRICTED_USER"
+              }, {
+                "description": null,
+                "label": "SITE_UNVERIFIED_USER",
+                "value": "SITE_UNVERIFIED_USER"
+              } ],
+              "optionsDataSource": null,
+              "placeholder": null,
+              "regex": null,
+              "required": false,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": "The URL of the site.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": "Site Url",
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "siteUrl",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "regex": null,
+              "required": false,
+              "type": "STRING"
+            } ],
+            "required": null,
+            "type": "OBJECT"
+          } ],
+          "label": "Site Entry",
+          "maxItems": null,
+          "metadata": { },
+          "minItems": null,
+          "multipleValues": null,
+          "name": "siteEntry",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": "Add to Site Entry",
+          "required": false,
+          "type": "ARRAY"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
     "perform": null,
     "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "TEXT",
-      "defaultValue": null,
-      "description": "The URL of the site to add.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Site URL",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "siteUrl",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
+    "properties": [ ],
     "resumePerform": null,
     "suspendPerform": null,
-    "title": "Add Site",
+    "title": "List Sites",
     "workflowNodeDescription": null
   }, {
     "batch": null,
