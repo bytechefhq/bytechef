@@ -13,7 +13,6 @@ interface UseClusterElementsCanvasDialogProps {
 }
 
 export default function useClusterElementsCanvasDialog({onOpenChange}: UseClusterElementsCanvasDialogProps) {
-    const editorPreferences = useClusterElementsCanvasDialogStore((state) => state.editorPreferences);
     const setCopilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setCopilotPanelOpen);
     const setShowAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.setShowAiAgentEditor);
     const setShowDataStreamEditor = useClusterElementsCanvasDialogStore((state) => state.setShowDataStreamEditor);
@@ -141,23 +140,24 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
 
     useEffect(() => {
         if (isAiAgentClusterRoot && agentNodeName) {
-            const showAiAgent = editorPreferences[agentNodeName] ?? true;
+            const showAiAgent = useClusterElementsCanvasDialogStore.getState().editorPreferences[agentNodeName] ?? true;
 
             setShowAiAgentEditor(showAiAgent);
         } else {
             setShowAiAgentEditor(false);
         }
-    }, [agentNodeName, editorPreferences, isAiAgentClusterRoot, setShowAiAgentEditor]);
+    }, [agentNodeName, isAiAgentClusterRoot, setShowAiAgentEditor]);
 
     useEffect(() => {
         if (isDataStreamClusterRoot && agentNodeName) {
-            const showDataStream = editorPreferences[agentNodeName] ?? true;
+            const showDataStream =
+                useClusterElementsCanvasDialogStore.getState().editorPreferences[agentNodeName] ?? true;
 
             setShowDataStreamEditor(showDataStream);
         } else {
             setShowDataStreamEditor(false);
         }
-    }, [agentNodeName, editorPreferences, isDataStreamClusterRoot, setShowDataStreamEditor]);
+    }, [agentNodeName, isDataStreamClusterRoot, setShowDataStreamEditor]);
 
     return {
         copilotEnabled,
