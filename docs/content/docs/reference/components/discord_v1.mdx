@@ -46,6 +46,86 @@ Version: 1
 ## Actions
 
 
+### Create Channel
+Name: createChannel
+
+`Create a new channel`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| guildId | Guild ID | STRING |  | true |
+| name | Name | STRING | The name of the new channel | true |
+| type | Type | INTEGER <details> <summary> Options </summary> <span title="a text channel within a server">0</span>, <span title="a voice channel within a server">2</span>, <span title="an organizational category that contains up to 50 channels">4</span> </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Channel",
+  "name" : "createChannel",
+  "parameters" : {
+    "guildId" : "",
+    "name" : "",
+    "type" : 1
+  },
+  "type" : "discord/v1/createChannel"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the channel. |
+| type | INTEGER | Type of the channel. |
+| last_message_id | STRING | ID of the last message sent in this channel. |
+| flags | INTEGER | Channel flags combined as a bitfield. |
+| guild_id | STRING | ID of the guild to which the channel belongs. |
+| name | STRING | Name of the channel. |
+| parent_id | STRING | For guild channels: id of the parent category for a channel |
+| rate_limit_per_user | INTEGER | Amount of seconds a user has to wait before sending another message |
+| topic | STRING | Topic of the channel. |
+| position | INTEGER | Sorting position of the channel (channels with the same position are sorted by id) |
+| permission_overwrites | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), INTEGER\(type), STRING\(allow), STRING\(deny)&#125;] </details> | Explicit permission overwrites for members and roles. |
+| nsfw | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the channel is marked as NSFW (Not Safe For Work). |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "type" : 1,
+  "last_message_id" : "",
+  "flags" : 1,
+  "guild_id" : "",
+  "name" : "",
+  "parent_id" : "",
+  "rate_limit_per_user" : 1,
+  "topic" : "",
+  "position" : 1,
+  "permission_overwrites" : [ {
+    "id" : "",
+    "type" : 1,
+    "allow" : "",
+    "deny" : ""
+  } ],
+  "nsfw" : false
+}
+```
+
+
+
+
 ### Send Channel Message
 Name: sendChannelMessage
 
@@ -139,86 +219,6 @@ Type: OBJECT
   },
   "pinned" : false,
   "mention_everyone" : false
-}
-```
-
-
-
-
-### Create Channel
-Name: createChannel
-
-`Create a new channel`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| guildId | Guild ID | STRING |  | true |
-| name | Name | STRING | The name of the new channel | true |
-| type | Type | INTEGER <details> <summary> Options </summary> <span title="a text channel within a server">0</span>, <span title="a voice channel within a server">2</span>, <span title="an organizational category that contains up to 50 channels">4</span> </details> |  | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Create Channel",
-  "name" : "createChannel",
-  "parameters" : {
-    "guildId" : "",
-    "name" : "",
-    "type" : 1
-  },
-  "type" : "discord/v1/createChannel"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the channel. |
-| type | INTEGER | Type of the channel. |
-| last_message_id | STRING | ID of the last message sent in this channel. |
-| flags | INTEGER | Channel flags combined as a bitfield. |
-| guild_id | STRING | ID of the guild to which the channel belongs. |
-| name | STRING | Name of the channel. |
-| parent_id | STRING | For guild channels: id of the parent category for a channel |
-| rate_limit_per_user | INTEGER | Amount of seconds a user has to wait before sending another message |
-| topic | STRING | Topic of the channel. |
-| position | INTEGER | Sorting position of the channel (channels with the same position are sorted by id) |
-| permission_overwrites | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), INTEGER\(type), STRING\(allow), STRING\(deny)&#125;] </details> | Explicit permission overwrites for members and roles. |
-| nsfw | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the channel is marked as NSFW (Not Safe For Work). |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : "",
-  "type" : 1,
-  "last_message_id" : "",
-  "flags" : 1,
-  "guild_id" : "",
-  "name" : "",
-  "parent_id" : "",
-  "rate_limit_per_user" : 1,
-  "topic" : "",
-  "position" : 1,
-  "permission_overwrites" : [ {
-    "id" : "",
-    "type" : 1,
-    "allow" : "",
-    "deny" : ""
-  } ],
-  "nsfw" : false
 }
 ```
 

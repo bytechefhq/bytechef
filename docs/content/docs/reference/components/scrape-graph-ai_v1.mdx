@@ -47,26 +47,26 @@ Version: 1
 ## Actions
 
 
-### Search Scraper
-Name: searchScraper
+### Get SmartCrawler Status
+Name: getCrawlStatus
 
-`Start a AI-powered web search request.`
+`Get the status and results of a previous smartcrawl request.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| user_prompt | User Prompt | STRING | The search query or question you want to ask. | true |
+| task_id | Task Id | STRING | The ID of the crawl job task. | true |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Search Scraper",
-  "name" : "searchScraper",
+  "label" : "Get SmartCrawler Status",
+  "name" : "getCrawlStatus",
   "parameters" : {
-    "user_prompt" : ""
+    "task_id" : ""
   },
-  "type" : "scrapeGraphAi/v1/searchScraper"
+  "type" : "scrapeGraphAi/v1/getCrawlStatus"
 }
 ```
 
@@ -81,12 +81,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| request_id | STRING | Unique identifier for the search request. |
-| status | STRING | Status of the request. One of: “queued”, “processing”, “completed”, “failed”. |
-| user_prompt | STRING | The original search query that was submitted. |
-| result | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The search results. |
-| reference_urls | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of URLs that were used as references for the answer. |
-| error | STRING | Error message if the request failed. Empty string if successful. |
+| status | STRING | Overall status of the request. |
+| result | OBJECT <details> <summary> Properties </summary> &#123;STRING\(status), &#123;&#125;\(llm_result), [STRING]\(crawled_urls), [&#123;STRING\(url), STRING\(markdown)&#125;]\(pages)&#125; </details> | The crawl job result. |
 
 
 
@@ -94,12 +90,16 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "request_id" : "",
   "status" : "",
-  "user_prompt" : "",
-  "result" : { },
-  "reference_urls" : [ "" ],
-  "error" : ""
+  "result" : {
+    "status" : "",
+    "llm_result" : { },
+    "crawled_urls" : [ "" ],
+    "pages" : [ {
+      "url" : "",
+      "markdown" : ""
+    } ]
+  }
 }
 ```
 
@@ -156,6 +156,65 @@ Type: OBJECT
   "status" : "",
   "website_url" : "",
   "result" : "",
+  "error" : ""
+}
+```
+
+
+
+
+### Search Scraper
+Name: searchScraper
+
+`Start a AI-powered web search request.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| user_prompt | User Prompt | STRING | The search query or question you want to ask. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Scraper",
+  "name" : "searchScraper",
+  "parameters" : {
+    "user_prompt" : ""
+  },
+  "type" : "scrapeGraphAi/v1/searchScraper"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| request_id | STRING | Unique identifier for the search request. |
+| status | STRING | Status of the request. One of: “queued”, “processing”, “completed”, “failed”. |
+| user_prompt | STRING | The original search query that was submitted. |
+| result | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The search results. |
+| reference_urls | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of URLs that were used as references for the answer. |
+| error | STRING | Error message if the request failed. Empty string if successful. |
+
+
+
+
+#### Output Example
+```json
+{
+  "request_id" : "",
+  "status" : "",
+  "user_prompt" : "",
+  "result" : { },
+  "reference_urls" : [ "" ],
   "error" : ""
 }
 ```
@@ -235,7 +294,7 @@ Name: startCrawl
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | url | URL | STRING | The starting URL for the crawl. | true |
 | prompt | Prompt | STRING | Instructions for data extraction. Required when extraction_mode is true. | false |
-| extraction_mode | Extraction Mode | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When false, enables markdown conversion mode (NO AI/LLM processing, 2 credits per page). Default is true. | false |
+| extraction_mode | Extraction Mode | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When false, enables markdown conversion mode (2 credits per page). Default is true. | false |
 | cache_website | Cache Website | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to cache the website content. | false |
 | depth | Depth | INTEGER | Maximum crawl depth. | false |
 | max_pages | Max Pages | INTEGER | Maximum number of pages to crawl. | false |
@@ -296,65 +355,6 @@ Type: OBJECT
 ```json
 {
   "task_id" : ""
-}
-```
-
-
-
-
-### Get SmartCrawler Status
-Name: getCrawlStatus
-
-`Get the status and results of a previous smartcrawl request.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| task_id | Task Id | STRING | The ID of the crawl job task. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get SmartCrawler Status",
-  "name" : "getCrawlStatus",
-  "parameters" : {
-    "task_id" : ""
-  },
-  "type" : "scrapeGraphAi/v1/getCrawlStatus"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| status | STRING | Overall status of the request. |
-| result | OBJECT <details> <summary> Properties </summary> &#123;STRING\(status), &#123;&#125;\(llm_result), [STRING]\(crawled_urls), [&#123;STRING\(url), STRING\(markdown)&#125;]\(pages)&#125; </details> | The crawl job result. |
-
-
-
-
-#### Output Example
-```json
-{
-  "status" : "",
-  "result" : {
-    "status" : "",
-    "llm_result" : { },
-    "crawled_urls" : [ "" ],
-    "pages" : [ {
-      "url" : "",
-      "markdown" : ""
-    } ]
-  }
 }
 ```
 

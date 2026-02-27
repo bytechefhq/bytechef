@@ -40,163 +40,6 @@ Version: 1
 ## Actions
 
 
-### Delete Contact
-Name: deleteContact
-
-`Move Contact to the recycling bin.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| contactId | Contact ID | STRING |  | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Delete Contact",
-  "name" : "deleteContact",
-  "parameters" : {
-    "contactId" : ""
-  },
-  "type" : "hubspot/v1/deleteContact"
-}
-```
-
-#### Output
-
-This action does not produce any output.
-
-
-
-
-
-
-### Get Contact
-Name: getContact
-
-`Get contact details.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| contactId | Contact ID | STRING |  | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Contact",
-  "name" : "getContact",
-  "parameters" : {
-    "contactId" : ""
-  },
-  "type" : "hubspot/v1/getContact"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the newly created contact. |
-| properties | OBJECT <details> <summary> Properties </summary> &#123;STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)&#125; </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : "",
-  "properties" : {
-    "firstname" : "",
-    "lastname" : "",
-    "email" : "",
-    "phone" : "",
-    "company" : "",
-    "website" : ""
-  }
-}
-```
-
-
-
-
-### Update Contact
-Name: updateContact
-
-`Update Contact properties.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| contactId | Contact | STRING |  | true |
-| properties | Properties | OBJECT <details> <summary> Properties </summary> &#123;STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)&#125; </details> |  | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Update Contact",
-  "name" : "updateContact",
-  "parameters" : {
-    "contactId" : "",
-    "properties" : {
-      "firstname" : "",
-      "lastname" : "",
-      "email" : "",
-      "phone" : "",
-      "company" : "",
-      "website" : ""
-    }
-  },
-  "type" : "hubspot/v1/updateContact"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the newly created contact. |
-| properties | OBJECT <details> <summary> Properties </summary> &#123;STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)&#125; </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : "",
-  "properties" : {
-    "firstname" : "",
-    "lastname" : "",
-    "email" : "",
-    "phone" : "",
-    "company" : "",
-    "website" : ""
-  }
-}
-```
-
-
-
-
 ### Create Contact
 Name: createContact
 
@@ -327,6 +170,96 @@ Type: OBJECT
 
 
 
+### Delete Contact
+Name: deleteContact
+
+`Move Contact to the recycling bin.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| contactId | Contact ID | STRING |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Contact",
+  "name" : "deleteContact",
+  "parameters" : {
+    "contactId" : ""
+  },
+  "type" : "hubspot/v1/deleteContact"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Get Contact
+Name: getContact
+
+`Get contact details.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| contactId | Contact ID | STRING |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Contact",
+  "name" : "getContact",
+  "parameters" : {
+    "contactId" : ""
+  },
+  "type" : "hubspot/v1/getContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the newly created contact. |
+| properties | OBJECT <details> <summary> Properties </summary> &#123;STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "properties" : {
+    "firstname" : "",
+    "lastname" : "",
+    "email" : "",
+    "phone" : "",
+    "company" : "",
+    "website" : ""
+  }
+}
+```
+
+
+
+
 ### Get Ticket
 Name: getTicket
 
@@ -378,6 +311,73 @@ Type: OBJECT
     "hs_pipeline_stage" : "",
     "hs_ticket_priority" : "",
     "subject" : ""
+  }
+}
+```
+
+
+
+
+### Update Contact
+Name: updateContact
+
+`Update Contact properties.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| contactId | Contact | STRING |  | true |
+| properties | Properties | OBJECT <details> <summary> Properties </summary> &#123;STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)&#125; </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Contact",
+  "name" : "updateContact",
+  "parameters" : {
+    "contactId" : "",
+    "properties" : {
+      "firstname" : "",
+      "lastname" : "",
+      "email" : "",
+      "phone" : "",
+      "company" : "",
+      "website" : ""
+    }
+  },
+  "type" : "hubspot/v1/updateContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the newly created contact. |
+| properties | OBJECT <details> <summary> Properties </summary> &#123;STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "properties" : {
+    "firstname" : "",
+    "lastname" : "",
+    "email" : "",
+    "phone" : "",
+    "company" : "",
+    "website" : ""
   }
 }
 ```

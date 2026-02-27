@@ -50,65 +50,6 @@ Version: 1
 ## Actions
 
 
-### Scan
-Name: scan
-
-`Submit a URL to be scanned and control options for how the scan should be performed.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| url | URL | STRING | The URL to be scanned. | true |
-| visibility | Visibility | STRING <details> <summary> Options </summary> <span>public</span>, <span>unlisted</span>, <span>private</span> </details> | Intended visibility of the final scan result. | false |
-| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | User-defined tags to annotate this scan. | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Scan",
-  "name" : "scan",
-  "parameters" : {
-    "url" : "",
-    "visibility" : "",
-    "tags" : [ "" ]
-  },
-  "type" : "urlscan/v1/scan"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| uuid | STRING | UUID for scan result, also called $scanId. |
-| country | STRING | Country for scanning. |
-| visibility | STRING | Determined visibility for scan. |
-| url | STRING | Determined URL being scanned. |
-
-
-
-
-#### Output Example
-```json
-{
-  "uuid" : "",
-  "country" : "",
-  "visibility" : "",
-  "url" : ""
-}
-```
-
-
-
-
 ### Result
 Name: result
 
@@ -567,6 +508,65 @@ Type: OBJECT
   "submitter" : {
     "country" : ""
   }
+}
+```
+
+
+
+
+### Scan
+Name: scan
+
+`Submit a URL to be scanned and control options for how the scan should be performed.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The URL to be scanned. | true |
+| visibility | Visibility | STRING <details> <summary> Options </summary> <span>public</span>, <span>unlisted</span>, <span>private</span> </details> | Intended visibility of the final scan result. | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | User-defined tags to annotate this scan. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Scan",
+  "name" : "scan",
+  "parameters" : {
+    "url" : "",
+    "visibility" : "",
+    "tags" : [ "" ]
+  },
+  "type" : "urlscan/v1/scan"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| uuid | STRING | UUID for scan result, also called $scanId. |
+| country | STRING | Country for scanning. |
+| visibility | STRING | Determined visibility for scan. |
+| url | STRING | Determined URL being scanned. |
+
+
+
+
+#### Output Example
+```json
+{
+  "uuid" : "",
+  "country" : "",
+  "visibility" : "",
+  "url" : ""
 }
 ```
 
