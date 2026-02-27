@@ -17,13 +17,15 @@
 package com.bytechef.component.workflow;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.workflow.constant.WorkflowConstants.WORKFLOW;
+import static com.bytechef.platform.component.constant.WorkflowConstants.WORKFLOW;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.workflow.action.WorkflowCallableResponseAction;
+import com.bytechef.component.workflow.action.WorkflowToolCallableResponseAction;
 import com.bytechef.component.workflow.trigger.WorkflowCallableTrigger;
+import com.bytechef.component.workflow.trigger.WorkflowToolCallableTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -37,8 +39,10 @@ public class WorkflowComponentHandler implements ComponentHandler {
         .description("Triggers and actions for workflow-to-workflow communication.")
         .icon("path:assets/workflow.svg")
         .categories(ComponentCategory.HELPERS)
-        .triggers(WorkflowCallableTrigger.TRIGGER_DEFINITION)
-        .actions(WorkflowCallableResponseAction.ACTION_DEFINITION);
+        .triggers(WorkflowCallableTrigger.TRIGGER_DEFINITION, WorkflowToolCallableTrigger.TRIGGER_DEFINITION)
+        .actions(
+            WorkflowCallableResponseAction.ACTION_DEFINITION,
+            WorkflowToolCallableResponseAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

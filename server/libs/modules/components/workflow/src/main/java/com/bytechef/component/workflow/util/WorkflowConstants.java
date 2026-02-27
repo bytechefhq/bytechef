@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.workflow.constant;
+package com.bytechef.component.workflow.util;
 
 /**
  * @author Ivica Cardic
  */
 public class WorkflowConstants {
 
-    public static final String CALLABLE = "callable";
-    public static final String CALLABLE_RESPONSE = "callableResponse";
-    public static final String INPUT_SCHEMA = "inputSchema";
-    public static final String OUTPUT_SCHEMA = "outputSchema";
-    public static final String WORKFLOW = "workflow";
-
-    private WorkflowConstants() {
-    }
+    public static final String RESPONSE = "response";
 }
