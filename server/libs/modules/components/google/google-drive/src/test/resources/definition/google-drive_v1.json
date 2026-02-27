@@ -423,9 +423,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "name": "new-file.txt",
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -534,9 +534,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "name": "new-file.txt",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "perform": { },
@@ -711,9 +711,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "name": "new-file.txt",
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -822,9 +822,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "name": "new-file.txt",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "perform": { },
@@ -2207,9 +2207,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "name": "new-file.txt",
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -2318,9 +2318,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "name": "new-file.txt",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "perform": { },
@@ -2873,9 +2873,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "name": "new-file.txt",
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -2984,9 +2984,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "name": "new-file.txt",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "processErrorResponse": null,
@@ -3160,9 +3160,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "name": "new-file.txt",
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -3271,9 +3271,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "name": "new-file.txt",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "processErrorResponse": null,
@@ -4650,9 +4650,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "name": "new-file.txt",
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -4761,9 +4761,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "name": "new-file.txt",
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "processErrorResponse": null,
