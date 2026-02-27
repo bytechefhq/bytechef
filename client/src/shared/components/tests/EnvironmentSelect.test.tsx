@@ -5,7 +5,7 @@ import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
-    edition: 'EE' as string,
+    edition: 'EE',
     mockSetCurrentEnvironmentId: vi.fn(),
 }));
 
