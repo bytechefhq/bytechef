@@ -86,18 +86,20 @@ export const deleteSchemaField = (path: string | string[], obj: any) => {
     return obj;
 };
 
-export const deleteSchemaProperty = (key: string, obj: any) => {
-    deleteSchemaField(['properties', key], obj);
+export const deleteSchemaProperty = (key: string, schema: any) => {
+    deleteSchemaField(['properties', key], schema);
 
-    const required = getSchemaRequired(obj);
+    const requiredKeys = getSchemaRequired(schema);
 
-    if (Array.isArray(required)) {
-        const filtered = required.filter((requiredKey: string) => requiredKey !== key);
+    if (Array.isArray(requiredKeys)) {
+        const remainingRequiredKeys = requiredKeys.filter((requiredKey: string) => requiredKey !== key);
 
-        setSchemaField('required', filtered, obj);
+        if (remainingRequiredKeys.length !== requiredKeys.length) {
+            setSchemaField('required', remainingRequiredKeys, schema);
+        }
     }
 
-    return obj;
+    return schema;
 };
 
 export const addSchemaProperty = (schema: SchemaRecordType) => setSchemaProperty(`__${Date.now()}__`, {}, schema);
@@ -119,12 +121,14 @@ export const renameSchemaProperty = (oldKey: string, newKey: string, schema: Sch
 
     setSchemaProperties(renamedProperties, schema);
 
-    const required = getSchemaRequired(schema);
+    const requiredKeys = getSchemaRequired(schema);
 
-    if (Array.isArray(required) && required.includes(oldKey)) {
-        const updated = required.map((key: string) => (key === oldKey ? newKey : key));
+    if (Array.isArray(requiredKeys) && requiredKeys.includes(oldKey)) {
+        const updatedRequiredKeys = requiredKeys.map((requiredKey: string) =>
+            requiredKey === oldKey ? newKey : requiredKey
+        );
 
-        setSchemaField('required', updated, schema);
+        setSchemaField('required', updatedRequiredKeys, schema);
     }
 
     return schema;
