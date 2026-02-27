@@ -5,6 +5,7 @@ interface ClusterElementsCanvasDialogStateI {
     copilotPanelOpen: boolean;
     editorPreferences: Record<string, boolean>;
     showAiAgentEditor: boolean;
+    showDataStreamEditor: boolean;
     testingPanelOpen: boolean;
 }
 
@@ -13,6 +14,7 @@ interface ClusterElementsCanvasDialogActionsI {
     setCopilotPanelOpen: (open: boolean) => void;
     setEditorPreference: (agentNodeName: string, showAiAgent: boolean) => void;
     setShowAiAgentEditor: (show: boolean) => void;
+    setShowDataStreamEditor: (show: boolean) => void;
     setTestingPanelOpen: (open: boolean) => void;
 }
 
@@ -22,6 +24,7 @@ const initialState: ClusterElementsCanvasDialogStateI = {
     copilotPanelOpen: false,
     editorPreferences: {},
     showAiAgentEditor: false,
+    showDataStreamEditor: false,
     testingPanelOpen: false,
 };
 
@@ -52,8 +55,14 @@ export const useClusterElementsCanvasDialogStore = create<ClusterElementsCanvasD
                         showAiAgentEditor: show,
                     })),
 
+                setShowDataStreamEditor: (show) =>
+                    set(() => ({
+                        showDataStreamEditor: show,
+                    })),
+
                 setTestingPanelOpen: (open) =>
                     set(() => ({
+                        showDataStreamEditor: false,
                         testingPanelOpen: open,
                     })),
             }),

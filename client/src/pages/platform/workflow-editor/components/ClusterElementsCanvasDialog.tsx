@@ -4,6 +4,7 @@ import AiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-edit
 import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
 import ClusterElementsWorkflowEditor from '@/pages/platform/cluster-element-editor/components/ClusterElementsWorkflowEditor';
 import ClusterElementsWorkflowEditorHeader from '@/pages/platform/cluster-element-editor/components/ClusterElementsWorkflowEditorHeader';
+import DataStreamEditor from '@/pages/platform/cluster-element-editor/data-stream-editor/DataStreamEditor';
 import {DataPillPanelSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import useClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/hooks/useClusterElementsCanvasDialog';
@@ -39,6 +40,7 @@ const ClusterElementsCanvasDialog = ({
 }: ClusterElementsCanvasDialogProps) => {
     const copilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.copilotPanelOpen);
     const showAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.showAiAgentEditor);
+    const showDataStreamEditor = useClusterElementsCanvasDialogStore((state) => state.showDataStreamEditor);
     const testingPanelOpen = useClusterElementsCanvasDialogStore((state) => state.testingPanelOpen);
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
@@ -55,6 +57,7 @@ const ClusterElementsCanvasDialog = ({
         handleTestClick,
         handleToggleEditor,
         isAiAgentClusterRoot,
+        isDataStreamClusterRoot,
     } = useClusterElementsCanvasDialog({
         onOpenChange,
     });
@@ -70,7 +73,11 @@ const ClusterElementsCanvasDialog = ({
             </DialogHeader>
 
             <DialogContent className="absolute bottom-4 left-16 top-12 h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 gap-2 bg-surface-main p-0">
-                {showAiAgentEditor ? (
+                {showDataStreamEditor ? (
+                    <div className="flex size-full min-h-0 overflow-hidden">
+                        <DataStreamEditor onClose={handleClose} onToggleEditor={handleToggleEditor} />
+                    </div>
+                ) : showAiAgentEditor ? (
                     <div className="flex size-full min-h-0 overflow-hidden">
                         <AiAgentEditor
                             className={twMerge(copilotPanelOpen && 'mr-[450px]')}
@@ -91,7 +98,7 @@ const ClusterElementsCanvasDialog = ({
                 ) : (
                     <>
                         <div className="flex size-full flex-col rounded-lg bg-surface-popover-canvas">
-                            {isAiAgentClusterRoot && (
+                            {(isAiAgentClusterRoot || isDataStreamClusterRoot) && (
                                 <ClusterElementsWorkflowEditorHeader
                                     className={twMerge(
                                         workflowNodeDetailsPanelOpen && 'pr-[470px]',
