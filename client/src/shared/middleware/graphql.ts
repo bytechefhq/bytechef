@@ -3625,7 +3625,7 @@ export type CreateIdentityProviderMutationVariables = Exact<{
 }>;
 
 
-export type CreateIdentityProviderMutation = { __typename?: 'Mutation', createIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } };
+export type CreateIdentityProviderMutation = { __typename?: 'Mutation', createIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes: string, signingCertificate?: string | null, type: string } };
 
 export type DeleteIdentityProviderMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3646,12 +3646,12 @@ export type IdentityProviderQueryVariables = Exact<{
 }>;
 
 
-export type IdentityProviderQuery = { __typename?: 'Query', identityProvider?: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } | null };
+export type IdentityProviderQuery = { __typename?: 'Query', identityProvider?: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes: string, signingCertificate?: string | null, type: string } | null };
 
 export type IdentityProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IdentityProvidersQuery = { __typename?: 'Query', identityProviders: Array<{ __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } | null> };
+export type IdentityProvidersQuery = { __typename?: 'Query', identityProviders: Array<{ __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes: string, signingCertificate?: string | null, type: string } | null> };
 
 export type InviteUserMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -3668,7 +3668,7 @@ export type UpdateIdentityProviderMutationVariables = Exact<{
 }>;
 
 
-export type UpdateIdentityProviderMutation = { __typename?: 'Mutation', updateIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } };
+export type UpdateIdentityProviderMutation = { __typename?: 'Mutation', updateIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes: string, signingCertificate?: string | null, type: string } };
 
 export type UpdateUserMutationVariables = Exact<{
   login: Scalars['String']['input'];
