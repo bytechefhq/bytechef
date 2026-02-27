@@ -118,14 +118,14 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     let previousComponentDefinitions: ComponentDefinitionBasic[] = [];
 
     if (!currentNode?.trigger && workflowNodeOutputs && componentDefinitions) {
-        const result = filterWorkflowNodeOutputs(
+        const filteredNodeOutputs = filterWorkflowNodeOutputs(
             workflowNodeOutputs,
             componentDefinitions,
             taskDispatcherDefinitions ?? []
         );
 
-        filteredWorkflowNodeOutputs = result.outputs;
-        previousComponentDefinitions = result.definitions;
+        filteredWorkflowNodeOutputs = filteredNodeOutputs.outputs;
+        previousComponentDefinitions = filteredNodeOutputs.definitions;
     }
 
     const handleComponentsAndFlowControlsClick = () => {

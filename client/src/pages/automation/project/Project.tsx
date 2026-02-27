@@ -59,8 +59,8 @@ const Project = () => {
             {projects && (
                 <div
                     className={twMerge(
-                        'shrink-0 overflow-hidden transition-[width,opacity] duration-300 ease-out',
-                        projectLeftSidebarOpen ? 'w-96 opacity-100' : 'w-0 opacity-0'
+                        'shrink-0 overflow-hidden transition-[width,visibility] duration-300 ease-out',
+                        projectLeftSidebarOpen ? 'visible w-96' : 'invisible w-0'
                     )}
                 >
                     <ProjectsLeftSidebar
