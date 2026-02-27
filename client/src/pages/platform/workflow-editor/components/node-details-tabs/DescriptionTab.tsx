@@ -11,7 +11,9 @@ import {
     TriggerDefinition,
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
+import {ComponentIcon} from 'lucide-react';
 import {ChangeEvent} from 'react';
+import InlineSVG from 'react-inlinesvg';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -191,6 +193,20 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
 
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
+            <fieldset className="space-y-1">
+                <Label>{currentNode?.taskDispatcher ? 'Flow Control' : 'Component'}</Label>
+
+                <div className="flex h-9 w-full items-center gap-2 rounded-md border border-dashed border-input bg-white px-3 py-1 md:text-sm">
+                    {'icon' in nodeDefinition && nodeDefinition.icon ? (
+                        <InlineSVG className="size-5 shrink-0" src={nodeDefinition.icon} />
+                    ) : (
+                        <ComponentIcon />
+                    )}
+
+                    <span className="min-w-0 truncate">{nodeDefinition.title}</span>
+                </div>
+            </fieldset>
+
             <fieldset className="space-y-1">
                 <Label>Title</Label>
 
