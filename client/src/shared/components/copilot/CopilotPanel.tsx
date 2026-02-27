@@ -123,9 +123,9 @@ const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => {
     const isFixedPosition = className?.split(/\s+/).includes('fixed');
 
     useEffect(() => {
-        let outerRafId: number;
-        let innerRafId: number;
-        let timerId: ReturnType<typeof setTimeout>;
+        let outerRafId: number | undefined;
+        let innerRafId: number | undefined;
+        let timerId: ReturnType<typeof setTimeout> | undefined;
 
         if (open) {
             setShouldRender(true);
@@ -142,27 +142,41 @@ const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => {
         }
 
         return () => {
-            cancelAnimationFrame(outerRafId);
-            cancelAnimationFrame(innerRafId);
-            clearTimeout(timerId);
+            if (outerRafId !== undefined) {
+                cancelAnimationFrame(outerRafId);
+            }
+
+            if (innerRafId !== undefined) {
+                cancelAnimationFrame(innerRafId);
+            }
+
+            if (timerId !== undefined) {
+                clearTimeout(timerId);
+            }
         };
     }, [open]);
 
     const contentClassName = isFixedPosition
-        ? twMerge('transition-transform duration-300 ease-in-out', isVisible ? 'translate-x-0' : 'translate-x-full', className)
+        ? twMerge(
+              'transition-transform duration-300 ease-in-out',
+              isVisible ? 'translate-x-0' : 'translate-x-full',
+              className
+          )
         : className;
 
     return (
         <CopilotPanelBoundary open={open}>
-            <div
-                className={twMerge(
-                    'h-full overflow-hidden',
-                    !isFixedPosition && 'transition-[width] duration-300 ease-in-out',
-                    !isFixedPosition && (isVisible ? 'w-[450px]' : 'w-0')
-                )}
-            >
-                {shouldRender && <CopilotPanelContent className={contentClassName} onClose={onClose} />}
-            </div>
+            {isFixedPosition && !shouldRender ? null : (
+                <div
+                    className={twMerge(
+                        'h-full overflow-hidden',
+                        !isFixedPosition && 'transition-[width] duration-300 ease-in-out',
+                        !isFixedPosition && (isVisible ? 'w-[450px]' : 'w-0')
+                    )}
+                >
+                    {shouldRender && <CopilotPanelContent className={contentClassName} onClose={onClose} />}
+                </div>
+            )}
         </CopilotPanelBoundary>
     );
 };
