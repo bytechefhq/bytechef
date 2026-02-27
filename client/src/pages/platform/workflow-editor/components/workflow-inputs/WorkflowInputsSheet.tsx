@@ -1,5 +1,6 @@
-import {Sheet, SheetContent} from '@/components/ui/sheet';
+import {Sheet, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
+import {VisuallyHidden} from 'radix-ui';
 import {Suspense, lazy} from 'react';
 
 import {WorkflowSheetSkeleton} from '../WorkflowEditorSkeletons';
@@ -20,6 +21,10 @@ const WorkflowInputsSheet = ({
     workflowTestConfiguration,
 }: WorkflowInputsSheetProps) => (
     <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>
+        <VisuallyHidden.Root>
+            <SheetTitle>Workflow Inputs</SheetTitle>
+        </VisuallyHidden.Root>
+
         <SheetContent
             className="bottom-4 right-4 top-3 flex h-auto flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-workflow-inputs-sheet-width"
             onFocusOutside={(event) => event.preventDefault()}
