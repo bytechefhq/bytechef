@@ -1,8 +1,10 @@
-import {useCallback, useState} from 'react';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {useCallback, useMemo, useState} from 'react';
 
 const TOTAL_STEPS = 3;
 
 interface UseDataStreamEditorResultI {
+    configuredSteps: Set<number>;
     currentStep: number;
     handleGoToStep: (step: number) => void;
     handleNext: () => void;
@@ -11,6 +13,32 @@ interface UseDataStreamEditorResultI {
 
 export default function useDataStreamEditor(): UseDataStreamEditorResultI {
     const [currentStep, setCurrentStep] = useState(0);
+
+    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
+
+    const configuredSteps = useMemo(() => {
+        const clusterElements = rootClusterElementNodeData?.clusterElements;
+
+        if (!clusterElements || Array.isArray(clusterElements)) {
+            return new Set<number>();
+        }
+
+        const steps = new Set<number>();
+
+        if (clusterElements['source']) {
+            steps.add(0);
+        }
+
+        if (clusterElements['destination']) {
+            steps.add(1);
+        }
+
+        if (clusterElements['processor']) {
+            steps.add(2);
+        }
+
+        return steps;
+    }, [rootClusterElementNodeData?.clusterElements]);
 
     const handleNext = useCallback(() => {
         setCurrentStep((previousStep) => Math.min(previousStep + 1, TOTAL_STEPS - 1));
@@ -27,6 +55,7 @@ export default function useDataStreamEditor(): UseDataStreamEditorResultI {
     }, []);
 
     return {
+        configuredSteps,
         currentStep,
         handleGoToStep,
         handleNext,

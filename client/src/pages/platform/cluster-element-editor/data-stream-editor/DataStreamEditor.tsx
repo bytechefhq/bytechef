@@ -1,5 +1,3 @@
-import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import DataStreamDestinationStep from './components/DataStreamDestinationStep';
@@ -20,35 +18,9 @@ interface DataStreamEditorProps {
 }
 
 export default function DataStreamEditor({className, onClose, onToggleEditor}: DataStreamEditorProps) {
-    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
-
-    const {currentStep, handleGoToStep, handleNext, handlePrevious} = useDataStreamEditor();
+    const {configuredSteps, currentStep, handleGoToStep, handleNext, handlePrevious} = useDataStreamEditor();
 
     useDataStreamDataPills();
-
-    const configuredSteps = useMemo(() => {
-        const clusterElements = rootClusterElementNodeData?.clusterElements;
-
-        if (!clusterElements || Array.isArray(clusterElements)) {
-            return new Set<number>();
-        }
-
-        const steps = new Set<number>();
-
-        if (clusterElements['source']) {
-            steps.add(0);
-        }
-
-        if (clusterElements['destination']) {
-            steps.add(1);
-        }
-
-        if (clusterElements['processor']) {
-            steps.add(2);
-        }
-
-        return steps;
-    }, [rootClusterElementNodeData?.clusterElements]);
 
     function renderCurrentStep() {
         switch (currentStep) {
