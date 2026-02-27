@@ -419,6 +419,7 @@ include("server:libs:modules:components:wolfram-alpha:wolfram-alpha-full-results
 include("server:libs:modules:components:wolfram-alpha:wolfram-alpha-shortanswers")
 include("server:libs:modules:components:woocommerce")
 include("server:libs:modules:components:wordpress")
+include("server:libs:modules:components:workflow")
 include("server:libs:modules:components:wrike")
 include("server:libs:modules:components:x")
 include("server:libs:modules:components:xero")

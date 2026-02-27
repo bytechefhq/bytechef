@@ -16,11 +16,14 @@
 
 package com.bytechef.component.workflow.trigger;
 
+import static com.bytechef.ai.tool.constant.ToolConstants.DESCRIPTION;
+import static com.bytechef.ai.tool.constant.ToolConstants.NAME;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
-import static com.bytechef.platform.component.constant.WorkflowConstants.CALLABLE;
+import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.platform.component.constant.WorkflowConstants.INPUT_SCHEMA;
+import static com.bytechef.platform.component.constant.WorkflowConstants.TOOL_CALLABLE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
@@ -32,21 +35,30 @@ import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowCallableTrigger {
+public class WorkflowToolCallableTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(CALLABLE)
-        .title("Callable")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(TOOL_CALLABLE)
+        .title("Tool Callable")
         .description(
-            "Triggers when this workflow is called from another workflow. Define the input schema to specify what data the calling workflow should provide.")
+            "Exposes this workflow as a tool with a custom name and description. Define the input schema to specify what data the AI model should provide.")
         .type(TriggerType.CALLABLE)
         .workflowSyncExecution(true)
         .properties(
+            string(NAME)
+                .label("Name")
+                .description("The tool name exposed to the AI model.")
+                .required(true),
+            string(DESCRIPTION)
+                .label("Description")
+                .description("The tool description exposed to the AI model.")
+                .controlType(TEXT_AREA)
+                .required(true),
             string(INPUT_SCHEMA)
                 .label("Inputs")
                 .placeholder("Edit Inputs schema")
-                .description("The schema definition for the input data this workflow expects from callers.")
+                .description("The schema definition for the input data this tool expects from the AI model.")
                 .controlType(JSON_SCHEMA_BUILDER))
-        .output(WorkflowCallableTrigger::output);
+        .output(WorkflowToolCallableTrigger::output);
 
     protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, TriggerContext context) {
