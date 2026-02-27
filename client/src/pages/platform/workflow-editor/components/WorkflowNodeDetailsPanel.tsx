@@ -12,9 +12,10 @@ import Properties from '@/pages/platform/workflow-editor/components/properties/P
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
-import {InfoIcon, XIcon} from 'lucide-react';
+import {ExternalLinkIcon, InfoIcon, XIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import InlineSVG from 'react-inlinesvg';
+import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 import {getClusterElementsLabel} from '../../cluster-element-editor/utils/clusterElementsUtils';
@@ -275,7 +276,7 @@ const WorkflowNodeDetailsPanel = ({
                             </ScrollArea>
                         </main>
 
-                        <footer className="z-50 mt-auto flex bg-background px-4 py-2">
+                        <footer className="z-50 mt-auto flex items-center justify-between bg-background px-4 py-2">
                             <Select defaultValue={getNodeVersion(currentWorkflowNode)}>
                                 <SelectTrigger className="w-auto border-none shadow-none">
                                     <SelectValue placeholder="Choose version..." />
@@ -285,6 +286,14 @@ const WorkflowNodeDetailsPanel = ({
                                     <SelectItem value="1">v1</SelectItem>
                                 </SelectContent>
                             </Select>
+
+                            {currentActionDefinition?.help?.learnMoreUrl && (
+                                <Link target="_blank" to={currentActionDefinition!.help!.learnMoreUrl}>
+                                    <Button size="sm" variant="ghost">
+                                        Documentation <ExternalLinkIcon />
+                                    </Button>
+                                </Link>
+                            )}
                         </footer>
                     </div>
                 )}
