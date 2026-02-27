@@ -1,6 +1,6 @@
 import LoadingIcon from '@/components/LoadingIcon';
+import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
-import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpProjectWorkflowDialog from '@/pages/automation/mcp-servers/components/McpProjectWorkflowDialog';
 import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServerDialog';
