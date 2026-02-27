@@ -106,54 +106,6 @@ Type: OBJECT
 
 
 
-### Get Subscription Information
-Name: getSubscriptionInfo
-
-`Returns user subscription information.`
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Subscription Information",
-  "name" : "getSubscriptionInfo",
-  "type" : "ahrefs/v1/getSubscriptionInfo"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| limits_and_usage | OBJECT <details> <summary> Properties </summary> &#123;STRING\(subscription), STRING\(usage_reset_date), INTEGER\(units_limit_workspace), INTEGER\(units_usage_workspace), INTEGER\(units_limit_api_key), INTEGER\(units_usage_api_key), STRING\(api_key_expiration_date)&#125; </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "limits_and_usage" : {
-    "subscription" : "",
-    "usage_reset_date" : "",
-    "units_limit_workspace" : 1,
-    "units_usage_workspace" : 1,
-    "units_limit_api_key" : 1,
-    "units_usage_api_key" : 1,
-    "api_key_expiration_date" : ""
-  }
-}
-```
-
-
-
-
 ### Get Page Content
 Name: getPageContent
 
@@ -205,6 +157,54 @@ Type: OBJECT
     "page_text" : "",
     "raw_html" : "",
     "rendered_html" : ""
+  }
+}
+```
+
+
+
+
+### Get Subscription Information
+Name: getSubscriptionInfo
+
+`Returns user subscription information.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Subscription Information",
+  "name" : "getSubscriptionInfo",
+  "type" : "ahrefs/v1/getSubscriptionInfo"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| limits_and_usage | OBJECT <details> <summary> Properties </summary> &#123;STRING\(subscription), STRING\(usage_reset_date), INTEGER\(units_limit_workspace), INTEGER\(units_usage_workspace), INTEGER\(units_limit_api_key), INTEGER\(units_usage_api_key), STRING\(api_key_expiration_date)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "limits_and_usage" : {
+    "subscription" : "",
+    "usage_reset_date" : "",
+    "units_limit_workspace" : 1,
+    "units_usage_workspace" : 1,
+    "units_limit_api_key" : 1,
+    "units_usage_api_key" : 1,
+    "api_key_expiration_date" : ""
   }
 }
 ```

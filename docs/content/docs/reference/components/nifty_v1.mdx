@@ -120,6 +120,66 @@ Type: OBJECT
 
 
 
+### Create Status
+Name: createStatus
+
+`Creates new status`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | Name of the status. | true |
+| project_id | Project ID | STRING | Project ID that the status belongs to. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Status",
+  "name" : "createStatus",
+  "parameters" : {
+    "name" : "",
+    "project_id" : ""
+  },
+  "type" : "nifty/v1/createStatus"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| message | STRING |  |
+| task_group | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(color), STRING\(created_by), STRING\(project), INTEGER\(order)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "message" : "",
+  "task_group" : {
+    "id" : "",
+    "name" : "",
+    "color" : "",
+    "created_by" : "",
+    "project" : "",
+    "order" : 1
+  }
+}
+```
+
+
+
+
 ### Create Task
 Name: createTask
 
@@ -234,66 +294,6 @@ Type: OBJECT
   "name" : "",
   "project" : "",
   "description" : ""
-}
-```
-
-
-
-
-### Create Status
-Name: createStatus
-
-`Creates new status`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | Name of the status. | true |
-| project_id | Project ID | STRING | Project ID that the status belongs to. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Create Status",
-  "name" : "createStatus",
-  "parameters" : {
-    "name" : "",
-    "project_id" : ""
-  },
-  "type" : "nifty/v1/createStatus"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| message | STRING |  |
-| task_group | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(color), STRING\(created_by), STRING\(project), INTEGER\(order)&#125; </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "message" : "",
-  "task_group" : {
-    "id" : "",
-    "name" : "",
-    "color" : "",
-    "created_by" : "",
-    "project" : "",
-    "order" : 1
-  }
 }
 ```
 

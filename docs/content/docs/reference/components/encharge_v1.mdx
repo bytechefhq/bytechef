@@ -49,6 +49,40 @@ Version: 1
 ## Actions
 
 
+### Add Tag
+Name: addTag
+
+`Add tag(s) to an existing user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| tag | Tag | STRING | Tag(s) to add. To add multiple tags, use a comma-separated list, e.g. tag1,tag2 | true |
+| email | Email | STRING | Email of the person. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Tag",
+  "name" : "addTag",
+  "parameters" : {
+    "tag" : "",
+    "email" : ""
+  },
+  "type" : "encharge/v1/addTag"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
 ### Create Email Template
 Name: createEmail
 
@@ -170,40 +204,6 @@ Type: OBJECT
   } ]
 }
 ```
-
-
-
-
-### Add Tag
-Name: addTag
-
-`Add tag(s) to an existing user.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| tag | Tag | STRING | Tag(s) to add. To add multiple tags, use a comma-separated list, e.g. tag1,tag2 | true |
-| email | Email | STRING | Email of the person. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Add Tag",
-  "name" : "addTag",
-  "parameters" : {
-    "tag" : "",
-    "email" : ""
-  },
-  "type" : "encharge/v1/addTag"
-}
-```
-
-#### Output
-
-This action does not produce any output.
-
-
 
 
 

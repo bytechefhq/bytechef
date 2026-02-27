@@ -58,45 +58,34 @@ Creation of OAuth 2.0 application is documented [here](/reference/components/goo
 ## Actions
 
 
-### List Sites
-Name: listSites
+### Add Site
+Name: addSite
 
-`Lists the user's Search Console sites.`
+`Adds a site to the set of the user's sites in Search Console.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteUrl | Site URL | STRING | The URL of the site to add. | true |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "List Sites",
-  "name" : "listSites",
-  "type" : "googleSearchConsole/v1/listSites"
+  "label" : "Add Site",
+  "name" : "addSite",
+  "parameters" : {
+    "siteUrl" : ""
+  },
+  "type" : "googleSearchConsole/v1/addSite"
 }
 ```
 
 #### Output
 
+This action does not produce any output.
 
 
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| siteEntry | ARRAY <details> <summary> Items </summary> [&#123;STRING\(permissionLevel), STRING\(siteUrl)&#125;] </details> | Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999). |
-
-
-
-
-#### Output Example
-```json
-{
-  "siteEntry" : [ {
-    "permissionLevel" : "",
-    "siteUrl" : ""
-  } ]
-}
-```
 
 
 
@@ -184,34 +173,45 @@ Type: OBJECT
 
 
 
-### Add Site
-Name: addSite
+### List Sites
+Name: listSites
 
-`Adds a site to the set of the user's sites in Search Console.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| siteUrl | Site URL | STRING | The URL of the site to add. | true |
+`Lists the user's Search Console sites.`
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Add Site",
-  "name" : "addSite",
-  "parameters" : {
-    "siteUrl" : ""
-  },
-  "type" : "googleSearchConsole/v1/addSite"
+  "label" : "List Sites",
+  "name" : "listSites",
+  "type" : "googleSearchConsole/v1/listSites"
 }
 ```
 
 #### Output
 
-This action does not produce any output.
 
 
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| siteEntry | ARRAY <details> <summary> Items </summary> [&#123;STRING\(permissionLevel), STRING\(siteUrl)&#125;] </details> | Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999). |
+
+
+
+
+#### Output Example
+```json
+{
+  "siteEntry" : [ {
+    "permissionLevel" : "",
+    "siteUrl" : ""
+  } ]
+}
+```
 
 
 

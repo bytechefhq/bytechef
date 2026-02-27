@@ -52,140 +52,6 @@ For details, see Hunter’s API authentication docs: https://hunter.io/api-docum
 ## Actions
 
 
-### Email Enrichment
-Name: emailEnrichment
-
-`Returns all the information associated with an email address, such as a person's name, location and social handles.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email Address | STRING | The email address name for which you to find associated information. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Email Enrichment",
-  "name" : "emailEnrichment",
-  "parameters" : {
-    "email" : ""
-  },
-  "type" : "hunter/v1/emailEnrichment"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), &#123;STRING\(fullName), STRING\(givenName), STRING\(familyName)&#125;\(name), STRING\(email), STRING\(location), &#123;STRING\(city), STRING\(state), INTEGER\(stateCode), STRING\(country), STRING\(countryCode), NUMBER\(lat), NUMBER\(lng)&#125;\(geo), &#123;STRING\(email)&#125;\(meta)&#125; </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "data" : {
-    "id" : "",
-    "name" : {
-      "fullName" : "",
-      "givenName" : "",
-      "familyName" : ""
-    },
-    "email" : "",
-    "location" : "",
-    "geo" : {
-      "city" : "",
-      "state" : "",
-      "stateCode" : 1,
-      "country" : "",
-      "countryCode" : "",
-      "lat" : 0.0,
-      "lng" : 0.0
-    },
-    "meta" : {
-      "email" : ""
-    }
-  }
-}
-```
-
-
-
-
-### Company Enrichment
-Name: companyEnrichment
-
-`Returns all the information associated with a domain name, such as the industry, the description, or headquarters' location.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| domain | Domain | STRING | The domain name for which you to find associated information. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Company Enrichment",
-  "name" : "companyEnrichment",
-  "parameters" : {
-    "domain" : ""
-  },
-  "type" : "hunter/v1/companyEnrichment"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(legalName), STRING\(domain), STRING\(description), INTEGER\(foundedYear), STRING\(location), STRING\(timeZone), STRING\(logo), STRING\(emailProvider), STRING\(phone), &#123;STRING\(domain)&#125;\(meta)&#125; </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "data" : {
-    "id" : "",
-    "name" : "",
-    "legalName" : "",
-    "domain" : "",
-    "description" : "",
-    "foundedYear" : 1,
-    "location" : "",
-    "timeZone" : "",
-    "logo" : "",
-    "emailProvider" : "",
-    "phone" : "",
-    "meta" : {
-      "domain" : ""
-    }
-  }
-}
-```
-
-
-
-
 ### Combined Enrichment
 Name: combinedEnrichment
 
@@ -268,6 +134,70 @@ Type: OBJECT
 
 
 
+### Company Enrichment
+Name: companyEnrichment
+
+`Returns all the information associated with a domain name, such as the industry, the description, or headquarters' location.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| domain | Domain | STRING | The domain name for which you to find associated information. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Company Enrichment",
+  "name" : "companyEnrichment",
+  "parameters" : {
+    "domain" : ""
+  },
+  "type" : "hunter/v1/companyEnrichment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(legalName), STRING\(domain), STRING\(description), INTEGER\(foundedYear), STRING\(location), STRING\(timeZone), STRING\(logo), STRING\(emailProvider), STRING\(phone), &#123;STRING\(domain)&#125;\(meta)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : "",
+    "name" : "",
+    "legalName" : "",
+    "domain" : "",
+    "description" : "",
+    "foundedYear" : 1,
+    "location" : "",
+    "timeZone" : "",
+    "logo" : "",
+    "emailProvider" : "",
+    "phone" : "",
+    "meta" : {
+      "domain" : ""
+    }
+  }
+}
+```
+
+
+
+
 ### Create Lead
 Name: createLead
 
@@ -332,6 +262,76 @@ Type: OBJECT
     "leads_list" : {
       "id" : 1,
       "name" : ""
+    }
+  }
+}
+```
+
+
+
+
+### Email Enrichment
+Name: emailEnrichment
+
+`Returns all the information associated with an email address, such as a person's name, location and social handles.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| email | Email Address | STRING | The email address name for which you to find associated information. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Email Enrichment",
+  "name" : "emailEnrichment",
+  "parameters" : {
+    "email" : ""
+  },
+  "type" : "hunter/v1/emailEnrichment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), &#123;STRING\(fullName), STRING\(givenName), STRING\(familyName)&#125;\(name), STRING\(email), STRING\(location), &#123;STRING\(city), STRING\(state), INTEGER\(stateCode), STRING\(country), STRING\(countryCode), NUMBER\(lat), NUMBER\(lng)&#125;\(geo), &#123;STRING\(email)&#125;\(meta)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : "",
+    "name" : {
+      "fullName" : "",
+      "givenName" : "",
+      "familyName" : ""
+    },
+    "email" : "",
+    "location" : "",
+    "geo" : {
+      "city" : "",
+      "state" : "",
+      "stateCode" : 1,
+      "country" : "",
+      "countryCode" : "",
+      "lat" : 0.0,
+      "lng" : 0.0
+    },
+    "meta" : {
+      "email" : ""
     }
   }
 }
