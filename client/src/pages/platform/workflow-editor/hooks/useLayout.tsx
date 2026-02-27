@@ -83,6 +83,12 @@ export default function useLayout({
             setSavedPositionCrossAxisShift: state.setSavedPositionCrossAxisShift,
         }))
     );
+    const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
+    const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
+    const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
+        (state) => state.workflowNodeDetailsPanelOpen
+    );
+    const layoutResetCounter = useWorkflowDataStore((state) => state.layoutResetCounter);
 
     const cancelAnimationRef = useRef<(() => void) | null>(null);
     const isInitialLayoutRef = useRef(true);
@@ -90,6 +96,10 @@ export default function useLayout({
     const initialDirectionRef = useRef<LayoutDirectionType | undefined>(undefined);
     const canvasWidthRef = useRef(canvasWidth);
     const canvasHeightRef = useRef(canvasHeight);
+    const previousDataPillPanelOpenRef = useRef<boolean | undefined>(undefined);
+    const previousNodeDetailsPanelOpenRef = useRef<boolean | undefined>(undefined);
+    const previousProjectLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
+
     canvasWidthRef.current = canvasWidth;
     canvasHeightRef.current = canvasHeight;
 
@@ -433,8 +443,6 @@ export default function useLayout({
         }
     });
 
-    const layoutResetCounter = useWorkflowDataStore((state) => state.layoutResetCounter);
-
     useEffect(() => {
         const canvasCrossDimension = layoutDirection === 'LR' && canvasHeight ? canvasHeight : canvasWidth;
 
@@ -446,16 +454,6 @@ export default function useLayout({
             setSavedPositionCrossAxisShift((canvasCrossDimension - initialCanvasCrossDimRef.current) / 2);
         }
     }, [canvasWidth, canvasHeight, layoutDirection, setSavedPositionCrossAxisShift]);
-
-    const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
-    const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
-    const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
-        (state) => state.workflowNodeDetailsPanelOpen
-    );
-
-    const previousDataPillPanelOpenRef = useRef<boolean | undefined>(undefined);
-    const previousNodeDetailsPanelOpenRef = useRef<boolean | undefined>(undefined);
-    const previousProjectLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
 
     useEffect(() => {
         if (!useWorkflowDataStore.getState().isWorkflowLoaded) {
@@ -489,13 +487,17 @@ export default function useLayout({
             widthDelta += projectLeftSidebarOpen ? PROJECT_LEFT_SIDEBAR_WIDTH : -PROJECT_LEFT_SIDEBAR_WIDTH;
         }
 
+        if (widthDelta === 0) {
+            previousDataPillPanelOpenRef.current = dataPillPanelOpen;
+            previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
+            previousProjectLeftSidebarOpenRef.current = projectLeftSidebarOpen;
+
+            return;
+        }
+
         previousDataPillPanelOpenRef.current = dataPillPanelOpen;
         previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
         previousProjectLeftSidebarOpenRef.current = projectLeftSidebarOpen;
-
-        if (widthDelta === 0) {
-            return;
-        }
 
         const crossAxis = layoutDirection === 'TB' ? 'x' : 'y';
         const positionDelta = -widthDelta / 2;
