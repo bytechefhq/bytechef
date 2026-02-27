@@ -30,7 +30,7 @@ import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 
 interface ProjectsLeftSidebarProps {
-    bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
+    bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
     onProjectClick: (projectId: number, projectWorkflowId: number) => void;
     projectId: number;
     currentWorkflowId: string;

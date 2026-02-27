@@ -24,7 +24,7 @@ import {useShallow} from 'zustand/react/shallow';
 const workflowTestApi = new WorkflowTestApi();
 
 interface UseProjectHeaderProps {
-    bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
+    bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
     chatTrigger?: boolean;
     projectId: number;
 }

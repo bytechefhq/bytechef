@@ -1,7 +1,7 @@
 import {COMPONENT_CATEGORY_ICON} from '@/shared/constants';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {useCallback, useMemo, useState} from 'react';
+import {type ReactNode, useCallback, useMemo, useState} from 'react';
 
 type ActiveViewType = 'all' | 'filtered';
 
@@ -104,7 +104,7 @@ export const useComponentFiltering = ({componentDefinitions}: {componentDefiniti
             return [];
         }
 
-        const categories: {icon: JSX.Element | null; label: string}[] = [];
+        const categories: {icon: ReactNode; label: string}[] = [];
 
         componentDefinitions.forEach((component) => {
             component.componentCategories?.forEach((componentCategory) => {

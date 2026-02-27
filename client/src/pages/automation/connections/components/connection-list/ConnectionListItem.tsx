@@ -20,7 +20,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useToast} from '@/hooks/use-toast';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -38,6 +37,7 @@ import {
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, EditIcon, EllipsisVerticalIcon, Link2OffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useState} from 'react';
+import {toast} from 'sonner';
 
 import TagList from '../../../../../shared/components/TagList';
 
@@ -59,14 +59,9 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
     const queryClient = useQueryClient();
 
-    const {toast} = useToast();
-
     const deleteConnectionMutation = useDeleteConnectionMutation({
         onError: () => {
-            toast({
-                description: `Failed to delete "${connection.name}". Please try again.`,
-                variant: 'destructive',
-            });
+            toast.error(`Failed to delete "${connection.name}". Please try again.`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -81,19 +76,15 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
             setShowDeleteDialog(false);
 
-            toast({
-                description: `Connection "${connection.name}" has been successfully deleted.`,
-            });
+            toast(`Connection "${connection.name}" has been successfully deleted.`);
         },
     });
 
     const disconnectConnectionMutation = useDisconnectConnectionMutation({
         onError: () => {
             setShowDisconnectDialog(false);
-            toast({
-                description: `Failed to disconnect "${connection.name}". Please try again.`,
-                variant: 'destructive',
-            });
+
+            toast.error(`Failed to disconnect "${connection.name}". Please try again.`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -108,9 +99,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
             setShowDisconnectDialog(false);
 
-            toast({
-                description: `"${connection.name}" was successfully disconnected from all workflows.`,
-            });
+            toast(`"${connection.name}" was successfully disconnected from all workflows.`);
         },
     });
 

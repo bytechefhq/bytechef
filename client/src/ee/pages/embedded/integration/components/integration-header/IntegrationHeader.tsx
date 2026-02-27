@@ -50,7 +50,7 @@ const IntegrationHeader = ({
     runDisabled,
     updateWorkflowMutation,
 }: {
-    bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
+    bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
     integrationId: number;
     integrationWorkflowId: number;
     runDisabled: boolean;

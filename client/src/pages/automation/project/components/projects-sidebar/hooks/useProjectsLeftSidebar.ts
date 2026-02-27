@@ -14,7 +14,7 @@ export const useProjectsLeftSidebar = ({
     bottomResizablePanelRef,
     projectId,
 }: {
-    bottomResizablePanelRef: RefObject<PanelImperativeHandle>;
+    bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
     projectId: number;
 }) => {
     const setShowBottomPanelOpen = useWorkflowEditorStore((state) => state.setShowBottomPanelOpen);

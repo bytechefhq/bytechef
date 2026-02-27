@@ -16,7 +16,7 @@ interface UseOpenApiSpecificationFieldI {
 export default function useOpenApiSpecificationField<T extends FieldValues, K extends FieldPath<T>>({
     field,
 }: UseOpenApiSpecificationFieldProps<T, K>): UseOpenApiSpecificationFieldI {
-    const hiddenInputRef = useRef<HTMLInputElement>(null);
+    const hiddenInputRef = useRef<HTMLInputElement>(null!);
     const [name, setName] = useState<string>();
 
     const handleUploadedFile = useCallback(

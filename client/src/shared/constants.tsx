@@ -18,6 +18,7 @@ import {
     ThumbsUpIcon,
     UsersIcon,
 } from 'lucide-react';
+import {type ReactNode} from 'react';
 
 import IconECommerce from '../assets/IconECommerce.svg';
 import {getRandomId} from './util/random-utils';
@@ -160,7 +161,7 @@ export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
     parallel: ['tasks'],
 };
 
-export const COMPONENT_CATEGORY_ICON: Record<string, JSX.Element> = {
+export const COMPONENT_CATEGORY_ICON: Record<string, ReactNode> = {
     accounting: <CalculatorIcon />,
     advertising: <MegaphoneIcon />,
     analytics: <ChartLineIcon />,

@@ -213,7 +213,7 @@ export type NodeDataType = {
     eachData?: EachDataType;
     forkJoinId?: string;
     forkJoinData?: ForkJoinDataType;
-    icon?: JSX.Element | ReactNode | string;
+    icon?: ReactNode;
     isNestedClusterRoot?: boolean;
     label?: string;
     loopBreakData?: LoopBreakDataType;

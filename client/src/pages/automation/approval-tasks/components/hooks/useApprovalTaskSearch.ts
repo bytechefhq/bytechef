@@ -27,7 +27,7 @@ export function useApprovalTaskSearch(): UseApprovalTaskSearchReturnI {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
 
-    const searchInputRef = useRef<HTMLInputElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null!);
 
     const {approvalTasks, filters, searchQuery, setSearchQuery} = useApprovalTasksStore(
         useShallow((state) => ({
