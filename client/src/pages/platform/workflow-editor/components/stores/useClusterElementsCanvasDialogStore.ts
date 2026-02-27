@@ -62,7 +62,6 @@ export const useClusterElementsCanvasDialogStore = create<ClusterElementsCanvasD
 
                 setTestingPanelOpen: (open) =>
                     set(() => ({
-                        showDataStreamEditor: false,
                         testingPanelOpen: open,
                     })),
             }),

@@ -3,13 +3,11 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {LayoutGridIcon, XIcon} from 'lucide-react';
 
 interface DataStreamHeaderProps {
-    isSimpleModeAvailable?: boolean;
     onClose?: () => void;
     onToggleEditor?: (showDataStream: boolean) => void;
 }
 
 export default function DataStreamHeader({
-    isSimpleModeAvailable = true,
     onClose,
     onToggleEditor,
 }: DataStreamHeaderProps) {
@@ -18,7 +16,7 @@ export default function DataStreamHeader({
             <div className="text-lg font-semibold">Data Stream Editor</div>
 
             <div className="flex items-center gap-1">
-                {isSimpleModeAvailable && onToggleEditor && (
+                {onToggleEditor && (
                     <div className="flex items-center gap-1 rounded-md p-0.5">
                         <Tooltip>
                             <TooltipTrigger asChild>

@@ -1,5 +1,4 @@
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {NodeDataType} from '@/shared/types';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -26,30 +25,6 @@ export default function DataStreamEditor({className, onClose, onToggleEditor}: D
     const {currentStep, handleGoToStep, handleNext, handlePrevious} = useDataStreamEditor();
 
     useDataStreamDataPills();
-
-    const isSimpleModeAvailable = useMemo(() => {
-        const clusterElements = rootClusterElementNodeData?.clusterElements;
-
-        if (!clusterElements || Array.isArray(clusterElements)) {
-            return true;
-        }
-
-        const processorValue = clusterElements['processor'];
-
-        if (!processorValue) {
-            return true;
-        }
-
-        const processorElement = (Array.isArray(processorValue)
-            ? processorValue[0]
-            : processorValue) as unknown as NodeDataType;
-
-        const typeSegments = processorElement.type?.split('/') || [];
-        const componentName = processorElement.componentName || typeSegments[0] || '';
-        const clusterElementName = typeSegments[2] || '';
-
-        return componentName === 'dataStreamProcessor' && clusterElementName === 'fieldMapper';
-    }, [rootClusterElementNodeData?.clusterElements]);
 
     const configuredSteps = useMemo(() => {
         const clusterElements = rootClusterElementNodeData?.clusterElements;
@@ -90,11 +65,7 @@ export default function DataStreamEditor({className, onClose, onToggleEditor}: D
 
     return (
         <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-white', className)}>
-            <DataStreamHeader
-                isSimpleModeAvailable={isSimpleModeAvailable}
-                onClose={onClose}
-                onToggleEditor={onToggleEditor}
-            />
+            <DataStreamHeader onClose={onClose} onToggleEditor={onToggleEditor} />
 
             <DataStreamStepNav
                 configuredSteps={configuredSteps}
