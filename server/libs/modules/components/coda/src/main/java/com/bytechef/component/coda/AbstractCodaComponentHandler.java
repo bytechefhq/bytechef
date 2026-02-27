@@ -36,13 +36,14 @@ public abstract class AbstractCodaComponentHandler implements OpenApiComponentHa
         component("coda")
             .title("Coda")
             .description(
-                "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps, and databases into a single platform."))
-                    .actions(modifyActions(CodaListDocsAction.ACTION_DEFINITION, CodaCopyDocAction.ACTION_DEFINITION,
-                        CodaUpdateRowAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(CodaConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(CodaListDocsAction.ACTION_DEFINITION),
-                        tool(CodaCopyDocAction.ACTION_DEFINITION), tool(CodaUpdateRowAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps, and databases into a single platform.")
+            .version(1))
+                .actions(modifyActions(CodaCopyDocAction.ACTION_DEFINITION, CodaListDocsAction.ACTION_DEFINITION,
+                    CodaUpdateRowAction.ACTION_DEFINITION))
+                .connection(modifyConnection(CodaConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(CodaCopyDocAction.ACTION_DEFINITION),
+                    tool(CodaListDocsAction.ACTION_DEFINITION), tool(CodaUpdateRowAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

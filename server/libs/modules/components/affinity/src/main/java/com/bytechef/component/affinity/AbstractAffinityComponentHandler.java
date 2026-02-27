@@ -36,15 +36,15 @@ public abstract class AbstractAffinityComponentHandler implements OpenApiCompone
         component("affinity")
             .title("Affinity")
             .description(
-                "Affinity is a customer relationship management (CRM) platform that leverages relationship intelligence to help businesses strengthen connections and drive engagement with client and prospects."))
-                    .actions(modifyActions(AffinityCreateOpportunityAction.ACTION_DEFINITION,
-                        AffinityCreateOrganizationAction.ACTION_DEFINITION,
-                        AffinityCreatePersonAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(AffinityConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(AffinityCreateOpportunityAction.ACTION_DEFINITION),
-                        tool(AffinityCreateOrganizationAction.ACTION_DEFINITION),
-                        tool(AffinityCreatePersonAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Affinity is a customer relationship management (CRM) platform that leverages relationship intelligence to help businesses strengthen connections and drive engagement with client and prospects.")
+            .version(1))
+                .actions(modifyActions(AffinityCreateOpportunityAction.ACTION_DEFINITION,
+                    AffinityCreateOrganizationAction.ACTION_DEFINITION, AffinityCreatePersonAction.ACTION_DEFINITION))
+                .connection(modifyConnection(AffinityConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(AffinityCreateOpportunityAction.ACTION_DEFINITION),
+                    tool(AffinityCreateOrganizationAction.ACTION_DEFINITION),
+                    tool(AffinityCreatePersonAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

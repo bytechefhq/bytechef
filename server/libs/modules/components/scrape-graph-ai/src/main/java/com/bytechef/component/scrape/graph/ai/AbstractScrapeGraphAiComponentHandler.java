@@ -37,14 +37,14 @@ public abstract class AbstractScrapeGraphAiComponentHandler implements OpenApiCo
         component("scrapeGraphAi")
             .title("ScrapeGraphAI")
             .description(
-                "ScrapeGraphAI is a web scraping python library that uses LLM and direct graph logic to create scraping pipelines for websites and local documents."))
-                    .actions(modifyActions(ScrapeGraphAiSearchScraperAction.ACTION_DEFINITION,
-                        ScrapeGraphAiMarkdownifyAction.ACTION_DEFINITION,
-                        ScrapeGraphAiSmartScraperAction.ACTION_DEFINITION,
-                        ScrapeGraphAiStartCrawlAction.ACTION_DEFINITION,
-                        ScrapeGraphAiGetCrawlStatusAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(ScrapeGraphAiConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "ScrapeGraphAI is a web scraping python library that uses LLM and direct graph logic to create scraping pipelines for websites and local documents.")
+            .version(1))
+                .actions(modifyActions(ScrapeGraphAiGetCrawlStatusAction.ACTION_DEFINITION,
+                    ScrapeGraphAiMarkdownifyAction.ACTION_DEFINITION,
+                    ScrapeGraphAiSearchScraperAction.ACTION_DEFINITION,
+                    ScrapeGraphAiSmartScraperAction.ACTION_DEFINITION, ScrapeGraphAiStartCrawlAction.ACTION_DEFINITION))
+                .connection(modifyConnection(ScrapeGraphAiConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

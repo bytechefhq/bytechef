@@ -35,13 +35,14 @@ public abstract class AbstractAsanaComponentHandler implements OpenApiComponentH
         component("asana")
             .title("Asana")
             .description(
-                "Asana is a web and mobile application designed to help teams organize, track, and manage their work tasks and projects efficiently."))
-                    .actions(modifyActions(AsanaCreateProjectAction.ACTION_DEFINITION,
-                        AsanaCreateTaskAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(AsanaConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(AsanaCreateProjectAction.ACTION_DEFINITION),
-                        tool(AsanaCreateTaskAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Asana is a web and mobile application designed to help teams organize, track, and manage their work tasks and projects efficiently.")
+            .version(1))
+                .actions(
+                    modifyActions(AsanaCreateProjectAction.ACTION_DEFINITION, AsanaCreateTaskAction.ACTION_DEFINITION))
+                .connection(modifyConnection(AsanaConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(AsanaCreateProjectAction.ACTION_DEFINITION),
+                    tool(AsanaCreateTaskAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

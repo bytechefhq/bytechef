@@ -36,15 +36,15 @@ public abstract class AbstractAhrefsComponentHandler implements OpenApiComponent
         component("ahrefs")
             .title("Ahrefs")
             .description(
-                "Ahrefs is a comprehensive suite of SEO (Search Engine Optimization) tools used by digital marketers and businesses to improve their website's visibility in search engine results."))
-                    .actions(modifyActions(AhrefsGetMetricsAction.ACTION_DEFINITION,
-                        AhrefsGetSubscriptionInfoAction.ACTION_DEFINITION,
-                        AhrefsGetPageContentAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(AhrefsConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(AhrefsGetMetricsAction.ACTION_DEFINITION),
-                        tool(AhrefsGetSubscriptionInfoAction.ACTION_DEFINITION),
-                        tool(AhrefsGetPageContentAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Ahrefs is a comprehensive suite of SEO (Search Engine Optimization) tools used by digital marketers and businesses to improve their website's visibility in search engine results.")
+            .version(1))
+                .actions(modifyActions(AhrefsGetMetricsAction.ACTION_DEFINITION,
+                    AhrefsGetPageContentAction.ACTION_DEFINITION, AhrefsGetSubscriptionInfoAction.ACTION_DEFINITION))
+                .connection(modifyConnection(AhrefsConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(AhrefsGetMetricsAction.ACTION_DEFINITION),
+                    tool(AhrefsGetPageContentAction.ACTION_DEFINITION),
+                    tool(AhrefsGetSubscriptionInfoAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

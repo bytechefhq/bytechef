@@ -34,11 +34,12 @@ public abstract class AbstractAcceloComponentHandler implements OpenApiComponent
         component("accelo")
             .title("Accelo")
             .description(
-                "Accelo is a cloud-based platform designed to streamline operations for service businesses by integrating project management, CRM, and billing functionalities into one unified system."))
-                    .actions(modifyActions(AcceloCreateCompanyAction.ACTION_DEFINITION,
-                        AcceloCreateContactAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(AcceloConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Accelo is a cloud-based platform designed to streamline operations for service businesses by integrating project management, CRM, and billing functionalities into one unified system.")
+            .version(1))
+                .actions(modifyActions(AcceloCreateCompanyAction.ACTION_DEFINITION,
+                    AcceloCreateContactAction.ACTION_DEFINITION))
+                .connection(modifyConnection(AcceloConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

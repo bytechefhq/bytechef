@@ -52,38 +52,40 @@ public abstract class AbstractPipedriveComponentHandler implements OpenApiCompon
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("pipedrive")
             .title("Pipedrive")
-            .description(null))
-                .actions(modifyActions(PipedriveGetDealsAction.ACTION_DEFINITION,
-                    PipedriveAddDealAction.ACTION_DEFINITION, PipedriveSearchDealsAction.ACTION_DEFINITION,
-                    PipedriveDeleteDealAction.ACTION_DEFINITION, PipedriveGetDealDetailsAction.ACTION_DEFINITION,
-                    PipedriveGetLeadsAction.ACTION_DEFINITION, PipedriveAddLeadAction.ACTION_DEFINITION,
-                    PipedriveDeleteLeadAction.ACTION_DEFINITION, PipedriveGetLeadDetailsAction.ACTION_DEFINITION,
-                    PipedriveSearchLeadsAction.ACTION_DEFINITION, PipedriveGetOrganizationsAction.ACTION_DEFINITION,
-                    PipedriveAddOrganizationAction.ACTION_DEFINITION,
+            .description(null)
+            .version(1))
+                .actions(modifyActions(PipedriveAddDealAction.ACTION_DEFINITION,
+                    PipedriveAddLeadAction.ACTION_DEFINITION, PipedriveAddOrganizationAction.ACTION_DEFINITION,
+                    PipedriveAddPersonAction.ACTION_DEFINITION, PipedriveDeleteDealAction.ACTION_DEFINITION,
+                    PipedriveDeleteLeadAction.ACTION_DEFINITION, PipedriveDeleteOrganizationAction.ACTION_DEFINITION,
+                    PipedriveDeletePersonAction.ACTION_DEFINITION, PipedriveGetDealDetailsAction.ACTION_DEFINITION,
+                    PipedriveGetDealsAction.ACTION_DEFINITION, PipedriveGetLeadDetailsAction.ACTION_DEFINITION,
+                    PipedriveGetLeadsAction.ACTION_DEFINITION, PipedriveGetOrganizationDetailsAction.ACTION_DEFINITION,
+                    PipedriveGetOrganizationsAction.ACTION_DEFINITION,
+                    PipedriveGetPersonDetailsAction.ACTION_DEFINITION, PipedriveGetPersonsAction.ACTION_DEFINITION,
+                    PipedriveSearchDealsAction.ACTION_DEFINITION, PipedriveSearchLeadsAction.ACTION_DEFINITION,
                     PipedriveSearchOrganizationAction.ACTION_DEFINITION,
-                    PipedriveDeleteOrganizationAction.ACTION_DEFINITION,
-                    PipedriveGetOrganizationDetailsAction.ACTION_DEFINITION,
-                    PipedriveGetPersonsAction.ACTION_DEFINITION, PipedriveAddPersonAction.ACTION_DEFINITION,
-                    PipedriveSearchPersonsAction.ACTION_DEFINITION, PipedriveDeletePersonAction.ACTION_DEFINITION,
-                    PipedriveGetPersonDetailsAction.ACTION_DEFINITION))
+                    PipedriveSearchPersonsAction.ACTION_DEFINITION))
                 .connection(modifyConnection(PipedriveConnection.CONNECTION_DEFINITION))
-                .clusterElements(modifyClusterElements(tool(PipedriveGetDealsAction.ACTION_DEFINITION),
-                    tool(PipedriveAddDealAction.ACTION_DEFINITION), tool(PipedriveSearchDealsAction.ACTION_DEFINITION),
-                    tool(PipedriveDeleteDealAction.ACTION_DEFINITION),
-                    tool(PipedriveGetDealDetailsAction.ACTION_DEFINITION),
-                    tool(PipedriveGetLeadsAction.ACTION_DEFINITION), tool(PipedriveAddLeadAction.ACTION_DEFINITION),
-                    tool(PipedriveDeleteLeadAction.ACTION_DEFINITION),
-                    tool(PipedriveGetLeadDetailsAction.ACTION_DEFINITION),
-                    tool(PipedriveSearchLeadsAction.ACTION_DEFINITION),
-                    tool(PipedriveGetOrganizationsAction.ACTION_DEFINITION),
+                .clusterElements(modifyClusterElements(tool(PipedriveAddDealAction.ACTION_DEFINITION),
+                    tool(PipedriveAddLeadAction.ACTION_DEFINITION),
                     tool(PipedriveAddOrganizationAction.ACTION_DEFINITION),
-                    tool(PipedriveSearchOrganizationAction.ACTION_DEFINITION),
+                    tool(PipedriveAddPersonAction.ACTION_DEFINITION), tool(PipedriveDeleteDealAction.ACTION_DEFINITION),
+                    tool(PipedriveDeleteLeadAction.ACTION_DEFINITION),
                     tool(PipedriveDeleteOrganizationAction.ACTION_DEFINITION),
-                    tool(PipedriveGetOrganizationDetailsAction.ACTION_DEFINITION),
-                    tool(PipedriveGetPersonsAction.ACTION_DEFINITION), tool(PipedriveAddPersonAction.ACTION_DEFINITION),
-                    tool(PipedriveSearchPersonsAction.ACTION_DEFINITION),
                     tool(PipedriveDeletePersonAction.ACTION_DEFINITION),
-                    tool(PipedriveGetPersonDetailsAction.ACTION_DEFINITION)))
+                    tool(PipedriveGetDealDetailsAction.ACTION_DEFINITION),
+                    tool(PipedriveGetDealsAction.ACTION_DEFINITION),
+                    tool(PipedriveGetLeadDetailsAction.ACTION_DEFINITION),
+                    tool(PipedriveGetLeadsAction.ACTION_DEFINITION),
+                    tool(PipedriveGetOrganizationDetailsAction.ACTION_DEFINITION),
+                    tool(PipedriveGetOrganizationsAction.ACTION_DEFINITION),
+                    tool(PipedriveGetPersonDetailsAction.ACTION_DEFINITION),
+                    tool(PipedriveGetPersonsAction.ACTION_DEFINITION),
+                    tool(PipedriveSearchDealsAction.ACTION_DEFINITION),
+                    tool(PipedriveSearchLeadsAction.ACTION_DEFINITION),
+                    tool(PipedriveSearchOrganizationAction.ACTION_DEFINITION),
+                    tool(PipedriveSearchPersonsAction.ACTION_DEFINITION)))
                 .triggers(getTriggers());
 
     @Override

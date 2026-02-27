@@ -37,14 +37,15 @@ public abstract class AbstractGoogleSearchConsoleComponentHandler implements Ope
         component("googleSearchConsole")
             .title("Google Search Console")
             .description(
-                "The Search Console API provides access to both Search Console data (verified users only) and to public information on an URL basis (anyone)."))
-                    .actions(modifyActions(GoogleSearchConsoleListSitesAction.ACTION_DEFINITION,
-                        GoogleSearchConsoleDeleteSiteAction.ACTION_DEFINITION,
-                        GoogleSearchConsoleGetSiteAction.ACTION_DEFINITION,
-                        GoogleSearchConsoleAddSiteAction.ACTION_DEFINITION,
-                        GoogleSearchConsoleSearchAnalyticsAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(GoogleSearchConsoleConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "The Search Console API provides access to both Search Console data (verified users only) and to public information on an URL basis (anyone).")
+            .version(1))
+                .actions(modifyActions(GoogleSearchConsoleAddSiteAction.ACTION_DEFINITION,
+                    GoogleSearchConsoleDeleteSiteAction.ACTION_DEFINITION,
+                    GoogleSearchConsoleGetSiteAction.ACTION_DEFINITION,
+                    GoogleSearchConsoleListSitesAction.ACTION_DEFINITION,
+                    GoogleSearchConsoleSearchAnalyticsAction.ACTION_DEFINITION))
+                .connection(modifyConnection(GoogleSearchConsoleConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

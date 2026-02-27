@@ -35,11 +35,12 @@ public abstract class AbstractEnchargeComponentHandler implements OpenApiCompone
         component("encharge")
             .title("Encharge")
             .description(
-                "Encharge is a marketing automation platform that helps businesses automate their customer communication and marketing campaigns."))
-                    .actions(modifyActions(EnchargeCreateEmailAction.ACTION_DEFINITION,
-                        EnchargeCreatePeopleAction.ACTION_DEFINITION, EnchargeAddTagAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(EnchargeConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Encharge is a marketing automation platform that helps businesses automate their customer communication and marketing campaigns.")
+            .version(1))
+                .actions(modifyActions(EnchargeAddTagAction.ACTION_DEFINITION,
+                    EnchargeCreateEmailAction.ACTION_DEFINITION, EnchargeCreatePeopleAction.ACTION_DEFINITION))
+                .connection(modifyConnection(EnchargeConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

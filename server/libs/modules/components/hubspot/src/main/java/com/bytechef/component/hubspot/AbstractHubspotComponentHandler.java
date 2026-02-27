@@ -39,19 +39,18 @@ public abstract class AbstractHubspotComponentHandler implements OpenApiComponen
         component("hubspot")
             .title("Hubspot")
             .description(
-                "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service."))
-                    .actions(modifyActions(HubspotGetContactAction.ACTION_DEFINITION,
-                        HubspotCreateContactAction.ACTION_DEFINITION, HubspotDeleteContactAction.ACTION_DEFINITION,
-                        HubspotUpdateContactAction.ACTION_DEFINITION, HubspotCreateDealAction.ACTION_DEFINITION,
-                        HubspotGetTicketAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(HubspotConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(HubspotGetContactAction.ACTION_DEFINITION),
-                        tool(HubspotCreateContactAction.ACTION_DEFINITION),
-                        tool(HubspotDeleteContactAction.ACTION_DEFINITION),
-                        tool(HubspotUpdateContactAction.ACTION_DEFINITION),
-                        tool(HubspotCreateDealAction.ACTION_DEFINITION),
-                        tool(HubspotGetTicketAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service.")
+            .version(1))
+                .actions(modifyActions(HubspotCreateContactAction.ACTION_DEFINITION,
+                    HubspotCreateDealAction.ACTION_DEFINITION, HubspotDeleteContactAction.ACTION_DEFINITION,
+                    HubspotGetContactAction.ACTION_DEFINITION, HubspotGetTicketAction.ACTION_DEFINITION,
+                    HubspotUpdateContactAction.ACTION_DEFINITION))
+                .connection(modifyConnection(HubspotConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(HubspotCreateContactAction.ACTION_DEFINITION),
+                    tool(HubspotCreateDealAction.ACTION_DEFINITION), tool(HubspotDeleteContactAction.ACTION_DEFINITION),
+                    tool(HubspotGetContactAction.ACTION_DEFINITION), tool(HubspotGetTicketAction.ACTION_DEFINITION),
+                    tool(HubspotUpdateContactAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

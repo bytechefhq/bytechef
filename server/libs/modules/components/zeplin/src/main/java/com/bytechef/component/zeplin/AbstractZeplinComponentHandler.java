@@ -33,10 +33,11 @@ public abstract class AbstractZeplinComponentHandler implements OpenApiComponent
         component("zeplin")
             .title("Zeplin")
             .description(
-                "Zeplin is a collaboration tool that bridges the gap between designers and developers by providing a platform to share, organize, and translate design files into development."))
-                    .actions(modifyActions(ZeplinUpdateProjectAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(ZeplinConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Zeplin is a collaboration tool that bridges the gap between designers and developers by providing a platform to share, organize, and translate design files into development.")
+            .version(1))
+                .actions(modifyActions(ZeplinUpdateProjectAction.ACTION_DEFINITION))
+                .connection(modifyConnection(ZeplinConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

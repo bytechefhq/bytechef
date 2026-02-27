@@ -35,12 +35,13 @@ public abstract class AbstractTavilyComponentHandler implements OpenApiComponent
         component("tavily")
             .title("Tavily")
             .description(
-                "Tavily is an AI-powered search tool designed to help users quickly find accurate, relevant, and up-to-date information from the web."))
-                    .actions(modifyActions(TavilySearchAction.ACTION_DEFINITION, TavilyExtractAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(TavilyConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(TavilySearchAction.ACTION_DEFINITION),
-                        tool(TavilyExtractAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Tavily is an AI-powered search tool designed to help users quickly find accurate, relevant, and up-to-date information from the web.")
+            .version(1))
+                .actions(modifyActions(TavilyExtractAction.ACTION_DEFINITION, TavilySearchAction.ACTION_DEFINITION))
+                .connection(modifyConnection(TavilyConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(TavilyExtractAction.ACTION_DEFINITION),
+                    tool(TavilySearchAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

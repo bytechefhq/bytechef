@@ -36,13 +36,14 @@ public abstract class AbstractUrlscanComponentHandler implements OpenApiComponen
         component("urlscan")
             .title("Urlscan.io")
             .description(
-                "Urlscan.io is an online service that allows you to safely analyze websites and URLs to determine potential security threats and risks."))
-                    .actions(modifyActions(UrlscanScanAction.ACTION_DEFINITION, UrlscanResultAction.ACTION_DEFINITION,
-                        UrlscanScreenshotAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(UrlscanConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(UrlscanScanAction.ACTION_DEFINITION),
-                        tool(UrlscanResultAction.ACTION_DEFINITION), tool(UrlscanScreenshotAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Urlscan.io is an online service that allows you to safely analyze websites and URLs to determine potential security threats and risks.")
+            .version(1))
+                .actions(modifyActions(UrlscanResultAction.ACTION_DEFINITION, UrlscanScanAction.ACTION_DEFINITION,
+                    UrlscanScreenshotAction.ACTION_DEFINITION))
+                .connection(modifyConnection(UrlscanConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(UrlscanResultAction.ACTION_DEFINITION),
+                    tool(UrlscanScanAction.ACTION_DEFINITION), tool(UrlscanScreenshotAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

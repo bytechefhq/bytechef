@@ -37,12 +37,13 @@ public abstract class AbstractProductboardComponentHandler implements OpenApiCom
         component("productboard")
             .title("Productboard")
             .description(
-                "Productboard is a product management platform that helps teams prioritize features, gather customer feedback, and align their product strategy to deliver better products."))
-                    .actions(modifyActions(ProductboardGetFeatureAction.ACTION_DEFINITION,
-                        ProductboardCreateNoteAction.ACTION_DEFINITION, ProductboardDeleteNoteAction.ACTION_DEFINITION,
-                        ProductboardGetNoteAction.ACTION_DEFINITION, ProductboardUpdateNoteAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(ProductboardConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Productboard is a product management platform that helps teams prioritize features, gather customer feedback, and align their product strategy to deliver better products.")
+            .version(1))
+                .actions(modifyActions(ProductboardCreateNoteAction.ACTION_DEFINITION,
+                    ProductboardDeleteNoteAction.ACTION_DEFINITION, ProductboardGetFeatureAction.ACTION_DEFINITION,
+                    ProductboardGetNoteAction.ACTION_DEFINITION, ProductboardUpdateNoteAction.ACTION_DEFINITION))
+                .connection(modifyConnection(ProductboardConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

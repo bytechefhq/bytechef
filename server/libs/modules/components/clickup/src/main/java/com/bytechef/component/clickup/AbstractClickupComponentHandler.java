@@ -36,14 +36,14 @@ public abstract class AbstractClickupComponentHandler implements OpenApiComponen
         component("clickup")
             .title("ClickUp")
             .description(
-                "ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams."))
-                    .actions(modifyActions(ClickupCreateListAction.ACTION_DEFINITION,
-                        ClickupCreateTaskAction.ACTION_DEFINITION, ClickupCreateFolderAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(ClickupConnection.CONNECTION_DEFINITION))
-                    .clusterElements(modifyClusterElements(tool(ClickupCreateListAction.ACTION_DEFINITION),
-                        tool(ClickupCreateTaskAction.ACTION_DEFINITION),
-                        tool(ClickupCreateFolderAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "ClickUp is a cloud-based collaboration tool that offers task management, document sharing, goal tracking, and other productivity features for teams.")
+            .version(1))
+                .actions(modifyActions(ClickupCreateFolderAction.ACTION_DEFINITION,
+                    ClickupCreateListAction.ACTION_DEFINITION, ClickupCreateTaskAction.ACTION_DEFINITION))
+                .connection(modifyConnection(ClickupConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(ClickupCreateFolderAction.ACTION_DEFINITION),
+                    tool(ClickupCreateListAction.ACTION_DEFINITION), tool(ClickupCreateTaskAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -35,11 +35,12 @@ public abstract class AbstractDevtoComponentHandler implements OpenApiComponentH
         component("devto")
             .title("Dev.to")
             .description(
-                "Dev.to is an online community and platform where software developers share articles, tutorials, and discussions about programming and technology."))
-                    .actions(modifyActions(DevtoCreateArticleAction.ACTION_DEFINITION,
-                        DevtoGetArticleAction.ACTION_DEFINITION, DevtoUpdateArticleAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(DevtoConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+                "Dev.to is an online community and platform where software developers share articles, tutorials, and discussions about programming and technology.")
+            .version(1))
+                .actions(modifyActions(DevtoCreateArticleAction.ACTION_DEFINITION,
+                    DevtoGetArticleAction.ACTION_DEFINITION, DevtoUpdateArticleAction.ACTION_DEFINITION))
+                .connection(modifyConnection(DevtoConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {
