@@ -1,4 +1,5 @@
 import Badge from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,6 +13,7 @@ import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {BoxIcon, CheckIcon, ChevronDownIcon, FlaskConicalIcon, type LucideIcon, WrenchIcon} from 'lucide-react';
+import {useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface EnvironmentConfigI {
@@ -42,6 +44,11 @@ const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
     },
 };
 
+interface EnvironmentOptionI {
+    config: EnvironmentConfigI;
+    id: string;
+}
+
 const EnvironmentSelect = () => {
     const application = useApplicationInfoStore((state) => state.application);
 
@@ -54,7 +61,27 @@ const EnvironmentSelect = () => {
 
     const {data: environmentsData} = useEnvironmentsQuery();
 
-    if (application?.edition !== 'EE' || !environmentsData?.environments) {
+    const environmentOptions = useMemo(() => {
+        if (!environmentsData?.environments) {
+            return [];
+        }
+
+        return environmentsData.environments.reduce<EnvironmentOptionI[]>((options, environment) => {
+            if (environment?.id == null) {
+                return options;
+            }
+
+            const config = ENVIRONMENT_CONFIGS[+environment.id];
+
+            if (config) {
+                options.push({config, id: environment.id});
+            }
+
+            return options;
+        }, []);
+    }, [environmentsData?.environments]);
+
+    if (application?.edition !== 'EE' || environmentOptions.length === 0) {
         return null;
     }
 
@@ -71,7 +98,7 @@ const EnvironmentSelect = () => {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                        <button className="flex items-center gap-1">
+                        <Button className="h-auto gap-1 p-0" variant="ghost">
                             <Badge
                                 icon={<CurrentIcon className="size-3" />}
                                 label={currentConfig.label}
@@ -80,7 +107,7 @@ const EnvironmentSelect = () => {
                             />
 
                             <ChevronDownIcon className="size-4 text-muted-foreground" />
-                        </button>
+                        </Button>
                     </DropdownMenuTrigger>
                 </TooltipTrigger>
 
@@ -92,44 +119,33 @@ const EnvironmentSelect = () => {
                     onValueChange={(value) => setCurrentEnvironmentId(+value)}
                     value={currentEnvironmentId.toString()}
                 >
-                    {environmentsData.environments
-                        .filter((environment) => environment?.id != null)
-                        .map((environment) => {
-                            const environmentId = environment!.id!;
-                            const config = ENVIRONMENT_CONFIGS[+environmentId];
+                    {environmentOptions.map(({config, id}) => {
+                        const Icon = config.icon;
+                        const isSelected = +id === currentEnvironmentId;
 
-                            if (!config) {
-                                return null;
-                            }
+                        return (
+                            <DropdownMenuRadioItem
+                                className="items-start px-3 py-3 [&>span:first-child]:hidden"
+                                key={id}
+                                value={id}
+                            >
+                                <div className="flex flex-1 flex-col gap-1">
+                                    <div className="flex items-center justify-between">
+                                        <Badge
+                                            icon={<Icon className="size-3" />}
+                                            label={config.label}
+                                            styleType={config.styleType}
+                                            weight="semibold"
+                                        />
 
-                            const Icon = config.icon;
-                            const isSelected = +environmentId === currentEnvironmentId;
-
-                            return (
-                                <DropdownMenuRadioItem
-                                    className="items-start px-3 py-3 [&>span:first-child]:hidden"
-                                    key={environmentId}
-                                    value={environmentId}
-                                >
-                                    <div className="flex flex-1 flex-col gap-1">
-                                        <div className="flex items-center justify-between">
-                                            <Badge
-                                                icon={<Icon className="size-3" />}
-                                                label={config.label}
-                                                styleType={config.styleType}
-                                                weight="semibold"
-                                            />
-
-                                            {isSelected && <CheckIcon className="size-4 text-muted-foreground" />}
-                                        </div>
-
-                                        <p className="text-xs font-normal text-muted-foreground">
-                                            {config.description}
-                                        </p>
+                                        {isSelected && <CheckIcon className="size-4 text-muted-foreground" />}
                                     </div>
-                                </DropdownMenuRadioItem>
-                            );
-                        })}
+
+                                    <p className="text-xs font-normal text-muted-foreground">{config.description}</p>
+                                </div>
+                            </DropdownMenuRadioItem>
+                        );
+                    })}
                 </DropdownMenuRadioGroup>
             </DropdownMenuContent>
         </DropdownMenu>
