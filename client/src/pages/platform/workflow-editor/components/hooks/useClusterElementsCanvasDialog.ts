@@ -151,12 +151,13 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
 
     useEffect(() => {
         if (isDataStreamClusterRoot && agentNodeName) {
-            const showDataStream =
-                useClusterElementsCanvasDialogStore.getState().editorPreferences[agentNodeName] ?? true;
+            const showDataStream = editorPreferences[agentNodeName] ?? true;
 
             setShowDataStreamEditor(showDataStream);
+        } else {
+            setShowDataStreamEditor(false);
         }
-    }, [isDataStreamClusterRoot, agentNodeName, setShowDataStreamEditor]);
+    }, [agentNodeName, editorPreferences, isDataStreamClusterRoot, setShowDataStreamEditor]);
 
     return {
         copilotEnabled,

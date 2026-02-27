@@ -26,7 +26,7 @@ export default function DataStreamWizardFooter({currentStep, onNext, onPrevious}
                 />
 
                 <Button disabled={isLastStep} onClick={onNext} size="default" variant="default">
-                    <span>{isLastStep ? 'Finish' : 'Next'}</span>
+                    <span>Next</span>
 
                     <ChevronRightIcon />
                 </Button>
