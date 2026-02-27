@@ -215,6 +215,7 @@ Name: sendChannelMessage
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | channel | Channel ID | STRING | ID of the channel, private group, or IM channel to send message to. | true |
+| post_at | Post at | DATE_TIME | Date and time when the message should be sent. | false |
 | text | Message | STRING | The text of your message. | true |
 
 #### Example JSON Structure
@@ -224,6 +225,7 @@ Name: sendChannelMessage
   "name" : "sendChannelMessage",
   "parameters" : {
     "channel" : "",
+    "post_at" : "2021-01-01T00:00:00",
     "text" : ""
   },
   "type" : "slack/v1/sendChannelMessage"
@@ -288,6 +290,7 @@ Name: sendDirectMessage
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | channel | User ID | STRING | ID of the user to send the direct message to. | true |
+| post_at | Post at | DATE_TIME | Date and time when the message should be sent. | false |
 | text | Message | STRING | The text of your message. | true |
 
 #### Example JSON Structure
@@ -297,6 +300,7 @@ Name: sendDirectMessage
   "name" : "sendDirectMessage",
   "parameters" : {
     "channel" : "",
+    "post_at" : "2021-01-01T00:00:00",
     "text" : ""
   },
   "type" : "slack/v1/sendDirectMessage"

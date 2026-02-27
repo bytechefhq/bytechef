@@ -56,44 +56,6 @@ Connect Spotify to ByteChef using OAuth 2.0 (Authorization Code).
 ## Actions
 
 
-### Play/Resume Playback
-Name: startResumePlayback
-
-`Start or resume current playback on an active device.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| deviceId | Device ID | STRING | The id of the device this command is targeting. If not supplied, the user's currently active device is the target. | false |
-| context_uri | Context Uri | STRING | Spotify URI of the context to play (album, artist, playlist). | false |
-| uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> | Spotify track URIs to play. | false |
-| position_ms | Position | INTEGER | The position in milliseconds to start playback from. | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Play/Resume Playback",
-  "name" : "startResumePlayback",
-  "parameters" : {
-    "deviceId" : "",
-    "context_uri" : "",
-    "uris" : [ "" ],
-    "position_ms" : 1
-  },
-  "type" : "spotify/v1/startResumePlayback"
-}
-```
-
-#### Output
-
-This action does not produce any output.
-
-
-
-
-
-
 ### Add Items to a Playlist
 Name: addItemsToPlaylist
 
@@ -149,6 +111,44 @@ Type: OBJECT
 1. In your Spotify web app open a playlist you want to find ID for.
 2. In **URL** you will see number like this `/playlist/3rfk5UPuFRMexzVirYZliv`
 3. Because of that your playlist ID is **3rfk5UPuFRMexzVirYZliv**
+
+
+
+### Play/Resume Playback
+Name: startResumePlayback
+
+`Start or resume current playback on an active device.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| deviceId | Device ID | STRING | The id of the device this command is targeting. If not supplied, the user's currently active device is the target. | false |
+| context_uri | Context Uri | STRING | Spotify URI of the context to play (album, artist, playlist). | false |
+| uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> | Spotify track URIs to play. | false |
+| position_ms | Position | INTEGER | The position in milliseconds to start playback from. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Play/Resume Playback",
+  "name" : "startResumePlayback",
+  "parameters" : {
+    "deviceId" : "",
+    "context_uri" : "",
+    "uris" : [ "" ],
+    "position_ms" : 1
+  },
+  "type" : "spotify/v1/startResumePlayback"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
 
 
 

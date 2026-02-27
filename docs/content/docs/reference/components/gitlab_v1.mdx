@@ -55,6 +55,66 @@ Version: 1
 ## Actions
 
 
+### Create Comment on Issue
+Name: createCommentOnIssue
+
+`Adds a comment to the specified issue.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| projectId | Project ID | STRING |  | true |
+| issueId | Issue ID | INTEGER <details> <summary> Depends On </summary> projectId </details> | ID of the issue to comment on. | true |
+| body | Comment | STRING | The comment to add to the issue. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Comment on Issue",
+  "name" : "createCommentOnIssue",
+  "parameters" : {
+    "projectId" : "",
+    "issueId" : 1,
+    "body" : ""
+  },
+  "type" : "gitlab/v1/createCommentOnIssue"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | The ID of the comment. |
+| body | STRING | The body of the comment. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "body" : ""
+}
+```
+
+#### Find Project ID and Issue ID
+
+To find the Project ID, click [here](/reference/components/gitlab_v1#how-to-find-the-project-id).
+
+To find the Issue ID, click [here](/reference/components/gitlab_v1#how-to-find-the-issue-id).
+
+
+
 ### Create Issue
 Name: createIssue
 
@@ -118,66 +178,6 @@ Type: OBJECT
 #### Find Project ID
 
 To find the Project ID, click [here](/reference/components/gitlab_v1#how-to-find-the-project-id).
-
-
-
-### Create Comment on Issue
-Name: createCommentOnIssue
-
-`Adds a comment to the specified issue.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| projectId | Project ID | STRING |  | true |
-| issueId | Issue ID | INTEGER <details> <summary> Depends On </summary> projectId </details> | ID of the issue to comment on. | true |
-| body | Comment | STRING | The comment to add to the issue. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Create Comment on Issue",
-  "name" : "createCommentOnIssue",
-  "parameters" : {
-    "projectId" : "",
-    "issueId" : 1,
-    "body" : ""
-  },
-  "type" : "gitlab/v1/createCommentOnIssue"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER | The ID of the comment. |
-| body | STRING | The body of the comment. |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : 1,
-  "body" : ""
-}
-```
-
-#### Find Project ID and Issue ID
-
-To find the Project ID, click [here](/reference/components/gitlab_v1#how-to-find-the-project-id).
-
-To find the Issue ID, click [here](/reference/components/gitlab_v1#how-to-find-the-issue-id).
 
 
 

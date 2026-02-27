@@ -72,6 +72,65 @@ Version: 1
 ## Actions
 
 
+### Create Project
+Name: createProject
+
+`Creates a project in selected workspace.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace | Workspace | STRING | Workspace where the project will be added. | true |
+| name | Name | STRING | The name of the project. | true |
+| key | Key | STRING | Key of the project (eg. AT, for a project named Atlassian). Project keys must start with a letter and may only consist of ASCII letters, numbers and underscores (A-Z, a-z, 0-9, _). | true |
+| description | Description | STRING | The description of project. | false |
+| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the project is private or not. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Project",
+  "name" : "createProject",
+  "parameters" : {
+    "workspace" : "",
+    "name" : "",
+    "key" : "",
+    "description" : "",
+    "is_private" : false
+  },
+  "type" : "bitbucket/v1/createProject"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| metrics | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(org_keywords)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "metrics" : {
+    "org_keywords" : 1
+  }
+}
+```
+
+
+
+
 ### Create Repository
 Name: createRepository
 
@@ -213,65 +272,6 @@ Type: OBJECT
   },
   "mainbranch" : {
     "type" : ""
-  }
-}
-```
-
-
-
-
-### Create Project
-Name: createProject
-
-`Creates a project in selected workspace.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace | Workspace | STRING | Workspace where the project will be added. | true |
-| name | Name | STRING | The name of the project. | true |
-| key | Key | STRING | Key of the project (eg. AT, for a project named Atlassian). Project keys must start with a letter and may only consist of ASCII letters, numbers and underscores (A-Z, a-z, 0-9, _). | true |
-| description | Description | STRING | The description of project. | false |
-| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the project is private or not. | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Create Project",
-  "name" : "createProject",
-  "parameters" : {
-    "workspace" : "",
-    "name" : "",
-    "key" : "",
-    "description" : "",
-    "is_private" : false
-  },
-  "type" : "bitbucket/v1/createProject"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| metrics | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(org_keywords)&#125; </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "metrics" : {
-    "org_keywords" : 1
   }
 }
 ```

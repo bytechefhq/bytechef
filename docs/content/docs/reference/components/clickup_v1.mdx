@@ -57,6 +57,66 @@ Connect ClickUp to ByteChef using OAuth 2.0 (Authorization Code).
 ## Actions
 
 
+### Create Folder
+Name: createFolder
+
+`Creates a new folder in a ClickUp workspace.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING |  | false |
+| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the space where new folder will be created. | true |
+| name | Name | STRING | The name of the folder. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Folder",
+  "name" : "createFolder",
+  "parameters" : {
+    "workspaceId" : "",
+    "spaceId" : "",
+    "name" : ""
+  },
+  "type" : "clickup/v1/createFolder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the folder. |
+| name | STRING | The name of the folder. |
+| space | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The space where the folder is located. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "name" : "",
+  "space" : {
+    "id" : "",
+    "name" : ""
+  }
+}
+```
+
+
+
+
 ### Create List
 Name: createList
 
@@ -196,66 +256,6 @@ Type: OBJECT
   },
   "space" : {
     "id" : ""
-  }
-}
-```
-
-
-
-
-### Create Folder
-Name: createFolder
-
-`Creates a new folder in a ClickUp workspace.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING |  | false |
-| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the space where new folder will be created. | true |
-| name | Name | STRING | The name of the folder. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Create Folder",
-  "name" : "createFolder",
-  "parameters" : {
-    "workspaceId" : "",
-    "spaceId" : "",
-    "name" : ""
-  },
-  "type" : "clickup/v1/createFolder"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | The ID of the folder. |
-| name | STRING | The name of the folder. |
-| space | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The space where the folder is located. |
-
-
-
-
-#### Output Example
-```json
-{
-  "id" : "",
-  "name" : "",
-  "space" : {
-    "id" : "",
-    "name" : ""
   }
 }
 ```

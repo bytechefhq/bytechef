@@ -83,89 +83,6 @@ Connect Productboard to ByteChef using either a Public API Access Token (Bearer 
 ## Actions
 
 
-### Get Feature
-Name: getFeature
-
-`Returns detail of a specific feature.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| featureId | Feature Id | STRING | ID of the feature | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Get Feature",
-  "name" : "getFeature",
-  "parameters" : {
-    "featureId" : ""
-  },
-  "type" : "productboard/v1/getFeature"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(description), STRING\(type), &#123;STRING\(id), STRING\(name)&#125;\(status), &#123;&#123;STRING\(id), &#123;STRING\(self)&#125;\(links)&#125;\(component)&#125;\(parent), &#123;STRING\(self), STRING\(html)&#125;\(links), BOOLEAN\(archived), &#123;STRING\(startDate), STRING\(endDate), STRING\(granularity)&#125;\(timeframe), &#123;STRING\(email), STRING\(name)&#125;\(owner), DATE_TIME\(createdAt), DATE_TIME\(updatedAt), DATE_TIME\(lastHealthUpdate)&#125; </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "data" : {
-    "id" : "",
-    "name" : "",
-    "description" : "",
-    "type" : "",
-    "status" : {
-      "id" : "",
-      "name" : ""
-    },
-    "parent" : {
-      "component" : {
-        "id" : "",
-        "links" : {
-          "self" : ""
-        }
-      }
-    },
-    "links" : {
-      "self" : "",
-      "html" : ""
-    },
-    "archived" : false,
-    "timeframe" : {
-      "startDate" : "",
-      "endDate" : "",
-      "granularity" : ""
-    },
-    "owner" : {
-      "email" : "",
-      "name" : ""
-    },
-    "createdAt" : "2021-01-01T00:00:00",
-    "updatedAt" : "2021-01-01T00:00:00",
-    "lastHealthUpdate" : "2021-01-01T00:00:00"
-  }
-}
-```
-
-
-
-
 ### Create Note
 Name: createNote
 
@@ -251,6 +168,89 @@ Name: deleteNote
 This action does not produce any output.
 
 
+
+
+
+
+### Get Feature
+Name: getFeature
+
+`Returns detail of a specific feature.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| featureId | Feature Id | STRING | ID of the feature | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Feature",
+  "name" : "getFeature",
+  "parameters" : {
+    "featureId" : ""
+  },
+  "type" : "productboard/v1/getFeature"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(description), STRING\(type), &#123;STRING\(id), STRING\(name)&#125;\(status), &#123;&#123;STRING\(id), &#123;STRING\(self)&#125;\(links)&#125;\(component)&#125;\(parent), &#123;STRING\(self), STRING\(html)&#125;\(links), BOOLEAN\(archived), &#123;STRING\(startDate), STRING\(endDate), STRING\(granularity)&#125;\(timeframe), &#123;STRING\(email), STRING\(name)&#125;\(owner), DATE_TIME\(createdAt), DATE_TIME\(updatedAt), DATE_TIME\(lastHealthUpdate)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : "",
+    "name" : "",
+    "description" : "",
+    "type" : "",
+    "status" : {
+      "id" : "",
+      "name" : ""
+    },
+    "parent" : {
+      "component" : {
+        "id" : "",
+        "links" : {
+          "self" : ""
+        }
+      }
+    },
+    "links" : {
+      "self" : "",
+      "html" : ""
+    },
+    "archived" : false,
+    "timeframe" : {
+      "startDate" : "",
+      "endDate" : "",
+      "granularity" : ""
+    },
+    "owner" : {
+      "email" : "",
+      "name" : ""
+    },
+    "createdAt" : "2021-01-01T00:00:00",
+    "updatedAt" : "2021-01-01T00:00:00",
+    "lastHealthUpdate" : "2021-01-01T00:00:00"
+  }
+}
+```
 
 
 

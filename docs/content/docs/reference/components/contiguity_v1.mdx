@@ -51,67 +51,6 @@ Version: 1
 ## Actions
 
 
-### Send SMS
-Name: sendSms
-
-`Send SMS.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| to | To | STRING | Recipient's phone number in E.164 format (e.g. +1234567890). | true |
-| message | Message | STRING | Content of the message. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Send SMS",
-  "name" : "sendSms",
-  "parameters" : {
-    "to" : "",
-    "message" : ""
-  },
-  "type" : "contiguity/v1/sendSms"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| code | INTEGER | Status code of response. |
-| message | STRING | Response message. |
-| crumbs | OBJECT <details> <summary> Properties </summary> &#123;STRING\(plan), INTEGER\(quota), INTEGER\(remaining), STRING\(type), BOOLEAN\(ad)&#125; </details> | Crumbs of the message that was sent. |
-
-
-
-
-#### Output Example
-```json
-{
-  "code" : 1,
-  "message" : "",
-  "crumbs" : {
-    "plan" : "",
-    "quota" : 1,
-    "remaining" : 1,
-    "type" : "",
-    "ad" : false
-  }
-}
-```
-
-
-
-
 ### Send Email
 Name: sendEmail
 
@@ -173,6 +112,67 @@ Type: OBJECT
   "crumbs" : {
     "plan" : "",
     "quota" : 1,
+    "type" : "",
+    "ad" : false
+  }
+}
+```
+
+
+
+
+### Send SMS
+Name: sendSms
+
+`Send SMS.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| to | To | STRING | Recipient's phone number in E.164 format (e.g. +1234567890). | true |
+| message | Message | STRING | Content of the message. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send SMS",
+  "name" : "sendSms",
+  "parameters" : {
+    "to" : "",
+    "message" : ""
+  },
+  "type" : "contiguity/v1/sendSms"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| code | INTEGER | Status code of response. |
+| message | STRING | Response message. |
+| crumbs | OBJECT <details> <summary> Properties </summary> &#123;STRING\(plan), INTEGER\(quota), INTEGER\(remaining), STRING\(type), BOOLEAN\(ad)&#125; </details> | Crumbs of the message that was sent. |
+
+
+
+
+#### Output Example
+```json
+{
+  "code" : 1,
+  "message" : "",
+  "crumbs" : {
+    "plan" : "",
+    "quota" : 1,
+    "remaining" : 1,
     "type" : "",
     "ad" : false
   }

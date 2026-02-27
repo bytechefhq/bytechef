@@ -88,77 +88,6 @@ Use this when you want each user to authorize access to their own Apollo account
 ## Actions
 
 
-### Update Deal
-Name: updateDeal
-
-`Updates the details of existing deals within your team's Apollo account.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| opportunity_id | Opportunity Id | STRING | The ID for the deal you want to update. | true |
-| owner_id | Owner ID | STRING | The ID for the deal owner within your team's Apollo account. | false |
-| name | Name | STRING | New name for the deal. | false |
-| closed_date | Close Date | DATE | Updated estimated close date for the deal. This can be a future or past date. | false |
-| account_id | Account ID | STRING | The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created. | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Update Deal",
-  "name" : "updateDeal",
-  "parameters" : {
-    "opportunity_id" : "",
-    "owner_id" : "",
-    "name" : "",
-    "closed_date" : "2021-01-01",
-    "account_id" : ""
-  },
-  "type" : "apollo/v1/updateDeal"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| opportunity | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(team_id), STRING\(owner_id), NUMBER\(amount), DATE\(closed_date), STRING\(account_id), STRING\(description), STRING\(name), &#123;STRING\(name), STRING\(iso_code), STRING\(symbol)&#125;\(currency)&#125; </details> |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "opportunity" : {
-    "id" : "",
-    "team_id" : "",
-    "owner_id" : "",
-    "amount" : 0.0,
-    "closed_date" : "2021-01-01",
-    "account_id" : "",
-    "description" : "",
-    "name" : "",
-    "currency" : {
-      "name" : "",
-      "iso_code" : "",
-      "symbol" : ""
-    }
-  }
-}
-```
-
-
-
-
 ### Create Deal
 Name: createDeal
 
@@ -223,6 +152,68 @@ Type: OBJECT
       "iso_code" : "",
       "symbol" : ""
     }
+  }
+}
+```
+
+
+
+
+### Enrich Company
+Name: enrichCompany
+
+`Enriches data for company.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| domain | Domain | STRING | The domain of the company that you want to enrich. Do not include www., the @ symbol, or similar. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Enrich Company",
+  "name" : "enrichCompany",
+  "parameters" : {
+    "domain" : ""
+  },
+  "type" : "apollo/v1/enrichCompany"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| organization | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(website_url), STRING\(blog_url), STRING\(linkedin_url), STRING\(twitter_url), STRING\(facebook_url), STRING\(phone), STRING\(logo_url), STRING\(primary_domain), STRING\(industry), [STRING]\(keywords)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "organization" : {
+    "id" : "",
+    "name" : "",
+    "website_url" : "",
+    "blog_url" : "",
+    "linkedin_url" : "",
+    "twitter_url" : "",
+    "facebook_url" : "",
+    "phone" : "",
+    "logo_url" : "",
+    "primary_domain" : "",
+    "industry" : "",
+    "keywords" : [ "" ]
   }
 }
 ```
@@ -306,26 +297,34 @@ Type: OBJECT
 
 
 
-### Enrich Company
-Name: enrichCompany
+### Update Deal
+Name: updateDeal
 
-`Enriches data for company.`
+`Updates the details of existing deals within your team's Apollo account.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| domain | Domain | STRING | The domain of the company that you want to enrich. Do not include www., the @ symbol, or similar. | true |
+| opportunity_id | Opportunity Id | STRING | The ID for the deal you want to update. | true |
+| owner_id | Owner ID | STRING | The ID for the deal owner within your team's Apollo account. | false |
+| name | Name | STRING | New name for the deal. | false |
+| closed_date | Close Date | DATE | Updated estimated close date for the deal. This can be a future or past date. | false |
+| account_id | Account ID | STRING | The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created. | false |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Enrich Company",
-  "name" : "enrichCompany",
+  "label" : "Update Deal",
+  "name" : "updateDeal",
   "parameters" : {
-    "domain" : ""
+    "opportunity_id" : "",
+    "owner_id" : "",
+    "name" : "",
+    "closed_date" : "2021-01-01",
+    "account_id" : ""
   },
-  "type" : "apollo/v1/enrichCompany"
+  "type" : "apollo/v1/updateDeal"
 }
 ```
 
@@ -340,7 +339,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| organization | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(website_url), STRING\(blog_url), STRING\(linkedin_url), STRING\(twitter_url), STRING\(facebook_url), STRING\(phone), STRING\(logo_url), STRING\(primary_domain), STRING\(industry), [STRING]\(keywords)&#125; </details> |  |
+| opportunity | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(team_id), STRING\(owner_id), NUMBER\(amount), DATE\(closed_date), STRING\(account_id), STRING\(description), STRING\(name), &#123;STRING\(name), STRING\(iso_code), STRING\(symbol)&#125;\(currency)&#125; </details> |  |
 
 
 
@@ -348,19 +347,20 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "organization" : {
+  "opportunity" : {
     "id" : "",
+    "team_id" : "",
+    "owner_id" : "",
+    "amount" : 0.0,
+    "closed_date" : "2021-01-01",
+    "account_id" : "",
+    "description" : "",
     "name" : "",
-    "website_url" : "",
-    "blog_url" : "",
-    "linkedin_url" : "",
-    "twitter_url" : "",
-    "facebook_url" : "",
-    "phone" : "",
-    "logo_url" : "",
-    "primary_domain" : "",
-    "industry" : "",
-    "keywords" : [ "" ]
+    "currency" : {
+      "name" : "",
+      "iso_code" : "",
+      "symbol" : ""
+    }
   }
 }
 ```
