@@ -5,148 +5,6 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Start or resume current playback on an active device.",
-    "help": {
-      "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/spotify_v1#playresume-playback"
-    },
-    "metadata": {
-      "path": "/me/player/play",
-      "mimeType": "application/json",
-      "method": "PUT",
-      "bodyContentType": "JSON"
-    },
-    "name": "startResumePlayback",
-    "outputDefinition": null,
-    "perform": null,
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The id of the device this command is targeting. If not supplied, the user's currently active device is the target.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Device ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "QUERY"
-      },
-      "minLength": null,
-      "name": "deviceId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": false,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "TEXT",
-      "defaultValue": null,
-      "description": "Spotify URI of the context to play (album, artist, playlist).",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Context Uri",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "minLength": null,
-      "name": "context_uri",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": null,
-      "regex": null,
-      "required": false,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "ARRAY_BUILDER",
-      "defaultValue": null,
-      "description": "Spotify track URIs to play.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "items": [ {
-        "advancedOption": null,
-        "controlType": "TEXT",
-        "defaultValue": null,
-        "description": "Spotify track URIs to play.",
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "languageId": null,
-        "maxLength": null,
-        "metadata": {
-          "type": "BODY"
-        },
-        "minLength": null,
-        "name": null,
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "regex": null,
-        "required": null,
-        "type": "STRING"
-      } ],
-      "label": "Tracks",
-      "maxItems": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "minItems": null,
-      "multipleValues": null,
-      "name": "uris",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": "Add to Uris",
-      "required": false,
-      "type": "ARRAY"
-    }, {
-      "advancedOption": null,
-      "controlType": "INTEGER",
-      "defaultValue": null,
-      "description": "The position in milliseconds to start playback from.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Position",
-      "maxValue": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "minValue": null,
-      "name": "position_ms",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": null,
-      "required": false,
-      "type": "INTEGER"
-    } ],
-    "resumePerform": null,
-    "suspendPerform": null,
-    "title": "Play/Resume Playback",
-    "workflowNodeDescription": null
-  }, {
-    "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
-    "deprecated": null,
     "description": "Adds one or more items to your playlist.",
     "help": {
       "body": "",
@@ -358,6 +216,148 @@
     "resumePerform": null,
     "suspendPerform": null,
     "title": "Add Items to a Playlist",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Start or resume current playback on an active device.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/spotify_v1#playresume-playback"
+    },
+    "metadata": {
+      "path": "/me/player/play",
+      "mimeType": "application/json",
+      "method": "PUT",
+      "bodyContentType": "JSON"
+    },
+    "name": "startResumePlayback",
+    "outputDefinition": null,
+    "perform": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The id of the device this command is targeting. If not supplied, the user's currently active device is the target.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Device ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "QUERY"
+      },
+      "minLength": null,
+      "name": "deviceId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Spotify URI of the context to play (album, artist, playlist).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Context Uri",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "minLength": null,
+      "name": "context_uri",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Spotify track URIs to play.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "Spotify track URIs to play.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": {
+          "type": "BODY"
+        },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Tracks",
+      "maxItems": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "uris",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": "Add to Uris",
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The position in milliseconds to start playback from.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Position",
+      "maxValue": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "minValue": null,
+      "name": "position_ms",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    } ],
+    "resumePerform": null,
+    "suspendPerform": null,
+    "title": "Play/Resume Playback",
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -1159,139 +1159,6 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
-    "name": "startResumePlayback",
-    "description": "Start or resume current playback on an active device.",
-    "element": null,
-    "help": null,
-    "outputDefinition": null,
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The id of the device this command is targeting. If not supplied, the user's currently active device is the target.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Device ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "QUERY"
-      },
-      "minLength": null,
-      "name": "deviceId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": false,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "TEXT",
-      "defaultValue": null,
-      "description": "Spotify URI of the context to play (album, artist, playlist).",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Context Uri",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "minLength": null,
-      "name": "context_uri",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": null,
-      "regex": null,
-      "required": false,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "ARRAY_BUILDER",
-      "defaultValue": null,
-      "description": "Spotify track URIs to play.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "items": [ {
-        "advancedOption": null,
-        "controlType": "TEXT",
-        "defaultValue": null,
-        "description": "Spotify track URIs to play.",
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "languageId": null,
-        "maxLength": null,
-        "metadata": {
-          "type": "BODY"
-        },
-        "minLength": null,
-        "name": null,
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "regex": null,
-        "required": null,
-        "type": "STRING"
-      } ],
-      "label": "Tracks",
-      "maxItems": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "minItems": null,
-      "multipleValues": null,
-      "name": "uris",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": "Add to Uris",
-      "required": false,
-      "type": "ARRAY"
-    }, {
-      "advancedOption": null,
-      "controlType": "INTEGER",
-      "defaultValue": null,
-      "description": "The position in milliseconds to start playback from.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Position",
-      "maxValue": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "minValue": null,
-      "name": "position_ms",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": null,
-      "required": false,
-      "type": "INTEGER"
-    } ],
-    "title": "Play/Resume Playback",
-    "type": {
-      "name": "TOOLS",
-      "key": "tools",
-      "label": "Tools",
-      "multipleElements": true,
-      "required": false
-    },
-    "workflowNodeDescription": null
-  }, {
     "name": "addItemsToPlaylist",
     "description": "Adds one or more items to your playlist.",
     "element": null,
@@ -1492,6 +1359,139 @@
       "type": "INTEGER"
     } ],
     "title": "Add Items to a Playlist",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "startResumePlayback",
+    "description": "Start or resume current playback on an active device.",
+    "element": null,
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The id of the device this command is targeting. If not supplied, the user's currently active device is the target.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Device ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "QUERY"
+      },
+      "minLength": null,
+      "name": "deviceId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Spotify URI of the context to play (album, artist, playlist).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Context Uri",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "minLength": null,
+      "name": "context_uri",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Spotify track URIs to play.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "Spotify track URIs to play.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": {
+          "type": "BODY"
+        },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Tracks",
+      "maxItems": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "uris",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": "Add to Uris",
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The position in milliseconds to start playback from.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Position",
+      "maxValue": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "minValue": null,
+      "name": "position_ms",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    } ],
+    "title": "Play/Resume Playback",
     "type": {
       "name": "TOOLS",
       "key": "tools",

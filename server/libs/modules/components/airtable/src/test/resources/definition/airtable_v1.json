@@ -106,133 +106,6 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Update an existing record in an Airtable table.",
-    "help": null,
-    "metadata": {
-      "path": "/{baseId}/{tableId}/{recordId}",
-      "responseType": {
-        "contentType": "application/json",
-        "type": "JSON"
-      },
-      "mimeType": "application/json",
-      "method": "PATCH",
-      "bodyContentType": "JSON"
-    },
-    "name": "updateRecord",
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
-    },
-    "perform": null,
-    "processErrorResponse": { },
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base where table is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the table where the record is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the record that will be retrieved.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Row ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "recordId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId", "tableId" ]
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "name": "fields",
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "dynamicPropertiesDataSource": {
-        "properties": { },
-        "propertiesLookupDependsOn": [ "baseId", "tableId" ]
-      },
-      "expressionEnabled": null,
-      "header": null,
-      "hidden": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "required": false,
-      "type": "DYNAMIC_PROPERTIES"
-    } ],
-    "resumePerform": null,
-    "suspendPerform": null,
-    "title": "Update Record",
-    "workflowNodeDescription": null
-  }, {
-    "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
-    "deprecated": null,
     "description": "Deletes a single record from a table.",
     "help": null,
     "metadata": {
@@ -583,110 +456,33 @@
     "suspendPerform": null,
     "title": "Get Record",
     "workflowNodeDescription": null
-  } ],
-  "clusterElements": [ {
-    "name": "createRecord",
-    "description": "Adds a record into an Airtable table.",
-    "element": null,
-    "help": null,
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
-    },
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base where table is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The table where the record will be created.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "name": "fields",
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "dynamicPropertiesDataSource": {
-        "properties": { },
-        "propertiesLookupDependsOn": [ "baseId", "tableId" ]
-      },
-      "expressionEnabled": null,
-      "header": null,
-      "hidden": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "required": false,
-      "type": "DYNAMIC_PROPERTIES"
-    } ],
-    "title": "Create Record",
-    "type": {
-      "name": "TOOLS",
-      "key": "tools",
-      "label": "Tools",
-      "multipleElements": true,
-      "required": false
-    },
-    "workflowNodeDescription": null
   }, {
-    "name": "updateRecord",
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
     "description": "Update an existing record in an Airtable table.",
-    "element": null,
     "help": null,
+    "metadata": {
+      "path": "/{baseId}/{tableId}/{recordId}",
+      "responseType": {
+        "contentType": "application/json",
+        "type": "JSON"
+      },
+      "mimeType": "application/json",
+      "method": "PATCH",
+      "bodyContentType": "JSON"
+    },
+    "name": "updateRecord",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
       "outputSchema": null,
       "sampleOutput": null
     },
-    "processErrorResponse": null,
+    "perform": null,
+    "processErrorResponse": { },
     "properties": [ {
       "advancedOption": null,
       "controlType": "SELECT",
@@ -783,7 +579,94 @@
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Record",
+    "workflowNodeDescription": null
+  } ],
+  "clusterElements": [ {
+    "name": "createRecord",
+    "description": "Adds a record into an Airtable table.",
+    "element": null,
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the base where table is located.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Base ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "PATH"
+      },
+      "minLength": null,
+      "name": "baseId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The table where the record will be created.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Table ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "PATH"
+      },
+      "minLength": null,
+      "name": "tableId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "baseId" ]
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "name": "fields",
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "dynamicPropertiesDataSource": {
+        "properties": { },
+        "propertiesLookupDependsOn": [ "baseId", "tableId" ]
+      },
+      "expressionEnabled": null,
+      "header": null,
+      "hidden": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "required": false,
+      "type": "DYNAMIC_PROPERTIES"
+    } ],
+    "title": "Create Record",
     "type": {
       "name": "TOOLS",
       "key": "tools",
@@ -1128,6 +1011,123 @@
       "type": "STRING"
     } ],
     "title": "Get Record",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "updateRecord",
+    "description": "Update an existing record in an Airtable table.",
+    "element": null,
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the base where table is located.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Base ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "PATH"
+      },
+      "minLength": null,
+      "name": "baseId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the table where the record is located.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Table ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "PATH"
+      },
+      "minLength": null,
+      "name": "tableId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "baseId" ]
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the record that will be retrieved.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Row ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "PATH"
+      },
+      "minLength": null,
+      "name": "recordId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "baseId", "tableId" ]
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "name": "fields",
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "dynamicPropertiesDataSource": {
+        "properties": { },
+        "propertiesLookupDependsOn": [ "baseId", "tableId" ]
+      },
+      "expressionEnabled": null,
+      "header": null,
+      "hidden": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "required": false,
+      "type": "DYNAMIC_PROPERTIES"
+    } ],
+    "title": "Update Record",
     "type": {
       "name": "TOOLS",
       "key": "tools",
