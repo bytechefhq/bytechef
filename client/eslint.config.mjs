@@ -254,7 +254,11 @@ export default [
 
     // Allow custom component wrapper imports
     {
-        files: ['src/components/Badge/Badge.tsx', 'src/components/Button/Button.tsx'],
+        files: [
+            'src/components/Badge/Badge.tsx',
+            'src/components/Button/Button.tsx',
+            'src/components/Switch/Switch.tsx',
+        ],
         rules: {
             '@typescript-eslint/no-restricted-imports': 'off',
         },
