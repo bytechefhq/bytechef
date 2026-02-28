@@ -145,9 +145,15 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                             value={filter}
                         />
 
-                        <span className="absolute right-2 top-1/2 -translate-y-1/2">
-                            <LoadingIcon />
-                        </span>
+                        {isSearchFetching && (
+                            <span
+                                aria-label="Loading"
+                                className="absolute right-2 top-1/2 -translate-y-1/2"
+                                role="status"
+                            >
+                                <LoadingIcon className="text-content-neutral-secondary" />
+                            </span>
+                        )}
                     </div>
                 </header>
 
