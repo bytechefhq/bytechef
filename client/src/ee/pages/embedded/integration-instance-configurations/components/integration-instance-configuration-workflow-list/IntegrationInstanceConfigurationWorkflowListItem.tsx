@@ -1,6 +1,6 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Switch} from '@/components/ui/switch';
+import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import IntegrationInstanceConfigurationWorkflowListItemDropDownMenu from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItemDropDownMenu';
