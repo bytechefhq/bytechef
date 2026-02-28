@@ -1,12 +1,11 @@
+import Switch from '@/components/Switch/Switch';
 import {Label} from '@/components/ui/label';
-import {Switch} from '@/components/ui/switch';
 import IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections';
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {ComponentConnection, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {useEffect} from 'react';
 import {Control, FormState, UseFormSetValue} from 'react-hook-form';
-import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 export interface IntegrationInstanceConfigurationDialogWorkflowListItemProps {
@@ -54,26 +53,11 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
 
                     <Switch
                         checked={workflowEnabledMap.get(workflow.id!)}
-                        className={twMerge(
-                            'cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2',
-                            workflowEnabledMap.get(workflow.id!) && 'bg-blue-600'
-                        )}
-                        onClick={() => {
-                            setValue(
-                                `integrationInstanceConfigurationWorkflows.${workflowIndex!}.enabled`,
-                                !workflowEnabledMap.get(workflow.id!)
-                            );
-                            setWorkflowEnabled(workflow.id!, !workflowEnabledMap.get(workflow.id!));
+                        onCheckedChange={(value) => {
+                            setValue(`integrationInstanceConfigurationWorkflows.${workflowIndex!}.enabled`, value);
+                            setWorkflowEnabled(workflow.id!, value);
                         }}
-                    >
-                        <span
-                            aria-hidden="true"
-                            className={twMerge(
-                                'pointer-events-none inline-block size-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                                workflowEnabledMap.get(workflow.id!) ? 'translate-x-5' : 'translate-x-0'
-                            )}
-                        />
-                    </Switch>
+                    />
                 </div>
             )}
 

@@ -1,7 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import LoadingIcon from '@/components/LoadingIcon';
+import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
-import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationListItemAlertDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItemAlertDialog';
 import IntegrationInstanceConfigurationListItemDropdownMenu from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItemDropdownMenu';
