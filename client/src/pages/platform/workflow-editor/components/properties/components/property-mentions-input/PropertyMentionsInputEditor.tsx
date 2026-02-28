@@ -593,6 +593,16 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             [editor]
         );
 
+        // Sync value prop into editor state when it changes externally (e.g. from Sheet save)
+        useEffect(() => {
+            if (value === undefined || value === editorValue) {
+                return;
+            }
+
+            setIsLocalUpdate(false);
+            setEditorValue(value);
+        }, [value, editorValue]);
+
         // Sync ref when editor changes - handle both callback and object refs
         useEffect(() => {
             editorRef.current = editor;
