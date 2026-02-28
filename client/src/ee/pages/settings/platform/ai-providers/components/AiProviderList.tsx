@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
+import Switch from '@/components/Switch/Switch';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
-import {Switch} from '@/components/ui/switch';
 import AiProviderForm from '@/ee/pages/settings/platform/ai-providers/components/AiProviderForm';
 import {AiProvider} from '@/ee/shared/middleware/platform/configuration';
 import {useEnableAiProviderMutation} from '@/ee/shared/mutations/platform/aiProvider.mutations';
