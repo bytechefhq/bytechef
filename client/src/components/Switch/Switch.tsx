@@ -1,5 +1,5 @@
 import {Switch as ShadcnSwitch} from '@/components/ui/switch';
-import {ComponentPropsWithoutRef, ElementRef, ReactNode, forwardRef} from 'react';
+import {type ComponentPropsWithoutRef, type ComponentRef, type ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface BaseSwitchProps extends Omit<ComponentPropsWithoutRef<typeof ShadcnSwitch>, 'checked' | 'onCheckedChange'> {
@@ -75,7 +75,7 @@ function TextBlock({description, label, variant}: TextBlockProps) {
     );
 }
 
-const Switch = forwardRef<ElementRef<typeof ShadcnSwitch>, SwitchPropsType>(
+const Switch = forwardRef<ComponentRef<typeof ShadcnSwitch>, SwitchPropsType>(
     (
         {
             alignment = 'start',
