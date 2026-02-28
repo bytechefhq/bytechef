@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import {Switch as ShadcnSwitch} from '@/components/ui/switch';
 import {ComponentPropsWithoutRef, ElementRef, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
