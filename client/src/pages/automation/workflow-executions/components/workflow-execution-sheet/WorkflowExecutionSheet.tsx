@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
+import LoadingIcon from '@/components/LoadingIcon';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
-import {Spinner} from '@/components/ui/spinner';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
@@ -42,7 +42,7 @@ const WorkflowExecutionSheet = () => {
                 <div className="flex min-w-0 flex-1 flex-col">
                     {workflowExecutionLoading ? (
                         <div className="flex size-full items-center justify-center">
-                            <Spinner className="size-6" />
+                            <LoadingIcon className="size-6" />
                         </div>
                     ) : (
                         <>

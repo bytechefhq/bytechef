@@ -1,9 +1,10 @@
 import Button from '@/components/Button/Button';
+import LoadingIcon from '@/components/LoadingIcon';
 import {DialogClose} from '@/components/ui/dialog';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {usePropertyCodeEditorDialogToolbar} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {Loader2Icon, PlayIcon, SaveIcon, SparklesIcon, SquareIcon, XIcon} from 'lucide-react';
+import {PlayIcon, SaveIcon, SparklesIcon, SquareIcon, XIcon} from 'lucide-react';
 
 interface PropertyCodeEditorDialogToolbarProps {
     language: string;
@@ -45,7 +46,7 @@ const PropertyCodeEditorDialogToolbar = ({
                     <TooltipTrigger asChild>
                         <Button
                             disabled={!dirty || saving}
-                            icon={saving ? <Loader2Icon className="animate-spin" /> : <SaveIcon />}
+                            icon={saving ? <LoadingIcon /> : <SaveIcon />}
                             onClick={handleSaveClick}
                             size="icon"
                             type="submit"

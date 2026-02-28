@@ -102,7 +102,7 @@ const WorkflowNodeDetailsPanel = ({
                                 {currentWorkflowNode.icon && (
                                     <InlineSVG
                                         className="size-8"
-                                        loader={<LoadingIcon className="ml-0 mr-2 size-6 text-muted-foreground" />}
+                                        loader={<LoadingIcon className="ml-0 mr-2 size-6" />}
                                         src={currentWorkflowNode.icon}
                                     />
                                 )}

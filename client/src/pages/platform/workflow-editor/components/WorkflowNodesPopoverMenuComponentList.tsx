@@ -1,5 +1,5 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Input} from '@/components/ui/input';
-import {Spinner} from '@/components/ui/spinner';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workflow-nodes-tabs/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
@@ -145,9 +145,9 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                             value={filter}
                         />
 
-                        {isSearchFetching && (
-                            <Spinner className="absolute right-2 top-1/2 -translate-y-1/2 text-content-neutral-secondary" />
-                        )}
+                        <span className="absolute right-2 top-1/2 -translate-y-1/2">
+                            <LoadingIcon />
+                        </span>
                     </div>
                 </header>
 
