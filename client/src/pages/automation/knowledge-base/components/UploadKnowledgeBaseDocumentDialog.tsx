@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import LoadingIcon from '@/components/LoadingIcon';
 import {
     Dialog,
     DialogCloseButton,
@@ -10,7 +11,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import useUploadKnowledgeBaseDocumentDialog from '@/pages/automation/knowledge-base/components/hooks/useUploadKnowledgeBaseDocumentDialog';
-import {Loader2Icon, UploadIcon, XIcon} from 'lucide-react';
+import {UploadIcon, XIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -120,7 +121,7 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                                                 <div className="flex items-center space-x-2">
                                                     <span className="text-xs text-gray-400">Uploading...</span>
 
-                                                    <Loader2Icon className="size-4 animate-spin text-gray-400" />
+                                                    <LoadingIcon />
                                                 </div>
                                             )}
 

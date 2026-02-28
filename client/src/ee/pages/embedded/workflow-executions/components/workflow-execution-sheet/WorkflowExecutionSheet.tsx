@@ -1,6 +1,6 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetContent} from '@/components/ui/sheet';
-import {Spinner} from '@/components/ui/spinner';
 import WorkflowExecutionSheetWorkflowPanel from '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheetWorkflowPanel';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationWorkflowExecutionQuery} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
@@ -57,7 +57,7 @@ const WorkflowExecutionSheet = () => {
             >
                 {workflowExecutionLoading ? (
                     <div className="flex size-full items-center justify-center">
-                        <Spinner className="size-6" />
+                        <LoadingIcon className="size-6" />
                     </div>
                 ) : (
                     <ResizablePanelGroup orientation="horizontal">
