@@ -27,10 +27,11 @@ const ProjectDeploymentDialogBasicStep = ({
     setValue,
     updateProjectVersion,
 }: ProjectDialogBasicStepProps) => {
-    const [curProjectId, setCurProjectId] = useState(getValues('projectId'));
-    const [curProjectVersion, setCurProjectVersion] = useState<number | undefined>(getValues('projectVersion'));
+    const [currentProjectId, setCurrentProjectId] = useState(getValues('projectId'));
+    const [currentProjectVersion, setCurrentProjectVersion] = useState<number | undefined>(getValues('projectVersion'));
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
     return (
@@ -57,8 +58,8 @@ const ProjectDeploymentDialogBasicStep = ({
                                                 setValue('name', item.name!.toString());
                                             }
 
-                                            setCurProjectId(item.value);
-                                            setCurProjectVersion(undefined);
+                                            setCurrentProjectId(item.value);
+                                            setCurrentProjectVersion(undefined);
                                         }
                                     }}
                                     value={field.value}
@@ -114,7 +115,7 @@ const ProjectDeploymentDialogBasicStep = ({
                 />
             )}
 
-            {curProjectId && (!projectDeployment?.id || updateProjectVersion) && (
+            {currentProjectId && (!projectDeployment?.id || updateProjectVersion) && (
                 <FormField
                     control={control}
                     name="projectVersion"
@@ -127,10 +128,10 @@ const ProjectDeploymentDialogBasicStep = ({
                                     onChange={(value) => {
                                         field.onChange(value);
                                         setValue('projectDeploymentWorkflows', []);
-                                        setCurProjectVersion(value);
+                                        setCurrentProjectVersion(value);
                                     }}
-                                    projectId={curProjectId}
-                                    projectVersion={curProjectVersion}
+                                    projectId={currentProjectId}
+                                    projectVersion={currentProjectVersion}
                                 />
                             </FormControl>
 

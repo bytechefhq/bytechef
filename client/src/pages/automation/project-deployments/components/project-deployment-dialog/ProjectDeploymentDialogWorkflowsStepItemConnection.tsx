@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import LoadingIcon from '@/components/LoadingIcon';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -43,7 +44,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const {data: componentDefinition} = useGetComponentDefinitionQuery({
+    const {data: componentDefinition, isPending: isComponentDefinitionPending} = useGetComponentDefinitionQuery({
         componentName: componentConnection.componentName,
         componentVersion: componentConnection.componentVersion,
     });
@@ -71,7 +72,12 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                             <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
                         )}
 
-                        <span>{workflowNodeLabel || `${componentDefinition?.title} Connection`}</span>
+                        <span>
+                            {workflowNodeLabel ||
+                                (isComponentDefinitionPending
+                                    ? 'Loading…'
+                                    : `${componentDefinition?.title ?? 'Component'} Connection`)}
+                        </span>
 
                         {!connectionGrouping && (
                             <span className="text-xs text-gray-500">({componentConnection.workflowNodeName})</span>
@@ -79,6 +85,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                     </FormLabel>
 
                     <Select
+                        disabled={isComponentDefinitionPending}
                         onValueChange={(value) => {
                             field.onChange(Number(value));
 
@@ -98,7 +105,15 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                         <FormControl>
                             <div className="flex space-x-2">
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Choose Connection..." />
+                                    {isComponentDefinitionPending ? (
+                                        <div className="flex items-center gap-2">
+                                            <LoadingIcon />
+
+                                            <span className="text-muted-foreground">Loading connection…</span>
+                                        </div>
+                                    ) : (
+                                        <SelectValue placeholder="Choose Connection..." />
+                                    )}
                                 </SelectTrigger>
 
                                 {componentDefinitions && (
@@ -143,17 +158,25 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                     </Select>
 
                     <FormDescription>
-                        <span>{`Choose connection for the ${componentDefinition?.title}`}</span>
+                        {isComponentDefinitionPending ? (
+                            <span>Loading component details…</span>
+                        ) : componentDefinition?.title ? (
+                            <>
+                                <span>{`Choose connection for the ${componentDefinition.title}`}</span>
 
-                        {connectionGrouping ? (
-                            <span className="mx-1 text-xs text-gray-500">
-                                (applies to {connectionGrouping.indices.length} nodes)
-                            </span>
+                                {connectionGrouping ? (
+                                    <span className="mx-1 text-xs text-gray-500">
+                                        (applies to {connectionGrouping.indices.length} nodes)
+                                    </span>
+                                ) : (
+                                    <span className="mx-1 text-xs text-gray-500">({componentConnection.key})</span>
+                                )}
+
+                                <span> component.</span>
+                            </>
                         ) : (
-                            <span className="mx-1 text-xs text-gray-500">({componentConnection.key})</span>
+                            <span>Choose a connection for this component.</span>
                         )}
-
-                        <span>component.</span>
                     </FormDescription>
 
                     <FormMessage />

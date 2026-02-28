@@ -5,15 +5,13 @@ import {Project, ProjectDeployment, Tag} from '@/shared/middleware/automation/co
 import ProjectDeploymentWorkflowList from '../project-deployment-workflow-list/ProjectDeploymentWorkflowList';
 import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
-const ProjectDeploymentList = ({
-    project,
-    projectDeployments,
-    tags,
-}: {
+interface ProjectDeploymentListProps {
     project: Project;
     projectDeployments: ProjectDeployment[];
     tags: Tag[];
-}) => {
+}
+
+const ProjectDeploymentList = ({project, projectDeployments, tags}: ProjectDeploymentListProps) => {
     const projectDeploymentMap = useProjectDeploymentsEnabledStore(({projectDeploymentMap}) => projectDeploymentMap);
 
     return (

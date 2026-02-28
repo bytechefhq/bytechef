@@ -16,23 +16,21 @@ const ProjectDeploymentDialogWorkflowsStep = ({
     groupConnections,
     setValue,
     workflows,
-}: ProjectDeploymentDialogWorkflowsStepProps) => {
-    return (
-        <div className="h-full space-y-4">
-            {workflows?.map((workflow, workflowIndex) => (
-                <ProjectDeploymentDialogWorkflowsStepItem
-                    control={control}
-                    formState={formState}
-                    groupConnections={groupConnections}
-                    key={workflow.id!}
-                    label={workflow.label!}
-                    setValue={setValue}
-                    workflow={workflow}
-                    workflowIndex={workflowIndex}
-                />
-            ))}
-        </div>
-    );
-};
+}: ProjectDeploymentDialogWorkflowsStepProps) => (
+    <div className="h-full space-y-4">
+        {workflows?.map((workflow, workflowIndex) => (
+            <ProjectDeploymentDialogWorkflowsStepItem
+                control={control}
+                formState={formState}
+                groupConnections={groupConnections}
+                key={workflow.id!}
+                label={workflow.label!}
+                setValue={setValue}
+                workflow={workflow}
+                workflowIndex={workflowIndex}
+            />
+        ))}
+    </div>
+);
 
 export default ProjectDeploymentDialogWorkflowsStep;

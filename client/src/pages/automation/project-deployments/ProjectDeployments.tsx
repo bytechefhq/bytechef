@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import {Skeleton} from '@/components/ui/skeleton';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -25,6 +26,28 @@ export enum Type {
     Project,
     Tag,
 }
+
+const ProjectDeploymentsSkeleton = () => (
+    <div className="flex w-full items-center px-2 py-5">
+        <div className="flex flex-1 flex-col gap-2">
+            <Skeleton className="h-5 w-48" />
+
+            <Skeleton className="h-4 w-32" />
+        </div>
+
+        <div className="flex items-center justify-end gap-x-6">
+            <Skeleton className="h-5 w-8 shrink-0" />
+
+            <div className="flex min-w-52 flex-col items-end gap-y-4">
+                <Skeleton className="h-5 w-10 shrink-0 self-end" />
+
+                <Skeleton className="h-5 w-20 shrink-0" />
+            </div>
+
+            <Skeleton className="size-9 shrink-0" />
+        </div>
+    </div>
+);
 
 const ProjectDeployments = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -54,6 +77,7 @@ const ProjectDeployments = () => {
     const {
         data: projectDeployments,
         error: projectDeploymentsError,
+        isFetching: projectDeploymentsIsFetching,
         isLoading: projectDeploymentsIsLoading,
     } = useGetWorkspaceProjectDeploymentsQuery({
         environmentId: currentEnvironmentId,
@@ -200,6 +224,10 @@ const ProjectDeployments = () => {
                                             tags={tags}
                                         />
                                     )
+                            )}
+
+                            {projectDeploymentsIsFetching && projectDeployments && projectDeployments.length > 0 && (
+                                <ProjectDeploymentsSkeleton />
                             )}
 
                             <ReadOnlyWorkflowSheet />
