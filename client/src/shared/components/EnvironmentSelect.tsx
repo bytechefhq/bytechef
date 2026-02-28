@@ -98,7 +98,7 @@ const EnvironmentSelect = () => {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                        <Button className="h-auto gap-1 p-0" variant="ghost">
+                        <Button className="h-auto gap-1 p-2" variant="ghost">
                             <Badge
                                 icon={<CurrentIcon className="size-3" />}
                                 label={currentConfig.label}
@@ -125,7 +125,7 @@ const EnvironmentSelect = () => {
 
                         return (
                             <DropdownMenuRadioItem
-                                className="items-start px-3 py-3 [&>span:first-child]:hidden"
+                                className="cursor-pointer items-start px-3 py-3 [&>span:first-child]:hidden"
                                 key={id}
                                 value={id}
                             >
