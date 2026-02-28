@@ -52,7 +52,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     }
 
     return (
-        <div>
+        <>
             {!switchHidden && (
                 <div className="flex cursor-pointer justify-between py-2">
                     <span className="font-semibold">{label}</span>
@@ -109,7 +109,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                     </li>
                 </ul>
             )}
-        </div>
+        </>
     );
 };
 

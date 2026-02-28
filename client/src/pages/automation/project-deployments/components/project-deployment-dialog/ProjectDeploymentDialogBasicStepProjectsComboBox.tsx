@@ -1,4 +1,5 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
+import {Skeleton} from '@/components/ui/skeleton';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -49,7 +50,7 @@ const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
             value={value}
         />
     ) : (
-        <>Loading...</>
+        <Skeleton className="h-9 w-full" />
     );
 };
 

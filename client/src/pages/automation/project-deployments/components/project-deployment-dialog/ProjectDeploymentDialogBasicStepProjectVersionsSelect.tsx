@@ -13,21 +13,25 @@ const ProjectDeploymentDialogBasicStepProjectVersionsSelect = ({
     projectId: number;
     projectVersion?: number;
 }) => {
-    const {data: projectVersions} = useGetProjectVersionsQuery(projectId);
+    const {data: projectVersions, isPending} = useGetProjectVersionsQuery(projectId);
 
     return (
         <Select
-            onValueChange={(value) => {
-                onChange(+value);
-            }}
+            disabled={isPending}
+            onValueChange={(value) => onChange(+value)}
             value={projectVersion?.toString() || ''}
         >
             <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select version" />
+                <SelectValue placeholder={isPending ? 'Loading versions…' : 'Select version'} />
             </SelectTrigger>
 
             <SelectContent>
-                {projectVersions &&
+                {isPending ? (
+                    <span className="flex items-center gap-2 px-2 py-3 text-sm text-muted-foreground">
+                        Loading versions…
+                    </span>
+                ) : (
+                    projectVersions &&
                     projectVersions.map(
                         (projectVersion) =>
                             projectVersion.status == ProjectStatus.Published && (
@@ -51,7 +55,8 @@ const ProjectDeploymentDialogBasicStepProjectVersionsSelect = ({
                                     </div>
                                 </Item>
                             )
-                    )}
+                    )
+                )}
             </SelectContent>
         </Select>
     );

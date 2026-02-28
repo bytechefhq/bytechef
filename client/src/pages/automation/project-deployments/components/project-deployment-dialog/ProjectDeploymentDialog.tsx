@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import LoadingDots from '@/components/LoadingDots';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {
@@ -89,7 +90,7 @@ const ProjectDeploymentDialog = ({
     const watchedProjectDeploymentWorkflows = watch('projectDeploymentWorkflows');
     const hasEnabledWorkflows = watchedProjectDeploymentWorkflows?.some((workflow) => workflow.enabled) ?? false;
 
-    const {data: workflows} = useGetProjectVersionWorkflowsQuery(
+    const {data: workflows, isPending: isWorkflowsPending} = useGetProjectVersionWorkflowsQuery(
         getValues().projectId!,
         getValues().projectVersion!,
         true,
@@ -147,8 +148,9 @@ const ProjectDeploymentDialog = ({
         onSuccess,
     });
 
-    const isSaveDisabled =
-        !hasEnabledWorkflows || createProjectDeploymentMutation.isPending || updateProjectDeploymentMutation.isPending;
+    const isDeploymentPending = createProjectDeploymentMutation.isPending || updateProjectDeploymentMutation.isPending;
+
+    const isSaveDisabled = !hasEnabledWorkflows || isDeploymentPending;
 
     const projectDeploymentDialogSteps = [
         {
@@ -334,7 +336,13 @@ const ProjectDeploymentDialog = ({
                         <div
                             className={twMerge('px-6', activeStepIndex === 1 && 'max-h-dialog-height overflow-y-auto')}
                         >
-                            {projectDeploymentDialogSteps[activeStepIndex].content}
+                            {activeStepIndex === 1 && isWorkflowsPending ? (
+                                <div className="flex justify-center py-12">
+                                    <LoadingDots />
+                                </div>
+                            ) : (
+                                projectDeploymentDialogSteps[activeStepIndex].content
+                            )}
                         </div>
                     </WorkflowMockProvider>
 
@@ -383,13 +391,8 @@ const ProjectDeploymentDialog = ({
                                             <span className="inline-flex">
                                                 <Button
                                                     disabled={isSaveDisabled}
-                                                    icon={
-                                                        createProjectDeploymentMutation.isPending ||
-                                                        updateProjectDeploymentMutation.isPending ? (
-                                                            <LoadingIcon />
-                                                        ) : undefined
-                                                    }
-                                                    label="Save"
+                                                    icon={isDeploymentPending ? <LoadingIcon /> : undefined}
+                                                    label={isDeploymentPending ? 'Saving...' : 'Save'}
                                                     onClick={handleSubmit(handleSaveClick)}
                                                 />
                                             </span>
@@ -402,13 +405,8 @@ const ProjectDeploymentDialog = ({
                                 ) : (
                                     <Button
                                         disabled={isSaveDisabled}
-                                        icon={
-                                            createProjectDeploymentMutation.isPending ||
-                                            updateProjectDeploymentMutation.isPending ? (
-                                                <LoadingIcon />
-                                            ) : undefined
-                                        }
-                                        label="Save"
+                                        icon={isDeploymentPending ? <LoadingIcon /> : undefined}
+                                        label={isDeploymentPending ? 'Saving...' : 'Save'}
                                         onClick={handleSubmit(handleSaveClick)}
                                     />
                                 )}
