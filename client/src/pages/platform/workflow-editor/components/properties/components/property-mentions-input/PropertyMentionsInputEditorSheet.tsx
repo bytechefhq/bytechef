@@ -15,6 +15,7 @@ export interface PropertyMentionsInputEditorSheetProps {
     controlType?: string;
     dataPills: DataPillType[];
     onClose?: () => void;
+    onValueChange?: (value: string | number) => void;
     path?: string;
     placeholder?: string;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
@@ -29,6 +30,7 @@ const PropertyMentionsInputEditorSheet = ({
     controlType,
     dataPills,
     onClose,
+    onValueChange,
     path,
     placeholder,
     taskDispatcherDefinitions,
@@ -58,30 +60,29 @@ const PropertyMentionsInputEditorSheet = ({
             </VisuallyHidden.Root>
 
             <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
-                <div className="flex items-center gap-x-2">
+                <div className="flex items-center">
                     <TextIcon />
 
-                    <span className="text-base font-medium text-content-neutral-primary">{title}</span>
+                    <span className="ml-4 text-base font-medium text-content-neutral-primary">{title}</span>
                 </div>
 
                 <SheetCloseButton />
             </header>
 
-            <div className="property-mentions-editor flex min-h-0 flex-1 p-3">
-                <div className="flex flex-1 overflow-y-auto rounded-md bg-surface-neutral-primary p-3">
-                    <PropertyMentionsInputEditor
-                        className="size-full"
-                        componentDefinitions={componentDefinitions}
-                        controlType={controlType}
-                        dataPills={dataPills}
-                        path={path}
-                        placeholder={placeholder}
-                        taskDispatcherDefinitions={taskDispatcherDefinitions}
-                        type={type}
-                        value={value}
-                        workflow={workflow}
-                    />
-                </div>
+            <div className="property-mentions-editor m-3 flex min-h-0 flex-1 rounded-md bg-surface-neutral-primary p-3">
+                <PropertyMentionsInputEditor
+                    className="size-full"
+                    componentDefinitions={componentDefinitions}
+                    controlType={controlType}
+                    dataPills={dataPills}
+                    onValueChange={onValueChange}
+                    path={path}
+                    placeholder={placeholder}
+                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                    type={type}
+                    value={value}
+                    workflow={workflow}
+                />
             </div>
         </SheetContent>
     </Sheet>

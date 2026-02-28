@@ -238,6 +238,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                         componentDefinitions={componentDefinitions}
                                         controlType={controlType}
                                         dataPills={dataPills}
+                                        onValueChange={onValueChange}
                                         path={path}
                                         placeholder={placeholder}
                                         taskDispatcherDefinitions={taskDispatcherDefinitions}
