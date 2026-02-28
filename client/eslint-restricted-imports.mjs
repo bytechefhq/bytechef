@@ -19,5 +19,11 @@ export const restrictedImports = {
             message: "Import Badge from '@/components/Badge/Badge' instead.",
             allowTypeImports: true,
         },
+        {
+            name: '@/components/ui/switch',
+            importNames: ['Switch'],
+            message: "Import Switch from '@/components/Switch/Switch' instead.",
+            allowTypeImports: true,
+        },
     ],
 };
