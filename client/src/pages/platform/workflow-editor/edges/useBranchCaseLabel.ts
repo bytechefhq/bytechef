@@ -247,12 +247,11 @@ export default function useBranchCaseLabel({
             );
 
             saveWorkflowDefinition({
-                invalidateWorkflowQueries: invalidateWorkflowQueries!,
                 nodeData: rootNodeData,
                 updateWorkflowMutation: updateWorkflowMutation!,
             });
         },
-        [invalidateWorkflowQueries, nodes, parentBranchNodeData, updateWorkflowMutation, workflow.definition]
+        [nodes, parentBranchNodeData, updateWorkflowMutation, workflow.definition]
     );
 
     const handleCreateCaseClick = useCallback(() => {
