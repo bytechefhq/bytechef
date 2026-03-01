@@ -10,6 +10,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import {branchCaseKeysMatch} from '../utils/layoutUtils';
 import saveRootTaskDispatcher from '../utils/saveRootTaskDispatcher';
 import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 import computeBranchCaseLabelPosition from './computeBranchCaseLabelPosition';
@@ -86,15 +87,17 @@ export default function BranchCaseLabel({
 
     const lastBranchCaseKey = branchCases?.[branchCases?.length - 1]?.key;
 
-    const isLastCase = caseKey === lastBranchCaseKey;
+    const isLastCase = lastBranchCaseKey !== undefined && branchCaseKeysMatch(caseKey, lastBranchCaseKey);
 
-    const isDefaultCase = !branchCases?.find((branchCase) => branchCase.key === caseKey);
+    const isDefaultCase = !branchCases?.find((branchCase) => branchCaseKeysMatch(branchCase.key, caseKey));
 
     const saveBranchChange = useCallback(
         (branchParameters: object) => {
             if (!workflow.definition || !parentBranchNodeData) {
                 return;
             }
+
+            console.log('saveBranchChange branchParameters: ', branchParameters);
 
             saveRootTaskDispatcher({
                 invalidateWorkflowQueries: invalidateWorkflowQueries!,
@@ -143,7 +146,9 @@ export default function BranchCaseLabel({
                 return;
             }
 
-            const newCases = parentBranchCases.filter((branchCase) => branchCase.key !== caseKeyToDelete);
+            const newCases = parentBranchCases.filter(
+                (branchCase) => !branchCaseKeysMatch(branchCase.key, caseKeyToDelete)
+            );
 
             saveBranchChange({
                 ...parentBranchNodeData.parameters,
@@ -175,8 +180,8 @@ export default function BranchCaseLabel({
         const parsedCaseKey = parseCaseKeyValue(caseKeyValue);
 
         const isDuplicate =
-            parsedCaseKey !== caseKey &&
-            (parentBranchCases || []).some((branchCase) => branchCase.key === parsedCaseKey);
+            !branchCaseKeysMatch(parsedCaseKey, caseKey) &&
+            (parentBranchCases || []).some((branchCase) => branchCaseKeysMatch(branchCase.key, parsedCaseKey));
 
         if (isDuplicate || caseKeyValue === 'default' || !caseKeyValue) {
             setIsCaseKeyEditable(false);
@@ -187,7 +192,7 @@ export default function BranchCaseLabel({
         }
 
         const newCases = (parentBranchCases || []).map((branchCase) => {
-            if (branchCase.key === caseKey) {
+            if (branchCaseKeysMatch(branchCase.key, caseKey)) {
                 return {
                     ...branchCase,
                     key: parsedCaseKey,
