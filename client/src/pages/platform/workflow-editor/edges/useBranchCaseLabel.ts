@@ -167,8 +167,6 @@ export default function useBranchCaseLabel({
         [hasEdgeButton, layoutDirection, sourceX, sourceY, targetX, targetY]
     );
 
-    const {invalidateWorkflowQueries} = useWorkflowEditor();
-
     const {nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
