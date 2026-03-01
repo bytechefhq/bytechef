@@ -916,6 +916,10 @@ export function getBranchCaseSide(
     }
 }
 
+export function branchCaseKeysMatch(left: string | number, right: string | number): boolean {
+    return left === right || String(left) === String(right);
+}
+
 /**
  * Collects nested tasks for all task dispatchers in the workflow
  */

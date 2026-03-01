@@ -16,6 +16,7 @@ import {
 import {Node} from '@xyflow/react';
 
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
+import {branchCaseKeysMatch} from './layoutUtils';
 
 export function buildGenericNodeData(
     baseNodeData: NodeDataType,
@@ -176,7 +177,7 @@ export const TASK_DISPATCHER_CONFIG = {
             }
 
             const cases = [...(parameters?.cases || [])];
-            const existingCaseIndex = cases.findIndex((caseItem) => caseItem.key === caseKey);
+            const existingCaseIndex = cases.findIndex((caseItem) => branchCaseKeysMatch(caseItem.key, caseKey));
 
             if (existingCaseIndex >= 0) {
                 return cases[existingCaseIndex].tasks;
@@ -204,7 +205,7 @@ export const TASK_DISPATCHER_CONFIG = {
 
             const cases = [...(task.parameters?.cases || [])];
 
-            const existingCaseIndex = cases.findIndex((c) => c.key === caseKey);
+            const existingCaseIndex = cases.findIndex((caseItem) => branchCaseKeysMatch(caseItem.key, caseKey));
 
             if (existingCaseIndex >= 0) {
                 cases[existingCaseIndex] = {
