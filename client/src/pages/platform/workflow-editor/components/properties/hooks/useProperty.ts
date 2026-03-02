@@ -218,6 +218,7 @@ export const useProperty = ({
     const [controlledFromAi, setControlledFromAi] = useState<boolean | undefined>(undefined);
 
     const editorRef = useRef<Editor>(null!);
+    const initialMountRef = useRef(true);
     const inputRef = useRef<HTMLInputElement>(null!);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
@@ -1118,6 +1119,8 @@ export const useProperty = ({
             return () => clearTimeout(timeoutId);
         }
 
+        initialMountRef.current = false;
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -1346,6 +1349,13 @@ export const useProperty = ({
     // set propertyParameterValue on workflow definition change
     useEffect(() => {
         if (control) {
+            return;
+        }
+
+        // Skip the initial mount — the mount effect above already sets the value
+        // from currentComponent.parameters which is more up-to-date than the
+        // workflow definition (updated via store before the definition refetch).
+        if (initialMountRef.current) {
             return;
         }
 
