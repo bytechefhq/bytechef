@@ -64,7 +64,7 @@ const ClusterElementTestPropertiesPopover = ({
                             </fieldset>
                         </div>
 
-                        <div className="flex justify-end gap-2 border-t px-4 py-3">
+                        <div className="flex justify-end gap-2 px-4 py-3">
                             <Button
                                 label="Cancel"
                                 onClick={() => onOpenChange(false)}
