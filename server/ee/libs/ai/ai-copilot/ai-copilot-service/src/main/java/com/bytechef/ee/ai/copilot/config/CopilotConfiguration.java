@@ -176,21 +176,31 @@ public class CopilotConfiguration {
     }
 
     @Bean
-    CodeEditorSpringAIAgent codeEditorAskSpringAIAgent(ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools) throws AGUIException {
+    CodeEditorSpringAIAgent codeEditorAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
+        ComponentTools componentTools, Optional<FirecrawlTools> firecrawlTools) throws AGUIException {
         String name = Source.CODE_EDITOR.name() + "_" + Mode.ASK.name();
+
+        List<Object> tools = new ArrayList<>(
+            List.of(readProjectWorkflowTools, componentTools));
+
+        firecrawlTools.ifPresent(tools::add);
 
         return CodeEditorSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorAskResource))
-            .tool(readProjectWorkflowTools)
+            .tools(tools)
             .state(new State())
             .build();
     }
 
     @Bean
-    CodeEditorSpringAIAgent codeEditorBuildSpringAIAgent(ChatMemory chatMemory, ChatModel chatModel, ProjectWorkflowToolsImpl projectWorkflowTools) throws AGUIException {
+    CodeEditorSpringAIAgent codeEditorBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ProjectWorkflowToolsImpl projectWorkflowTools,
+        ComponentTools componentTools)
+        throws AGUIException {
         String name = Source.CODE_EDITOR.name() + "_" + Mode.BUILD.name();
 
         return CodeEditorSpringAIAgent.builder()
@@ -198,7 +208,7 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorBuildResource))
-            .tool(projectWorkflowTools)
+            .tools(List.of(projectWorkflowTools, componentTools))
             .state(new State())
             .build();
     }

@@ -25,6 +25,8 @@ import java.util.List;
  */
 public interface ReadProjectWorkflowTools {
 
+    String getScriptCodeInstructions();
+
     WorkflowInfo getWorkflow(String workflowId);
 
     String getWorkflowBuildInstructions();

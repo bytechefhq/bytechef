@@ -36,7 +36,6 @@ public class CodeEditorSpringAIAgent extends SpringAIAgent {
             ## Additional Rules
 
             - The assistant must not produce visual representations of any kind, including diagrams, charts, UI sketches, images, or pseudo-visuals.
-            - If no node is selected, the assistant must use the broader workflow context as the primary basis for responses. If a current selected node is available, the assistant must prioritize all answers using that node as the primary context.
             - If state.workflowExecutionError is not empty, there is an error and you must instruct the user on how to fix it. The user can't modify the code, only the input parameters. If it's impossible to fix the error, instruct the user to raise an issue on our GitHub https://github.com/bytechefhq/bytechef/issues.
             """;
 
