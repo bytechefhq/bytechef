@@ -1,6 +1,7 @@
 import {
     COPILOT_PANEL_WIDTH,
     DATA_PILL_PANEL_WIDTH,
+    DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM,
     DEFAULT_NODE_POSITION,
     NODE_DETAILS_PANEL_WIDTH,
 } from '@/shared/constants';
@@ -12,7 +13,7 @@ import {
 import {ClusterElementItemType, ClusterElementsType, NestedClusterRootComponentDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {Edge, Node} from '@xyflow/react';
-import {useCallback, useEffect, useMemo} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useClusterElementsCanvasDialogStore} from '../../workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
@@ -20,6 +21,7 @@ import useDataPillPanelStore from '../../workflow-editor/stores/useDataPillPanel
 import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import animateNodePositions from '../../workflow-editor/utils/animateNodePositions';
 import {getTask} from '../../workflow-editor/utils/getTask';
 import {getClusterElementsLayoutElements} from '../../workflow-editor/utils/layoutUtils';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
@@ -99,23 +101,27 @@ const useClusterElementsLayout = () => {
     // so only (panelWidth - 16) actually overlaps the visible canvas.
     const dialogRightGap = 16;
 
-    let canvasWidth = window.innerWidth - 80;
+    const canvasWidth = useMemo(() => {
+        let width = window.innerWidth - 80;
 
-    if (copilotPanelOpen) {
-        canvasWidth -= COPILOT_PANEL_WIDTH;
-    }
-
-    if (workflowNodeDetailsPanelOpen) {
-        canvasWidth -= NODE_DETAILS_PANEL_WIDTH;
-
-        if (dataPillPanelOpen) {
-            canvasWidth -= DATA_PILL_PANEL_WIDTH;
+        if (copilotPanelOpen) {
+            width -= COPILOT_PANEL_WIDTH;
         }
-    }
 
-    if (copilotPanelOpen || workflowNodeDetailsPanelOpen) {
-        canvasWidth += dialogRightGap;
-    }
+        if (workflowNodeDetailsPanelOpen) {
+            width -= NODE_DETAILS_PANEL_WIDTH;
+
+            if (dataPillPanelOpen) {
+                width -= DATA_PILL_PANEL_WIDTH;
+            }
+        }
+
+        if (copilotPanelOpen || workflowNodeDetailsPanelOpen) {
+            width += dialogRightGap;
+        }
+
+        return width;
+    }, [copilotPanelOpen, dataPillPanelOpen, workflowNodeDetailsPanelOpen]);
 
     const workflowDefinitionTasks = useMemo(() => {
         if (!workflow.definition) {
@@ -322,6 +328,10 @@ const useClusterElementsLayout = () => {
         rootClusterElementDefinition,
     ]);
 
+    const cancelAnimationRef = useRef<(() => void) | null>(null);
+    const previousCanvasWidthRef = useRef(canvasWidth);
+
+    // Structural layout: runs when nodes/edges change, NOT on panel toggle
     useEffect(() => {
         if (isNodeDragging || isPositionSaving) {
             return;
@@ -344,7 +354,43 @@ const useClusterElementsLayout = () => {
         setEdges(elements.edges);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canvasWidth, copilotPanelOpen, rootClusterElementNodeData, allNodes]);
+    }, [rootClusterElementNodeData, allNodes]);
+
+    // Panel toggle animation: shift nodes horizontally when canvas width changes
+    useEffect(() => {
+        const previousWidth = previousCanvasWidthRef.current;
+
+        previousCanvasWidthRef.current = canvasWidth;
+
+        if (previousWidth === canvasWidth) {
+            return;
+        }
+
+        const currentNodes = useClusterElementsDataStore.getState().nodes;
+
+        if (currentNodes.length === 0) {
+            return;
+        }
+
+        const widthDelta = canvasWidth - previousWidth;
+        const positionDelta = widthDelta / (2 * DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM);
+
+        const targetNodes = currentNodes.map((node) => ({
+            ...node,
+            position: node.parentId
+                ? node.position
+                : {
+                      ...node.position,
+                      x: node.position.x + positionDelta,
+                  },
+        }));
+
+        if (cancelAnimationRef.current) {
+            cancelAnimationRef.current();
+        }
+
+        cancelAnimationRef.current = animateNodePositions(currentNodes, targetNodes, setNodes);
+    }, [canvasWidth, setNodes]);
 };
 
 export default useClusterElementsLayout;
