@@ -46,6 +46,73 @@ public final class GraphQLScalarTypes {
     private GraphQLScalarTypes() {
     }
 
+    public static GraphQLScalarType anyScalar() {
+        return GraphQLScalarType.newScalar()
+            .name("Any")
+            .description("A scalar that represents any JSON-compatible value")
+            .coercing(new Coercing<Object, Object>() {
+
+                @Override
+                public Object serialize(Object dataFetcherResult) throws CoercingSerializeException {
+                    return dataFetcherResult;
+                }
+
+                @Override
+                public Object parseValue(Object input) throws CoercingParseValueException {
+                    return input;
+                }
+
+                @Override
+                public Object parseLiteral(Object input) throws CoercingParseLiteralException {
+                    return parseLiteralValue((Value<?>) input);
+                }
+
+                private Object parseLiteralValue(Value<?> value) {
+                    if (value instanceof StringValue stringValue) {
+                        return stringValue.getValue();
+                    }
+
+                    if (value instanceof IntValue intValue) {
+                        return intValue.getValue()
+                            .intValue();
+                    }
+
+                    if (value instanceof FloatValue floatValue) {
+                        return floatValue.getValue()
+                            .doubleValue();
+                    }
+
+                    if (value instanceof BooleanValue booleanValue) {
+                        return booleanValue.isValue();
+                    }
+
+                    if (value instanceof NullValue) {
+                        return null;
+                    }
+
+                    if (value instanceof ObjectValue objectValue) {
+                        Map<String, Object> result = new LinkedHashMap<>();
+
+                        for (ObjectField field : objectValue.getObjectFields()) {
+                            result.put(field.getName(), parseLiteralValue(field.getValue()));
+                        }
+
+                        return result;
+                    }
+
+                    if (value instanceof ArrayValue arrayValue) {
+                        return arrayValue.getValues()
+                            .stream()
+                            .map(this::parseLiteralValue)
+                            .collect(Collectors.toList());
+                    }
+
+                    return value.toString();
+                }
+            })
+            .build();
+    }
+
     public static GraphQLScalarType longScalar() {
         return GraphQLScalarType.newScalar()
             .name("Long")

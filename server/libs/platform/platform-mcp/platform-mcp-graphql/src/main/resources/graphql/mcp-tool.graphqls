@@ -1,11 +1,31 @@
 extend type Query {
     mcpTool(id: ID): McpTool
+    mcpToolPropertyDynamicProperties(
+        componentName: String!
+        componentVersion: Int!
+        clusterElementName: String!
+        propertyName: String!
+        connectionId: Long
+        inputParameters: Map
+        lookupDependsOnPaths: [String!]
+    ): [Property!]!
+    mcpToolPropertyOptions(
+        componentName: String!
+        componentVersion: Int!
+        clusterElementName: String!
+        propertyName: String!
+        connectionId: Long
+        inputParameters: Map
+        lookupDependsOnPaths: [String!]
+    ): [Option!]!
     mcpTools: [McpTool]
     mcpToolsByComponentId(mcpComponentId: ID): [McpTool]
 }
 
 extend type Mutation {
     createMcpTool(input: McpToolInput!): McpTool
+    deleteMcpTool(id: ID!): Boolean
+    updateMcpTool(id: ID!, input: McpToolInput!): McpTool
 }
 
 input McpToolInput {
@@ -17,6 +37,7 @@ input McpToolInput {
 type McpTool {
     id: ID!
     name: String!
+    title: String
     parameters: Map
     mcpComponentId: ID!
     createdBy: String

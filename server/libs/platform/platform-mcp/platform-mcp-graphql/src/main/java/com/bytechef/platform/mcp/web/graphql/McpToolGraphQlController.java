@@ -17,6 +17,9 @@
 package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,10 +39,14 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class McpToolGraphQlController {
 
+    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
-    public McpToolGraphQlController(McpToolService mcpToolService) {
+    public McpToolGraphQlController(
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade, McpToolService mcpToolService) {
+
+        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.mcpToolService = mcpToolService;
     }
 
@@ -47,6 +54,33 @@ public class McpToolGraphQlController {
     public McpTool mcpTool(@Argument long id) {
         return mcpToolService.fetchMcpTool(id)
             .orElse(null);
+    }
+
+    @QueryMapping
+    public List<Property> mcpToolPropertyDynamicProperties(
+        @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
+        @Argument String propertyName, @Argument Long connectionId, @Argument Map<String, ?> inputParameters,
+        @Argument List<String> lookupDependsOnPaths) {
+
+        return clusterElementDefinitionFacade.executeDynamicProperties(
+            componentName, componentVersion, clusterElementName, propertyName,
+            inputParameters != null ? inputParameters : Map.of(),
+            lookupDependsOnPaths != null ? lookupDependsOnPaths : List.of(),
+            connectionId);
+    }
+
+    @QueryMapping
+    public List<Option> mcpToolPropertyOptions(
+        @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
+        @Argument String propertyName, @Argument Long connectionId, @Argument Map<String, ?> inputParameters,
+        @Argument List<String> lookupDependsOnPaths) {
+
+        return clusterElementDefinitionFacade.executeOptions(
+            componentName, componentVersion, clusterElementName, propertyName,
+            inputParameters != null ? inputParameters : Map.of(),
+            Map.of(),
+            lookupDependsOnPaths != null ? lookupDependsOnPaths : List.of(),
+            null, connectionId, Map.of(), Map.of());
     }
 
     @QueryMapping
@@ -61,12 +95,33 @@ public class McpToolGraphQlController {
 
     @MutationMapping
     public McpTool createMcpTool(@Argument McpToolInput input) {
-        Map<String, String> parameters = input.parameters() != null ? input.parameters() : Map.of();
+        Map<String, Object> parameters = input.parameters() != null ? input.parameters() : Map.of();
 
         return mcpToolService.create(new McpTool(input.name(), parameters, input.mcpComponentId()));
     }
 
+    @MutationMapping
+    public boolean deleteMcpTool(@Argument long id) {
+        McpTool mcpTool = mcpToolService.fetchMcpTool(id)
+            .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
+
+        mcpToolService.delete(mcpTool);
+
+        return true;
+    }
+
+    @MutationMapping
+    public McpTool updateMcpTool(@Argument long id, @Argument McpToolInput input) {
+        Map<String, Object> parameters = input.parameters() != null ? input.parameters() : Map.of();
+
+        McpTool mcpTool = new McpTool(input.name(), parameters, input.mcpComponentId());
+
+        mcpTool.setId(id);
+
+        return mcpToolService.update(mcpTool);
+    }
+
     @SuppressFBWarnings("EI")
-    public record McpToolInput(String name, Map<String, String> parameters, Long mcpComponentId) {
+    public record McpToolInput(String name, Map<String, Object> parameters, Long mcpComponentId) {
     }
 }

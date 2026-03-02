@@ -48,9 +48,9 @@ public class McpToolServiceImpl implements McpToolService {
     public McpTool update(McpTool mcpTool) {
         McpTool currentMcpTool = OptionalUtils.get(mcpToolRepository.findById(mcpTool.getId()));
 
-        currentMcpTool.setName(mcpTool.getName());
         currentMcpTool.setMcpComponentId(mcpTool.getMcpComponentId());
-        currentMcpTool.setVersion(mcpTool.getVersion());
+        currentMcpTool.setName(mcpTool.getName());
+        currentMcpTool.setParameters(mcpTool.getParameters());
 
         return mcpToolRepository.save(currentMcpTool);
     }

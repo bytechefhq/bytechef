@@ -17,6 +17,9 @@
 package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
@@ -42,13 +45,20 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class McpComponentGraphQlController {
 
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final ComponentDefinitionService componentDefinitionService;
     private final McpComponentService mcpComponentService;
     private final McpServerFacade mcpServerFacade;
     private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
-    public McpComponentGraphQlController(McpComponentService mcpComponentService, McpServerFacade mcpServerFacade,
-        McpToolService mcpToolService) {
+    public McpComponentGraphQlController(
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ComponentDefinitionService componentDefinitionService, McpComponentService mcpComponentService,
+        McpServerFacade mcpServerFacade, McpToolService mcpToolService) {
+
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.componentDefinitionService = componentDefinitionService;
         this.mcpComponentService = mcpComponentService;
         this.mcpServerFacade = mcpServerFacade;
         this.mcpToolService = mcpToolService;
@@ -116,6 +126,24 @@ public class McpComponentGraphQlController {
         return mcpComponent.getConnectionId();
     }
 
+    @SchemaMapping(typeName = "McpComponent")
+    public String title(McpComponent mcpComponent) {
+        return componentDefinitionService
+            .fetchComponentDefinition(mcpComponent.getComponentName(), mcpComponent.getComponentVersion())
+            .map(ComponentDefinition::getTitle)
+            .orElse(mcpComponent.getComponentName());
+    }
+
+    @SchemaMapping(typeName = "McpTool", field = "title")
+    public String mcpToolTitle(McpTool mcpTool) {
+        McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
+
+        return clusterElementDefinitionService
+            .getClusterElementDefinition(
+                mcpComponent.getComponentName(), mcpComponent.getComponentVersion(), mcpTool.getName())
+            .getTitle();
+    }
+
     @BatchMapping
     public Map<McpComponent, List<McpTool>> mcpTools(List<McpComponent> mcpComponents) {
         return mcpComponents.stream()
@@ -134,6 +162,6 @@ public class McpComponentGraphQlController {
     }
 
     @SuppressFBWarnings("EI")
-    public record McpToolInputForComponent(String name, Map<String, String> parameters) {
+    public record McpToolInputForComponent(String name, Map<String, Object> parameters) {
     }
 }

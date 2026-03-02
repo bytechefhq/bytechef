@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.configuration.web.graphql;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
@@ -33,8 +33,8 @@ import org.springframework.stereotype.Controller;
 public class WorkflowGraphQLController {
 
     @SchemaMapping(typeName = "Workflow", field = "triggers")
-    public List<WorkflowTrigger> triggers(Workflow workflow) {
+    public List<WorkflowTrigger> triggers(WorkflowDTO workflowDTO) {
 
-        return WorkflowTrigger.of(workflow);
+        return WorkflowTrigger.of(workflowDTO.getWorkflow());
     }
 }

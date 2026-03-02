@@ -15,6 +15,7 @@ type McpComponent {
     id: ID!
     componentName: String!
     componentVersion: Int!
+    title: String
     mcpServerId: ID!
     connectionId: ID
     mcpTools: [McpTool]
