@@ -101,6 +101,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const savingRef = useRef<Promise<void> | null>(null);
         const pendingValueRef = useRef<string | number | null | undefined>(undefined);
 
+        const editorValueRef = useRef(editorValue);
+        editorValueRef.current = editorValue;
+
         const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
         const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
 
@@ -583,9 +586,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             [editor]
         );
 
-        // Sync value prop into editor state when it changes externally (e.g. from Sheet save)
+        // Sync value prop into editor state when it changes externally (e.g. from Sheet save).
+        // Only reacts to `value` prop changes — uses editorValueRef to avoid firing when
+        // editorValue changes locally (which would overwrite in-flight datapill insertions).
         useEffect(() => {
-            if (value === undefined || value === editorValue) {
+            if (value === undefined || value === editorValueRef.current) {
                 return;
             }
 
@@ -593,7 +598,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
             setIsLocalUpdate(false);
             setEditorValue(strippedValue);
-        }, [value, editorValue]);
+        }, [value]);
 
         // Sync ref when editor changes - handle both callback and object refs
         useEffect(() => {
