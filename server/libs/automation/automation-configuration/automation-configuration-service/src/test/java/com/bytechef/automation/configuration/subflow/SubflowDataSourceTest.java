@@ -99,7 +99,7 @@ class SubflowDataSourceTest {
 
         WorkflowTrigger callableTrigger = mock(WorkflowTrigger.class);
 
-        when(callableTrigger.getType()).thenReturn("workflow/v1/callable");
+        when(callableTrigger.getType()).thenReturn("workflow/v1/newWorkflowCall");
         when(callableTrigger.getParameters()).thenReturn(Map.of());
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class);
@@ -141,7 +141,7 @@ class SubflowDataSourceTest {
 
         WorkflowTask callableResponseTask = mock(WorkflowTask.class);
 
-        when(callableResponseTask.getType()).thenReturn("workflow/v1/callableResponse");
+        when(callableResponseTask.getType()).thenReturn("workflow/v1/responseToWorkflowCall");
         when(callableResponseTask.getParameters()).thenReturn(Map.of());
         when(workflow.getTasks(true)).thenReturn(List.of(callableResponseTask));
 
@@ -182,7 +182,7 @@ class SubflowDataSourceTest {
 
         WorkflowTrigger callableTrigger = mock(WorkflowTrigger.class);
 
-        when(callableTrigger.getType()).thenReturn("workflow/v1/callable");
+        when(callableTrigger.getType()).thenReturn("workflow/v1/newWorkflowCall");
 
         Project project = mock(Project.class);
 
@@ -229,7 +229,7 @@ class SubflowDataSourceTest {
 
         WorkflowTrigger callableTrigger = mock(WorkflowTrigger.class);
 
-        when(callableTrigger.getType()).thenReturn("workflow/v1/callable");
+        when(callableTrigger.getType()).thenReturn("workflow/v1/newWorkflowCall");
 
         WorkflowTrigger nonCallableTrigger = mock(WorkflowTrigger.class);
 
@@ -283,11 +283,11 @@ class SubflowDataSourceTest {
 
         WorkflowTrigger trigger1 = mock(WorkflowTrigger.class);
 
-        when(trigger1.getType()).thenReturn("workflow/v1/callable");
+        when(trigger1.getType()).thenReturn("workflow/v1/newWorkflowCall");
 
         WorkflowTrigger trigger2 = mock(WorkflowTrigger.class);
 
-        when(trigger2.getType()).thenReturn("workflow/v1/callable");
+        when(trigger2.getType()).thenReturn("workflow/v1/newWorkflowCall");
 
         Project project1 = mock(Project.class);
 
@@ -330,7 +330,7 @@ class SubflowDataSourceTest {
 
         WorkflowTrigger callableTrigger = mock(WorkflowTrigger.class);
 
-        when(callableTrigger.getType()).thenReturn("workflow/v1/callable");
+        when(callableTrigger.getType()).thenReturn("workflow/v1/newWorkflowCall");
 
         Project project = mock(Project.class);
 
@@ -366,7 +366,7 @@ class SubflowDataSourceTest {
 
         WorkflowTrigger callableTrigger = mock(WorkflowTrigger.class);
 
-        when(callableTrigger.getType()).thenReturn("workflow/v1/callable");
+        when(callableTrigger.getType()).thenReturn("workflow/v1/newWorkflowCall");
 
         Project project = mock(Project.class);
 

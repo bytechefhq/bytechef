@@ -22,10 +22,10 @@ import static com.bytechef.platform.component.constant.WorkflowConstants.WORKFLO
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.workflow.action.WorkflowCallableResponseAction;
-import com.bytechef.component.workflow.action.WorkflowToolCallableResponseAction;
-import com.bytechef.component.workflow.trigger.WorkflowCallableTrigger;
-import com.bytechef.component.workflow.trigger.WorkflowToolCallableTrigger;
+import com.bytechef.component.workflow.action.WorkflowResponseToAiModelCallAction;
+import com.bytechef.component.workflow.action.WorkflowResponseToWorkflowCallAction;
+import com.bytechef.component.workflow.trigger.WorkflowNewAiModelCallTrigger;
+import com.bytechef.component.workflow.trigger.WorkflowNewWorkflowCallTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -39,10 +39,12 @@ public class WorkflowComponentHandler implements ComponentHandler {
         .description("Triggers and actions for workflow-to-workflow communication.")
         .icon("path:assets/workflow.svg")
         .categories(ComponentCategory.HELPERS)
-        .triggers(WorkflowCallableTrigger.TRIGGER_DEFINITION, WorkflowToolCallableTrigger.TRIGGER_DEFINITION)
+        .triggers(
+            WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION,
+            WorkflowNewAiModelCallTrigger.TRIGGER_DEFINITION)
         .actions(
-            WorkflowCallableResponseAction.ACTION_DEFINITION,
-            WorkflowToolCallableResponseAction.ACTION_DEFINITION);
+            WorkflowResponseToWorkflowCallAction.ACTION_DEFINITION,
+            WorkflowResponseToAiModelCallAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

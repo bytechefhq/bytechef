@@ -19,8 +19,8 @@ package com.bytechef.component.workflow.trigger;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
-import static com.bytechef.platform.component.constant.WorkflowConstants.CALLABLE;
 import static com.bytechef.platform.component.constant.WorkflowConstants.INPUT_SCHEMA;
+import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
@@ -32,10 +32,10 @@ import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowCallableTrigger {
+public class WorkflowNewWorkflowCallTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(CALLABLE)
-        .title("Callable")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_WORKFLOW_CALL)
+        .title("New Workflow Call")
         .description(
             "Triggers when this workflow is called from another workflow. Define the input schema to specify what data the calling workflow should provide.")
         .type(TriggerType.CALLABLE)
@@ -46,7 +46,7 @@ public class WorkflowCallableTrigger {
                 .placeholder("Edit Inputs schema")
                 .description("The schema definition for the input data this workflow expects from callers.")
                 .controlType(JSON_SCHEMA_BUILDER))
-        .output(WorkflowCallableTrigger::output);
+        .output(WorkflowNewWorkflowCallTrigger::output);
 
     protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, TriggerContext context) {
