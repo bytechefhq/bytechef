@@ -116,7 +116,7 @@ const ClusterElementsCanvasDialog = ({
                 <DialogDescription />
             </DialogHeader>
 
-            <DialogContent className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-col gap-2 bg-surface-main p-0">
+            <DialogContent className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-col gap-2 overflow-hidden bg-surface-main p-0">
                 {isDataStreamClusterRoot && showDataStreamEditor ? (
                     <div className="flex size-full min-h-0 overflow-hidden">
                         <DataStreamEditor onClose={handleClose} onToggleEditor={handleToggleEditor} />
@@ -137,7 +137,7 @@ const ClusterElementsCanvasDialog = ({
                         />
 
                         <CopilotPanel
-                            className="fixed inset-y-0 right-0 rounded-r-md border-l"
+                            className="absolute inset-y-0 right-0 rounded-r-md border-l"
                             onClose={handleCopilotClose}
                             open={copilotPanelOpen}
                         />
@@ -175,7 +175,7 @@ const ClusterElementsCanvasDialog = ({
 
                         <WorkflowNodeDetailsPanel
                             className={twMerge(
-                                'fixed inset-y-0 right-0 rounded-l-none transition-[right] duration-300 ease-in-out',
+                                'absolute inset-y-0 right-0 rounded-l-none transition-[right] duration-300 ease-in-out',
                                 copilotPanelOpen && 'right-[450px] rounded-r-none border-r-0'
                             )}
                             closeButton={
@@ -194,7 +194,7 @@ const ClusterElementsCanvasDialog = ({
                                 fallback={
                                     <DataPillPanelSkeleton
                                         className={twMerge(
-                                            'fixed inset-y-0 right-[465px] rounded-none transition-[right,transform,opacity] duration-300 ease-in-out',
+                                            'absolute inset-y-0 right-[465px] rounded-none transition-[right,transform,opacity] duration-300 ease-in-out',
                                             copilotPanelOpen && 'right-[915px]',
                                             !isDataPillPanelVisible && 'translate-x-8 opacity-0'
                                         )}
@@ -203,7 +203,7 @@ const ClusterElementsCanvasDialog = ({
                             >
                                 <DataPillPanel
                                     className={twMerge(
-                                        'fixed inset-y-0 right-[465px] rounded-none transition-[right,transform,opacity] duration-300 ease-in-out',
+                                        'absolute inset-y-0 right-[465px] rounded-none transition-[right,transform,opacity] duration-300 ease-in-out',
                                         copilotPanelOpen && 'right-[915px]',
                                         !isDataPillPanelVisible && 'translate-x-8 opacity-0'
                                     )}
@@ -216,7 +216,7 @@ const ClusterElementsCanvasDialog = ({
                         {testingPanelOpen && (
                             <div
                                 className={twMerge(
-                                    'fixed inset-y-0 right-0 z-0 w-[800px] overflow-hidden border-l border-r bg-background transition-[right] duration-300 ease-in-out',
+                                    'absolute inset-y-0 right-0 z-0 w-[800px] overflow-hidden border-l border-r bg-background transition-[right] duration-300 ease-in-out',
                                     workflowNodeDetailsPanelOpen && !copilotPanelOpen && 'right-[465px]',
                                     copilotPanelOpen && 'right-[450px] z-10'
                                 )}
@@ -232,7 +232,7 @@ const ClusterElementsCanvasDialog = ({
                         )}
 
                         <CopilotPanel
-                            className="fixed inset-y-0 right-0 rounded-r-md border-l"
+                            className="absolute inset-y-0 right-0 rounded-r-md border-l"
                             onClose={handleCopilotClose}
                             open={copilotPanelOpen}
                         />
