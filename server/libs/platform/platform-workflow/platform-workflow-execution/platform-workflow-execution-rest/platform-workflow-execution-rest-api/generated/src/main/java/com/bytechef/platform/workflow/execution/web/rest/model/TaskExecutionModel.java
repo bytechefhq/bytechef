@@ -8,7 +8,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
@@ -28,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.511898+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-02T17:00:01.590461885+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
 public class TaskExecutionModel {
 
   private @Nullable String createdBy;
@@ -128,6 +131,12 @@ public class TaskExecutionModel {
   private @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel workflowTask;
 
   private @Nullable String type;
+
+  @Valid
+  private List<@Valid TaskExecutionModel> children = new ArrayList<>();
+
+  @Valid
+  private List<List<@Valid TaskExecutionModel>> iterations = new ArrayList<>();
 
   public TaskExecutionModel() {
     super();
@@ -671,6 +680,62 @@ public class TaskExecutionModel {
     this.type = type;
   }
 
+  public TaskExecutionModel children(List<@Valid TaskExecutionModel> children) {
+    this.children = children;
+    return this;
+  }
+
+  public TaskExecutionModel addChildrenItem(TaskExecutionModel childrenItem) {
+    if (this.children == null) {
+      this.children = new ArrayList<>();
+    }
+    this.children.add(childrenItem);
+    return this;
+  }
+
+  /**
+   * Get children
+   * @return children
+   */
+  @Valid 
+  @Schema(name = "children", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("children")
+  public List<@Valid TaskExecutionModel> getChildren() {
+    return children;
+  }
+
+  public void setChildren(List<@Valid TaskExecutionModel> children) {
+    this.children = children;
+  }
+
+  public TaskExecutionModel iterations(List<List<@Valid TaskExecutionModel>> iterations) {
+    this.iterations = iterations;
+    return this;
+  }
+
+  public TaskExecutionModel addIterationsItem(List<@Valid TaskExecutionModel> iterationsItem) {
+    if (this.iterations == null) {
+      this.iterations = new ArrayList<>();
+    }
+    this.iterations.add(iterationsItem);
+    return this;
+  }
+
+  /**
+   * Get iterations
+   * @return iterations
+   */
+  @Valid 
+  @Schema(name = "iterations", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("iterations")
+  public List<List<@Valid TaskExecutionModel>> getIterations() {
+    return iterations;
+  }
+
+  public void setIterations(List<List<@Valid TaskExecutionModel>> iterations) {
+    this.iterations = iterations;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -705,12 +770,14 @@ public class TaskExecutionModel {
         Objects.equals(this.title, taskExecution.title) &&
         Objects.equals(this.retryDelayMillis, taskExecution.retryDelayMillis) &&
         Objects.equals(this.workflowTask, taskExecution.workflowTask) &&
-        Objects.equals(this.type, taskExecution.type);
+        Objects.equals(this.type, taskExecution.type) &&
+        Objects.equals(this.children, taskExecution.children) &&
+        Objects.equals(this.iterations, taskExecution.iterations);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type);
+    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type, children, iterations);
   }
 
   @Override
@@ -743,6 +810,8 @@ public class TaskExecutionModel {
     sb.append("    retryDelayMillis: ").append(toIndentedString(retryDelayMillis)).append("\n");
     sb.append("    workflowTask: ").append(toIndentedString(workflowTask)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    children: ").append(toIndentedString(children)).append("\n");
+    sb.append("    iterations: ").append(toIndentedString(iterations)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -751,7 +820,7 @@ public class TaskExecutionModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
+  private String toIndentedString(@Nullable Object o) {
     if (o == null) {
       return "null";
     }
