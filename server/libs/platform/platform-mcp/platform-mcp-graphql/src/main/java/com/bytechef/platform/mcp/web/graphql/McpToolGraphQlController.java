@@ -118,10 +118,14 @@ public class McpToolGraphQlController {
 
         mcpTool.setId(id);
 
+        if (input.version() != null) {
+            mcpTool.setVersion(input.version());
+        }
+
         return mcpToolService.update(mcpTool);
     }
 
     @SuppressFBWarnings("EI")
-    public record McpToolInput(String name, Map<String, Object> parameters, Long mcpComponentId) {
+    public record McpToolInput(Long mcpComponentId, String name, Map<String, Object> parameters, Integer version) {
     }
 }

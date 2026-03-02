@@ -29,9 +29,10 @@ extend type Mutation {
 }
 
 input McpToolInput {
+    mcpComponentId: ID!
     name: String!
     parameters: Map
-    mcpComponentId: ID!
+    version: Int
 }
 
 type McpTool {
