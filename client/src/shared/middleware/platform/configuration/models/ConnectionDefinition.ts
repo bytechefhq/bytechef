@@ -20,6 +20,13 @@ import {
     AuthorizationToJSON,
     AuthorizationToJSONTyped,
 } from './Authorization';
+import type { ConnectionDefinitionHelp } from './ConnectionDefinitionHelp';
+import {
+    ConnectionDefinitionHelpFromJSON,
+    ConnectionDefinitionHelpFromJSONTyped,
+    ConnectionDefinitionHelpToJSON,
+    ConnectionDefinitionHelpToJSONTyped,
+} from './ConnectionDefinitionHelp';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
@@ -65,6 +72,12 @@ export interface ConnectionDefinition {
      */
     componentName: string;
     /**
+     * 
+     * @type {ConnectionDefinitionHelp}
+     * @memberof ConnectionDefinition
+     */
+    help?: ConnectionDefinitionHelp;
+    /**
      * The properties of the connection.
      * @type {Array<Property>}
      * @memberof ConnectionDefinition
@@ -108,6 +121,7 @@ export function ConnectionDefinitionFromJSONTyped(json: any, ignoreDiscriminator
         'baseUri': json['baseUri'] == null ? undefined : json['baseUri'],
         'componentDescription': json['componentDescription'] == null ? undefined : json['componentDescription'],
         'componentName': json['componentName'],
+        'help': json['help'] == null ? undefined : ConnectionDefinitionHelpFromJSON(json['help']),
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'componentTitle': json['componentTitle'] == null ? undefined : json['componentTitle'],
         'version': json['version'],
@@ -130,6 +144,7 @@ export function ConnectionDefinitionToJSONTyped(value?: ConnectionDefinition | n
         'baseUri': value['baseUri'],
         'componentDescription': value['componentDescription'],
         'componentName': value['componentName'],
+        'help': ConnectionDefinitionHelpToJSON(value['help']),
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
         'componentTitle': value['componentTitle'],
         'version': value['version'],
