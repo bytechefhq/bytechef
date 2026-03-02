@@ -191,7 +191,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         // Check initial value for formula mode
         useEffect(() => {
             if (isInitialLoadRef.current && setIsFormulaMode) {
-                const initialValue = value || defaultValue;
+                const initialValue = value ?? defaultValue;
 
                 if (typeof initialValue === 'string' && initialValue.trim().startsWith('=')) {
                     setIsFormulaMode(true);
@@ -305,7 +305,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                             type={type}
                             validateBeforeSave={validateBeforeSave}
-                            value={value || defaultValue}
+                            value={value ?? defaultValue}
                             workflow={workflow}
                         />
                     </div>
