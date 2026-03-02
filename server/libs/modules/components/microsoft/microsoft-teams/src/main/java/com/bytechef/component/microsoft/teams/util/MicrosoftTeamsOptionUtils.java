@@ -21,7 +21,6 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.VALUE;
-import static com.bytechef.component.microsoft.teams.util.MicrosoftTeamsUtils.getChatMembers;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
 import com.bytechef.component.definition.ActionContext;
@@ -46,6 +45,7 @@ public class MicrosoftTeamsOptionUtils {
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context.http(http -> http.get("/chats"))
+            .queryParameters("$expand", "members")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -55,9 +55,18 @@ public class MicrosoftTeamsOptionUtils {
         if (body.get(VALUE) instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    List<String> members = getChatMembers(context, map);
 
-                    String chatName = getChatName((String) map.get("topic"), members);
+                    List<String> chatMembers = new ArrayList<>();
+
+                    if (map.get("members") instanceof List<?> members) {
+                        for (Object member : members) {
+                            if (member instanceof Map<?, ?> memberMap) {
+                                chatMembers.add((String) memberMap.get(DISPLAY_NAME));
+                            }
+                        }
+                    }
+
+                    String chatName = getChatName((String) map.get("topic"), chatMembers);
 
                     options.add(option(map.get("chatType") + " chat: " + chatName, (String) map.get(ID)));
                 }
