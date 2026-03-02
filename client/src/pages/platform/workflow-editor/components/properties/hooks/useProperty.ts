@@ -955,6 +955,7 @@ export const useProperty = ({
 
             if (shouldUseMentionInput) {
                 setMentionInput(true);
+                setMentionInputValue(propertyParameterValue);
 
                 return;
             } else {
@@ -1177,7 +1178,7 @@ export const useProperty = ({
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [propertyParameterValue, mentionInput, controlType, inputValue]);
+    }, [mentionInputValue, propertyParameterValue, mentionInput, controlType, inputValue]);
 
     // set options lookup dependencies
     useEffect(() => {
