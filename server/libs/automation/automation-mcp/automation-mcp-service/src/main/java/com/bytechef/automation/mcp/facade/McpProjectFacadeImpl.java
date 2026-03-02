@@ -84,7 +84,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
             projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
             projectDeploymentWorkflow.setWorkflowId(workflowId);
-            projectDeploymentWorkflow.setEnabled(false);
+            projectDeploymentWorkflow.setEnabled(true);
             projectDeploymentWorkflow.setInputs(Map.of());
 
             projectDeploymentWorkflow = projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
@@ -144,7 +144,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
                 projectDeploymentWorkflow.setProjectDeploymentId(mcpProject.getProjectDeploymentId());
                 projectDeploymentWorkflow.setWorkflowId(workflowId);
-                projectDeploymentWorkflow.setEnabled(false);
+                projectDeploymentWorkflow.setEnabled(true);
                 projectDeploymentWorkflow.setInputs(Map.of());
 
                 projectDeploymentWorkflow = projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
