@@ -35,6 +35,7 @@ public class ConnectionDefinition {
     private String componentDescription;
     private String componentName;
     private String componentTitle;
+    private Help help;
     private List<? extends Property> properties;
     private int version;
 
@@ -51,6 +52,9 @@ public class ConnectionDefinition {
         this.componentDescription = componentDescription;
         this.componentName = componentName;
         this.componentTitle = componentTitle;
+        this.help = connectionDefinition.getHelp()
+            .map(Help::new)
+            .orElse(null);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(connectionDefinition.getProperties(), Collections.emptyList()),
             valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
@@ -67,14 +71,14 @@ public class ConnectionDefinition {
             Objects.equals(authorizations, that.authorizations) &&
             Objects.equals(componentDescription, that.componentDescription) &&
             Objects.equals(componentName, that.componentName) && Objects.equals(componentTitle, that.componentTitle) &&
-            Objects.equals(properties, that.properties);
+            Objects.equals(help, that.help) && Objects.equals(properties, that.properties);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            authorizationRequired, authorizations, componentDescription, componentName, componentTitle, properties,
-            version);
+            authorizationRequired, authorizations, componentDescription, componentName, componentTitle, help,
+            properties, version);
     }
 
     public List<Authorization> getAuthorizations() {
@@ -92,6 +96,10 @@ public class ConnectionDefinition {
 
     public String getComponentTitle() {
         return componentTitle;
+    }
+
+    public Help getHelp() {
+        return help;
     }
 
     public List<? extends Property> getProperties() {
@@ -115,6 +123,7 @@ public class ConnectionDefinition {
             ", componentDescription='" + componentDescription + '\'' +
             ", authorizationRequired=" + authorizationRequired +
             ", properties=" + properties +
+            ", help=" + help +
             ", authorizations=" + authorizations +
             '}';
     }
