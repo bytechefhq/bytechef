@@ -9,6 +9,7 @@ import {twMerge} from 'tailwind-merge';
 
 interface PropertyTextAreaProps {
     className?: string;
+    deletePropertyButton?: ReactNode;
     description?: string;
     disabled?: boolean;
     error: boolean;
@@ -19,6 +20,7 @@ interface PropertyTextAreaProps {
     onChange?: (event: ChangeEvent<HTMLTextAreaElement>) => void;
     required?: boolean;
     title?: string;
+    trailingAction?: ReactNode;
     value?: string;
 }
 
@@ -26,6 +28,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
     (
         {
             className,
+            deletePropertyButton,
             description,
             disabled,
             error,
@@ -36,6 +39,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
             onChange,
             required,
             title,
+            trailingAction,
             value,
             ...props
         },
@@ -43,27 +47,37 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
     ) => (
         <fieldset className="mb-3 w-full">
             {label && (
-                <div className="flex items-center">
-                    <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
-                        {label}
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                        <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
+                            {label}
 
-                        {required && <RequiredMark />}
-                    </Label>
+                            {required && <RequiredMark />}
+                        </Label>
 
-                    {description && (
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <CircleQuestionMarkIcon className="size-4 text-muted-foreground" />
-                            </TooltipTrigger>
+                        {description && (
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <CircleQuestionMarkIcon className="size-4 text-muted-foreground" />
+                                </TooltipTrigger>
 
-                            <TooltipContent>{description}</TooltipContent>
-                        </Tooltip>
-                    )}
+                                <TooltipContent>{description}</TooltipContent>
+                            </Tooltip>
+                        )}
+                    </div>
+
+                    {deletePropertyButton}
                 </div>
             )}
 
             <div className={twMerge([label && 'mt-1', leadingIcon && 'relative'])} title={title}>
-                <div className={twMerge(leadingIcon && 'relative rounded-md')}>
+                <div
+                    className={twMerge(
+                        leadingIcon && 'relative rounded-md',
+                        trailingAction &&
+                            'flex rounded-md border border-input shadow-sm focus-within:ring-2 focus-within:ring-blue-500'
+                    )}
+                >
                     {leadingIcon && (
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-gray-200 bg-gray-100 px-3">
                             {leadingIcon}
@@ -76,6 +90,8 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                                 'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500',
                             disabled && 'bg-gray-100 text-gray-500',
                             leadingIcon && 'pl-12 leading-relaxed',
+                            trailingAction &&
+                                'flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
                             className
                         )}
                         id={name}
@@ -86,6 +102,8 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                         value={value}
                         {...props}
                     />
+
+                    {trailingAction && <div className="flex items-start pr-1 pt-1">{trailingAction}</div>}
 
                     {error && (
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
