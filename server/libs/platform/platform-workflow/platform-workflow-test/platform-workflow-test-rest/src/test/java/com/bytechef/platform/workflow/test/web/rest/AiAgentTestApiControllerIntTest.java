@@ -17,32 +17,20 @@
 package com.bytechef.platform.workflow.test.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.evaluator.Evaluator;
-import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,22 +54,7 @@ class AiAgentTestApiControllerIntTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private ActionDefinitionFacade actionDefinitionFacade;
-
-    @MockitoBean
-    private Evaluator evaluator;
-
-    @MockitoBean
-    private TempFileStorage tempFileStorage;
-
-    @MockitoBean
-    private WorkflowNodeOutputFacade workflowNodeOutputFacade;
-
-    @MockitoBean
-    private WorkflowService workflowService;
-
-    @MockitoBean
-    private WorkflowTestConfigurationService workflowTestConfigurationService;
+    private AiAgentTestFacade aiAgentTestFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -94,13 +67,8 @@ class AiAgentTestApiControllerIntTest {
 
     @Test
     void testAiAgentEmitsStartAndResult() throws Exception {
-        setupWorkflowMocks();
-
-        when(
-            actionDefinitionFacade.executePerform(
-                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), isNull(), anyString(), anyMap(),
-                anyMap(), anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
-                    .thenReturn("Test response");
+        when(aiAgentTestFacade.executeAiAgentAction(anyString(), anyString(), anyLong(), anyString(), anyString(),
+            anyList())).thenReturn("Test response");
 
         MvcResult mvcResult = mockMvc.perform(
             post("/internal/ai-agent-tests")
@@ -128,19 +96,14 @@ class AiAgentTestApiControllerIntTest {
 
     @Test
     void testAiAgentStreamingEmitsStreamEventsAndResult() throws Exception {
-        setupWorkflowMocks();
-
         ActionDefinition.SseEmitterHandler sseEmitterHandler = sseEmitter -> {
             sseEmitter.send("chunk1");
             sseEmitter.send("chunk2");
             sseEmitter.complete();
         };
 
-        when(
-            actionDefinitionFacade.executePerform(
-                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), isNull(), anyString(), anyMap(),
-                anyMap(), anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
-                    .thenReturn(sseEmitterHandler);
+        when(aiAgentTestFacade.executeAiAgentAction(anyString(), anyString(), anyLong(), anyString(), anyString(),
+            anyList())).thenReturn(sseEmitterHandler);
 
         MvcResult mvcResult = mockMvc.perform(
             post("/internal/ai-agent-tests")
@@ -168,13 +131,8 @@ class AiAgentTestApiControllerIntTest {
 
     @Test
     void testAiAgentEmitsErrorOnException() throws Exception {
-        setupWorkflowMocks();
-
-        when(
-            actionDefinitionFacade.executePerform(
-                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), isNull(), anyString(), anyMap(),
-                anyMap(), anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
-                    .thenThrow(new RuntimeException("Something went wrong"));
+        when(aiAgentTestFacade.executeAiAgentAction(anyString(), anyString(), anyLong(), anyString(), anyString(),
+            anyList())).thenThrow(new RuntimeException("Something went wrong"));
 
         MvcResult mvcResult = mockMvc.perform(
             post("/internal/ai-agent-tests")
@@ -201,18 +159,13 @@ class AiAgentTestApiControllerIntTest {
 
     @Test
     void testAiAgentStreamingEmitsErrorOnHandlerFailure() throws Exception {
-        setupWorkflowMocks();
-
         ActionDefinition.SseEmitterHandler sseEmitterHandler = sseEmitter -> {
             sseEmitter.send("partial");
             sseEmitter.error(new RuntimeException("Stream failed"));
         };
 
-        when(
-            actionDefinitionFacade.executePerform(
-                anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), isNull(), anyString(), anyMap(),
-                anyMap(), anyMap(), anyLong(), isNull(), anyBoolean(), any(), any()))
-                    .thenReturn(sseEmitterHandler);
+        when(aiAgentTestFacade.executeAiAgentAction(anyString(), anyString(), anyLong(), anyString(), anyString(),
+            anyList())).thenReturn(sseEmitterHandler);
 
         MvcResult mvcResult = mockMvc.perform(
             post("/internal/ai-agent-tests")
@@ -255,50 +208,12 @@ class AiAgentTestApiControllerIntTest {
             "}";
     }
 
-    private void setupWorkflowMocks() {
-        Workflow workflow = new Workflow(
-            """
-                {
-                    "tasks": [
-                        {
-                            "name": "node-1",
-                            "type": "testComponent/v1/testAction",
-                            "parameters": {}
-                        }
-                    ]
-                }
-                """, Workflow.Format.JSON);
-
-        when(workflowService.getWorkflow("wf-1")).thenReturn(workflow);
-
-        when(
-            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(anyString(), anyLong()))
-                .thenReturn(Map.of());
-
-        when(
-            workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(anyString(), anyString(), anyLong()))
-                .thenReturn(Map.of());
-
-        when(evaluator.evaluate(any(), anyMap())).thenAnswer(invocation -> invocation.getArgument(0));
-
-        when(
-            workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                anyString(), anyString(), anyLong()))
-                    .thenReturn(List.of());
-    }
-
     @Configuration
     static class AiAgentTestApiControllerTestConfiguration {
 
         @Bean
-        AiAgentTestApiController aiAgentTestApiController(
-            ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator, TempFileStorage tempFileStorage,
-            WorkflowNodeOutputFacade workflowNodeOutputFacade, WorkflowService workflowService,
-            WorkflowTestConfigurationService workflowTestConfigurationService) {
-
-            return new AiAgentTestApiController(
-                actionDefinitionFacade, evaluator, Runnable::run, tempFileStorage, workflowNodeOutputFacade,
-                workflowService, workflowTestConfigurationService);
+        AiAgentTestApiController aiAgentTestApiController(AiAgentTestFacade aiAgentTestFacade) {
+            return new AiAgentTestApiController(aiAgentTestFacade, Runnable::run);
         }
     }
 }
