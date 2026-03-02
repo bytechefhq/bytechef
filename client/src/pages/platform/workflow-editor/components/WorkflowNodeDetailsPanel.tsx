@@ -82,6 +82,9 @@ const WorkflowNodeDetailsPanel = ({
         return <></>;
     }
 
+    const documentationUrl =
+        currentActionDefinition?.help?.learnMoreUrl ?? currentTriggerDefinition?.help?.learnMoreUrl;
+
     return (
         <div
             className={twMerge(
@@ -287,8 +290,8 @@ const WorkflowNodeDetailsPanel = ({
                                 </SelectContent>
                             </Select>
 
-                            {currentActionDefinition?.help?.learnMoreUrl && (
-                                <Link target="_blank" to={currentActionDefinition!.help!.learnMoreUrl}>
+                            {documentationUrl && (
+                                <Link target="_blank" to={documentationUrl}>
                                     <Button size="sm" variant="ghost">
                                         Documentation <ExternalLinkIcon />
                                     </Button>
