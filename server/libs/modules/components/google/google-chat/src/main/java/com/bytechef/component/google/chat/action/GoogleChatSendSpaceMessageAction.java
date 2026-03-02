@@ -38,15 +38,15 @@ import java.util.Map;
 /**
  * @author Nikolina Spehar
  */
-public class GoogleChatCreateMessageAction {
+public class GoogleChatSendSpaceMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createMessage")
-        .title("Create Message")
-        .description("Creates a new message in selected space.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendSpaceMessage")
+        .title("Send Space Message")
+        .description("Sends a new message in selected space.")
         .properties(
             string(SPACE_NAME)
                 .label("Space Name")
-                .description("Name of the space in which the message will be created.")
+                .description("Name of the space in which the message will be sent.")
                 .options((OptionsFunction<String>) GoogleChatUtils::getSpaceNameOptions)
                 .required(true),
             string(TEXT)
@@ -58,7 +58,7 @@ public class GoogleChatCreateMessageAction {
                 object()
                     .properties(
                         string("name")
-                            .description("Name of the message that was created."),
+                            .description("Name of the message that was sent."),
                         object("sender")
                             .description("Sender of the message.")
                             .properties(
@@ -67,7 +67,7 @@ public class GoogleChatCreateMessageAction {
                                 string("type")
                                     .description("Type of the sender of the message (BOT or HUMAN).")),
                         string("createTime")
-                            .description("Time when the message was created."),
+                            .description("Time when the message was sent."),
                         string("text")
                             .description("Text of the message."),
                         object("thread")
@@ -80,11 +80,11 @@ public class GoogleChatCreateMessageAction {
                                     .description("Space to which the message was sent.")),
                         string("argumentText"),
                         string("formattedText"))))
-        .perform(GoogleChatCreateMessageAction::perform)
+        .perform(GoogleChatSendSpaceMessageAction::perform)
         .processErrorResponse(GoogleUtils::processErrorResponse)
-        .help("", "https://docs.bytechef.io/reference/components/google-chat_v1#create-message");
+        .help("", "https://docs.bytechef.io/reference/components/google-chat_v1#send-space-message");
 
-    private GoogleChatCreateMessageAction() {
+    private GoogleChatSendSpaceMessageAction() {
     }
 
     public static Map<String, Object> perform(
