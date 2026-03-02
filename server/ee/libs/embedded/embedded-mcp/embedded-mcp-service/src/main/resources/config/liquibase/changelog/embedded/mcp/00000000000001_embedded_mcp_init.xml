@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="mcp_integration"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="mcp_integration">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_server_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_mcp_integration_mcp_server_id" references="mcp_server(id)"/>
+            </column>
+            <column name="integration_instance_configuration_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_mcp_integration_integration_instance_configuration" references="integration_instance_configuration(id)"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_mcp_integration_integration_instance_configuration_server" tableName="mcp_integration" columnNames="integration_instance_configuration_id,mcp_server_id" />
+
+        <createTable tableName="mcp_integration_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_integration_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_mcp_integration_workflow_mcp_integration" references="mcp_integration(id)"/>
+            </column>
+            <column name="integration_instance_configuration_workflow_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_mcp_integration_workflow_iic_workflow" references="integration_instance_configuration_workflow(id)"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_mcp_integration_workflow_iic_workflow" tableName="mcp_integration_workflow" columnNames="mcp_integration_id,integration_instance_configuration_workflow_id" />
+    </changeSet>
+</databaseChangeLog>
