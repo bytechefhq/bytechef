@@ -151,7 +151,7 @@ class SubflowDataSourceImpl implements SubflowDataSource {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
             if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), WorkflowConstants.CALLABLE_RESPONSE)) {
+                Objects.equals(workflowNodeType.operation(), WorkflowConstants.RESPONSE_TO_WORKFLOW_CALL)) {
 
                 return workflowTask;
             }
@@ -167,7 +167,7 @@ class SubflowDataSourceImpl implements SubflowDataSource {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), WorkflowConstants.CALLABLE)) {
+                Objects.equals(workflowNodeType.operation(), WorkflowConstants.NEW_WORKFLOW_CALL)) {
 
                 return workflowTrigger;
             }

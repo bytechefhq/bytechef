@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
 import static com.bytechef.component.workflow.util.WorkflowConstants.RESPONSE;
 import static com.bytechef.platform.component.constant.WorkflowConstants.OUTPUT_SCHEMA;
-import static com.bytechef.platform.component.constant.WorkflowConstants.TOOL_CALLABLE_RESPONSE;
+import static com.bytechef.platform.component.constant.WorkflowConstants.RESPONSE_TO_WORKFLOW_CALL;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.CallableResponse;
@@ -38,25 +38,25 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowToolCallableResponseAction {
+public class WorkflowResponseToWorkflowCallAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(TOOL_CALLABLE_RESPONSE)
-        .title("Tool Callable Workflow Response")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(RESPONSE_TO_WORKFLOW_CALL)
+        .title("Response to Workflow Call")
         .description(
-            "Respond and send back data to the calling AI model. Must be the last step in a tool callable workflow.")
+            "Respond and send back data to the calling workflow. Must be the last step in a callable workflow.")
         .properties(
             string(OUTPUT_SCHEMA)
                 .label("Output Schema")
                 .placeholder("Edit Output schema")
-                .description("The schema definition for the response data sent back to the AI model.")
+                .description("The schema definition for the response data sent back to the calling workflow.")
                 .controlType(JSON_SCHEMA_BUILDER),
             dynamicProperties(RESPONSE)
-                .description("The response data to send back to the AI model.")
+                .description("The response data to send back to the calling workflow.")
                 .propertiesLookupDependsOn(OUTPUT_SCHEMA)
-                .properties(WorkflowToolCallableResponseAction::responseProperties)
+                .properties(WorkflowResponseToWorkflowCallAction::responseProperties)
                 .required(true))
-        .output(WorkflowToolCallableResponseAction::output)
-        .perform(WorkflowToolCallableResponseAction::perform);
+        .output(WorkflowResponseToWorkflowCallAction::output)
+        .perform(WorkflowResponseToWorkflowCallAction::perform);
 
     protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {

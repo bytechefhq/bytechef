@@ -244,7 +244,7 @@ class McpIntegrationWorkflowGraphQlController {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), WorkflowConstants.TOOL_CALLABLE)) {
+                Objects.equals(workflowNodeType.operation(), WorkflowConstants.NEW_AI_MODEL_CALL)) {
 
                 return workflowTrigger;
             }
