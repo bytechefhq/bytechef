@@ -86,6 +86,7 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
         const componentName = element.componentName || typeSegments[0] || '';
         const operationName = element.operationName || typeSegments[2] || '';
         const definitionsMap = new Map(componentDefinitions.map((definition) => [definition.name, definition]));
+
         const componentDefinition = definitionsMap.get(componentName);
 
         return {
