@@ -100,11 +100,7 @@ const PropertyComboBox = ({
         }))
     );
 
-    const {rootClusterElementNodeData} = useWorkflowEditorStore(
-        useShallow((state) => ({
-            rootClusterElementNodeData: state.rootClusterElementNodeData,
-        }))
-    );
+    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
     const path = useMemo(() => {
         let updatedPath = initialPath;
