@@ -118,9 +118,7 @@ public class WorkflowTestConfiguration {
         return new TestWorkflowExecutorImpl(
             componentDefinitionService, contextService, evaluator,
             new JobSyncExecutor(
-                contextService, evaluator, jobService, 1000,
-                role -> (role == JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR)
-                    ? asyncMessageBroker : new AsyncMessageBroker(environment),
+                contextService, evaluator, jobService, 1000, asyncMessageBroker,
                 getApplicationEventListeners(
                     evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
                 getTaskCompletionHandlerFactories(
