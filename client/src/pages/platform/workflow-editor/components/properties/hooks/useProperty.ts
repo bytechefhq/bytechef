@@ -65,6 +65,10 @@ const MENTION_INPUT_PROPERTY_CONTROL_TYPES = [
 ];
 
 type UsePropertyReturnType = {
+    calculatedPath: string | undefined;
+    controlledBlurError: string | undefined;
+    controlledDynamicMode: boolean;
+    controlledFromAi: boolean | undefined;
     controlType?: ControlType;
     currentComponent: ComponentType | undefined;
     currentNode: NodeDataType | undefined;
@@ -74,13 +78,17 @@ type UsePropertyReturnType = {
     editorRef: RefObject<Editor | null>;
     errorMessage: string;
     formattedOptions: Array<Option> | undefined;
+    fromAiExpression: string;
     handleCodeEditorChange: (value?: string) => void;
+    handleControlledBlur: (value: unknown) => void;
+    handleControlledModeSwitch: (toDynamic: boolean) => void;
+    handleFromAiToggle: (fromAi: boolean, fieldOnChange: (value: string) => void) => void;
     handleDeleteCustomPropertyClick: (path: string) => void;
     handleFromAiClick: (fromAi: boolean) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
-    handleMentionInputValueChange: (value: string | number) => void;
     handleInputTypeSwitchButtonClick: () => void;
     handleJsonSchemaBuilderChange: (value?: SchemaRecordType) => void;
+    handleMentionInputValueChange: (value: string | number) => void;
     handleMultiSelectChange: (value: string[]) => void;
     handleSelectChange: (value: string, name: string) => void;
     hasError: boolean;
@@ -89,8 +97,8 @@ type UsePropertyReturnType = {
     inputValue: string;
     isDisplayConditionsPending: boolean;
     isFetchingCurrentDisplayCondition: boolean;
-    isFromAi: boolean;
     isFormulaMode: boolean;
+    isFromAi: boolean;
     isNumericalInput: boolean;
     isValidControlType: boolean | undefined;
     label?: string;
@@ -106,13 +114,14 @@ type UsePropertyReturnType = {
     name: string | undefined;
     options?: PropertyAllType['options'];
     optionsDataSource?: OptionsDataSource;
-    calculatedPath: string | undefined;
     placeholder: string;
     propertiesDataSource?: PropertiesDataSource;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     propertyParameterValue: any;
     required: boolean;
+    resetOnModeChangeRef: RefObject<boolean>;
     selectValue: string;
+    setControlledFromAi: Dispatch<SetStateAction<boolean | undefined>>;
     setIsFormulaMode: Dispatch<SetStateAction<boolean>>;
     setSelectValue: Dispatch<SetStateAction<string>>;
     showInputTypeSwitchButton: boolean;
@@ -176,7 +185,7 @@ export const useProperty = ({
         property.defaultValue !== undefined ? property.defaultValue : 'null'
     );
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
-        (property.type !== 'STRING' && property.expressionEnabled) || false
+        !control && ((property.type !== 'STRING' && property.expressionEnabled) || false)
     );
     const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(true);
 
@@ -1203,37 +1212,70 @@ export const useProperty = ({
 
     // set options lookup dependencies
     useEffect(() => {
-        if (!currentComponent?.parameters || !optionsDataSource?.optionsLookupDependsOn) {
+        if (!optionsDataSource?.optionsLookupDependsOn) {
             return;
         }
 
-        const optionsLookupDependsOnValues: unknown[] = optionsDataSource?.optionsLookupDependsOn.map(
-            (optionLookupDependency) =>
-                resolvePath(currentComponent?.parameters, optionLookupDependency.replace('[index]', `[${arrayIndex}]`))
+        const parametersSource = currentComponent?.parameters || (control ? control._formValues : undefined);
+
+        if (!parametersSource) {
+            return;
+        }
+
+        const optionsLookupDependsOnValues: unknown[] = optionsDataSource.optionsLookupDependsOn.map(
+            (optionLookupDependency) => {
+                const resolvedValue = resolvePath(
+                    parametersSource,
+                    optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
+                );
+
+                if (typeof resolvedValue === 'string' && resolvedValue.startsWith('=fromAi(')) {
+                    return undefined;
+                }
+
+                return resolvedValue;
+            }
         );
 
         setLookupDependsOnValues(optionsLookupDependsOnValues);
-    }, [arrayIndex, currentComponent?.parameters, optionsDataSource?.optionsLookupDependsOn]);
+    }, [arrayIndex, control, currentComponent?.parameters, optionsDataSource?.optionsLookupDependsOn]);
 
     // set properties lookup dependencies
     useEffect(() => {
-        if (!currentComponent?.parameters || !propertiesDataSource?.propertiesLookupDependsOn) {
+        if (!propertiesDataSource?.propertiesLookupDependsOn) {
             return;
         }
 
-        const propertiesLookupDependsOnValues: unknown[] = propertiesDataSource?.propertiesLookupDependsOn.map(
-            (propertyLookupDependency) =>
-                resolvePath(
-                    currentComponent?.parameters,
+        const parametersSource = currentComponent?.parameters || (control ? control._formValues : undefined);
+
+        if (!parametersSource) {
+            return;
+        }
+
+        const propertiesLookupDependsOnValues: unknown[] = propertiesDataSource.propertiesLookupDependsOn.map(
+            (propertyLookupDependency) => {
+                const resolvedValue = resolvePath(
+                    parametersSource,
                     propertyLookupDependency.replace('[index]', `[${arrayIndex}]`)
-                )
+                );
+
+                if (typeof resolvedValue === 'string' && resolvedValue.startsWith('=fromAi(')) {
+                    return undefined;
+                }
+
+                return resolvedValue;
+            }
         );
 
         setLookupDependsOnValues(propertiesLookupDependsOnValues);
-    }, [arrayIndex, currentComponent?.parameters, propertiesDataSource?.propertiesLookupDependsOn]);
+    }, [arrayIndex, control, currentComponent?.parameters, propertiesDataSource?.propertiesLookupDependsOn]);
 
     // set showInputTypeSwitchButton state depending on the controlType
     useEffect(() => {
+        if (control) {
+            return;
+        }
+
         if (controlType === 'FILE_ENTRY') {
             setShowInputTypeSwitchButton(false);
         }
@@ -1255,7 +1297,7 @@ export const useProperty = ({
         if (controlType === 'FORMULA_MODE') {
             setShowInputTypeSwitchButton(false);
         }
-    }, [controlType, expressionEnabled]);
+    }, [control, controlType, expressionEnabled]);
 
     // set propertyParameterValue on workflow definition change
     useEffect(() => {
@@ -1336,9 +1378,78 @@ export const useProperty = ({
         }
     }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionsFetched]);
 
+    const [controlledBlurError, setControlledBlurError] = useState<string | undefined>();
+    const [controlledDynamicMode, setControlledDynamicMode] = useState(() => {
+        if (!control) {
+            return false;
+        }
+
+        const propertyName = property.name?.replace(/\s/g, '_');
+
+        if (!propertyName) {
+            return false;
+        }
+
+        const fieldPath = controlPath ? `${controlPath}.${propertyName}` : propertyName;
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const formValues = (control as any)._formValues as Record<string, unknown> | undefined;
+
+        if (!formValues) {
+            return false;
+        }
+
+        const fieldValue = fieldPath
+            .split('.')
+            .reduce<unknown>((currentObject, key) => (currentObject as Record<string, unknown>)?.[key], formValues);
+
+        return typeof fieldValue === 'string' && fieldValue.startsWith('=');
+    });
+    const [controlledFromAi, setControlledFromAi] = useState<boolean | undefined>(undefined);
+
+    const resetOnModeChangeRef = useRef(false);
+
+    const handleControlledModeSwitch = useCallback((toDynamic: boolean) => {
+        resetOnModeChangeRef.current = true;
+        setControlledDynamicMode(toDynamic);
+        setControlledFromAi(undefined);
+    }, []);
+
+    const fromAiExpression = useMemo(
+        () => (description ? `=fromAi('${name}', '${description}')` : `=fromAi('${name}')`),
+        [description, name]
+    );
+
+    const handleFromAiToggle = useCallback(
+        (fromAi: boolean, fieldOnChange: (value: string) => void) => {
+            setControlledFromAi(fromAi);
+
+            if (fromAi) {
+                fieldOnChange(fromAiExpression);
+            }
+        },
+        [fromAiExpression]
+    );
+
+    const handleControlledBlur = useCallback(
+        (value: unknown) => {
+            if (value === '' || value == null) {
+                setControlledBlurError(undefined);
+            } else if (!validatePropertyValue(value as string | number)) {
+                setControlledBlurError(ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE);
+            } else {
+                setControlledBlurError(undefined);
+            }
+        },
+        [validatePropertyValue]
+    );
+
     return {
         calculatedPath: path,
         controlType,
+        controlledBlurError,
+        controlledDynamicMode,
+        controlledFromAi,
         currentComponent,
         currentNode,
         defaultValue,
@@ -1347,9 +1458,13 @@ export const useProperty = ({
         editorRef,
         errorMessage,
         formattedOptions,
+        fromAiExpression,
         handleCodeEditorChange,
+        handleControlledBlur,
+        handleControlledModeSwitch,
         handleDeleteCustomPropertyClick,
         handleFromAiClick,
+        handleFromAiToggle,
         handleInputChange,
         handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
@@ -1383,7 +1498,9 @@ export const useProperty = ({
         propertiesDataSource,
         propertyParameterValue,
         required,
+        resetOnModeChangeRef,
         selectValue,
+        setControlledFromAi,
         setIsFormulaMode,
         setSelectValue,
         showInputTypeSwitchButton,
