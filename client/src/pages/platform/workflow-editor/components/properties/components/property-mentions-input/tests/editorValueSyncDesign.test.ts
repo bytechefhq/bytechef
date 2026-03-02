@@ -31,12 +31,21 @@ type EditorSyncResultType = {
 };
 
 /**
+ * Strips the `=` prefix from formula mode values so the editor only displays
+ * the expression body (the EqualIcon leading icon already represents `=`).
+ */
+const stripFormulaPrefix = (rawValue: string | number | undefined): string | number | undefined => {
+    return typeof rawValue === 'string' && rawValue.startsWith('=') ? rawValue.substring(1) : rawValue;
+};
+
+/**
  * Replicates the value prop sync effect from PropertyMentionsInputEditor.tsx:
  *
  * useEffect(() => {
  *     if (value === undefined || value === editorValue) { return; }
+ *     const strippedValue = typeof value === 'string' && value.startsWith('=') ? value.substring(1) : value;
  *     setIsLocalUpdate(false);
- *     setEditorValue(value);
+ *     setEditorValue(strippedValue);
  * }, [value, editorValue]);
  */
 const computeEditorSync = ({editorValue, value}: EditorSyncInputType): EditorSyncResultType => {
@@ -46,8 +55,10 @@ const computeEditorSync = ({editorValue, value}: EditorSyncInputType): EditorSyn
         return result;
     }
 
+    const strippedValue = stripFormulaPrefix(value);
+
     result.isLocalUpdate = false;
-    result.editorValue = value;
+    result.editorValue = typeof strippedValue === 'string' ? strippedValue : value;
 
     return result;
 };
@@ -161,6 +172,75 @@ describe('PropertyMentionsInputEditor value prop sync effect', () => {
 
             expect(externalUpdate.editorValue).toBe('new value');
             expect(externalUpdate.isLocalUpdate).toBe(false);
+        });
+    });
+
+    describe('formula mode `=` prefix stripping', () => {
+        it('should strip `=` prefix from formula mode initialization', () => {
+            const value = '=3+3';
+            const initialEditorValue = stripFormulaPrefix(value);
+
+            expect(initialEditorValue).toBe('3+3');
+        });
+
+        it('should not strip when value does not start with `=`', () => {
+            const value = 'normalValue';
+            const initialEditorValue = stripFormulaPrefix(value);
+
+            expect(initialEditorValue).toBe('normalValue');
+        });
+
+        it('should handle `=` only (empty expression body)', () => {
+            const value = '=';
+            const initialEditorValue = stripFormulaPrefix(value);
+
+            expect(initialEditorValue).toBe('');
+        });
+
+        it('should not strip from non-string values', () => {
+            const value = 42 as string | number | undefined;
+            const initialEditorValue = stripFormulaPrefix(value);
+
+            expect(initialEditorValue).toBe(42);
+        });
+
+        it('should not strip from undefined', () => {
+            const value = undefined;
+            const initialEditorValue = stripFormulaPrefix(value);
+
+            expect(initialEditorValue).toBeUndefined();
+        });
+
+        it('should strip `=` prefix during external sync', () => {
+            const result = computeEditorSync({
+                editorValue: 'old',
+                isLocalUpdate: false,
+                value: '=expression()',
+            });
+
+            expect(result.editorValue).toBe('expression()');
+            expect(result.isLocalUpdate).toBe(false);
+        });
+
+        it('should strip `=` prefix from formula expression on external update', () => {
+            const result = computeEditorSync({
+                editorValue: '3+3',
+                isLocalUpdate: true,
+                value: '=5+5',
+            });
+
+            expect(result.editorValue).toBe('5+5');
+            expect(result.isLocalUpdate).toBe(false);
+        });
+
+        it('should not strip `=` from ${interpolation} values', () => {
+            const result = computeEditorSync({
+                editorValue: 'old',
+                isLocalUpdate: false,
+                value: '${datapill}',
+            });
+
+            expect(result.editorValue).toBe('${datapill}');
         });
     });
 });

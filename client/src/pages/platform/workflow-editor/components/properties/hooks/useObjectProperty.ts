@@ -261,6 +261,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
                     ...matchingProperty,
                     controlType: matchingPropertyControlType,
                     defaultValue: parameterKeyValue,
+                    expressionEnabled: matchingProperty.expressionEnabled ?? matchingPropertyType !== 'STRING',
                     type: matchingPropertyType,
                 } as PropertyAllType;
             } else {
