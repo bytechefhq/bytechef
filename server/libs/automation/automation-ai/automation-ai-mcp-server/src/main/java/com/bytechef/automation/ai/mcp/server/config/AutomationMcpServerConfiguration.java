@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.ai.mcp.server.config;
 
-import static com.bytechef.platform.job.sync.executor.JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR;
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -141,8 +140,7 @@ public class AutomationMcpServerConfiguration {
         ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, evaluator, jobService, -1,
-            role -> (role == COORDINATOR) ? asyncMessageBroker : new AsyncMessageBroker(environment),
+            contextService, evaluator, jobService, -1, asyncMessageBroker,
             getAdditionalApplicationEventListeners(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
             getTaskCompletionHandlerFactories(
