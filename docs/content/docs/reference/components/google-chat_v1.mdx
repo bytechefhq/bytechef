@@ -74,81 +74,6 @@ Creation of OAuth 2.0 application is documented [here](/reference/components/goo
 ## Actions
 
 
-### Create Message
-Name: createMessage
-
-`Creates a new message in selected space.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| spaceName | Space Name | STRING | Name of the space in which the message will be created. | true |
-| text | Message Text | STRING | Text of the message. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Create Message",
-  "name" : "createMessage",
-  "parameters" : {
-    "spaceName" : "",
-    "text" : ""
-  },
-  "type" : "googleChat/v1/createMessage"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| name | STRING | Name of the message that was created. |
-| sender | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(type)&#125; </details> | Sender of the message. |
-| createTime | STRING | Time when the message was created. |
-| text | STRING | Text of the message. |
-| thread | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name)&#125; </details> |  |
-| space | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name)&#125; </details> |  |
-| argumentText | STRING |  |
-| formattedText | STRING |  |
-
-
-
-
-#### Output Example
-```json
-{
-  "name" : "",
-  "sender" : {
-    "name" : "",
-    "type" : ""
-  },
-  "createTime" : "",
-  "text" : "",
-  "thread" : {
-    "name" : ""
-  },
-  "space" : {
-    "name" : ""
-  },
-  "argumentText" : "",
-  "formattedText" : ""
-}
-```
-
-#### Find Space Name
-
-To find the Space Name, click [here](/reference/components/google-chat_v1#how-to-find-space-name)
-
-
-
 ### Create Space
 Name: createSpace
 
@@ -216,6 +141,78 @@ Type: OBJECT
   },
   "customer" : "",
   "spaceUri" : ""
+}
+```
+
+
+
+
+### Send Space Message
+Name: sendSpaceMessage
+
+`Sends a new message in selected space.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| spaceName | Space Name | STRING | Name of the space in which the message will be sent. | true |
+| text | Message Text | STRING | Text of the message. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Space Message",
+  "name" : "sendSpaceMessage",
+  "parameters" : {
+    "spaceName" : "",
+    "text" : ""
+  },
+  "type" : "googleChat/v1/sendSpaceMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING | Name of the message that was sent. |
+| sender | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(type)&#125; </details> | Sender of the message. |
+| createTime | STRING | Time when the message was sent. |
+| text | STRING | Text of the message. |
+| thread | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name)&#125; </details> |  |
+| space | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name)&#125; </details> |  |
+| argumentText | STRING |  |
+| formattedText | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "name" : "",
+  "sender" : {
+    "name" : "",
+    "type" : ""
+  },
+  "createTime" : "",
+  "text" : "",
+  "thread" : {
+    "name" : ""
+  },
+  "space" : {
+    "name" : ""
+  },
+  "argumentText" : "",
+  "formattedText" : ""
 }
 ```
 
