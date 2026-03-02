@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.tool.FromAiResult;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class AbstractToolFacadeTest {
 
     @Mock
@@ -105,8 +108,55 @@ class AbstractToolFacadeTest {
         List<FromAiResult> results = toolFacade.extractFromAiResults(Map.of("param", directResult));
 
         assertEquals(1, results.size());
-        assertEquals("directParam", results.getFirst()
+
+        FromAiResult firstResult = results.getFirst();
+
+        assertEquals("directParam", firstResult.name());
+    }
+
+    @Test
+    void testExtractFromAiResultsWithMapConvertibleToFromAiResult() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        Map<String, Object> fromAiResultMap = new LinkedHashMap<>();
+
+        fromAiResultMap.put("name", "mapParam");
+        fromAiResultMap.put("description", "A map-based param");
+        fromAiResultMap.put("type", "STRING");
+        fromAiResultMap.put("defaultValue", null);
+
+        List<FromAiResult> results = toolFacade.extractFromAiResults(Map.of("param", fromAiResultMap));
+
+        assertEquals(1, results.size());
+        assertEquals("mapParam", results.getFirst()
             .name());
+        assertEquals("A map-based param", results.getFirst()
+            .description());
+    }
+
+    @Test
+    void testExtractFromAiResultsWithMapConvertibleToFromAiResultDeduplicatesWithDirectResult() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        FromAiResult directResult = new FromAiResult("sharedName", "Direct", "STRING", null);
+
+        Map<String, Object> fromAiResultMap = new LinkedHashMap<>();
+
+        fromAiResultMap.put("name", "sharedName");
+        fromAiResultMap.put("description", "From map");
+        fromAiResultMap.put("type", "STRING");
+        fromAiResultMap.put("defaultValue", null);
+
+        Map<String, Object> parameters = new LinkedHashMap<>();
+
+        parameters.put("first", directResult);
+        parameters.put("second", fromAiResultMap);
+
+        List<FromAiResult> results = toolFacade.extractFromAiResults(parameters);
+
+        assertEquals(1, results.size());
+        assertEquals("Direct", results.getFirst()
+            .description());
     }
 
     @Test
@@ -157,6 +207,54 @@ class AbstractToolFacadeTest {
         FromAiResult fromAiResult = new FromAiResult("subject", null, "STRING", null);
 
         Object result = toolFacade.resolveParameterValue(fromAiResult, Map.of());
+
+        assertNull(result);
+    }
+
+    @Test
+    void testResolveParameterValueWithMapConvertibleToFromAiResult() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        Map<String, Object> fromAiResultMap = new LinkedHashMap<>();
+
+        fromAiResultMap.put("name", "subject");
+        fromAiResultMap.put("description", null);
+        fromAiResultMap.put("type", "STRING");
+        fromAiResultMap.put("defaultValue", null);
+
+        Object result = toolFacade.resolveParameterValue(fromAiResultMap, Map.of("subject", "Resolved Value"));
+
+        assertEquals("Resolved Value", result);
+    }
+
+    @Test
+    void testResolveParameterValueWithMapConvertibleToFromAiResultFallsBackToDefault() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        Map<String, Object> fromAiResultMap = new LinkedHashMap<>();
+
+        fromAiResultMap.put("name", "subject");
+        fromAiResultMap.put("description", null);
+        fromAiResultMap.put("type", "STRING");
+        fromAiResultMap.put("defaultValue", "fallback");
+
+        Object result = toolFacade.resolveParameterValue(fromAiResultMap, Map.of());
+
+        assertEquals("fallback", result);
+    }
+
+    @Test
+    void testResolveParameterValueWithMapConvertibleToFromAiResultReturnsNullWhenNoDefault() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        Map<String, Object> fromAiResultMap = new LinkedHashMap<>();
+
+        fromAiResultMap.put("name", "subject");
+        fromAiResultMap.put("description", null);
+        fromAiResultMap.put("type", "STRING");
+        fromAiResultMap.put("defaultValue", null);
+
+        Object result = toolFacade.resolveParameterValue(fromAiResultMap, Map.of());
 
         assertNull(result);
     }
