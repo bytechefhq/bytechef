@@ -102,7 +102,7 @@ const useWorkflowEditorCanvas = ({
 
     const nodeTypes = useMemo(
         () => ({
-            aiAgentNode: AiAgentNode,
+            clusterRoot: AiAgentNode,
             placeholder: PlaceholderNode,
             readonly: ReadOnlyNode,
             readonlyPlaceholder: ReadOnlyPlaceholderNode,

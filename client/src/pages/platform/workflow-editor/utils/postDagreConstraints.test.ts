@@ -682,7 +682,7 @@ describe('centerNodesAfterBottomGhost', () => {
             position: {x: 300, y: 500},
             type: 'taskDispatcherBottomGhostNode',
         };
-        const aiAgentNode: Node = {
+        const clusterRootNode: Node = {
             data: {
                 clusterElements: {tools: ['tool_1']},
                 clusterRoot: true,
@@ -690,9 +690,9 @@ describe('centerNodesAfterBottomGhost', () => {
             },
             id: 'aiAgent_1',
             position: {x: 500, y: 600},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
-        const allNodes = [dispatcher, bottomGhost, aiAgentNode];
+        const allNodes = [dispatcher, bottomGhost, clusterRootNode];
         const edges = [
             {
                 id: 'condition_1-condition-bottom-ghost=>aiAgent_1',
@@ -705,7 +705,7 @@ describe('centerNodesAfterBottomGhost', () => {
         centerNodesAfterBottomGhost(allNodes, edges, {crossAxis: 'x', crossAxisSize: NODE_WIDTH, direction: 'TB'});
 
         // AI Agent cluster root offset is -85 in TB mode
-        expect(aiAgentNode.position.x).toBe(300 + -85);
+        expect(clusterRootNode.position.x).toBe(300 + -85);
     });
 
     it('should apply LR cluster root cross offset for AI Agent nodes', () => {
@@ -721,7 +721,7 @@ describe('centerNodesAfterBottomGhost', () => {
             position: {x: 500, y: 300},
             type: 'taskDispatcherBottomGhostNode',
         };
-        const aiAgentNode: Node = {
+        const clusterRootNode: Node = {
             data: {
                 clusterElements: {tools: ['tool_1']},
                 clusterRoot: true,
@@ -729,9 +729,9 @@ describe('centerNodesAfterBottomGhost', () => {
             },
             id: 'aiAgent_1',
             position: {x: 600, y: 500},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
-        const allNodes = [dispatcher, bottomGhost, aiAgentNode];
+        const allNodes = [dispatcher, bottomGhost, clusterRootNode];
         const edges = [
             {
                 id: 'condition_1-condition-bottom-ghost=>aiAgent_1',
@@ -744,7 +744,7 @@ describe('centerNodesAfterBottomGhost', () => {
         centerNodesAfterBottomGhost(allNodes, edges, {crossAxis: 'y', crossAxisSize: NODE_WIDTH, direction: 'LR'});
 
         // AI Agent cluster root offset is -23 in LR mode
-        expect(aiAgentNode.position.y).toBe(300 + -23);
+        expect(clusterRootNode.position.y).toBe(300 + -23);
     });
 
     it('should skip centering when dispatcher has saved position', () => {
@@ -2330,7 +2330,7 @@ describe('alignChainNodesCrossAxis', () => {
             },
             id: 'aiAgent_1',
             position: {x: 500, y: 400},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
         const regularNode: Node = {
             data: {componentName: 'httpClient', workflowNodeName: 'httpClient_1'},
@@ -2358,7 +2358,7 @@ describe('alignChainNodesCrossAxis', () => {
             position: {x: 500, y: 400},
             type: 'workflow',
         };
-        const aiAgentNode: Node = {
+        const clusterRootNode: Node = {
             data: {
                 clusterElements: {tool_1: {label: 'Tool 1'}},
                 clusterRoot: true,
@@ -2367,10 +2367,10 @@ describe('alignChainNodesCrossAxis', () => {
             },
             id: 'aiAgent_1',
             position: {x: 800, y: 700},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
         const edges: Edge[] = [{id: 'httpClient_1=>aiAgent_1', source: 'httpClient_1', target: 'aiAgent_1'}];
-        const allNodes = [savedNode, aiAgentNode];
+        const allNodes = [savedNode, clusterRootNode];
 
         alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
 
@@ -2552,7 +2552,7 @@ describe('alignChainNodesCrossAxis', () => {
             position: {x: 500, y: 400},
             type: 'workflow',
         };
-        const aiAgentNode: Node = {
+        const clusterRootNode: Node = {
             data: {
                 clusterElements: {tool_1: {label: 'Tool 1'}, tool_2: {label: 'Tool 2'}},
                 clusterRoot: true,
@@ -2561,10 +2561,10 @@ describe('alignChainNodesCrossAxis', () => {
             },
             id: 'aiAgent_1',
             position: {x: 1000, y: 600},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
         const edges: Edge[] = [{id: 'httpClient_1=>aiAgent_1', source: 'httpClient_1', target: 'aiAgent_1'}];
-        const allNodes = [savedNode, aiAgentNode];
+        const allNodes = [savedNode, clusterRootNode];
 
         alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
 
@@ -2583,7 +2583,7 @@ describe('alignChainNodesCrossAxis', () => {
             },
             id: 'aiAgent_1',
             position: {x: 415, y: 400},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
         const regularNode: Node = {
             data: {componentName: 'httpClient', workflowNodeName: 'httpClient_1'},
@@ -2611,7 +2611,7 @@ describe('alignChainNodesCrossAxis', () => {
             position: {x: 400, y: 300},
             type: 'workflow',
         };
-        const aiAgentNode: Node = {
+        const clusterRootNode: Node = {
             data: {
                 clusterElements: {tool_1: {label: 'Tool 1'}},
                 clusterRoot: true,
@@ -2620,10 +2620,10 @@ describe('alignChainNodesCrossAxis', () => {
             },
             id: 'aiAgent_1',
             position: {x: 600, y: 500},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
         const edges: Edge[] = [{id: 'httpClient_1=>aiAgent_1', source: 'httpClient_1', target: 'aiAgent_1'}];
-        const allNodes = [savedNode, aiAgentNode];
+        const allNodes = [savedNode, clusterRootNode];
 
         alignChainNodesCrossAxis(allNodes, edges, 'y', 'LR');
 
@@ -2642,7 +2642,7 @@ describe('alignChainNodesCrossAxis', () => {
             },
             id: 'aiAgent_1',
             position: {x: 500, y: 400},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
         const secondAiAgent: Node = {
             data: {
@@ -2653,7 +2653,7 @@ describe('alignChainNodesCrossAxis', () => {
             },
             id: 'aiAgent_2',
             position: {x: 1000, y: 600},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
         const edges: Edge[] = [{id: 'aiAgent_1=>aiAgent_2', source: 'aiAgent_1', target: 'aiAgent_2'}];
         const allNodes = [savedAiAgent, secondAiAgent];
@@ -2684,7 +2684,7 @@ describe('alignChainNodesCrossAxis', () => {
             },
             id: 'aiAgent_1',
             position: {x: 1000, y: 600},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
         const edges: Edge[] = [{id: 'httpClient_1=>aiAgent_1', source: 'httpClient_1', target: 'aiAgent_1'}];
         const allNodes = [savedNode, aiAgentNoCluster];
@@ -2902,7 +2902,7 @@ describe('alignTrailingPlaceholder', () => {
     });
 
     it('should use wider gap for AI agent predecessor with cluster elements in LR mode', () => {
-        const aiAgentNode: Node = {
+        const clusterRootNode: Node = {
             data: {
                 clusterElements: {tools: ['tool_1']},
                 componentName: 'aiAgent',
@@ -2910,7 +2910,7 @@ describe('alignTrailingPlaceholder', () => {
             },
             id: 'aiAgent_1',
             position: {x: 100, y: 300},
-            type: 'aiAgentNode',
+            type: 'clusterRoot',
         };
         const trailingPlaceholder: Node = {
             data: {label: '+'},
@@ -2919,7 +2919,7 @@ describe('alignTrailingPlaceholder', () => {
             type: 'placeholder',
         };
         const edges: Edge[] = [{id: 'aiAgent_1=>final', source: 'aiAgent_1', target: 'final-placeholder'}];
-        const allNodes = [aiAgentNode, trailingPlaceholder];
+        const allNodes = [clusterRootNode, trailingPlaceholder];
 
         alignTrailingPlaceholder(allNodes, edges, 'y', 'LR');
 

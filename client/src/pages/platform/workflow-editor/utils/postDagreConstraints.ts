@@ -1462,18 +1462,18 @@ function computeMainAxisGap(predecessorNode: Node, currentNode: Node, direction:
     return getTBDagreHeight(predecessorNode) / 2 + RANKSEP + getTBDagreHeight(currentNode) / 2;
 }
 
-const AI_AGENT_NODE_HEIGHT = 150;
+const CLUSTER_ROOT_NODE_HEIGHT = 150;
 
 function getTBDagreHeight(node: Node): number {
-    if (node.type === 'aiAgentNode') {
-        return AI_AGENT_NODE_HEIGHT;
+    if (node.type === 'clusterRoot') {
+        return CLUSTER_ROOT_NODE_HEIGHT;
     }
 
     return NODE_HEIGHT;
 }
 
 function getLRDagreWidth(node: Node): number {
-    if (node.type === 'aiAgentNode') {
+    if (node.type === 'clusterRoot') {
         const nodeData = node.data as NodeDataType;
         const hasClusterElements =
             nodeData.clusterElements &&
@@ -1488,7 +1488,7 @@ function getLRDagreWidth(node: Node): number {
 }
 
 function getLRRenderedWidth(node: Node): number {
-    if (node.type === 'aiAgentNode') {
+    if (node.type === 'clusterRoot') {
         const nodeData = node.data as NodeDataType;
         const hasClusterElements =
             nodeData.clusterElements &&
