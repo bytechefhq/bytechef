@@ -18,6 +18,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -187,6 +188,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder workflowService(final WorkflowService workflowService) {
             this.workflowService = workflowService;
 
