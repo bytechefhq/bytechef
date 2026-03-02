@@ -161,6 +161,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     <WorkflowNodesTabs
                         actionComponentDefinitions={filteredActionComponentDefinitions}
                         clusterElementComponentDefinitions={filteredClusterElementComponentDefinitions}
+                        clusterElementType={clusterElementType}
                         hideActionComponents={hideActionComponents}
                         hideClusterElementComponents={hideClusterElementComponents}
                         hideTaskDispatchers={hideTaskDispatchers}
