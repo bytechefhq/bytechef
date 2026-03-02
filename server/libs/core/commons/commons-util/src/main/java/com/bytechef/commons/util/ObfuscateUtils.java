@@ -63,10 +63,16 @@ public class ObfuscateUtils {
 
         map.forEach(
             (key, valueIn) -> {
-                int secureVisibleLength = getSecureVisibleLength(String.valueOf(key), visibleLength);
-
                 obfuscatedMap.computeIfAbsent(
-                    key, k -> obfuscate(String.valueOf(valueIn), maxLength, secureVisibleLength));
+                    key, k -> {
+                        if (SECURITY_INSENSITIVE_KEYS.contains(key)) {
+                            return String.valueOf(valueIn);
+                        }
+
+                        int secureVisibleLength = getSecureVisibleLength(key, visibleLength);
+
+                        return obfuscate(String.valueOf(valueIn), maxLength, secureVisibleLength);
+                    });
 
             });
 
@@ -90,5 +96,7 @@ public class ObfuscateUtils {
     }
 
     private static final String SENSITIVE_KEYS = "password";
+    private static final String SECURITY_INSENSITIVE_KEYS =
+        "authorizationUrl,authorizationType,headerPrefix,refreshUrl,scopes,tokenUrl";
 
 }
