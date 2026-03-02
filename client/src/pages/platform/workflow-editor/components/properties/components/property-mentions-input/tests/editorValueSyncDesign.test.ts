@@ -175,6 +175,76 @@ describe('PropertyMentionsInputEditor value prop sync effect', () => {
         });
     });
 
+    describe('datapill insertion protection (ref-based sync)', () => {
+        /**
+         * Models the ref-based sync approach: the sync effect only fires when the
+         * `value` prop changes (not when `editorValue` changes locally). It compares
+         * `value` against `editorValueRef.current` (which always tracks the latest
+         * editorValue) to avoid overwriting in-flight datapill insertions.
+         *
+         * Previous behavior: sync depended on [value, editorValue], so a local
+         * editorValue change (from onUpdate after datapill drop) would trigger the
+         * sync and overwrite the local value with the stale `value` prop.
+         */
+        const shouldSyncOverwrite = (
+            valueProp: string | undefined,
+            editorValueRefCurrent: string,
+            valuePropChanged: boolean
+        ): boolean => {
+            if (!valuePropChanged) {
+                return false;
+            }
+
+            if (valueProp === undefined || valueProp === editorValueRefCurrent) {
+                return false;
+            }
+
+            return true;
+        };
+
+        it('should NOT overwrite when only editorValue changed locally (datapill inserted)', () => {
+            // Scenario: user drops datapill → editorValue updates to "${trigger_email}"
+            // but value prop is still "" (save hasn't completed yet)
+            const overwrite = shouldSyncOverwrite(
+                '',
+                '${trigger_email}',
+                false // value prop did NOT change, only editorValue changed
+            );
+
+            expect(overwrite).toBe(false);
+        });
+
+        it('should NOT overwrite when save completes and value matches editorValue', () => {
+            // After save: value prop updates to "${trigger_email}", editorValue is already "${trigger_email}"
+            const overwrite = shouldSyncOverwrite(
+                '${trigger_email}',
+                '${trigger_email}',
+                true // value prop changed (from "" to "${trigger_email}")
+            );
+
+            expect(overwrite).toBe(false);
+        });
+
+        it('should overwrite when value prop changes to a genuinely different external value', () => {
+            // External update: another source changes the value
+            const overwrite = shouldSyncOverwrite('${different_datapill}', '${trigger_email}', true);
+
+            expect(overwrite).toBe(true);
+        });
+
+        it('should NOT overwrite when value prop is undefined', () => {
+            const overwrite = shouldSyncOverwrite(undefined, '${trigger_email}', true);
+
+            expect(overwrite).toBe(false);
+        });
+
+        it('should overwrite when value prop clears the field externally', () => {
+            const overwrite = shouldSyncOverwrite('', '${trigger_email}', true);
+
+            expect(overwrite).toBe(true);
+        });
+    });
+
     describe('formula mode `=` prefix stripping', () => {
         it('should strip `=` prefix from formula mode initialization', () => {
             const value = '=3+3';
