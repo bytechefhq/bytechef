@@ -58,6 +58,7 @@ const ClusterElementsCanvasDialog = ({
         handleToggleEditor,
         isAiAgentClusterRoot,
         isDataStreamClusterRoot,
+        isDataStreamSimpleModeAvailable,
     } = useClusterElementsCanvasDialog({
         onOpenChange,
     });
@@ -100,14 +101,14 @@ const ClusterElementsCanvasDialog = ({
                         <div className="flex size-full flex-col rounded-lg bg-surface-popover-canvas">
                             {(isAiAgentClusterRoot || isDataStreamClusterRoot) && (
                                 <ClusterElementsWorkflowEditorHeader
-                                    className={twMerge(
-                                        workflowNodeDetailsPanelOpen && 'pr-[470px]',
-                                        workflowNodeDetailsPanelOpen && copilotPanelOpen && 'pr-[920px]'
-                                    )}
                                     copilotEnabled={ff_4070 && copilotEnabled}
                                     onCopilotClick={handleCopilotClick}
                                     onTestClick={handleTestClick}
                                     onToggleEditor={handleToggleEditor}
+                                    showToggleEditor={
+                                        isAiAgentClusterRoot ||
+                                        (isDataStreamClusterRoot && isDataStreamSimpleModeAvailable)
+                                    }
                                 />
                             )}
 
