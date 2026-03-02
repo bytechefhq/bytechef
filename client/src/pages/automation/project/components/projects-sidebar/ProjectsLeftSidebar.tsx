@@ -141,8 +141,8 @@ const ProjectsLeftSidebar = ({
     }, [selectedProjectId]);
 
     return (
-        <aside className="flex h-full min-w-96 flex-col items-center gap-2 bg-surface-main pt-3">
-            <div className="mx-4 flex w-80 flex-col gap-2">
+        <aside className="flex h-full min-w-[355px] flex-col items-center gap-2 bg-surface-main px-4 pt-3">
+            <div className="flex w-full flex-col gap-2">
                 {projectsLoading ? (
                     <div className="flex items-center gap-2">
                         <Skeleton className="h-9 flex-1 rounded-md" />
@@ -275,7 +275,7 @@ const ProjectsLeftSidebar = ({
                 </ButtonGroup>
             </div>
 
-            <ScrollArea className="mb-3 h-screen w-full overflow-y-auto px-4">
+            <ScrollArea className="mb-3 h-screen w-full overflow-y-auto">
                 {isLoading && <WorkflowsListSkeleton />}
 
                 {!isLoading && (

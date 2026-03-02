@@ -57,18 +57,20 @@ const Project = () => {
             <WorkflowTestRunLeaveDialog onCancel={cancelLeave} onConfirm={confirmLeave} open={showLeaveDialog} />
 
             {projects && (
-                <div
-                    className={twMerge(
-                        'shrink-0 overflow-hidden transition-[width,visibility] duration-300 ease-out',
-                        projectLeftSidebarOpen ? 'visible w-96' : 'invisible w-0'
-                    )}
-                >
-                    <ProjectsLeftSidebar
-                        bottomResizablePanelRef={bottomResizablePanelRef}
-                        currentWorkflowId={workflow.id!}
-                        onProjectClick={handleProjectClick}
-                        projectId={projectId}
-                    />
+                <div className="shrink-0 overflow-hidden">
+                    <div
+                        className={twMerge(
+                            'w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
+                            projectLeftSidebarOpen ? 'ml-0 opacity-100' : '-ml-[355px] opacity-0'
+                        )}
+                    >
+                        <ProjectsLeftSidebar
+                            bottomResizablePanelRef={bottomResizablePanelRef}
+                            currentWorkflowId={workflow.id!}
+                            onProjectClick={handleProjectClick}
+                            projectId={projectId}
+                        />
+                    </div>
                 </div>
             )}
 
