@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.511898+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-02T17:00:01.590461885+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
 public class JobModel {
 
   private @Nullable String createdBy;
@@ -623,7 +623,7 @@ public class JobModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
+  private String toIndentedString(@Nullable Object o) {
     if (o == null) {
       return "null";
     }
