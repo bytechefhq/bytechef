@@ -161,24 +161,16 @@ const Property = ({
         return <></>;
     }
 
-    if (displayCondition && isDisplayConditionsPending && type !== 'ARRAY' && type !== 'OBJECT') {
-        return (
-            <div className={twMerge('flex flex-col space-y-1', objectName && 'ml-2 mt-1')}>
-                <Skeleton className="h-5 w-1/4" />
-
-                <Skeleton className="h-9 w-full" />
-            </div>
-        );
-    }
-
-    if (
-        displayConditionsQuery &&
+    const isLoadingDisplayCondition =
         displayCondition &&
-        currentComponent?.displayConditions?.[displayCondition] &&
-        (isFetchingCurrentDisplayCondition || isDisplayConditionsPending) &&
         type !== 'ARRAY' &&
-        type !== 'OBJECT'
-    ) {
+        type !== 'OBJECT' &&
+        (isDisplayConditionsPending ||
+            (displayConditionsQuery &&
+                currentComponent?.displayConditions?.[displayCondition] &&
+                isFetchingCurrentDisplayCondition));
+
+    if (isLoadingDisplayCondition) {
         return (
             <div className={twMerge('flex flex-col space-y-1', objectName && 'ml-2 mt-1')}>
                 <Skeleton className="h-5 w-1/4" />
@@ -615,8 +607,7 @@ const Property = ({
                         !controlledDynamicMode &&
                         controlType === 'SELECT' &&
                         type !== 'BOOLEAN' &&
-                        calculatedPath &&
-                        optionsDataSource && (
+                        calculatedPath && (
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
@@ -633,7 +624,7 @@ const Property = ({
                                         }}
                                         label={label || fieldName}
                                         leadingIcon={typeIcon}
-                                        lookupDependsOnPaths={optionsDataSource.optionsLookupDependsOn?.map(
+                                        lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
                                             (optionLookupDependency) =>
                                                 optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
                                         )}
@@ -647,48 +638,6 @@ const Property = ({
                                         }}
                                         options={(formattedOptions as Array<Option>) || []}
                                         optionsDataSource={optionsDataSource}
-                                        path={calculatedPath}
-                                        required={required}
-                                        showInputTypeSwitchButton={isToolsClusterElement}
-                                        value={fieldValue !== undefined ? fieldValue : selectValue}
-                                        workflowId={workflow.id || ''}
-                                        workflowNodeName={currentNode?.name || ''}
-                                    />
-                                )}
-                                rules={{required}}
-                            />
-                        )}
-
-                    {control &&
-                        !controlledDynamicMode &&
-                        controlType === 'SELECT' &&
-                        type !== 'BOOLEAN' &&
-                        calculatedPath &&
-                        !optionsDataSource && (
-                            <Controller
-                                control={control}
-                                defaultValue={defaultValue}
-                                name={calculatedPath}
-                                render={({field: {name: fieldName, onBlur, onChange, value: fieldValue}}) => (
-                                    <PropertyComboBox
-                                        arrayIndex={arrayIndex}
-                                        defaultValue={defaultValue}
-                                        deletePropertyButton={deletePropertyButton}
-                                        description={description}
-                                        handleInputTypeSwitchButtonClick={() => {
-                                            onChange('=');
-                                            handleControlledModeSwitch(true);
-                                        }}
-                                        label={label || fieldName}
-                                        leadingIcon={typeIcon}
-                                        name={fieldName}
-                                        onBlur={onBlur}
-                                        onValueChange={(value) => {
-                                            onChange(value);
-
-                                            setSelectValue(value);
-                                        }}
-                                        options={(formattedOptions as Array<Option>) || []}
                                         path={calculatedPath}
                                         required={required}
                                         showInputTypeSwitchButton={isToolsClusterElement}
@@ -865,7 +814,7 @@ const Property = ({
                             lookupDependsOnValues={lookupDependsOnValues}
                             name={name}
                             onValueChange={(value: string) => handleSelectChange(value, name!)}
-                            options={(formattedOptions as Array<Option>) || undefined || []}
+                            options={(formattedOptions as Array<Option>) || []}
                             optionsDataSource={optionsDataSource}
                             path={calculatedPath}
                             required={required}
