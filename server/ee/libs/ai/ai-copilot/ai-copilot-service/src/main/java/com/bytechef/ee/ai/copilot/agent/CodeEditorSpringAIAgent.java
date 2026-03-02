@@ -155,11 +155,11 @@ public class CodeEditorSpringAIAgent extends SpringAIAgent {
 
         public Builder messages(List<BaseMessage> messages) {
             super.messages(messages);
+
             return this;
         }
 
         public CodeEditorSpringAIAgent build() throws AGUIException {
-            this.systemMessage("");
 
             return new CodeEditorSpringAIAgent(this);
         }
