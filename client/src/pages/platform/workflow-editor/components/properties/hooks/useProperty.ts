@@ -541,6 +541,30 @@ export const useProperty = ({
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         const {value} = event.target;
 
+        if (isNumericalInput && value && value.startsWith('=') && expressionEnabled) {
+            setMentionInput(true);
+            setIsFormulaMode(true);
+
+            const expressionContent = value.substring(1);
+
+            setMentionInputValue(expressionContent);
+
+            setTimeout(() => {
+                if (editorRef.current) {
+                    editorRef.current.commands.setContent(expressionContent);
+                    editorRef.current.commands.focus();
+
+                    setFocusedInput(editorRef.current);
+
+                    if (workflowNodeDetailsPanelOpen) {
+                        setDataPillPanelOpen(true);
+                    }
+                }
+            }, 50);
+
+            return;
+        }
+
         if (isNumericalInput && value) {
             const numericValue = parseFloat(value);
 

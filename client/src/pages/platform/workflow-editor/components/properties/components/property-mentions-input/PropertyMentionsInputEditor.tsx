@@ -90,7 +90,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         },
         ref: ForwardedRef<Editor>
     ) => {
-        const [editorValue, setEditorValue] = useState<string | number | undefined>(value);
+        const [editorValue, setEditorValue] = useState<string | number | undefined>(
+            typeof value === 'string' && value.startsWith('=') ? value.substring(1) : value
+        );
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
@@ -582,8 +584,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 return;
             }
 
+            const strippedValue = typeof value === 'string' && value.startsWith('=') ? value.substring(1) : value;
+
             setIsLocalUpdate(false);
-            setEditorValue(value);
+            setEditorValue(strippedValue);
         }, [value, editorValue]);
 
         // Sync ref when editor changes - handle both callback and object refs
