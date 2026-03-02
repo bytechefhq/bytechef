@@ -499,6 +499,16 @@ components:
           description: "The type of the task."
           type: "string"
           readOnly: true
+        children:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TaskExecution"
+        iterations:
+          type: "array"
+          items:
+            type: "array"
+            items:
+              $ref: "#/components/schemas/TaskExecution"
     TriggerExecution:
       description: "Adds execution semantics to a trigger."
       type: "object"
