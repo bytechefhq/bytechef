@@ -1,6 +1,7 @@
 import PageLoader from '@/components/PageLoader';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
+import {WIDTHS} from '@/shared/theme/constants';
 import {ReactFlowProvider} from '@xyflow/react';
 import {Suspense, lazy} from 'react';
 
@@ -45,6 +46,7 @@ const ReadOnlyWorkflowSheet = () => {
                             <Suspense>
                                 <WorkflowEditor
                                     componentDefinitions={componentDefinitions}
+                                    customCanvasWidth={WIDTHS.WORKFLOW_READ_ONLY_SHEET_WIDTH}
                                     invalidateWorkflowQueries={() => {}}
                                     readOnlyWorkflow={workflow}
                                     taskDispatcherDefinitions={taskDispatcherDefinitions}
