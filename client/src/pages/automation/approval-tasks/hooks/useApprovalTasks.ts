@@ -5,6 +5,7 @@ import {
     useUsersQuery,
 } from '@/shared/middleware/graphql';
 import {useCallback, useEffect, useMemo} from 'react';
+import {useShallow} from 'zustand/shallow';
 
 import {useApprovalTasksStore} from '../stores/useApprovalTasksStore';
 import {getAvailableAssignees, getCurrentTimestamp} from '../utils/approval-task-utils';
@@ -27,13 +28,25 @@ export interface UseApprovalTasksReturnI {
 }
 
 export function useApprovalTasks(): UseApprovalTasksReturnI {
-    const approvalTasks = useApprovalTasksStore((state) => state.approvalTasks);
-    const selectedApprovalTaskId = useApprovalTasksStore((state) => state.selectedApprovalTaskId);
-    const setSelectedApprovalTaskId = useApprovalTasksStore((state) => state.setSelectedApprovalTaskId);
-    const storeUpdateApprovalTask = useApprovalTasksStore((state) => state.updateApprovalTask);
-    const storeAddComment = useApprovalTasksStore((state) => state.addComment);
-    const storeAddAttachment = useApprovalTasksStore((state) => state.addAttachment);
-    const storeRemoveAttachment = useApprovalTasksStore((state) => state.removeAttachment);
+    const {
+        addAttachment: storeAddAttachment,
+        addComment: storeAddComment,
+        approvalTasks,
+        removeAttachment: storeRemoveAttachment,
+        selectedApprovalTaskId,
+        setSelectedApprovalTaskId,
+        updateApprovalTask: storeUpdateApprovalTask,
+    } = useApprovalTasksStore(
+        useShallow((state) => ({
+            addAttachment: state.addAttachment,
+            addComment: state.addComment,
+            approvalTasks: state.approvalTasks,
+            removeAttachment: state.removeAttachment,
+            selectedApprovalTaskId: state.selectedApprovalTaskId,
+            setSelectedApprovalTaskId: state.setSelectedApprovalTaskId,
+            updateApprovalTask: state.updateApprovalTask,
+        }))
+    );
 
     const {data: approvalTasksData} = useApprovalTasksQuery();
     const {data: usersData} = useUsersQuery();
