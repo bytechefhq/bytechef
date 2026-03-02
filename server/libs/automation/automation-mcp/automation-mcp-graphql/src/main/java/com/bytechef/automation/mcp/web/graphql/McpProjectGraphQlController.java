@@ -106,8 +106,17 @@ public class McpProjectGraphQlController {
         return true;
     }
 
+    @MutationMapping
+    public McpProject updateMcpProject(@Argument long id, @Argument UpdateMcpProjectInput input) {
+        return mcpProjectFacade.updateMcpProject(id, input.selectedWorkflowIds());
+    }
+
     @SuppressFBWarnings("EI")
     public record CreateMcpProjectInput(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record UpdateMcpProjectInput(List<String> selectedWorkflowIds) {
     }
 }
