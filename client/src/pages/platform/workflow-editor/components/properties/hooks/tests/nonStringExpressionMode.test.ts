@@ -171,6 +171,103 @@ describe('non-string expression mode', () => {
         });
     });
 
+    describe('array item Object.keys guard against strings', () => {
+        /**
+         * Replicates the guard in ArrayProperty.tsx that prevents
+         * Object.keys() from being called on string values (which would
+         * return character indices like ["0","1","2","3",...]).
+         */
+        it('should NOT iterate over string character indices', () => {
+            const parameterItemValue = '=3+3+3+3';
+            const isObject = parameterItemValue && typeof parameterItemValue === 'object';
+
+            expect(isObject).toBe(false);
+            expect(Object.keys(parameterItemValue)).toEqual(['0', '1', '2', '3', '4', '5', '6', '7']);
+        });
+
+        it('should iterate over actual object keys', () => {
+            const parameterItemValue = {name: 'test', value: 42};
+            const isObject = parameterItemValue && typeof parameterItemValue === 'object';
+
+            expect(isObject).toBe(true);
+            expect(Object.keys(parameterItemValue)).toEqual(['name', 'value']);
+        });
+
+        it('should NOT iterate over null', () => {
+            const parameterItemValue = null;
+            const isObject = parameterItemValue && typeof parameterItemValue === 'object';
+
+            expect(isObject).toBeFalsy();
+        });
+    });
+
+    describe('formula mode validation with `=` prefix', () => {
+        /**
+         * Replicates the validateBeforeSave logic from saveMentionInputValue.
+         * In formula mode, the value must have `=` prepended BEFORE validation
+         * so that validatePropertyValue recognizes it as an expression.
+         */
+        const validatePropertyValue = (value: string | number, controlType: string): boolean => {
+            const stringValue = typeof value === 'string' ? value : String(value);
+
+            if (typeof value === 'string' && (value.startsWith('=') || value.includes('${'))) {
+                return true;
+            }
+
+            if (controlType === 'INTEGER' && typeof value === 'string' && !/^-?\d+$/.test(stringValue)) {
+                return false;
+            }
+
+            return true;
+        };
+
+        it('should REJECT "3+3" as literal INTEGER (no formula prefix)', () => {
+            expect(validatePropertyValue('3+3', 'INTEGER')).toBe(false);
+        });
+
+        it('should ACCEPT "=3+3" as expression', () => {
+            expect(validatePropertyValue('=3+3', 'INTEGER')).toBe(true);
+        });
+
+        it('should ACCEPT "${datapill}+3" as expression', () => {
+            expect(validatePropertyValue('${datapill}+3', 'INTEGER')).toBe(true);
+        });
+
+        it('should prepend `=` in formula mode before validation', () => {
+            const editorValue = '3+3';
+            const isFormulaMode = true;
+            const valueForValidation =
+                isFormulaMode && typeof editorValue === 'string' && !editorValue.startsWith('=')
+                    ? `=${editorValue}`
+                    : editorValue;
+
+            expect(validatePropertyValue(valueForValidation, 'INTEGER')).toBe(true);
+        });
+
+        it('should not double-prepend `=` if already present', () => {
+            const editorValue = '=3+3';
+            const isFormulaMode = true;
+            const valueForValidation =
+                isFormulaMode && typeof editorValue === 'string' && !editorValue.startsWith('=')
+                    ? `=${editorValue}`
+                    : editorValue;
+
+            expect(valueForValidation).toBe('=3+3');
+        });
+
+        it('should not prepend `=` when not in formula mode', () => {
+            const editorValue = '42';
+            const isFormulaMode = false;
+            const valueForValidation =
+                isFormulaMode && typeof editorValue === 'string' && !editorValue.startsWith('=')
+                    ? `=${editorValue}`
+                    : editorValue;
+
+            expect(valueForValidation).toBe('42');
+            expect(validatePropertyValue(valueForValidation, 'INTEGER')).toBe(true);
+        });
+    });
+
     describe('showInputTypeSwitchButton initialization', () => {
         /**
          * Replicates the useState initializer from useProperty.ts:
