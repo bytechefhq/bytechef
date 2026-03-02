@@ -72,7 +72,7 @@ class SubflowResolverTest {
 
         WorkflowTrigger callableTrigger = mock(WorkflowTrigger.class);
 
-        when(callableTrigger.getType()).thenReturn("workflow/v1/callable");
+        when(callableTrigger.getType()).thenReturn("workflow/v1/newWorkflowCall");
         when(callableTrigger.getName()).thenReturn(TRIGGER_NAME);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
@@ -100,7 +100,7 @@ class SubflowResolverTest {
 
         WorkflowTrigger callableTrigger = mock(WorkflowTrigger.class);
 
-        when(callableTrigger.getType()).thenReturn("workflow/v1/callable");
+        when(callableTrigger.getType()).thenReturn("workflow/v1/newWorkflowCall");
         when(callableTrigger.getName()).thenReturn(TRIGGER_NAME);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {

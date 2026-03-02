@@ -8,7 +8,7 @@
     "description": "Respond and send back data to the calling workflow. Must be the last step in a callable workflow.",
     "help": null,
     "metadata": null,
-    "name": "callableResponse",
+    "name": "responseToWorkflowCall",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
@@ -56,7 +56,7 @@
     } ],
     "resumePerform": null,
     "suspendPerform": null,
-    "title": "Callable Workflow Response",
+    "title": "Response to Workflow Call",
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -67,7 +67,7 @@
     "description": "Respond and send back data to the calling AI model. Must be the last step in a tool callable workflow.",
     "help": null,
     "metadata": null,
-    "name": "toolCallableResponse",
+    "name": "responseToAiModelCall",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
@@ -115,7 +115,7 @@
     } ],
     "resumePerform": null,
     "suspendPerform": null,
-    "title": "Tool Callable Workflow Response",
+    "title": "Response to AI Model Call",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
@@ -142,7 +142,7 @@
     "help": null,
     "listenerDisable": null,
     "listenerEnable": null,
-    "name": "callable",
+    "name": "newWorkflowCall",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
@@ -173,7 +173,7 @@
       "required": null,
       "type": "STRING"
     } ],
-    "title": "Callable",
+    "title": "New Workflow Call",
     "type": "CALLABLE",
     "webhookDisable": null,
     "webhookEnable": null,
@@ -192,7 +192,7 @@
     "help": null,
     "listenerDisable": null,
     "listenerEnable": null,
-    "name": "toolCallable",
+    "name": "newAiModelCall",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
@@ -265,7 +265,7 @@
       "required": null,
       "type": "STRING"
     } ],
-    "title": "Tool Callable",
+    "title": "New AI Model Call",
     "type": "CALLABLE",
     "webhookDisable": null,
     "webhookEnable": null,
