@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.test.facade;
 
+import static com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO.buildHierarchy;
+
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -201,27 +203,33 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         try {
             return new JobDTO(
                 job, getOutputs(job),
-                CollectionUtils.map(
-                    taskExecutionService.getJobTaskExecutions(Validate.notNull(job.getId(), "id")),
-                    taskExecution -> {
-                        Map<String, ?> context = taskFileStorage.readContextValue(
-                            contextService.peek(
-                                Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
-
-                        WorkflowTask workflowTask = taskExecution.getWorkflowTask();
-                        DefinitionResult definitionResult = getDefinition(taskExecution);
-
-                        Object output = taskExecution.getOutput() == null
-                            ? null
-                            : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
-
-                        return new TaskExecutionDTO(
-                            taskExecution, definitionResult.title(), definitionResult.icon(),
-                            workflowTask.evaluateParameters(context, evaluator), output);
-                    }));
+                getJobTaskExecutions(Validate.notNull(job.getId(), "id")));
         } finally {
             jobSyncExecutor.deleteJob(Validate.notNull(job.getId(), "id"));
         }
+    }
+
+    private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {
+        List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
+            taskExecutionService.getJobTaskExecutions(jobId),
+            taskExecution -> {
+                Map<String, ?> context = taskFileStorage.readContextValue(
+                    contextService.peek(
+                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+
+                DefinitionResult definitionResult = getDefinition(taskExecution.getType());
+                WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+                Object output = taskExecution.getOutput() == null
+                    ? null
+                    : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+
+                return new TaskExecutionDTO(
+                    taskExecutionService.getTaskExecution(Validate.notNull(taskExecution.getId(), "id")),
+                    definitionResult.title(), definitionResult.icon(),
+                    workflowTask.evaluateParameters(context, evaluator), output);
+            });
+
+        return buildHierarchy(taskExecutionDTOs);
     }
 
     private JobDTO execute(JobParametersDTO jobParametersDTO) {
@@ -230,8 +238,8 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         return await(jobId);
     }
 
-    private DefinitionResult getDefinition(TaskExecution taskExecution) {
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskExecution.getType());
+    private DefinitionResult getDefinition(String type) {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
         if (componentDefinitionService.hasComponentDefinition(
             workflowNodeType.name(), workflowNodeType.version())) {
