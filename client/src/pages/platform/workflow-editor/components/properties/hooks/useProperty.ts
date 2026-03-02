@@ -184,6 +184,7 @@ export const useProperty = ({
     const inputRef = useRef<HTMLInputElement>(null!);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
+    const mentionInputSyncedRef = useRef(false);
 
     const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore(
@@ -1120,6 +1121,17 @@ export const useProperty = ({
 
         if (typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=')) {
             setMentionInputValue(propertyParameterValue.substring(1));
+        }
+
+        if (
+            mentionInput &&
+            !mentionInputSyncedRef.current &&
+            typeof propertyParameterValue === 'string' &&
+            !propertyParameterValue.startsWith('=') &&
+            propertyParameterValue !== ''
+        ) {
+            setMentionInputValue(propertyParameterValue);
+            mentionInputSyncedRef.current = true;
         }
 
         if (
