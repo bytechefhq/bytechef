@@ -1,0 +1,313 @@
+query clusterElementDefinition($componentName: String!, $componentVersion: Int!, $clusterElementName: String!) {
+    clusterElementDefinition(
+        componentName: $componentName
+        componentVersion: $componentVersion
+        clusterElementName: $clusterElementName
+    ) {
+        componentName
+        componentVersion
+        description
+        name
+        title
+        properties {
+            advancedOption
+            description
+            displayCondition
+            expressionEnabled
+            hidden
+            name
+            required
+            type
+            ... on StringProperty {
+                controlType
+                defaultValue
+                label
+                placeholder
+                options {
+                    description
+                    label
+                    value
+                }
+                optionsDataSource {
+                    optionsLookupDependsOn
+                }
+            }
+            ... on IntegerProperty {
+                controlType
+                integerDefaultValue: defaultValue
+                label
+                placeholder
+                options {
+                    description
+                    label
+                    value
+                }
+                optionsDataSource {
+                    optionsLookupDependsOn
+                }
+            }
+            ... on NumberProperty {
+                controlType
+                label
+                numberDefaultValue: defaultValue
+                placeholder
+                options {
+                    description
+                    label
+                    value
+                }
+                optionsDataSource {
+                    optionsLookupDependsOn
+                }
+            }
+            ... on BooleanProperty {
+                booleanDefaultValue: defaultValue
+                controlType
+                label
+                placeholder
+            }
+            ... on ArrayProperty {
+                arrayDefaultValue: defaultValue
+                controlType
+                label
+                placeholder
+                optionsDataSource {
+                    optionsLookupDependsOn
+                }
+                items {
+                    advancedOption
+                    description
+                    displayCondition
+                    expressionEnabled
+                    hidden
+                    name
+                    required
+                    type
+                    ... on StringProperty {
+                        controlType
+                        defaultValue
+                        label
+                        placeholder
+                        options {
+                            description
+                            label
+                            value
+                        }
+                        optionsDataSource {
+                            optionsLookupDependsOn
+                        }
+                    }
+                    ... on IntegerProperty {
+                        controlType
+                        integerDefaultValue: defaultValue
+                        label
+                        placeholder
+                        options {
+                            description
+                            label
+                            value
+                        }
+                        optionsDataSource {
+                            optionsLookupDependsOn
+                        }
+                    }
+                    ... on NumberProperty {
+                        controlType
+                        label
+                        numberDefaultValue: defaultValue
+                        placeholder
+                        options {
+                            description
+                            label
+                            value
+                        }
+                        optionsDataSource {
+                            optionsLookupDependsOn
+                        }
+                    }
+                    ... on BooleanProperty {
+                        booleanDefaultValue: defaultValue
+                        controlType
+                        label
+                        placeholder
+                    }
+                    ... on ArrayProperty {
+                        arrayDefaultValue: defaultValue
+                        controlType
+                        label
+                        placeholder
+                    }
+                    ... on ObjectProperty {
+                        controlType
+                        label
+                        objectDefaultValue: defaultValue
+                        placeholder
+                    }
+                    ... on DateProperty {
+                        controlType
+                        dateDefaultValue: defaultValue
+                        label
+                        placeholder
+                    }
+                    ... on DateTimeProperty {
+                        controlType
+                        dateTimeDefaultValue: defaultValue
+                        label
+                        placeholder
+                    }
+                    ... on TimeProperty {
+                        controlType
+                        label
+                        placeholder
+                        timeDefaultValue: defaultValue
+                    }
+                    ... on NullProperty {
+                        controlType
+                        label
+                        placeholder
+                    }
+                    ... on DynamicPropertiesProperty {
+                        propertiesDataSource {
+                            propertiesLookupDependsOn
+                        }
+                    }
+                }
+            }
+            ... on ObjectProperty {
+                controlType
+                label
+                objectDefaultValue: defaultValue
+                placeholder
+                optionsDataSource {
+                    optionsLookupDependsOn
+                }
+                properties {
+                    advancedOption
+                    description
+                    displayCondition
+                    expressionEnabled
+                    hidden
+                    name
+                    required
+                    type
+                    ... on StringProperty {
+                        controlType
+                        defaultValue
+                        label
+                        placeholder
+                        options {
+                            description
+                            label
+                            value
+                        }
+                        optionsDataSource {
+                            optionsLookupDependsOn
+                        }
+                    }
+                    ... on IntegerProperty {
+                        controlType
+                        integerDefaultValue: defaultValue
+                        label
+                        placeholder
+                        options {
+                            description
+                            label
+                            value
+                        }
+                        optionsDataSource {
+                            optionsLookupDependsOn
+                        }
+                    }
+                    ... on NumberProperty {
+                        controlType
+                        label
+                        numberDefaultValue: defaultValue
+                        placeholder
+                        options {
+                            description
+                            label
+                            value
+                        }
+                        optionsDataSource {
+                            optionsLookupDependsOn
+                        }
+                    }
+                    ... on BooleanProperty {
+                        booleanDefaultValue: defaultValue
+                        controlType
+                        label
+                        placeholder
+                    }
+                    ... on ArrayProperty {
+                        arrayDefaultValue: defaultValue
+                        controlType
+                        label
+                        placeholder
+                    }
+                    ... on ObjectProperty {
+                        controlType
+                        label
+                        objectDefaultValue: defaultValue
+                        placeholder
+                    }
+                    ... on DateProperty {
+                        controlType
+                        dateDefaultValue: defaultValue
+                        label
+                        placeholder
+                    }
+                    ... on DateTimeProperty {
+                        controlType
+                        dateTimeDefaultValue: defaultValue
+                        label
+                        placeholder
+                    }
+                    ... on TimeProperty {
+                        controlType
+                        label
+                        placeholder
+                        timeDefaultValue: defaultValue
+                    }
+                    ... on NullProperty {
+                        controlType
+                        label
+                        placeholder
+                    }
+                    ... on DynamicPropertiesProperty {
+                        propertiesDataSource {
+                            propertiesLookupDependsOn
+                        }
+                    }
+                }
+            }
+            ... on DateProperty {
+                controlType
+                dateDefaultValue: defaultValue
+                label
+                placeholder
+            }
+            ... on DateTimeProperty {
+                controlType
+                dateTimeDefaultValue: defaultValue
+                label
+                placeholder
+            }
+            ... on TimeProperty {
+                controlType
+                label
+                placeholder
+                timeDefaultValue: defaultValue
+            }
+            ... on NullProperty {
+                controlType
+                label
+                placeholder
+            }
+            ... on DynamicPropertiesProperty {
+                propertiesDataSource {
+                    propertiesLookupDependsOn
+                }
+            }
+        }
+    }
+}
