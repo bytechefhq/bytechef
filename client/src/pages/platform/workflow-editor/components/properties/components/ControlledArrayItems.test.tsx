@@ -1,8 +1,8 @@
 import {PropertyAllType} from '@/shared/types';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import React from 'react';
-import {describe, expect, it, vi} from 'vitest';
 import {FormProvider, useForm} from 'react-hook-form';
+import {describe, expect, it, vi} from 'vitest';
 
 import ControlledArrayItems from './ControlledArrayItems';
 
@@ -18,6 +18,7 @@ vi.mock('../Property', () => ({
     }) => (
         <div data-testid={`property-${property.name}`} data-tools-mode={String(!!toolsMode)}>
             {property.label}
+
             {deletePropertyButton}
         </div>
     ),
