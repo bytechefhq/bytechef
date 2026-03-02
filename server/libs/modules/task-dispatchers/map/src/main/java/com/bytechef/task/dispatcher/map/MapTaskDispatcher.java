@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 import tools.jackson.core.type.TypeReference;
 
@@ -85,8 +84,7 @@ public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements Ta
     public void doDispatch(TaskExecution taskExecution) {
         List<?> items = MapUtils.getRequiredList(taskExecution.getParameters(), ITEMS, Object.class);
         List<WorkflowTask> iterateeWorkflowTasks = MapUtils
-            .getList(
-                taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {}, List.of())
+            .getList(taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {}, List.of())
             .stream()
             .map(WorkflowTask::new)
             .toList();
@@ -102,12 +100,11 @@ public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements Ta
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
-            long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
+            long taskExecutionId = Objects.requireNonNull(taskExecution.getId());
 
             counterService.set(taskExecutionId, items.size());
 
-            long taskExecutionJobId = Validate.notNull(
-                taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
+            long taskExecutionJobId = Objects.requireNonNull(taskExecution.getJobId());
 
             for (int i = 0; i < items.size(); i++) {
                 Object item = items.get(i);
@@ -137,7 +134,7 @@ public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements Ta
 
                 iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
 
-                long iterateeTaskExecutionId = Validate.notNull(iterateeTaskExecution.getId(), "id");
+                long iterateeTaskExecutionId = Objects.requireNonNull(iterateeTaskExecution.getId());
 
                 contextService.push(
                     iterateeTaskExecutionId, Classname.TASK_EXECUTION,
