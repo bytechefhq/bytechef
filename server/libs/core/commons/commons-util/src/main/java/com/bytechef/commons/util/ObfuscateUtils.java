@@ -26,6 +26,10 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ObfuscateUtils {
 
+    private static final String SECURITY_INSENSITIVE_KEYS =
+        "authorizationUrl,authorizationType,headerPrefix,refreshUrl,scopes,tokenUrl";
+    private static final String SECURITY_SENSITIVE_KEYS = "password";
+
     /**
      * Obfuscates original string value. Argument maxLength value may be used to influence the length of new obfuscated
      * string. Argument visibleLength may be used to leave the portion unobfuscated. It can be used as a hint.
@@ -88,15 +92,11 @@ public class ObfuscateUtils {
      * @return secure visible length
      */
     private static int getSecureVisibleLength(String keyName, int expectedVisibleLength) {
-        if (SENSITIVE_KEYS.contains(String.valueOf(keyName))) {
+        if (SECURITY_SENSITIVE_KEYS.contains(String.valueOf(keyName))) {
             return 0;
         }
 
         return expectedVisibleLength;
     }
-
-    private static final String SENSITIVE_KEYS = "password";
-    private static final String SECURITY_INSENSITIVE_KEYS =
-        "authorizationUrl,authorizationType,headerPrefix,refreshUrl,scopes,tokenUrl";
 
 }
