@@ -188,12 +188,41 @@ export const useProperty = ({
         !control && ((property.type !== 'STRING' && property.expressionEnabled) || false)
     );
     const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(true);
+    const [controlledBlurError, setControlledBlurError] = useState<string | undefined>();
+    const [controlledDynamicMode, setControlledDynamicMode] = useState(() => {
+        if (!control) {
+            return false;
+        }
+
+        const propertyName = property.name?.replace(/\s/g, '_');
+
+        if (!propertyName) {
+            return false;
+        }
+
+        const fieldPath = controlPath ? `${controlPath}.${propertyName}` : propertyName;
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const formValues = (control as any)._formValues as Record<string, unknown> | undefined;
+
+        if (!formValues) {
+            return false;
+        }
+
+        const fieldValue = fieldPath
+            .split('.')
+            .reduce<unknown>((currentObject, key) => (currentObject as Record<string, unknown>)?.[key], formValues);
+
+        return typeof fieldValue === 'string' && fieldValue.startsWith('=');
+    });
+    const [controlledFromAi, setControlledFromAi] = useState<boolean | undefined>(undefined);
 
     const editorRef = useRef<Editor>(null!);
     const inputRef = useRef<HTMLInputElement>(null!);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
     const mentionInputSyncedRef = useRef(false);
+    const resetOnModeChangeRef = useRef(false);
 
     const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore(
@@ -293,11 +322,7 @@ export const useProperty = ({
         updateWorkflowNodeParameterMutation,
     } = useWorkflowEditor();
 
-    const {rootClusterElementNodeData} = useWorkflowEditorStore(
-        useShallow((state) => ({
-            rootClusterElementNodeData: state.rootClusterElementNodeData,
-        }))
-    );
+    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
     if (!path && name) {
         path = name;
@@ -1373,37 +1398,6 @@ export const useProperty = ({
         }
     }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionsFetched]);
 
-    const [controlledBlurError, setControlledBlurError] = useState<string | undefined>();
-    const [controlledDynamicMode, setControlledDynamicMode] = useState(() => {
-        if (!control) {
-            return false;
-        }
-
-        const propertyName = property.name?.replace(/\s/g, '_');
-
-        if (!propertyName) {
-            return false;
-        }
-
-        const fieldPath = controlPath ? `${controlPath}.${propertyName}` : propertyName;
-
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        const formValues = (control as any)._formValues as Record<string, unknown> | undefined;
-
-        if (!formValues) {
-            return false;
-        }
-
-        const fieldValue = fieldPath
-            .split('.')
-            .reduce<unknown>((currentObject, key) => (currentObject as Record<string, unknown>)?.[key], formValues);
-
-        return typeof fieldValue === 'string' && fieldValue.startsWith('=');
-    });
-    const [controlledFromAi, setControlledFromAi] = useState<boolean | undefined>(undefined);
-
-    const resetOnModeChangeRef = useRef(false);
-
     const handleControlledModeSwitch = useCallback((toDynamic: boolean) => {
         resetOnModeChangeRef.current = true;
         setControlledDynamicMode(toDynamic);
@@ -1428,13 +1422,10 @@ export const useProperty = ({
 
     const handleControlledBlur = useCallback(
         (value: unknown) => {
-            if (value === '' || value == null) {
-                setControlledBlurError(undefined);
-            } else if (!validatePropertyValue(value as string | number)) {
-                setControlledBlurError(ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE);
-            } else {
-                setControlledBlurError(undefined);
-            }
+            const isInvalid =
+                value !== '' && value != null && !validatePropertyValue(value as string | number);
+
+            setControlledBlurError(isInvalid ? ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE : undefined);
         },
         [validatePropertyValue]
     );

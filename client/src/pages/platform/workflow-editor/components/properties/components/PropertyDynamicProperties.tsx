@@ -59,7 +59,7 @@ const PropertyDynamicProperties = ({
         }))
     );
 
-    const {rootClusterElementNodeData} = useWorkflowEditorStore();
+    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
     const clusterElementContext = useClusterElementContext();
 
