@@ -33,6 +33,8 @@ Name | Type
 `retryDelayMillis` | number
 `workflowTask` | [WorkflowTask](WorkflowTask.md)
 `type` | string
+`children` | [Array&lt;TaskExecution&gt;](TaskExecution.md)
+`iterations` | Array&lt;Array&lt;TaskExecution&gt;&gt;
 
 ## Example
 
@@ -67,6 +69,8 @@ const example = {
   "retryDelayMillis": null,
   "workflowTask": null,
   "type": null,
+  "children": null,
+  "iterations": null,
 } satisfies TaskExecution
 
 console.log(example)
