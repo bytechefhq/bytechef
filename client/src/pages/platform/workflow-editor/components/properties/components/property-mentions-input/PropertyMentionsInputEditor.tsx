@@ -36,7 +36,6 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
-import {useShallow} from 'zustand/shallow';
 
 import {FormulaMode} from './FormulaMode.extension';
 import {FromAi} from './FromAi.extension';
@@ -130,11 +129,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
         const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
-        const {rootClusterElementNodeData} = useWorkflowEditorStore(
-            useShallow((state) => ({
-                rootClusterElementNodeData: state.rootClusterElementNodeData,
-            }))
-        );
+        const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
         const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
             if (!currentNode?.name || !workflow.definition) {
@@ -622,16 +617,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 editor.storage.MentionStorage.dataPills = dataPills;
             }
         }, [dataPills, editor]);
-
-        // Update editor content when editorValue changes (but not during local updates)
-        useEffect(() => {
-            if (editor && !isLocalUpdate) {
-                editor.commands.setContent(getContent(editorValue as string)!, {
-                    emitUpdate: false,
-                    parseOptions: {preserveWhitespace: 'full'},
-                });
-            }
-        }, [editor, getContent, editorValue, isLocalUpdate]);
 
         // Update editor content when editorValue changes (but not during local updates)
         useEffect(() => {
