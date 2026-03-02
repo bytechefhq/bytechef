@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.platform.component.constant.WorkflowConstants.INPUT_SCHEMA;
-import static com.bytechef.platform.component.constant.WorkflowConstants.TOOL_CALLABLE;
+import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_AI_MODEL_CALL;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
@@ -35,10 +35,10 @@ import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowToolCallableTrigger {
+public class WorkflowNewAiModelCallTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(TOOL_CALLABLE)
-        .title("Tool Callable")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_AI_MODEL_CALL)
+        .title("New AI Model Call")
         .description(
             "Exposes this workflow as a tool with a custom name and description. Define the input schema to specify what data the AI model should provide.")
         .type(TriggerType.CALLABLE)
@@ -58,7 +58,7 @@ public class WorkflowToolCallableTrigger {
                 .placeholder("Edit Inputs schema")
                 .description("The schema definition for the input data this tool expects from the AI model.")
                 .controlType(JSON_SCHEMA_BUILDER))
-        .output(WorkflowToolCallableTrigger::output);
+        .output(WorkflowNewAiModelCallTrigger::output);
 
     protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, TriggerContext context) {
