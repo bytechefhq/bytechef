@@ -2171,6 +2171,13 @@ components:
         componentName:
           description: "The component name used from the connection's component."
           type: "string"
+        help:
+          type: "object"
+          properties:
+            body:
+              type: "string"
+            learnMoreUrl:
+              type: "string"
         properties:
           description: "The properties of the connection."
           type: "array"
