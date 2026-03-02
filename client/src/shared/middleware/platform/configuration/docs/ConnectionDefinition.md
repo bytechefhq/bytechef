@@ -12,6 +12,7 @@ Name | Type
 `baseUri` | string
 `componentDescription` | string
 `componentName` | string
+`help` | [ConnectionDefinitionHelp](ConnectionDefinitionHelp.md)
 `properties` | [Array&lt;Property&gt;](Property.md)
 `componentTitle` | string
 `version` | number
@@ -28,6 +29,7 @@ const example = {
   "baseUri": null,
   "componentDescription": null,
   "componentName": null,
+  "help": null,
   "properties": null,
   "componentTitle": null,
   "version": null,

@@ -18,6 +18,7 @@
  * @export
  */
 export const TriggerType = {
+    Callable: 'CALLABLE',
     StaticWebhook: 'STATIC_WEBHOOK',
     Hybrid: 'HYBRID',
     Listener: 'LISTENER',
