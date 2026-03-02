@@ -63,10 +63,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
 
         if (mcpTools != null && !mcpTools.isEmpty()) {
             for (McpTool mcpTool : mcpTools) {
-                @SuppressWarnings("unchecked")
-                Map<String, String> parameters = (Map<String, String>) mcpTool.getParameters();
-
-                McpTool toolToCreate = new McpTool(mcpTool.getName(), parameters, savedComponent.getId());
+                McpTool toolToCreate = new McpTool(mcpTool.getName(), mcpTool.getParameters(), savedComponent.getId());
 
                 mcpToolService.create(toolToCreate);
             }
@@ -146,10 +143,8 @@ public class McpServerFacadeImpl implements McpServerFacade {
 
         if (mcpTools != null && !mcpTools.isEmpty()) {
             for (McpTool mcpTool : mcpTools) {
-                @SuppressWarnings("unchecked")
-                Map<String, String> parameters = (Map<String, String>) mcpTool.getParameters();
-
-                McpTool toolToCreate = new McpTool(mcpTool.getName(), parameters, updatedComponent.getId());
+                McpTool toolToCreate =
+                    new McpTool(mcpTool.getName(), mcpTool.getParameters(), updatedComponent.getId());
 
                 mcpToolService.create(toolToCreate);
             }

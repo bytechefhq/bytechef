@@ -28,6 +28,11 @@ import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 public class PlatformConfigurationGraphQlTestConfiguration {
 
     @Bean
+    RuntimeWiringConfigurer anyScalarWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.anyScalar());
+    }
+
+    @Bean
     RuntimeWiringConfigurer longScalarWiringConfigurer() {
         return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.longScalar());
     }

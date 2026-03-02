@@ -17,6 +17,8 @@
 package com.bytechef.platform.mcp.web.graphql.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -34,8 +36,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    ApplicationProperties.class, McpServerFacade.class, McpServerService.class,
-    McpComponentService.class, McpToolService.class, TagService.class
+    ApplicationProperties.class, ClusterElementDefinitionFacade.class,
+    ClusterElementDefinitionService.class, McpServerFacade.class,
+    McpServerService.class, McpComponentService.class, McpToolService.class, TagService.class
 })
 public @interface McpGraphQlConfigurationSharedMocks {
 }

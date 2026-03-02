@@ -17,6 +17,9 @@
 package com.bytechef.platform.mcp.web.graphql.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -44,6 +47,24 @@ public class McpGraphQlTestConfiguration {
             .thenReturn("http://localhost:8080");
 
         return properties;
+    }
+
+    @Bean
+    @Primary
+    public ClusterElementDefinitionFacade clusterElementDefinitionFacade() {
+        return Mockito.mock(ClusterElementDefinitionFacade.class);
+    }
+
+    @Bean
+    @Primary
+    public ClusterElementDefinitionService clusterElementDefinitionService() {
+        return Mockito.mock(ClusterElementDefinitionService.class);
+    }
+
+    @Bean
+    @Primary
+    public ComponentDefinitionService componentDefinitionService() {
+        return Mockito.mock(ComponentDefinitionService.class);
     }
 
     @Bean
@@ -77,6 +98,11 @@ public class McpGraphQlTestConfiguration {
     }
 
     @Bean
+    RuntimeWiringConfigurer anyScalarWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.anyScalar());
+    }
+
+    @Bean
     RuntimeWiringConfigurer longScalarWiringConfigurer() {
         return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.longScalar());
     }
@@ -85,5 +111,4 @@ public class McpGraphQlTestConfiguration {
     RuntimeWiringConfigurer mapScalarWiringConfigurer() {
         return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.mapScalar());
     }
-
 }

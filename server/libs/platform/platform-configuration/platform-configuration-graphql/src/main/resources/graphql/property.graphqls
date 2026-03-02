@@ -236,7 +236,7 @@ type TimeProperty implements Property {
 type Option {
     description: String
     label: String
-    value: Map
+    value: Any
 }
 
 type OptionsDataSource {
