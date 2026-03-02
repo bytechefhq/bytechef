@@ -20,6 +20,7 @@ interface PropertiesProps {
     formState?: FormState<FieldValues>;
     path?: string;
     properties: Array<PropertyAllType>;
+    toolsMode?: boolean;
 }
 
 const Properties = ({
@@ -31,6 +32,7 @@ const Properties = ({
     operationName,
     path,
     properties,
+    toolsMode,
 }: PropertiesProps) => {
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
@@ -78,6 +80,7 @@ const Properties = ({
                         operationName={operationName}
                         path={path}
                         property={property}
+                        toolsMode={toolsMode}
                     />
                 ))}
             </ul>
@@ -104,6 +107,7 @@ const Properties = ({
                                     operationName={operationName}
                                     path={path}
                                     property={property}
+                                    toolsMode={toolsMode}
                                 />
                             ))}
                         </ul>
