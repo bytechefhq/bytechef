@@ -22,6 +22,7 @@ import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/p
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
+import resolveExpressionValue from '@/pages/platform/workflow-editor/utils/resolveExpressionValue';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {
     GetClusterElementParameterDisplayConditions200Response,
@@ -351,21 +352,7 @@ const Property = ({
                                         }
                                         mentionInput
                                         onChange={(event) => {
-                                            const rawValue = event.target.value;
-                                            const inExpressionMode =
-                                                typeof field.value === 'string' && field.value.startsWith('=');
-
-                                            if (rawValue === '' && inExpressionMode) {
-                                                fieldOnChange('=');
-                                            } else if (rawValue === '') {
-                                                fieldOnChange('');
-                                            } else if (rawValue.startsWith('=')) {
-                                                fieldOnChange(rawValue);
-                                            } else if (inExpressionMode) {
-                                                fieldOnChange(`=${rawValue}`);
-                                            } else {
-                                                fieldOnChange(rawValue);
-                                            }
+                                            fieldOnChange(resolveExpressionValue(event.target.value, field.value));
                                         }}
                                         onFocus={() => setDataPillPanelOpen(true)}
                                         placeholder="Use '=' for an expression"
@@ -531,21 +518,9 @@ const Property = ({
                                                         return;
                                                     }
 
-                                                    const rawValue = event.target.value;
-                                                    const inExpressionMode =
-                                                        typeof field.value === 'string' && field.value.startsWith('=');
-
-                                                    if (rawValue === '' && inExpressionMode) {
-                                                        fieldOnChange('=');
-                                                    } else if (rawValue === '') {
-                                                        fieldOnChange('');
-                                                    } else if (rawValue.startsWith('=')) {
-                                                        fieldOnChange(rawValue);
-                                                    } else if (inExpressionMode) {
-                                                        fieldOnChange(`=${rawValue}`);
-                                                    } else {
-                                                        fieldOnChange(rawValue);
-                                                    }
+                                                    fieldOnChange(
+                                                        resolveExpressionValue(event.target.value, field.value)
+                                                    );
                                                 }}
                                                 placeholder={
                                                     isNumericalInput && minValue && maxValue

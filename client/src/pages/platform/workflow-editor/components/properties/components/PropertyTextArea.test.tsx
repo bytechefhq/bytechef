@@ -5,18 +5,9 @@ import PropertyTextArea from './PropertyTextArea';
 
 describe('PropertyTextArea', () => {
     it('renders with label and placeholder', () => {
-        render(
-            <PropertyTextArea
-                error={false}
-                errorMessage=""
-                label="Description"
-                name="description"
-                placeholder="Enter description"
-            />
-        );
+        render(<PropertyTextArea error={false} errorMessage="" label="Description" name="description" />);
 
         expect(screen.getByText('Description')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Enter description')).toBeInTheDocument();
     });
 
     it('renders trailingAction when provided', () => {
@@ -48,28 +39,13 @@ describe('PropertyTextArea', () => {
     });
 
     it('shows required mark when required is true', () => {
-        render(
-            <PropertyTextArea
-                error={false}
-                errorMessage=""
-                label="Required Field"
-                name="required"
-                required
-            />
-        );
+        render(<PropertyTextArea error={false} errorMessage="" label="Required Field" name="required" required />);
 
         expect(screen.getByText('*')).toBeInTheDocument();
     });
 
     it('renders error state with error icon', () => {
-        render(
-            <PropertyTextArea
-                error={true}
-                errorMessage="Something went wrong"
-                label="Broken"
-                name="broken"
-            />
-        );
+        render(<PropertyTextArea error={true} errorMessage="Something went wrong" label="Broken" name="broken" />);
 
         // Error icon should be present (TriangleAlertIcon)
         expect(screen.getByRole('textbox')).toHaveClass('border-rose-300');

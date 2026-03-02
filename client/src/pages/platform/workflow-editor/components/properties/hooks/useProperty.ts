@@ -1422,8 +1422,7 @@ export const useProperty = ({
 
     const handleControlledBlur = useCallback(
         (value: unknown) => {
-            const isInvalid =
-                value !== '' && value != null && !validatePropertyValue(value as string | number);
+            const isInvalid = value !== '' && value != null && !validatePropertyValue(value as string | number);
 
             setControlledBlurError(isInvalid ? ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE : undefined);
         },
