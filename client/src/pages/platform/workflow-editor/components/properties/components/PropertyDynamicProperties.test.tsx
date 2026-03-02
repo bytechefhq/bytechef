@@ -27,7 +27,11 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStor
 }));
 
 vi.mock('../../../stores/useWorkflowEditorStore', () => ({
-    default: () => hoisted.mockWorkflowEditorStore(),
+    default: (selector?: (state: unknown) => unknown) => {
+        const state = hoisted.mockWorkflowEditorStore();
+
+        return selector ? selector(state) : state;
+    },
 }));
 
 vi.mock('@/shared/queries/platform/workflowNodeDynamicProperties.queries', () => ({
