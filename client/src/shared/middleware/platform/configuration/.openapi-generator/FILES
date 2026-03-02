@@ -35,6 +35,7 @@ docs/ComponentDefinitionBasic.md
 docs/ConnectionDefinition.md
 docs/ConnectionDefinitionApi.md
 docs/ConnectionDefinitionBasic.md
+docs/ConnectionDefinitionHelp.md
 docs/ControlType.md
 docs/CredentialStatus.md
 docs/DateProperty.md
@@ -122,6 +123,7 @@ models/ComponentDefinition.ts
 models/ComponentDefinitionBasic.ts
 models/ConnectionDefinition.ts
 models/ConnectionDefinitionBasic.ts
+models/ConnectionDefinitionHelp.ts
 models/ControlType.ts
 models/CredentialStatus.ts
 models/DateProperty.ts

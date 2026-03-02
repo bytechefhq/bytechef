@@ -16,6 +16,7 @@ export * from './ComponentDefinition';
 export * from './ComponentDefinitionBasic';
 export * from './ConnectionDefinition';
 export * from './ConnectionDefinitionBasic';
+export * from './ConnectionDefinitionHelp';
 export * from './ControlType';
 export * from './CredentialStatus';
 export * from './DateProperty';
