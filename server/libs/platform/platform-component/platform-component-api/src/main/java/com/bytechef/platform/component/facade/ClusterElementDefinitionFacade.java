@@ -45,4 +45,8 @@ public interface ClusterElementDefinitionFacade {
 
     Object executeTool(
         String componentName, String clusterElementName, Map<String, ?> inputParameters, @Nullable Long connectionId);
+
+    Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId);
 }

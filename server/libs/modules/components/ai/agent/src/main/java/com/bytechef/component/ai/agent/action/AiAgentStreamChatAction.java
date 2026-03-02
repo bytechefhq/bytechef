@@ -19,12 +19,12 @@ package com.bytechef.component.ai.agent.action;
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT_PROPERTIES;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
+import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
@@ -49,15 +49,15 @@ import reactor.core.publisher.Flux;
 public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
     public static ActionDefinition of(
-        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+        ClusterElementDefinitionService clusterElementDefinitionService, AiAgentToolFacade aiAgentToolFacade) {
 
-        return new AiAgentStreamChatAction(clusterElementDefinitionService, evaluator).build();
+        return new AiAgentStreamChatAction(clusterElementDefinitionService, aiAgentToolFacade).build();
     }
 
     private AiAgentStreamChatAction(
-        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+        ClusterElementDefinitionService clusterElementDefinitionService, AiAgentToolFacade aiAgentToolFacade) {
 
-        super(clusterElementDefinitionService, evaluator);
+        super(clusterElementDefinitionService, aiAgentToolFacade);
     }
 
     private ChatActionDefinitionWrapper build() {

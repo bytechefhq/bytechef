@@ -28,6 +28,7 @@ include("cli:commands:component:init:openapi")
 
 include("server:apps:server-app")
 
+include("server:libs:ai:ai-tool-api")
 include("server:libs:ai:mcp:mcp-server")
 include("server:libs:ai:mcp:mcp-server-configuration:mcp-server-configuration-graphql")
 include("server:libs:ai:mcp:mcp-tool:mcp-tool-api")
@@ -75,8 +76,6 @@ include("server:libs:automation:automation-knowledge-base:automation-knowledge-b
 include("server:libs:automation:automation-knowledge-base:automation-knowledge-base-rest")
 include("server:libs:automation:automation-knowledge-base:automation-knowledge-base-service")
 include("server:libs:automation:automation-knowledge-base:automation-knowledge-base-worker")
-include("server:libs:automation:automation-execution:automation-execution-api")
-include("server:libs:automation:automation-execution:automation-execution-service")
 include("server:libs:automation:automation-mcp:automation-mcp-api")
 include("server:libs:automation:automation-mcp:automation-mcp-graphql")
 include("server:libs:automation:automation-mcp:automation-mcp-service")

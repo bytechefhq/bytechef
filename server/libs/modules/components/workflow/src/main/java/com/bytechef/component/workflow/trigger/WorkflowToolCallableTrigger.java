@@ -16,8 +16,8 @@
 
 package com.bytechef.component.workflow.trigger;
 
-import static com.bytechef.ai.tool.constant.ToolConstants.DESCRIPTION;
-import static com.bytechef.ai.tool.constant.ToolConstants.NAME;
+import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
+import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
@@ -44,11 +44,11 @@ public class WorkflowToolCallableTrigger {
         .type(TriggerType.CALLABLE)
         .workflowSyncExecution(true)
         .properties(
-            string(NAME)
+            string(TOOL_NAME)
                 .label("Name")
                 .description("The tool name exposed to the AI model.")
                 .required(true),
-            string(DESCRIPTION)
+            string(TOOL_DESCRIPTION)
                 .label("Description")
                 .description("The tool description exposed to the AI model.")
                 .controlType(TEXT_AREA)
