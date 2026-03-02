@@ -193,14 +193,13 @@ public class AutomationMcpServerConfiguration {
                     .flatMap(
                         mcpComponent -> CollectionUtils.stream(
                             mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
-                    .map(mcpTool -> McpToolUtils
-                        .toAsyncToolSpecification(mcpToolFacade.getFunctionToolCallback(mcpTool)))
+                    .map(mcpTool -> McpToolUtils.toAsyncToolSpecification(
+                        mcpToolFacade.getFunctionToolCallback(mcpTool)))
                     .forEach(tools::add);
 
                 mcpProjectService.getMcpServerMcpProjects(mcpServer.getId())
                     .stream()
-                    .flatMap(mcpProject -> mcpToolFacade.getFunctionToolCallbacks(mcpProject)
-                        .stream())
+                    .flatMap(mcpProject -> CollectionUtils.stream(mcpToolFacade.getFunctionToolCallbacks(mcpProject)))
                     .map(McpToolUtils::toAsyncToolSpecification)
                     .forEach(tools::add);
 

@@ -156,24 +156,12 @@ public class McpToolFacade extends AbstractToolFacade {
 
             List<FromAiResult> fromAiResults = extractFromAiResults(workflowParameters);
 
-            String inputSchema;
-
-            if (!fromAiResults.isEmpty()) {
-                inputSchema = FromAiInputSchemaUtils.generateInputSchema(fromAiResults);
-            } else {
-                inputSchema = MapUtils.getString(trigger.getParameters(), WorkflowConstants.INPUT_SCHEMA);
-
-                if (inputSchema == null || inputSchema.isEmpty()) {
-                    continue;
-                }
-            }
-
             FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback.builder(
                 Objects.requireNonNull(toolName),
                 getWorkflowFromAiToolCallbackFunction(projectDeploymentWorkflow, trigger.getName(),
                     workflowParameters))
                 .inputType(Map.class)
-                .inputSchema(inputSchema);
+                .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
             if (description != null) {
                 builder.description(description);
