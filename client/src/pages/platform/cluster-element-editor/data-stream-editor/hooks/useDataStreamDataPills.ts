@@ -12,10 +12,9 @@ export default function useDataStreamDataPills() {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
-    const {componentDefinitions, setDataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
+    const {componentDefinitions, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             componentDefinitions: state.componentDefinitions,
-            setDataPills: state.setDataPills,
             taskDispatcherDefinitions: state.taskDispatcherDefinitions,
             workflow: state.workflow,
         }))
@@ -82,7 +81,7 @@ export default function useDataStreamDataPills() {
 
     useEffect(() => {
         if (calculatedDataPills.length > 0) {
-            setDataPills(calculatedDataPills);
+            useWorkflowDataStore.getState().setDataPills(calculatedDataPills);
         }
-    }, [calculatedDataPills, setDataPills]);
+    }, [calculatedDataPills]);
 }
