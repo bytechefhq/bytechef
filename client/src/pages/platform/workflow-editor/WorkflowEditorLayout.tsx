@@ -4,7 +4,6 @@ import '@xyflow/react/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
-import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
@@ -38,13 +37,18 @@ const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSideba
 
 interface WorkflowEditorLayoutProps {
     includeComponents?: string[];
+    leftSidebarOpen?: boolean;
     runDisabled: boolean;
     showWorkflowInputs: boolean;
 }
 
-const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInputs}: WorkflowEditorLayoutProps) => {
+const WorkflowEditorLayout = ({
+    includeComponents,
+    leftSidebarOpen,
+    runDisabled,
+    showWorkflowInputs,
+}: WorkflowEditorLayoutProps) => {
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
-    const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
@@ -94,13 +98,13 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
     return (
         <ReactFlowProvider>
-            <div className={twMerge('relative mx-3 mb-3 flex w-full', projectLeftSidebarOpen && 'ml-0')}>
+            <div className={twMerge('relative mx-3 mb-3 flex w-full', leftSidebarOpen && 'ml-0')}>
                 {componentDefinitions && taskDispatcherDefinitions && (
                     <Suspense>
                         <WorkflowEditor
                             componentDefinitions={componentDefinitions}
                             invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                            projectLeftSidebarOpen={projectLeftSidebarOpen}
+                            leftSidebarOpen={leftSidebarOpen}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />
                     </Suspense>
