@@ -1,7 +1,8 @@
 import PageLoader from '@/components/PageLoader';
-import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {ReactFlowProvider} from '@xyflow/react';
+import {VisuallyHidden} from 'radix-ui';
 import {Suspense, lazy} from 'react';
 
 const WorkflowEditor = lazy(() => import('@/pages/platform/workflow-editor/components/WorkflowEditor'));
@@ -29,12 +30,16 @@ const ReadOnlyWorkflowSheet = () => {
             }}
             open={isReadOnlyWorkflowSheetOpen}
         >
-            <SheetContent className="flex flex-col bg-white p-0 sm:max-w-workflow-read-only-project-deployment-workflow-sheet-width">
-                <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
-                    <SheetTitle>{workflow?.label}</SheetTitle>
+            <VisuallyHidden.Root>
+                <SheetTitle>{workflow?.label}</SheetTitle>
+            </VisuallyHidden.Root>
+
+            <SheetContent className="bottom-4 right-4 top-3 flex h-auto flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-workflow-read-only-project-deployment-workflow-sheet-width">
+                <header className="flex shrink-0 items-center justify-between rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
+                    <span className="text-lg font-semibold">{workflow?.label}</span>
 
                     <SheetCloseButton />
-                </SheetHeader>
+                </header>
 
                 <ReactFlowProvider>
                     <PageLoader
