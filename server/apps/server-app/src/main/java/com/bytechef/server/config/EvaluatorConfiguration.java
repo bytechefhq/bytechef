@@ -7,9 +7,9 @@
 
 package com.bytechef.server.config;
 
+import com.bytechef.ai.tool.FromAi;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
-import com.bytechef.platform.workflow.worker.ai.FromAi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -20,11 +20,11 @@ import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT;
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT_PROPERTIES;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
+import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -45,13 +45,14 @@ import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
     public static ChatActionDefinitionWrapper of(
-        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+        ClusterElementDefinitionService clusterElementDefinitionService, AiAgentToolFacade aiAgentToolFacade) {
 
-        return new AiAgentChatAction(clusterElementDefinitionService, evaluator).build();
+        return new AiAgentChatAction(clusterElementDefinitionService, aiAgentToolFacade).build();
     }
 
-    private AiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
-        super(clusterElementDefinitionService, evaluator);
+    private AiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService,
+        AiAgentToolFacade aiAgentToolFacade) {
+        super(clusterElementDefinitionService, aiAgentToolFacade);
     }
 
     private ChatActionDefinitionWrapper build() {

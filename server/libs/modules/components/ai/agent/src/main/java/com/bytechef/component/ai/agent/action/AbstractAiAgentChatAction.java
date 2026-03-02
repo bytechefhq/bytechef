@@ -22,35 +22,28 @@ import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.ai.agent.util.FromAiExpressionUtils;
-import com.bytechef.component.ai.agent.util.FromAiInputSchemaUtils;
+import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
-import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
-import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
-import com.bytechef.platform.workflow.worker.ai.FromAiResult;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
@@ -61,7 +54,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
-import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.ai.util.json.JsonParser;
 
 /**
@@ -70,13 +62,13 @@ import org.springframework.ai.util.json.JsonParser;
 public abstract class AbstractAiAgentChatAction {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
-    private final Evaluator evaluator;
+    private final AiAgentToolFacade aiAgentToolFacade;
 
     protected AbstractAiAgentChatAction(
-        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator) {
+        ClusterElementDefinitionService clusterElementDefinitionService, AiAgentToolFacade aiAgentToolFacade) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
-        this.evaluator = evaluator;
+        this.aiAgentToolFacade = aiAgentToolFacade;
     }
 
     protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
@@ -196,44 +188,10 @@ public abstract class AbstractAiAgentChatAction {
         List<ToolCallback> rawToolCallbacks = new ArrayList<>();
 
         for (ClusterElement clusterElement : toolClusterElements) {
-            ClusterElementDefinition clusterElementDefinition =
-                clusterElementDefinitionService.getClusterElementDefinition(
-                    clusterElement.getComponentName(), clusterElement.getComponentVersion(),
-                    clusterElement.getClusterElementName());
-
             ComponentConnection componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
 
-            Map<String, ?> toolParameters = clusterElement.getParameters();
-            List<FromAiResult> fromAiResults = extractFromAiResults(toolParameters);
-
-            FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback.builder(
-                clusterElementDefinition.getName(),
-                getToolCallbackFunction(
-                    clusterElement.getComponentName(), clusterElement.getComponentVersion(),
-                    clusterElementDefinition.getName(), toolParameters, componentConnection,
-                    editorEnvironment))
-                .inputType(Map.class)
-                .inputSchema(
-                    fromAiResults.isEmpty()
-                        ? JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties())
-                        : FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
-
-            // Prefer the per-tool description provided as a PROPERTY (cluster element parameter), then fall back to the
-            // extension-based description for backward compatibility, otherwise use the cluster element definition
-            // description.
-            String toolDescription = getToolDescription(clusterElement);
-
-            if (toolDescription != null) {
-                builder.description(toolDescription);
-            } else {
-                String description = clusterElementDefinition.getDescription();
-
-                if (description != null) {
-                    builder.description(description);
-                }
-            }
-
-            rawToolCallbacks.add(builder.build());
+            rawToolCallbacks.add(
+                aiAgentToolFacade.getFunctionToolCallback(clusterElement, componentConnection, editorEnvironment));
         }
 
         if (toolExecutionListener == null) {
@@ -316,143 +274,5 @@ public abstract class AbstractAiAgentChatAction {
                 return result;
             }
         };
-    }
-
-    List<FromAiResult> extractFromAiResults(Map<String, ?> parameters) {
-        Map<String, FromAiResult> fromAiResultsByName = new LinkedHashMap<>();
-
-        if (parameters != null) {
-            for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                Object value = entry.getValue();
-
-                if (value instanceof FromAiResult fromAiResult) {
-                    fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
-                } else if (value instanceof String expression && expression.contains("fromAi(")) {
-                    for (String fromAiCall : FromAiExpressionUtils.extractFromAiCallStrings(expression)) {
-                        FromAiResult fromAiResult = evaluateSingleFromAi(fromAiCall);
-
-                        if (fromAiResult != null) {
-                            fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
-                        }
-                    }
-                }
-            }
-        }
-
-        return new ArrayList<>(fromAiResultsByName.values());
-    }
-
-    @Nullable
-    FromAiResult evaluateSingleFromAi(String fromAiCall) {
-        Map<String, Object> evaluated = evaluator.evaluate(Map.of("value", "=" + fromAiCall), Map.of());
-
-        if (evaluated.get("value") instanceof FromAiResult fromAiResult) {
-            return fromAiResult;
-        }
-
-        return null;
-    }
-
-    private Function<Map<String, Object>, Object> getToolCallbackFunction(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
-        ComponentConnection componentConnection, boolean editorEnvironment) {
-
-        return request -> {
-            Map<String, Object> resolvedParameters = new HashMap<>();
-
-            for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                resolvedParameters.put(entry.getKey(), resolveParameterValue(entry.getValue(), request));
-            }
-
-            return clusterElementDefinitionService.executeTool(
-                componentName, componentVersion, clusterElementName, MapUtils.concat(request, resolvedParameters),
-                componentConnection, editorEnvironment);
-        };
-    }
-
-    Object resolveParameterValue(Object value, Map<String, Object> request) {
-        if (value instanceof FromAiResult fromAiResult) {
-            Object requestValue = request.get(fromAiResult.name());
-
-            return requestValue != null ? requestValue : fromAiResult.defaultValue();
-        }
-
-        if (!(value instanceof String expression) || !expression.contains("fromAi(")) {
-            return value;
-        }
-
-        List<String> fromAiCalls = FromAiExpressionUtils.extractFromAiCallStrings(expression);
-
-        if (fromAiCalls.isEmpty()) {
-            return value;
-        }
-
-        // Pure fromAi expression — direct mapping preserves type fidelity for non-string types
-
-        String strippedExpression = expression.startsWith("=") ? expression.substring(1)
-            .trim() : expression.trim();
-
-        if (fromAiCalls.size() == 1 && strippedExpression.equals(fromAiCalls.getFirst())) {
-            FromAiResult fromAiResult = evaluateSingleFromAi(fromAiCalls.getFirst());
-
-            if (fromAiResult != null) {
-                Object requestValue = request.get(fromAiResult.name());
-
-                return requestValue != null ? requestValue : fromAiResult.defaultValue();
-            }
-
-            return value;
-        }
-
-        // Composite expression — replace all fromAi() calls with resolved values and re-evaluate
-
-        String resolvedExpression = expression;
-
-        for (String fromAiCall : fromAiCalls) {
-            FromAiResult fromAiResult = evaluateSingleFromAi(fromAiCall);
-
-            if (fromAiResult != null) {
-                Object requestValue = request.get(fromAiResult.name());
-                Object resolvedValue = requestValue != null ? requestValue : fromAiResult.defaultValue();
-
-                resolvedExpression = resolvedExpression.replace(
-                    fromAiCall, FromAiExpressionUtils.toSpelLiteral(resolvedValue));
-            }
-        }
-
-        if (!resolvedExpression.startsWith("=")) {
-            resolvedExpression = "=" + resolvedExpression;
-        }
-
-        Map<String, Object> evaluated = evaluator.evaluate(Map.of("value", resolvedExpression), Map.of());
-
-        return evaluated.get("value");
-    }
-
-    private static @Nullable String getToolDescription(ClusterElement clusterElement) {
-        String toolDescription = null;
-        Map<String, ?> parameters = clusterElement.getParameters();
-
-        if (parameters != null) {
-            Object description = parameters.get("description");
-
-            if (description instanceof String string && !string.isBlank()) {
-                toolDescription = string;
-            }
-        }
-
-        if (toolDescription == null) {
-            Map<String, ?> extensions = clusterElement.getExtensions();
-
-            if (extensions != null) {
-                Object desc = extensions.get("description");
-
-                if (desc instanceof String string && !string.isBlank()) {
-                    toolDescription = string;
-                }
-            }
-        }
-
-        return toolDescription;
     }
 }

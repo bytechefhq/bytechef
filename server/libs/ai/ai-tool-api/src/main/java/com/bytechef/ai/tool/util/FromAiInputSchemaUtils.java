@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.util;
+package com.bytechef.ai.tool.util;
 
-import com.bytechef.platform.workflow.worker.ai.FromAiResult;
+import com.bytechef.ai.tool.FromAiResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -99,5 +99,4 @@ public class FromAiInputSchemaUtils {
             default -> "string";
         };
     }
-
 }
