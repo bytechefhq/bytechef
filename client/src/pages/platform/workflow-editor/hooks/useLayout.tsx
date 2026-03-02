@@ -172,7 +172,7 @@ export default function useLayout({
                     },
                     id: name,
                     position: {x: 0, y: 0},
-                    type: task.clusterRoot ? 'aiAgentNode' : 'workflow',
+                    type: task.clusterRoot ? 'clusterRoot' : 'workflow',
                 };
             }
 
@@ -560,7 +560,7 @@ export default function useLayout({
 
         if (readOnlyWorkflow) {
             layoutNodes = allNodes.map((node) => {
-                if (node.type === 'workflow' || node.type === 'aiAgentNode') {
+                if (node.type === 'workflow' || node.type === 'clusterRoot') {
                     return {
                         ...node,
                         data: {

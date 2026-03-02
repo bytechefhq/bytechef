@@ -140,7 +140,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 'group relative flex min-w-60 cursor-pointer items-center justify-center',
                 isHorizontal && !hasIcons && 'min-w-0'
             )}
-            data-nodetype="aiAgentNode"
+            data-nodetype="clusterRoot"
             key={id}
         >
             <div className="invisible absolute left-workflow-node-popover-hover top-0 pr-4 group-hover:visible">
