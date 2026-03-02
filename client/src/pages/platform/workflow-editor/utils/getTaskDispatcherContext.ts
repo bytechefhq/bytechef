@@ -150,9 +150,9 @@ export default function getTaskDispatcherContext({
     const isTargetTaskDispatcher = TASK_DISPATCHER_NAMES.includes((targetNode?.data as NodeDataType).componentName);
 
     const isSourceTask =
-        (sourceNode?.type === 'workflow' || sourceNode?.type === 'aiAgentNode') && !isSourceTaskDispatcher;
+        (sourceNode?.type === 'workflow' || sourceNode?.type === 'clusterRoot') && !isSourceTaskDispatcher;
     const isTargetTask =
-        (targetNode?.type === 'workflow' || targetNode?.type === 'aiAgentNode') && !isTargetTaskDispatcher;
+        (targetNode?.type === 'workflow' || targetNode?.type === 'clusterRoot') && !isTargetTaskDispatcher;
 
     const isSourceGhost = source.includes('ghost');
     const isTargetGhost = target.includes('ghost');
