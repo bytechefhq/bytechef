@@ -40,11 +40,11 @@ import com.bytechef.microsoft.commons.MicrosoftUtils;
 /**
  * @author Monika Domiter
  */
-public class MicrosoftTeamsSendChatMessageAction {
+public class MicrosoftTeamsSendDirectMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendChatMessage")
-        .title("Send Chat Message")
-        .description("Sends a message in an existing chat.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendDirectMessage")
+        .title("Send Direct Message")
+        .description("Sends a direct message in an existing chat.")
         .properties(
             string(CHAT_ID)
                 .label("Chat ID")
@@ -67,10 +67,10 @@ public class MicrosoftTeamsSendChatMessageAction {
                                     .description("Type of the content."),
                                 string(CONTENT)
                                     .description("The content of the message.")))))
-        .perform(MicrosoftTeamsSendChatMessageAction::perform)
+        .perform(MicrosoftTeamsSendDirectMessageAction::perform)
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
-    private MicrosoftTeamsSendChatMessageAction() {
+    private MicrosoftTeamsSendDirectMessageAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {

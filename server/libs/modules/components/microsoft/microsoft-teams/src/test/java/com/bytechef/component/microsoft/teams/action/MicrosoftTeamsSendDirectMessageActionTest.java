@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-class MicrosoftTeamsSendChatMessageActionTest extends AbstractMicrosoftTeamsActionTest {
+class MicrosoftTeamsSendDirectMessageActionTest extends AbstractMicrosoftTeamsActionTest {
 
     @Test
     void testPerform() {
@@ -38,7 +38,8 @@ class MicrosoftTeamsSendChatMessageActionTest extends AbstractMicrosoftTeamsActi
         when(mockedParameters.getRequiredString(CONTENT))
             .thenReturn("message");
 
-        Object result = MicrosoftTeamsSendChatMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result =
+            MicrosoftTeamsSendDirectMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
 
