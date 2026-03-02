@@ -277,7 +277,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     ? `=${editorValue}`
                     : editorValue;
 
-            if (validateBeforeSave && !validateBeforeSave(valueForValidation)) {
+            if (validateBeforeSave && editorValue !== '' && !validateBeforeSave(valueForValidation)) {
                 return;
             }
 
