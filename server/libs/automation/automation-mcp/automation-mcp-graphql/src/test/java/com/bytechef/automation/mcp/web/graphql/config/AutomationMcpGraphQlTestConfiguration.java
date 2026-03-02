@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.mcp.facade.McpProjectFacade;
+import com.bytechef.automation.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.mcp.service.McpProjectService;
 import com.bytechef.automation.mcp.service.McpProjectWorkflowService;
@@ -54,6 +55,12 @@ public class AutomationMcpGraphQlTestConfiguration {
     @Primary
     public McpProjectFacade mcpProjectFacade() {
         return Mockito.mock(McpProjectFacade.class);
+    }
+
+    @Bean
+    @Primary
+    public McpProjectWorkflowFacade mcpProjectWorkflowFacade() {
+        return Mockito.mock(McpProjectWorkflowFacade.class);
     }
 
     @Bean
