@@ -24,7 +24,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsCreateChannelAction;
 import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsSendChannelMessageAction;
-import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsSendChatMessageAction;
+import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsSendDirectMessageAction;
 import com.bytechef.component.microsoft.teams.connection.MicrosoftTeamsConnection;
 import com.google.auto.service.AutoService;
 
@@ -46,11 +46,11 @@ public class MicrosoftTeamsComponentHandler implements ComponentHandler {
         .actions(
             MicrosoftTeamsCreateChannelAction.ACTION_DEFINITION,
             MicrosoftTeamsSendChannelMessageAction.ACTION_DEFINITION,
-            MicrosoftTeamsSendChatMessageAction.ACTION_DEFINITION)
+            MicrosoftTeamsSendDirectMessageAction.ACTION_DEFINITION)
         .clusterElements(
             tool(MicrosoftTeamsCreateChannelAction.ACTION_DEFINITION),
             tool(MicrosoftTeamsSendChannelMessageAction.ACTION_DEFINITION),
-            tool(MicrosoftTeamsSendChatMessageAction.ACTION_DEFINITION));
+            tool(MicrosoftTeamsSendDirectMessageAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
