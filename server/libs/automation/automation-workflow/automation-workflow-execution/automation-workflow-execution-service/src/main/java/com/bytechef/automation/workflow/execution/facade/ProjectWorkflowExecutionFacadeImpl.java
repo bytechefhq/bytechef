@@ -16,6 +16,8 @@
 
 package com.bytechef.automation.workflow.execution.facade;
 
+import static com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO.buildHierarchy;
+
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -293,7 +295,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     }
 
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {
-        return CollectionUtils.map(
+        List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> {
                 Map<String, ?> context = taskFileStorage.readContextValue(
@@ -311,6 +313,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     definitionResult.title(), definitionResult.icon(),
                     workflowTask.evaluateParameters(context, evaluator), output);
             });
+
+        return buildHierarchy(taskExecutionDTOs);
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(

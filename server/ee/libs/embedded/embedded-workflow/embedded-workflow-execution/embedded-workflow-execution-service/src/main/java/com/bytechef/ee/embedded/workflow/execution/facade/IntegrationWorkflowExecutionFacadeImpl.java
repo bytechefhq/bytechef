@@ -16,6 +16,8 @@
 
 package com.bytechef.ee.embedded.workflow.execution.facade;
 
+import static com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO.buildHierarchy;
+
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -260,7 +262,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     }
 
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {
-        return CollectionUtils.map(
+        List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> {
                 Map<String, ?> context = taskFileStorage.readContextValue(
@@ -278,6 +280,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                     definitionResult.title(), definitionResult.icon(),
                     workflowTask.evaluateParameters(context, evaluator), output);
             });
+
+        return buildHierarchy(taskExecutionDTOs);
     }
 
     private List<String> getWorkflowIds(Integration integration) {
