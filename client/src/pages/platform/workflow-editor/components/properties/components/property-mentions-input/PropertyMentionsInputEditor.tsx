@@ -269,7 +269,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 return;
             }
 
-            if (validateBeforeSave && !validateBeforeSave(editorValue)) {
+            const valueForValidation =
+                isFormulaMode && typeof editorValue === 'string' && !editorValue.startsWith('=')
+                    ? `=${editorValue}`
+                    : editorValue;
+
+            if (validateBeforeSave && !validateBeforeSave(valueForValidation)) {
                 return;
             }
 
