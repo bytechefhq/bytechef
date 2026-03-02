@@ -7,8 +7,6 @@ import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/work
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {
-    encodeParameters,
-    encodePath,
     escapeHtmlForParagraph,
     transformValueForObjectAccess,
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
@@ -33,7 +31,6 @@ import {EditorView} from '@tiptap/pm/view';
 import {Editor, EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {decode} from 'html-entities';
-import resolvePath from 'object-resolve-path';
 import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import sanitizeHtml from 'sanitize-html';
@@ -137,14 +134,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             useShallow((state) => ({
                 rootClusterElementNodeData: state.rootClusterElementNodeData,
             }))
-        );
-
-        const memoizedWorkflowTask = useMemo(
-            () =>
-                [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
-                    (node) => node.name === currentNode?.name
-                ),
-            [workflow.triggers, workflow.tasks, currentNode?.name]
         );
 
         const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
@@ -643,32 +632,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 });
             }
         }, [editor, getContent, editorValue, isLocalUpdate]);
-
-        // Set propertyParameterValue on workflow definition change
-        useEffect(() => {
-            if (!workflow.definition || !currentNode?.name || !path) {
-                return;
-            }
-
-            const encodedParameters = encodeParameters(
-                (memoizedWorkflowTask?.parameters || memoizedClusterElementTask?.parameters) ?? {}
-            );
-            const encodedPath = encodePath(path);
-
-            const propertyValue = resolvePath(encodedParameters, encodedPath);
-
-            if (typeof propertyValue === 'string' && propertyValue.startsWith('=')) {
-                setEditorValue(propertyValue.substring(1));
-            } else {
-                setEditorValue(propertyValue);
-            }
-        }, [
-            currentNode?.name,
-            memoizedClusterElementTask?.parameters,
-            memoizedWorkflowTask?.parameters,
-            path,
-            workflow.definition,
-        ]);
 
         // Update editor content when editorValue changes (but not during local updates)
         useEffect(() => {
