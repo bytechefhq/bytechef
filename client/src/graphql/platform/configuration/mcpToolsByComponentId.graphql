@@ -2,7 +2,9 @@ query mcpToolsByComponentId($mcpComponentId: ID!) {
     mcpToolsByComponentId(mcpComponentId: $mcpComponentId) {
         id
         name
+        title
         mcpComponentId
         parameters
+        version
     }
 }
