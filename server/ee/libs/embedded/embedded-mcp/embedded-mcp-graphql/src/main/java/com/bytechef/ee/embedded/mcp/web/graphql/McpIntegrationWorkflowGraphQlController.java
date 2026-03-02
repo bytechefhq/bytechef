@@ -25,10 +25,13 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.util.SchemaUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -81,17 +84,34 @@ class McpIntegrationWorkflowGraphQlController {
     List<IntegrationWorkflowDTO> toolEligibleIntegrationVersionWorkflows(
         @Argument long integrationId, @Argument int integrationVersion) {
 
+        List<String> workflowIds = integrationWorkflowService.getIntegrationWorkflows(
+            integrationId, integrationVersion)
+            .stream()
+            .map(integrationWorkflow -> integrationWorkflow.getWorkflowId())
+            .toList();
+
+        List<Workflow> workflows = workflowService.getWorkflows(workflowIds);
+
+        Map<String, Workflow> workflowMap = workflows
+            .stream()
+            .collect(Collectors.toMap(Workflow::getId, Function.identity()));
+
         return integrationWorkflowService.getIntegrationWorkflows(integrationId, integrationVersion)
             .stream()
-            .filter(integrationWorkflow -> hasToolCallableTrigger(integrationWorkflow.getWorkflowId()))
+            .filter(integrationWorkflow -> {
+                Workflow workflow = workflowMap.get(integrationWorkflow.getWorkflowId());
+
+                return workflow != null && getToolCallableTrigger(workflow) != null;
+            })
             .map(integrationWorkflow -> {
-                Workflow workflow = workflowService.getWorkflow(integrationWorkflow.getWorkflowId());
+                Workflow workflow = workflowMap.get(integrationWorkflow.getWorkflowId());
 
                 return new IntegrationWorkflowDTO(workflow, integrationWorkflow);
             })
             .toList();
     }
 
+    @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
     @QueryMapping
     List<Property> mcpIntegrationWorkflowProperties(@Argument long mcpIntegrationWorkflowId) {
         McpIntegrationWorkflow mcpIntegrationWorkflow =
@@ -175,8 +195,13 @@ class McpIntegrationWorkflowGraphQlController {
         if (input.containsKey("parameters")) {
             Object parametersObject = input.get("parameters");
 
-            Map<String, ?> parameters = parametersObject instanceof Map
-                ? (Map<String, ?>) parametersObject : Map.of();
+            if (parametersObject != null && !(parametersObject instanceof Map)) {
+                throw new IllegalArgumentException(
+                    "Expected parameters to be a Map, but got: " + parametersObject.getClass()
+                        .getName());
+            }
+
+            Map<String, ?> parameters = parametersObject != null ? (Map<String, ?>) parametersObject : Map.of();
 
             mcpIntegrationWorkflow = mcpIntegrationWorkflowService.updateParameters(id, parameters);
         }
@@ -224,9 +249,4 @@ class McpIntegrationWorkflowGraphQlController {
         return null;
     }
 
-    private boolean hasToolCallableTrigger(String workflowId) {
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        return getToolCallableTrigger(workflow) != null;
-    }
 }

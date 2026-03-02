@@ -37,10 +37,13 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.util.SchemaUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -96,12 +99,28 @@ public class McpProjectWorkflowGraphQlController {
 
     @QueryMapping
     List<ProjectWorkflow> toolEligibleProjectVersionWorkflows(@Argument long projectId, @Argument int projectVersion) {
+        List<String> workflowIds = projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
+            .stream()
+            .map(ProjectWorkflow::getWorkflowId)
+            .toList();
+
+        List<Workflow> workflows = workflowService.getWorkflows(workflowIds);
+
+        Map<String, Workflow> workflowMap = workflows
+            .stream()
+            .collect(Collectors.toMap(Workflow::getId, Function.identity()));
+
         return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
             .stream()
-            .filter(projectWorkflow -> hasToolCallableTrigger(projectWorkflow.getWorkflowId()))
+            .filter(projectWorkflow -> {
+                Workflow workflow = workflowMap.get(projectWorkflow.getWorkflowId());
+
+                return workflow != null && getToolCallableTrigger(workflow) != null;
+            })
             .toList();
     }
 
+    @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
     @QueryMapping
     List<Property> mcpProjectWorkflowProperties(@Argument long mcpProjectWorkflowId) {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService.fetchMcpProjectWorkflow(mcpProjectWorkflowId)
@@ -180,8 +199,14 @@ public class McpProjectWorkflowGraphQlController {
         if (input.containsKey("parameters")) {
             Object parametersObject = input.get("parameters");
 
-            Map<String, ?> parameters = parametersObject instanceof Map
-                ? (Map<String, ?>) parametersObject : Map.of();
+            if (parametersObject != null && !(parametersObject instanceof Map)) {
+                Class<?> parametersClass = parametersObject.getClass();
+
+                throw new IllegalArgumentException(
+                    "Expected parameters to be a Map, but got: " + parametersClass.getName());
+            }
+
+            Map<String, ?> parameters = parametersObject != null ? (Map<String, ?>) parametersObject : Map.of();
 
             mcpProjectWorkflow = mcpProjectWorkflowService.updateParameters(id, parameters);
         }
@@ -227,9 +252,4 @@ public class McpProjectWorkflowGraphQlController {
         return null;
     }
 
-    private boolean hasToolCallableTrigger(String workflowId) {
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        return getToolCallableTrigger(workflow) != null;
-    }
 }

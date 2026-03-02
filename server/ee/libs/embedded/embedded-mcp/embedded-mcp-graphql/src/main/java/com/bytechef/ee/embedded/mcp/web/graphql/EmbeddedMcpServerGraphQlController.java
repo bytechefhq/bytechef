@@ -75,8 +75,16 @@ class EmbeddedMcpServerGraphQlController {
 
     @MutationMapping
     McpServer createEmbeddedMcpServer(@Argument CreateEmbeddedMcpServerInput input) {
+        Environment[] environments = Environment.values();
+
+        int environmentIndex = (int) input.environmentId();
+
+        if (environmentIndex < 0 || environmentIndex >= environments.length) {
+            throw new IllegalArgumentException("Invalid environmentId: " + input.environmentId());
+        }
+
         return mcpServerService.create(
-            input.name(), PlatformType.EMBEDDED, Environment.values()[(int) input.environmentId()], input.enabled());
+            input.name(), PlatformType.EMBEDDED, environments[environmentIndex], input.enabled());
     }
 
     @MutationMapping

@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.mcp.domain.McpIntegrationWorkflow;
 import com.bytechef.ee.embedded.mcp.service.McpIntegrationService;
 import com.bytechef.ee.embedded.mcp.service.McpIntegrationWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,8 @@ public class McpIntegrationFacadeImpl implements McpIntegrationFacade {
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
-        integrationInstanceConfiguration.setName("__MCP_SERVER__" + integrationId + "_v" + integrationVersion);
+        integrationInstanceConfiguration.setName(
+            McpServer.MCP_SERVER_NAME_PREFIX + integrationId + "_v" + integrationVersion);
         integrationInstanceConfiguration.setIntegrationId(integrationId);
         integrationInstanceConfiguration.setIntegrationVersion(integrationVersion);
         integrationInstanceConfiguration.setEnvironment(Environment.DEVELOPMENT);
@@ -92,13 +94,25 @@ public class McpIntegrationFacadeImpl implements McpIntegrationFacade {
 
     @Override
     public void deleteMcpIntegration(long mcpIntegrationId) {
+        McpIntegration mcpIntegration = mcpIntegrationService.fetchMcpIntegration(mcpIntegrationId)
+            .orElseThrow(() -> new IllegalArgumentException("McpIntegration not found: " + mcpIntegrationId));
+
         List<McpIntegrationWorkflow> mcpIntegrationWorkflows =
             mcpIntegrationWorkflowService.getMcpIntegrationMcpIntegrationWorkflows(mcpIntegrationId);
 
         for (McpIntegrationWorkflow mcpIntegrationWorkflow : mcpIntegrationWorkflows) {
             mcpIntegrationWorkflowService.delete(mcpIntegrationWorkflow.getId());
+
+            integrationInstanceConfigurationWorkflowService.delete(
+                mcpIntegrationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
         }
 
         mcpIntegrationService.delete(mcpIntegrationId);
+
+        Long integrationInstanceConfigurationId = mcpIntegration.getIntegrationInstanceConfigurationId();
+
+        if (integrationInstanceConfigurationId != null) {
+            integrationInstanceConfigurationService.delete(integrationInstanceConfigurationId);
+        }
     }
 }

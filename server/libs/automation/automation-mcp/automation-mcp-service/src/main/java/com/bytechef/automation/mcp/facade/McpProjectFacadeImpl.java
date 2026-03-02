@@ -25,6 +25,7 @@ import com.bytechef.automation.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.mcp.service.McpProjectService;
 import com.bytechef.automation.mcp.service.McpProjectWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
-        projectDeployment.setName("__MCP_SERVER__" + projectId + "_v" + projectVersion);
+        projectDeployment.setName(McpServer.MCP_SERVER_NAME_PREFIX + projectId + "_v" + projectVersion);
         projectDeployment.setProjectId(projectId);
         projectDeployment.setProjectVersion(projectVersion);
         projectDeployment.setEnvironment(Environment.DEVELOPMENT);
@@ -93,13 +94,24 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
     @Override
     public void deleteMcpProject(long mcpProjectId) {
+        McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
+            .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
+
         List<McpProjectWorkflow> mcpProjectWorkflows = mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(
             mcpProjectId);
 
         for (McpProjectWorkflow mcpProjectWorkflow : mcpProjectWorkflows) {
             mcpProjectWorkflowService.delete(mcpProjectWorkflow.getId());
+
+            projectDeploymentWorkflowService.delete(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
         }
 
         mcpProjectService.delete(mcpProjectId);
+
+        Long projectDeploymentId = mcpProject.getProjectDeploymentId();
+
+        if (projectDeploymentId != null) {
+            projectDeploymentService.delete(projectDeploymentId);
+        }
     }
 }

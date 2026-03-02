@@ -138,19 +138,8 @@ public class McpToolFacade extends AbstractToolFacade {
                 continue;
             }
 
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(trigger.getType());
-
-            boolean mcpTrigger = Objects.equals(workflowNodeType.name(), "workflow");
-
-            String toolName;
-            String description;
-
-            if (mcpTrigger) {
-                toolName = MapUtils.getString(trigger.getParameters(), ToolConstants.TOOL_NAME);
-                description = MapUtils.getString(trigger.getParameters(), ToolConstants.TOOL_DESCRIPTION);
-            } else {
-                throw new IllegalArgumentException("MCP trigger not found: " + workflowNodeType.name());
-            }
+            String toolName = MapUtils.getString(trigger.getParameters(), ToolConstants.TOOL_NAME);
+            String description = MapUtils.getString(trigger.getParameters(), ToolConstants.TOOL_DESCRIPTION);
 
             Map<String, ?> workflowParameters = mcpProjectWorkflow.getParameters();
 
