@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "bytechef-monolith.fullname" . }}
+  name: {{ include "bytechef.fullname" . }}
   labels:
-    {{- include "bytechef-monolith.labels" . | nindent 4 }}
+    {{- include "bytechef.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "bytechef-monolith.selectorLabels" . | nindent 6 }}
+      {{- include "bytechef.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,7 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "bytechef-monolith.labels" . | nindent 8 }}
+        {{- include "bytechef.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -27,7 +27,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "bytechef-monolith.serviceAccountName" . }}
+      serviceAccountName: {{ include "bytechef.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -39,11 +39,11 @@ spec:
           envFrom:
           {{- if .Values.env.secret }}
           - secretRef:
-              name: {{ include "bytechef-monolith.fullname" . }}-secrets
+              name: {{ include "bytechef.fullname" . }}-secrets
           {{- end }}
           {{- if .Values.env.normal }}
           - configMapRef:
-              name: {{ include "bytechef-monolith.fullname" . }}-envs
+              name: {{ include "bytechef.fullname" . }}-envs
           {{- end }}
           ports:
             - name: http

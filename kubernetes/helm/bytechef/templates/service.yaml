@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "bytechef-monolith.fullname" . }}
+  name: {{ include "bytechef.fullname" . }}
   labels:
-    {{- include "bytechef-monolith.labels" . | nindent 4 }}
+    {{- include "bytechef.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "bytechef-monolith.selectorLabels" . | nindent 4 }}
+    {{- include "bytechef.selectorLabels" . | nindent 4 }}
