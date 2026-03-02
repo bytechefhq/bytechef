@@ -17,7 +17,6 @@
 package com.bytechef.task.dispatcher.subflow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -30,7 +29,6 @@ import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition.PropertiesFunction;
-import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition.VariablePropertiesFunction;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.domain.SubflowEntry;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -54,12 +52,11 @@ class SubflowTaskDispatcherDefinitionFactoryTest {
     @Mock
     private SubflowDataSource subflowDataSource;
 
-    private SubflowTaskDispatcherDefinitionFactory factory;
     private TaskDispatcherDefinition definition;
 
     @BeforeEach
     void setUp() {
-        factory = new SubflowTaskDispatcherDefinitionFactory(subflowDataSource);
+        SubflowTaskDispatcherDefinitionFactory factory = new SubflowTaskDispatcherDefinitionFactory(subflowDataSource);
         definition = factory.getDefinition();
     }
 
@@ -149,28 +146,6 @@ class SubflowTaskDispatcherDefinitionFactoryTest {
         assertEquals(expectedResponse, result);
     }
 
-    @Test
-    void testVariablePropertiesReturnsDefaultObjectWhenWorkflowUuidIsNull() throws Exception {
-        VariablePropertiesFunction variablePropertiesFunction = getVariablePropertiesFunction();
-
-        OutputResponse result = (OutputResponse) variablePropertiesFunction.apply(Map.of());
-
-        assertNotNull(result);
-        assertNotNull(result.getOutputSchema());
-    }
-
-    @Test
-    void testVariablePropertiesReturnsDefaultObjectWhenInputSchemaIsNull() throws Exception {
-        when(subflowDataSource.getSubWorkflowInputSchema("test-uuid")).thenReturn(null);
-
-        VariablePropertiesFunction variablePropertiesFunction = getVariablePropertiesFunction();
-
-        OutputResponse result = (OutputResponse) variablePropertiesFunction.apply(Map.of("workflowUuid", "test-uuid"));
-
-        assertNotNull(result);
-        assertNotNull(result.getOutputSchema());
-    }
-
     private PropertiesFunction getDynamicPropertiesFunction() {
         List<? extends Property> properties = definition.getProperties()
             .orElseThrow();
@@ -190,11 +165,6 @@ class SubflowTaskDispatcherDefinitionFactoryTest {
         return definition.getOutputDefinition()
             .flatMap(OutputDefinition::getOutput)
             .map(function -> (OutputFunction) function)
-            .orElseThrow();
-    }
-
-    private VariablePropertiesFunction getVariablePropertiesFunction() {
-        return definition.getVariableProperties()
             .orElseThrow();
     }
 }
