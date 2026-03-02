@@ -82,9 +82,9 @@ type UsePropertyReturnType = {
     handleCodeEditorChange: (value?: string) => void;
     handleControlledBlur: (value: unknown) => void;
     handleControlledModeSwitch: (toDynamic: boolean) => void;
-    handleFromAiToggle: (fromAi: boolean, fieldOnChange: (value: string) => void) => void;
     handleDeleteCustomPropertyClick: (path: string) => void;
     handleFromAiClick: (fromAi: boolean) => void;
+    handleFromAiToggle: (fromAi: boolean, fieldOnChange: (value: string) => void) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
     handleInputTypeSwitchButtonClick: () => void;
     handleJsonSchemaBuilderChange: (value?: SchemaRecordType) => void;
