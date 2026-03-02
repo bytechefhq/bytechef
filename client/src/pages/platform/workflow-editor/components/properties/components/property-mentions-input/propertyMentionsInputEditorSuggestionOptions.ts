@@ -116,6 +116,15 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                         showOnCreate: true,
                         trigger: 'manual',
                     })[0];
+
+                    // When inside a Radix modal dialog, DismissableLayer sets
+                    // document.body pointer-events to "none" and react-remove-scroll
+                    // blocks wheel events outside the dialog content.
+                    // Fix both by re-enabling pointer events and intercepting wheel
+                    // events before react-remove-scroll can preventDefault on them.
+                    popup.popper.style.pointerEvents = 'auto';
+
+                    popup.popper.addEventListener('wheel', (event) => event.stopPropagation(), {capture: true});
                 },
 
                 onUpdate(props) {
