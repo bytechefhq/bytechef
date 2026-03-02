@@ -85,11 +85,15 @@ class DateHelperGetTimeFromNowActionTest {
 
     @Test
     void testPerformTwoYearsAgo() {
-        LocalDateTime now = LocalDateTime.now()
-            .plusSeconds(1);
-        LocalDateTime pastDate = now.minusYears(2);
+        LocalDateTime mockedNow = LocalDateTime.of(2026, 1, 12, 15, 0, 0);
+        LocalDateTime pastDate = mockedNow.minusYears(2);
 
-        assertEquals("2 years, 1 day ago", run(pastDate));
+        try (MockedStatic<LocalDateTime> mockedLocalDateTime = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+            mockedLocalDateTime.when(LocalDateTime::now)
+                .thenReturn(mockedNow);
+
+            assertEquals("2 years, 1 day ago", run(pastDate));
+        }
     }
 
     @Test
