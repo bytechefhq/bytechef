@@ -80,13 +80,15 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
     @Tool(description = "Instructions for writing custom code in Script component")
     public String getScriptCodeInstructions() {
         return """
-            The main function is perform(input, context). In it, you need to write the required logic.
-            - input - ex. input.testInputMapName
-                    - object that holds all the input parameters defined in the 'input' object property of the Script component
-            - context - ex. context.component.componentName.actionName({'parameterName': parameterValue});
-                      - holds all Actions in Bytechef. Action parameters are defined as a map.
+            The main function is perform(input, context).
+            - input - object that holds all the input parameters defined in the 'input' object property of the Script component
+                    - the input parameters are of same type as in the Script component
+                    - `input.testInputMapName`
+            - context - used for calling Actions from other providers. Parameters of the action are defined as a map.
+                      - `context.component.componentName.actionName({'parameterName': parameterValue});`
+                      - ONLY use context property when you need to use outside services
 
-            Always add ';' at the end of the line, where it's appropriate.
+            If the language supports ';' at the end of the line, add ';' at the end of the line.
             """;
     }
 
