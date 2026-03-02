@@ -125,14 +125,7 @@ describe('PropertyInput', async () => {
     });
 
     it('does not strip = from display when expressionPrefix is false', () => {
-        render(
-            <PropertyInput
-                aria-label="Normal"
-                label="Normal"
-                name="normal"
-                value="=someValue"
-            />
-        );
+        render(<PropertyInput aria-label="Normal" label="Normal" name="normal" value="=someValue" />);
 
         const input = screen.getByRole('textbox', {name: /normal/i});
 
