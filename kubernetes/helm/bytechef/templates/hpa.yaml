@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "bytechef-monolith.fullname" . }}
+  name: {{ include "bytechef.fullname" . }}
   labels:
-    {{- include "bytechef-monolith.labels" . | nindent 4 }}
+    {{- include "bytechef.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "bytechef-monolith.fullname" . }}
+    name: {{ include "bytechef.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
