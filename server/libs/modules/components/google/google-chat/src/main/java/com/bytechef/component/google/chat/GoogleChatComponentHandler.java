@@ -22,8 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.google.chat.action.GoogleChatCreateMessageAction;
 import com.bytechef.component.google.chat.action.GoogleChatCreateSpaceAction;
+import com.bytechef.component.google.chat.action.GoogleChatSendSpaceMessageAction;
 import com.bytechef.component.google.chat.connection.GoogleChatConnection;
 import com.google.auto.service.AutoService;
 
@@ -44,11 +44,11 @@ public class GoogleChatComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.COMMUNICATION)
         .connection(GoogleChatConnection.CONNECTION_DEFINITION)
         .actions(
-            GoogleChatCreateMessageAction.ACTION_DEFINITION,
-            GoogleChatCreateSpaceAction.ACTION_DEFINITION)
+            GoogleChatCreateSpaceAction.ACTION_DEFINITION,
+            GoogleChatSendSpaceMessageAction.ACTION_DEFINITION)
         .clusterElements(
-            tool(GoogleChatCreateMessageAction.ACTION_DEFINITION),
-            tool(GoogleChatCreateSpaceAction.ACTION_DEFINITION))
+            tool(GoogleChatCreateSpaceAction.ACTION_DEFINITION),
+            tool(GoogleChatSendSpaceMessageAction.ACTION_DEFINITION))
         .version(1);
 
     @Override
