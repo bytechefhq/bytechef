@@ -16,7 +16,9 @@
 
 package com.bytechef.automation.mcp.domain;
 
+import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -43,6 +45,9 @@ public final class McpProjectWorkflow {
 
     @Column("project_deployment_workflow_id")
     private Long projectDeploymentWorkflowId;
+
+    @Column
+    private MapWrapper parameters = new MapWrapper();
 
     @CreatedBy
     @Column("created_by")
@@ -93,6 +98,14 @@ public final class McpProjectWorkflow {
 
     public void setProjectDeploymentWorkflowId(Long projectDeploymentWorkflowId) {
         this.projectDeploymentWorkflowId = projectDeploymentWorkflowId;
+    }
+
+    public Map<String, ?> getParameters() {
+        return parameters.getMap();
+    }
+
+    public void setParameters(Map<String, ?> parameters) {
+        this.parameters = new MapWrapper(parameters);
     }
 
     public String getCreatedBy() {
@@ -159,6 +172,7 @@ public final class McpProjectWorkflow {
             "id=" + id +
             ", mcpProjectId=" + mcpProjectId +
             ", projectDeploymentWorkflowId=" + projectDeploymentWorkflowId +
+            ", parameters=" + parameters +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

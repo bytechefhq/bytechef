@@ -26,6 +26,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseProperty;
+import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -70,7 +71,7 @@ class SubflowDataSourceImpl implements SubflowDataSource {
             return null;
         }
 
-        String inputSchema = MapUtils.getString(callableTrigger.getParameters(), SubflowConstants.INPUT_SCHEMA);
+        String inputSchema = MapUtils.getString(callableTrigger.getParameters(), WorkflowConstants.INPUT_SCHEMA);
 
         if (inputSchema == null || inputSchema.isEmpty()) {
             return null;
@@ -98,7 +99,7 @@ class SubflowDataSourceImpl implements SubflowDataSource {
             return null;
         }
 
-        String outputSchema = MapUtils.getString(callableResponseTask.getParameters(), SubflowConstants.OUTPUT_SCHEMA);
+        String outputSchema = MapUtils.getString(callableResponseTask.getParameters(), WorkflowConstants.OUTPUT_SCHEMA);
 
         if (outputSchema == null || outputSchema.isEmpty()) {
             return null;
@@ -149,8 +150,8 @@ class SubflowDataSourceImpl implements SubflowDataSource {
         for (WorkflowTask workflowTask : workflowTasks) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-            if (Objects.equals(workflowNodeType.name(), SubflowConstants.CALLABLE_TRIGGER_COMPONENT_NAME) &&
-                Objects.equals(workflowNodeType.operation(), SubflowConstants.CALLABLE_RESPONSE_OPERATION_NAME)) {
+            if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
+                Objects.equals(workflowNodeType.operation(), WorkflowConstants.CALLABLE_RESPONSE)) {
 
                 return workflowTask;
             }
@@ -165,8 +166,8 @@ class SubflowDataSourceImpl implements SubflowDataSource {
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-            if (Objects.equals(workflowNodeType.name(), SubflowConstants.CALLABLE_TRIGGER_COMPONENT_NAME) &&
-                Objects.equals(workflowNodeType.operation(), SubflowConstants.CALLABLE_TRIGGER_OPERATION_NAME)) {
+            if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
+                Objects.equals(workflowNodeType.operation(), WorkflowConstants.CALLABLE)) {
 
                 return workflowTrigger;
             }

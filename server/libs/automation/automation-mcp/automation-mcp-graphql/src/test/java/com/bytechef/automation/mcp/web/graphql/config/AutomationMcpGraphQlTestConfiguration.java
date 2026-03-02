@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.mcp.facade.McpProjectFacade;
 import com.bytechef.automation.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.mcp.service.McpProjectService;
@@ -87,6 +88,12 @@ public class AutomationMcpGraphQlTestConfiguration {
 
     @Bean
     @Primary
+    public ProjectWorkflowService projectWorkflowService() {
+        return Mockito.mock(ProjectWorkflowService.class);
+    }
+
+    @Bean
+    @Primary
     public WorkflowService workflowService() {
         return Mockito.mock(WorkflowService.class);
     }
@@ -95,6 +102,11 @@ public class AutomationMcpGraphQlTestConfiguration {
     @Primary
     public WorkspaceMcpServerFacade workspaceMcpServerFacade() {
         return Mockito.mock(WorkspaceMcpServerFacade.class);
+    }
+
+    @Bean
+    RuntimeWiringConfigurer anyScalarWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.anyScalar());
     }
 
     @Bean

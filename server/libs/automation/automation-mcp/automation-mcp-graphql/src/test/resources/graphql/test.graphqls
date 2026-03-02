@@ -2,6 +2,7 @@
 # Contains all types, queries, and mutations needed by the integration tests.
 
 # Custom scalars
+scalar Any
 scalar Long
 scalar Map
 
@@ -26,6 +27,8 @@ type Query {
     mcpProjectWorkflows: [McpProjectWorkflow]
     mcpProjectWorkflowsByMcpProjectId(mcpProjectId: ID): [McpProjectWorkflow]
     mcpProjectWorkflowsByProjectDeploymentWorkflowId(projectDeploymentWorkflowId: ID): [McpProjectWorkflow]
+    toolEligibleProjectVersionWorkflows(projectId: ID!, projectVersion: Int!): [ProjectWorkflow!]!
+    mcpProjectWorkflowProperties(mcpProjectWorkflowId: ID!): [Property]
 }
 
 # Base Mutation type with all mutation fields
@@ -68,6 +71,7 @@ input McpProjectWorkflowInput {
 input McpProjectWorkflowUpdateInput {
     mcpProjectId: Long
     projectDeploymentWorkflowId: Long
+    parameters: Map
 }
 
 # Main types
@@ -102,6 +106,7 @@ type McpProjectWorkflow {
     id: ID!
     mcpProjectId: Long!
     projectDeploymentWorkflowId: Long!
+    parameters: Map
     projectDeploymentWorkflow: ProjectDeploymentWorkflow
     workflow: Workflow
     createdBy: String
@@ -122,7 +127,141 @@ type ProjectDeploymentWorkflow {
     workflowId: String
 }
 
+type ProjectWorkflow {
+    id: ID!
+    projectId: ID!
+    workflowId: String!
+    projectVersion: Int!
+    uuid: String
+    sseStreamResponse: Boolean!
+    workflow: Workflow!
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int!
+}
+
 type Workflow {
     id: ID
     label: String
+    triggers: [WorkflowTrigger!]!
+}
+
+type WorkflowTrigger {
+    name: String!
+    label: String
+    type: String!
+    parameters: Map
+    description: String
+}
+
+enum PropertyType {
+    ARRAY
+    BOOLEAN
+    DATE
+    DATE_TIME
+    DYNAMIC_PROPERTIES
+    FILE_ENTRY
+    INTEGER
+    NULL
+    NUMBER
+    OBJECT
+    STRING
+    TIME
+}
+
+interface Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+}
+
+type StringProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+    controlType: String
+    label: String
+    placeholder: String
+}
+
+type IntegerProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+    controlType: String
+    label: String
+    placeholder: String
+}
+
+type NumberProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+    controlType: String
+    label: String
+    placeholder: String
+}
+
+type BooleanProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+    controlType: String
+    label: String
+    placeholder: String
+}
+
+type ObjectProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+    controlType: String
+    label: String
+    placeholder: String
+}
+
+type ArrayProperty implements Property {
+    advancedOption: Boolean
+    description: String
+    displayCondition: String
+    expressionEnabled: Boolean
+    hidden: Boolean
+    name: String
+    required: Boolean
+    type: PropertyType!
+    controlType: String
+    label: String
+    placeholder: String
 }

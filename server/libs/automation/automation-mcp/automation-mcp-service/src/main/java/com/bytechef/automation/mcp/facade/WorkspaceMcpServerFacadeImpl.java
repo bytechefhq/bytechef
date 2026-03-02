@@ -21,6 +21,7 @@ import com.bytechef.automation.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -36,13 +37,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
+    private final McpServerFacade mcpServerFacade;
     private final McpServerService mcpServerService;
     private final WorkspaceMcpServerService workspaceMcpServerService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceMcpServerFacadeImpl(
-        McpServerService mcpServerService, WorkspaceMcpServerService workspaceMcpServerService) {
+        McpServerFacade mcpServerFacade, McpServerService mcpServerService,
+        WorkspaceMcpServerService workspaceMcpServerService) {
 
+        this.mcpServerFacade = mcpServerFacade;
         this.mcpServerService = mcpServerService;
         this.workspaceMcpServerService = workspaceMcpServerService;
     }
@@ -72,6 +76,6 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     public void deleteWorkspaceMcpServer(Long mcpServerId) {
         workspaceMcpServerService.removeMcpServerFromWorkspace(mcpServerId);
 
-        mcpServerService.delete(mcpServerId);
+        mcpServerFacade.deleteMcpServer(mcpServerId);
     }
 }

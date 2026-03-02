@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.mcp.facade.McpProjectFacade;
 import com.bytechef.automation.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.mcp.service.McpProjectService;
@@ -39,7 +40,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @MockitoBean(types = {
     ApplicationProperties.class, McpProjectFacade.class, McpProjectService.class,
     McpProjectWorkflowService.class, ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class,
-    ProjectService.class, WorkflowService.class, WorkspaceMcpServerFacade.class
+    ProjectService.class, ProjectWorkflowService.class, WorkflowService.class, WorkspaceMcpServerFacade.class
 })
 public @interface AutomationMcpGraphQlConfigurationSharedMocks {
 }
