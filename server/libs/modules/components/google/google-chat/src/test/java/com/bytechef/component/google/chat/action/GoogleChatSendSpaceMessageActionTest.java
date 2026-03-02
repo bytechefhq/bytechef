@@ -46,7 +46,7 @@ import org.mockito.ArgumentCaptor;
  * @author Nikolina Spehar
  */
 @ExtendWith(MockContextSetupExtension.class)
-class GoogleChatCreateMessageActionTest {
+class GoogleChatSendSpaceMessageActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
@@ -67,7 +67,7 @@ class GoogleChatCreateMessageActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Map<String, Object> result = GoogleChatCreateMessageAction.perform(mockedParameters, null, mockedContext);
+        Map<String, Object> result = GoogleChatSendSpaceMessageAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(responseMap, result);
 
