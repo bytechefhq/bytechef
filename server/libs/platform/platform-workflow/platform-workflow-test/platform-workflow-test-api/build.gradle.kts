@@ -6,4 +6,6 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:file-storage:file-storage-api"))
+    implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
 }
