@@ -7,6 +7,7 @@ interface ClusterElementsWorkflowEditorHeaderProps {
     onCopilotClick: () => void;
     onTestClick: () => void;
     onToggleEditor: (showAiAgent: boolean) => void;
+    showTestButton: boolean;
     showToggleEditor: boolean;
 }
 
@@ -15,6 +16,7 @@ const ClusterElementsWorkflowEditorHeader = ({
     onCopilotClick,
     onTestClick,
     onToggleEditor,
+    showTestButton,
     showToggleEditor,
 }: ClusterElementsWorkflowEditorHeaderProps) => {
     return (
@@ -35,19 +37,21 @@ const ClusterElementsWorkflowEditorHeader = ({
                     </Tooltip>
                 )}
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            className="hover:bg-background/70 [&_svg]:size-5"
-                            icon={<PlayIcon className="text-content-brand-primary" />}
-                            onClick={onTestClick}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
+                {showTestButton && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                className="hover:bg-background/70 [&_svg]:size-5"
+                                icon={<PlayIcon className="text-content-brand-primary" />}
+                                onClick={onTestClick}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
 
-                    <TooltipContent>Test agent</TooltipContent>
-                </Tooltip>
+                        <TooltipContent>Test agent</TooltipContent>
+                    </Tooltip>
+                )}
 
                 {copilotEnabled && (
                     <Tooltip>
