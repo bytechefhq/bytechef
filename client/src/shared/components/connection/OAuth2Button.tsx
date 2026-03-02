@@ -44,7 +44,7 @@ const OAuth2Button = ({
     return (
         <Button
             disabled={loading}
-            icon={loading ? <LoadingIcon /> : undefined}
+            icon={loading ? <LoadingIcon className="text-white" /> : undefined}
             label={loading ? 'Connecting...' : 'Connect'}
             onClick={() => {
                 if (!loading) {
