@@ -109,7 +109,11 @@ const Project = () => {
                                 }}
                             >
                                 {projectId && (
-                                    <WorkflowEditorLayout runDisabled={runDisabled} showWorkflowInputs={true} />
+                                    <WorkflowEditorLayout
+                                        leftSidebarOpen={projectLeftSidebarOpen}
+                                        runDisabled={runDisabled}
+                                        showWorkflowInputs={true}
+                                    />
                                 )}
                             </WorkflowEditorProvider>
                         </ResizablePanel>

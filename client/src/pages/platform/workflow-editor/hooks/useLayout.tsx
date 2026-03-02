@@ -1,4 +1,3 @@
-import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import {
     DATA_PILL_PANEL_WIDTH,
     EDGE_STYLES,
@@ -53,6 +52,7 @@ interface UseLayoutProps {
     canvasWidth: number;
     componentDefinitions: Array<ComponentDefinitionBasic>;
     direction?: LayoutDirectionType;
+    leftSidebarOpen?: boolean;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasic>;
 }
@@ -62,6 +62,7 @@ export default function useLayout({
     canvasWidth,
     componentDefinitions,
     direction: directionProp,
+    leftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: UseLayoutProps) {
@@ -86,7 +87,6 @@ export default function useLayout({
         }))
     );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
-    const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
     );
@@ -100,7 +100,7 @@ export default function useLayout({
     const canvasHeightRef = useRef(canvasHeight);
     const previousDataPillPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousNodeDetailsPanelOpenRef = useRef<boolean | undefined>(undefined);
-    const previousProjectLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
+    const previousLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
 
     canvasWidthRef.current = canvasWidth;
     canvasHeightRef.current = canvasHeight;
@@ -485,7 +485,7 @@ export default function useLayout({
         if (!useWorkflowDataStore.getState().isWorkflowLoaded) {
             previousDataPillPanelOpenRef.current = dataPillPanelOpen;
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
-            previousProjectLeftSidebarOpenRef.current = projectLeftSidebarOpen;
+            previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
             return;
         }
@@ -507,23 +507,23 @@ export default function useLayout({
         }
 
         if (
-            previousProjectLeftSidebarOpenRef.current !== undefined &&
-            previousProjectLeftSidebarOpenRef.current !== projectLeftSidebarOpen
+            previousLeftSidebarOpenRef.current !== undefined &&
+            previousLeftSidebarOpenRef.current !== leftSidebarOpen
         ) {
-            widthDelta += projectLeftSidebarOpen ? PROJECT_LEFT_SIDEBAR_WIDTH : -PROJECT_LEFT_SIDEBAR_WIDTH;
+            widthDelta += leftSidebarOpen ? PROJECT_LEFT_SIDEBAR_WIDTH : -PROJECT_LEFT_SIDEBAR_WIDTH;
         }
 
         if (widthDelta === 0) {
             previousDataPillPanelOpenRef.current = dataPillPanelOpen;
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
-            previousProjectLeftSidebarOpenRef.current = projectLeftSidebarOpen;
+            previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
             return;
         }
 
         previousDataPillPanelOpenRef.current = dataPillPanelOpen;
         previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
-        previousProjectLeftSidebarOpenRef.current = projectLeftSidebarOpen;
+        previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
         const crossAxis = layoutDirection === 'TB' ? 'x' : 'y';
         const positionDelta = -widthDelta / 2;
@@ -542,7 +542,7 @@ export default function useLayout({
         }
 
         cancelAnimationRef.current = animateNodePositions(currentNodes, targetNodes, setNodes);
-    }, [dataPillPanelOpen, layoutDirection, projectLeftSidebarOpen, setNodes, workflowNodeDetailsPanelOpen]);
+    }, [dataPillPanelOpen, layoutDirection, leftSidebarOpen, setNodes, workflowNodeDetailsPanelOpen]);
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
