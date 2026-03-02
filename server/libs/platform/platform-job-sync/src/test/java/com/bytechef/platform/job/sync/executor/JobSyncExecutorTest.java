@@ -89,7 +89,7 @@ class JobSyncExecutorTest {
         WorkflowService workflowService = Mockito.mock(WorkflowService.class);
 
         jobSyncExecutor = new JobSyncExecutor(
-            contextService, evaluator, jobService, -1, (type) -> memoryMessageBroker, List.of(), List.of(), List.of(),
+            contextService, evaluator, jobService, -1, memoryMessageBroker, List.of(), List.of(), List.of(),
             List.of(), List.of(), taskExecutionService, new SyncTaskExecutor(), taskHandlerRegistry, taskFileStorage,
             2L, workflowService);
     }
