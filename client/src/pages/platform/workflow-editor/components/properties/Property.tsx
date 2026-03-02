@@ -1,4 +1,3 @@
-import Button from '@/components/Button/Button';
 import {MultiSelectOptionType} from '@/components/MultiSelect/MultiSelect';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
@@ -6,6 +5,8 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ArrayProperty from '@/pages/platform/workflow-editor/components/properties/ArrayProperty';
 import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
+import ControlledArrayItems from '@/pages/platform/workflow-editor/components/properties/components/ControlledArrayItems';
+import ControlledObjectEntries from '@/pages/platform/workflow-editor/components/properties/components/ControlledObjectEntries';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicProperties';
@@ -26,9 +27,9 @@ import {
 import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/types';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
-import {CircleQuestionMarkIcon, PlusIcon, XIcon} from 'lucide-react';
-import {ReactNode, useMemo, useRef, useState} from 'react';
-import {Control, Controller, FieldValues, FormState, useFormContext, useWatch} from 'react-hook-form';
+import {CircleQuestionMarkIcon} from 'lucide-react';
+import {ReactNode} from 'react';
+import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
 interface PropertyProps {
@@ -50,213 +51,6 @@ interface PropertyProps {
     path?: string;
     property: PropertyAllType;
 }
-
-interface ControlledArrayItemsProps {
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    control: Control<any, any>;
-    controlPath: string;
-    formState?: FormState<FieldValues>;
-    property: PropertyAllType;
-}
-
-/**
- * Renders array items in controlled (react-hook-form) mode.
- * Must be rendered within a FormProvider ancestor (e.g., shadcn's Form component).
- */
-const ControlledArrayItems = ({control, controlPath, formState, property}: ControlledArrayItemsProps) => {
-    const {setValue} = useFormContext();
-    const watchedValue = useWatch({control, name: controlPath});
-    const itemKeysRef = useRef<string[]>([]);
-
-    const items = Array.isArray(watchedValue) ? (watchedValue as unknown[]) : [];
-    const itemDefinition = property.items?.[0];
-
-    // Sync stable keys with items (handles initial load and external resets)
-    while (itemKeysRef.current.length < items.length) {
-        itemKeysRef.current.push(crypto.randomUUID());
-    }
-
-    itemKeysRef.current.length = items.length;
-
-    if (!itemDefinition) {
-        return null;
-    }
-
-    return (
-        <>
-            <ul className="ml-2 flex flex-col space-y-4 border-l border-l-border/50">
-                {items.map((item, index) => (
-                    <li className="flex items-center gap-1" key={itemKeysRef.current[index]}>
-                        <Property
-                            control={control}
-                            controlPath={controlPath}
-                            customClassName="w-full pl-2"
-                            deletePropertyButton={
-                                <Button
-                                    icon={<XIcon />}
-                                    onClick={() => {
-                                        itemKeysRef.current.splice(index, 1);
-
-                                        setValue(
-                                            controlPath,
-                                            items.filter((_, itemIndex) => itemIndex !== index)
-                                        );
-                                    }}
-                                    size="iconXs"
-                                    variant="destructiveGhost"
-                                />
-                            }
-                            formState={formState}
-                            parameterValue={item}
-                            property={
-                                {
-                                    ...itemDefinition,
-                                    defaultValue: item,
-                                    label: `Item ${index}`,
-                                    name: String(index),
-                                } as PropertyAllType
-                            }
-                        />
-                    </li>
-                ))}
-            </ul>
-
-            <Button
-                className="mt-3 rounded-sm"
-                icon={<PlusIcon />}
-                label="Add item"
-                onClick={() => {
-                    itemKeysRef.current.push(crypto.randomUUID());
-
-                    setValue(controlPath, [...items, '']);
-                }}
-                size="sm"
-                variant="secondary"
-            />
-        </>
-    );
-};
-
-interface ControlledObjectEntriesProps {
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    control: Control<any, any>;
-    controlPath: string;
-    formState?: FormState<FieldValues>;
-    property: PropertyAllType;
-}
-
-/**
- * Renders dynamic key-value entries for objects in controlled (react-hook-form) mode.
- * Must be rendered within a FormProvider ancestor (e.g., shadcn's Form component).
- */
-const ControlledObjectEntries = ({control, controlPath, formState, property}: ControlledObjectEntriesProps) => {
-    const {setValue} = useFormContext();
-    const watchedValue = useWatch({control, name: controlPath});
-    const [newEntryKey, setNewEntryKey] = useState('');
-
-    const entries = useMemo(() => {
-        if (watchedValue && typeof watchedValue === 'object' && !Array.isArray(watchedValue)) {
-            return Object.entries(watchedValue as Record<string, unknown>);
-        }
-
-        return [];
-    }, [watchedValue]);
-
-    const itemDefinition = property.additionalProperties?.[0];
-
-    const handleAddEntry = () => {
-        const trimmedKey = newEntryKey.trim();
-
-        if (!trimmedKey) {
-            return;
-        }
-
-        const currentObject =
-            watchedValue && typeof watchedValue === 'object' && !Array.isArray(watchedValue)
-                ? (watchedValue as Record<string, unknown>)
-                : {};
-
-        if (trimmedKey in currentObject) {
-            return;
-        }
-
-        setValue(controlPath, {
-            ...currentObject,
-            [trimmedKey]: '',
-        });
-
-        setNewEntryKey('');
-    };
-
-    return (
-        <>
-            <ul className="ml-2 flex flex-col space-y-4 border-l border-l-border/50">
-                {entries.map(([entryKey, entryValue]) => (
-                    <li className="flex items-center gap-1" key={`${controlPath}_${entryKey}`}>
-                        <Property
-                            control={control}
-                            controlPath={controlPath}
-                            customClassName="w-full pl-2"
-                            deletePropertyButton={
-                                <Button
-                                    icon={<XIcon />}
-                                    onClick={() => {
-                                        const currentObject = {...(watchedValue as Record<string, unknown>)};
-
-                                        delete currentObject[entryKey];
-
-                                        setValue(controlPath, currentObject);
-                                    }}
-                                    size="iconXs"
-                                    variant="destructiveGhost"
-                                />
-                            }
-                            formState={formState}
-                            parameterValue={entryValue}
-                            property={
-                                {
-                                    ...itemDefinition,
-                                    controlType: 'TEXT',
-                                    defaultValue: entryValue,
-                                    label: entryKey,
-                                    name: entryKey,
-                                    type: itemDefinition?.type || 'STRING',
-                                } as PropertyAllType
-                            }
-                        />
-                    </li>
-                ))}
-            </ul>
-
-            <div className="mt-3 flex items-center gap-2">
-                <input
-                    className="h-8 flex-1 rounded-md border bg-background px-2 text-sm"
-                    onChange={(event) => setNewEntryKey(event.target.value)}
-                    onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                            event.preventDefault();
-
-                            handleAddEntry();
-                        }
-                    }}
-                    placeholder="Key name"
-                    type="text"
-                    value={newEntryKey}
-                />
-
-                <Button
-                    className="rounded-sm"
-                    disabled={!newEntryKey.trim()}
-                    icon={<PlusIcon />}
-                    label="Add"
-                    onClick={handleAddEntry}
-                    size="sm"
-                    variant="secondary"
-                />
-            </div>
-        </>
-    );
-};
 
 const Property = ({
     arrayIndex,
