@@ -3,6 +3,7 @@ mutation createMcpComponent($input: McpComponentInput!) {
         id
         componentName
         componentVersion
+        title
         mcpServerId
         connectionId
     }

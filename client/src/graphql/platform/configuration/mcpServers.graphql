@@ -11,6 +11,7 @@ query mcpServers($type: PlatformType!) {
             mcpServerId
             componentName
             componentVersion
+            title
         }
         tags {
             id
