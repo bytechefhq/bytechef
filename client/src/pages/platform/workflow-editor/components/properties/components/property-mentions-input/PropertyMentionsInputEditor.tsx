@@ -1,6 +1,6 @@
-import Button from '@/components/Button/Button';
 import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {canInsertMentionForProperty} from '@/pages/platform/workflow-editor/components/datapills/DataPill';
+import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -33,7 +33,6 @@ import {EditorView} from '@tiptap/pm/view';
 import {Editor, EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {decode} from 'html-entities';
-import {SparklesIcon, XIcon} from 'lucide-react';
 import resolvePath from 'object-resolve-path';
 import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
@@ -735,28 +734,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     value={editorValue}
                 />
 
-                {fromAiExtension &&
-                    handleFromAiClick &&
-                    currentNode?.clusterElementType === 'tools' &&
-                    (isFromAi ? (
-                        <Button
-                            className="self-center"
-                            icon={<XIcon />}
-                            onClick={() => handleFromAiClick && handleFromAiClick(false)}
-                            size="iconSm"
-                            title="Stop AI generation"
-                            variant="destructiveGhost"
-                        />
-                    ) : (
-                        <Button
-                            className="self-center"
-                            icon={<SparklesIcon />}
-                            onClick={() => handleFromAiClick && handleFromAiClick(true)}
-                            size="iconSm"
-                            title="Generate content with AI"
-                            variant="ghost"
-                        />
-                    ))}
+                {fromAiExtension && handleFromAiClick && currentNode?.clusterElementType === 'tools' && (
+                    <FromAiToggleButton isFromAi={!!isFromAi} onToggle={handleFromAiClick} />
+                )}
 
                 {controlType === 'RICH_TEXT' && editor && <PropertyMentionsInputBubbleMenu editor={editor} />}
             </>
