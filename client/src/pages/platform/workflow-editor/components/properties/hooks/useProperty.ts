@@ -1109,7 +1109,12 @@ export const useProperty = ({
         setErrorMessage(regexMismatch ? VALUE_DOES_NOT_MATCH_PATTERN : INCORRECT_VALUE);
     }, [INCORRECT_VALUE, mentionInput, mentionInputValue, maxLength, minLength, regex, VALUE_DOES_NOT_MATCH_PATTERN]);
 
-    // set value to propertyParameterValue
+    // Distribute propertyParameterValue to the appropriate display state variables.
+    // This effect reacts to propertyParameterValue changes and propagates the value
+    // one-way to mentionInputValue, inputValue, selectValue, etc.
+    // IMPORTANT: Do NOT add mentionInputValue or inputValue to the dependency array —
+    // this effect WRITES to those variables, so including them creates a feedback loop
+    // that resets user input before the debounced save can complete.
     useEffect(() => {
         // Skip updating if a save operation is in progress
         if (isSavingRef.current) {
@@ -1132,30 +1137,37 @@ export const useProperty = ({
 
                 setPropertyParameterValue('');
             }
+
+            return;
         }
 
         if (typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=')) {
-            setMentionInputValue(propertyParameterValue.substring(1));
+            if (!mentionInputSyncedRef.current) {
+                setMentionInputValue(propertyParameterValue.substring(1));
+                mentionInputSyncedRef.current = true;
+            }
+
+            return;
         }
 
         const shouldSyncMentionInputFromPlainStringParameter =
             mentionInput &&
             !mentionInputSyncedRef.current &&
             typeof propertyParameterValue === 'string' &&
-            !propertyParameterValue.startsWith('=') &&
             propertyParameterValue !== '';
 
         if (shouldSyncMentionInputFromPlainStringParameter) {
             setMentionInputValue(propertyParameterValue);
 
             mentionInputSyncedRef.current = true;
+
+            return;
         }
 
         const shouldApplyParameterValueToEmptyPlainInput =
             !mentionInput &&
             controlType &&
             INPUT_PROPERTY_CONTROL_TYPES.includes(controlType) &&
-            inputValue === '' &&
             propertyParameterValue;
 
         if (shouldApplyParameterValueToEmptyPlainInput) {
@@ -1186,29 +1198,12 @@ export const useProperty = ({
             }
         }
 
-        if (
-            isNumericalInput &&
-            (inputValue === null || inputValue === undefined) &&
-            propertyParameterValue !== null &&
-            propertyParameterValue !== undefined &&
-            parameterValue
-        ) {
-            setInputValue(propertyParameterValue);
-        }
-
-        if (
-            isNumericalInput &&
-            inputValue !== null &&
-            inputValue !== undefined &&
-            propertyParameterValue !== null &&
-            propertyParameterValue !== undefined &&
-            propertyParameterValue !== inputValue
-        ) {
+        if (isNumericalInput && propertyParameterValue !== null && propertyParameterValue !== undefined) {
             setInputValue(propertyParameterValue);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mentionInputValue, propertyParameterValue, mentionInput, controlType, inputValue]);
+    }, [propertyParameterValue, mentionInput, controlType]);
 
     // set options lookup dependencies
     useEffect(() => {
