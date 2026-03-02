@@ -31,8 +31,22 @@ import java.util.Objects;
  */
 public record FromAiResult(String name, String description, String type, Object defaultValue) {
 
+    private static final String DEFAULT_TYPE = "STRING";
+
     public FromAiResult {
         Objects.requireNonNull(name, "name must not be null");
         Objects.requireNonNull(type, "type must not be null");
+    }
+
+    public FromAiResult(String name) {
+        this(name, null, DEFAULT_TYPE, null);
+    }
+
+    public FromAiResult(String name, String description) {
+        this(name, description, DEFAULT_TYPE, null);
+    }
+
+    public FromAiResult(String name, String description, String type) {
+        this(name, description, type, null);
     }
 }

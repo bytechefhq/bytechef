@@ -18,6 +18,7 @@ package com.bytechef.ai.tool.facade;
 
 import com.bytechef.ai.tool.FromAiResult;
 import com.bytechef.ai.tool.constant.ToolConstants;
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.evaluator.Evaluator;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -46,6 +47,10 @@ public abstract class AbstractToolFacade {
 
                 if (value instanceof FromAiResult fromAiResult) {
                     fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
+                } else if (value instanceof Map<?, ?> map && ConvertUtils.canConvert(map, FromAiResult.class)) {
+                    FromAiResult fromAiResult = ConvertUtils.convertValue(value, FromAiResult.class);
+
+                    fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
                 } else if (value instanceof String expression && expression.contains("fromAi(")) {
                     for (String fromAiCall : extractFromAiCallStrings(expression)) {
                         FromAiResult fromAiResult = evaluateSingleFromAi(fromAiCall);
@@ -63,6 +68,14 @@ public abstract class AbstractToolFacade {
 
     protected Object resolveParameterValue(Object value, Map<String, Object> request) {
         if (value instanceof FromAiResult fromAiResult) {
+            Object requestValue = request.get(fromAiResult.name());
+
+            return requestValue != null ? requestValue : fromAiResult.defaultValue();
+        }
+
+        if (value instanceof Map<?, ?> map && ConvertUtils.canConvert(map, FromAiResult.class)) {
+            FromAiResult fromAiResult = ConvertUtils.convertValue(value, FromAiResult.class);
+
             Object requestValue = request.get(fromAiResult.name());
 
             return requestValue != null ? requestValue : fromAiResult.defaultValue();
@@ -104,10 +117,10 @@ public abstract class AbstractToolFacade {
 
             if (fromAiResult != null) {
                 Object requestValue = request.get(fromAiResult.name());
+
                 Object resolvedValue = requestValue != null ? requestValue : fromAiResult.defaultValue();
 
-                resolvedExpression = resolvedExpression.replace(
-                    fromAiCall, toSpElLiteral(resolvedValue));
+                resolvedExpression = resolvedExpression.replace(fromAiCall, toSpElLiteral(resolvedValue));
             }
         }
 
@@ -166,7 +179,7 @@ public abstract class AbstractToolFacade {
         return sb.toString();
     }
 
-    static List<String> extractFromAiCallStrings(String expression) {
+    protected static List<String> extractFromAiCallStrings(String expression) {
         List<String> calls = new ArrayList<>();
 
         String marker = "fromAi(";
@@ -218,7 +231,7 @@ public abstract class AbstractToolFacade {
         return calls;
     }
 
-    static String toSpElLiteral(Object value) {
+    protected static String toSpElLiteral(Object value) {
         if (value == null) {
             return "null";
         }
