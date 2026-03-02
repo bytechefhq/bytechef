@@ -44,6 +44,8 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table
 public final class McpServer {
 
+    public static final String MCP_SERVER_NAME_PREFIX = "__MCP_SERVER__";
+
     @Id
     private Long id;
 

@@ -102,6 +102,7 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
             query += "tag_id = ? ";
         }
 
+        // __MCP_SERVER__% matches McpServer.MCP_SERVER_NAME_PREFIX in platform-mcp-api
         query += "AND (project_deployment.name NOT LIKE '__API_COLLECTION__%' AND " +
             "project_deployment.name NOT LIKE '__MCP_SERVER__%' )";
 

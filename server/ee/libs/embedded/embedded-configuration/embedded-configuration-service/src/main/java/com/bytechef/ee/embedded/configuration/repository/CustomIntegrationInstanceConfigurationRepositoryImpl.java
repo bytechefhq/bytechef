@@ -90,6 +90,7 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
             query += "WHERE ";
         }
 
+        // Matches McpServer.MCP_SERVER_NAME_PREFIX in platform-mcp-api
         query += "integration_instance_configuration.name NOT LIKE '__MCP_SERVER__%' ";
 
         query += "ORDER BY integration.component_name ASC, integration_instance_configuration.integration_version " +
