@@ -93,7 +93,7 @@ class AiAgentTestApiController {
         value = "/ai-agent-tests",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    SseEmitter testAiAgent(@RequestBody AiAgentTestRequest aiAgentTestRequest) {
+    public SseEmitter testAiAgent(@RequestBody AiAgentTestRequest aiAgentTestRequest) {
         SseEmitter sseEmitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
 
         String testId = String.valueOf(UUID.randomUUID());
@@ -138,13 +138,12 @@ class AiAgentTestApiController {
                     workflowId, workflowNodeName, environmentId);
 
                 @SuppressWarnings("unchecked")
-                Map<String, Object> evaluatedParameters = (Map<String, Object>) evaluator.evaluate(
+                Map<String, Object> evaluatedParameters = evaluator.evaluate(
                     taskParameters, MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
 
                 if (evaluatedParameters.containsKey("attachments")) {
                     evaluatedParameters.put(
-                        "attachments",
-                        TestAttachmentUtils.getFileEntries(tempFileStorage, evaluatedParameters));
+                        "attachments", TestAttachmentUtils.getFileEntries(tempFileStorage, evaluatedParameters));
                 }
 
                 List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
@@ -152,16 +151,19 @@ class AiAgentTestApiController {
                         workflowId, workflowNodeName, environmentId);
 
                 Map<String, Long> connectionIds = MapUtils.toMap(
-                    workflowTestConfigurationConnections,
-                    WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+                    workflowTestConfigurationConnections, WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
                     WorkflowTestConfigurationConnection::getConnectionId);
 
                 Map<String, ?> extensions = workflowTask.getExtensions();
 
+                @SuppressWarnings("unchecked")
+                Map<String, Object> evaluatedExtensions = evaluator.evaluate(
+                    extensions, MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
+
                 Object result = actionDefinitionFacade.executePerform(
                     workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null,
-                    null, workflowId, evaluatedParameters, connectionIds, extensions, environmentId, null, true, null,
-                    null);
+                    null, workflowId, evaluatedParameters, connectionIds, evaluatedExtensions, environmentId, null,
+                    true, null, null);
 
                 if (result instanceof ActionDefinition.SseEmitterHandler sseEmitterHandler) {
                     AiAgentSseEmitterBridge bridge = new AiAgentSseEmitterBridge(sseEmitter, testId);
@@ -207,7 +209,7 @@ class AiAgentTestApiController {
     }
 
     @PostMapping(value = "/ai-agent-tests/{testId}/stop")
-    ResponseEntity<Void> stopAiAgentTest(@PathVariable String testId) {
+    public ResponseEntity<Void> stopAiAgentTest(@PathVariable String testId) {
         SseEmitter sseEmitter = activeTests.getIfPresent(testId);
 
         if (sseEmitter != null) {
