@@ -229,6 +229,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                         ? {
                               ...property,
                               defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                              expressionEnabled: property.expressionEnabled ?? property.type !== 'STRING',
                           }
                         : property
                 );
@@ -236,6 +237,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 return {
                     ...matchingItem,
                     custom: true,
+                    expressionEnabled: true,
                     name: index.toString(),
                     properties: subProperties,
                 };
@@ -251,6 +253,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                         ? {
                               ...property,
                               defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                              expressionEnabled: property.expressionEnabled ?? property.type !== 'STRING',
                           }
                         : property
                 );
@@ -258,6 +261,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 return {
                     ...items[0],
                     custom: true,
+                    expressionEnabled: true,
                     name: index.toString(),
                     properties: subProperties,
                 };
@@ -301,6 +305,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                     controlType,
                     custom: true,
                     defaultValue: parameterItemValue,
+                    expressionEnabled: true,
                     label,
                     name: index.toString(),
                     path: subPropertyPath,
