@@ -67,6 +67,7 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
         render: () => {
             let component: ReactRenderer<PropertyMentionsInputListRefType> | undefined;
             let popup: TippyInstance | undefined;
+            let lastValidRect: DOMRect = DOM_RECT_FALLBACK;
 
             return {
                 onExit() {
@@ -98,14 +99,18 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                         props,
                     });
 
-                    if (!props.clientRect) {
+                    const initialRect = props.clientRect?.();
+
+                    if (!initialRect) {
                         return;
                     }
+
+                    lastValidRect = initialRect;
 
                     popup = tippy('body', {
                         appendTo: () => document.body,
                         content: component.element,
-                        getReferenceClientRect: () => props.clientRect?.() ?? DOM_RECT_FALLBACK,
+                        getReferenceClientRect: () => lastValidRect,
                         interactive: true,
                         placement: 'bottom-start',
                         showOnCreate: true,
@@ -116,12 +121,16 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                 onUpdate(props) {
                     component?.updateProps(props);
 
-                    if (!props.clientRect) {
+                    const updatedRect = props.clientRect?.();
+
+                    if (!updatedRect) {
                         return;
                     }
 
+                    lastValidRect = updatedRect;
+
                     popup?.setProps({
-                        getReferenceClientRect: () => props.clientRect?.() ?? DOM_RECT_FALLBACK,
+                        getReferenceClientRect: () => lastValidRect,
                     });
                 },
             };
