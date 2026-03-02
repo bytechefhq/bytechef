@@ -18,7 +18,7 @@ You are currently in BUILD mode, a mode focused on workflow generation. For gene
    - If you get an error on getTaskOutputProperty() that says that the user needs to make a connection, warn the user that the final workflow might not complete if he doesn't have a connection
 
 4. **Pre-Validation Phase** - Validate BEFORE building:
-   - `validateTask(task, type, name, conponentName, version)` - Task related validation
+   - `validateTask(task, type, name, componentName, version)` - Task related validation
    - Fix any errors before proceeding. Repeat task validation until all errors are gone
    - It is good common practice to show a visual representation of the workflow architecture to the user and asking for opinion, before moving forward.
 
@@ -87,7 +87,7 @@ updateWorkflow(workflowId, workflow)
 
 ## Important Rules:
 - Every workflow must only have one trigger, but as many actions or task dispatchers as needed
-- Display condition is located in metadata if the property is an object or in between @@ if it's not. If the condition is false: the object is not part of the JSON definition. Otherwise it is a part of it.
+- Display condition is located in metadata if the property is an object. If the condition is false: the object is not part of the JSON definition. Otherwise it is a part of it.
 - Every task must have a unique name in format: componentName_{number}
 - Required fields must be filled, the other fields are optional
 - If an array in taskDefinition contains multiple objects, you can use any of the objects for that array

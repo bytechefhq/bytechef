@@ -110,14 +110,12 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         private WorkflowService workflowService;
         private WorkflowNodeOutputFacade workflowNodeOutputFacade;
 
-        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder chatModel(ChatModel chatModel) {
             super.chatModel(chatModel);
 
             return this;
         }
 
-        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder advisors(List<Advisor> advisors) {
             super.advisors(advisors);
 
@@ -130,7 +128,6 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
-        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder tools(List<Object> tools) {
             super.tools(tools);
 
@@ -179,7 +176,6 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
-        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder chatMemory(ChatMemory chatMemory) {
             super.chatMemory(chatMemory);
 
@@ -192,14 +188,12 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
-        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder workflowService(final WorkflowService workflowService) {
             this.workflowService = workflowService;
 
             return this;
         }
 
-        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder workflowNodeOutputFacade(final WorkflowNodeOutputFacade workflowNodeOutputFacade) {
             this.workflowNodeOutputFacade = workflowNodeOutputFacade;
 
