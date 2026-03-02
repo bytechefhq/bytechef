@@ -17,60 +17,48 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The help text that is meant to guide your users as to how to configure this action or trigger.
+ * ConnectionDefinitionHelpModel
  */
 
-@Schema(name = "Help", description = "The help text that is meant to guide your users as to how to configure this action or trigger.")
-@JsonTypeName("Help")
+@JsonTypeName("ConnectionDefinition_help")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-02T12:16:06.542836107+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
-public class HelpModel {
+public class ConnectionDefinitionHelpModel {
 
-  private String body;
+  private @Nullable String body;
 
   private @Nullable String learnMoreUrl;
 
-  public HelpModel() {
-    super();
-  }
-
-  /**
-   * Constructor with only required parameters
-   */
-  public HelpModel(String body) {
-    this.body = body;
-  }
-
-  public HelpModel body(String body) {
+  public ConnectionDefinitionHelpModel body(@Nullable String body) {
     this.body = body;
     return this;
   }
 
   /**
-   * The help text
+   * Get body
    * @return body
    */
-  @NotNull 
-  @Schema(name = "body", description = "The help text", requiredMode = Schema.RequiredMode.REQUIRED)
+  
+  @Schema(name = "body", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("body")
-  public String getBody() {
+  public @Nullable String getBody() {
     return body;
   }
 
-  public void setBody(String body) {
+  public void setBody(@Nullable String body) {
     this.body = body;
   }
 
-  public HelpModel learnMoreUrl(@Nullable String learnMoreUrl) {
+  public ConnectionDefinitionHelpModel learnMoreUrl(@Nullable String learnMoreUrl) {
     this.learnMoreUrl = learnMoreUrl;
     return this;
   }
 
   /**
-   * The url to additional documentation
+   * Get learnMoreUrl
    * @return learnMoreUrl
    */
   
-  @Schema(name = "learnMoreUrl", description = "The url to additional documentation", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "learnMoreUrl", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("learnMoreUrl")
   public @Nullable String getLearnMoreUrl() {
     return learnMoreUrl;
@@ -88,9 +76,9 @@ public class HelpModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    HelpModel help = (HelpModel) o;
-    return Objects.equals(this.body, help.body) &&
-        Objects.equals(this.learnMoreUrl, help.learnMoreUrl);
+    ConnectionDefinitionHelpModel connectionDefinitionHelp = (ConnectionDefinitionHelpModel) o;
+    return Objects.equals(this.body, connectionDefinitionHelp.body) &&
+        Objects.equals(this.learnMoreUrl, connectionDefinitionHelp.learnMoreUrl);
   }
 
   @Override
@@ -101,7 +89,7 @@ public class HelpModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class HelpModel {\n");
+    sb.append("class ConnectionDefinitionHelpModel {\n");
     sb.append("    body: ").append(toIndentedString(body)).append("\n");
     sb.append("    learnMoreUrl: ").append(toIndentedString(learnMoreUrl)).append("\n");
     sb.append("}");

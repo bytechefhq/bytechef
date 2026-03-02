@@ -3,6 +3,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.AuthorizationModel;
+import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionHelpModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -27,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-02-19T05:53:32.886377+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-02T12:16:06.542836107+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
 public class ConnectionDefinitionModel {
 
   private Boolean authorizationRequired = true;
@@ -40,6 +41,8 @@ public class ConnectionDefinitionModel {
   private @Nullable String componentDescription;
 
   private String componentName;
+
+  private @Nullable ConnectionDefinitionHelpModel help;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
@@ -168,6 +171,26 @@ public class ConnectionDefinitionModel {
     this.componentName = componentName;
   }
 
+  public ConnectionDefinitionModel help(@Nullable ConnectionDefinitionHelpModel help) {
+    this.help = help;
+    return this;
+  }
+
+  /**
+   * Get help
+   * @return help
+   */
+  @Valid 
+  @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("help")
+  public @Nullable ConnectionDefinitionHelpModel getHelp() {
+    return help;
+  }
+
+  public void setHelp(@Nullable ConnectionDefinitionHelpModel help) {
+    this.help = help;
+  }
+
   public ConnectionDefinitionModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
@@ -250,6 +273,7 @@ public class ConnectionDefinitionModel {
         Objects.equals(this.baseUri, connectionDefinition.baseUri) &&
         Objects.equals(this.componentDescription, connectionDefinition.componentDescription) &&
         Objects.equals(this.componentName, connectionDefinition.componentName) &&
+        Objects.equals(this.help, connectionDefinition.help) &&
         Objects.equals(this.properties, connectionDefinition.properties) &&
         Objects.equals(this.componentTitle, connectionDefinition.componentTitle) &&
         Objects.equals(this.version, connectionDefinition.version);
@@ -257,7 +281,7 @@ public class ConnectionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationRequired, authorizations, baseUri, componentDescription, componentName, properties, componentTitle, version);
+    return Objects.hash(authorizationRequired, authorizations, baseUri, componentDescription, componentName, help, properties, componentTitle, version);
   }
 
   @Override
@@ -269,6 +293,7 @@ public class ConnectionDefinitionModel {
     sb.append("    baseUri: ").append(toIndentedString(baseUri)).append("\n");
     sb.append("    componentDescription: ").append(toIndentedString(componentDescription)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    componentTitle: ").append(toIndentedString(componentTitle)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
