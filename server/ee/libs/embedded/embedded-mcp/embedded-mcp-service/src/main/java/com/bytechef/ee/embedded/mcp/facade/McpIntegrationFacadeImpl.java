@@ -82,7 +82,7 @@ public class McpIntegrationFacadeImpl implements McpIntegrationFacade {
             integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
                 integrationInstanceConfiguration.getId());
             integrationInstanceConfigurationWorkflow.setWorkflowId(workflowId);
-            integrationInstanceConfigurationWorkflow.setEnabled(false);
+            integrationInstanceConfigurationWorkflow.setEnabled(true);
             integrationInstanceConfigurationWorkflow.setInputs(Map.of());
 
             integrationInstanceConfigurationWorkflow =
@@ -148,7 +148,7 @@ public class McpIntegrationFacadeImpl implements McpIntegrationFacade {
                 integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
                     mcpIntegration.getIntegrationInstanceConfigurationId());
                 integrationInstanceConfigurationWorkflow.setWorkflowId(workflowId);
-                integrationInstanceConfigurationWorkflow.setEnabled(false);
+                integrationInstanceConfigurationWorkflow.setEnabled(true);
                 integrationInstanceConfigurationWorkflow.setInputs(Map.of());
 
                 integrationInstanceConfigurationWorkflow =
