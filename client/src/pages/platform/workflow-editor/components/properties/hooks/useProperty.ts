@@ -222,7 +222,7 @@ export const useProperty = ({
     const inputRef = useRef<HTMLInputElement>(null!);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
-    const mentionInputSyncedRef = useRef(false);
+    const mentionInputSyncedRef = useRef<string | number | undefined>(undefined);
     const resetOnModeChangeRef = useRef(false);
 
     const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
@@ -691,7 +691,40 @@ export const useProperty = ({
     );
 
     const handleInputTypeSwitchButtonClick = () => {
-        setMentionInput(!mentionInput);
+        const switchingToDynamic = !mentionInput;
+
+        setMentionInput(switchingToDynamic);
+
+        if (switchingToDynamic && isFromAi) {
+            setMentionInputValue(fromAiExpression.substring(1));
+            setPropertyParameterValue(fromAiExpression);
+            setMultiSelectValue([]);
+
+            setTimeout(() => {
+                setFocusedInput(editorRef.current);
+            }, 50);
+
+            if (
+                currentComponent &&
+                name &&
+                path &&
+                (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
+                workflow.id
+            ) {
+                saveProperty({
+                    fromAi: true,
+                    includeInMetadata: true,
+                    path,
+                    type,
+                    updateClusterElementParameterMutation,
+                    updateWorkflowNodeParameterMutation,
+                    value: fromAiExpression,
+                    workflowId: workflow.id!,
+                });
+            }
+
+            return;
+        }
 
         setMentionInputValue('');
         setPropertyParameterValue('');
@@ -1009,13 +1042,18 @@ export const useProperty = ({
             const isStringValue = typeof propertyParameterValue === 'string';
 
             const hasDataPill = isStringValue && propertyParameterValue.includes('${');
+            const hasExpression = isStringValue && propertyParameterValue.startsWith('=');
             const hasFormula = isStringValue && propertyParameterValue.includes('#{');
 
-            const shouldUseMentionInput = hasDataPill || hasFormula;
+            const shouldUseMentionInput = hasDataPill || hasExpression || hasFormula;
 
             if (shouldUseMentionInput) {
                 setMentionInput(true);
-                setMentionInputValue(propertyParameterValue);
+                setMentionInputValue(hasExpression ? propertyParameterValue.substring(1) : propertyParameterValue);
+
+                if (hasExpression) {
+                    setIsFormulaMode(true);
+                }
 
                 return;
             } else {
@@ -1073,6 +1111,8 @@ export const useProperty = ({
         const encodedParameters = encodeParameters(parameters);
         const encodedPath = path ? encodePath(path) : undefined;
 
+        const isExpressionValue = typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=');
+
         if (Object.keys(parameters).length && (!propertyParameterValue || propertyParameterValue === defaultValue)) {
             if (!path || !encodedPath) {
                 setPropertyParameterValue(parameters[name]);
@@ -1087,12 +1127,18 @@ export const useProperty = ({
 
                 if (typeof valueFromDefinition === 'string' && valueFromDefinition.startsWith('=')) {
                     setMentionInput(true);
+                    setMentionInputValue(valueFromDefinition.substring(1));
 
                     setIsFormulaMode(true);
                 }
             } else {
                 setPropertyParameterValue(encodedParameters[name]);
             }
+        } else if (isExpressionValue) {
+            setMentionInput(true);
+            setMentionInputValue(propertyParameterValue.substring(1));
+
+            setIsFormulaMode(true);
         }
 
         const shouldSaveHiddenProperty =
@@ -1118,8 +1164,6 @@ export const useProperty = ({
 
             return () => clearTimeout(timeoutId);
         }
-
-        initialMountRef.current = false;
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -1180,7 +1224,7 @@ export const useProperty = ({
                 if (!userHasUnsavedInput) {
                     setMentionInputValue('');
 
-                    mentionInputSyncedRef.current = false;
+                    mentionInputSyncedRef.current = undefined;
                 }
             } else {
                 setInputValue('');
@@ -1194,9 +1238,9 @@ export const useProperty = ({
         }
 
         if (typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=')) {
-            if (!mentionInputSyncedRef.current) {
+            if (mentionInputSyncedRef.current !== propertyParameterValue) {
                 setMentionInputValue(propertyParameterValue.substring(1));
-                mentionInputSyncedRef.current = true;
+                mentionInputSyncedRef.current = propertyParameterValue;
             }
 
             return;
@@ -1204,14 +1248,14 @@ export const useProperty = ({
 
         const shouldSyncMentionInputFromPlainStringParameter =
             mentionInput &&
-            !mentionInputSyncedRef.current &&
+            mentionInputSyncedRef.current !== propertyParameterValue &&
             typeof propertyParameterValue === 'string' &&
             propertyParameterValue !== '';
 
         if (shouldSyncMentionInputFromPlainStringParameter) {
             setMentionInputValue(propertyParameterValue);
 
-            mentionInputSyncedRef.current = true;
+            mentionInputSyncedRef.current = propertyParameterValue;
 
             return;
         }
@@ -1356,6 +1400,8 @@ export const useProperty = ({
         // from currentComponent.parameters which is more up-to-date than the
         // workflow definition (updated via store before the definition refetch).
         if (initialMountRef.current) {
+            initialMountRef.current = false;
+
             return;
         }
 
@@ -1385,7 +1431,7 @@ export const useProperty = ({
             setMentionInputValue(parameterDefaultValue);
             setSelectValue(parameterDefaultValue.toString());
 
-            mentionInputSyncedRef.current = false;
+            mentionInputSyncedRef.current = undefined;
 
             if (Array.isArray(parameterDefaultValue)) {
                 setMultiSelectValue(parameterDefaultValue);
