@@ -1,0 +1,15 @@
+extend type Query {
+    embeddedMcpServers: [McpServer]
+    mcpComponentDefinitions: [ComponentDefinition!]!
+}
+
+extend type Mutation {
+    createEmbeddedMcpServer(input: CreateEmbeddedMcpServerInput!): McpServer
+    deleteEmbeddedMcpServer(mcpServerId: ID!): Boolean
+}
+
+input CreateEmbeddedMcpServerInput {
+    name: String!
+    environmentId: ID!
+    enabled: Boolean
+}
