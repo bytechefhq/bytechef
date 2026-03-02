@@ -1,6 +1,7 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {useClusterElementPropertyDynamicPropertiesQuery} from '@/shared/middleware/graphql';
 import {
     useGetClusterElementDynamicPropertiesQuery,
     useGetWorkflowNodeDynamicPropertiesQuery,
@@ -8,31 +9,42 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PropertyAllType} from '@/shared/types';
 import {useEffect, useMemo, useState} from 'react';
+import {Control, FieldValues, FormState} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
 import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
+import {useClusterElementContext} from '../ClusterElementContext';
 import Property from '../Property';
 
 interface PropertyDynamicPropertiesProps {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    control?: Control<any, any>;
+    controlPath?: string;
     currentOperationName?: string;
     enabled: boolean;
+    formState?: FormState<FieldValues>;
     lookupDependsOnPaths?: Array<unknown>;
     lookupDependsOnValues?: Array<unknown>;
     name?: string;
     path?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     parameterValue?: any;
+    toolsMode?: boolean;
 }
 
 const PropertyDynamicProperties = ({
+    control,
+    controlPath,
     currentOperationName,
     enabled,
+    formState,
     lookupDependsOnPaths,
     lookupDependsOnValues,
     name,
     parameterValue,
     path,
+    toolsMode,
 }: PropertyDynamicPropertiesProps) => {
     const [subProperties, setSubProperties] = useState<PropertyAllType[]>([]);
     const [lastProcessedKey, setLastProcessedKey] = useState('');
@@ -48,6 +60,8 @@ const PropertyDynamicProperties = ({
     );
 
     const {rootClusterElementNodeData} = useWorkflowEditorStore();
+
+    const clusterElementContext = useClusterElementContext();
 
     const lookupDependsOnValuesKey = getFormattedDependencyKey(lookupDependsOnValues);
 
@@ -92,23 +106,113 @@ const PropertyDynamicProperties = ({
     const queryEnabled = useMemo(
         () =>
             (lookupDependsOnPaths?.length
-                ? lookupDependsOnValues?.every((loadDependencyValue) => loadDependencyValue != null)
+                ? lookupDependsOnValues?.every((loadDependencyValue) => {
+                      if (loadDependencyValue == null) {
+                          return false;
+                      }
+
+                      if (control && typeof loadDependencyValue === 'string') {
+                          return (
+                              loadDependencyValue !== '' &&
+                              !loadDependencyValue.startsWith('=') &&
+                              !loadDependencyValue.includes('${')
+                          );
+                      }
+
+                      return true;
+                  })
                 : true) &&
             enabled &&
             !operationChangeInProgress,
-        [lookupDependsOnPaths?.length, lookupDependsOnValues, enabled, operationChangeInProgress]
+        [control, lookupDependsOnPaths?.length, lookupDependsOnValues, enabled, operationChangeInProgress]
     );
 
     const {data: properties, isLoading} = useGetWorkflowNodeDynamicPropertiesQuery(
         queryOptions,
-        Boolean(queryEnabled && !currentNode?.clusterElementType)
+        Boolean(queryEnabled && !currentNode?.clusterElementType && !clusterElementContext)
     );
 
     const {data: clusterElementProperties, isLoading: isClusterElementPropertiesLoading} =
         useGetClusterElementDynamicPropertiesQuery(
             clusterElementQueryOptions,
-            Boolean(queryEnabled && currentNode?.clusterElementType)
+            Boolean(queryEnabled && currentNode?.clusterElementType && !clusterElementContext)
         );
+
+    // Cluster element context fallback: resolve lookup dependencies from form values
+    const clusterElementInputParameters = useMemo(() => {
+        if (!clusterElementContext?.inputParameters) {
+            return undefined;
+        }
+
+        const filtered: Record<string, unknown> = {};
+
+        for (const [parameterKey, parameterValue] of Object.entries(clusterElementContext.inputParameters)) {
+            if (
+                typeof parameterValue === 'string' &&
+                (parameterValue.startsWith('=') || parameterValue.includes('${'))
+            ) {
+                continue;
+            }
+
+            filtered[parameterKey] = parameterValue;
+        }
+
+        return filtered;
+    }, [clusterElementContext?.inputParameters]);
+
+    const clusterElementLookupDependsOnValues = useMemo(() => {
+        if (!clusterElementInputParameters || !lookupDependsOnPaths?.length) {
+            return undefined;
+        }
+
+        return (lookupDependsOnPaths as string[]).map(
+            (dependencyPath) => clusterElementInputParameters[dependencyPath]
+        );
+    }, [clusterElementInputParameters, lookupDependsOnPaths]);
+
+    const clusterElementContextQueryEnabled = useMemo(() => {
+        if (!clusterElementContext || currentNode) {
+            return false;
+        }
+
+        if ((lookupDependsOnPaths as string[] | undefined)?.length && clusterElementLookupDependsOnValues) {
+            return clusterElementLookupDependsOnValues.every(
+                (dependencyValue) => dependencyValue !== undefined && dependencyValue !== null && dependencyValue !== ''
+            );
+        }
+
+        return enabled;
+    }, [currentNode, enabled, lookupDependsOnPaths, clusterElementLookupDependsOnValues, clusterElementContext]);
+
+    const {data: clusterElementPropertyDynamicProperties, isLoading: isClusterElementPropertyDynamicPropertiesLoading} =
+        useClusterElementPropertyDynamicPropertiesQuery(
+            {
+                clusterElementName: clusterElementContext?.clusterElementName || '',
+                componentName: clusterElementContext?.componentName || '',
+                componentVersion: clusterElementContext?.componentVersion || 0,
+                connectionId: clusterElementContext?.connectionId,
+                inputParameters: clusterElementInputParameters,
+                lookupDependsOnPaths: (lookupDependsOnPaths as string[]) || [],
+                propertyName: name || '',
+            },
+            {
+                enabled: clusterElementContextQueryEnabled,
+                queryKey: [
+                    'clusterElementPropertyDynamicProperties',
+                    {
+                        clusterElementName: clusterElementContext?.clusterElementName,
+                        componentName: clusterElementContext?.componentName,
+                        componentVersion: clusterElementContext?.componentVersion,
+                        connectionId: clusterElementContext?.connectionId,
+                        lookupDependsOnValues: clusterElementLookupDependsOnValues,
+                        propertyName: name,
+                    },
+                ],
+            }
+        );
+
+    const clusterElementDynamicProperties =
+        clusterElementPropertyDynamicProperties?.clusterElementPropertyDynamicProperties;
 
     // Update subProperties and track which key generated these properties
     useEffect(() => {
@@ -120,10 +224,14 @@ const PropertyDynamicProperties = ({
             setSubProperties(clusterElementProperties);
 
             setLastProcessedKey(lookupDependsOnValuesKey);
+        } else if (clusterElementDynamicProperties && clusterElementDynamicProperties.length > 0) {
+            setSubProperties(clusterElementDynamicProperties as PropertyAllType[]);
+
+            setLastProcessedKey(lookupDependsOnValuesKey);
         } else {
             setSubProperties([]);
         }
-    }, [properties, lookupDependsOnValuesKey, clusterElementProperties]);
+    }, [properties, lookupDependsOnValuesKey, clusterElementProperties, clusterElementDynamicProperties]);
 
     const isPending = lookupDependsOnValuesKey !== lastProcessedKey;
 
@@ -136,10 +244,20 @@ const PropertyDynamicProperties = ({
         [parameterValue]
     );
 
-    const hasLoadedData =
-        (properties && properties.length > 0) || (clusterElementProperties && clusterElementProperties.length > 0);
+    // In controlled mode, use the parent's calculatedPath as controlPath for children
+    // so form fields register under the correct nested path (e.g., "fields.Id")
+    const childControlPath = control ? path : controlPath;
 
-    if ((isLoading || isClusterElementPropertiesLoading || isPending) && queryEnabled && !hasLoadedData) {
+    const hasLoadedData =
+        (properties && properties.length > 0) ||
+        (clusterElementProperties && clusterElementProperties.length > 0) ||
+        (clusterElementDynamicProperties && clusterElementDynamicProperties.length > 0);
+
+    const isAnyLoading =
+        isLoading || isClusterElementPropertiesLoading || isClusterElementPropertyDynamicPropertiesLoading;
+    const isAnyQueryEnabled = queryEnabled || clusterElementContextQueryEnabled;
+
+    if ((isAnyLoading || isPending) && isAnyQueryEnabled && !hasLoadedData) {
         return (
             <ul className="flex flex-col gap-4">
                 {Array.from({length: 3}).map((_, index) => (
@@ -153,7 +271,7 @@ const PropertyDynamicProperties = ({
         );
     }
 
-    if (!subProperties) {
+    if (!subProperties.length) {
         return <></>;
     }
 
@@ -168,16 +286,20 @@ const PropertyDynamicProperties = ({
 
                 return (
                     <Property
+                        control={control}
+                        controlPath={childControlPath}
                         dynamicPropertySource={name}
+                        formState={formState}
                         key={`${property.name}_${index}_${lastProcessedKey}_property`}
-                        objectName={name}
+                        objectName={control ? undefined : name}
                         operationName={currentOperationName}
                         parameterValue={defaultValue}
-                        path={path}
+                        path={control ? undefined : path}
                         property={{
                             ...property,
                             defaultValue,
                         }}
+                        toolsMode={toolsMode}
                     />
                 );
             })}
