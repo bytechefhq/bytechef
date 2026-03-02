@@ -19,8 +19,11 @@ package com.bytechef.platform.workflow.execution.web.rest.mapper;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.web.rest.mapper.config.PlatformWorkflowExecutionMapperSpringConfig;
 import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionModel;
+import java.util.List;
 import java.util.Optional;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Named;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -30,7 +33,11 @@ import org.springframework.core.convert.converter.Converter;
 public interface TaskExecutionMapper extends Converter<TaskExecutionDTO, TaskExecutionModel> {
 
     @Override
+    @Named(value = "taskExecutionDTOToTaskExecutionModelMapper")
     TaskExecutionModel convert(TaskExecutionDTO taskExecutionDTO);
+
+    @IterableMapping(qualifiedByName = "taskExecutionDTOToTaskExecutionModelMapper")
+    List<TaskExecutionModel> convertList(List<TaskExecutionDTO> list);
 
     default String map(Optional<String> optional) {
         return optional.orElse(null);
