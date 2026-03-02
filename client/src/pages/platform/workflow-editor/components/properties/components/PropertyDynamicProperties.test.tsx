@@ -1,10 +1,13 @@
 import {PropertyAllType} from '@/shared/types';
 import {render, screen} from '@/shared/util/test-utils';
+import {Control, FieldValues} from 'react-hook-form';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import PropertyDynamicProperties from './PropertyDynamicProperties';
 
 const hoisted = vi.hoisted(() => ({
+    mockClusterElementContext: vi.fn(),
+    mockClusterElementDynamicPropertiesQuery: vi.fn(),
     mockClusterElementQuery: vi.fn(),
     mockDynamicPropertiesQuery: vi.fn(),
     mockNodeDetailsPanelStore: vi.fn(),
@@ -32,6 +35,14 @@ vi.mock('@/shared/queries/platform/workflowNodeDynamicProperties.queries', () =>
     useGetWorkflowNodeDynamicPropertiesQuery: hoisted.mockDynamicPropertiesQuery,
 }));
 
+vi.mock('@/shared/middleware/graphql', () => ({
+    useClusterElementPropertyDynamicPropertiesQuery: hoisted.mockClusterElementDynamicPropertiesQuery,
+}));
+
+vi.mock('../ClusterElementContext', () => ({
+    useClusterElementContext: () => hoisted.mockClusterElementContext(),
+}));
+
 vi.mock('../Property', () => ({
     default: ({parameterValue, property}: {parameterValue: unknown; property: PropertyAllType}) => (
         <div data-testid={`property-${property.name}`} data-value={String(parameterValue)}>
@@ -57,6 +68,8 @@ const defaultProps = {
 beforeEach(() => {
     hoisted.mockDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: false});
     hoisted.mockClusterElementQuery.mockReturnValue({data: undefined, isLoading: false});
+    hoisted.mockClusterElementDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: false});
+    hoisted.mockClusterElementContext.mockReturnValue(undefined);
 
     hoisted.mockNodeDetailsPanelStore.mockReturnValue({
         currentNode: {
@@ -92,7 +105,7 @@ describe('PropertyDynamicProperties', () => {
 
             const {container} = render(<PropertyDynamicProperties {...defaultProps} />);
 
-            expect(container.querySelector('ul')).toBeInTheDocument();
+            expect(container.querySelector('ul')).not.toBeInTheDocument();
             expect(screen.queryByTestId('property-field1')).not.toBeInTheDocument();
         });
 
@@ -277,6 +290,142 @@ describe('PropertyDynamicProperties', () => {
 
             expect(screen.getByTestId('property-field1')).toBeInTheDocument();
             expect(screen.getByTestId('property-field2')).toBeInTheDocument();
+        });
+    });
+
+    describe('cluster element context fallback path', () => {
+        beforeEach(() => {
+            hoisted.mockNodeDetailsPanelStore.mockReturnValue({
+                currentNode: undefined,
+                operationChangeInProgress: false,
+            });
+
+            hoisted.mockClusterElementContext.mockReturnValue({
+                clusterElementName: 'mcpTool_1',
+                componentName: 'mcpServer',
+                componentVersion: 1,
+                connectionId: 42,
+                inputParameters: {serverId: 'srv-1'},
+            });
+        });
+
+        it('should render cluster element dynamic properties when context is available', () => {
+            hoisted.mockClusterElementDynamicPropertiesQuery.mockReturnValue({
+                data: {clusterElementPropertyDynamicProperties: sampleProperties},
+                isLoading: false,
+            });
+
+            render(<PropertyDynamicProperties {...defaultProps} />);
+
+            expect(screen.getByTestId('property-field1')).toBeInTheDocument();
+            expect(screen.getByTestId('property-field2')).toBeInTheDocument();
+        });
+
+        it('should show skeletons when cluster element context query is loading', () => {
+            hoisted.mockClusterElementDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: true});
+
+            const {container} = render(<PropertyDynamicProperties {...defaultProps} />);
+            const skeletons = container.querySelectorAll('[class*="animate-pulse"]');
+
+            expect(skeletons.length).toBeGreaterThan(0);
+        });
+
+        it('should filter expression values from cluster element dependency checks', () => {
+            hoisted.mockClusterElementContext.mockReturnValue({
+                clusterElementName: 'mcpTool_1',
+                componentName: 'mcpServer',
+                componentVersion: 1,
+                inputParameters: {serverId: '=expression'},
+            });
+
+            hoisted.mockClusterElementDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: false});
+
+            const mockControl = {} as Control<FieldValues>;
+
+            const {container} = render(
+                <PropertyDynamicProperties
+                    {...defaultProps}
+                    control={mockControl}
+                    lookupDependsOnPaths={['serverId']}
+                    lookupDependsOnValues={['=expression']}
+                />
+            );
+
+            // Should not show skeletons or properties since dependency is an expression
+            const skeletons = container.querySelectorAll('[class*="animate-pulse"]');
+
+            expect(skeletons.length).toBe(0);
+        });
+    });
+
+    describe('expression dependency filtering (controlled mode only)', () => {
+        const mockControl = {} as Control<FieldValues>;
+
+        it('should disable query when dependency value starts with = in controlled mode', () => {
+            hoisted.mockDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: false});
+
+            render(
+                <PropertyDynamicProperties
+                    {...defaultProps}
+                    control={mockControl}
+                    lookupDependsOnPaths={['field']}
+                    lookupDependsOnValues={['=someExpression']}
+                />
+            );
+
+            const queryCall = hoisted.mockDynamicPropertiesQuery.mock.calls[0];
+
+            expect(queryCall[1]).toBe(false);
+        });
+
+        it('should disable query when dependency value contains ${ in controlled mode', () => {
+            hoisted.mockDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: false});
+
+            render(
+                <PropertyDynamicProperties
+                    {...defaultProps}
+                    control={mockControl}
+                    lookupDependsOnPaths={['field']}
+                    lookupDependsOnValues={['${interpolated}']}
+                />
+            );
+
+            const queryCall = hoisted.mockDynamicPropertiesQuery.mock.calls[0];
+
+            expect(queryCall[1]).toBe(false);
+        });
+
+        it('should NOT disable query for expression values in uncontrolled mode', () => {
+            hoisted.mockDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: true});
+
+            render(
+                <PropertyDynamicProperties
+                    {...defaultProps}
+                    lookupDependsOnPaths={['field']}
+                    lookupDependsOnValues={['=someExpression']}
+                />
+            );
+
+            const queryCall = hoisted.mockDynamicPropertiesQuery.mock.calls[0];
+
+            expect(queryCall[1]).toBe(true);
+        });
+
+        it('should disable query when dependency value is empty string', () => {
+            hoisted.mockDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: false});
+
+            render(
+                <PropertyDynamicProperties
+                    {...defaultProps}
+                    control={mockControl}
+                    lookupDependsOnPaths={['field']}
+                    lookupDependsOnValues={['']}
+                />
+            );
+
+            const queryCall = hoisted.mockDynamicPropertiesQuery.mock.calls[0];
+
+            expect(queryCall[1]).toBe(false);
         });
     });
 });
