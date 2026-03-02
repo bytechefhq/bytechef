@@ -122,6 +122,14 @@ const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => {
 
     const isFixedPosition = className?.split(/\s+/).includes('fixed');
 
+    const contentClassName = isFixedPosition
+        ? twMerge(
+              'transition-transform duration-300 ease-in-out',
+              isVisible ? 'translate-x-0' : 'translate-x-full',
+              className
+          )
+        : className;
+
     useEffect(() => {
         let outerRafId: number | undefined;
         let innerRafId: number | undefined;
@@ -155,14 +163,6 @@ const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => {
             }
         };
     }, [open]);
-
-    const contentClassName = isFixedPosition
-        ? twMerge(
-              'transition-transform duration-300 ease-in-out',
-              isVisible ? 'translate-x-0' : 'translate-x-full',
-              className
-          )
-        : className;
 
     return (
         <CopilotPanelBoundary open={open}>
