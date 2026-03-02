@@ -91,5 +91,4 @@ public class FromAi implements MethodExecutor {
 
         return new TypedValue(new FromAiResult(name, description, type, defaultValue));
     }
-
 }
