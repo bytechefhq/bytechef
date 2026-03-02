@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "StringProperty", description = "A string property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-02-19T05:53:32.886377+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-02T12:16:06.542836107+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
 public class StringPropertyModel extends ValuePropertyModel {
 
   private @Nullable String languageId;
@@ -74,7 +74,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The language id used together with CODE_EDITOR control type.
    * @return languageId
    */
-
+  
   @Schema(name = "languageId", description = "The language id used together with CODE_EDITOR control type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("languageId")
   public @Nullable String getLanguageId() {
@@ -94,7 +94,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The property default value.
    * @return defaultValue
    */
-
+  
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
   public @Nullable String getDefaultValue() {
@@ -114,7 +114,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The property sample value.
    * @return exampleValue
    */
-
+  
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
   public @Nullable String getExampleValue() {
@@ -134,7 +134,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The maximum string length.
    * @return maxLength
    */
-
+  
   @Schema(name = "maxLength", description = "The maximum string length.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxLength")
   public @Nullable Integer getMaxLength() {
@@ -154,7 +154,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The minimum string length.
    * @return minLength
    */
-
+  
   @Schema(name = "minLength", description = "The minimum string length.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("minLength")
   public @Nullable Integer getMinLength() {
@@ -174,7 +174,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The regular expression pattern for validation.
    * @return regex
    */
-
+  
   @Schema(name = "regex", description = "The regular expression pattern for validation.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("regex")
   public @Nullable String getRegex() {
@@ -202,7 +202,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * The list of valid property options.
    * @return options
    */
-  @Valid
+  @Valid 
   @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("options")
   public List<@Valid OptionModel> getOptions() {
@@ -222,7 +222,7 @@ public class StringPropertyModel extends ValuePropertyModel {
    * Get optionsDataSource
    * @return optionsDataSource
    */
-  @Valid
+  @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsDataSource")
   public @Nullable OptionsDataSourceModel getOptionsDataSource() {
@@ -232,6 +232,7 @@ public class StringPropertyModel extends ValuePropertyModel {
   public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
+
 
   public StringPropertyModel controlType(ControlTypeModel controlType) {
     super.controlType(controlType);

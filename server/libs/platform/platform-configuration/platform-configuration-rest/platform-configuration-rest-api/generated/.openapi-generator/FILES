@@ -32,6 +32,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentConnec
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionBasicModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionHelpModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ControlTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/CredentialStatusModel.java
