@@ -76,6 +76,21 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
     }
 
     @Override
+    @SuppressFBWarnings("VA")
+    @Tool(description = "Instructions for writing custom code in Script component")
+    public String getScriptCodeInstructions() {
+        return """
+            The main function is perform(input, context). In it, you need to write the required logic.
+            - input - ex. input.testInputMapName
+                    - object that holds all the input parameters defined in the 'input' object property of the Script component
+            - context - ex. context.component.componentName.actionName({'parameterName': parameterValue});
+                      - holds all Actions in Bytechef. Action parameters are defined as a map.
+
+            Always add ';' at the end of the line, where it's appropriate.
+            """;
+    }
+
+    @Override
     @Tool(
         description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
     public WorkflowInfo getWorkflow(
