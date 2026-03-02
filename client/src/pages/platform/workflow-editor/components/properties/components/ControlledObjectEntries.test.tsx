@@ -1,7 +1,7 @@
 import {PropertyAllType} from '@/shared/types';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
 import {FormProvider, useForm} from 'react-hook-form';
+import {describe, expect, it, vi} from 'vitest';
 
 import ControlledObjectEntries from './ControlledObjectEntries';
 

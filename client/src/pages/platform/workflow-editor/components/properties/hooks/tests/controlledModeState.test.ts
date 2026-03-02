@@ -114,7 +114,7 @@ describe('controlled-mode state logic', () => {
         });
 
         it('does not detect numeric values as dynamic mode', () => {
-            const fieldValue = 42;
+            const fieldValue = 42 as string | number;
             const isDynamic = typeof fieldValue === 'string' && fieldValue.startsWith('=');
 
             expect(isDynamic).toBe(false);
