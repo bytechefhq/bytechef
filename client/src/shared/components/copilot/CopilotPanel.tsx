@@ -120,9 +120,9 @@ const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => {
     const [shouldRender, setShouldRender] = useState(open);
     const [isVisible, setIsVisible] = useState(open);
 
-    const isFixedPosition = className?.split(/\s+/).includes('fixed');
+    const isSlideAnimation = className?.split(/\s+/).some((cls) => cls === 'fixed' || cls === 'absolute');
 
-    const contentClassName = isFixedPosition
+    const contentClassName = isSlideAnimation
         ? twMerge(
               'transition-transform duration-300 ease-in-out',
               isVisible ? 'translate-x-0' : 'translate-x-full',
@@ -166,17 +166,15 @@ const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => {
 
     return (
         <CopilotPanelBoundary open={open}>
-            {isFixedPosition && !shouldRender ? null : (
-                <div
-                    className={twMerge(
-                        'overflow-hidden',
-                        !isFixedPosition && 'h-full transition-[width] duration-300 ease-in-out',
-                        !isFixedPosition && (isVisible ? 'w-[450px]' : 'w-0')
-                    )}
-                >
-                    {shouldRender && <CopilotPanelContent className={contentClassName} onClose={onClose} />}
-                </div>
-            )}
+            <div
+                className={twMerge(
+                    'overflow-hidden',
+                    !isSlideAnimation && 'h-full transition-[width] duration-300 ease-in-out',
+                    !isSlideAnimation && (isVisible ? 'w-[450px]' : 'w-0')
+                )}
+            >
+                {shouldRender && <CopilotPanelContent className={contentClassName} onClose={onClose} />}
+            </div>
         </CopilotPanelBoundary>
     );
 };
