@@ -29,7 +29,6 @@ export interface UseApprovalTasksReturnI {
 export function useApprovalTasks(): UseApprovalTasksReturnI {
     const approvalTasks = useApprovalTasksStore((state) => state.approvalTasks);
     const selectedApprovalTaskId = useApprovalTasksStore((state) => state.selectedApprovalTaskId);
-    const setApprovalTasks = useApprovalTasksStore((state) => state.setApprovalTasks);
     const setSelectedApprovalTaskId = useApprovalTasksStore((state) => state.setSelectedApprovalTaskId);
     const storeUpdateApprovalTask = useApprovalTasksStore((state) => state.updateApprovalTask);
     const storeAddComment = useApprovalTasksStore((state) => state.addComment);
@@ -71,9 +70,9 @@ export function useApprovalTasks(): UseApprovalTasksReturnI {
                 .filter((approvalTask): approvalTask is ApprovalTask => approvalTask !== null)
                 .map(mapApiApprovalTaskToUiApprovalTask);
 
-            setApprovalTasks(mappedApprovalTasks);
+            useApprovalTasksStore.getState().setApprovalTasks(mappedApprovalTasks);
         }
-    }, [approvalTasksData, mapApiApprovalTaskToUiApprovalTask, setApprovalTasks]);
+    }, [approvalTasksData, mapApiApprovalTaskToUiApprovalTask]);
 
     const selectedApprovalTaskObject =
         approvalTasks.find((approvalTask) => approvalTask.id === selectedApprovalTaskId) || null;
