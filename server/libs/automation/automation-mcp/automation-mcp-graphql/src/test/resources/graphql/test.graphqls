@@ -40,6 +40,7 @@ type Mutation {
     # McpProject mutations
     createMcpProject(input: CreateMcpProjectInput!): McpProject
     deleteMcpProject(id: ID!): Boolean
+    updateMcpProject(id: ID!, input: UpdateMcpProjectInput!): McpProject
 
     # McpProjectWorkflow mutations
     createMcpProjectWorkflow(input: McpProjectWorkflowInput!): McpProjectWorkflow
@@ -60,6 +61,10 @@ input CreateMcpProjectInput {
     mcpServerId: ID!
     projectId: ID!
     projectVersion: Int!
+    selectedWorkflowIds: [String!]!
+}
+
+input UpdateMcpProjectInput {
     selectedWorkflowIds: [String!]!
 }
 
