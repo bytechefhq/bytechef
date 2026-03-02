@@ -1,38 +1,39 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {PlayIcon, SparklesIcon, TextInitialIcon} from 'lucide-react';
-import {twMerge} from 'tailwind-merge';
 
 interface ClusterElementsWorkflowEditorHeaderProps {
-    className?: string;
     copilotEnabled: boolean;
     onCopilotClick: () => void;
     onTestClick: () => void;
     onToggleEditor: (showAiAgent: boolean) => void;
+    showToggleEditor: boolean;
 }
 
 const ClusterElementsWorkflowEditorHeader = ({
-    className,
     copilotEnabled,
     onCopilotClick,
     onTestClick,
     onToggleEditor,
+    showToggleEditor,
 }: ClusterElementsWorkflowEditorHeaderProps) => {
     return (
-        <div className={twMerge('flex items-center justify-end p-4', className)}>
+        <div className="flex items-center justify-end p-4">
             <div className="flex items-center gap-1">
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            icon={<TextInitialIcon />}
-                            onClick={() => onToggleEditor(true)}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
+                {showToggleEditor && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                icon={<TextInitialIcon />}
+                                onClick={() => onToggleEditor(true)}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
 
-                    <TooltipContent>Switch to AI Agent editor</TooltipContent>
-                </Tooltip>
+                        <TooltipContent>Switch to AI Agent editor</TooltipContent>
+                    </Tooltip>
+                )}
 
                 <Tooltip>
                     <TooltipTrigger asChild>
