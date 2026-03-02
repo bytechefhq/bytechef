@@ -39,8 +39,15 @@ public class ReadProjectWorkflowToolsImpl {
     private final ProjectWorkflowTools delegate;
 
     @SuppressFBWarnings("EI")
-    public ReadProjectWorkflowToolsImpl(ProjectWorkflowTools projectTools) {
-        this.delegate = projectTools;
+    public ReadProjectWorkflowToolsImpl(ProjectWorkflowTools projectWorkflowTools) {
+        this.delegate = projectWorkflowTools;
+    }
+
+    @Tool(
+        description = "Instructions for writing custom code in Script component")
+    public String getScriptCodeInstructions(
+        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId) {
+        return delegate.getScriptCodeInstructions();
     }
 
     @Tool(
