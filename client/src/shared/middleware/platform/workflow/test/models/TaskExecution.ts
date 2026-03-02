@@ -190,6 +190,18 @@ export interface TaskExecution {
      * @memberof TaskExecution
      */
     readonly type?: string;
+    /**
+     * 
+     * @type {Array<TaskExecution>}
+     * @memberof TaskExecution
+     */
+    children?: Array<TaskExecution>;
+    /**
+     * 
+     * @type {Array<Array<TaskExecution>>}
+     * @memberof TaskExecution
+     */
+    iterations?: Array<Array<TaskExecution>>;
 }
 
 
@@ -253,6 +265,8 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'retryDelayMillis': json['retryDelayMillis'] == null ? undefined : json['retryDelayMillis'],
         'workflowTask': json['workflowTask'] == null ? undefined : WorkflowTaskFromJSON(json['workflowTask']),
         'type': json['type'] == null ? undefined : json['type'],
+        'children': json['children'] == null ? undefined : ((json['children'] as Array<any>).map(TaskExecutionFromJSON)),
+        'iterations': json['iterations'] == null ? undefined : json['iterations'],
     };
 }
 
@@ -269,6 +283,8 @@ export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'
         
         'error': ExecutionErrorToJSON(value['error']),
         'workflowTask': WorkflowTaskToJSON(value['workflowTask']),
+        'children': value['children'] == null ? undefined : ((value['children'] as Array<any>).map(TaskExecutionToJSON)),
+        'iterations': value['iterations'],
     };
 }
 
