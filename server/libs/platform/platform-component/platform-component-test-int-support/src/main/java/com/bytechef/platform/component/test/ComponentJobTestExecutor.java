@@ -86,7 +86,7 @@ public class ComponentJobTestExecutor {
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, evaluator, jobService, -1, role -> new AsyncMessageBroker(environment),
+            contextService, evaluator, jobService, -1, new AsyncMessageBroker(environment),
             getTaskDispatcherPreSendProcessors(), taskExecutionService, taskExecutor,
             MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get, taskFileStorage, -1, workflowService);
 
