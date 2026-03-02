@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.web.rest;
+package com.bytechef.platform.workflow.test.util;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
@@ -31,7 +31,7 @@ import tools.jackson.core.type.TypeReference;
 /**
  * @author Ivica Cardic
  */
-final class TestAttachmentUtils {
+public final class TestAttachmentUtils {
 
     private static final Pattern IMAGE_PATTERN = Pattern.compile("data:image/[^;]+;base64,([^\\s]+)");
     private static final Pattern TEXT_PATTERN = Pattern.compile(
@@ -40,7 +40,7 @@ final class TestAttachmentUtils {
     private TestAttachmentUtils() {
     }
 
-    static List<FileEntry> getFileEntries(TempFileStorage tempFileStorage, Map<String, Object> parameters) {
+    public static List<FileEntry> getFileEntries(TempFileStorage tempFileStorage, Map<String, Object> parameters) {
         List<Map<String, Object>> attachments = MapUtils.getRequiredList(
             parameters, "attachments", new TypeReference<>() {});
 
@@ -85,5 +85,4 @@ final class TestAttachmentUtils {
 
         return fileEntries;
     }
-
 }
