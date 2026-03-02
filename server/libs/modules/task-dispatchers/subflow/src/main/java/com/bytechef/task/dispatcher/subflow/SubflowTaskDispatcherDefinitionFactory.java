@@ -18,7 +18,6 @@ package com.bytechef.task.dispatcher.subflow;
 
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.INPUTS;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.dynamicProperties;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.option;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.string;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
@@ -68,8 +67,7 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
                     .description("The input parameters for the sub-workflow.")
                     .propertiesLookupDependsOn(WORKFLOW_UUID)
                     .propertiesFunction(inputParameters -> inputs(inputParameters, subflowDataSource)))
-            .output(inputParameters -> output(inputParameters, subflowDataSource))
-            .variableProperties(inputParameters -> variableProperties(inputParameters, subflowDataSource));
+            .output(inputParameters -> output(inputParameters, subflowDataSource));
     }
 
     @Override
@@ -108,23 +106,5 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
         }
 
         return subflowDataSource.getSubWorkflowOutputSchema(workflowUuid);
-    }
-
-    private static OutputResponse variableProperties(
-        Map<String, ?> inputParameters, SubflowDataSource subflowDataSource) {
-
-        String workflowUuid = MapUtils.getString(inputParameters, WORKFLOW_UUID);
-
-        if (workflowUuid == null || workflowUuid.isEmpty()) {
-            return OutputResponse.of(object());
-        }
-
-        OutputResponse outputResponse = subflowDataSource.getSubWorkflowInputSchema(workflowUuid);
-
-        if (outputResponse == null) {
-            return OutputResponse.of(object());
-        }
-
-        return outputResponse;
     }
 }
