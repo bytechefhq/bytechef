@@ -17,7 +17,7 @@ const useIntegrationsLeftSidebarStore = create<LeftSidebarStateI>()(
                     })),
             }),
             {
-                name: 'bytechef.projects-left-sidebar',
+                name: 'bytechef.integrations-left-sidebar',
             }
         )
     )
