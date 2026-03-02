@@ -18,6 +18,7 @@ package com.bytechef.automation.mcp.service;
 
 import com.bytechef.automation.mcp.domain.McpProjectWorkflow;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -100,4 +101,13 @@ public interface McpProjectWorkflowService {
      * @throws IllegalArgumentException if the MCP project workflow with the given ID is not found
      */
     McpProjectWorkflow update(long id, Long mcpProjectId, Long projectDeploymentWorkflowId);
+
+    /**
+     * Updates the parameters of an existing MCP project workflow.
+     *
+     * @param id         the ID of the MCP project workflow to update
+     * @param parameters the parameters to set
+     * @return the updated MCP project workflow
+     */
+    McpProjectWorkflow updateParameters(long id, Map<String, ?> parameters);
 }

@@ -3,6 +3,8 @@ extend type Query {
     mcpProjectWorkflows: [McpProjectWorkflow]
     mcpProjectWorkflowsByMcpProjectId(mcpProjectId: ID): [McpProjectWorkflow]
     mcpProjectWorkflowsByProjectDeploymentWorkflowId(projectDeploymentWorkflowId: ID): [McpProjectWorkflow]
+    toolEligibleProjectVersionWorkflows(projectId: ID!, projectVersion: Int!): [ProjectWorkflow!]!
+    mcpProjectWorkflowProperties(mcpProjectWorkflowId: ID!): [Property]
 }
 
 extend type Mutation {
@@ -15,6 +17,7 @@ type McpProjectWorkflow {
     id: ID!
     mcpProjectId: Long!
     projectDeploymentWorkflowId: Long!
+    parameters: Map
     projectDeploymentWorkflow: ProjectDeploymentWorkflow
     workflow: Workflow
     createdBy: String
@@ -32,4 +35,5 @@ input McpProjectWorkflowInput {
 input McpProjectWorkflowUpdateInput {
     mcpProjectId: Long
     projectDeploymentWorkflowId: Long
+    parameters: Map
 }

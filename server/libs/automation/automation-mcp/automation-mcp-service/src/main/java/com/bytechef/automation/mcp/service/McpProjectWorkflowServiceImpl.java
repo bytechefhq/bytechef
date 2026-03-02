@@ -20,6 +20,7 @@ import com.bytechef.automation.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.mcp.repository.McpProjectWorkflowRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,5 +107,15 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
         }
 
         return update(existingMcpProjectWorkflow);
+    }
+
+    @Override
+    public McpProjectWorkflow updateParameters(long id, Map<String, ?> parameters) {
+        McpProjectWorkflow existingMcpProjectWorkflow = fetchMcpProjectWorkflow(id)
+            .orElseThrow(() -> new IllegalArgumentException("McpProjectWorkflow not found with id: " + id));
+
+        existingMcpProjectWorkflow.setParameters(parameters);
+
+        return mcpProjectWorkflowRepository.save(existingMcpProjectWorkflow);
     }
 }

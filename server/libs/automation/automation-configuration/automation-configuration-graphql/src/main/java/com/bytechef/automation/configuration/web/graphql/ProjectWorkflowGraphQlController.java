@@ -25,6 +25,7 @@ import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -98,8 +99,10 @@ public class ProjectWorkflowGraphQlController {
     }
 
     @SchemaMapping(typeName = "ProjectWorkflow", field = "workflow")
-    public Workflow workflow(ProjectWorkflow projectWorkflow) {
-        return workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+    public WorkflowDTO workflow(ProjectWorkflow projectWorkflow) {
+        Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+
+        return new WorkflowDTO(workflow, List.of(), List.of());
     }
 
     @QueryMapping(name = "sharedWorkflow")

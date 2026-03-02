@@ -33,6 +33,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.domain.SubflowEntry;
@@ -106,7 +107,8 @@ class SubflowDataSourceTest {
 
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
                 .thenReturn(List.of(callableTrigger));
-            mockedMapUtils.when(() -> MapUtils.getString(callableTrigger.getParameters(), "inputSchema"))
+            mockedMapUtils
+                .when(() -> MapUtils.getString(callableTrigger.getParameters(), WorkflowConstants.INPUT_SCHEMA))
                 .thenReturn(null);
 
             OutputResponse result = subflowDataSource.getSubWorkflowInputSchema(WORKFLOW_UUID);
@@ -144,7 +146,8 @@ class SubflowDataSourceTest {
         when(workflow.getTasks(true)).thenReturn(List.of(callableResponseTask));
 
         try (MockedStatic<MapUtils> mockedMapUtils = mockStatic(MapUtils.class)) {
-            mockedMapUtils.when(() -> MapUtils.getString(callableResponseTask.getParameters(), "outputSchema"))
+            mockedMapUtils
+                .when(() -> MapUtils.getString(callableResponseTask.getParameters(), WorkflowConstants.OUTPUT_SCHEMA))
                 .thenReturn(null);
 
             OutputResponse result = subflowDataSource.getSubWorkflowOutputSchema(WORKFLOW_UUID);

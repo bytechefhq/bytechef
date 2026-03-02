@@ -15,6 +15,7 @@ type Subscription {
 
 # Minimal type stubs referenced by this module's SDL
 
+scalar Any
 scalar Long
 scalar Map
 
