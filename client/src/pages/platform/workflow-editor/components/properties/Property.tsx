@@ -555,7 +555,6 @@ const Property = ({
                                                         fieldOnChange(rawValue);
                                                     }
                                                 }}
-                                                onFocus={() => setDataPillPanelOpen(true)}
                                                 placeholder={
                                                     isNumericalInput && minValue && maxValue
                                                         ? `From ${minValue} to ${maxValue}`
