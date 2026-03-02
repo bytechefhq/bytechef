@@ -84,6 +84,14 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
             query += "tag_id = ? ";
         }
 
+        if (environment != null || integrationId != null || tagId != null) {
+            query += "AND ";
+        } else {
+            query += "WHERE ";
+        }
+
+        query += "integration_instance_configuration.name NOT LIKE '__MCP_SERVER__%' ";
+
         query += "ORDER BY integration.component_name ASC, integration_instance_configuration.integration_version " +
             "ASC, integration_instance_configuration.environment ASC";
 

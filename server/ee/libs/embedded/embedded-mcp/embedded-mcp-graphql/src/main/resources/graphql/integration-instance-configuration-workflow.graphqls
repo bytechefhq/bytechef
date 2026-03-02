@@ -1,0 +1,15 @@
+type IntegrationInstanceConfigurationWorkflow {
+    id: ID!
+    workflowId: String!
+    integrationInstanceConfigurationId: ID!
+    enabled: Boolean!
+    connections: [IntegrationInstanceConfigurationWorkflowConnection!]!
+    inputs: Map
+    version: Int!
+}
+
+type IntegrationInstanceConfigurationWorkflowConnection {
+    connectionId: ID
+    workflowConnectionKey: String!
+    workflowNodeName: String!
+}

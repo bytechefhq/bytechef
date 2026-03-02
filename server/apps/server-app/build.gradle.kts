@@ -187,6 +187,8 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service"))
     implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-public-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-mcp:embedded-mcp-graphql"))
+    implementation(project(":server:ee:libs:embedded:embedded-mcp:embedded-mcp-service"))
     implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-service"))
     implementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl"))

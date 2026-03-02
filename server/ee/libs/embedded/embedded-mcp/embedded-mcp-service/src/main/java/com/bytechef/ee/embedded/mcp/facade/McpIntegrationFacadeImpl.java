@@ -1,0 +1,104 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.mcp.facade;
+
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.mcp.domain.McpIntegration;
+import com.bytechef.ee.embedded.mcp.domain.McpIntegrationWorkflow;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationWorkflowService;
+import com.bytechef.platform.configuration.domain.Environment;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.Map;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Implementation of {@link McpIntegrationFacade}.
+ *
+ * @author Ivica Cardic
+ * @version ee
+ */
+@Service
+@Transactional
+public class McpIntegrationFacadeImpl implements McpIntegrationFacade {
+
+    private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
+    private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
+    private final McpIntegrationService mcpIntegrationService;
+    private final McpIntegrationWorkflowService mcpIntegrationWorkflowService;
+
+    @SuppressFBWarnings("EI")
+    public McpIntegrationFacadeImpl(
+        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
+        McpIntegrationService mcpIntegrationService,
+        McpIntegrationWorkflowService mcpIntegrationWorkflowService) {
+
+        this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
+        this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
+        this.mcpIntegrationService = mcpIntegrationService;
+        this.mcpIntegrationWorkflowService = mcpIntegrationWorkflowService;
+    }
+
+    @Override
+    public McpIntegration createMcpIntegration(
+        long mcpServerId, long integrationId, int integrationVersion, List<String> selectedWorkflowIds) {
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setName("__MCP_SERVER__" + integrationId + "_v" + integrationVersion);
+        integrationInstanceConfiguration.setIntegrationId(integrationId);
+        integrationInstanceConfiguration.setIntegrationVersion(integrationVersion);
+        integrationInstanceConfiguration.setEnvironment(Environment.DEVELOPMENT);
+        integrationInstanceConfiguration.setEnabled(false);
+
+        integrationInstanceConfiguration =
+            integrationInstanceConfigurationService.create(integrationInstanceConfiguration);
+
+        McpIntegration mcpIntegration =
+            new McpIntegration(integrationInstanceConfiguration.getId(), mcpServerId);
+
+        mcpIntegration = mcpIntegrationService.create(mcpIntegration);
+
+        for (String workflowId : selectedWorkflowIds) {
+            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                new IntegrationInstanceConfigurationWorkflow();
+
+            integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+                integrationInstanceConfiguration.getId());
+            integrationInstanceConfigurationWorkflow.setWorkflowId(workflowId);
+            integrationInstanceConfigurationWorkflow.setEnabled(false);
+            integrationInstanceConfigurationWorkflow.setInputs(Map.of());
+
+            integrationInstanceConfigurationWorkflow =
+                integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+
+            mcpIntegrationWorkflowService.create(
+                mcpIntegration.getId(), integrationInstanceConfigurationWorkflow.getId());
+        }
+
+        return mcpIntegration;
+    }
+
+    @Override
+    public void deleteMcpIntegration(long mcpIntegrationId) {
+        List<McpIntegrationWorkflow> mcpIntegrationWorkflows =
+            mcpIntegrationWorkflowService.getMcpIntegrationMcpIntegrationWorkflows(mcpIntegrationId);
+
+        for (McpIntegrationWorkflow mcpIntegrationWorkflow : mcpIntegrationWorkflows) {
+            mcpIntegrationWorkflowService.delete(mcpIntegrationWorkflow.getId());
+        }
+
+        mcpIntegrationService.delete(mcpIntegrationId);
+    }
+}

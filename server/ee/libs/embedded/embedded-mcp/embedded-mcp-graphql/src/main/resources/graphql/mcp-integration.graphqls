@@ -1,0 +1,31 @@
+extend type Query {
+    mcpIntegration(id: ID): McpIntegration
+    mcpIntegrations: [McpIntegration]
+    mcpIntegrationsByServerId(mcpServerId: ID): [McpIntegration]
+}
+
+extend type Mutation {
+    createMcpIntegration(input: CreateMcpIntegrationInput!): McpIntegration
+    deleteMcpIntegration(id: ID!): Boolean
+}
+
+type McpIntegration {
+    id: ID!
+    integrationInstanceConfigurationId: ID!
+    mcpServerId: ID!
+    mcpIntegrationWorkflows: [McpIntegrationWorkflow]
+    integration: Integration
+    integrationVersion: Int
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+input CreateMcpIntegrationInput {
+    mcpServerId: ID!
+    integrationId: ID!
+    integrationVersion: Int!
+    selectedWorkflowIds: [String!]!
+}
