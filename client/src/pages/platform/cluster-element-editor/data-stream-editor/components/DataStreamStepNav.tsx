@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {CheckIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
@@ -25,9 +26,9 @@ export default function DataStreamStepNav({
                     <div className="flex items-center gap-2" key={label}>
                         {index > 0 && <div className="h-px w-8 bg-border" />}
 
-                        <button
+                        <Button
                             className={twMerge(
-                                'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors',
+                                'flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors',
                                 isCurrent && 'bg-primary/10 font-medium text-primary',
                                 !isCurrent &&
                                     isClickable &&
@@ -36,7 +37,7 @@ export default function DataStreamStepNav({
                             )}
                             disabled={!isClickable}
                             onClick={() => isClickable && onGoToStep(index)}
-                            type="button"
+                            variant="ghost"
                         >
                             <div
                                 className={twMerge(
@@ -52,7 +53,7 @@ export default function DataStreamStepNav({
                             </div>
 
                             <span>{label}</span>
-                        </button>
+                        </Button>
                     </div>
                 );
             })}

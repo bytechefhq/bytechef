@@ -23,13 +23,11 @@ export default function DataStreamDestinationStep() {
 
     return (
         <div className="space-y-4 py-4">
-            <div>
-                <h2 className="text-lg font-semibold">Select Destination</h2>
+            <h2 className="text-lg font-semibold">Select Destination</h2>
 
-                <p className="text-sm text-muted-foreground">
-                    Choose a data destination component and configure its connection and parameters.
-                </p>
-            </div>
+            <p className="mb-4 text-sm text-muted-foreground">
+                Choose a data destination component and configure its connection and parameters.
+            </p>
 
             {rootWorkflowNodeName && (
                 <>

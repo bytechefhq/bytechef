@@ -64,7 +64,9 @@ export default function useDataStreamMapping() {
         const processorElement = (Array.isArray(processorValue)
             ? processorValue[0]
             : processorValue) as unknown as NodeDataType;
+
         const typeSegments = processorElement.type?.split('/') || [];
+
         const componentName = processorElement.componentName || typeSegments[0] || '';
         const operationName = processorElement.operationName || typeSegments[2] || '';
 
@@ -101,8 +103,11 @@ export default function useDataStreamMapping() {
         }
 
         const sourceElement = sourceValue as unknown as NodeDataType;
+
         const typeSegments = sourceElement.type?.split('/') || [];
+
         const componentName = sourceElement.componentName || typeSegments[0] || '';
+
         const definition = componentDefinitions.find(
             (componentDefinition) => componentDefinition.name === componentName
         );
@@ -124,8 +129,11 @@ export default function useDataStreamMapping() {
         }
 
         const destinationElement = destinationValue as unknown as NodeDataType;
+
         const typeSegments = destinationElement.type?.split('/') || [];
+
         const componentName = destinationElement.componentName || typeSegments[0] || '';
+
         const definition = componentDefinitions.find(
             (componentDefinition) => componentDefinition.name === componentName
         );
