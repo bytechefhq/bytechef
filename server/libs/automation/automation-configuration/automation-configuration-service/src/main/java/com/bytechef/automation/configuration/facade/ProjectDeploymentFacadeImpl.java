@@ -67,6 +67,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -79,6 +81,8 @@ import org.springframework.util.Assert;
 @Service
 @Transactional
 public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectDeploymentFacadeImpl.class);
 
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
@@ -766,9 +770,20 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-            TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
-                Objects.requireNonNull(triggerWorkflowNodeType.operation()));
+            TriggerDefinition triggerDefinition;
+
+            try {
+                triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+                    triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                    Objects.requireNonNull(triggerWorkflowNodeType.operation()));
+            } catch (Exception exception) {
+                logger.error(
+                    "Failed to get trigger definition for workflow trigger type=%s".formatted(
+                        triggerWorkflowNodeType.name()),
+                    exception);
+
+                return null;
+            }
 
             if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK &&
                 !Objects.equals(triggerDefinition.getName(), "manual")) {
