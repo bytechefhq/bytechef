@@ -477,7 +477,7 @@ export const WorkflowExecutions = () => {
                         </div>
                     )}
 
-                    {filterAutomations && (
+                    {!!filterAutomations && (
                         <div className="flex flex-col space-y-2">
                             <Label>Connected Users</Label>
 
