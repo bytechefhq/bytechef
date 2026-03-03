@@ -34,7 +34,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon} from 'lucide-react';
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -45,6 +45,7 @@ import ProjectDeploymentDialogWorkflowsStep from './ProjectDeploymentDialogWorkf
 import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
 
 interface ProjectDeploymentDialogProps {
+    filterWorkflowUuids?: string[];
     onClose?: () => void;
     projectDeployment?: ProjectDeployment;
     triggerNode?: ReactNode;
@@ -52,6 +53,7 @@ interface ProjectDeploymentDialogProps {
 }
 
 const ProjectDeploymentDialog = ({
+    filterWorkflowUuids,
     onClose,
     projectDeployment,
     triggerNode,
@@ -90,12 +92,24 @@ const ProjectDeploymentDialog = ({
     const watchedProjectDeploymentWorkflows = watch('projectDeploymentWorkflows');
     const hasEnabledWorkflows = watchedProjectDeploymentWorkflows?.some((workflow) => workflow.enabled) ?? false;
 
-    const {data: workflows, isPending: isWorkflowsPending} = useGetProjectVersionWorkflowsQuery(
+    const {data: allWorkflows, isPending: isWorkflowsPending} = useGetProjectVersionWorkflowsQuery(
         getValues().projectId!,
         getValues().projectVersion!,
         true,
         !!getValues().projectId && !!getValues().projectVersion
     );
+
+    const workflows = useMemo(() => {
+        if (!allWorkflows) {
+            return undefined;
+        }
+
+        if (!filterWorkflowUuids || filterWorkflowUuids.length === 0) {
+            return allWorkflows;
+        }
+
+        return allWorkflows.filter((workflow) => filterWorkflowUuids.includes(workflow.workflowUuid!));
+    }, [allWorkflows, filterWorkflowUuids]);
 
     const hasVisibleConnections = workflows?.some((workflow) => {
         const isEnabled = workflowEnabledMap.get(workflow.id!);
