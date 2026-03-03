@@ -4,6 +4,7 @@ import ClusterElementTestButton from '@/pages/platform/workflow-editor/component
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 
 interface OutputSchemaCreationControlsProps {
+    clusterElementType?: string;
     connectionMissing?: boolean;
     currentNode?: NodeDataType;
     currentOperationProperties?: PropertyAllType[];
@@ -22,6 +23,7 @@ interface OutputSchemaCreationControlsProps {
 }
 
 const OutputSchemaCreationControls = ({
+    clusterElementType,
     connectionMissing,
     currentNode,
     currentOperationProperties,
@@ -36,76 +38,91 @@ const OutputSchemaCreationControls = ({
     trigger = false,
     uploadSampleOutputRequestMutationPending,
     variablePropertiesDefined = false,
-}: OutputSchemaCreationControlsProps) => (
-    <div className="flex size-full items-center justify-center">
-        <div className="flex flex-col items-center gap-8">
-            {outputDefined || variablePropertiesDefined ? (
-                <div className="flex w-full flex-col gap-1">
-                    <div className="self-center">Define Output Schema</div>
+}: OutputSchemaCreationControlsProps) => {
+    const operationLabel = clusterElementType === 'tools' ? 'Tool' : trigger ? 'Trigger' : 'Action';
 
-                    <p className="text-sm text-muted-foreground">
-                        {!variablePropertiesDefined
-                            ? 'Define the expected output schema with one of the methods'
-                            : 'Define the expected output schema by uploading sample data'}
-                    </p>
-                </div>
-            ) : (
-                <div className="flex w-full flex-col gap-1">
-                    <div className="self-center">Output Test</div>
+    return (
+        <div className="flex size-full items-center justify-center">
+            <div className="flex flex-col items-center gap-8">
+                {clusterElementType === 'tools' ? (
+                    <div className="flex w-full flex-col gap-1">
+                        <div className="self-center">Explore Output Schema</div>
 
-                    <p className="text-sm text-muted-foreground">
-                        {`Test the ${trigger ? 'trigger' : 'action'} to see the expected behaviour.`}
-                    </p>
-                </div>
-            )}
+                        <p className="text-sm text-muted-foreground">
+                            Explore the expected output schema by testing tool
+                        </p>
+                    </div>
+                ) : outputDefined || variablePropertiesDefined ? (
+                    <div className="flex w-full flex-col gap-1">
+                        <div className="self-center">Define Output Schema</div>
 
-            <div className="flex flex-col gap-4">
-                {!variablePropertiesDefined && (
-                    <div className="flex w-full flex-col gap-3">
-                        {showClusterElementTestButton &&
-                        currentNode &&
-                        currentOperationProperties &&
-                        handleClusterElementTestSubmit ? (
-                            <ClusterElementTestButton
-                                connectionMissing={!!connectionMissing}
-                                currentNode={currentNode}
-                                onSubmit={handleClusterElementTestSubmit}
-                                properties={currentOperationProperties}
-                                saving={!!saveClusterElementTestOutputMutationPending}
-                            />
-                        ) : (
-                            <Button
-                                disabled={saveWorkflowNodeTestOutputMutationPending}
-                                label={`Test ${trigger ? 'Trigger' : 'Action'}`}
-                                onClick={handleTestOperationClick}
-                                type="button"
-                            />
-                        )}
+                        <p className="text-sm text-muted-foreground">
+                            {!variablePropertiesDefined
+                                ? 'Define the expected output schema with one of the methods'
+                                : 'Define the expected output schema by uploading sample data'}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="flex w-full flex-col gap-1">
+                        <div className="self-center">Output Test</div>
 
-                        {showUploadSampleOutputButton && <span className="text-center">or</span>}
+                        <p className="text-sm text-muted-foreground">
+                            {`Test the ${operationLabel.toLowerCase()} to see the expected behaviour.`}
+                        </p>
                     </div>
                 )}
 
-                {showUploadSampleOutputButton && (
-                    <Button
-                        disabled={uploadSampleOutputRequestMutationPending}
-                        onClick={() => setShowUploadDialog(true)}
-                        type="button"
-                    >
-                        {uploadSampleOutputRequestMutationPending && (
-                            <>
-                                <LoadingIcon />
+                <div className="flex flex-col gap-4">
+                    {!variablePropertiesDefined && (
+                        <div className="flex w-full flex-col gap-3">
+                            {showClusterElementTestButton &&
+                            currentNode &&
+                            currentOperationProperties &&
+                            handleClusterElementTestSubmit ? (
+                                <ClusterElementTestButton
+                                    clusterElementType={clusterElementType}
+                                    connectionMissing={!!connectionMissing}
+                                    currentNode={currentNode}
+                                    onSubmit={handleClusterElementTestSubmit}
+                                    properties={currentOperationProperties}
+                                    saving={!!saveClusterElementTestOutputMutationPending}
+                                />
+                            ) : (
+                                <Button
+                                    disabled={saveWorkflowNodeTestOutputMutationPending}
+                                    label={`Test ${operationLabel}`}
+                                    onClick={handleTestOperationClick}
+                                    type="button"
+                                />
+                            )}
 
-                                <span>Uploading...</span>
-                            </>
-                        )}
+                            {clusterElementType !== 'tools' && showUploadSampleOutputButton && (
+                                <span className="text-center">or</span>
+                            )}
+                        </div>
+                    )}
 
-                        {!uploadSampleOutputRequestMutationPending && <span>Upload Sample Output Data</span>}
-                    </Button>
-                )}
+                    {clusterElementType !== 'tools' && showUploadSampleOutputButton && (
+                        <Button
+                            disabled={uploadSampleOutputRequestMutationPending}
+                            onClick={() => setShowUploadDialog(true)}
+                            type="button"
+                        >
+                            {uploadSampleOutputRequestMutationPending && (
+                                <>
+                                    <LoadingIcon />
+
+                                    <span>Uploading...</span>
+                                </>
+                            )}
+
+                            {!uploadSampleOutputRequestMutationPending && <span>Upload Sample Output Data</span>}
+                        </Button>
+                    )}
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default OutputSchemaCreationControls;

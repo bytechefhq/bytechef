@@ -83,6 +83,7 @@ const OutputTab = ({
                 <div className="h-full">
                     {outputSchema && (
                         <OutputSchemaDisplay
+                            clusterElementType={clusterElementType}
                             connectionMissing={connectionMissing}
                             copiedValue={copiedValue}
                             copyToClipboard={copyToClipboard}
@@ -104,6 +105,7 @@ const OutputTab = ({
 
                     {!outputSchema && (
                         <OutputSchemaCreationControls
+                            clusterElementType={clusterElementType}
                             connectionMissing={connectionMissing}
                             currentNode={currentNode}
                             currentOperationProperties={currentOperationProperties}
@@ -153,7 +155,7 @@ const OutputTab = ({
                             >
                                 <LoadingIcon />
 
-                                <span className="text-lg">{`Testing ${currentNode.trigger ? 'Trigger' : 'Action'}`}</span>
+                                <span className="text-lg">{`Testing ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}</span>
                             </div>
 
                             {currentNode.trigger &&
