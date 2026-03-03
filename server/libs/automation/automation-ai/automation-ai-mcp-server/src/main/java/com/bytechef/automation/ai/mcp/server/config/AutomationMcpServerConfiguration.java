@@ -127,11 +127,11 @@ public class AutomationMcpServerConfiguration {
         ClusterElementDefinitionService clusterElementDefinitionService, ContextService contextService,
         CounterService counterService, Environment environment, Evaluator evaluator, JobService jobService,
         McpComponentService mcpComponentService, McpProjectWorkflowService mcpProjectWorkflowService,
-        PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        SubflowResolver subflowResolver,
+        McpServerService mcpServerService, PrincipalJobFacade principalJobFacade,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, SubflowResolver subflowResolver,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        TaskExecutionService taskExecutionService, TaskExecutor taskExecutor,
-        TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
+        WorkflowService workflowService) {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
@@ -153,8 +153,9 @@ public class AutomationMcpServerConfiguration {
 
         return new McpToolFacade(
             clusterElementDefinitionFacade, clusterElementDefinitionService, evaluator, jobSyncExecutor,
-            mcpComponentService, mcpProjectWorkflowService, principalJobFacade,
-            projectDeploymentWorkflowService, taskFileStorage, workflowService);
+            mcpComponentService, mcpProjectWorkflowService, mcpServerService, principalJobFacade,
+            projectDeploymentWorkflowService,
+            taskFileStorage, workflowService);
     }
 
     @Bean
