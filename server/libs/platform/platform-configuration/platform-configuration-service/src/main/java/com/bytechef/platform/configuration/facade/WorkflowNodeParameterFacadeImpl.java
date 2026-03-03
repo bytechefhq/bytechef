@@ -143,7 +143,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
-        removeEmptyCollections(workflowNodeStructure.parameterMap);
+        if (workflowNodeStructure.isNotBranchTaskDispatcher()) {
+            removeEmptyCollections(workflowNodeStructure.parameterMap);
+        }
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -189,7 +191,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
-        removeEmptyCollections(workflowNodeStructure.parameterMap);
+        if (workflowNodeStructure.isNotBranchTaskDispatcher()) {
+            removeEmptyCollections(workflowNodeStructure.parameterMap);
+        }
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -328,7 +332,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
         }
 
-        removeEmptyCollections(workflowNodeStructure.parameterMap);
+        if (workflowNodeStructure.isNotBranchTaskDispatcher()) {
+            removeEmptyCollections(workflowNodeStructure.parameterMap);
+        }
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -376,7 +382,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
         }
 
-        removeEmptyCollections(workflowNodeStructure.parameterMap);
+        if (workflowNodeStructure.isNotBranchTaskDispatcher()) {
+            removeEmptyCollections(workflowNodeStructure.parameterMap);
+        }
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -1144,6 +1152,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Map<String, ?> parameterMap;
         List<? extends BaseProperty> properties;
+        String name;
 
         // We need a mutable map
         Map<String, ?> triggerMap = getTrigger(
@@ -1176,6 +1185,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                             workflowNodeType.name(), workflowNodeType.version());
 
                     properties = taskDispatcherDefinition.getProperties();
+                    name = taskDispatcherDefinition.getName();
                 } else {
                     operationType = WorkflowNodeStructure.OperationType.TASK;
 
@@ -1184,6 +1194,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                         workflowNodeType.operation());
 
                     properties = actionDefinition.getProperties();
+                    name = actionDefinition.getName();
                 }
             } else {
                 Map<String, ?> clusterElementMap = getClusterElementMap(
@@ -1201,6 +1212,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                         workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
 
                 properties = clusterElementDefinition.getProperties();
+                name = clusterElementDefinition.getName();
             }
         } else {
             operationType = WorkflowNodeStructure.OperationType.TRIGGER;
@@ -1212,6 +1224,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
 
             properties = triggerDefinition.getProperties();
+            name = triggerDefinition.getName();
         }
 
         Set<String> missingRequiredProperties = new HashSet<>();
@@ -1220,7 +1233,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             checkRequiredProperties(properties, parameterMap, "", missingRequiredProperties);
         }
 
-        return new WorkflowNodeStructure(operationType, parameterMap, properties, missingRequiredProperties);
+        return new WorkflowNodeStructure(operationType, parameterMap, properties, missingRequiredProperties, name);
     }
 
     private void checkRequiredProperties(
@@ -1511,7 +1524,11 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     private record WorkflowNodeStructure(
         OperationType operationType, Map<String, ?> parameterMap, List<? extends BaseProperty> properties,
-        Set<String> missingRequiredProperties) {
+        Set<String> missingRequiredProperties, String name) {
+
+        public boolean isNotBranchTaskDispatcher() {
+            return !OperationType.TASK_DISPATCHER.equals(operationType) || !"branch".equals(name);
+        }
 
         enum OperationType {
             CLUSTER_ELEMENT,
