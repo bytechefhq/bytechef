@@ -24,6 +24,7 @@ interface OutputSchemaDisplayProps {
     handleClusterElementTestSubmit?: (inputParameters: Record<string, any>, onSuccess?: () => void) => void;
     handlePredefinedOutputSchemaClick: () => void;
     handleTestOperationClick: () => void;
+    clusterElementType?: string;
     isClusterElement?: boolean;
     outputSchema: PropertyAllType;
     sampleOutput?: object;
@@ -35,6 +36,7 @@ interface OutputSchemaDisplayProps {
 }
 
 const OutputSchemaDisplay = ({
+    clusterElementType,
     connectionMissing,
     copiedValue = null,
     copyToClipboard,
@@ -66,6 +68,7 @@ const OutputSchemaDisplay = ({
                         currentOperationProperties &&
                         handleClusterElementTestSubmit ? (
                             <ClusterElementTestButton
+                                clusterElementType={clusterElementType}
                                 connectionMissing={connectionMissing}
                                 currentNode={currentNode}
                                 onSubmit={handleClusterElementTestSubmit}
@@ -75,7 +78,7 @@ const OutputSchemaDisplay = ({
                         ) : (
                             <Button
                                 disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
-                                label={`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
+                                label={`Test ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}
                                 onClick={handleTestOperationClick}
                                 variant="outline"
                             />
