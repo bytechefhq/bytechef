@@ -17,14 +17,12 @@
 package com.bytechef.component.microsoft.one.drive.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.ODATA_NEXT_LINK;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getItemsFromNextPage;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
@@ -40,36 +38,6 @@ import java.util.Map;
 public class MicrosoftOneDriveUtils {
 
     private MicrosoftOneDriveUtils() {
-    }
-
-    public static List<Option<String>> getFileIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext actionContext) {
-
-        Map<String, Object> body = actionContext.http(http -> http.get("/me/drive/root/search"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map && map.containsKey(FILE)) {
-                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
-                }
-            }
-        }
-
-        List<Map<?, ?>> itemsFromNextPage = getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), actionContext);
-
-        for (Map<?, ?> map : itemsFromNextPage) {
-            if (map.containsKey(FILE)) {
-                options.add(option((String) map.get(NAME), (String) map.get(ID)));
-            }
-        }
-
-        return options;
     }
 
     public static String getFolderId(String parentId) {
