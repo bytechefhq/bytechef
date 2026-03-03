@@ -223,7 +223,7 @@ describe('getTaskDispatcherContext', () => {
         const mapTaskNode = makeNode({
             data: {
                 componentName: 'map',
-                mapData: {mapId: 'map_1', index: 0},
+                mapData: {index: 0, mapId: 'map_1'},
                 name: 'map_1',
                 taskDispatcherId: 'map_1',
                 workflowNodeName: 'Map',
