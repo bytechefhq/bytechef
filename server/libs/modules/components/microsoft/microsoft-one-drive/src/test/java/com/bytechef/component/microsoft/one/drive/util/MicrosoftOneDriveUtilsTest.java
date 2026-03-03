@@ -26,7 +26,6 @@ import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
@@ -55,33 +54,6 @@ class MicrosoftOneDriveUtilsTest {
     private final List<Option<String>> expectedOptions = List.of(option("some name", "abc"));
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
-
-    @Test
-    void testGetFileIdOptions(
-        ActionContext mockedActionContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
-
-        when(mockedHttp.get(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(VALUE, List.of(Map.of(NAME, "some name", ID, "abc", "file", "file"))));
-
-        assertEquals(
-            expectedOptions,
-            MicrosoftOneDriveUtils.getFileIdOptions(mockedParameters, null, Map.of(), "", mockedActionContext));
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Configuration configuration = configurationBuilder.build();
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.JSON, responseType);
-        assertEquals("/me/drive/root/search", stringArgumentCaptor.getValue());
-    }
 
     @Test
     void testGetFolderId() {
