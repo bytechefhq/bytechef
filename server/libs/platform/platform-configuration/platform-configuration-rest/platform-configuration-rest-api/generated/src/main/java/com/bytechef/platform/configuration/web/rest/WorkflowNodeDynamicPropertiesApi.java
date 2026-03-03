@@ -43,7 +43,7 @@ public interface WorkflowNodeDynamicPropertiesApi {
         return Optional.empty();
     }
 
-    String PATH_GET_CLUSTER_ELEMENT_DYNAMIC_PROPERTIES = "/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/dynamic-properties/{propertyName}";
+    String PATH_GET_CLUSTER_ELEMENT_NODE_DYNAMIC_PROPERTIES = "/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/dynamic-properties/{propertyName}";
     /**
      * GET /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/dynamic-properties/{propertyName} : Get dynamic properties for an action or trigger property shown in the editor
      * Get dynamic properties for an action or trigger property shown in the editor.
@@ -58,7 +58,7 @@ public interface WorkflowNodeDynamicPropertiesApi {
      * @return The list of options. (status code 200)
      */
     @Operation(
-        operationId = "getClusterElementDynamicProperties",
+        operationId = "getClusterElementNodeDynamicProperties",
         summary = "Get dynamic properties for an action or trigger property shown in the editor",
         description = "Get dynamic properties for an action or trigger property shown in the editor.",
         tags = { "workflow-node-dynamic-properties" },
@@ -70,10 +70,10 @@ public interface WorkflowNodeDynamicPropertiesApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = WorkflowNodeDynamicPropertiesApi.PATH_GET_CLUSTER_ELEMENT_DYNAMIC_PROPERTIES,
+        value = WorkflowNodeDynamicPropertiesApi.PATH_GET_CLUSTER_ELEMENT_NODE_DYNAMIC_PROPERTIES,
         produces = { "application/json" }
     )
-    default ResponseEntity<List<PropertyModel>> getClusterElementDynamicProperties(
+    default ResponseEntity<List<PropertyModel>> getClusterElementNodeDynamicProperties(
         @NotNull @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @NotNull @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @NotNull @Parameter(name = "clusterElementType", description = "The name of a cluster element type.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementType") String clusterElementType,
