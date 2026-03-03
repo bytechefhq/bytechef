@@ -4,14 +4,14 @@ All URIs are relative to */api/platform/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**getClusterElementDynamicProperties**](WorkflowNodeDynamicPropertiesApi.md#getclusterelementdynamicproperties) | **GET** /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/dynamic-properties/{propertyName} | Get dynamic properties for an action or trigger property shown in the editor |
+| [**getClusterElementNodeDynamicProperties**](WorkflowNodeDynamicPropertiesApi.md#getclusterelementnodedynamicproperties) | **GET** /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/dynamic-properties/{propertyName} | Get dynamic properties for an action or trigger property shown in the editor |
 | [**getWorkflowNodeDynamicProperties**](WorkflowNodeDynamicPropertiesApi.md#getworkflownodedynamicproperties) | **GET** /workflows/{id}/workflow-nodes/{workflowNodeName}/dynamic-properties/{propertyName} | Get dynamic properties for an action or trigger property shown in the editor |
 
 
 
-## getClusterElementDynamicProperties
+## getClusterElementNodeDynamicProperties
 
-> Array&lt;Property&gt; getClusterElementDynamicProperties(id, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, propertyName, environmentId, lookupDependsOnPaths)
+> Array&lt;Property&gt; getClusterElementNodeDynamicProperties(id, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, propertyName, environmentId, lookupDependsOnPaths)
 
 Get dynamic properties for an action or trigger property shown in the editor
 
@@ -24,7 +24,7 @@ import {
   Configuration,
   WorkflowNodeDynamicPropertiesApi,
 } from '';
-import type { GetClusterElementDynamicPropertiesRequest } from '';
+import type { GetClusterElementNodeDynamicPropertiesRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -45,10 +45,10 @@ async function example() {
     environmentId: 789,
     // Array<string> | The list of dependency paths. (optional)
     lookupDependsOnPaths: ...,
-  } satisfies GetClusterElementDynamicPropertiesRequest;
+  } satisfies GetClusterElementNodeDynamicPropertiesRequest;
 
   try {
-    const data = await api.getClusterElementDynamicProperties(body);
+    const data = await api.getClusterElementNodeDynamicProperties(body);
     console.log(data);
   } catch (error) {
     console.error(error);
