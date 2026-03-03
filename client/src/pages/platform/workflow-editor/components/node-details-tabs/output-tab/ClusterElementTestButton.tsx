@@ -4,6 +4,7 @@ import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {useCallback, useState} from 'react';
 
 interface ClusterElementTestButtonProps {
+    clusterElementType?: string;
     connectionMissing: boolean;
     currentNode: NodeDataType;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,6 +14,7 @@ interface ClusterElementTestButtonProps {
 }
 
 const ClusterElementTestButton = ({
+    clusterElementType,
     connectionMissing,
     currentNode,
     onSubmit,
@@ -37,7 +39,11 @@ const ClusterElementTestButton = ({
             open={open}
             properties={properties}
         >
-            <Button disabled={connectionMissing || saving} label="Test Action" variant="outline" />
+            <Button
+                disabled={connectionMissing || saving}
+                label={`Test ${clusterElementType === 'tools' ? 'Tool' : 'Action'}`}
+                variant="outline"
+            />
         </ClusterElementTestPropertiesPopover>
     );
 };
