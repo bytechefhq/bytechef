@@ -1,0 +1,10 @@
+query mcpProjects {
+    mcpProjects {
+        id
+        mcpServerId
+        project {
+            id
+            name
+        }
+    }
+}
