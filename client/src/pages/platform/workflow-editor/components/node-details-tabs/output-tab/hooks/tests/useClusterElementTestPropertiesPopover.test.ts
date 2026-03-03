@@ -33,7 +33,7 @@ describe('useClusterElementTestPropertiesPopover', () => {
     });
 
     describe('filteredDefaultValues', () => {
-        it('should filter out parameters with =fromAi() expressions', () => {
+        it('should filter out parameters with = prefix expressions', () => {
             const currentNode = makeNode({
                 model: 'gpt-4',
                 prompt: '=fromAi(description)',
@@ -120,14 +120,20 @@ describe('useClusterElementTestPropertiesPopover', () => {
             expect(result.current.form.getValues()).toEqual({});
         });
 
-        it('should keep strings that do not match =fromAi( pattern', () => {
+        it('should keep plain strings and filter expressions', () => {
             const currentNode = makeNode({
                 description: 'This uses fromAi internally',
                 note: 'fromAi(test)',
                 prefix: '=notFromAi(value)',
+                ref: '${accelo_1.response.id}',
             });
 
-            const properties = [makeProperty('description'), makeProperty('note'), makeProperty('prefix')];
+            const properties = [
+                makeProperty('description'),
+                makeProperty('note'),
+                makeProperty('prefix'),
+                makeProperty('ref'),
+            ];
 
             const {result} = renderHook(() =>
                 useClusterElementTestPropertiesPopover({
@@ -142,8 +148,41 @@ describe('useClusterElementTestPropertiesPopover', () => {
             expect(defaultValues).toEqual({
                 description: 'This uses fromAi internally',
                 note: 'fromAi(test)',
-                prefix: '=notFromAi(value)',
             });
+            expect(defaultValues).not.toHaveProperty('prefix');
+            expect(defaultValues).not.toHaveProperty('ref');
+        });
+
+        it('should recursively filter expressions inside nested objects', () => {
+            const currentNode = makeNode({
+                fields: {
+                    contactId: '${accelo_1.response.id}',
+                    name: 'Test Contact',
+                    status: '=fromAi(status)',
+                },
+                model: 'gpt-4',
+            });
+
+            const properties = [makeProperty('model'), makeProperty('fields', {type: 'DYNAMIC_PROPERTIES'})];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            const defaultValues = result.current.form.getValues();
+
+            expect(defaultValues).toEqual({
+                fields: {
+                    name: 'Test Contact',
+                },
+                model: 'gpt-4',
+            });
+            expect(defaultValues.fields).not.toHaveProperty('contactId');
+            expect(defaultValues.fields).not.toHaveProperty('status');
         });
     });
 
@@ -169,7 +208,7 @@ describe('useClusterElementTestPropertiesPopover', () => {
             expect(result.current.propertiesWithDefaults[2]).toEqual(properties[2]);
         });
 
-        it('should not set defaultValue from =fromAi() parameters', () => {
+        it('should not set defaultValue from expression parameters', () => {
             const currentNode = makeNode({
                 prompt: '=fromAi(description)',
             });
