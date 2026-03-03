@@ -37,7 +37,14 @@ const LOG_LEVEL_BADGE_CONFIG = {
 const LogLevelBadge = ({level}: {level: LogLevel}) => {
     const {className, icon} = LOG_LEVEL_BADGE_CONFIG[level] || LOG_LEVEL_BADGE_CONFIG[LogLevel.Info];
 
-    return <Badge className={twMerge('border-0', className)} icon={icon} label={level} styleType="secondary-filled" />;
+    return (
+        <Badge
+            className={twMerge('min-w-24 border-0', className)}
+            icon={icon}
+            label={level}
+            styleType="secondary-filled"
+        />
+    );
 };
 
 const LogEntryRow = ({entry}: {entry: LogEntry}) => {
