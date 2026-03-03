@@ -127,15 +127,30 @@ public class McpIntegrationFacadeImpl implements McpIntegrationFacade {
         List<McpIntegrationWorkflow> existingMcpIntegrationWorkflows =
             mcpIntegrationWorkflowService.getMcpIntegrationMcpIntegrationWorkflows(mcpIntegrationId);
 
+        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                mcpIntegration.getIntegrationInstanceConfigurationId());
+
+        Map<Long, IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflowMap =
+            new HashMap<>();
+
+        for (IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow : integrationInstanceConfigurationWorkflows) {
+
+            integrationInstanceConfigurationWorkflowMap.put(
+                integrationInstanceConfigurationWorkflow.getId(), integrationInstanceConfigurationWorkflow);
+        }
+
         Map<String, McpIntegrationWorkflow> existingWorkflowIdMap = new HashMap<>();
 
         for (McpIntegrationWorkflow mcpIntegrationWorkflow : existingMcpIntegrationWorkflows) {
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
-                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                integrationInstanceConfigurationWorkflowMap.get(
                     mcpIntegrationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
 
-            existingWorkflowIdMap.put(
-                integrationInstanceConfigurationWorkflow.getWorkflowId(), mcpIntegrationWorkflow);
+            if (integrationInstanceConfigurationWorkflow != null) {
+                existingWorkflowIdMap.put(
+                    integrationInstanceConfigurationWorkflow.getWorkflowId(), mcpIntegrationWorkflow);
+            }
         }
 
         Set<String> selectedWorkflowIdSet = new HashSet<>(selectedWorkflowIds);

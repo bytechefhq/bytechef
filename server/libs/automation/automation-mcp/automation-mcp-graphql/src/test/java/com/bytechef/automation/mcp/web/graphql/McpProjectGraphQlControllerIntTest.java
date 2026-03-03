@@ -235,6 +235,40 @@ class McpProjectGraphQlControllerIntTest {
     }
 
     @Test
+    void testUpdateMcpProject() {
+        // Given
+        McpProject mockProject = createMockMcpProject(1L, 123L, 1L);
+
+        when(mcpProjectFacade.updateMcpProject(anyLong(), any())).thenReturn(mockProject);
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpProject(id: "1", input: {
+                        selectedWorkflowIds: ["workflow1", "workflow3"]
+                    }) {
+                        id
+                        projectDeploymentId
+                        mcpServerId
+                    }
+                }
+                """)
+            .execute()
+            .path("updateMcpProject.id")
+            .entity(String.class)
+            .isEqualTo("1")
+            .path("updateMcpProject.projectDeploymentId")
+            .entity(String.class)
+            .isEqualTo("123")
+            .path("updateMcpProject.mcpServerId")
+            .entity(String.class)
+            .isEqualTo("1");
+
+        verify(mcpProjectFacade).updateMcpProject(1L, List.of("workflow1", "workflow3"));
+    }
+
+    @Test
     void testGetProjectVersion() {
         // Given
         Long projectId = 1L;
