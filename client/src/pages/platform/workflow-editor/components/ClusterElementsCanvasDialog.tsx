@@ -143,6 +143,7 @@ const ClusterElementsCanvasDialog = ({
                                     onCopilotClick={handleCopilotClick}
                                     onTestClick={handleTestClick}
                                     onToggleEditor={handleToggleEditor}
+                                    showTestButton={isAiAgentClusterRoot}
                                     showToggleEditor={
                                         isAiAgentClusterRoot ||
                                         (isDataStreamClusterRoot && isDataStreamSimpleModeAvailable)
