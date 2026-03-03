@@ -1,0 +1,48 @@
+query mcpProjectWorkflowProperties($mcpProjectWorkflowId: ID!) {
+    mcpProjectWorkflowProperties(mcpProjectWorkflowId: $mcpProjectWorkflowId) {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+            controlType
+            defaultValue
+            label
+            placeholder
+        }
+        ... on IntegerProperty {
+            controlType
+            integerDefaultValue: defaultValue
+            label
+            placeholder
+        }
+        ... on NumberProperty {
+            controlType
+            label
+            numberDefaultValue: defaultValue
+            placeholder
+        }
+        ... on BooleanProperty {
+            booleanDefaultValue: defaultValue
+            controlType
+            label
+            placeholder
+        }
+        ... on ArrayProperty {
+            arrayDefaultValue: defaultValue
+            controlType
+            label
+            placeholder
+        }
+        ... on ObjectProperty {
+            controlType
+            label
+            objectDefaultValue: defaultValue
+            placeholder
+        }
+    }
+}
