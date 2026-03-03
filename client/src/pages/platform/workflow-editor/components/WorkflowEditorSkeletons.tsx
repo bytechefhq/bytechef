@@ -36,13 +36,16 @@ export const DescriptionTabSkeleton = () => (
     </div>
 );
 
-export const DataPillPanelSkeleton = ({className}: {className?: string}) => (
-    <div
-        className={twMerge(
-            'z-10 w-screen max-w-data-pill-panel-width overflow-hidden border border-stroke-neutral-secondary bg-background',
-            className || 'absolute bottom-6 right-data-pill-panel-placement top-2 rounded-md'
-        )}
-    >
+const DATA_PILL_PANEL_SKELETON_BASE_CLASSES =
+    'z-10 w-screen max-w-data-pill-panel-width overflow-hidden border border-stroke-neutral-secondary bg-background';
+const DATA_PILL_PANEL_SKELETON_DEFAULT_PLACEMENT = 'absolute bottom-6 right-data-pill-panel-placement top-2 rounded-md';
+
+export const DataPillPanelSkeleton = ({
+    className = DATA_PILL_PANEL_SKELETON_DEFAULT_PLACEMENT,
+}: {
+    className?: string;
+}) => (
+    <div className={twMerge(DATA_PILL_PANEL_SKELETON_BASE_CLASSES, className)}>
         <ul className="flex flex-col">
             {Array.from({length: 12}).map((_, index) => (
                 <li className="flex items-center space-x-4 border-b border-border/50 p-4" key={index}>
