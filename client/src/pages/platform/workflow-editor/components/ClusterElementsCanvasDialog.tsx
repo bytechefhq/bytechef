@@ -69,9 +69,9 @@ const ClusterElementsCanvasDialog = ({
     const ff_4070 = useFeatureFlagsStore()('ff-4070');
 
     useEffect(() => {
-        let outerRafId: number;
-        let innerRafId: number;
-        let timerId: ReturnType<typeof setTimeout>;
+        let outerRafId: number | undefined;
+        let innerRafId: number | undefined;
+        let timerId: ReturnType<typeof setTimeout> | undefined;
 
         if (dataPillPanelOpen) {
             setShouldRenderDataPillPanel(true);
@@ -88,9 +88,17 @@ const ClusterElementsCanvasDialog = ({
         }
 
         return () => {
-            cancelAnimationFrame(outerRafId);
-            cancelAnimationFrame(innerRafId);
-            clearTimeout(timerId);
+            if (outerRafId !== undefined) {
+                cancelAnimationFrame(outerRafId);
+            }
+
+            if (innerRafId !== undefined) {
+                cancelAnimationFrame(innerRafId);
+            }
+
+            if (timerId !== undefined) {
+                clearTimeout(timerId);
+            }
         };
     }, [dataPillPanelOpen]);
 
@@ -147,6 +155,11 @@ const ClusterElementsCanvasDialog = ({
                                     showToggleEditor={
                                         isAiAgentClusterRoot ||
                                         (isDataStreamClusterRoot && isDataStreamSimpleModeAvailable)
+                                    }
+                                    toggleEditorLabel={
+                                        isAiAgentClusterRoot
+                                            ? 'Switch to AI Agent editor'
+                                            : 'Switch to DataStream editor'
                                     }
                                 />
                             )}
