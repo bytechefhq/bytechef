@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.Map;
 
 /**
@@ -46,7 +47,7 @@ public class MicrosoftOneDriveCopyFileAction {
             string(ID)
                 .label("File ID")
                 .description("ID of the file to copy.")
-                .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
+                .options((OptionsFunction<String>) MicrosoftUtils::getFileIdOptions)
                 .required(true),
             string(NAME)
                 .label("New File Name")

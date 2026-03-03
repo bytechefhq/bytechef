@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
@@ -32,8 +33,41 @@ import java.util.Map;
  */
 public class MicrosoftUtils {
 
+    public static final String FILE = "file";
+    public static final String ID = "id";
+    public static final String NAME = "name";
     public static final String ODATA_NEXT_LINK = "@odata.nextLink";
     public static final String VALUE = "value";
+
+    public static List<Option<String>> getFileIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        Map<String, Object> body = context.http(http -> http.get("/me/drive/root/search"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get(VALUE) instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map && map.containsKey(FILE)) {
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
+                }
+            }
+        }
+
+        List<Map<?, ?>> itemsFromNextPage = getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
+
+        for (Map<?, ?> map : itemsFromNextPage) {
+            if (map.containsKey(FILE)) {
+                options.add(option((String) map.get(NAME), (String) map.get(ID)));
+            }
+        }
+
+        return options;
+    }
 
     public static List<Option<String>> getOptions(
         Context context, Map<String, ?> body, String label, String value) {
