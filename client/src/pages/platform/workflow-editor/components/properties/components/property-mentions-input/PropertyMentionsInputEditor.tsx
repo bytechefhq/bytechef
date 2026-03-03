@@ -665,7 +665,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         return (
             <>
                 {isFromAi ? (
-                    <div className="flex w-full items-center px-2 py-[0.44rem] text-sm italic text-muted-foreground">
+                    <div className="flex w-full items-center px-2 py-[0.44rem] text-sm font-medium italic text-muted-foreground">
                         Automatically defined by the model
                     </div>
                 ) : (
