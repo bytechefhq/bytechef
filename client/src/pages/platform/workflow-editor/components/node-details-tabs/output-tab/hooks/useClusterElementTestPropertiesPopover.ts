@@ -2,13 +2,30 @@ import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {useEffect, useMemo} from 'react';
 import {useForm} from 'react-hook-form';
 
-const FROM_AI_PATTERN = /^=fromAi\(/;
-
 interface UseClusterElementTestPropertiesPopoverProps {
     currentNode: NodeDataType;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSubmit: (inputParameters: Record<string, any>) => void;
     properties: PropertyAllType[];
+}
+
+function isExpression(value: unknown): boolean {
+    return typeof value === 'string' && (value.startsWith('=') || value.includes('${'));
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function filterExpressions(obj: Record<string, any>): Record<string, any> {
+    return Object.fromEntries(
+        Object.entries(obj)
+            .filter(([, value]) => !isExpression(value))
+            .map(([key, value]) => {
+                if (value && typeof value === 'object' && !Array.isArray(value)) {
+                    return [key, filterExpressions(value)];
+                }
+
+                return [key, value];
+            })
+    );
 }
 
 export default function useClusterElementTestPropertiesPopover({
@@ -19,11 +36,7 @@ export default function useClusterElementTestPropertiesPopover({
     const filteredDefaultValues = useMemo(() => {
         const parameters = currentNode.parameters ?? {};
 
-        return Object.fromEntries(
-            Object.entries(parameters).filter(
-                ([, value]) => !(typeof value === 'string' && FROM_AI_PATTERN.test(value))
-            )
-        );
+        return filterExpressions(parameters);
     }, [currentNode.parameters]);
 
     const propertiesWithDefaults = useMemo(
