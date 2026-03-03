@@ -122,6 +122,9 @@ const useClusterElementsLayout = () => {
         return width;
     }, [copilotPanelOpen, dataPillPanelOpen, workflowNodeDetailsPanelOpen]);
 
+    const previousCanvasWidthRef = useRef(canvasWidth);
+    const cancelAnimationRef = useRef<(() => void) | null>(null);
+
     const workflowDefinitionTasks = useMemo(() => {
         if (!workflow.definition) {
             return [];
@@ -326,9 +329,6 @@ const useClusterElementsLayout = () => {
         setNestedClusterRootsComponentDefinitions,
         rootClusterElementDefinition,
     ]);
-
-    const cancelAnimationRef = useRef<(() => void) | null>(null);
-    const previousCanvasWidthRef = useRef(canvasWidth);
 
     // Structural layout: runs when nodes/edges change, NOT on panel toggle
     useEffect(() => {

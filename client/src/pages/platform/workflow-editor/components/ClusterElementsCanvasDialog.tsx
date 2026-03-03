@@ -18,6 +18,7 @@ import {UpdateWorkflowMutationType} from '@/shared/types';
 import {XIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 const DataPillPanel = lazy(() => import('./datapills/DataPillPanel'));
 
@@ -38,17 +39,22 @@ const ClusterElementsCanvasDialog = ({
     updateWorkflowMutation,
     workflowNodeOutputs,
 }: ClusterElementsCanvasDialogProps) => {
-    const copilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.copilotPanelOpen);
-    const showAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.showAiAgentEditor);
-    const showDataStreamEditor = useClusterElementsCanvasDialogStore((state) => state.showDataStreamEditor);
-    const testingPanelOpen = useClusterElementsCanvasDialogStore((state) => state.testingPanelOpen);
+    const [shouldRenderDataPillPanel, setShouldRenderDataPillPanel] = useState(false);
+    const [isDataPillPanelVisible, setIsDataPillPanelVisible] = useState(false);
+
+    const {copilotPanelOpen, showAiAgentEditor, showDataStreamEditor, testingPanelOpen} =
+        useClusterElementsCanvasDialogStore(
+            useShallow((state) => ({
+                copilotPanelOpen: state.copilotPanelOpen,
+                showAiAgentEditor: state.showAiAgentEditor,
+                showDataStreamEditor: state.showDataStreamEditor,
+                testingPanelOpen: state.testingPanelOpen,
+            }))
+        );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
     );
-
-    const [shouldRenderDataPillPanel, setShouldRenderDataPillPanel] = useState(false);
-    const [isDataPillPanelVisible, setIsDataPillPanelVisible] = useState(false);
 
     const {
         copilotEnabled,

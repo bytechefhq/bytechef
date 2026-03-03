@@ -22,8 +22,14 @@ interface DataPillPanelProps {
 const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOutputs}: DataPillPanelProps) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
-    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+    const {setDataPillPanelOpen} = useDataPillPanelStore(
+        useShallow((state) => ({
+            setDataPillPanelOpen: state.setDataPillPanelOpen,
+        }))
+    );
+
     const workflow = useWorkflowDataStore((state) => state.workflow);
+
     const {aiAgentNodeDetailsPanelOpen, currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             aiAgentNodeDetailsPanelOpen: state.aiAgentNodeDetailsPanelOpen,
