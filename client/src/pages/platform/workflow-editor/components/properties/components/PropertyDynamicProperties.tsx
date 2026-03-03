@@ -1,9 +1,9 @@
 import {PropertyDynamicPropertiesSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {useClusterElementPropertyDynamicPropertiesQuery} from '@/shared/middleware/graphql';
+import {useClusterElementDynamicPropertiesQuery} from '@/shared/middleware/graphql';
 import {
-    useGetClusterElementDynamicPropertiesQuery,
+    useGetClusterElementNodeDynamicPropertiesQuery,
     useGetWorkflowNodeDynamicPropertiesQuery,
 } from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -127,13 +127,13 @@ const PropertyDynamicProperties = ({
         [control, lookupDependsOnPaths?.length, lookupDependsOnValues, enabled, operationChangeInProgress]
     );
 
-    const {data: properties, isLoading} = useGetWorkflowNodeDynamicPropertiesQuery(
+    const {data: workflowNodeDynamicProperties, isLoading} = useGetWorkflowNodeDynamicPropertiesQuery(
         queryOptions,
         Boolean(queryEnabled && !currentNode?.clusterElementType && !clusterElementContext)
     );
 
-    const {data: clusterElementProperties, isLoading: isClusterElementPropertiesLoading} =
-        useGetClusterElementDynamicPropertiesQuery(
+    const {data: clusterElementNodeDynamicProperties, isLoading: isClusterElementNodeDynamicPropertiesLoading} =
+        useGetClusterElementNodeDynamicPropertiesQuery(
             clusterElementQueryOptions,
             Boolean(queryEnabled && currentNode?.clusterElementType && !clusterElementContext)
         );
@@ -184,8 +184,8 @@ const PropertyDynamicProperties = ({
         return enabled;
     }, [currentNode, enabled, lookupDependsOnPaths, clusterElementLookupDependsOnValues, clusterElementContext]);
 
-    const {data: clusterElementPropertyDynamicProperties, isLoading: isClusterElementPropertyDynamicPropertiesLoading} =
-        useClusterElementPropertyDynamicPropertiesQuery(
+    const {data: clusterElementDynamicProperties, isLoading: isClusterElementDynamicPropertiesLoading} =
+        useClusterElementDynamicPropertiesQuery(
             {
                 clusterElementName: clusterElementContext?.clusterElementName || '',
                 componentName: clusterElementContext?.componentName || '',
@@ -198,7 +198,7 @@ const PropertyDynamicProperties = ({
             {
                 enabled: clusterElementContextQueryEnabled,
                 queryKey: [
-                    'clusterElementPropertyDynamicProperties',
+                    'clusterElementDynamicProperties',
                     {
                         clusterElementName: clusterElementContext?.clusterElementName,
                         componentName: clusterElementContext?.componentName,
@@ -211,27 +211,32 @@ const PropertyDynamicProperties = ({
             }
         );
 
-    const clusterElementDynamicProperties =
-        clusterElementPropertyDynamicProperties?.clusterElementPropertyDynamicProperties;
-
     // Update subProperties and track which key generated these properties
     useEffect(() => {
-        if (properties) {
-            setSubProperties(properties);
+        if (workflowNodeDynamicProperties) {
+            setSubProperties(workflowNodeDynamicProperties);
 
             setLastProcessedKey(lookupDependsOnValuesKey);
-        } else if (clusterElementProperties) {
-            setSubProperties(clusterElementProperties);
+        } else if (clusterElementNodeDynamicProperties) {
+            setSubProperties(clusterElementNodeDynamicProperties);
 
             setLastProcessedKey(lookupDependsOnValuesKey);
-        } else if (clusterElementDynamicProperties && clusterElementDynamicProperties.length > 0) {
-            setSubProperties(clusterElementDynamicProperties as PropertyAllType[]);
+        } else if (
+            clusterElementDynamicProperties?.clusterElementDynamicProperties &&
+            clusterElementDynamicProperties?.clusterElementDynamicProperties.length > 0
+        ) {
+            setSubProperties(clusterElementDynamicProperties?.clusterElementDynamicProperties as PropertyAllType[]);
 
             setLastProcessedKey(lookupDependsOnValuesKey);
         } else {
             setSubProperties([]);
         }
-    }, [properties, lookupDependsOnValuesKey, clusterElementProperties, clusterElementDynamicProperties]);
+    }, [
+        workflowNodeDynamicProperties,
+        lookupDependsOnValuesKey,
+        clusterElementNodeDynamicProperties,
+        clusterElementDynamicProperties,
+    ]);
 
     const isPending = lookupDependsOnValuesKey !== lastProcessedKey;
 
@@ -247,12 +252,13 @@ const PropertyDynamicProperties = ({
     const childControlPath = control ? path : controlPath;
 
     const hasLoadedData =
-        (properties && properties.length > 0) ||
-        (clusterElementProperties && clusterElementProperties.length > 0) ||
-        (clusterElementDynamicProperties && clusterElementDynamicProperties.length > 0);
+        (workflowNodeDynamicProperties && workflowNodeDynamicProperties.length > 0) ||
+        (clusterElementNodeDynamicProperties && clusterElementNodeDynamicProperties.length > 0) ||
+        (clusterElementDynamicProperties?.clusterElementDynamicProperties &&
+            clusterElementDynamicProperties?.clusterElementDynamicProperties.length > 0);
 
     const isAnyLoading =
-        isLoading || isClusterElementPropertiesLoading || isClusterElementPropertyDynamicPropertiesLoading;
+        isLoading || isClusterElementNodeDynamicPropertiesLoading || isClusterElementDynamicPropertiesLoading;
 
     const isAnyQueryEnabled = queryEnabled || clusterElementContextQueryEnabled;
 
