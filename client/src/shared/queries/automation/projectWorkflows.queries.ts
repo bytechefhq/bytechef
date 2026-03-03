@@ -45,12 +45,14 @@ export const useGetProjectVersionWorkflowsQuery = (
     id: number,
     projectVersion: number,
     includeAllFields: boolean = true,
-    enabled?: boolean
+    enabled?: boolean,
+    refetchOnWindowFocus?: boolean
 ) =>
     useQuery<Workflow[], Error>({
         queryKey: ProjectWorkflowKeys.projectVersionWorkflows(id, projectVersion, includeAllFields),
         queryFn: () => new WorkflowApi().getProjectVersionWorkflows({id, projectVersion, includeAllFields}),
         enabled: enabled === undefined ? true : enabled,
+        refetchOnWindowFocus,
     });
 
 export const useGetWorkflowsQuery = (enabled?: boolean) =>
