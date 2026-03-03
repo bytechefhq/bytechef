@@ -305,5 +305,142 @@ describe('useClusterElementTestPropertiesPopover', () => {
 
             expect(mockOnSubmit).toHaveBeenCalledWith({});
         });
+
+        it('should convert string "42" to integer 42 for INTEGER properties', () => {
+            const currentNode = makeNode({});
+            const properties = [makeProperty('count', {type: 'INTEGER'})];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            act(() => {
+                result.current.handleFormSubmit({count: '42'});
+            });
+
+            expect(mockOnSubmit).toHaveBeenCalledWith({count: 42});
+        });
+
+        it('should convert string "3.14" to float 3.14 for NUMBER properties', () => {
+            const currentNode = makeNode({});
+            const properties = [makeProperty('rate', {type: 'NUMBER'})];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            act(() => {
+                result.current.handleFormSubmit({rate: '3.14'});
+            });
+
+            expect(mockOnSubmit).toHaveBeenCalledWith({rate: 3.14});
+        });
+
+        it('should pass through non-numeric strings for INTEGER properties', () => {
+            const currentNode = makeNode({});
+            const properties = [makeProperty('count', {type: 'INTEGER'})];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            act(() => {
+                result.current.handleFormSubmit({count: 'abc'});
+            });
+
+            expect(mockOnSubmit).toHaveBeenCalledWith({count: 'abc'});
+        });
+
+        it('should not convert STRING property values that look numeric', () => {
+            const currentNode = makeNode({});
+            const properties = [makeProperty('label', {type: 'STRING'})];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            act(() => {
+                result.current.handleFormSubmit({label: '42'});
+            });
+
+            expect(mockOnSubmit).toHaveBeenCalledWith({label: '42'});
+        });
+
+        it('should pass through already-numeric values without conversion', () => {
+            const currentNode = makeNode({});
+            const properties = [makeProperty('count', {type: 'INTEGER'}), makeProperty('rate', {type: 'NUMBER'})];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            act(() => {
+                result.current.handleFormSubmit({count: 7, rate: 2.718});
+            });
+
+            expect(mockOnSubmit).toHaveBeenCalledWith({count: 7, rate: 2.718});
+        });
+
+        it('should truncate decimal for INTEGER using parseInt', () => {
+            const currentNode = makeNode({});
+            const properties = [makeProperty('count', {type: 'INTEGER'})];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            act(() => {
+                result.current.handleFormSubmit({count: '10.7'});
+            });
+
+            expect(mockOnSubmit).toHaveBeenCalledWith({count: 10});
+        });
+
+        it('should handle mixed property types in one submission', () => {
+            const currentNode = makeNode({});
+            const properties = [
+                makeProperty('count', {type: 'INTEGER'}),
+                makeProperty('label', {type: 'STRING'}),
+                makeProperty('rate', {type: 'NUMBER'}),
+            ];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            act(() => {
+                result.current.handleFormSubmit({count: '5', label: 'hello', rate: '9.99'});
+            });
+
+            expect(mockOnSubmit).toHaveBeenCalledWith({count: 5, label: 'hello', rate: 9.99});
+        });
     });
 });
