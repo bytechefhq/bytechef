@@ -34,7 +34,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon} from 'lucide-react';
-import {ReactNode, useEffect, useMemo, useState} from 'react';
+import {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -62,6 +62,8 @@ const ProjectDeploymentDialog = ({
     const [activeStepIndex, setActiveStepIndex] = useState(0);
     const [groupConnections, setGroupConnections] = useState(false);
     const [isOpen, setIsOpen] = useState(!triggerNode);
+
+    const initializedProjectKeyRef = useRef<string>('');
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
@@ -96,7 +98,8 @@ const ProjectDeploymentDialog = ({
         getValues().projectId!,
         getValues().projectVersion!,
         true,
-        !!getValues().projectId && !!getValues().projectVersion
+        !!getValues().projectId && !!getValues().projectVersion,
+        false
     );
 
     const workflows = useMemo(() => {
@@ -201,6 +204,8 @@ const ProjectDeploymentDialog = ({
 
             setActiveStepIndex(0);
 
+            initializedProjectKeyRef.current = '';
+
             if (onClose) {
                 onClose();
             }
@@ -255,6 +260,14 @@ const ProjectDeploymentDialog = ({
         if (!workflows?.length) {
             return;
         }
+
+        const projectKey = `${getValues().projectId}-${getValues().projectVersion}`;
+
+        if (initializedProjectKeyRef.current === projectKey) {
+            return;
+        }
+
+        initializedProjectKeyRef.current = projectKey;
 
         const projectDeploymentWorkflows: ProjectDeploymentWorkflow[] = workflows.map((workflow) => {
             const projectDeploymentWorkflow = projectDeployment?.projectDeploymentWorkflows?.find(
