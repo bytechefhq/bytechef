@@ -26,14 +26,15 @@ export function buildGenericNodeData(
 ): NodeDataType {
     const {contextIdentifier} = TASK_DISPATCHER_CONFIG[dispatcherType];
 
-    const newNodeData = {
+    const newNodeData: NodeDataType = {
         ...baseNodeData,
         [contextIdentifier]: taskDispatcherId,
     };
 
     for (const [type, config] of Object.entries(TASK_DISPATCHER_CONFIG)) {
-        const taskDispatcherId =
-            taskDispatcherContext[config.contextIdentifier as 'branchId' | 'conditionId' | 'eachId' | 'loopId'];
+        const taskDispatcherId = taskDispatcherContext[config.contextIdentifier as keyof TaskDispatcherContextType] as
+            | string
+            | undefined;
 
         if (taskDispatcherId) {
             if (type === 'condition') {
@@ -50,6 +51,11 @@ export function buildGenericNodeData(
             } else if (type === 'loopBreak') {
                 newNodeData.loopBreakData = {
                     loopBreakId: taskDispatcherId,
+                };
+            } else if (type === 'map') {
+                newNodeData.mapData = {
+                    index: taskDispatcherContext.index ?? 0,
+                    mapId: taskDispatcherId,
                 };
             } else if (type === 'subflow') {
                 newNodeData.subflowData = {
@@ -450,6 +456,42 @@ export const TASK_DISPATCHER_CONFIG = {
         getTask: getTaskDispatcherTask,
         initializeParameters: () => ({}),
         updateTaskParameters: ({task}: UpdateTaskParametersType): WorkflowTask => task,
+    },
+    map: {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'map'),
+        contextIdentifier: 'mapId',
+        dataKey: 'mapData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const parts = placeholderId.split('-');
+            const index = parseInt(parts[parts.length - 1] || '-1');
+
+            return {index, taskDispatcherId: parts[0]};
+        },
+        getDispatcherId: (context: TaskDispatcherContextType) => context.mapId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+        }),
+        getSubtasks: ({node, task}: {node?: Node; task?: WorkflowTask}): Array<WorkflowTask> => {
+            const parameters = (node?.data as NodeDataType)?.parameters || task?.parameters;
+
+            if (!parameters) {
+                return [];
+            }
+
+            return parameters?.iteratee || [];
+        },
+        getTask: getTaskDispatcherTask,
+        initializeParameters: () => ({
+            iteratee: [],
+        }),
+        updateTaskParameters: ({task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => ({
+            ...task,
+            parameters: {
+                ...task.parameters,
+                iteratee: updatedSubtasks,
+            },
+        }),
     },
     parallel: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>

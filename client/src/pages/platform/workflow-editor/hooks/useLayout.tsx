@@ -35,6 +35,8 @@ import createForkJoinEdges from '../utils/createForkJoinEdges';
 import createForkJoinNode from '../utils/createForkJoinNode';
 import createLoopEdges from '../utils/createLoopEdges';
 import createLoopNode from '../utils/createLoopNode';
+import createMapEdges from '../utils/createMapEdges';
+import createMapNode from '../utils/createMapNode';
 import createParallelEdges from '../utils/createParallelEdges';
 import createParallelNode from '../utils/createParallelNode';
 import {
@@ -126,6 +128,7 @@ export default function useLayout({
         const eachChildTasks = {};
         const forkJoinChildTasks = {};
         const loopChildTasks = {};
+        const mapChildTasks = {};
         const parallelChildTasks = {};
 
         // First pass: collect all task dispatcher data and save it in the corresponding objects
@@ -137,6 +140,7 @@ export default function useLayout({
                 eachChildTasks,
                 forkJoinChildTasks,
                 loopChildTasks,
+                mapChildTasks,
                 parallelChildTasks
             );
         });
@@ -178,6 +182,7 @@ export default function useLayout({
                 eachChildTasks,
                 forkJoinChildTasks,
                 loopChildTasks,
+                mapChildTasks,
                 parallelChildTasks,
                 taskName: name,
             });
@@ -210,6 +215,17 @@ export default function useLayout({
                     allNodes: [...allNodes, taskNode],
                     isNested,
                     loopId: taskNode.id,
+                    options: {
+                        createPlaceholder: !hasSubtasks,
+                    },
+                });
+            } else if (componentName === 'map') {
+                const hasSubtasks = parameters?.iteratee?.length > 0;
+
+                allNodes = createMapNode({
+                    allNodes: [...allNodes, taskNode],
+                    isNested,
+                    mapId: taskNode.id,
                     options: {
                         createPlaceholder: !hasSubtasks,
                     },
@@ -290,6 +306,7 @@ export default function useLayout({
         const isConditionNode = nodeData.componentName === 'condition';
         const isEachNode = nodeData.componentName === 'each';
         const isLoopNode = nodeData.componentName === 'loop';
+        const isMapNode = nodeData.componentName === 'map';
         const isParallellNode = nodeData.componentName === 'parallel';
         const isForkJoinNode = nodeData.componentName === 'fork-join';
 
@@ -314,6 +331,15 @@ export default function useLayout({
             const loopEdges = createLoopEdges(node);
 
             taskEdges.push(...loopEdges);
+
+            return;
+        }
+
+        // Create initial edges for the Map node
+        if (isMapNode) {
+            const mapEdges = createMapEdges(node);
+
+            taskEdges.push(...mapEdges);
 
             return;
         }
