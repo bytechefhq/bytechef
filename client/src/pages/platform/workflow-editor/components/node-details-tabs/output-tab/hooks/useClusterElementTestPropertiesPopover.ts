@@ -53,10 +53,40 @@ export default function useClusterElementTestPropertiesPopover({
 
     const {control, formState, handleSubmit} = form;
 
+    const propertyTypeMap = useMemo(() => {
+        const typeMap: Record<string, string> = {};
+
+        for (const property of properties) {
+            if (property.name && property.type) {
+                typeMap[property.name] = property.type;
+            }
+        }
+
+        return typeMap;
+    }, [properties]);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function handleFormSubmit(values: Record<string, any>) {
         const sanitizedValues = Object.fromEntries(
-            Object.entries(values).map(([key, value]) => [key, value === '' ? null : value])
+            Object.entries(values).map(([key, value]) => {
+                if (value === '') {
+                    return [key, null];
+                }
+
+                const propertyType = propertyTypeMap[key];
+
+                if (
+                    (propertyType === 'INTEGER' || propertyType === 'NUMBER') &&
+                    typeof value === 'string' &&
+                    value !== ''
+                ) {
+                    const numericValue = propertyType === 'INTEGER' ? parseInt(value, 10) : parseFloat(value);
+
+                    return [key, isNaN(numericValue) ? value : numericValue];
+                }
+
+                return [key, value];
+            })
         );
 
         onSubmit(sanitizedValues);
