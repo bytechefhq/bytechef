@@ -131,14 +131,16 @@ const ProjectsLeftSidebar = ({
     }, [projectId]);
 
     useEffect(() => {
+        if (isLoading) {
+            return;
+        }
+
         const timeoutId = setTimeout(() => {
-            if (searchInputRef.current) {
-                searchInputRef.current.focus();
-            }
+            searchInputRef.current?.focus();
         }, 50);
 
         return () => clearTimeout(timeoutId);
-    }, [selectedProjectId]);
+    }, [isLoading, selectedProjectId]);
 
     return (
         <aside className="flex h-full min-w-[355px] flex-col items-center gap-2 bg-surface-main px-4 pt-3">
