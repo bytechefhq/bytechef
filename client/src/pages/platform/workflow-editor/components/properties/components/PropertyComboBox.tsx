@@ -430,12 +430,7 @@ const PropertyComboBox = ({
                     </Button>
                 </PopoverTrigger>
 
-                <PopoverContent
-                    align="start"
-                    // aria-label="Select options"
-                    className="min-w-combo-box-popper-anchor-width p-0"
-                    side="bottom"
-                >
+                <PopoverContent align="start" className="min-w-combo-box-popper-anchor-width p-0" side="bottom">
                     <Command>
                         <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
 
