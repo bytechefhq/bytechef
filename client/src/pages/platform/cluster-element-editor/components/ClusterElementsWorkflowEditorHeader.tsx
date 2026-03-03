@@ -43,7 +43,7 @@ const ClusterElementsWorkflowEditorHeader = ({
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                className="hover:bg-background/70 [&_svg]:size-5"
+                                className="[&_svg]:size-5"
                                 icon={<PlayIcon className="text-content-brand-primary" />}
                                 onClick={onTestClick}
                                 size="icon"
