@@ -21,25 +21,27 @@ function prettyPrintJson(value: unknown): string {
     return JSON.stringify(value, null, 2);
 }
 
+function toBackendToolName(componentName: string, operationName: string): string {
+    let result = componentName.toUpperCase() + '_';
+
+    for (const char of operationName) {
+        if (char >= 'A' && char <= 'Z') {
+            result += '_' + char;
+        } else {
+            result += char.toUpperCase();
+        }
+    }
+
+    return result;
+}
+
 export const AiAgentTestingPanelToolFallback: ToolCallMessagePartComponent = ({argsText, result, toolName}) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const {tools} = useAiAgentTools();
 
     const toolItem = useMemo(() => {
-        const byOperationName = tools.find((tool) => tool.operationName === toolName);
-
-        if (byOperationName) {
-            return byOperationName;
-        }
-
-        if (toolName.includes('_')) {
-            const operationName = toolName.split('_').slice(1).join('_');
-
-            return tools.find((tool) => tool.operationName === operationName);
-        }
-
-        return undefined;
+        return tools.find((tool) => toBackendToolName(tool.componentName, tool.operationName) === toolName);
     }, [tools, toolName]);
 
     const {data: clusterElementDefinition} = useGetClusterElementDefinitionQuery(
