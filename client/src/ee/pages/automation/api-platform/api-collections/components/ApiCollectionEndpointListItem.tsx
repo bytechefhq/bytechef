@@ -161,15 +161,19 @@ const ApiCollectionEndpointListItem = ({
             </div>
 
             <div className="flex items-center justify-end gap-x-6">
-                <Tooltip>
-                    <TooltipTrigger className="flex items-center text-sm text-muted-foreground">
-                        <span className="text-xs">
-                            {`Executed at ${apiCollectionEndpoint.lastExecutionDate?.toLocaleDateString()} ${apiCollectionEndpoint.lastExecutionDate?.toLocaleTimeString()}`}
-                        </span>
-                    </TooltipTrigger>
+                {apiCollectionEndpoint?.lastExecutionDate ? (
+                    <Tooltip>
+                        <TooltipTrigger className="flex items-center justify-end text-sm text-gray-500">
+                            <span className="text-xs">
+                                {`Executed at ${apiCollectionEndpoint.lastExecutionDate?.toLocaleDateString()} ${apiCollectionEndpoint.lastExecutionDate?.toLocaleTimeString()}`}
+                            </span>
+                        </TooltipTrigger>
 
-                    <TooltipContent>Last Modified Date</TooltipContent>
-                </Tooltip>
+                        <TooltipContent>Last Execution Date</TooltipContent>
+                    </Tooltip>
+                ) : (
+                    <span className="text-xs">No executions</span>
+                )}
 
                 <Switch checked={apiCollectionEndpoint.enabled} onCheckedChange={handleApiCollectionEndpointEnable} />
 
