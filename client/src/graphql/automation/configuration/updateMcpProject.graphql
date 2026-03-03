@@ -1,0 +1,8 @@
+mutation updateMcpProject($id: ID!, $input: UpdateMcpProjectInput!) {
+    updateMcpProject(id: $id, input: $input) {
+        id
+        mcpServerId
+        projectDeploymentId
+        projectVersion
+    }
+}
