@@ -1911,8 +1911,8 @@ export type Query = {
   clusterElementDefinition: ClusterElementDefinition;
   clusterElementDefinitions: Array<ClusterElementDefinition>;
   clusterElementMissingRequiredProperties: Array<Scalars['String']['output']>;
-  clusterElementPropertyDynamicProperties: Array<Property>;
-  clusterElementPropertyOptions: Array<Option>;
+  clusterElementDynamicProperties: Array<Property>;
+  clusterElementOptions: Array<Option>;
   clusterElementScriptInput?: Maybe<Scalars['Map']['output']>;
   componentDefinition: ComponentDefinition;
   componentDefinitionSearch: Array<ComponentDefinition>;
@@ -2082,7 +2082,7 @@ export type QueryClusterElementMissingRequiredPropertiesArgs = {
 };
 
 
-export type QueryClusterElementPropertyDynamicPropertiesArgs = {
+export type QueryClusterElementDynamicPropertiesArgs = {
   clusterElementName: Scalars['String']['input'];
   componentName: Scalars['String']['input'];
   componentVersion: Scalars['Int']['input'];
@@ -2093,7 +2093,7 @@ export type QueryClusterElementPropertyDynamicPropertiesArgs = {
 };
 
 
-export type QueryClusterElementPropertyOptionsArgs = {
+export type QueryClusterElementOptionsArgs = {
   clusterElementName: Scalars['String']['input'];
   componentName: Scalars['String']['input'];
   componentVersion: Scalars['Int']['input'];
@@ -3564,7 +3564,7 @@ export type ClusterElementDefinitionQuery = { __typename?: 'Query', clusterEleme
       | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, timeDefaultValue?: string | null }
     > } };
 
-export type ClusterElementPropertyDynamicPropertiesQueryVariables = Exact<{
+export type ClusterElementDynamicPropertiesQueryVariables = Exact<{
   componentName: Scalars['String']['input'];
   componentVersion: Scalars['Int']['input'];
   clusterElementName: Scalars['String']['input'];
@@ -3575,7 +3575,7 @@ export type ClusterElementPropertyDynamicPropertiesQueryVariables = Exact<{
 }>;
 
 
-export type ClusterElementPropertyDynamicPropertiesQuery = { __typename?: 'Query', clusterElementPropertyDynamicProperties: Array<
+export type ClusterElementDynamicPropertiesQuery = { __typename?: 'Query', clusterElementDynamicProperties: Array<
     | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null, items?: Array<
         | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
         | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
@@ -3616,7 +3616,7 @@ export type ClusterElementPropertyDynamicPropertiesQuery = { __typename?: 'Query
     | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
   > };
 
-export type ClusterElementPropertyOptionsQueryVariables = Exact<{
+export type ClusterElementOptionsQueryVariables = Exact<{
   componentName: Scalars['String']['input'];
   componentVersion: Scalars['Int']['input'];
   clusterElementName: Scalars['String']['input'];
@@ -3627,7 +3627,7 @@ export type ClusterElementPropertyOptionsQueryVariables = Exact<{
 }>;
 
 
-export type ClusterElementPropertyOptionsQuery = { __typename?: 'Query', clusterElementPropertyOptions: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> };
+export type ClusterElementOptionsQuery = { __typename?: 'Query', clusterElementOptions: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> };
 
 export type ClusterElementScriptInputQueryVariables = Exact<{
   workflowId: Scalars['String']['input'];
@@ -6956,9 +6956,9 @@ export const useClusterElementDefinitionQuery = <
   }
     )};
 
-export const ClusterElementPropertyDynamicPropertiesDocument = `
-    query clusterElementPropertyDynamicProperties($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
-  clusterElementPropertyDynamicProperties(
+export const ClusterElementDynamicPropertiesDocument = `
+    query clusterElementDynamicProperties($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
+  clusterElementDynamicProperties(
     componentName: $componentName
     componentVersion: $componentVersion
     clusterElementName: $clusterElementName
@@ -7242,25 +7242,25 @@ export const ClusterElementPropertyDynamicPropertiesDocument = `
 }
     `;
 
-export const useClusterElementPropertyDynamicPropertiesQuery = <
-      TData = ClusterElementPropertyDynamicPropertiesQuery,
+export const useClusterElementDynamicPropertiesQuery = <
+      TData = ClusterElementDynamicPropertiesQuery,
       TError = unknown
     >(
-      variables: ClusterElementPropertyDynamicPropertiesQueryVariables,
-      options?: Omit<UseQueryOptions<ClusterElementPropertyDynamicPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementPropertyDynamicPropertiesQuery, TError, TData>['queryKey'] }
+      variables: ClusterElementDynamicPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementDynamicPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementDynamicPropertiesQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<ClusterElementPropertyDynamicPropertiesQuery, TError, TData>(
+    return useQuery<ClusterElementDynamicPropertiesQuery, TError, TData>(
       {
-    queryKey: ['clusterElementPropertyDynamicProperties', variables],
-    queryFn: fetcher<ClusterElementPropertyDynamicPropertiesQuery, ClusterElementPropertyDynamicPropertiesQueryVariables>(ClusterElementPropertyDynamicPropertiesDocument, variables),
+    queryKey: ['clusterElementDynamicProperties', variables],
+    queryFn: fetcher<ClusterElementDynamicPropertiesQuery, ClusterElementDynamicPropertiesQueryVariables>(ClusterElementDynamicPropertiesDocument, variables),
     ...options
   }
     )};
 
-export const ClusterElementPropertyOptionsDocument = `
-    query clusterElementPropertyOptions($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
-  clusterElementPropertyOptions(
+export const ClusterElementOptionsDocument = `
+    query clusterElementOptions($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
+  clusterElementOptions(
     componentName: $componentName
     componentVersion: $componentVersion
     clusterElementName: $clusterElementName
@@ -7276,18 +7276,18 @@ export const ClusterElementPropertyOptionsDocument = `
 }
     `;
 
-export const useClusterElementPropertyOptionsQuery = <
-      TData = ClusterElementPropertyOptionsQuery,
+export const useClusterElementOptionsQuery = <
+      TData = ClusterElementOptionsQuery,
       TError = unknown
     >(
-      variables: ClusterElementPropertyOptionsQueryVariables,
-      options?: Omit<UseQueryOptions<ClusterElementPropertyOptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementPropertyOptionsQuery, TError, TData>['queryKey'] }
+      variables: ClusterElementOptionsQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementOptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementOptionsQuery, TError, TData>['queryKey'] }
     ) => {
-    
-    return useQuery<ClusterElementPropertyOptionsQuery, TError, TData>(
+
+    return useQuery<ClusterElementOptionsQuery, TError, TData>(
       {
-    queryKey: ['clusterElementPropertyOptions', variables],
-    queryFn: fetcher<ClusterElementPropertyOptionsQuery, ClusterElementPropertyOptionsQueryVariables>(ClusterElementPropertyOptionsDocument, variables),
+    queryKey: ['clusterElementOptions', variables],
+    queryFn: fetcher<ClusterElementOptionsQuery, ClusterElementOptionsQueryVariables>(ClusterElementOptionsDocument, variables),
     ...options
   }
     )};
