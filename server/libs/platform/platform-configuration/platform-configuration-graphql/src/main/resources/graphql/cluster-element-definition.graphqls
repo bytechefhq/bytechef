@@ -1,6 +1,24 @@
 extend type Query {
     clusterElementDefinition(componentName: String!, componentVersion: Int!, clusterElementName: String!): ClusterElementDefinition!
     clusterElementDefinitions(rootComponentName: String!, rootComponentVersion: Int!, clusterElementType: String!): [ClusterElementDefinition!]!
+    clusterElementPropertyDynamicProperties(
+        componentName: String!
+        componentVersion: Int!
+        clusterElementName: String!
+        propertyName: String!
+        connectionId: Long
+        inputParameters: Map
+        lookupDependsOnPaths: [String!]
+    ): [Property!]!
+    clusterElementPropertyOptions(
+        componentName: String!
+        componentVersion: Int!
+        clusterElementName: String!
+        propertyName: String!
+        connectionId: Long
+        inputParameters: Map
+        lookupDependsOnPaths: [String!]
+    ): [Option!]!
 }
 
 type ClusterElementDefinition {
