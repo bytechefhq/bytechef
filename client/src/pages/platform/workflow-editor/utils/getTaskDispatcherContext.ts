@@ -26,6 +26,10 @@ function getContextFromTaskNodeData(
         context.loopId = nodeData.loopData.loopId as string;
         context.index = (nodeData.loopData.index as number) + indexIncrement;
         context.taskDispatcherId = nodeData.loopData.loopId as string;
+    } else if (nodeData.mapData) {
+        context.mapId = nodeData.mapData.mapId as string;
+        context.index = (nodeData.mapData.index as number) + indexIncrement;
+        context.taskDispatcherId = nodeData.mapData.mapId as string;
     } else if (nodeData.branchData) {
         context.branchId = nodeData.branchData.branchId as string;
         context.caseKey = nodeData.branchData.caseKey as string | number;
@@ -55,6 +59,7 @@ function getContextFromTaskNodeData(
 function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherContextType | undefined {
     const isPlaceholder = placeholderNode.type === 'placeholder';
     const isLoopPlaceholder = placeholderNode.id.includes('loop') && isPlaceholder;
+    const isMapPlaceholder = placeholderNode.id.includes('map') && isPlaceholder;
     const isConditionPlaceholder = placeholderNode.id.includes('condition') && isPlaceholder;
     const isBranchPlaceholder = placeholderNode.id.includes('branch') && isPlaceholder;
     const isParallelPlaceholder = placeholderNode.id.includes('parallel') && isPlaceholder;
@@ -78,6 +83,11 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
 
         context.loopId = loopId;
         context.taskDispatcherId = loopId;
+    } else if (isMapPlaceholder) {
+        const mapId = placeholderNode.data.mapId as string;
+
+        context.mapId = mapId;
+        context.taskDispatcherId = mapId;
     } else if (isConditionPlaceholder) {
         const conditionId = placeholderNode.data.conditionId as string;
 
@@ -173,12 +183,22 @@ export default function getTaskDispatcherContext({
             if (
                 targetNode.data.conditionData ||
                 targetNode.data.loopData ||
+                targetNode.data.mapData ||
                 targetNode.data.branchData ||
                 targetNode.data.parallelData ||
                 targetNode.data.eachData ||
                 targetNode.data.forkJoinData
             ) {
                 return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
+            }
+
+            const targetData = targetNode.data as NodeDataType;
+
+            if (targetData?.componentName === 'map') {
+                context.mapId = taskDispatcherId;
+                context.index = 0;
+
+                return context;
             }
 
             return undefined;
@@ -215,6 +235,7 @@ export default function getTaskDispatcherContext({
         if (
             !sourceNode.data.conditionData &&
             !sourceNode.data.loopData &&
+            !sourceNode.data.mapData &&
             !sourceNode.data.branchData &&
             !sourceNode.data.forkJoinData
         ) {

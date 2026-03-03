@@ -24,6 +24,7 @@ import {
     EachChildTasksType,
     ForkJoinChildTasksType,
     LoopChildTasksType,
+    MapChildTasksType,
     NodeDataType,
     ParallelChildTasksType,
 } from '@/shared/types';
@@ -930,6 +931,7 @@ export function collectTaskDispatcherData(
     eachChildTasks: EachChildTasksType,
     forkJoinChildTasks: ForkJoinChildTasksType,
     loopChildTasks: LoopChildTasksType,
+    mapChildTasks: MapChildTasksType,
     parallelChildTasks: ParallelChildTasksType
 ): void {
     const {name, parameters, type} = task;
@@ -950,6 +952,12 @@ export function collectTaskDispatcherData(
         };
     } else if (componentName === 'loop' && parameters?.iteratee) {
         loopChildTasks[name] = {
+            iteratee: Array.isArray(parameters.iteratee)
+                ? parameters.iteratee.map((iteratee: WorkflowTask) => iteratee.name)
+                : [],
+        };
+    } else if (componentName === 'map' && parameters?.iteratee) {
+        mapChildTasks[name] = {
             iteratee: Array.isArray(parameters.iteratee)
                 ? parameters.iteratee.map((iteratee: WorkflowTask) => iteratee.name)
                 : [],
@@ -1001,6 +1009,7 @@ interface GetTaskAncestryProps {
     eachChildTasks: EachChildTasksType;
     forkJoinChildTasks: ForkJoinChildTasksType;
     loopChildTasks: LoopChildTasksType;
+    mapChildTasks: MapChildTasksType;
     parallelChildTasks: ParallelChildTasksType;
     taskName: string;
 }
@@ -1011,6 +1020,7 @@ export function getTaskAncestry({
     eachChildTasks,
     forkJoinChildTasks,
     loopChildTasks,
+    mapChildTasks,
     parallelChildTasks,
     taskName,
 }: GetTaskAncestryProps): {nestingData: Record<string, unknown>; isNested: boolean} {
@@ -1047,6 +1057,23 @@ export function getTaskAncestry({
                     loopData: {
                         index: loopData.iteratee.indexOf(taskName),
                         loopId,
+                    },
+                };
+
+                isNested = true;
+
+                break;
+            }
+        }
+    }
+
+    if (!isNested) {
+        for (const [mapId, mapData] of Object.entries(mapChildTasks)) {
+            if (mapData.iteratee.includes(taskName)) {
+                nestingData = {
+                    mapData: {
+                        index: mapData.iteratee.indexOf(taskName),
+                        mapId,
                     },
                 };
 

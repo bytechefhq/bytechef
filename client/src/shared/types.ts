@@ -126,6 +126,11 @@ type LoopDataType = {
     loopId: string;
 };
 
+type MapDataType = {
+    index: number;
+    mapId: string;
+};
+
 type LoopBreakDataType = {
     loopBreakId: string;
 };
@@ -154,6 +159,7 @@ export type TaskDispatcherDataType = BranchDataType &
     EachDataType &
     LoopDataType &
     LoopBreakDataType &
+    MapDataType &
     SubflowDataType &
     ConditionDataType &
     ParallelDataType &
@@ -219,6 +225,8 @@ export type NodeDataType = {
     loopBreakData?: LoopBreakDataType;
     loopData?: LoopDataType;
     loopId?: string;
+    mapData?: MapDataType;
+    mapId?: string;
     metadata?: {
         ui?: {
             dynamicPropertyTypes?: {[key: string]: string};
@@ -355,6 +363,7 @@ export type TaskDispatcherContextType = {
     index?: number;
     loopBreakId?: string;
     loopId?: string;
+    mapId?: string;
     parallelId?: string;
     subflowId?: string;
     taskDispatcherId: string;
@@ -378,6 +387,7 @@ export type BranchChildTasksType = {
 export type ConditionChildTasksType = {[conditionId: string]: {caseTrue: string[]; caseFalse: string[]}};
 export type EachChildTasksType = {[eachId: string]: {iteratee: string}};
 export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};
+export type MapChildTasksType = {[mapId: string]: {iteratee: string[]}};
 export type ParallelChildTasksType = {[parallelId: string]: {tasks: string[]}};
 export type ForkJoinChildTasksType = {[forkJoinId: string]: {branches: string[][]}};
 
