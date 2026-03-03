@@ -1,7 +1,7 @@
 extend type Query {
     clusterElementDefinition(componentName: String!, componentVersion: Int!, clusterElementName: String!): ClusterElementDefinition!
     clusterElementDefinitions(rootComponentName: String!, rootComponentVersion: Int!, clusterElementType: String!): [ClusterElementDefinition!]!
-    clusterElementPropertyDynamicProperties(
+    clusterElementDynamicProperties(
         componentName: String!
         componentVersion: Int!
         clusterElementName: String!
@@ -10,7 +10,7 @@ extend type Query {
         inputParameters: Map
         lookupDependsOnPaths: [String!]
     ): [Property!]!
-    clusterElementPropertyOptions(
+    clusterElementOptions(
         componentName: String!
         componentVersion: Int!
         clusterElementName: String!

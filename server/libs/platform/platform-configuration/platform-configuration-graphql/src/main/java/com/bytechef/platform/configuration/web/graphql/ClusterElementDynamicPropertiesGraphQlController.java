@@ -39,7 +39,7 @@ class ClusterElementDynamicPropertiesGraphQlController {
     }
 
     @QueryMapping
-    public List<Property> clusterElementPropertyDynamicProperties(
+    public List<Property> clusterElementDynamicProperties(
         @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
         @Argument String propertyName, @Argument Long connectionId, @Argument Map<String, ?> inputParameters,
         @Argument List<String> lookupDependsOnPaths) {
