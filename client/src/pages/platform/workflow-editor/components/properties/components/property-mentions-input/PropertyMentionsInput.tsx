@@ -281,7 +281,6 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         className={twMerge(
                             'property-mentions-editor flex h-full min-h-[34px] w-full rounded-md bg-white',
                             leadingIcon && 'border-0 pl-10 pr-0.5',
-                            isFromAi && 'is-from-ai',
                             className
                         )}
                     >
