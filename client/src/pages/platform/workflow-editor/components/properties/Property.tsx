@@ -328,6 +328,13 @@ const Property = ({
                                             fieldOnChange('');
                                             handleControlledModeSwitch(false);
                                         }}
+                                        inputOverlay={
+                                            isFieldFromAi ? (
+                                                <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium italic text-muted-foreground">
+                                                    Automatically defined by the model
+                                                </span>
+                                            ) : undefined
+                                        }
                                         label={label || name}
                                         leadingIcon={
                                             isExpressionMode || isFieldFromAi ? (
@@ -472,6 +479,13 @@ const Property = ({
                                                               handleControlledModeSwitch(true);
                                                           }
                                                         : undefined
+                                                }
+                                                inputOverlay={
+                                                    isFieldFromAi ? (
+                                                        <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium italic text-muted-foreground">
+                                                            Automatically defined by the model
+                                                        </span>
+                                                    ) : undefined
                                                 }
                                                 label={label || name}
                                                 leadingIcon={
