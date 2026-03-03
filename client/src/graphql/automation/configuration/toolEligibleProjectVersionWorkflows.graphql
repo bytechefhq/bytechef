@@ -1,0 +1,9 @@
+query toolEligibleProjectVersionWorkflows($projectId: ID!, $projectVersion: Int!) {
+    toolEligibleProjectVersionWorkflows(projectId: $projectId, projectVersion: $projectVersion) {
+        id
+        workflow {
+            id
+            label
+        }
+    }
+}
