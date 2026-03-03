@@ -27,7 +27,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
@@ -43,7 +42,7 @@ public class MicrosoftOneDriveGetFileAction {
             string(ID)
                 .label("File ID")
                 .description("ID of the file to retrieve.")
-                .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
+                .options((OptionsFunction<String>) MicrosoftUtils::getFileIdOptions)
                 .required(true))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))
         .perform(MicrosoftOneDriveGetFileAction::perform)
