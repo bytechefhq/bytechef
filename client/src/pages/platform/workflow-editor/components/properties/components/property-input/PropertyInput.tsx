@@ -17,6 +17,7 @@ interface PropertyInputProps extends InputHTMLAttributes<HTMLInputElement> {
     expressionPrefix?: boolean;
     fieldsetClassName?: string;
     handleInputTypeSwitchButtonClick?: () => void;
+    inputOverlay?: ReactNode;
     label?: string;
     leadingIcon?: ReactNode;
     mentionInput?: boolean;
@@ -41,6 +42,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             fieldsetClassName,
             handleInputTypeSwitchButtonClick,
             id,
+            inputOverlay,
             label,
             leadingIcon,
             mentionInput = false,
@@ -141,35 +143,37 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                             </div>
                         )}
 
-                        <Input
-                            className={twMerge(
-                                'bg-background outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
-                                error &&
-                                    'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 ring-rose-300 focus-visible:ring-rose-300',
-                                disabled && 'bg-gray-100 text-gray-500',
-                                leadingIcon && 'pl-property-input-position leading-relaxed',
-                                trailingAction &&
-                                    'h-full flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
-                                className
-                            )}
-                            disabled={disabled}
-                            id={id || name}
-                            name={name}
-                            onBlur={() => setIsFocused(false)}
-                            onChange={handleInputChange}
-                            onFocus={() => {
-                                setIsFocused(true);
+                        {inputOverlay || (
+                            <Input
+                                className={twMerge(
+                                    'bg-background outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
+                                    error &&
+                                        'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 ring-rose-300 focus-visible:ring-rose-300',
+                                    disabled && 'bg-gray-100 text-gray-500',
+                                    leadingIcon && 'pl-property-input-position leading-relaxed',
+                                    trailingAction &&
+                                        'h-full flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
+                                    className
+                                )}
+                                disabled={disabled}
+                                id={id || name}
+                                name={name}
+                                onBlur={() => setIsFocused(false)}
+                                onChange={handleInputChange}
+                                onFocus={() => {
+                                    setIsFocused(true);
 
-                                setFocusedInput(null);
-                            }}
-                            placeholder={placeholder}
-                            ref={ref}
-                            required={required}
-                            step={1}
-                            type={type}
-                            value={localValue}
-                            {...props}
-                        />
+                                    setFocusedInput(null);
+                                }}
+                                placeholder={placeholder}
+                                ref={ref}
+                                required={required}
+                                step={1}
+                                type={type}
+                                value={localValue}
+                                {...props}
+                            />
+                        )}
 
                         {trailingAction}
                     </div>
