@@ -1124,24 +1124,27 @@ export const useProperty = ({
             setMentionInputValue(propertyParameterValue.substring(1));
         }
 
-        if (
+        const shouldSyncMentionInputFromPlainStringParameter =
             mentionInput &&
             !mentionInputSyncedRef.current &&
             typeof propertyParameterValue === 'string' &&
             !propertyParameterValue.startsWith('=') &&
-            propertyParameterValue !== ''
-        ) {
+            propertyParameterValue !== '';
+
+        if (shouldSyncMentionInputFromPlainStringParameter) {
             setMentionInputValue(propertyParameterValue);
+
             mentionInputSyncedRef.current = true;
         }
 
-        if (
+        const shouldApplyParameterValueToEmptyPlainInput =
             !mentionInput &&
             controlType &&
             INPUT_PROPERTY_CONTROL_TYPES.includes(controlType) &&
             inputValue === '' &&
-            propertyParameterValue
-        ) {
+            propertyParameterValue;
+
+        if (shouldApplyParameterValueToEmptyPlainInput) {
             setInputValue(propertyParameterValue);
         }
 
@@ -1280,6 +1283,7 @@ export const useProperty = ({
             setInputValue(parameterDefaultValue);
             setMentionInputValue(parameterDefaultValue);
             setSelectValue(parameterDefaultValue.toString());
+
             mentionInputSyncedRef.current = false;
 
             if (Array.isArray(parameterDefaultValue)) {
