@@ -419,6 +419,12 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableActionDefinition perform(CallableResponsePerformFunction perform) {
+            this.performFunction = perform;
+
+            return this;
+        }
+
         public ModifiableActionDefinition perform(PerformFunction perform) {
             this.performFunction = perform;
 
