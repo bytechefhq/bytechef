@@ -127,7 +127,7 @@ const ThreadWelcome: FC = () => {
                         exit={{opacity: 0, y: 10}}
                         initial={{opacity: 0, y: 10}}
                     >
-                        Hello there!
+                        Test your agent
                     </m.div>
 
                     <m.div
@@ -137,7 +137,7 @@ const ThreadWelcome: FC = () => {
                         initial={{opacity: 0, y: 10}}
                         transition={{delay: 0.1}}
                     >
-                        How can I help you today?
+                        Send a message to start a conversation
                     </m.div>
                 </div>
             </div>
@@ -152,24 +152,24 @@ const ThreadSuggestions: FC = () => {
         <div className="aui-thread-welcome-suggestions @md:grid-cols-2 grid w-full gap-2 pb-4">
             {[
                 {
-                    action: 'Describe what this workflow does end-to-end',
-                    label: 'does end-to-end.',
-                    title: 'Describe what this workflow',
+                    action: 'What can you help me with?',
+                    label: 'you help me with?',
+                    title: 'What can',
                 },
                 {
-                    action: 'Which properties of this node are required?',
-                    label: 'of this node are required?',
-                    title: 'Which properties',
+                    action: 'What tools do you have access to?',
+                    label: 'do you have access to?',
+                    title: 'What tools',
                 },
                 {
-                    action: 'Search for an action that can send an email',
-                    label: 'that can send an email',
-                    title: 'Search for an action',
+                    action: 'Summarize your instructions and capabilities',
+                    label: 'your instructions and capabilities',
+                    title: 'Summarize',
                 },
                 {
-                    action: 'How do I implement conditional branching in workflows?',
-                    label: 'conditional branching in workflows?',
-                    title: 'How do I implement',
+                    action: 'Walk me through how you would handle a typical request',
+                    label: 'you would handle a typical request',
+                    title: 'Walk me through how',
                 },
             ].map((suggestedAction, index) => (
                 <m.div
