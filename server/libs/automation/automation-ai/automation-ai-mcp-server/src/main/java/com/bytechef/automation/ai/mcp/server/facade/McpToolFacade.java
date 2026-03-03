@@ -101,11 +101,12 @@ public class McpToolFacade extends AbstractToolFacade {
 
         List<FromAiResult> fromAiResults = extractFromAiResults(mcpTool.getParameters());
 
-        FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback.builder(
-            getToolName(clusterElementDefinition.getComponentName(), clusterElementDefinition.getName()),
-            getFromAiToolCallbackFunction(
-                clusterElementDefinition.getComponentName(), clusterElementDefinition.getComponentVersion(),
-                clusterElementDefinition.getName(), mcpTool.getParameters(), mcpComponent.getConnectionId()))
+        FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
+            .builder(
+                getToolName(clusterElementDefinition.getComponentName(), clusterElementDefinition.getName()),
+                getFromAiToolCallbackFunction(
+                    clusterElementDefinition.getComponentName(), clusterElementDefinition.getComponentVersion(),
+                    clusterElementDefinition.getName(), mcpTool.getParameters(), mcpComponent.getConnectionId()))
             .inputType(Map.class)
             .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -145,10 +146,11 @@ public class McpToolFacade extends AbstractToolFacade {
 
             List<FromAiResult> fromAiResults = extractFromAiResults(workflowParameters);
 
-            FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback.builder(
-                Objects.requireNonNull(toolName),
-                getWorkflowFromAiToolCallbackFunction(projectDeploymentWorkflow, trigger.getName(),
-                    workflowParameters))
+            FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
+                .builder(
+                    Objects.requireNonNull(toolName),
+                    getWorkflowFromAiToolCallbackFunction(
+                        projectDeploymentWorkflow, trigger.getName(), workflowParameters))
                 .inputType(Map.class)
                 .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -180,8 +182,7 @@ public class McpToolFacade extends AbstractToolFacade {
     }
 
     private Function<Map<String, Object>, Object> getWorkflowFromAiToolCallbackFunction(
-        ProjectDeploymentWorkflow projectDeploymentWorkflow, String triggerName,
-        Map<String, ?> workflowParameters) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, String triggerName, Map<String, ?> workflowParameters) {
 
         return inputParameters -> {
             Map<String, Object> inputs = new HashMap<>(projectDeploymentWorkflow.getInputs());
@@ -196,14 +197,11 @@ public class McpToolFacade extends AbstractToolFacade {
 
             inputs.put(triggerName, resolvedTriggerInputs);
 
-            long projectDeploymentId = projectDeploymentWorkflow.getProjectDeploymentId();
-
             Job job = jobSyncExecutor.execute(
                 new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs),
                 jobParameters -> principalJobFacade.createSyncJob(
-                    jobParameters, projectDeploymentId, PlatformType.AUTOMATION),
-                true,
-                taskExecutionCompleteEvent -> {});
+                    jobParameters, projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION),
+                true, taskExecutionCompleteEvent -> {});
 
             if (job.getOutputs() == null) {
                 return null;
