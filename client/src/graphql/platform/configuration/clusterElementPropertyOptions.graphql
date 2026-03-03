@@ -1,4 +1,4 @@
-query clusterElementPropertyOptions(
+query clusterElementOptions(
     $componentName: String!
     $componentVersion: Int!
     $clusterElementName: String!
@@ -7,7 +7,7 @@ query clusterElementPropertyOptions(
     $inputParameters: Map
     $lookupDependsOnPaths: [String!]
 ) {
-    clusterElementPropertyOptions(
+    clusterElementOptions(
         componentName: $componentName
         componentVersion: $componentVersion
         clusterElementName: $clusterElementName

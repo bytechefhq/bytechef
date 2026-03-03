@@ -1,4 +1,4 @@
-query clusterElementPropertyDynamicProperties(
+query clusterElementDynamicProperties(
     $componentName: String!
     $componentVersion: Int!
     $clusterElementName: String!
@@ -7,7 +7,7 @@ query clusterElementPropertyDynamicProperties(
     $inputParameters: Map
     $lookupDependsOnPaths: [String!]
 ) {
-    clusterElementPropertyDynamicProperties(
+    clusterElementDynamicProperties(
         componentName: $componentName
         componentVersion: $componentVersion
         clusterElementName: $clusterElementName
