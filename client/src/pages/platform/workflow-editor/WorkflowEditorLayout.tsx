@@ -98,7 +98,13 @@ const WorkflowEditorLayout = ({
 
     return (
         <ReactFlowProvider>
-            <div className={twMerge('relative mx-3 mb-3 flex w-full', leftSidebarOpen && 'ml-0')}>
+            <div
+                className={twMerge(
+                    'relative mx-3 mb-3 flex w-full',
+                    leftSidebarOpen && 'ml-0',
+                    copilotPanelOpen && 'mr-0'
+                )}
+            >
                 {componentDefinitions && taskDispatcherDefinitions && (
                     <Suspense>
                         <WorkflowEditor
