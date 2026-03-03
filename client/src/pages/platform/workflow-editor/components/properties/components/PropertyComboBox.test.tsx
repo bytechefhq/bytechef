@@ -5,7 +5,7 @@ import PropertyComboBox from './PropertyComboBox';
 
 const hoisted = vi.hoisted(() => ({
     mockClusterElementContext: vi.fn(),
-    mockClusterElementPropertyOptionsQuery: vi.fn(),
+    mockClusterElementOptionsQuery: vi.fn(),
     mockNodeDetailsPanelStore: vi.fn(),
     mockOnValueChange: vi.fn(),
 }));
@@ -42,8 +42,7 @@ vi.mock('react-inlinesvg', () => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useClusterElementPropertyOptionsQuery: (...args: unknown[]) =>
-        hoisted.mockClusterElementPropertyOptionsQuery(...args),
+    useClusterElementOptionsQuery: (...args: unknown[]) => hoisted.mockClusterElementOptionsQuery(...args),
 }));
 
 vi.mock('../ClusterElementContext', () => ({
@@ -64,7 +63,7 @@ beforeEach(() => {
 
     hoisted.mockClusterElementContext.mockReturnValue(undefined);
 
-    hoisted.mockClusterElementPropertyOptionsQuery.mockReturnValue({data: undefined, isLoading: false});
+    hoisted.mockClusterElementOptionsQuery.mockReturnValue({data: undefined, isLoading: false});
 });
 
 afterEach(() => {
@@ -185,8 +184,8 @@ describe('PropertyComboBox', () => {
         });
 
         it('should render options from cluster element context query', async () => {
-            hoisted.mockClusterElementPropertyOptionsQuery.mockReturnValue({
-                data: {clusterElementPropertyOptions: clusterElementOptions},
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
+                data: {clusterElementOptions: clusterElementOptions},
                 isLoading: false,
             });
 
@@ -208,14 +207,14 @@ describe('PropertyComboBox', () => {
                 },
             });
 
-            hoisted.mockClusterElementPropertyOptionsQuery.mockReturnValue({
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
                 data: undefined,
                 isLoading: false,
             });
 
             render(<PropertyComboBox {...defaultProps} options={[]} optionsDataSource={optionsDataSource} />);
 
-            const queryCall = hoisted.mockClusterElementPropertyOptionsQuery.mock.calls[0];
+            const queryCall = hoisted.mockClusterElementOptionsQuery.mock.calls[0];
             const queryArgs = queryCall[0];
 
             expect(queryArgs.inputParameters).toEqual({normalField: 'plainValue'});
@@ -231,14 +230,14 @@ describe('PropertyComboBox', () => {
                 operationChangeInProgress: false,
             });
 
-            hoisted.mockClusterElementPropertyOptionsQuery.mockReturnValue({
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
                 data: undefined,
                 isLoading: false,
             });
 
             render(<PropertyComboBox {...defaultProps} options={[]} optionsDataSource={optionsDataSource} />);
 
-            const queryCall = hoisted.mockClusterElementPropertyOptionsQuery.mock.calls[0];
+            const queryCall = hoisted.mockClusterElementOptionsQuery.mock.calls[0];
             const queryOptions = queryCall[1];
 
             expect(queryOptions.enabled).toBe(false);
@@ -250,7 +249,7 @@ describe('PropertyComboBox', () => {
                 inputParameters: {},
             });
 
-            hoisted.mockClusterElementPropertyOptionsQuery.mockReturnValue({
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
                 data: undefined,
                 isLoading: false,
             });
@@ -265,28 +264,28 @@ describe('PropertyComboBox', () => {
                 />
             );
 
-            const queryCall = hoisted.mockClusterElementPropertyOptionsQuery.mock.calls[0];
+            const queryCall = hoisted.mockClusterElementOptionsQuery.mock.calls[0];
             const queryOptions = queryCall[1];
 
             expect(queryOptions.enabled).toBe(false);
         });
 
         it('should not enable query when no optionsDataSource is provided', () => {
-            hoisted.mockClusterElementPropertyOptionsQuery.mockReturnValue({
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
                 data: undefined,
                 isLoading: false,
             });
 
             render(<PropertyComboBox {...defaultProps} options={[]} />);
 
-            const queryCall = hoisted.mockClusterElementPropertyOptionsQuery.mock.calls[0];
+            const queryCall = hoisted.mockClusterElementOptionsQuery.mock.calls[0];
             const queryOptions = queryCall[1];
 
             expect(queryOptions.enabled).toBe(false);
         });
 
         it('should enable query when all conditions are met', () => {
-            hoisted.mockClusterElementPropertyOptionsQuery.mockReturnValue({
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
                 data: undefined,
                 isLoading: false,
             });
@@ -301,14 +300,14 @@ describe('PropertyComboBox', () => {
                 />
             );
 
-            const queryCall = hoisted.mockClusterElementPropertyOptionsQuery.mock.calls[0];
+            const queryCall = hoisted.mockClusterElementOptionsQuery.mock.calls[0];
             const queryOptions = queryCall[1];
 
             expect(queryOptions.enabled).toBe(true);
         });
 
         it('should fall back to initialOptions when no query data is available', async () => {
-            hoisted.mockClusterElementPropertyOptionsQuery.mockReturnValue({
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
                 data: undefined,
                 isLoading: false,
             });

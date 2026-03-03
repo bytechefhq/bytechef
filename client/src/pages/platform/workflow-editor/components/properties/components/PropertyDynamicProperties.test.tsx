@@ -35,12 +35,12 @@ vi.mock('../../../stores/useWorkflowEditorStore', () => ({
 }));
 
 vi.mock('@/shared/queries/platform/workflowNodeDynamicProperties.queries', () => ({
-    useGetClusterElementDynamicPropertiesQuery: hoisted.mockClusterElementQuery,
+    useGetClusterElementNodeDynamicPropertiesQuery: hoisted.mockClusterElementQuery,
     useGetWorkflowNodeDynamicPropertiesQuery: hoisted.mockDynamicPropertiesQuery,
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useClusterElementPropertyDynamicPropertiesQuery: hoisted.mockClusterElementDynamicPropertiesQuery,
+    useClusterElementDynamicPropertiesQuery: hoisted.mockClusterElementDynamicPropertiesQuery,
 }));
 
 vi.mock('../ClusterElementContext', () => ({
@@ -315,7 +315,7 @@ describe('PropertyDynamicProperties', () => {
 
         it('should render cluster element dynamic properties when context is available', () => {
             hoisted.mockClusterElementDynamicPropertiesQuery.mockReturnValue({
-                data: {clusterElementPropertyDynamicProperties: sampleProperties},
+                data: {clusterElementDynamicProperties: sampleProperties},
                 isLoading: false,
             });
 
