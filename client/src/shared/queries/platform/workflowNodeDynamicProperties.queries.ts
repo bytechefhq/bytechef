@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys */
 import {
-    GetClusterElementDynamicPropertiesRequest,
+    GetClusterElementNodeDynamicPropertiesRequest,
     GetWorkflowNodeDynamicPropertiesRequest,
     type Property,
     WorkflowNodeDynamicPropertiesApi,
@@ -24,7 +24,7 @@ export const WorkflowNodeDynamicPropertyKeys = {
 
 export const ClusterElementDynamicPropertyKeys = {
     propertyClusterElementDynamicProperties: (
-        request: GetClusterElementDynamicPropertiesRequest,
+        request: GetClusterElementNodeDynamicPropertiesRequest,
         lookupDependsOnValues: string
     ) => [
         ...ClusterElementDynamicPropertyKeys.clusterElementDynamicProperties,
@@ -55,11 +55,11 @@ export const useGetWorkflowNodeDynamicPropertiesQuery = (
         staleTime: 60000,
     });
 
-export const useGetClusterElementDynamicPropertiesQuery = (
+export const useGetClusterElementNodeDynamicPropertiesQuery = (
     {
         lookupDependsOnValuesKey,
         request,
-    }: {lookupDependsOnValuesKey: string; request: GetClusterElementDynamicPropertiesRequest},
+    }: {lookupDependsOnValuesKey: string; request: GetClusterElementNodeDynamicPropertiesRequest},
     enabled?: boolean
 ) =>
     useQuery<Array<Property>, Error>({
@@ -67,7 +67,7 @@ export const useGetClusterElementDynamicPropertiesQuery = (
             request,
             lookupDependsOnValuesKey
         ),
-        queryFn: () => new WorkflowNodeDynamicPropertiesApi().getClusterElementDynamicProperties(request),
+        queryFn: () => new WorkflowNodeDynamicPropertiesApi().getClusterElementNodeDynamicProperties(request),
         enabled: enabled === undefined ? true : enabled,
         staleTime: 60000,
     });
