@@ -168,14 +168,14 @@ const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => {
         <CopilotPanelBoundary open={open}>
             {isFixedPosition && !shouldRender ? null : (
                 <div
-                className={twMerge(
-                    'overflow-hidden',
-                    !isFixedPosition && 'h-full transition-[width] duration-300 ease-in-out',
-                    !isFixedPosition && (isVisible ? 'w-[450px]' : 'w-0')
-                )}
-            >
-                {shouldRender && <CopilotPanelContent className={contentClassName} onClose={onClose} />}
-            </div>
+                    className={twMerge(
+                        'overflow-hidden',
+                        !isFixedPosition && 'h-full transition-[width] duration-300 ease-in-out',
+                        !isFixedPosition && (isVisible ? 'w-[450px]' : 'w-0')
+                    )}
+                >
+                    {shouldRender && <CopilotPanelContent className={contentClassName} onClose={onClose} />}
+                </div>
             )}
         </CopilotPanelBoundary>
     );
