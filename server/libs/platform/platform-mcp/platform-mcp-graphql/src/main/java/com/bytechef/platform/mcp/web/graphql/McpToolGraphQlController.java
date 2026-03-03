@@ -17,9 +17,6 @@
 package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.component.domain.Option;
-import com.bytechef.platform.component.domain.Property;
-import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -39,14 +36,10 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class McpToolGraphQlController {
 
-    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
-    public McpToolGraphQlController(
-        ClusterElementDefinitionFacade clusterElementDefinitionFacade, McpToolService mcpToolService) {
-
-        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
+    public McpToolGraphQlController(McpToolService mcpToolService) {
         this.mcpToolService = mcpToolService;
     }
 
@@ -54,33 +47,6 @@ public class McpToolGraphQlController {
     public McpTool mcpTool(@Argument long id) {
         return mcpToolService.fetchMcpTool(id)
             .orElse(null);
-    }
-
-    @QueryMapping
-    public List<Property> mcpToolPropertyDynamicProperties(
-        @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
-        @Argument String propertyName, @Argument Long connectionId, @Argument Map<String, ?> inputParameters,
-        @Argument List<String> lookupDependsOnPaths) {
-
-        return clusterElementDefinitionFacade.executeDynamicProperties(
-            componentName, componentVersion, clusterElementName, propertyName,
-            inputParameters != null ? inputParameters : Map.of(),
-            lookupDependsOnPaths != null ? lookupDependsOnPaths : List.of(),
-            connectionId);
-    }
-
-    @QueryMapping
-    public List<Option> mcpToolPropertyOptions(
-        @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
-        @Argument String propertyName, @Argument Long connectionId, @Argument Map<String, ?> inputParameters,
-        @Argument List<String> lookupDependsOnPaths) {
-
-        return clusterElementDefinitionFacade.executeOptions(
-            componentName, componentVersion, clusterElementName, propertyName,
-            inputParameters != null ? inputParameters : Map.of(),
-            Map.of(),
-            lookupDependsOnPaths != null ? lookupDependsOnPaths : List.of(),
-            null, connectionId, Map.of(), Map.of());
     }
 
     @QueryMapping
