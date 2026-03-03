@@ -39,16 +39,14 @@ class ClusterElementOptionGraphQlController {
     }
 
     @QueryMapping
-    public List<Option> clusterElementPropertyOptions(
+    public List<Option> clusterElementOptions(
         @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
         @Argument String propertyName, @Argument Long connectionId, @Argument Map<String, ?> inputParameters,
         @Argument List<String> lookupDependsOnPaths) {
 
         return clusterElementDefinitionFacade.executeOptions(
             componentName, componentVersion, clusterElementName, propertyName,
-            inputParameters != null ? inputParameters : Map.of(),
-            Map.of(),
-            lookupDependsOnPaths != null ? lookupDependsOnPaths : List.of(),
-            null, connectionId, Map.of(), Map.of());
+            inputParameters != null ? inputParameters : Map.of(), Map.of(),
+            lookupDependsOnPaths != null ? lookupDependsOnPaths : List.of(), null, connectionId, Map.of(), Map.of());
     }
 }

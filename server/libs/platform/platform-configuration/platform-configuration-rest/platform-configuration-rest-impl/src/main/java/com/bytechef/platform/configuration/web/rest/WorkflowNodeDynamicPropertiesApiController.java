@@ -45,7 +45,7 @@ public class WorkflowNodeDynamicPropertiesApiController implements WorkflowNodeD
     }
 
     @Override
-    public ResponseEntity<List<PropertyModel>> getClusterElementDynamicProperties(
+    public ResponseEntity<List<PropertyModel>> getClusterElementNodeDynamicProperties(
         String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
         String propertyName, Long environmentId, List<String> lookupDependsOnPaths) {
 
