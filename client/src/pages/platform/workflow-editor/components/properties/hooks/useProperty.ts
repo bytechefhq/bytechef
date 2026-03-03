@@ -1109,8 +1109,13 @@ export const useProperty = ({
 
         if (propertyParameterValue === '' || propertyParameterValue === undefined) {
             if (mentionInput) {
-                setMentionInputValue('');
-                mentionInputSyncedRef.current = false;
+                const userHasUnsavedInput = !mentionInputSyncedRef.current && mentionInputValue;
+
+                if (!userHasUnsavedInput) {
+                    setMentionInputValue('');
+
+                    mentionInputSyncedRef.current = false;
+                }
             } else {
                 setInputValue('');
                 setSelectValue('');
