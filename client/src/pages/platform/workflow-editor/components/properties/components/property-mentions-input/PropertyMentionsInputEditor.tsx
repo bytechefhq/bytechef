@@ -1,16 +1,13 @@
-import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {canInsertMentionForProperty} from '@/pages/platform/workflow-editor/components/datapills/DataPill';
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {
     escapeHtmlForParagraph,
     transformValueForObjectAccess,
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
-import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {
@@ -19,7 +16,7 @@ import {
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {TYPE_ICONS} from '@/shared/typeIcons';
-import {ClusterElementItemType, DataPillDragPayloadType, DataPillType} from '@/shared/types';
+import {DataPillDragPayloadType, DataPillType} from '@/shared/types';
 import {Extension, mergeAttributes} from '@tiptap/core';
 import Document from '@tiptap/extension-document';
 import {Mention} from '@tiptap/extension-mention';
@@ -39,7 +36,6 @@ import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
 import {FormulaMode} from './FormulaMode.extension';
-import {FromAi} from './FromAi.extension';
 import {MentionStorage} from './MentionStorage.extension';
 
 interface PropertyMentionsInputEditorProps {
@@ -164,13 +160,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const extensions = useMemo(() => {
             const extensions = [
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
-                ...(memoizedClusterElementTask
-                    ? [
-                          FromAi.configure({
-                              setFromAi: () => {},
-                          }),
-                      ]
-                    : []),
                 FormulaMode.configure({
                     saveNullValue: () => {
                         if (
@@ -257,7 +246,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         }, [
             controlType,
             getComponentIcon,
-            memoizedClusterElementTask,
             path,
             placeholder,
             setIsFormulaMode,
@@ -585,12 +573,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             return getContent(editorValue);
         }, [editorValue, getContent]);
 
-        const fromAiExtension = useMemo(
-            () => editor?.extensionManager.extensions.find((extension) => extension.name === 'fromAi'),
-            [editor]
-        );
-
-        // When the value prop changes externally, sync it into editor state unless it already matches the current editor value (to avoid overwriting in-flight local updates such as datapill insertions).
+        // Sync value prop into editor state when it changes externally (e.g. from Sheet save).
+        // Only reacts to `value` prop changes — uses editorValueRef to avoid firing when
+        // editorValue changes locally (which would overwrite in-flight datapill insertions).
         useEffect(() => {
             if (value === undefined || value === editorValueRef.current) {
                 return;
@@ -661,17 +646,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
         }, [editor, value, isFormulaMode, setIsFormulaMode]);
 
-        // Set fromAi based on metadata and sync with editor storage
-        useEffect(() => {
-            if (!editor || !path || isFromAi === undefined || !currentComponent?.metadata?.ui?.fromAi?.includes(path)) {
-                return;
-            }
-
-            if (currentComponent?.metadata?.ui?.fromAi?.includes(path)) {
-                editor.commands.setFromAi(isFromAi);
-            }
-        }, [currentComponent, currentComponent?.metadata?.ui?.fromAi, editor, isFromAi, path]);
-
         // Set editable based on isFromAi
         useEffect(() => {
             if (path && !currentComponent?.metadata?.ui?.fromAi?.includes(path)) {
@@ -690,15 +664,19 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
         return (
             <>
-                <EditorContent
-                    className={twMerge(isFromAi && 'pointer-events-none cursor-not-allowed')}
-                    disabled={isFromAi}
-                    editor={editor}
-                    onChange={(event) => setEditorValue((event.target as HTMLInputElement).value)}
-                    value={editorValue}
-                />
+                {isFromAi ? (
+                    <div className="flex w-full items-center px-2 py-[0.44rem] text-sm italic text-muted-foreground">
+                        Automatically defined by the model
+                    </div>
+                ) : (
+                    <EditorContent
+                        editor={editor}
+                        onChange={(event) => setEditorValue((event.target as HTMLInputElement).value)}
+                        value={editorValue}
+                    />
+                )}
 
-                {fromAiExtension && handleFromAiClick && currentNode?.clusterElementType === 'tools' && (
+                {handleFromAiClick && currentNode?.clusterElementType === 'tools' && (
                     <FromAiToggleButton isFromAi={isFromAi} onToggle={handleFromAiClick} />
                 )}
 
