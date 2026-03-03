@@ -1,7 +1,6 @@
 import {
     COPILOT_PANEL_WIDTH,
     DATA_PILL_PANEL_WIDTH,
-    DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM,
     DEFAULT_NODE_POSITION,
     NODE_DETAILS_PANEL_WIDTH,
 } from '@/shared/constants';
@@ -372,8 +371,9 @@ const useClusterElementsLayout = () => {
             return;
         }
 
+        const currentZoom = useClusterElementsDataStore.getState().canvasZoom;
         const widthDelta = canvasWidth - previousWidth;
-        const positionDelta = widthDelta / (2 * DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM);
+        const positionDelta = widthDelta / (2 * currentZoom);
 
         const targetNodes = currentNodes.map((node) => ({
             ...node,
@@ -390,6 +390,13 @@ const useClusterElementsLayout = () => {
         }
 
         cancelAnimationRef.current = animateNodePositions(currentNodes, targetNodes, setNodes);
+
+        return () => {
+            if (cancelAnimationRef.current) {
+                cancelAnimationRef.current();
+                cancelAnimationRef.current = null;
+            }
+        };
     }, [canvasWidth, setNodes]);
 };
 

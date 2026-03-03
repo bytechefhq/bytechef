@@ -1,5 +1,6 @@
 /* eslint-disable sort-keys */
 
+import {DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
 import {Edge, Node, OnEdgesChange, OnNodesChange, applyEdgeChanges, applyNodeChanges} from '@xyflow/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
@@ -24,6 +25,9 @@ interface ClusterElementsDataStoreI {
 
     isPositionSaving: boolean;
     setIsPositionSaving: (isPositionSaving: boolean) => void;
+
+    canvasZoom: number;
+    setCanvasZoom: (canvasZoom: number) => void;
 }
 
 const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
@@ -62,6 +66,11 @@ const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
             isPositionSaving: false,
             setIsPositionSaving: (isPositionSaving) => {
                 set({isPositionSaving});
+            },
+
+            canvasZoom: DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM,
+            setCanvasZoom: (canvasZoom) => {
+                set({canvasZoom});
             },
         }),
         {name: 'cluster-elements-data'}

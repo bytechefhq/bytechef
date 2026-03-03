@@ -9,6 +9,7 @@ interface ClusterElementsWorkflowEditorHeaderProps {
     onToggleEditor: (showAiAgent: boolean) => void;
     showTestButton: boolean;
     showToggleEditor: boolean;
+    toggleEditorLabel?: string;
 }
 
 const ClusterElementsWorkflowEditorHeader = ({
@@ -18,6 +19,7 @@ const ClusterElementsWorkflowEditorHeader = ({
     onToggleEditor,
     showTestButton,
     showToggleEditor,
+    toggleEditorLabel = 'Switch to simple editor',
 }: ClusterElementsWorkflowEditorHeaderProps) => {
     return (
         <div className="flex items-center justify-end p-4">
@@ -33,7 +35,7 @@ const ClusterElementsWorkflowEditorHeader = ({
                             />
                         </TooltipTrigger>
 
-                        <TooltipContent>Switch to AI Agent editor</TooltipContent>
+                        <TooltipContent>{toggleEditorLabel}</TooltipContent>
                     </Tooltip>
                 )}
 
