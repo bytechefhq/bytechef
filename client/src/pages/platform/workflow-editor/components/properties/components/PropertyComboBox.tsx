@@ -6,7 +6,7 @@ import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
-import {useClusterElementPropertyOptionsQuery} from '@/shared/middleware/graphql';
+import {useClusterElementOptionsQuery} from '@/shared/middleware/graphql';
 import {
     useGetClusterElementNodeOptionsQuery,
     useGetWorkflowNodeOptionsQuery,
@@ -193,15 +193,15 @@ const PropertyComboBox = ({
     );
 
     const {
-        data: optionsData,
+        data: workflowNodeOptions,
         isLoading,
         isRefetching,
     } = useGetWorkflowNodeOptionsQuery(queryOptions, Boolean(queryEnabled && !currentNode?.clusterElementType));
 
     const {
-        data: clusterElementOptionsData,
-        isLoading: isClusterElementOptionsLoading,
-        isRefetching: isClusterElementOptionsRefetching,
+        data: clusterElementNodeOptions,
+        isLoading: isClusterElementNodeOptionsLoading,
+        isRefetching: isClusterElementNodeOptionsRefetching,
     } = useGetClusterElementNodeOptionsQuery(
         clusterElementQueryOptions,
         Boolean(queryEnabled && currentNode?.clusterElementType)
@@ -256,48 +256,47 @@ const PropertyComboBox = ({
         optionsDataSource,
     ]);
 
-    const {data: clusterElementPropertyOptionsData, isLoading: isClusterElementPropertyOptionsLoading} =
-        useClusterElementPropertyOptionsQuery(
-            {
-                clusterElementName: clusterElementContext?.clusterElementName || '',
-                componentName: clusterElementContext?.componentName || '',
-                componentVersion: clusterElementContext?.componentVersion || 0,
-                connectionId: clusterElementContext?.connectionId,
-                inputParameters: clusterElementInputParameters,
-                lookupDependsOnPaths: lookupDependsOnPaths || [],
-                propertyName: path || name || '',
-            },
-            {
-                enabled: clusterElementContextQueryEnabled,
-                queryKey: [
-                    'clusterElementPropertyOptions',
-                    {
-                        clusterElementName: clusterElementContext?.clusterElementName,
-                        componentName: clusterElementContext?.componentName,
-                        componentVersion: clusterElementContext?.componentVersion,
-                        connectionId: clusterElementContext?.connectionId,
-                        lookupDependsOnValues: clusterElementLookupDependsOnValues,
-                        propertyName: path || name,
-                    },
-                ],
-            }
-        );
+    const {data: clusterElementOptions, isLoading: isClusterElementOptionsLoading} = useClusterElementOptionsQuery(
+        {
+            clusterElementName: clusterElementContext?.clusterElementName || '',
+            componentName: clusterElementContext?.componentName || '',
+            componentVersion: clusterElementContext?.componentVersion || 0,
+            connectionId: clusterElementContext?.connectionId,
+            inputParameters: clusterElementInputParameters,
+            lookupDependsOnPaths: lookupDependsOnPaths || [],
+            propertyName: path || name || '',
+        },
+        {
+            enabled: clusterElementContextQueryEnabled,
+            queryKey: [
+                'clusterElementOptions',
+                {
+                    clusterElementName: clusterElementContext?.clusterElementName,
+                    componentName: clusterElementContext?.componentName,
+                    componentVersion: clusterElementContext?.componentVersion,
+                    connectionId: clusterElementContext?.connectionId,
+                    lookupDependsOnValues: clusterElementLookupDependsOnValues,
+                    propertyName: path || name,
+                },
+            ],
+        }
+    );
 
     const options = useMemo(() => {
-        if (optionsData) {
-            return optionsData.map((option) => ({
+        if (workflowNodeOptions) {
+            return workflowNodeOptions.map((option) => ({
                 description: option.description,
                 label: option.label ?? option.value,
                 value: option.value.toString(),
             }));
-        } else if (clusterElementOptionsData) {
-            return clusterElementOptionsData.map((option) => ({
+        } else if (clusterElementNodeOptions) {
+            return clusterElementNodeOptions.map((option) => ({
                 description: option.description,
                 label: option.label ?? option.value,
                 value: option.value.toString(),
             }));
-        } else if (clusterElementPropertyOptionsData?.clusterElementPropertyOptions) {
-            return clusterElementPropertyOptionsData.clusterElementPropertyOptions.map((option) => ({
+        } else if (clusterElementOptions?.clusterElementOptions) {
+            return clusterElementOptions.clusterElementOptions.map((option) => ({
                 description: option.description,
                 label: option.label ?? option.value,
                 value: String(option.value),
@@ -308,7 +307,7 @@ const PropertyComboBox = ({
             ...option,
             value: option.value?.toString() || '',
         }));
-    }, [optionsData, clusterElementOptionsData, clusterElementPropertyOptionsData, initialOptions]);
+    }, [workflowNodeOptions, clusterElementNodeOptions, clusterElementOptions, initialOptions]);
 
     const currentOption = useMemo(
         () => (options as Array<ComboBoxItemType>)?.find((option) => String(option.value) === String(value)),
@@ -459,7 +458,7 @@ const PropertyComboBox = ({
                         disabled={
                             !options.length &&
                             (isRefetching ||
-                                isClusterElementOptionsRefetching ||
+                                isClusterElementNodeOptionsRefetching ||
                                 noOptionsAvailable ||
                                 !!missingConnection ||
                                 !connectionRequirementMet)
@@ -475,22 +474,22 @@ const PropertyComboBox = ({
                         )}
 
                         {lookupDependsOnValues &&
-                            (isRefetching || isClusterElementOptionsRefetching) &&
+                            (isRefetching || isClusterElementNodeOptionsRefetching) &&
                             !currentOption?.label && (
                                 <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                     <LoadingIcon /> Refetching...
                                 </span>
                             )}
 
-                        {(lookupDependsOnValues && (isLoading || isClusterElementOptionsLoading)) ||
-                        isClusterElementPropertyOptionsLoading ? (
+                        {(lookupDependsOnValues && (isLoading || isClusterElementNodeOptionsLoading)) ||
+                        isClusterElementOptionsLoading ? (
                             <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                 <LoadingIcon /> Loading...
                             </span>
                         ) : null}
 
                         {((lookupDependsOnValues &&
-                            !(isLoading || isClusterElementOptionsLoading || isClusterElementPropertyOptionsLoading)) ||
+                            !(isLoading || isClusterElementNodeOptionsLoading || isClusterElementOptionsLoading)) ||
                             !lookupDependsOnValues) && (
                             <>
                                 {currentOption ? (
@@ -507,7 +506,7 @@ const PropertyComboBox = ({
                                         {currentOption?.label}
                                     </span>
                                 ) : (
-                                    !(isRefetching || isClusterElementOptionsRefetching) && (
+                                    !(isRefetching || isClusterElementNodeOptionsRefetching) && (
                                         <span className={placeholderClassName}>{memoizedPlaceholder}</span>
                                     )
                                 )}
