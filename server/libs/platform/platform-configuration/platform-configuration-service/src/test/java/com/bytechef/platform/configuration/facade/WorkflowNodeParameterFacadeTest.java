@@ -52,6 +52,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
 import com.bytechef.platform.configuration.dto.ParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -2897,11 +2898,12 @@ public class WorkflowNodeParameterFacadeTest {
         String type = "STRING";
         boolean includeInMetadata = true;
 
-        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+        TaskDispatcherDefinition taskDispatcherDefinition = mock(TaskDispatcherDefinition.class);
 
-        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
-        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
-            .thenReturn(actionDefinition);
+        when(taskDispatcherDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(taskDispatcherDefinition.getName()).thenReturn("loop");
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("loop", 1))
+            .thenReturn(taskDispatcherDefinition);
 
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
@@ -2912,7 +2914,7 @@ public class WorkflowNodeParameterFacadeTest {
             Map<String, Object> task = new HashMap<>();
 
             task.put("name", "task1");
-            task.put("type", "dispatcher/v1/dispatcher");
+            task.put("type", "loop/v1");
             task.put("parameters", parameters);
             task.put("metadata", new HashMap<>());
 
@@ -2942,6 +2944,113 @@ public class WorkflowNodeParameterFacadeTest {
             // Then
             assertNotNull(result);
             verify(workflowService).update(anyString(), anyString(), anyInt());
+            verify(taskDispatcherDefinitionService).getTaskDispatcherDefinition(anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterBranchTaskDispatcherDoesNotRemoveEmptyCollections() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "branch1";
+        String parameterPath = "expression";
+        Object value = "true";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        TaskDispatcherDefinition taskDispatcherDefinition = mock(TaskDispatcherDefinition.class);
+
+        when(taskDispatcherDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(taskDispatcherDefinition.getName()).thenReturn("branch");
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("branch", 1))
+            .thenReturn(taskDispatcherDefinition);
+
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("cases", new ArrayList<>()); // Empty list
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", "branch1");
+            task.put("type", "branch/v1");
+            task.put("parameters", parameters);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(Map.of("tasks", List.of(task)));
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            assertTrue(result.parameters()
+                .containsKey("cases"), "Empty 'cases' list should NOT be removed for branch");
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterOtherTaskDispatcherRemovesEmptyCollections() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "loop1";
+        String parameterPath = "iterable";
+        Object value = "[1, 2]";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        TaskDispatcherDefinition taskDispatcherDefinition = mock(TaskDispatcherDefinition.class);
+
+        when(taskDispatcherDefinition.getProperties()).thenReturn(new ArrayList<>());
+        when(taskDispatcherDefinition.getName()).thenReturn("loop");
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("loop", 1))
+            .thenReturn(taskDispatcherDefinition);
+
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("emptyList", new ArrayList<>()); // Empty list
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", "loop1");
+            task.put("type", "loop/v1");
+            task.put("parameters", parameters);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(Map.of("tasks", List.of(task)));
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            assertFalse(result.parameters()
+                .containsKey("emptyList"), "Empty list should be removed for other dispatchers");
         }
     }
 
