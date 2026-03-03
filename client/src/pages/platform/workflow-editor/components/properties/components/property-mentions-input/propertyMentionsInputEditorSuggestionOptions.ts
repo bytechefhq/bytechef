@@ -68,9 +68,11 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
             let component: ReactRenderer<PropertyMentionsInputListRefType> | undefined;
             let popup: TippyInstance | undefined;
             let lastValidRect: DOMRect = DOM_RECT_FALLBACK;
+            let wheelAbortController: AbortController | undefined;
 
             return {
                 onExit() {
+                    wheelAbortController?.abort();
                     popup?.destroy();
                     component?.destroy();
                 },
@@ -102,6 +104,9 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                     const initialRect = props.clientRect?.();
 
                     if (!initialRect) {
+                        component.destroy();
+                        component = undefined;
+
                         return;
                     }
 
@@ -124,7 +129,13 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                     // events before react-remove-scroll can preventDefault on them.
                     popup.popper.style.pointerEvents = 'auto';
 
-                    popup.popper.addEventListener('wheel', (event) => event.stopPropagation(), {capture: true});
+                    wheelAbortController = new AbortController();
+
+                    popup.popper.addEventListener('wheel', (event) => event.stopPropagation(), {
+                        capture: true,
+                        passive: true,
+                        signal: wheelAbortController.signal,
+                    });
                 },
 
                 onUpdate(props) {
