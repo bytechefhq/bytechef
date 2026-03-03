@@ -1110,6 +1110,7 @@ export const useProperty = ({
         if (propertyParameterValue === '' || propertyParameterValue === undefined) {
             if (mentionInput) {
                 setMentionInputValue('');
+                mentionInputSyncedRef.current = false;
             } else {
                 setInputValue('');
                 setSelectValue('');
@@ -1279,6 +1280,7 @@ export const useProperty = ({
             setInputValue(parameterDefaultValue);
             setMentionInputValue(parameterDefaultValue);
             setSelectValue(parameterDefaultValue.toString());
+            mentionInputSyncedRef.current = false;
 
             if (Array.isArray(parameterDefaultValue)) {
                 setMultiSelectValue(parameterDefaultValue);
