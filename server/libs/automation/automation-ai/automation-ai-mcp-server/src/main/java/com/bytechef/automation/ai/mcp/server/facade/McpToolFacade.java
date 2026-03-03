@@ -24,14 +24,18 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.mcp.domain.McpProject;
 import com.bytechef.automation.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.mcp.service.McpProjectWorkflowService;
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
@@ -52,8 +56,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
@@ -61,6 +68,8 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
  * @author Matija Petanjek
  */
 public class McpToolFacade extends AbstractToolFacade {
+
+    private static final Logger logger = LoggerFactory.getLogger(McpToolFacade.class);
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -70,6 +79,7 @@ public class McpToolFacade extends AbstractToolFacade {
     private final McpServerService mcpServerService;
     private final PrincipalJobFacade principalJobFacade;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
     private final WorkflowService workflowService;
 
@@ -80,7 +90,7 @@ public class McpToolFacade extends AbstractToolFacade {
         JobSyncExecutor jobSyncExecutor, McpComponentService mcpComponentService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         super(evaluator);
 
@@ -92,6 +102,7 @@ public class McpToolFacade extends AbstractToolFacade {
         this.mcpServerService = mcpServerService;
         this.principalJobFacade = principalJobFacade;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;
     }
@@ -225,8 +236,33 @@ public class McpToolFacade extends AbstractToolFacade {
                 return null;
             }
 
-            return taskFileStorage.readJobOutputs(job.getOutputs());
+            return getCallableResponseOutput(job)
+                .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
         };
+    }
+
+    private Optional<Object> getCallableResponseOutput(Job job) {
+        try {
+            return taskExecutionService.fetchLastJobTaskExecution(Objects.requireNonNull(job.getId()))
+                .filter(
+                    lastTaskExecution -> {
+                        Map<String, ?> metadata = lastTaskExecution.getMetadata();
+
+                        return metadata.containsKey(MetadataConstants.CALLABLE_RESPONSE);
+                    })
+                .map(lastTaskExecution -> {
+                    ActionDefinition.CallableResponse callableResponse = ConvertUtils.convertValue(
+                        taskFileStorage.readTaskExecutionOutput(lastTaskExecution.getOutput()),
+                        ActionDefinition.CallableResponse.class);
+
+                    return callableResponse.output();
+                });
+        } catch (Exception exception) {
+            logger.warn(
+                "Failed to extract callable response output from job {}: {}", job.getId(), exception.getMessage());
+
+            return Optional.empty();
+        }
     }
 
     private static @Nullable WorkflowTrigger getMcpToolCallableTrigger(Workflow workflow) {
