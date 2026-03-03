@@ -815,7 +815,7 @@ paths:
       summary: "Get dynamic properties for an action or trigger property shown in the editor"
       tags:
         - "workflow-node-dynamic-properties"
-      operationId: "getClusterElementDynamicProperties"
+      operationId: "getClusterElementNodeDynamicProperties"
       parameters:
         - name: "id"
           description: "The workflow id"
