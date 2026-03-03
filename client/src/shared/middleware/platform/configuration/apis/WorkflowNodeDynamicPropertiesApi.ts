@@ -22,7 +22,7 @@ import {
     PropertyToJSON,
 } from '../models/index';
 
-export interface GetClusterElementDynamicPropertiesRequest {
+export interface GetClusterElementNodeDynamicPropertiesRequest {
     id: string;
     workflowNodeName: string;
     clusterElementType: string;
@@ -49,46 +49,46 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
      * Get dynamic properties for an action or trigger property shown in the editor.
      * Get dynamic properties for an action or trigger property shown in the editor
      */
-    async getClusterElementDynamicPropertiesRaw(requestParameters: GetClusterElementDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Property>>> {
+    async getClusterElementNodeDynamicPropertiesRaw(requestParameters: GetClusterElementNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Property>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling getClusterElementDynamicProperties().'
+                'Required parameter "id" was null or undefined when calling getClusterElementNodeDynamicProperties().'
             );
         }
 
         if (requestParameters['workflowNodeName'] == null) {
             throw new runtime.RequiredError(
                 'workflowNodeName',
-                'Required parameter "workflowNodeName" was null or undefined when calling getClusterElementDynamicProperties().'
+                'Required parameter "workflowNodeName" was null or undefined when calling getClusterElementNodeDynamicProperties().'
             );
         }
 
         if (requestParameters['clusterElementType'] == null) {
             throw new runtime.RequiredError(
                 'clusterElementType',
-                'Required parameter "clusterElementType" was null or undefined when calling getClusterElementDynamicProperties().'
+                'Required parameter "clusterElementType" was null or undefined when calling getClusterElementNodeDynamicProperties().'
             );
         }
 
         if (requestParameters['clusterElementWorkflowNodeName'] == null) {
             throw new runtime.RequiredError(
                 'clusterElementWorkflowNodeName',
-                'Required parameter "clusterElementWorkflowNodeName" was null or undefined when calling getClusterElementDynamicProperties().'
+                'Required parameter "clusterElementWorkflowNodeName" was null or undefined when calling getClusterElementNodeDynamicProperties().'
             );
         }
 
         if (requestParameters['propertyName'] == null) {
             throw new runtime.RequiredError(
                 'propertyName',
-                'Required parameter "propertyName" was null or undefined when calling getClusterElementDynamicProperties().'
+                'Required parameter "propertyName" was null or undefined when calling getClusterElementNodeDynamicProperties().'
             );
         }
 
         if (requestParameters['environmentId'] == null) {
             throw new runtime.RequiredError(
                 'environmentId',
-                'Required parameter "environmentId" was null or undefined when calling getClusterElementDynamicProperties().'
+                'Required parameter "environmentId" was null or undefined when calling getClusterElementNodeDynamicProperties().'
             );
         }
 
@@ -126,8 +126,8 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
      * Get dynamic properties for an action or trigger property shown in the editor.
      * Get dynamic properties for an action or trigger property shown in the editor
      */
-    async getClusterElementDynamicProperties(requestParameters: GetClusterElementDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Property>> {
-        const response = await this.getClusterElementDynamicPropertiesRaw(requestParameters, initOverrides);
+    async getClusterElementNodeDynamicProperties(requestParameters: GetClusterElementNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Property>> {
+        const response = await this.getClusterElementNodeDynamicPropertiesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
