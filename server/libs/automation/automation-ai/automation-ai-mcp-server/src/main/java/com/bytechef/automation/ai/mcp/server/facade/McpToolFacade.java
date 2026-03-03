@@ -41,8 +41,10 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.mcp.domain.McpComponent;
+import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
+import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -65,6 +67,7 @@ public class McpToolFacade extends AbstractToolFacade {
     private final JobSyncExecutor jobSyncExecutor;
     private final McpComponentService mcpComponentService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
+    private final McpServerService mcpServerService;
     private final PrincipalJobFacade principalJobFacade;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final TaskFileStorage taskFileStorage;
@@ -75,9 +78,9 @@ public class McpToolFacade extends AbstractToolFacade {
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         JobSyncExecutor jobSyncExecutor, McpComponentService mcpComponentService,
-        McpProjectWorkflowService mcpProjectWorkflowService, PrincipalJobFacade principalJobFacade,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
+        PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         super(evaluator);
 
@@ -86,6 +89,7 @@ public class McpToolFacade extends AbstractToolFacade {
         this.jobSyncExecutor = jobSyncExecutor;
         this.mcpComponentService = mcpComponentService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
+        this.mcpServerService = mcpServerService;
         this.principalJobFacade = principalJobFacade;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.taskFileStorage = taskFileStorage;
@@ -104,9 +108,10 @@ public class McpToolFacade extends AbstractToolFacade {
         FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
             .builder(
                 getToolName(clusterElementDefinition.getComponentName(), clusterElementDefinition.getName()),
-                getFromAiToolCallbackFunction(
+                getClusterElementToolCallbackFunction(
                     clusterElementDefinition.getComponentName(), clusterElementDefinition.getComponentVersion(),
-                    clusterElementDefinition.getName(), mcpTool.getParameters(), mcpComponent.getConnectionId()))
+                    clusterElementDefinition.getName(), mcpTool.getParameters(), mcpComponent.getConnectionId(),
+                    mcpComponent.getMcpServerId()))
             .inputType(Map.class)
             .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -149,8 +154,8 @@ public class McpToolFacade extends AbstractToolFacade {
             FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
                 .builder(
                     Objects.requireNonNull(toolName),
-                    getWorkflowFromAiToolCallbackFunction(
-                        projectDeploymentWorkflow, trigger.getName(), workflowParameters))
+                    getWorkflowToolCallbackFunction(
+                        projectDeploymentWorkflow, trigger.getName(), workflowParameters, mcpProject.getMcpServerId()))
                 .inputType(Map.class)
                 .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -164,11 +169,17 @@ public class McpToolFacade extends AbstractToolFacade {
         return toolCallbacks;
     }
 
-    private Function<Map<String, Object>, Object> getFromAiToolCallbackFunction(
+    private Function<Map<String, Object>, Object> getClusterElementToolCallbackFunction(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
-        @Nullable Long connectionId) {
+        @Nullable Long connectionId, long mcpServerId) {
 
         return request -> {
+            McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
+
+            if (!mcpServer.isEnabled()) {
+                throw new IllegalStateException("MCP server is disabled");
+            }
+
             Map<String, Object> resolvedParameters = new HashMap<>();
 
             for (Map.Entry<String, ?> entry : parameters.entrySet()) {
@@ -181,10 +192,17 @@ public class McpToolFacade extends AbstractToolFacade {
         };
     }
 
-    private Function<Map<String, Object>, Object> getWorkflowFromAiToolCallbackFunction(
-        ProjectDeploymentWorkflow projectDeploymentWorkflow, String triggerName, Map<String, ?> workflowParameters) {
+    private Function<Map<String, Object>, Object> getWorkflowToolCallbackFunction(
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, String triggerName, Map<String, ?> workflowParameters,
+        long mcpServerId) {
 
         return inputParameters -> {
+            McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
+
+            if (!mcpServer.isEnabled()) {
+                throw new IllegalStateException("MCP server is disabled");
+            }
+
             Map<String, Object> inputs = new HashMap<>(projectDeploymentWorkflow.getInputs());
 
             Map<String, Object> resolvedTriggerInputs = new HashMap<>();
