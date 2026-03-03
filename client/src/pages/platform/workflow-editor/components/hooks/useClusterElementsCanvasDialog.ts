@@ -106,7 +106,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
                         panelStore.setCurrentComponent((previousComponent) => ({
                             ...rootClusterElementNodeData,
                             displayConditions: previousComponent?.displayConditions,
-                            n: rootClusterElementNodeData.workflowNodeName || '',
+                            workflowNodeName: rootClusterElementNodeData.workflowNodeName || '',
                         }));
 
                         panelStore.setWorkflowNodeDetailsPanelOpen(true);
