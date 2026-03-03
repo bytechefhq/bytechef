@@ -18,7 +18,7 @@ import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 
 interface ApiCollectionListItemProps {
     apiCollection: ApiCollection;
@@ -82,6 +82,11 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
             }
         );
     };
+
+    const endpointWorkflowUuids = useMemo(
+        () => [...new Set(apiCollection.endpoints?.map((endpoint) => endpoint.workflowUuid) || [])],
+        [apiCollection.endpoints]
+    );
 
     const handleOnProjectDeploymentDialogClose = () => {
         queryClient
@@ -214,6 +219,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
 
             {showUpdateProjectVersionDialog && (
                 <ProjectDeploymentDialog
+                    filterWorkflowUuids={endpointWorkflowUuids}
                     onClose={handleOnProjectDeploymentDialogClose}
                     projectDeployment={projectDeployment}
                     updateProjectVersion={true}
