@@ -12,13 +12,21 @@ import '@xyflow/react/dist/style.css';
 import {CANVAS_BACKGROUND_COLOR, DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
 import {BrushCleaningIcon} from 'lucide-react';
 import {useCallback} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsWorkflowEditor from '../hooks/useClusterElementsWorkflowEditor';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 
 const ClusterElementsWorkflowEditor = () => {
-    const onEdgesChange = useClusterElementsDataStore((state) => state.onEdgesChange);
-    const setCanvasZoom = useClusterElementsDataStore((state) => state.setCanvasZoom);
+    const {onEdgesChange, setCanvasZoom} = useClusterElementsDataStore(
+        useShallow((state) => ({
+            onEdgesChange: state.onEdgesChange,
+            setCanvasZoom: state.setCanvasZoom,
+        }))
+    );
+
+    const {clusterElementsEdgeTypes, clusterElementsNodeTypes, edges, handleNodesChange, handleResetLayout, nodes} =
+        useClusterElementsWorkflowEditor();
 
     const handleViewportChange = useCallback(
         (viewport: Viewport) => {
@@ -26,9 +34,6 @@ const ClusterElementsWorkflowEditor = () => {
         },
         [setCanvasZoom]
     );
-
-    const {clusterElementsEdgeTypes, clusterElementsNodeTypes, edges, handleNodesChange, handleResetLayout, nodes} =
-        useClusterElementsWorkflowEditor();
 
     return (
         <div className="flex-1">

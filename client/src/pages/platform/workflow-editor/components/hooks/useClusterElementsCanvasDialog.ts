@@ -52,7 +52,9 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         }
 
         const processorElement = (Array.isArray(processorValue) ? processorValue[0] : processorValue) as NodeDataType;
+
         const typeSegments = processorElement?.type?.split('/') || [];
+
         const componentName = (processorElement as NodeDataType)?.componentName || typeSegments[0] || '';
         const clusterElementName = typeSegments[2] || '';
 
@@ -62,6 +64,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     useEffect(() => {
         if (isAiAgentClusterRoot && workflowNodeName) {
             const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[workflowNodeName];
+
             const showAiAgent = preference ?? true;
 
             setShowAiAgentEditor(showAiAgent);
@@ -77,6 +80,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
             }
 
             const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[workflowNodeName];
+
             const showDataStream = preference ?? true;
 
             setShowDataStreamEditor(showDataStream);
@@ -87,7 +91,9 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         (showSimpleEditor: boolean) => {
             if (isAiAgentClusterRoot) {
                 setShowAiAgentEditor(showSimpleEditor);
+
                 useTestingModeStore.getState().resetTestingMode();
+
                 useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
             } else if (isDataStreamClusterRoot) {
                 setShowDataStreamEditor(showSimpleEditor);
