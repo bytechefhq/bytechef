@@ -126,14 +126,24 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         List<McpProjectWorkflow> existingMcpProjectWorkflows =
             mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProjectId);
 
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(mcpProject.getProjectDeploymentId());
+
+        Map<Long, ProjectDeploymentWorkflow> projectDeploymentWorkflowMap = new HashMap<>();
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            projectDeploymentWorkflowMap.put(projectDeploymentWorkflow.getId(), projectDeploymentWorkflow);
+        }
+
         Map<String, McpProjectWorkflow> existingWorkflowIdMap = new HashMap<>();
 
         for (McpProjectWorkflow mcpProjectWorkflow : existingMcpProjectWorkflows) {
             ProjectDeploymentWorkflow projectDeploymentWorkflow =
-                projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
-                    mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+                projectDeploymentWorkflowMap.get(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
 
-            existingWorkflowIdMap.put(projectDeploymentWorkflow.getWorkflowId(), mcpProjectWorkflow);
+            if (projectDeploymentWorkflow != null) {
+                existingWorkflowIdMap.put(projectDeploymentWorkflow.getWorkflowId(), mcpProjectWorkflow);
+            }
         }
 
         Set<String> selectedWorkflowIdSet = new HashSet<>(selectedWorkflowIds);

@@ -778,11 +778,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                     Objects.requireNonNull(triggerWorkflowNodeType.operation()));
             } catch (Exception exception) {
                 logger.error(
-                    "Failed to get trigger definition for workflow trigger type=%s".formatted(
-                        triggerWorkflowNodeType.name()),
+                    "Failed to get trigger definition for workflow trigger type={}",
+                    triggerWorkflowNodeType.name(),
                     exception);
 
-                return null;
+                continue;
             }
 
             if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK &&

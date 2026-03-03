@@ -170,6 +170,59 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
+    public void testUpdateMcpProjectAddWorkflow() {
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
+
+        McpProject updatedMcpProject = mcpProjectFacade.updateMcpProject(
+            mcpProject.getId(), List.of("workflow1", "workflow2"));
+
+        assertThat(updatedMcpProject).isNotNull();
+        assertThat(updatedMcpProject.getId()).isEqualTo(mcpProject.getId());
+
+        List<McpProjectWorkflow> mcpProjectWorkflows =
+            mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
+
+        assertThat(mcpProjectWorkflows).hasSize(2);
+    }
+
+    @Test
+    public void testUpdateMcpProjectRemoveWorkflow() {
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), project.getId(), 1, List.of("workflow1", "workflow2"));
+
+        List<McpProjectWorkflow> mcpProjectWorkflowsBefore =
+            mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
+
+        assertThat(mcpProjectWorkflowsBefore).hasSize(2);
+
+        mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of("workflow1"));
+
+        List<McpProjectWorkflow> mcpProjectWorkflowsAfter =
+            mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
+
+        assertThat(mcpProjectWorkflowsAfter).hasSize(1);
+    }
+
+    @Test
+    public void testUpdateMcpProjectUnchangedWorkflows() {
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), project.getId(), 1, List.of("workflow1", "workflow2"));
+
+        List<McpProjectWorkflow> mcpProjectWorkflowsBefore =
+            mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
+
+        assertThat(mcpProjectWorkflowsBefore).hasSize(2);
+
+        mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of("workflow1", "workflow2"));
+
+        List<McpProjectWorkflow> mcpProjectWorkflowsAfter =
+            mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
+
+        assertThat(mcpProjectWorkflowsAfter).hasSize(2);
+    }
+
+    @Test
     public void testDeleteMcpProject() {
         McpProject mcpProject = new McpProject(projectDeployment.getId(), mcpServer.getId());
 
