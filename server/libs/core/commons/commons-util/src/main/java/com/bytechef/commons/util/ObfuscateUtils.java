@@ -27,7 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 public class ObfuscateUtils {
 
     private static final String SECURITY_INSENSITIVE_KEYS =
-        "authorizationUrl,authorizationType,headerPrefix,refreshUrl,scopes,tokenUrl";
+        "authorizationUrl,authorizationType,bucketName,clientId,headerPrefix,refreshUrl,region,scopes,tokenUrl";
     private static final String SECURITY_SENSITIVE_KEYS = "password";
 
     /**
