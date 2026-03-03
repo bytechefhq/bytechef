@@ -74,11 +74,11 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
         if (list.isEmpty()) {
             variableProperties = object();
         } else {
+            ModifiableValueProperty<?, ?> outputSchema = (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
+                ITEM, list.getFirst(), PropertyFactory.PROPERTY_FACTORY);
+
             variableProperties = object()
-                .properties(
-                    (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                        ITEM, list.getFirst(), PropertyFactory.PROPERTY_FACTORY),
-                    integer(INDEX));
+                .properties(outputSchema, integer(INDEX));
         }
 
         return OutputResponse.of(variableProperties);
