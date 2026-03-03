@@ -2,7 +2,6 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import ProjectHeader from '@/pages/automation/project/components/project-header/ProjectHeader';
 import ProjectsLeftSidebar from '@/pages/automation/project/components/projects-sidebar/ProjectsLeftSidebar';
 import {useProject} from '@/pages/automation/project/hooks/useProject';
-import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
@@ -20,11 +19,6 @@ import {useShallow} from 'zustand/react/shallow';
 
 const Project = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore(
-        useShallow((state) => ({
-            projectLeftSidebarOpen: state.projectLeftSidebarOpen,
-        }))
-    );
     const {workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             workflow: state.workflow,
@@ -42,8 +36,9 @@ const Project = () => {
         handleWorkflowExecutionsTestOutputCloseClick,
         invalidateWorkflowQueries,
         projectId,
+        projectLeftSidebarOpen,
         projectWorkflowId,
-        projects,
+        sidebarLoaded,
         updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
@@ -56,23 +51,23 @@ const Project = () => {
         <div className="flex w-full">
             <WorkflowTestRunLeaveDialog onCancel={cancelLeave} onConfirm={confirmLeave} open={showLeaveDialog} />
 
-            {projects && (
-                <div className="shrink-0 overflow-hidden">
-                    <div
-                        className={twMerge(
-                            'w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
-                            projectLeftSidebarOpen ? 'ml-0 opacity-100' : '-ml-[355px] opacity-0'
-                        )}
-                    >
+            <div className="shrink-0 overflow-hidden">
+                <div
+                    className={twMerge(
+                        'w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
+                        projectLeftSidebarOpen ? 'ml-0 opacity-100' : '-ml-[355px] opacity-0'
+                    )}
+                >
+                    {sidebarLoaded && (
                         <ProjectsLeftSidebar
                             bottomResizablePanelRef={bottomResizablePanelRef}
                             currentWorkflowId={workflow.id!}
                             onProjectClick={handleProjectClick}
                             projectId={projectId}
                         />
-                    </div>
+                    )}
                 </div>
-            )}
+            </div>
 
             <div className="flex w-full flex-col">
                 {projectId && (

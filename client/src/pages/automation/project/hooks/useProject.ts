@@ -21,12 +21,12 @@ import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/conne
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/shared/queries/automation/projectWorkflows.queries';
-import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
@@ -42,7 +42,12 @@ export const useProject = () => {
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const setProjectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.setProjectLeftSidebarOpen);
+    const {projectLeftSidebarOpen, setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore(
+        useShallow((state) => ({
+            projectLeftSidebarOpen: state.projectLeftSidebarOpen,
+            setProjectLeftSidebarOpen: state.setProjectLeftSidebarOpen,
+        }))
+    );
     const setRightSidebarOpen = useRightSidebarStore((state) => state.setRightSidebarOpen);
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore(
         useShallow((state) => ({
@@ -56,7 +61,15 @@ export const useProject = () => {
     const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const [sidebarLoaded, setSidebarLoaded] = useState(false);
+
     const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
+    const sidebarLoadedRef = useRef(false);
+
+    if (projectLeftSidebarOpen && !sidebarLoadedRef.current) {
+        sidebarLoadedRef.current = true;
+        setSidebarLoaded(true);
+    }
 
     const {projectId, projectWorkflowId} = useParams();
     const navigate = useNavigate();
@@ -93,12 +106,6 @@ export const useProject = () => {
     };
 
     const {data: categories} = useGetProjectCategoriesQuery();
-
-    const {data: projects} = useGetWorkspaceProjectsQuery({
-        categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
-        id: currentWorkspaceId!,
-        tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
-    });
 
     const {data: tags} = useGetProjectTagsQuery();
 
@@ -250,8 +257,9 @@ export const useProject = () => {
         handleWorkflowExecutionsTestOutputCloseClick,
         invalidateWorkflowQueries,
         projectId: parseInt(projectId!),
+        projectLeftSidebarOpen,
         projectWorkflowId: parseInt(projectWorkflowId!),
-        projects,
+        sidebarLoaded,
         tags,
         updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
