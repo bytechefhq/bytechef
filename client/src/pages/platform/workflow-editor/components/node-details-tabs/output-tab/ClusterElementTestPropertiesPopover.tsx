@@ -3,6 +3,7 @@ import {Form} from '@/components/ui/form';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
+import {XIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 
 import useClusterElementTestPropertiesPopover from './hooks/useClusterElementTestPropertiesPopover';
@@ -42,12 +43,22 @@ const ClusterElementTestPropertiesPopover = ({
             >
                 <Form {...form}>
                     <form onSubmit={handleSubmit(handleFormSubmit)}>
-                        <div className="border-b px-4 py-3">
-                            <h3 className="text-sm font-medium">Test Properties</h3>
+                        <div className="flex items-center justify-between border-b px-4 py-3">
+                            <div>
+                                <h3 className="text-sm font-medium">Test Properties</h3>
 
-                            <p className="text-xs text-muted-foreground">
-                                Override property values for testing this tool.
-                            </p>
+                                <p className="text-xs text-muted-foreground">
+                                    Override property values for testing this tool.
+                                </p>
+                            </div>
+
+                            <button
+                                className="text-muted-foreground hover:text-foreground"
+                                onClick={() => onOpenChange(false)}
+                                type="button"
+                            >
+                                <XIcon className="size-4" />
+                            </button>
                         </div>
 
                         <div
