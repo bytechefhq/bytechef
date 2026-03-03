@@ -153,8 +153,8 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
                     return callableResponse.output();
                 });
         } catch (Exception exception) {
-            logger.warn("Failed to extract callable response output from job {}: {}",
-                job.getId(), exception.getMessage());
+            logger.warn(
+                "Failed to extract callable response output from job {}: {}", job.getId(), exception.getMessage());
 
             return Optional.empty();
         }
