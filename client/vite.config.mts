@@ -20,11 +20,6 @@ export default ({mode}) => {
                 output: {
                     manualChunks: {
                         'vendor-analytics': ['posthog-js'],
-                        'vendor-d3': ['d3-hierarchy', 'd3-timer'],
-                        'vendor-dagre': ['@dagrejs/dagre'],
-                        'vendor-editor': ['monaco-editor', '@monaco-editor/react'],
-                        'vendor-flow': ['@xyflow/react'],
-                        'vendor-json': ['react-json-view'],
                         'vendor-query': ['@tanstack/react-query'],
                         'vendor-react': ['react', 'react-dom', 'react-router-dom'],
                         'vendor-ui': ['@radix-ui/react-icons', 'lucide-react'],
