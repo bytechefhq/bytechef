@@ -122,6 +122,22 @@ describe('PropertyCodeEditorDialogEditor', () => {
 
             expect(editorLanguage).toHaveTextContent('ruby');
         });
+
+        it('should pass r language to editor', async () => {
+            render(<PropertyCodeEditorDialogEditor language="r" />);
+
+            const editorLanguage = await screen.findByTestId('editor-language');
+
+            expect(editorLanguage).toHaveTextContent('r');
+        });
+
+        it('should pass java language to editor', async () => {
+            render(<PropertyCodeEditorDialogEditor language="java" />);
+
+            const editorLanguage = await screen.findByTestId('editor-language');
+
+            expect(editorLanguage).toHaveTextContent('java');
+        });
     });
 
     describe('onChange callback', () => {
