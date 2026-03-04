@@ -91,6 +91,7 @@ const PropertyComboBox = ({
     const [value, setValue] = useState(initialValue != null ? initialValue.toString() : defaultValue);
 
     const clusterElementContext = useClusterElementContext();
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {currentNode, operationChangeInProgress} = useWorkflowNodeDetailsPanelStore(
@@ -211,7 +212,7 @@ const PropertyComboBox = ({
             return undefined;
         }
 
-        const filtered: Record<string, unknown> = {};
+        const filteredParameters: Record<string, unknown> = {};
 
         for (const [parameterKey, parameterValue] of Object.entries(clusterElementContext.inputParameters)) {
             if (
@@ -221,10 +222,10 @@ const PropertyComboBox = ({
                 continue;
             }
 
-            filtered[parameterKey] = parameterValue;
+            filteredParameters[parameterKey] = parameterValue;
         }
 
-        return filtered;
+        return filteredParameters;
     }, [clusterElementContext?.inputParameters]);
 
     const clusterElementLookupDependsOnValues = useMemo(() => {

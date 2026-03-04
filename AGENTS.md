@@ -81,7 +81,6 @@ ByteChef is a workflow automation platform. The client is a React application bu
     -   Import grouping and sorting
     -   No conditional object keys
     -   No duplicate imports
-    -   No `.length` in JSX expressions
     -   Ref names must end with `Ref` suffix
     -   State variables must follow naming pattern
 -   TypeScript naming conventions for interfaces and types
@@ -195,7 +194,7 @@ export function useStore<U>(selector: (state: ExtractState<typeof store>) => U):
 
 ### Store Usage
 
--   Use `useShallow` when selecting multiple values to prevent unnecessary re-renders:
+-   Use `useShallow` when selecting multiple values to prevent unnecessary re-renders (the selector returns a new object each time, so without a shallow compare the component would re-render on every store update):
 
 ```typescript
 const {value1, value2} = useStore(
@@ -205,6 +204,8 @@ const {value1, value2} = useStore(
     }))
 );
 ```
+
+-   Do not use `useShallow` for single-value selectors. A selector that returns one slice (e.g. `(state) => state.foo`) is already stable; the component only re-renders when that slice changes. `useShallow` is only needed when the selector returns an object of multiple fields.
 
 -   Main stores:
     -   `useAuthenticationStore` - User authentication state

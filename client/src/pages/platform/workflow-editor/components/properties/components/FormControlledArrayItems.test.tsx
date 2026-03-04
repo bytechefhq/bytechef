@@ -4,7 +4,7 @@ import React from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import {describe, expect, it, vi} from 'vitest';
 
-import ControlledArrayItems from './ControlledArrayItems';
+import FormControlledArrayItems from './FormControlledArrayItems';
 
 vi.mock('../Property', () => ({
     default: ({
@@ -43,7 +43,7 @@ function Wrapper({
 
     return (
         <FormProvider {...methods}>
-            <ControlledArrayItems
+            <FormControlledArrayItems
                 control={methods.control}
                 controlPath="tags"
                 formState={methods.formState}
@@ -54,7 +54,7 @@ function Wrapper({
     );
 }
 
-describe('ControlledArrayItems', () => {
+describe('FormControlledArrayItems', () => {
     it('renders array items with labels', () => {
         render(<Wrapper />);
 

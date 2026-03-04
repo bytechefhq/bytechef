@@ -20,6 +20,18 @@ export const FieldsetSkeleton = ({bottomBorder = false, label}: {bottomBorder?: 
 
 export const PropertySkeleton = () => <Skeleton className="h-9 w-full" />;
 
+export const PropertyDynamicPropertiesSkeleton = () => (
+    <ul className="flex flex-col gap-4">
+        {Array.from({length: 3}).map((_, index) => (
+            <li className="flex flex-col space-y-1" key={index}>
+                <Skeleton className="h-5 w-1/4" />
+
+                <Skeleton className="h-9 w-full" />
+            </li>
+        ))}
+    </ul>
+);
+
 export const DescriptionTabSkeleton = () => (
     <div className="flex flex-col gap-y-4 p-4">
         <div className="flex flex-col gap-y-2">
