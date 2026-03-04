@@ -37,7 +37,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
+import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.List;
 import java.util.Map;
@@ -56,13 +56,13 @@ public class MicrosoftTeamsSendChannelMessageAction {
             string(TEAM_ID)
                 .label("Team ID")
                 .description("ID of the team where the channel is located.")
-                .options((OptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
+                .options((OptionsFunction<String>) MicrosoftTeamsUtils::getTeamIdOptions)
                 .required(true),
             string(CHANNEL_ID)
                 .label("Channel ID")
                 .description("Channel to send message to.")
                 .optionsLookupDependsOn(TEAM_ID)
-                .options((OptionsFunction<String>) MicrosoftTeamsOptionUtils::getChannelIdOptions)
+                .options((OptionsFunction<String>) MicrosoftTeamsUtils::getChannelIdOptions)
                 .required(true),
             CONTENT_TYPE_PROPERTY,
             CONTENT_PROPERTY,
@@ -98,9 +98,9 @@ public class MicrosoftTeamsSendChannelMessageAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<String> fileIds = inputParameters.getList(ATTACHMENTS, String.class, List.of());
-        List<Map<String, String>> attachments = MicrosoftTeamsOptionUtils.getAttachmentsList(fileIds, context);
+        List<Map<String, String>> attachments = MicrosoftTeamsUtils.getAttachmentsList(fileIds, context);
 
-        String htmlAttachmentsTag = MicrosoftTeamsOptionUtils.getHtmlAttachmentsTag(attachments);
+        String htmlAttachmentsTag = MicrosoftTeamsUtils.getHtmlAttachmentsTag(attachments);
 
         return context
             .http(http -> http.post(

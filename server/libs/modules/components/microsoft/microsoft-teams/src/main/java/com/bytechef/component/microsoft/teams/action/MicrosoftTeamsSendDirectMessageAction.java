@@ -36,7 +36,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
+import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class MicrosoftTeamsSendDirectMessageAction {
         .properties(
             string(CHAT_ID)
                 .label("Chat ID")
-                .options((OptionsFunction<String>) MicrosoftTeamsOptionUtils::getChatIdOptions)
+                .options((OptionsFunction<String>) MicrosoftTeamsUtils::getChatIdOptions)
                 .required(true),
             CONTENT_TYPE_PROPERTY,
             CONTENT_PROPERTY,
@@ -85,9 +85,9 @@ public class MicrosoftTeamsSendDirectMessageAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<String> fileIds = inputParameters.getList(ATTACHMENTS, String.class, List.of());
-        List<Map<String, String>> attachments = MicrosoftTeamsOptionUtils.getAttachmentsList(fileIds, context);
+        List<Map<String, String>> attachments = MicrosoftTeamsUtils.getAttachmentsList(fileIds, context);
 
-        String htmlAttachmentsTag = MicrosoftTeamsOptionUtils.getHtmlAttachmentsTag(attachments);
+        String htmlAttachmentsTag = MicrosoftTeamsUtils.getHtmlAttachmentsTag(attachments);
 
         return context
             .http(http -> http.post("/chats/" + inputParameters.getRequiredString(CHAT_ID) + "/messages"))

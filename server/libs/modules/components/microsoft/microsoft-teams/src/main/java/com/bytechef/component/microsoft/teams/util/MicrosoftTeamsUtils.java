@@ -28,7 +28,6 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.WEB_DAV_URL;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
@@ -41,9 +40,9 @@ import java.util.Map;
 /**
  * @author Monika Domiter
  */
-public class MicrosoftTeamsOptionUtils {
+public class MicrosoftTeamsUtils {
 
-    private MicrosoftTeamsOptionUtils() {
+    private MicrosoftTeamsUtils() {
     }
 
     public static List<Map<String, String>> getAttachmentsList(List<String> fileIds, Context context) {
@@ -76,7 +75,7 @@ public class MicrosoftTeamsOptionUtils {
 
     public static List<Option<String>> getChatIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         List<Option<String>> options = new ArrayList<>();
         String nextLink = "/chats";
@@ -125,7 +124,7 @@ public class MicrosoftTeamsOptionUtils {
 
     public static List<Option<String>> getChannelIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get(
             "/teams/" + inputParameters.getRequiredString(TEAM_ID) + "/channels"))
@@ -148,7 +147,7 @@ public class MicrosoftTeamsOptionUtils {
 
     public static List<Option<String>> getTeamIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/me/joinedTeams"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
