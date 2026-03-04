@@ -46,6 +46,8 @@ public class MicrosoftTeamsConnection {
             map.put("Chat.ReadWrite", true);
             map.put("Directory.Read.All", false);
             map.put("Directory.ReadWrite.All", false);
+            map.put("Files.Read", true);
+            map.put("Files.Read.All", true);
             map.put("Group.Read.All", false);
             map.put("Group.ReadWrite.All", false);
             map.put("Team.Create", false);
