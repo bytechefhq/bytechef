@@ -17,10 +17,30 @@ Creation of OAuth 2.0 application is documented [here](/reference/components/mic
      - Channel.ReadBasic.All
      - ChannelMessage.Send
      - Chat.ReadWrite
+     - Chat.Read
+     - ChatMember.Read
      - Team.ReadBasic.All
      - offline_access
 8. After selecting all the scopes click on **Update permissions**
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/pM8jOSv3CEQnOnICK4NE?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+### Grant Necessary Permissions - For Microsoft OneDrive (needed for sending attachments)
+
+1. Open the Azure Portal: https://portal.azure.com/
+2. Click on **App registrations**.
+3. Click on **All applications**.
+4. Click on application you want to connect to Microsoft OneDrive.
+5. Click on **API permissions**.
+6. Click on **Microsoft Graph (1)**.
+7. Select following scopes:
+  - Files.Read
+  - Files.ReadWrite.All
+  - offline_access
+8. After selecting all the scopes click on **Update permissions**
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/zpYIHd7Hegb549Jmdemu?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
