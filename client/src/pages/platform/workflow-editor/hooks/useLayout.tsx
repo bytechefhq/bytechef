@@ -78,14 +78,16 @@ export default function useLayout({
 
     const {tasks, triggers} = workflow;
 
-    const {initializeWithCanvasWidth, setEdges, setNodes, setSavedPositionCrossAxisShift} = useWorkflowDataStore(
-        useShallow((state) => ({
-            initializeWithCanvasWidth: state.initializeWithCanvasWidth,
-            setEdges: state.setEdges,
-            setNodes: state.setNodes,
-            setSavedPositionCrossAxisShift: state.setSavedPositionCrossAxisShift,
-        }))
-    );
+    const {incrementLayoutResetCounter, initializeWithCanvasWidth, setEdges, setNodes, setSavedPositionCrossAxisShift} =
+        useWorkflowDataStore(
+            useShallow((state) => ({
+                incrementLayoutResetCounter: state.incrementLayoutResetCounter,
+                initializeWithCanvasWidth: state.initializeWithCanvasWidth,
+                setEdges: state.setEdges,
+                setNodes: state.setNodes,
+                setSavedPositionCrossAxisShift: state.setSavedPositionCrossAxisShift,
+            }))
+        );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
@@ -525,24 +527,23 @@ export default function useLayout({
         previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
         previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
-        const crossAxis = layoutDirection === 'TB' ? 'x' : 'y';
-        const positionDelta = -widthDelta / 2;
-        const currentNodes = useWorkflowDataStore.getState().nodes;
-
-        const targetNodes = currentNodes.map((node) => ({
-            ...node,
-            position: {
-                ...node.position,
-                [crossAxis]: node.position[crossAxis] + positionDelta,
-            },
-        }));
-
         if (cancelAnimationRef.current) {
             cancelAnimationRef.current();
+            cancelAnimationRef.current = null;
         }
 
-        cancelAnimationRef.current = animateNodePositions(currentNodes, targetNodes, setNodes);
-    }, [dataPillPanelOpen, layoutDirection, leftSidebarOpen, setNodes, workflowNodeDetailsPanelOpen]);
+        // Trigger a full layout recomputation rather than shifting nodes directly.
+        // The dagre worker already accounts for canvas dimensions via savedPositionCrossAxisShift.
+        // Direct shifting caused visible jumps in LR mode when the panel open coincided
+        // with a structural graph change (e.g. adding a node).
+        incrementLayoutResetCounter();
+    }, [
+        dataPillPanelOpen,
+        incrementLayoutResetCounter,
+        layoutDirection,
+        leftSidebarOpen,
+        workflowNodeDetailsPanelOpen,
+    ]);
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
@@ -597,7 +598,15 @@ export default function useLayout({
 
         const savedPositionCrossAxisShift = useWorkflowDataStore.getState().savedPositionCrossAxisShift;
 
-        const preLayoutNodes = useWorkflowDataStore.getState().nodes;
+        // Cancel any in-flight animation immediately so competing effects
+        // (e.g. panel-shift animation) don't visibly move nodes while the worker runs
+        if (cancelAnimationRef.current) {
+            cancelAnimationRef.current();
+            cancelAnimationRef.current = null;
+        }
+
+        // Snapshot positions right after cancelling — these are where nodes visually are right now
+        const frozenNodes = useWorkflowDataStore.getState().nodes;
 
         getLayoutElements({
             canvasHeight: canvasHeightRef.current,
@@ -629,30 +638,34 @@ export default function useLayout({
                 targetNodes = elements.nodes;
             }
 
-            if (cancelAnimationRef.current) {
-                cancelAnimationRef.current();
-            }
-
             if (isInitialLayoutRef.current || readOnlyWorkflow) {
                 setNodes(targetNodes);
                 setEdges(elements.edges);
                 isInitialLayoutRef.current = false;
             } else {
-                const previousPositionMap = new Map(preLayoutNodes.map((node) => [node.id, node.position]));
+                const structureChanged = frozenNodes.length !== targetNodes.length;
 
-                // Place surviving nodes at their current positions so they can animate to targets
-                const nodesWithCurrentPositions = targetNodes.map((targetNode) => {
-                    const previousPosition = previousPositionMap.get(targetNode.id);
+                if (structureChanged) {
+                    // Snap immediately when nodes are added or removed — animating
+                    // a large centering shift looks like a visual jump
+                    setNodes(targetNodes);
+                    setEdges(elements.edges);
+                } else {
+                    const previousPositionMap = new Map(frozenNodes.map((node) => [node.id, node.position]));
 
-                    return previousPosition ? {...targetNode, position: previousPosition} : targetNode;
-                });
+                    // Place surviving nodes at their frozen positions so they can animate to targets
+                    const nodesWithCurrentPositions = targetNodes.map((targetNode) => {
+                        const previousPosition = previousPositionMap.get(targetNode.id);
 
-                // Set final nodes (at old positions) and final edges immediately —
-                // deleted nodes and their edges vanish, surviving nodes then animate to new positions
-                setNodes(nodesWithCurrentPositions);
-                setEdges(elements.edges);
+                        return previousPosition ? {...targetNode, position: previousPosition} : targetNode;
+                    });
 
-                cancelAnimationRef.current = animateNodePositions(preLayoutNodes, targetNodes, setNodes);
+                    // Set final nodes (at frozen positions) and final edges immediately
+                    setNodes(nodesWithCurrentPositions);
+                    setEdges(elements.edges);
+
+                    cancelAnimationRef.current = animateNodePositions(frozenNodes, targetNodes, setNodes);
+                }
             }
         });
 
