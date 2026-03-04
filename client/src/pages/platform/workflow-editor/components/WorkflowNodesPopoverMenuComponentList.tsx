@@ -189,7 +189,8 @@ const isTaskDispatcherSubtask = (node?: Node) =>
     !!node?.data?.branchData ||
     !!node?.data?.parallelData ||
     !!node?.data?.eachData ||
-    !!node?.data?.forkJoinData;
+    !!node?.data?.forkJoinData ||
+    !!node?.data?.terminateData;
 
 const filterTaskDispatcherDefinitions = (
     taskDispatcherDefinitions: Array<TaskDispatcherDefinition> | null,
