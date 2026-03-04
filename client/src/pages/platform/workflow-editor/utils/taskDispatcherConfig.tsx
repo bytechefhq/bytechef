@@ -61,6 +61,10 @@ export function buildGenericNodeData(
                 newNodeData.subflowData = {
                     subflowId: taskDispatcherId,
                 };
+            } else if (type === 'terminate') {
+                newNodeData.terminateData = {
+                    terminateId: taskDispatcherId,
+                };
             } else if (type === 'branch') {
                 newNodeData.branchData = {
                     branchId: taskDispatcherId,
@@ -542,6 +546,27 @@ export const TASK_DISPATCHER_CONFIG = {
             return {index, taskDispatcherId: parts[0]};
         },
         getDispatcherId: (context: TaskDispatcherContextType) => context.subflowId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+        }),
+        getSubtasks: () => [],
+        getTask: getTaskDispatcherTask,
+        initializeParameters: () => ({}),
+        updateTaskParameters: ({task}: UpdateTaskParametersType): WorkflowTask => task,
+    },
+    terminate: {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'terminate'),
+
+        contextIdentifier: 'terminateId',
+        dataKey: 'terminateData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const parts = placeholderId.split('-');
+            const index = parseInt(parts[parts.length - 1] || '-1');
+
+            return {index, taskDispatcherId: parts[0]};
+        },
+        getDispatcherId: (context: TaskDispatcherContextType) => context.terminateId,
         getInitialParameters: (properties: Array<PropertyAllType>) => ({
             ...getParametersWithDefaultValues({properties}),
         }),

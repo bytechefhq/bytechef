@@ -101,6 +101,10 @@ export default async function handleTaskDispatcherClick({
                 forkJoinId: taskDispatcherContext.forkJoinId as string,
                 index: (taskDispatcherContext.index ?? 0) as number,
             };
+        } else if (taskDispatcherContext.terminateId) {
+            newNodeData.terminateData = {
+                terminateId: taskDispatcherContext.terminateId as string,
+            };
         }
     }
 

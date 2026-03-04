@@ -48,8 +48,15 @@ export default function saveTaskDispatcherSubtaskFieldChange({
     );
 
     let taskDispatcherContext: TaskDispatcherContextType | undefined = undefined;
-    let taskDispatcherComponentName: 'branch' | 'condition' | 'each' | 'fork-join' | 'loop' | 'parallel' | undefined =
-        undefined;
+    let taskDispatcherComponentName:
+        | 'branch'
+        | 'condition'
+        | 'each'
+        | 'fork-join'
+        | 'loop'
+        | 'parallel'
+        | 'terminate'
+        | undefined = undefined;
 
     switch (taskDispatcherDataKey) {
         case 'branchData': {
@@ -139,6 +146,19 @@ export default function saveTaskDispatcherSubtaskFieldChange({
 
             break;
         }
+        case 'terminateData': {
+            if (!currentNode.terminateData) {
+                break;
+            }
+
+            taskDispatcherContext = {
+                taskDispatcherId: currentNode.terminateData.terminateId,
+            };
+
+            taskDispatcherComponentName = 'terminate';
+
+            break;
+        }
         default: {
             return;
         }
@@ -163,47 +183,83 @@ export default function saveTaskDispatcherSubtaskFieldChange({
         return;
     }
 
-    const subtasks: Array<WorkflowTask> = getSubtasks({
-        context: taskDispatcherContext,
-        task: parentTaskDispatcherTask,
-    });
+    let recursivelyUpdatedTasks: Array<WorkflowTask>;
 
-    const updatedSubtasks = subtasks.map((subtask) => {
-        if (subtask.name === currentNode.name) {
-            switch (fieldUpdate.field) {
-                case 'operation':
-                    return {
-                        ...subtask,
-                        parameters: getParametersWithDefaultValues({
-                            properties: currentOperationProperties as Array<PropertyAllType>,
-                        }),
-                        type: `${currentNode.componentName}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
-                    };
-                case 'label':
-                    return {
-                        ...subtask,
-                        label: fieldUpdate.value,
-                    };
-                case 'description':
-                    return {
-                        ...subtask,
-                        description: fieldUpdate.value,
-                    };
-                default:
-                    return subtask;
-            }
+    if (taskDispatcherComponentName === 'terminate') {
+        let updatedTask: WorkflowTask = parentTaskDispatcherTask;
+
+        switch (fieldUpdate.field) {
+            case 'operation':
+                updatedTask = {
+                    ...parentTaskDispatcherTask,
+                    parameters: getParametersWithDefaultValues({
+                        properties: currentOperationProperties as Array<PropertyAllType>,
+                    }),
+                    type: `${currentNode.componentName}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
+                };
+                break;
+            case 'label':
+                updatedTask = {
+                    ...parentTaskDispatcherTask,
+                    label: fieldUpdate.value,
+                };
+                break;
+            case 'description':
+                updatedTask = {
+                    ...parentTaskDispatcherTask,
+                    description: fieldUpdate.value,
+                };
+                break;
+            default:
+                break;
         }
 
-        return subtask;
-    });
+        recursivelyUpdatedTasks = workflowDefinitionTasks.map((task: WorkflowTask) =>
+            task.name === parentTaskDispatcherTask.name ? updatedTask : task
+        );
+    } else {
+        const subtasks: Array<WorkflowTask> = getSubtasks({
+            context: taskDispatcherContext,
+            task: parentTaskDispatcherTask,
+        });
 
-    const updatedTaskDispatcherTask = updateTaskParameters({
-        context: taskDispatcherContext,
-        task: parentTaskDispatcherTask,
-        updatedSubtasks,
-    });
+        const updatedSubtasks = subtasks.map((subtask) => {
+            if (subtask.name === currentNode.name) {
+                switch (fieldUpdate.field) {
+                    case 'operation':
+                        return {
+                            ...subtask,
+                            parameters: getParametersWithDefaultValues({
+                                properties: currentOperationProperties as Array<PropertyAllType>,
+                            }),
+                            type: `${currentNode.componentName}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
+                        };
+                    case 'label':
+                        return {
+                            ...subtask,
+                            label: fieldUpdate.value,
+                        };
+                    case 'description':
+                        return {
+                            ...subtask,
+                            description: fieldUpdate.value,
+                        };
+                    default:
+                        return subtask;
+                }
+            }
 
-    const recursivelyUpdatedTasks = getRecursivelyUpdatedTasks(workflowDefinitionTasks, updatedTaskDispatcherTask);
+            return subtask;
+        });
+
+        const updatedTaskDispatcherTask = updateTaskParameters({
+            context: taskDispatcherContext,
+            task: parentTaskDispatcherTask,
+            updatedSubtasks,
+        });
+
+        recursivelyUpdatedTasks = getRecursivelyUpdatedTasks(workflowDefinitionTasks, updatedTaskDispatcherTask);
+    }
 
     saveWorkflowDefinition({
         invalidateWorkflowQueries,
