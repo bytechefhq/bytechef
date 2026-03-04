@@ -20,6 +20,8 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ATTACHMENTS;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ATTACHMENTS_PROPERTY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BODY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CHAT_ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT;
@@ -36,6 +38,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -44,14 +48,17 @@ public class MicrosoftTeamsSendDirectMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendDirectMessage")
         .title("Send Direct Message")
-        .description("Sends a direct message in an existing chat.")
+        .description(
+            "Sends a direct message in an existing chat. Sending attachments is supported with Message Text Format " +
+                "set to \"html\".")
         .properties(
             string(CHAT_ID)
                 .label("Chat ID")
                 .options((OptionsFunction<String>) MicrosoftTeamsOptionUtils::getChatIdOptions)
                 .required(true),
             CONTENT_TYPE_PROPERTY,
-            CONTENT_PROPERTY)
+            CONTENT_PROPERTY,
+            ATTACHMENTS_PROPERTY)
         .output(
             outputSchema(
                 object()
@@ -74,16 +81,20 @@ public class MicrosoftTeamsSendDirectMessageAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        List<String> fileIds = inputParameters.getList(ATTACHMENTS, String.class, List.of());
+        List<Map<String, String>> attachments = MicrosoftTeamsOptionUtils.getAttachmentsList(fileIds, context);
+
+        String htmlAttachmentsTag = MicrosoftTeamsOptionUtils.getHtmlAttachmentsTag(attachments);
+
         return context
             .http(http -> http.post("/chats/" + inputParameters.getRequiredString(CHAT_ID) + "/messages"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(
-                    BODY,
-                    new Object[] {
-                        CONTENT, inputParameters.getRequiredString(CONTENT),
-                        CONTENT_TYPE, inputParameters.getRequiredString(CONTENT_TYPE)
-                    }))
+                    BODY, Map.of(
+                        CONTENT, inputParameters.getRequiredString(CONTENT) + htmlAttachmentsTag,
+                        CONTENT_TYPE, inputParameters.getRequiredString(CONTENT_TYPE)),
+                    ATTACHMENTS, attachments))
             .execute()
             .getBody(new TypeReference<>() {});
     }

@@ -17,10 +17,15 @@
 package com.bytechef.component.microsoft.teams.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_TYPE;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_URL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DISPLAY_NAME;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.E_TAG;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.NAME;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.VALUE;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.WEB_DAV_URL;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,6 +35,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration;
@@ -57,6 +63,45 @@ class MicrosoftTeamsOptionUtilsTest {
     private final Parameters mockedParameters = mock(Parameters.class);
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+
+    @Test
+    void testGetAttachmentsList(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(E_TAG, "{eTag},1", WEB_DAV_URL, "webDavUrl", NAME, "name"));
+
+        List<Map<String, String>> result = MicrosoftTeamsOptionUtils.getAttachmentsList(
+            List.of("fileId"), mockedContext);
+
+        List<Map<String, String>> expected = List.of(
+            Map.of(ID, "eTag", CONTENT_TYPE, "reference", CONTENT_URL, "webDavUrl", NAME, "name"));
+
+        assertEquals(expected, result);
+
+        List<String> expectedStrings = List.of(
+            "https://graph.microsoft.com/v1.0/me/drive/items/fileId",
+            "$select",
+            "id,name,webUrl,webDavUrl,@microsoft.graph.downloadUrl,etag");
+
+        assertEquals(expectedStrings, stringArgumentCaptor.getAllValues());
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+    }
 
     @Test
     void testGetChatIdOptions(
