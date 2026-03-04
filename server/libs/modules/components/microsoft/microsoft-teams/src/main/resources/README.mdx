@@ -1,0 +1,22 @@
+### How to find Team ID
+
+You can get your Team ID from your Microsoft Teams:
+
+1. Open **Microsoft Teams**
+2. Go to **Teams and Channels**
+3. Click the **three dots (...)** next to the team name
+4. Select **Copy link**
+5. You'll get URL like: `https://teams.microsoft.com/l/team/19%3aabc123def456%40thread.tacv2/conversations?groupId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&tenantId=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy`
+6. The **Team ID** is the value of: `groupId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+
+### How to find Channel ID
+
+You can get your Channel ID from your Microsoft Teams:
+
+1. Open **Microsoft Teams**
+2. Go to **Teams and Channels**
+3. Click the **three dots (...)** next to the channel name
+4. Select **Copy link**
+5. You'll get URL like: `https://teams.microsoft.com/l/channel/19%3abc8e04002356415884ba1769f437de36%40thread.tacv2/General?groupId=e95fd37a-caad-496e-8a89-762f0aa441bf&tenantId=43f519c0-e5a6-438f-808f-6491be63b3be`
+6. The **Channel ID** is the value after **/l/channel/**: `19:bc8e04002356415884ba1769f437de36@thread.tacv2`
+7. Important notice is that string in the URL is URL encoded `19%3abc8e04002356415884ba1769f437de36%40thread.tacv2` so you will have to decode it to get `19:bc8e04002356415884ba1769f437de36@thread.tacv2`
