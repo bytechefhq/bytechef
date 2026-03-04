@@ -22,6 +22,7 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.E_TAG;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.LAST_TIME_CHECKED;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.NAME;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.VALUE;
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
@@ -45,14 +47,19 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * @author Monika Domiter
@@ -186,5 +193,53 @@ class MicrosoftTeamsUtilsTest {
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/me/joinedTeams", stringArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testPollMicrosoftTeamsMessage(
+        Context context, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Map<String, String> messageMap = Map.of(
+            "createdDateTime", "2024-01-01T14:28:23Z", "messageType", "message");
+
+        String mockedUrl = "mockedUrl";
+
+        LocalDateTime startDate = LocalDateTime.of(2024, 1, 1, 0, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
+
+        Parameters mockedClosureParameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
+
+        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
+            LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
+                .thenReturn(endDate);
+
+            when(mockedHttp.get(stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedResponse.getBody(any(TypeReference.class)))
+                .thenReturn(Map.of(VALUE, List.of(messageMap)));
+
+            PollOutput pollOutput = MicrosoftTeamsUtils.pollMicrosoftTeamsMessage(
+                mockedUrl, mockedClosureParameters, context);
+
+            PollOutput expectedPollOutput = new PollOutput(
+                List.of(messageMap), Map.of(LAST_TIME_CHECKED, endDate), false);
+
+            assertEquals(expectedPollOutput, pollOutput);
+
+            ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+            ResponseType responseType = configuration.getResponseType();
+
+            assertEquals(ResponseType.JSON, responseType);
+            assertEquals(mockedUrl, stringArgumentCaptor.getValue());
+        }
     }
 }

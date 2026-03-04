@@ -39,6 +39,7 @@ public class MicrosoftTeamsConnection {
             map.put("Channel.Delete.All", false);
             map.put("Channel.ReadBasic.All", true);
             map.put("ChannelMessage.Send", true);
+            map.put("ChannelMessage.Read.All", true);
             map.put("ChannelSettings.Read.All", false);
             map.put("ChannelSettings.Read.Group", false);
             map.put("ChannelSettings.ReadWrite.All", false);
