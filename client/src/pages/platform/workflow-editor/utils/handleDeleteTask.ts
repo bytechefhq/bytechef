@@ -285,10 +285,12 @@ export default function handleDeleteTask({
         useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
     }
 
+    const optimisticTasks = buildOptimisticTasks(workflow.tasks || [], updatedTasks!, data.name);
+
     useWorkflowDataStore.getState().setWorkflow({
         ...workflow,
         definition: updatedDefinition,
-        tasks: (workflow.tasks || []).filter((task) => task.name !== data.name),
+        tasks: optimisticTasks,
     });
 
     setWorkflowMutating(workflow.id!, true);
@@ -323,4 +325,29 @@ export default function handleDeleteTask({
             },
         }
     );
+}
+
+/**
+ * Builds optimistic tasks by removing the deleted task and applying parameter changes
+ * from definition-parsed tasks onto the rich workflow task objects (which carry componentName, icon, etc.).
+ * Handles both top-level deletion (filter) and nested deletion (parent parameter update).
+ */
+export function buildOptimisticTasks(
+    workflowTasks: WorkflowTask[],
+    updatedTasks: Array<WorkflowTaskType>,
+    deletedTaskName: string
+): WorkflowTask[] {
+    const updatedParametersByName = new Map(updatedTasks.map((task) => [task.name, task.parameters]));
+
+    return workflowTasks
+        .filter((task) => task.name !== deletedTaskName)
+        .map((task) => {
+            const updatedParameters = updatedParametersByName.get(task.name);
+
+            if (updatedParameters && updatedParameters !== task.parameters) {
+                return {...task, parameters: updatedParameters};
+            }
+
+            return task;
+        });
 }
