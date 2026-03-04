@@ -306,24 +306,17 @@ describe('PropertyMentionsInputEditor', () => {
     });
 
     describe('isFromAi behavior', () => {
-        it('should show placeholder instead of editor when isFromAi is true', async () => {
+        it('should disable editor interaction when isFromAi is true', async () => {
             renderEditor({isFromAi: true, value: 'fromAi content'});
 
             await microtaskTick(2);
 
-            expect(screen.queryByRole('textbox', {name: 'Editor'})).not.toBeInTheDocument();
-            expect(screen.getByText('Automatically defined by the model')).toBeInTheDocument();
-        });
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
+            const editorContent = textbox.closest('.ProseMirror')?.parentElement;
 
-        it('should render placeholder with muted styling when isFromAi is true', async () => {
-            renderEditor({isFromAi: true, value: 'fromAi content'});
-
-            await microtaskTick(2);
-
-            const placeholder = screen.getByText('Automatically defined by the model');
-
-            expect(placeholder.className).toContain('text-muted-foreground');
-            expect(placeholder.className).toContain('italic');
+            expect(editorContent).toHaveAttribute('disabled');
+            expect(editorContent?.className).toContain('pointer-events-none');
+            expect(editorContent?.className).toContain('cursor-not-allowed');
         });
 
         it('should not disable the editor when isFromAi is false', async () => {
@@ -346,12 +339,10 @@ describe('PropertyMentionsInputEditor', () => {
 
             await microtaskTick(2);
 
-            // When isFromAi is true, the editor is replaced by a placeholder div
-            // so no textbox exists and save should never be called
-            const placeholder = screen.getByText('Automatically defined by the model');
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
             const user = userEvent.setup();
 
-            await user.click(placeholder);
+            await user.click(textbox);
 
             await microtaskTick(3);
 
