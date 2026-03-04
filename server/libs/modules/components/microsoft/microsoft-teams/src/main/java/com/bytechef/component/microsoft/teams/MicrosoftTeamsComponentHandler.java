@@ -26,6 +26,8 @@ import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsCreateChannel
 import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsSendChannelMessageAction;
 import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsSendDirectMessageAction;
 import com.bytechef.component.microsoft.teams.connection.MicrosoftTeamsConnection;
+import com.bytechef.component.microsoft.teams.trigger.MicrosoftTeamsNewChannelMessageTrigger;
+import com.bytechef.component.microsoft.teams.trigger.MicrosoftTeamsNewDirectMessageTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -54,6 +56,9 @@ public class MicrosoftTeamsComponentHandler implements ComponentHandler {
             tool(MicrosoftTeamsCreateChannelAction.ACTION_DEFINITION),
             tool(MicrosoftTeamsSendChannelMessageAction.ACTION_DEFINITION),
             tool(MicrosoftTeamsSendDirectMessageAction.ACTION_DEFINITION))
+        .triggers(
+            MicrosoftTeamsNewChannelMessageTrigger.TRIGGER_DEFINITION,
+            MicrosoftTeamsNewDirectMessageTrigger.TRIGGER_DEFINITION)
         .version(1);
 
     @Override
