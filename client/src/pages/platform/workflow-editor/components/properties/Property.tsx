@@ -20,7 +20,6 @@ import PropertyInput from '@/pages/platform/workflow-editor/components/propertie
 import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilder';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
-import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import resolveExpressionValue from '@/pages/platform/workflow-editor/utils/resolveExpressionValue';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
@@ -32,7 +31,7 @@ import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/typ
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
 import {CircleQuestionMarkIcon, EqualIcon} from 'lucide-react';
-import {ReactNode, useEffect, useRef} from 'react';
+import {ReactNode} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
@@ -80,6 +79,7 @@ const Property = ({
         controlType,
         controlledBlurError,
         controlledDynamicMode,
+        controlledDynamicOnChangeRef,
         controlledFromAi,
         currentComponent,
         currentNode,
@@ -111,6 +111,7 @@ const Property = ({
         isFormulaMode,
         isFromAi,
         isNumericalInput,
+        isToolsClusterElement,
         isValidControlType,
         label,
         languageId,
@@ -129,8 +130,8 @@ const Property = ({
         propertiesDataSource,
         propertyParameterValue,
         required,
-        resetOnModeChangeRef,
         selectValue,
+        setDataPillPanelOpen,
         setIsFormulaMode,
         setSelectValue,
         showInputTypeSwitchButton,
@@ -151,21 +152,10 @@ const Property = ({
         parentArrayItems,
         path,
         property,
+        toolsMode,
     });
 
-    const controlledDynamicOnChangeRef = useRef<((value: string) => void) | null>(null);
-
-    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const clusterElementContext = useClusterElementContext();
-
-    useEffect(() => {
-        if (controlledDynamicMode && resetOnModeChangeRef.current && controlledDynamicOnChangeRef.current) {
-            resetOnModeChangeRef.current = false;
-            controlledDynamicOnChangeRef.current('=');
-        }
-    }, [controlledDynamicMode, resetOnModeChangeRef]);
-
-    const isToolsClusterElement = toolsMode || currentNode?.clusterElementType === 'tools';
 
     if (hidden && !control) {
         return <></>;
