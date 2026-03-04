@@ -41,9 +41,10 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon, RocketIcon} from 'lucide-react';
+import {ClipboardIcon, ExternalLinkIcon, RocketIcon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {Link} from 'react-router-dom';
 import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
 
@@ -733,62 +734,81 @@ const ConnectionDialog = ({
                         </div>
                     )}
 
-                    <DialogFooter className="px-6 pb-6 pt-4">
-                        {wizardStep === 'oauth_step' && (
-                            <Button
-                                label="Previous"
-                                onClick={() => {
-                                    connectionMutation.reset();
-
-                                    setOAuth2Error(undefined);
-
-                                    setWizardStep('configuration_step');
-                                }}
-                                type="button"
-                                variant="outline"
-                            />
+                    <DialogFooter
+                        className={twMerge(
+                            'flex-row flex-wrap items-center gap-2 px-6 pb-6 pt-4',
+                            connectionDefinition?.help?.learnMoreUrl ? 'sm:justify-between' : 'sm:justify-end'
+                        )}
+                    >
+                        {connectionDefinition?.help?.learnMoreUrl && (
+                            <Link target="_blank" to={connectionDefinition.help.learnMoreUrl}>
+                                <Button size="sm" variant="ghost">
+                                    Documentation <ExternalLinkIcon />
+                                </Button>
+                            </Link>
                         )}
 
-                        {wizardStep === 'configuration_step' && (
-                            <Button label="Cancel" onClick={closeDialog} type="button" variant="outline" />
-                        )}
+                        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:space-x-2">
+                            {wizardStep === 'oauth_step' && (
+                                <Button
+                                    label="Previous"
+                                    onClick={() => {
+                                        connectionMutation.reset();
 
-                        {showOAuth2Step && (
-                            <>
-                                {wizardStep === 'configuration_step' && (
-                                    <Button
-                                        label="Next"
-                                        onClick={handleSubmit(() => {
-                                            setWizardStep('oauth_step');
-                                        })}
-                                        type="submit"
-                                    />
-                                )}
+                                        setOAuth2Error(undefined);
 
-                                {wizardStep === 'oauth_step' &&
-                                    oAuth2AuthorizationParameters?.authorizationUrl &&
-                                    oAuth2AuthorizationParameters?.clientId && (
-                                        <OAuth2Button
-                                            authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
-                                            clientId={oAuth2AuthorizationParameters.clientId}
-                                            extraQueryParameters={oAuth2AuthorizationParameters?.extraQueryParameters}
-                                            onClick={(getAuth: () => void) => {
-                                                getAuth();
-                                            }}
-                                            onCodeSuccess={handleCodeSuccess}
-                                            onError={(error: string) => setOAuth2Error(error)}
-                                            onTokenSuccess={handleTokenSuccess}
-                                            redirectUri={oAuth2Properties?.redirectUri ?? ''}
-                                            responseType={isOAuth2AuthorizationType ? 'code' : 'token'}
-                                            scopes={watch('selectedScopes') ?? oAuth2AuthorizationParameters?.scopes}
+                                        setWizardStep('configuration_step');
+                                    }}
+                                    type="button"
+                                    variant="outline"
+                                />
+                            )}
+
+                            {wizardStep === 'configuration_step' && (
+                                <Button label="Cancel" onClick={closeDialog} type="button" variant="outline" />
+                            )}
+
+                            {showOAuth2Step && (
+                                <>
+                                    {wizardStep === 'configuration_step' && (
+                                        <Button
+                                            label="Next"
+                                            onClick={handleSubmit(() => {
+                                                setWizardStep('oauth_step');
+                                            })}
+                                            type="submit"
                                         />
                                     )}
-                            </>
-                        )}
 
-                        {!showOAuth2Step && (
-                            <Button label="Save" onClick={handleSubmit(() => saveConnection())} type="submit" />
-                        )}
+                                    {wizardStep === 'oauth_step' &&
+                                        oAuth2AuthorizationParameters?.authorizationUrl &&
+                                        oAuth2AuthorizationParameters?.clientId && (
+                                            <OAuth2Button
+                                                authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
+                                                clientId={oAuth2AuthorizationParameters.clientId}
+                                                extraQueryParameters={
+                                                    oAuth2AuthorizationParameters?.extraQueryParameters
+                                                }
+                                                onClick={(getAuth: () => void) => {
+                                                    getAuth();
+                                                }}
+                                                onCodeSuccess={handleCodeSuccess}
+                                                onError={(error: string) => setOAuth2Error(error)}
+                                                onTokenSuccess={handleTokenSuccess}
+                                                redirectUri={oAuth2Properties?.redirectUri ?? ''}
+                                                responseType={isOAuth2AuthorizationType ? 'code' : 'token'}
+                                                scopes={
+                                                    watch('selectedScopes') ?? oAuth2AuthorizationParameters?.scopes
+                                                }
+                                            />
+                                        )}
+                                </>
+                            )}
+
+                            {!showOAuth2Step && (
+                                <Button label="Save" onClick={handleSubmit(() => saveConnection())} type="submit" />
+                            )}
+                        </div>
                     </DialogFooter>
                 </Form>
             </DialogContent>
