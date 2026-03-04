@@ -10,8 +10,6 @@ import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
 import Register from '@/pages/account/public/Register';
 import RegisterSuccess from '@/pages/account/public/RegisterSuccess';
 import VerifyEmail from '@/pages/account/public/VerifyEmail';
-import {Connections} from '@/pages/automation/connections/Connections';
-import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
 import TriggerForm from '@/pages/automation/trigger-form/TriggerForm';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
@@ -33,6 +31,9 @@ import {createBrowserRouter, redirect} from 'react-router-dom';
 
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
 const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
+const AutomationConnections = lazy(() =>
+    import('@/pages/automation/connections/Connections').then((module) => ({default: module.Connections}))
+);
 const AutomationWorkflowExecutions = lazy(() =>
     import('@/pages/automation/workflow-executions/WorkflowExecutions').then((module) => ({
         default: module.WorkflowExecutions,
@@ -47,6 +48,7 @@ const McpServer = lazy(() => import('@/pages/settings/platform/mcp-server/McpSer
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const Notifications = lazy(() => import('@/pages/settings/platform/notifications/Notifications'));
 const Project = lazy(() => import('@/pages/automation/project/Project'));
+const ProjectDeployments = lazy(() => import('@/pages/automation/project-deployments/ProjectDeployments'));
 const ProjectTemplate = lazy(() => import('@/pages/automation/template/project-template/ProjectTemplate'));
 const ProjectTemplates = lazy(() => import('@/pages/automation/templates/project-templates/ProjectTemplates'));
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
@@ -593,7 +595,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <ProjectDeployments />
+                                            <LazyLoadWrapper>
+                                                <ProjectDeployments />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'deployments',
@@ -656,7 +660,9 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <Connections />
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <AutomationConnections />
+                                            </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
                                     path: 'connections',

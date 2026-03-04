@@ -3,7 +3,6 @@ import {Toaster} from '@/components/ui/sonner';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {useUserGuiding} from '@/hooks/useUserGuiding';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
-import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -35,9 +34,11 @@ import {
     Workflow,
     ZapIcon,
 } from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {Suspense, lazy, useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
+
+const CopilotPanel = lazy(() => import('@/shared/components/copilot/CopilotPanel'));
 
 type NavigationType = {
     name: string;
@@ -318,7 +319,9 @@ function App() {
 
                     {ai.copilot.enabled && (
                         <aside className="h-full shrink-0">
-                            <CopilotPanel open={copilotPanelOpen} />
+                            <Suspense>
+                                <CopilotPanel open={copilotPanelOpen} />
+                            </Suspense>
                         </aside>
                     )}
                 </div>

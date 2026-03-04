@@ -5,7 +5,6 @@ import './styles/index.css';
 import './styles/components.css';
 
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {getRouter as getEmbeddedRouter} from '@/embeddedWorkflowBuilderRoutes';
 import I18n from '@/i18n';
 import {ConditionalPostHogProvider} from '@/shared/providers/conditional-posthog-provider';
 import {ThemeProvider} from '@/shared/providers/theme-provider';
@@ -45,7 +44,15 @@ async function renderApp() {
 
     const isEmbeddedWorkflowBuilder = window.location.pathname.includes('/embedded/workflow-builder');
 
-    const router = isEmbeddedWorkflowBuilder ? getEmbeddedRouter() : getMainRouter(queryClient);
+    let router;
+
+    if (isEmbeddedWorkflowBuilder) {
+        const {getRouter: getEmbeddedRouter} = await import('@/embeddedWorkflowBuilderRoutes');
+
+        router = getEmbeddedRouter();
+    } else {
+        router = getMainRouter(queryClient);
+    }
 
     await applicationInfoStore.getState().getApplicationInfo();
 
