@@ -287,34 +287,6 @@ export const useProperty = ({
 
     let {displayCondition} = property;
 
-    const formattedOptions = useMemo(() => {
-        return options
-            ?.map((option) => {
-                if (option.value === '') {
-                    return null;
-                }
-
-                return option;
-            })
-            .filter((option) => option !== null);
-    }, [options]);
-
-    const isValidControlType = useMemo(() => {
-        return controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
-    }, [controlType]);
-
-    const isNumericalInput = useMemo(() => {
-        return !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER');
-    }, [mentionInput, controlType]);
-
-    const typeIcon = useMemo(() => {
-        if (controlType === 'MULTI_SELECT') {
-            return TYPE_ICONS[property.items?.[0].type as keyof typeof TYPE_ICONS];
-        }
-
-        return TYPE_ICONS[type as keyof typeof TYPE_ICONS];
-    }, [controlType, property.items, type]);
-
     const {
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
@@ -365,6 +337,74 @@ export const useProperty = ({
             }
         }
     }
+
+    const formattedOptions = useMemo(() => {
+        return options
+            ?.map((option) => {
+                if (option.value === '') {
+                    return null;
+                }
+
+                return option;
+            })
+            .filter((option) => option !== null);
+    }, [options]);
+
+    const fromAiExpression = useMemo(
+        () => (description ? `=fromAi('${name}', '${description}')` : `=fromAi('${name}')`),
+        [description, name]
+    );
+
+    const isValidControlType = useMemo(() => {
+        return controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
+    }, [controlType]);
+
+    const isNumericalInput = useMemo(() => {
+        return !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER');
+    }, [mentionInput, controlType]);
+
+    const typeIcon = useMemo(() => {
+        if (controlType === 'MULTI_SELECT') {
+            return TYPE_ICONS[property.items?.[0].type as keyof typeof TYPE_ICONS];
+        }
+
+        return TYPE_ICONS[type as keyof typeof TYPE_ICONS];
+    }, [controlType, property.items, type]);
+
+    const isFromAi = useMemo(() => {
+        if (!currentComponent?.metadata?.ui?.fromAi || !path) {
+            return false;
+        }
+
+        return currentComponent.metadata.ui.fromAi.includes(path);
+    }, [currentComponent?.metadata?.ui?.fromAi, path]);
+
+    const memoizedWorkflowTask = useMemo(() => {
+        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
+            (node) => node.name === currentNode?.name
+        );
+    }, [workflow.triggers, workflow.tasks, currentNode?.name]);
+
+    const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
+        if (!currentNode?.name || !workflow.definition) {
+            return undefined;
+        }
+
+        if (currentNode.clusterElementType) {
+            const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+
+            const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+                ? getTask({
+                      tasks: workflowDefinitionTasks,
+                      workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                  })
+                : undefined;
+
+            if (mainClusterRootTask?.clusterElements) {
+                return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
+            }
+        }
+    }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
 
     const validatePropertyValue = useCallback(
         (value: string | number): boolean => {
@@ -513,6 +553,32 @@ export const useProperty = ({
             );
         },
         [deleteWorkflowNodeParameterMutation, deleteClusterElementParameterMutation, workflow.id]
+    );
+
+    const handleControlledBlur = useCallback(
+        (value: unknown) => {
+            const isInvalid = value !== '' && value != null && !validatePropertyValue(value as string | number);
+
+            setControlledBlurError(isInvalid ? ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE : undefined);
+        },
+        [validatePropertyValue]
+    );
+
+    const handleControlledModeSwitch = useCallback((toDynamic: boolean) => {
+        resetOnModeChangeRef.current = true;
+        setControlledDynamicMode(toDynamic);
+        setControlledFromAi(undefined);
+    }, []);
+
+    const handleFromAiToggle = useCallback(
+        (fromAi: boolean, fieldOnChange: (value: string) => void) => {
+            setControlledFromAi(fromAi);
+
+            if (fromAi) {
+                fieldOnChange(fromAiExpression);
+            }
+        },
+        [fromAiExpression]
     );
 
     const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
@@ -996,41 +1062,6 @@ export const useProperty = ({
         [property.controlType]
     );
 
-    const isFromAi = useMemo(() => {
-        if (!currentComponent?.metadata?.ui?.fromAi || !path) {
-            return false;
-        }
-
-        return currentComponent.metadata.ui.fromAi.includes(path);
-    }, [currentComponent?.metadata?.ui?.fromAi, path]);
-
-    const memoizedWorkflowTask = useMemo(() => {
-        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
-            (node) => node.name === currentNode?.name
-        );
-    }, [workflow.triggers, workflow.tasks, currentNode?.name]);
-
-    const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
-        if (!currentNode?.name || !workflow.definition) {
-            return undefined;
-        }
-
-        if (currentNode.clusterElementType) {
-            const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
-
-            const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-                ? getTask({
-                      tasks: workflowDefinitionTasks,
-                      workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-                  })
-                : undefined;
-
-            if (mainClusterRootTask?.clusterElements) {
-                return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
-            }
-        }
-    }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
-
     // set default mentionInput state
     useEffect(() => {
         if (control || mentionInput) {
@@ -1476,37 +1507,6 @@ export const useProperty = ({
             }
         }
     }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionsFetched]);
-
-    const handleControlledModeSwitch = useCallback((toDynamic: boolean) => {
-        resetOnModeChangeRef.current = true;
-        setControlledDynamicMode(toDynamic);
-        setControlledFromAi(undefined);
-    }, []);
-
-    const fromAiExpression = useMemo(
-        () => (description ? `=fromAi('${name}', '${description}')` : `=fromAi('${name}')`),
-        [description, name]
-    );
-
-    const handleFromAiToggle = useCallback(
-        (fromAi: boolean, fieldOnChange: (value: string) => void) => {
-            setControlledFromAi(fromAi);
-
-            if (fromAi) {
-                fieldOnChange(fromAiExpression);
-            }
-        },
-        [fromAiExpression]
-    );
-
-    const handleControlledBlur = useCallback(
-        (value: unknown) => {
-            const isInvalid = value !== '' && value != null && !validatePropertyValue(value as string | number);
-
-            setControlledBlurError(isInvalid ? ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE : undefined);
-        },
-        [validatePropertyValue]
-    );
 
     return {
         calculatedPath: path,
