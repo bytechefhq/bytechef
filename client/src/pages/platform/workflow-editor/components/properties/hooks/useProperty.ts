@@ -131,12 +131,11 @@ type UsePropertyReturnType = {
     hidden: boolean | undefined;
     inputRef: RefObject<HTMLInputElement | null>;
     inputValue: string;
-    isDisplayConditionsPending: boolean;
-    isFetchingCurrentDisplayCondition: boolean;
-    isToolsClusterElement: boolean;
     isFormulaMode: boolean;
     isFromAi: boolean;
+    isLoadingDisplayCondition: boolean;
     isNumericalInput: boolean;
+    isToolsClusterElement: boolean;
     isValidControlType: boolean | undefined;
     label?: string;
     languageId?: string;
@@ -1521,6 +1520,16 @@ export const useProperty = ({
         }
     }, [controlledDynamicMode, resetOnModeChangeRef]);
 
+    const isLoadingDisplayCondition = !!(
+        displayCondition &&
+        type !== 'ARRAY' &&
+        type !== 'OBJECT' &&
+        (isDisplayConditionsPending ||
+            (displayConditionsQuery &&
+                currentComponent?.displayConditions?.[displayCondition] &&
+                isFetchingCurrentDisplayCondition))
+    );
+
     return {
         calculatedPath: path,
         controlType,
@@ -1553,10 +1562,9 @@ export const useProperty = ({
         hidden,
         inputRef,
         inputValue,
-        isDisplayConditionsPending,
-        isFetchingCurrentDisplayCondition,
         isFormulaMode,
         isFromAi,
+        isLoadingDisplayCondition,
         isNumericalInput,
         isToolsClusterElement,
         isValidControlType,
