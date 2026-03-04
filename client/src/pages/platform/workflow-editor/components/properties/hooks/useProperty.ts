@@ -202,8 +202,7 @@ export const useProperty = ({
 
         const fieldPath = controlPath ? `${controlPath}.${propertyName}` : propertyName;
 
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        const formValues = (control as any)._formValues as Record<string, unknown> | undefined;
+        const formValues = control._formValues;
 
         if (!formValues) {
             return false;

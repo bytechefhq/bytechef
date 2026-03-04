@@ -22,13 +22,14 @@ const ControlledArrayItems = ({control, controlPath, formState, property, toolsM
     const {setValue} = useFormContext();
     const watchedValue = useWatch({control, name: controlPath});
     const itemKeysRef = useRef<string[]>([]);
+    const nextKeyIdRef = useRef(0);
 
     const items = Array.isArray(watchedValue) ? (watchedValue as unknown[]) : [];
     const itemDefinition = property.items?.[0];
 
     // Sync stable keys with items (handles initial load and external resets)
     while (itemKeysRef.current.length < items.length) {
-        itemKeysRef.current.push(crypto.randomUUID());
+        itemKeysRef.current.push(`item-${nextKeyIdRef.current++}`);
     }
 
     itemKeysRef.current.length = items.length;
@@ -82,7 +83,7 @@ const ControlledArrayItems = ({control, controlPath, formState, property, toolsM
                 icon={<PlusIcon />}
                 label="Add item"
                 onClick={() => {
-                    itemKeysRef.current.push(crypto.randomUUID());
+                    itemKeysRef.current.push(`item-${nextKeyIdRef.current++}`);
 
                     setValue(controlPath, [...items, '']);
                 }}
