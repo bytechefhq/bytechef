@@ -27,8 +27,8 @@ import org.apache.commons.lang3.StringUtils;
 public class ObfuscateUtils {
 
     private static final String SECURITY_INSENSITIVE_KEYS =
-        "authorizationUrl,authorizationType,bucketName,clientId,headerPrefix,refreshUrl,region,scopes,tokenUrl";
-    private static final String SECURITY_SENSITIVE_KEYS = "password";
+        ":authorizationUrl:authorizationType:bucketName:clientId:headerPrefix:refreshUrl:region:scopes:tokenUrl:";
+    private static final String SECURITY_SENSITIVE_KEYS = ":password:";
 
     /**
      * Obfuscates original string value. Argument maxLength value may be used to influence the length of new obfuscated
@@ -69,11 +69,13 @@ public class ObfuscateUtils {
             (key, valueIn) -> {
                 obfuscatedMap.computeIfAbsent(
                     key, k -> {
-                        if (SECURITY_INSENSITIVE_KEYS.contains(key)) {
+                        var keyExpression = String.format(":%s:", key);
+
+                        if (SECURITY_INSENSITIVE_KEYS.contains(keyExpression)) {
                             return String.valueOf(valueIn);
                         }
 
-                        int secureVisibleLength = getSecureVisibleLength(key, visibleLength);
+                        int secureVisibleLength = getSecureVisibleLength(keyExpression, visibleLength);
 
                         return obfuscate(String.valueOf(valueIn), maxLength, secureVisibleLength);
                     });
