@@ -706,11 +706,13 @@ export default function useWorkflowNodeDetailsPanel({
             const oppositeConditionCase =
                 conditionData.conditionCase === CONDITION_CASE_TRUE ? CONDITION_CASE_FALSE : CONDITION_CASE_TRUE;
 
-            const oppositeConditionCaseNodeNames = parentConditionTask.parameters?.[oppositeConditionCase]?.map(
-                (task: WorkflowTask) => task.name
-            );
+            const oppositeConditionCaseTasks = parentConditionTask.parameters?.[oppositeConditionCase];
 
-            return nodeNames.filter((nodeName) => !oppositeConditionCaseNodeNames?.includes(nodeName));
+            const oppositeConditionCaseNodeNames = Array.isArray(oppositeConditionCaseTasks)
+                ? oppositeConditionCaseTasks.map((task: WorkflowTask) => task.name)
+                : [];
+
+            return nodeNames.filter((nodeName) => !oppositeConditionCaseNodeNames.includes(nodeName));
         },
         [workflow.tasks]
     );
@@ -727,8 +729,8 @@ export default function useWorkflowNodeDetailsPanel({
             }
 
             const branchCases: BranchCaseType[] = [
-                {key: 'default', tasks: parentBranchTask.parameters.default},
-                ...parentBranchTask.parameters.cases,
+                {key: 'default', tasks: parentBranchTask.parameters.default || []},
+                ...(Array.isArray(parentBranchTask.parameters.cases) ? parentBranchTask.parameters.cases : []),
             ];
 
             const otherCaseKeys =
@@ -738,7 +740,7 @@ export default function useWorkflowNodeDetailsPanel({
 
             const otherCasesNodeNames = branchCases
                 .filter((caseItem) => otherCaseKeys.includes(caseItem.key))
-                .flatMap((caseItem) => caseItem.tasks.map((task: WorkflowTask) => task.name));
+                .flatMap((caseItem) => (caseItem.tasks || []).map((task: WorkflowTask) => task.name));
 
             return nodeNames.filter((nodeName) => !otherCasesNodeNames.includes(nodeName));
         },
