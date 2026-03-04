@@ -2,37 +2,35 @@ import Badge from '@/components/Badge/Badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import {McpProject} from '@/shared/middleware/graphql';
-import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
-import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {WorkflowIcon} from 'lucide-react';
 
+import McpProjectWorkflowDialog from '../McpProjectWorkflowDialog';
 import McpProjectListItemDropdownMenu from './McpProjectListItemDropdownMenu';
+import useMcpProjectListItem from './hooks/useMcpProjectListItem';
 
 interface McpProjectListItemProps {
     mcpProject: McpProject;
 }
 
 const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
-    const [showUpdateProjectVersionDialog, setShowUpdateProjectVersionDialog] = useState(false);
-
-    const {data: projectDeployment} = useGetProjectDeploymentQuery(+mcpProject.projectDeploymentId!);
-
-    const queryClient = useQueryClient();
-
-    const handleOnProjectDeploymentDialogClose = () => {
-        queryClient
-            .invalidateQueries({
-                queryKey: ['mcpProjectsByServerId'],
-            })
-            .then(() => setShowUpdateProjectVersionDialog(false));
-    };
+    const {
+        handleOnProjectDeploymentDialogClose,
+        mcpWorkflowUuids,
+        projectDeployment,
+        setShowEditWorkflowsDialog,
+        setShowUpdateProjectVersionDialog,
+        showEditWorkflowsDialog,
+        showUpdateProjectVersionDialog,
+    } = useMcpProjectListItem(mcpProject);
 
     return (
         <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
             <div className="flex flex-1 items-center py-1">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
-                        <div className="flex w-full items-center justify-between">
+                        <div className="flex w-full items-center gap-x-2">
+                            <WorkflowIcon className="size-4 flex-none text-gray-500" />
+
                             <span className="mr-2 text-base font-semibold">
                                 {mcpProject.project?.name || `Project ${mcpProject.projectDeploymentId}`}
                             </span>
@@ -73,13 +71,19 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
 
                     <McpProjectListItemDropdownMenu
                         mcpProject={mcpProject}
+                        onEditWorkflowsClick={() => setShowEditWorkflowsDialog(true)}
                         onUpdateProjectVersionClick={() => setShowUpdateProjectVersionDialog(true)}
                     />
                 </div>
             </div>
 
+            {showEditWorkflowsDialog && (
+                <McpProjectWorkflowDialog mcpProject={mcpProject} onClose={() => setShowEditWorkflowsDialog(false)} />
+            )}
+
             {showUpdateProjectVersionDialog && (
                 <ProjectDeploymentDialog
+                    filterWorkflowUuids={mcpWorkflowUuids}
                     onClose={handleOnProjectDeploymentDialogClose}
                     projectDeployment={projectDeployment}
                     updateProjectVersion={true}
