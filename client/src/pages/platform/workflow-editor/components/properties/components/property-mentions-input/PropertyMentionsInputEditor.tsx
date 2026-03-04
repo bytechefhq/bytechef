@@ -36,6 +36,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
+import {useShallow} from 'zustand/react/shallow';
 
 import {FormulaMode} from './FormulaMode.extension';
 import {FromAi} from './FromAi.extension';
@@ -74,7 +75,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             elementId,
             handleFromAiClick,
             isFormulaMode,
-            isFromAi,
+            isFromAi = false,
             labelId,
             onChange,
             onFocus,
@@ -96,16 +97,44 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
-        // Saving coordination to avoid parallel saves (which can cause optimistic lock exceptions)
         const lastSavedRef = useRef<string | number | null | undefined>(undefined);
         const savingRef = useRef<Promise<void> | null>(null);
         const pendingValueRef = useRef<string | number | null | undefined>(undefined);
-
         const editorValueRef = useRef(editorValue);
+
         editorValueRef.current = editorValue;
 
-        const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
-        const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+        const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                currentComponent: state.currentComponent,
+                currentNode: state.currentNode,
+            }))
+        );
+
+        const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
+
+        const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
+
+        const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
+            if (!currentNode?.name || !workflow.definition) {
+                return undefined;
+            }
+
+            if (currentNode.clusterElementType) {
+                const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+
+                const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+                    ? getTask({
+                          tasks: workflowDefinitionTasks,
+                          workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                      })
+                    : undefined;
+
+                if (mainClusterRootTask?.clusterElements) {
+                    return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
+                }
+            }
+        }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
 
         const getComponentIcon = useCallback(
             (mentionValue: string) => {
@@ -131,31 +160,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             },
             [componentDefinitions, taskDispatcherDefinitions, workflow.workflowTriggerComponentNames]
         );
-
-        const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
-
-        const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
-
-        const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
-            if (!currentNode?.name || !workflow.definition) {
-                return undefined;
-            }
-
-            if (currentNode.clusterElementType) {
-                const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
-
-                const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-                    ? getTask({
-                          tasks: workflowDefinitionTasks,
-                          workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-                      })
-                    : undefined;
-
-                if (mainClusterRootTask?.clusterElements) {
-                    return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
-                }
-            }
-        }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
 
         const extensions = useMemo(() => {
             const extensions = [
@@ -586,9 +590,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             [editor]
         );
 
-        // Sync value prop into editor state when it changes externally (e.g. from Sheet save).
-        // Only reacts to `value` prop changes — uses editorValueRef to avoid firing when
-        // editorValue changes locally (which would overwrite in-flight datapill insertions).
+        // When the value prop changes externally, sync it into editor state unless it already matches the current editor value (to avoid overwriting in-flight local updates such as datapill insertions).
         useEffect(() => {
             if (value === undefined || value === editorValueRef.current) {
                 return;
@@ -697,7 +699,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 />
 
                 {fromAiExtension && handleFromAiClick && currentNode?.clusterElementType === 'tools' && (
-                    <FromAiToggleButton isFromAi={!!isFromAi} onToggle={handleFromAiClick} />
+                    <FromAiToggleButton isFromAi={isFromAi} onToggle={handleFromAiClick} />
                 )}
 
                 {controlType === 'RICH_TEXT' && editor && <PropertyMentionsInputBubbleMenu editor={editor} />}

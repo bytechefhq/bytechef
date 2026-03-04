@@ -14,20 +14,17 @@ interface ControlledObjectEntriesProps {
     toolsMode?: boolean;
 }
 
-/**
- * Renders dynamic key-value entries for objects in controlled (react-hook-form) mode.
- * Must be rendered within a FormProvider ancestor (e.g., shadcn's Form component).
- */
-const ControlledObjectEntries = ({
+const FormControlledObjectEntries = ({
     control,
     controlPath,
     formState,
     property,
     toolsMode,
 }: ControlledObjectEntriesProps) => {
+    const [newEntryKey, setNewEntryKey] = useState('');
+    
     const {setValue} = useFormContext();
     const watchedValue = useWatch({control, name: controlPath});
-    const [newEntryKey, setNewEntryKey] = useState('');
 
     const entries = useMemo(() => {
         if (watchedValue && typeof watchedValue === 'object' && !Array.isArray(watchedValue)) {
@@ -136,4 +133,4 @@ const ControlledObjectEntries = ({
     );
 };
 
-export default ControlledObjectEntries;
+export default FormControlledObjectEntries;

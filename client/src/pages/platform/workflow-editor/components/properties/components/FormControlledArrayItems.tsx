@@ -14,20 +14,22 @@ interface ControlledArrayItemsProps {
     toolsMode?: boolean;
 }
 
-/**
- * Renders array items in controlled (react-hook-form) mode.
- * Must be rendered within a FormProvider ancestor (e.g., shadcn's Form component).
- */
-const ControlledArrayItems = ({control, controlPath, formState, property, toolsMode}: ControlledArrayItemsProps) => {
-    const {setValue} = useFormContext();
-    const watchedValue = useWatch({control, name: controlPath});
+const FormControlledArrayItems = ({
+    control,
+    controlPath,
+    formState,
+    property,
+    toolsMode,
+}: ControlledArrayItemsProps) => {
     const itemKeysRef = useRef<string[]>([]);
     const nextKeyIdRef = useRef(0);
+
+    const {setValue} = useFormContext();
+    const watchedValue = useWatch({control, name: controlPath});
 
     const items = Array.isArray(watchedValue) ? (watchedValue as unknown[]) : [];
     const itemDefinition = property.items?.[0];
 
-    // Sync stable keys with items (handles initial load and external resets)
     while (itemKeysRef.current.length < items.length) {
         itemKeysRef.current.push(`item-${nextKeyIdRef.current++}`);
     }
@@ -94,4 +96,4 @@ const ControlledArrayItems = ({control, controlPath, formState, property, toolsM
     );
 };
 
-export default ControlledArrayItems;
+export default FormControlledArrayItems;
