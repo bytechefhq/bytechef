@@ -17,13 +17,19 @@
 package com.bytechef.component.microsoft.teams.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_TYPE;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_URL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DISPLAY_NAME;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.E_TAG;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.NAME;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.VALUE;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.WEB_DAV_URL;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -38,6 +44,34 @@ import java.util.Map;
 public class MicrosoftTeamsOptionUtils {
 
     private MicrosoftTeamsOptionUtils() {
+    }
+
+    public static List<Map<String, String>> getAttachmentsList(List<String> fileIds, Context context) {
+        List<Map<String, String>> attachmetsList = new ArrayList<>();
+
+        for (String fileId : fileIds) {
+            attachmetsList.add(getAttachments(fileId, context));
+        }
+
+        return attachmetsList;
+    }
+
+    private static Map<String, String> getAttachments(String fileId, Context context) {
+        Map<String, String> body = context
+            .http(http -> http.get("https://graph.microsoft.com/v1.0/me/drive/items/" + fileId))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .queryParameter("$select", "id,name,webUrl,webDavUrl,@microsoft.graph.downloadUrl,etag")
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        String eTag = body.get(E_TAG);
+        String id = eTag.substring(eTag.indexOf('{') + 1, eTag.indexOf('}'));
+
+        return Map.of(
+            ID, id,
+            CONTENT_TYPE, "reference",
+            CONTENT_URL, body.get(WEB_DAV_URL),
+            NAME, body.get(NAME));
     }
 
     public static List<Option<String>> getChatIdOptions(
@@ -93,6 +127,16 @@ public class MicrosoftTeamsOptionUtils {
             .getBody(new TypeReference<>() {});
 
         return getOptions(context, body, DISPLAY_NAME, ID);
+    }
+
+    public static String getHtmlAttachmentsTag(List<Map<String, String>> attachments) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Map<String, String> attachment : attachments) {
+            stringBuilder.append("<attachment id=%s></attachment>".formatted(attachment.get(ID)));
+        }
+
+        return stringBuilder.toString();
     }
 
     public static List<Option<String>> getTeamIdOptions(
