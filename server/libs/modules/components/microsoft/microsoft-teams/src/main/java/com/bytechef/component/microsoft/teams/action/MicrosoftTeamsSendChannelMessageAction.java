@@ -88,6 +88,9 @@ public class MicrosoftTeamsSendChannelMessageAction {
                                 string(CHANNEL_ID)
                                     .description("ID of the channel in which the message was posted.")))))
         .perform(MicrosoftTeamsSendChannelMessageAction::perform)
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/microsoft-teams_v1#send-channel-message")
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftTeamsSendChannelMessageAction() {
