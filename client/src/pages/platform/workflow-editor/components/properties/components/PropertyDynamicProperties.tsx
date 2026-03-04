@@ -1,4 +1,4 @@
-import {Skeleton} from '@/components/ui/skeleton';
+import {PropertyDynamicPropertiesSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {useClusterElementPropertyDynamicPropertiesQuery} from '@/shared/middleware/graphql';
@@ -144,7 +144,7 @@ const PropertyDynamicProperties = ({
             return undefined;
         }
 
-        const filtered: Record<string, unknown> = {};
+        const filteredParameters: Record<string, unknown> = {};
 
         for (const [parameterKey, parameterValue] of Object.entries(clusterElementContext.inputParameters)) {
             if (
@@ -154,10 +154,10 @@ const PropertyDynamicProperties = ({
                 continue;
             }
 
-            filtered[parameterKey] = parameterValue;
+            filteredParameters[parameterKey] = parameterValue;
         }
 
-        return filtered;
+        return filteredParameters;
     }, [clusterElementContext?.inputParameters]);
 
     const clusterElementLookupDependsOnValues = useMemo(() => {
@@ -244,8 +244,6 @@ const PropertyDynamicProperties = ({
         [parameterValue]
     );
 
-    // In controlled mode, use the parent's calculatedPath as controlPath for children
-    // so form fields register under the correct nested path (e.g., "fields.Id")
     const childControlPath = control ? path : controlPath;
 
     const hasLoadedData =
@@ -255,20 +253,11 @@ const PropertyDynamicProperties = ({
 
     const isAnyLoading =
         isLoading || isClusterElementPropertiesLoading || isClusterElementPropertyDynamicPropertiesLoading;
+
     const isAnyQueryEnabled = queryEnabled || clusterElementContextQueryEnabled;
 
     if ((isAnyLoading || isPending) && isAnyQueryEnabled && !hasLoadedData) {
-        return (
-            <ul className="flex flex-col gap-4">
-                {Array.from({length: 3}).map((_, index) => (
-                    <li className="flex flex-col space-y-1" key={index}>
-                        <Skeleton className="h-5 w-1/4" />
-
-                        <Skeleton className="h-9 w-full" />
-                    </li>
-                ))}
-            </ul>
-        );
+        return <PropertyDynamicPropertiesSkeleton />;
     }
 
     if (!subProperties.length) {

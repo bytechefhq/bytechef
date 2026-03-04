@@ -6,8 +6,8 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ArrayProperty from '@/pages/platform/workflow-editor/components/properties/ArrayProperty';
 import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
-import ControlledArrayItems from '@/pages/platform/workflow-editor/components/properties/components/ControlledArrayItems';
-import ControlledObjectEntries from '@/pages/platform/workflow-editor/components/properties/components/ControlledObjectEntries';
+import FormControlledArrayItems from '@/pages/platform/workflow-editor/components/properties/components/FormControlledArrayItems';
+import FormControlledObjectEntries from '@/pages/platform/workflow-editor/components/properties/components/FormControlledObjectEntries';
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox';
@@ -382,7 +382,7 @@ const Property = ({
                     )}
 
                     {control && !controlledDynamicMode && controlType === 'ARRAY_BUILDER' && calculatedPath && (
-                        <ControlledArrayItems
+                        <FormControlledArrayItems
                             control={control}
                             controlPath={calculatedPath}
                             formState={formState}
@@ -427,7 +427,7 @@ const Property = ({
                         (controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') &&
                         calculatedPath &&
                         !property.properties?.length && (
-                            <ControlledObjectEntries
+                            <FormControlledObjectEntries
                                 control={control}
                                 controlPath={calculatedPath}
                                 formState={formState}

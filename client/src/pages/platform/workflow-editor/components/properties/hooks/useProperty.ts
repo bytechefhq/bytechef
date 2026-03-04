@@ -64,6 +64,41 @@ const MENTION_INPUT_PROPERTY_CONTROL_TYPES = [
     'URL',
 ];
 
+function getInitialControlledDynamicMode(
+    control: Control<FieldValues, FieldValues> | undefined,
+    controlPath: string,
+    propertyName: string | undefined
+): boolean {
+    if (!control?._formValues || !propertyName) {
+        return false;
+    }
+
+    const fieldPath = controlPath ? `${controlPath}.${propertyName}` : propertyName;
+    const fieldValue = fieldPath
+        .split('.')
+        .reduce<unknown>(
+            (currentObject, key) => (currentObject as Record<string, unknown>)?.[key],
+            control._formValues
+        );
+
+    return typeof fieldValue === 'string' && fieldValue.startsWith('=');
+}
+
+function getInitialInputValue(
+    control: Control<FieldValues, FieldValues> | undefined,
+    property: PropertyAllType
+): string {
+    if (!control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
+        return '';
+    }
+
+    if (!INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
+        return '';
+    }
+
+    return property.defaultValue || '';
+}
+
 type UsePropertyReturnType = {
     calculatedPath: string | undefined;
     controlledBlurError: string | undefined;
@@ -162,17 +197,7 @@ export const useProperty = ({
 }: UsePropertyProps): UsePropertyReturnType => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
-    const [inputValue, setInputValue] = useState(() => {
-        if (!control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
-            return '';
-        }
-
-        if (!INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
-            return '';
-        }
-
-        return property.defaultValue || '';
-    });
+    const [inputValue, setInputValue] = useState(() => getInitialInputValue(control, property));
     const [isFormulaMode, setIsFormulaModeInternal] = useState(property.controlType === 'FORMULA_MODE');
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<unknown> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
@@ -189,31 +214,9 @@ export const useProperty = ({
     );
     const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(true);
     const [controlledBlurError, setControlledBlurError] = useState<string | undefined>();
-    const [controlledDynamicMode, setControlledDynamicMode] = useState(() => {
-        if (!control) {
-            return false;
-        }
-
-        const propertyName = property.name?.replace(/\s/g, '_');
-
-        if (!propertyName) {
-            return false;
-        }
-
-        const fieldPath = controlPath ? `${controlPath}.${propertyName}` : propertyName;
-
-        const formValues = control._formValues;
-
-        if (!formValues) {
-            return false;
-        }
-
-        const fieldValue = fieldPath
-            .split('.')
-            .reduce<unknown>((currentObject, key) => (currentObject as Record<string, unknown>)?.[key], formValues);
-
-        return typeof fieldValue === 'string' && fieldValue.startsWith('=');
-    });
+    const [controlledDynamicMode, setControlledDynamicMode] = useState(() =>
+        getInitialControlledDynamicMode(control, controlPath, property.name?.replace(/\s/g, '_'))
+    );
     const [controlledFromAi, setControlledFromAi] = useState<boolean | undefined>(undefined);
 
     const editorRef = useRef<Editor>(null!);
@@ -221,7 +224,7 @@ export const useProperty = ({
     const inputRef = useRef<HTMLInputElement>(null!);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
-    const mentionInputSyncedRef = useRef<string | number | undefined>(undefined);
+    const mentionInputValueRef = useRef<string | number | undefined>(undefined);
     const resetOnModeChangeRef = useRef(false);
 
     const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
@@ -355,13 +358,15 @@ export const useProperty = ({
         [description, name]
     );
 
-    const isValidControlType = useMemo(() => {
-        return controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
-    }, [controlType]);
+    const isValidControlType = useMemo(
+        () => controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType),
+        [controlType]
+    );
 
-    const isNumericalInput = useMemo(() => {
-        return !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER');
-    }, [mentionInput, controlType]);
+    const isNumericalInput = useMemo(
+        () => !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER'),
+        [mentionInput, controlType]
+    );
 
     const typeIcon = useMemo(() => {
         if (controlType === 'MULTI_SELECT') {
@@ -566,6 +571,7 @@ export const useProperty = ({
 
     const handleControlledModeSwitch = useCallback((toDynamic: boolean) => {
         resetOnModeChangeRef.current = true;
+
         setControlledDynamicMode(toDynamic);
         setControlledFromAi(undefined);
     }, []);
@@ -1235,26 +1241,20 @@ export const useProperty = ({
         setErrorMessage(regexMismatch ? VALUE_DOES_NOT_MATCH_PATTERN : INCORRECT_VALUE);
     }, [INCORRECT_VALUE, mentionInput, mentionInputValue, maxLength, minLength, regex, VALUE_DOES_NOT_MATCH_PATTERN]);
 
-    // Distribute propertyParameterValue to the appropriate display state variables.
-    // This effect reacts to propertyParameterValue changes and propagates the value
-    // one-way to mentionInputValue, inputValue, selectValue, etc.
-    // IMPORTANT: Do NOT add mentionInputValue or inputValue to the dependency array —
-    // this effect WRITES to those variables, so including them creates a feedback loop
-    // that resets user input before the debounced save can complete.
+    // Sync propertyParameterValue one-way into value states
     useEffect(() => {
-        // Skip updating if a save operation is in progress
         if (isSavingRef.current) {
             return;
         }
 
         if (propertyParameterValue === '' || propertyParameterValue === undefined) {
             if (mentionInput) {
-                const userHasUnsavedInput = !mentionInputSyncedRef.current && mentionInputValue;
+                const userHasUnsavedInput = !mentionInputValueRef.current && mentionInputValue;
 
                 if (!userHasUnsavedInput) {
                     setMentionInputValue('');
 
-                    mentionInputSyncedRef.current = undefined;
+                    mentionInputValueRef.current = undefined;
                 }
             } else {
                 setInputValue('');
@@ -1268,9 +1268,10 @@ export const useProperty = ({
         }
 
         if (typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=')) {
-            if (mentionInputSyncedRef.current !== propertyParameterValue) {
+            if (mentionInputValueRef.current !== propertyParameterValue) {
                 setMentionInputValue(propertyParameterValue.substring(1));
-                mentionInputSyncedRef.current = propertyParameterValue;
+
+                mentionInputValueRef.current = propertyParameterValue;
             }
 
             return;
@@ -1278,14 +1279,14 @@ export const useProperty = ({
 
         const shouldSyncMentionInputFromPlainStringParameter =
             mentionInput &&
-            mentionInputSyncedRef.current !== propertyParameterValue &&
+            mentionInputValueRef.current !== propertyParameterValue &&
             typeof propertyParameterValue === 'string' &&
             propertyParameterValue !== '';
 
         if (shouldSyncMentionInputFromPlainStringParameter) {
             setMentionInputValue(propertyParameterValue);
 
-            mentionInputSyncedRef.current = propertyParameterValue;
+            mentionInputValueRef.current = propertyParameterValue;
 
             return;
         }
@@ -1328,7 +1329,7 @@ export const useProperty = ({
             setInputValue(propertyParameterValue);
         }
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- omit mentionInputValue/inputValue to avoid feedback loop
     }, [propertyParameterValue, mentionInput, controlType]);
 
     // set options lookup dependencies
@@ -1420,15 +1421,12 @@ export const useProperty = ({
         }
     }, [control, controlType, expressionEnabled]);
 
-    // set propertyParameterValue on workflow definition change
+    // Sync propertyParameterValue from workflow definition on change; skip initial mount (mount effect already set from store).
     useEffect(() => {
         if (control) {
             return;
         }
 
-        // Skip the initial mount — the mount effect above already sets the value
-        // from currentComponent.parameters which is more up-to-date than the
-        // workflow definition (updated via store before the definition refetch).
         if (initialMountRef.current) {
             initialMountRef.current = false;
 
@@ -1461,7 +1459,7 @@ export const useProperty = ({
             setMentionInputValue(parameterDefaultValue);
             setSelectValue(parameterDefaultValue.toString());
 
-            mentionInputSyncedRef.current = undefined;
+            mentionInputValueRef.current = undefined;
 
             if (Array.isArray(parameterDefaultValue)) {
                 setMultiSelectValue(parameterDefaultValue);
