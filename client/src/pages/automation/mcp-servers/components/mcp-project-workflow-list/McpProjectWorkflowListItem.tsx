@@ -1,49 +1,96 @@
+import Badge from '@/components/Badge/Badge';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
+import {useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
 import {McpProjectWorkflow} from '@/shared/middleware/graphql';
-import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
-import {useState} from 'react';
+import {BoltIcon, PencilIcon, XIcon} from 'lucide-react';
 
-import McpProjectWorkflowListItemDropdownMenu from './McpProjectWorkflowListItemDropdownMenu';
+import McpProjectWorkflowPropertiesPopover from './McpProjectWorkflowPropertiesPopover';
+import useMcpProjectWorkflowBadge from './hooks/useMcpProjectWorkflowBadge';
 
 interface McpProjectWorkflowListItemProps {
     mcpProjectWorkflow: McpProjectWorkflow;
 }
 
 const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowListItemProps) => {
-    const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
+    const {
+        handleCloseEditDialog,
+        handleConfirmDelete,
+        projectDeploymentWorkflow,
+        setShowDeleteDialog,
+        setShowEditWorkflowDialog,
+        showDeleteDialog,
+        showEditWorkflowDialog,
+        workflow,
+    } = useMcpProjectWorkflowBadge(mcpProjectWorkflow);
 
-    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-    const {data: workflow} = useGetWorkflowQuery(mcpProjectWorkflow.projectDeploymentWorkflow?.workflowId!);
+    const {activePopoverId, closePopover, openPopover} = useMcpActivePopover();
+
+    const popoverId = `project-workflow-${mcpProjectWorkflow.id}`;
+    const isPopoverOpen = activePopoverId === popoverId;
+    const workflowLabel = mcpProjectWorkflow.workflow?.label || 'Unnamed Workflow';
 
     return (
-        <div className="flex w-full items-center space-x-3">
-            <div className="flex-1">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-sm font-medium text-gray-900">{mcpProjectWorkflow.workflow?.label}</p>
-                    </div>
+        <>
+            <Popover onOpenChange={(open) => !open && closePopover()} open={isPopoverOpen}>
+                <PopoverAnchor asChild>
+                    <Badge className="max-w-96 gap-1 py-1 pl-2.5 pr-1" styleType="secondary-filled">
+                        <span className="truncate text-sm">{workflowLabel}</span>
 
-                    <div className="flex items-center gap-x-6 text-xs text-gray-500">
-                        {mcpProjectWorkflow.lastModifiedDate ? (
-                            <span>{`Modified at ${new Date(mcpProjectWorkflow.lastModifiedDate).toLocaleDateString()}`}</span>
-                        ) : (
-                            <span>-</span>
-                        )}
+                        <span className="ml-auto flex shrink-0 items-center gap-0.5">
+                            <button
+                                className="rounded p-0.5 hover:bg-foreground/10"
+                                onClick={() => openPopover(popoverId)}
+                                title="Configure"
+                                type="button"
+                            >
+                                <BoltIcon className="size-3" />
+                            </button>
 
-                        <McpProjectWorkflowListItemDropdownMenu onEditClick={() => setShowEditWorkflowDialog(true)} />
-                    </div>
-                </div>
-            </div>
+                            <button
+                                className="rounded p-0.5 hover:bg-foreground/10"
+                                onClick={() => setShowEditWorkflowDialog(true)}
+                                title="Edit"
+                                type="button"
+                            >
+                                <PencilIcon className="size-3" />
+                            </button>
 
-            {showEditWorkflowDialog && mcpProjectWorkflow.projectDeploymentWorkflow && workflow && (
+                            <button
+                                className="rounded p-0.5 hover:bg-destructive/10 hover:text-destructive"
+                                onClick={() => setShowDeleteDialog(true)}
+                                title="Delete"
+                                type="button"
+                            >
+                                <XIcon className="size-3" />
+                            </button>
+                        </span>
+                    </Badge>
+                </PopoverAnchor>
+
+                {isPopoverOpen && (
+                    <McpProjectWorkflowPropertiesPopover
+                        mcpProjectWorkflow={mcpProjectWorkflow}
+                        onClose={closePopover}
+                    />
+                )}
+            </Popover>
+
+            <DeleteAlertDialog
+                onCancel={() => setShowDeleteDialog(false)}
+                onDelete={handleConfirmDelete}
+                open={showDeleteDialog}
+            />
+
+            {showEditWorkflowDialog && projectDeploymentWorkflow && workflow && (
                 <ProjectDeploymentEditWorkflowDialog
-                    onClose={() => setShowEditWorkflowDialog(false)}
-                    /* eslint-disable @typescript-eslint/no-explicit-any */
-                    projectDeploymentWorkflow={mcpProjectWorkflow.projectDeploymentWorkflow as any}
+                    onClose={handleCloseEditDialog}
+                    projectDeploymentWorkflow={projectDeploymentWorkflow}
                     workflow={workflow}
                 />
             )}
-        </div>
+        </>
     );
 };
 

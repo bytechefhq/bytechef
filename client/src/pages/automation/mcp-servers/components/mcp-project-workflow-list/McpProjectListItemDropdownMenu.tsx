@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -6,57 +7,25 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {McpProject, useDeleteMcpProjectMutation} from '@/shared/middleware/graphql';
-import {useQueryClient} from '@tanstack/react-query';
+import {McpProject} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon} from 'lucide-react';
-import {useState} from 'react';
 
-import McpProjectListItemAlertDialog from './McpProjectListItemAlertDialog';
+import useMcpProjectListItemDropdownMenu from './hooks/useMcpProjectListItemDropdownMenu';
 
 interface McpProjectListItemDropdownMenuProps {
     mcpProject: McpProject;
+    onEditWorkflowsClick: () => void;
     onUpdateProjectVersionClick: () => void;
 }
 
 const McpProjectListItemDropdownMenu = ({
     mcpProject,
+    onEditWorkflowsClick,
     onUpdateProjectVersionClick,
 }: McpProjectListItemDropdownMenuProps) => {
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [isPending, setIsPending] = useState(false);
-    const queryClient = useQueryClient();
-
-    const deleteMcpProjectMutation = useDeleteMcpProjectMutation({
-        onError: () => {
-            setIsPending(false);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpProjectsByServerId'],
-            });
-            setShowDeleteDialog(false);
-            setIsPending(false);
-        },
-    });
-
-    const handleDeleteClick = () => {
-        setShowDeleteDialog(true);
-    };
-
-    const handleConfirmDelete = async () => {
-        setIsPending(true);
-        try {
-            await deleteMcpProjectMutation.mutateAsync({
-                id: mcpProject.id.toString(),
-            });
-        } catch (error) {
-            console.error('Error deleting MCP project:', error);
-        }
-    };
-
-    const handleCancelDelete = () => {
-        setShowDeleteDialog(false);
-    };
+    const {handleConfirmDelete, setShowDeleteDialog, showDeleteDialog} = useMcpProjectListItemDropdownMenu(
+        mcpProject.id.toString()
+    );
 
     return (
         <>
@@ -66,23 +35,23 @@ const McpProjectListItemDropdownMenu = ({
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={onEditWorkflowsClick}>Edit Workflows</DropdownMenuItem>
+
                     <DropdownMenuItem onClick={onUpdateProjectVersionClick}>Update Project Version</DropdownMenuItem>
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem className="text-destructive" onClick={handleDeleteClick}>
+                    <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
                         <span className="w-full">Delete</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            {showDeleteDialog && (
-                <McpProjectListItemAlertDialog
-                    isPending={isPending}
-                    onCancelClick={handleCancelDelete}
-                    onDeleteClick={handleConfirmDelete}
-                />
-            )}
+            <DeleteAlertDialog
+                onCancel={() => setShowDeleteDialog(false)}
+                onDelete={handleConfirmDelete}
+                open={showDeleteDialog}
+            />
         </>
     );
 };
