@@ -20,6 +20,8 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ATTACHMENTS;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ATTACHMENTS_PROPERTY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BODY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CHANNEL_ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT;
@@ -37,6 +39,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -45,7 +49,9 @@ public class MicrosoftTeamsSendChannelMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendChannelMessage")
         .title("Send Channel Message")
-        .description("Sends a message to a channel.")
+        .description(
+            "Sends a message to a channel. Sending attachments is supported with Message Text Format is set to " +
+                "\"html\".")
         .properties(
             string(TEAM_ID)
                 .label("Team ID")
@@ -59,7 +65,8 @@ public class MicrosoftTeamsSendChannelMessageAction {
                 .options((OptionsFunction<String>) MicrosoftTeamsOptionUtils::getChannelIdOptions)
                 .required(true),
             CONTENT_TYPE_PROPERTY,
-            CONTENT_PROPERTY)
+            CONTENT_PROPERTY,
+            ATTACHMENTS_PROPERTY)
         .output(
             outputSchema(
                 object()
@@ -87,6 +94,11 @@ public class MicrosoftTeamsSendChannelMessageAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        List<String> fileIds = inputParameters.getList(ATTACHMENTS, String.class, List.of());
+        List<Map<String, String>> attachments = MicrosoftTeamsOptionUtils.getAttachmentsList(fileIds, context);
+
+        String htmlAttachmentsTag = MicrosoftTeamsOptionUtils.getHtmlAttachmentsTag(attachments);
+
         return context
             .http(http -> http.post(
                 "/teams/" + inputParameters.getRequiredString(TEAM_ID) + "/channels/"
@@ -94,11 +106,10 @@ public class MicrosoftTeamsSendChannelMessageAction {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(
-                    BODY,
-                    new Object[] {
-                        CONTENT, inputParameters.getRequiredString(CONTENT),
-                        CONTENT_TYPE, inputParameters.getRequiredString(CONTENT_TYPE)
-                    }))
+                    BODY, Map.of(
+                        CONTENT, inputParameters.getRequiredString(CONTENT) + htmlAttachmentsTag,
+                        CONTENT_TYPE, inputParameters.getRequiredString(CONTENT_TYPE)),
+                    ATTACHMENTS, attachments))
             .execute()
             .getBody(new TypeReference<>() {});
     }

@@ -16,27 +16,49 @@
 
 package com.bytechef.component.microsoft.teams.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
+import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Domiter
  */
 public class MicrosoftTeamsConstants {
 
+    public static final String ATTACHMENT = "attachment";
+    public static final String ATTACHMENTS = "attachments";
     public static final String BODY = "body";
-    public static final String CHAT_ID = "chatId";
     public static final String CHANNEL_ID = "channelId";
+    public static final String CHAT_ID = "chatId";
     public static final String CONTENT = "content";
     public static final String CONTENT_TYPE = "contentType";
-    public static final String DISPLAY_NAME = "displayName";
+    public static final String CONTENT_URL = "contentUrl";
     public static final String DESCRIPTION = "description";
+    public static final String DISPLAY_NAME = "displayName";
+    public static final String E_TAG = "eTag";
     public static final String ID = "id";
+    public static final String NAME = "name";
     public static final String TEAM_ID = "teamId";
     public static final String VALUE = "value";
+    public static final String WEB_DAV_URL = "webDavUrl";
+
+    public static final ModifiableArrayProperty ATTACHMENTS_PROPERTY = array(ATTACHMENTS)
+        .label("Attachments")
+        .description(
+            "The attachments to send with the message. The file to attach must already be in SharePoint.")
+        .options((OptionsFunction<String>) MicrosoftUtils::getFileIdOptions)
+        .required(false)
+        .items(
+            string(ATTACHMENT)
+                .label("Attachment")
+                .required(false))
+        .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, "html"));
 
     public static final ModifiableStringProperty CONTENT_TYPE_PROPERTY = string(CONTENT_TYPE)
         .label("Message Text Format")
