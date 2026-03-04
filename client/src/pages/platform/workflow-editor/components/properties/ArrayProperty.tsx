@@ -224,10 +224,11 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                     return parameterItem;
                 }
 
-                const isParameterItemObject = parameterItem && typeof parameterItem === 'object';
+                const parameterItemIsObject =
+                    parameterItem && typeof parameterItem === 'object' && !Array.isArray(parameterItem);
 
                 const subProperties = (matchingItem as ObjectProperty).properties?.map((property) =>
-                    isParameterItemObject &&
+                    parameterItemIsObject &&
                     Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
                         ? {
                               ...property,
@@ -251,7 +252,8 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             }
         } else if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {
             const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
-                const parameterItemIsObject = parameterItem && typeof parameterItem === 'object';
+                const parameterItemIsObject =
+                    parameterItem && typeof parameterItem === 'object' && !Array.isArray(parameterItem);
 
                 const subProperties = (items[0] as ObjectProperty).properties?.map((property) =>
                     parameterItemIsObject &&

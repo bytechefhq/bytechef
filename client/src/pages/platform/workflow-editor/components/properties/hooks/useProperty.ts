@@ -103,6 +103,7 @@ type UsePropertyReturnType = {
     calculatedPath: string | undefined;
     controlledBlurError: string | undefined;
     controlledDynamicMode: boolean;
+    controlledDynamicOnChangeRef: RefObject<((value: string) => void) | null>;
     controlledFromAi: boolean | undefined;
     controlType?: ControlType;
     currentComponent: ComponentType | undefined;
@@ -132,6 +133,7 @@ type UsePropertyReturnType = {
     inputValue: string;
     isDisplayConditionsPending: boolean;
     isFetchingCurrentDisplayCondition: boolean;
+    isToolsClusterElement: boolean;
     isFormulaMode: boolean;
     isFromAi: boolean;
     isNumericalInput: boolean;
@@ -157,6 +159,7 @@ type UsePropertyReturnType = {
     resetOnModeChangeRef: RefObject<boolean>;
     selectValue: string;
     setControlledFromAi: Dispatch<SetStateAction<boolean | undefined>>;
+    setDataPillPanelOpen: (open: boolean) => void;
     setIsFormulaMode: Dispatch<SetStateAction<boolean>>;
     setSelectValue: Dispatch<SetStateAction<string>>;
     showInputTypeSwitchButton: boolean;
@@ -181,6 +184,7 @@ interface UsePropertyProps {
     parentArrayItems?: Array<ArrayPropertyType>;
     path?: string;
     property: PropertyAllType;
+    toolsMode?: boolean;
 }
 
 export const useProperty = ({
@@ -194,6 +198,7 @@ export const useProperty = ({
     parameterValue,
     path,
     property,
+    toolsMode,
 }: UsePropertyProps): UsePropertyReturnType => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
@@ -219,6 +224,7 @@ export const useProperty = ({
     );
     const [controlledFromAi, setControlledFromAi] = useState<boolean | undefined>(undefined);
 
+    const controlledDynamicOnChangeRef = useRef<((value: string) => void) | null>(null);
     const editorRef = useRef<Editor>(null!);
     const initialMountRef = useRef(true);
     const inputRef = useRef<HTMLInputElement>(null!);
@@ -238,6 +244,8 @@ export const useProperty = ({
         );
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
+
+    const isToolsClusterElement = toolsMode || currentNode?.clusterElementType === 'tools';
 
     const {isFetchedAfterMount: isDisplayConditionsFetched, isPending: isDisplayConditionsPending} =
         displayConditionsQuery ?? {
@@ -1506,11 +1514,19 @@ export const useProperty = ({
         }
     }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionsFetched]);
 
+    useEffect(() => {
+        if (controlledDynamicMode && resetOnModeChangeRef.current && controlledDynamicOnChangeRef.current) {
+            resetOnModeChangeRef.current = false;
+            controlledDynamicOnChangeRef.current('=');
+        }
+    }, [controlledDynamicMode, resetOnModeChangeRef]);
+
     return {
         calculatedPath: path,
         controlType,
         controlledBlurError,
         controlledDynamicMode,
+        controlledDynamicOnChangeRef,
         controlledFromAi,
         currentComponent,
         currentNode,
@@ -1542,6 +1558,7 @@ export const useProperty = ({
         isFormulaMode,
         isFromAi,
         isNumericalInput,
+        isToolsClusterElement,
         isValidControlType,
         label,
         languageId,
@@ -1563,6 +1580,7 @@ export const useProperty = ({
         resetOnModeChangeRef,
         selectValue,
         setControlledFromAi,
+        setDataPillPanelOpen,
         setIsFormulaMode,
         setSelectValue,
         showInputTypeSwitchButton,
