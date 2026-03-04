@@ -61,6 +61,8 @@ import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.boot.http.client.HttpClientSettings;
 import org.springframework.boot.ssl.SslBundle;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestClient;
@@ -179,7 +181,18 @@ public class ModelUtils {
             .build(requestFactorySettings);
 
         return RestClient.builder()
-            .requestFactory(requestFactory);
+            .requestFactory(requestFactory)
+            .requestInterceptor((request, body, execution) -> {
+                HttpMethod httpMethod = request.getMethod();
+                String methodName = httpMethod.name();
+                HttpHeaders httpHeaders = request.getHeaders();
+
+                if (methodName.equalsIgnoreCase("POST") && httpHeaders.getContentLength() == -1) {
+                    httpHeaders.setContentLength(body.length);
+                }
+
+                return execution.execute(request, body);
+            });
     }
 
     public static OutputResponse output(
