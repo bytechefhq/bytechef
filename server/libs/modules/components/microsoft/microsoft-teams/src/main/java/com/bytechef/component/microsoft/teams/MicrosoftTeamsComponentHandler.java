@@ -40,6 +40,9 @@ public class MicrosoftTeamsComponentHandler implements ComponentHandler {
             "Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, " +
                 "and application integration.")
         .customAction(true)
+        .customActionHelp(
+            "",
+            "https://learn.microsoft.com/en-us/graph/api/resources/teams-api-overview?view=graph-rest-1.0")
         .icon("path:assets/microsoft-teams.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(MicrosoftTeamsConnection.CONNECTION_DEFINITION)
@@ -50,7 +53,8 @@ public class MicrosoftTeamsComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(MicrosoftTeamsCreateChannelAction.ACTION_DEFINITION),
             tool(MicrosoftTeamsSendChannelMessageAction.ACTION_DEFINITION),
-            tool(MicrosoftTeamsSendDirectMessageAction.ACTION_DEFINITION));
+            tool(MicrosoftTeamsSendDirectMessageAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

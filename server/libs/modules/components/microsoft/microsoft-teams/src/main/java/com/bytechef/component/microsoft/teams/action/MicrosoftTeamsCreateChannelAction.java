@@ -77,6 +77,7 @@ public class MicrosoftTeamsCreateChannelAction {
                         bool("isArchived")
                             .description("Indicates whether the channel is archived."))))
         .perform(MicrosoftTeamsCreateChannelAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-teams_v1#create-channel")
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftTeamsCreateChannelAction() {

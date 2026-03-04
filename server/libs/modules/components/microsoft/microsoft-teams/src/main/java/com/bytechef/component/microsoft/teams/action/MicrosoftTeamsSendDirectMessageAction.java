@@ -75,6 +75,9 @@ public class MicrosoftTeamsSendDirectMessageAction {
                                 string(CONTENT)
                                     .description("The content of the message.")))))
         .perform(MicrosoftTeamsSendDirectMessageAction::perform)
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/microsoft-teams_v1#send-direct-message")
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftTeamsSendDirectMessageAction() {
