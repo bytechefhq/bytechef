@@ -78,33 +78,40 @@ public class MicrosoftTeamsOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, Object> body = context.http(http -> http.get("/chats"))
-            .queryParameters("$expand", "members")
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
         List<Option<String>> options = new ArrayList<>();
+        String nextLink = "/chats";
 
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
+        while (nextLink != null) {
+            String currentLink = nextLink;
 
-                    List<String> chatMembers = new ArrayList<>();
+            Map<String, Object> body = context.http(http -> http.get(currentLink))
+                .queryParameters("$expand", "members")
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
 
-                    if (map.get("members") instanceof List<?> members) {
-                        for (Object member : members) {
-                            if (member instanceof Map<?, ?> memberMap) {
-                                chatMembers.add((String) memberMap.get(DISPLAY_NAME));
+            if (body.get(VALUE) instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof Map<?, ?> map) {
+
+                        List<String> chatMembers = new ArrayList<>();
+
+                        if (map.get("members") instanceof List<?> members) {
+                            for (Object member : members) {
+                                if (member instanceof Map<?, ?> memberMap) {
+                                    chatMembers.add((String) memberMap.get(DISPLAY_NAME));
+                                }
                             }
                         }
+
+                        String chatName = getChatName((String) map.get("topic"), chatMembers);
+
+                        options.add(option(map.get("chatType") + " chat: " + chatName, (String) map.get(ID)));
                     }
-
-                    String chatName = getChatName((String) map.get("topic"), chatMembers);
-
-                    options.add(option(map.get("chatType") + " chat: " + chatName, (String) map.get(ID)));
                 }
             }
+
+            nextLink = (String) body.get("@odata.nextLink");
         }
 
         return options;
