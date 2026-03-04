@@ -1,36 +1,21 @@
 import Button from '@/components/Button/Button';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {McpComponent, useDeleteMcpComponentMutation} from '@/shared/middleware/graphql';
-import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
-import {useState} from 'react';
 
-interface McpComponentListItemDropDownProps {
-    mcpComponent: McpComponent;
+interface McpComponentToolDropdownMenuProps {
+    handleConfirmDelete: () => void;
     onEditClick: () => void;
+    setShowDeleteDialog: (show: boolean) => void;
+    showDeleteDialog: boolean;
 }
 
-const McpComponentListItemDropdownMenu = ({mcpComponent, onEditClick}: McpComponentListItemDropDownProps) => {
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-    const queryClient = useQueryClient();
-
-    const deleteMcpComponentMutation = useDeleteMcpComponentMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
-            });
-            setShowDeleteDialog(false);
-        },
-    });
-
-    const handleConfirmDelete = () => {
-        deleteMcpComponentMutation.mutate({
-            id: mcpComponent.id.toString(),
-        });
-    };
-
+const McpComponentToolDropdownMenu = ({
+    handleConfirmDelete,
+    onEditClick,
+    setShowDeleteDialog,
+    showDeleteDialog,
+}: McpComponentToolDropdownMenuProps) => {
     return (
         <>
             <DropdownMenu>
@@ -58,4 +43,4 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, onEditClick}: McpCompon
     );
 };
 
-export default McpComponentListItemDropdownMenu;
+export default McpComponentToolDropdownMenu;
