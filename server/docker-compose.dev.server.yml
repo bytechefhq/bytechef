@@ -47,6 +47,8 @@ services:
     build:
       context: ../
       dockerfile: ./server/apps/server-app/Dockerfile_dev
+      args:
+        BUILDKIT_INLINE_CACHE: 1
     container_name: bytechef-server
     volumes:
       - ~/.bytechef/key:/root/.bytechef/key:ro

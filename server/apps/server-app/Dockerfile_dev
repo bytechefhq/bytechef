@@ -14,7 +14,8 @@ COPY --chown=gradle:gradle ./settings.gradle.kts ./settings.gradle.kts
 
 WORKDIR ./
 
-RUN gradle bootJar --no-daemon
+RUN --mount=type=cache,target=/home/gradle/.gradle/caches \
+    gradle bootJar --no-daemon
 
 FROM ghcr.io/graalvm/graalvm-community:25.0.2
 
