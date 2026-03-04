@@ -22,12 +22,9 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.script.action.ScriptJavaAction;
 import com.bytechef.component.script.action.ScriptJavaScriptAction;
 import com.bytechef.component.script.action.ScriptPythonAction;
-import com.bytechef.component.script.action.ScriptRAction;
 import com.bytechef.component.script.action.ScriptRubyAction;
-import com.bytechef.component.script.datastream.ScriptJavaItemProcessor;
 import com.bytechef.component.script.datastream.ScriptJavaScriptItemProcessor;
 import com.bytechef.component.script.datastream.ScriptPythonItemProcessor;
 import com.bytechef.component.script.datastream.ScriptRubyItemProcessor;
@@ -68,11 +65,12 @@ public class ScriptComponentHandler implements ComponentHandler {
                     .actions(
                         ScriptJavaScriptAction.of(polyglotEngine),
                         ScriptPythonAction.of(polyglotEngine),
-                        ScriptRAction.of(polyglotEngine),
-                        ScriptRubyAction.of(polyglotEngine),
-                        ScriptJavaAction.of(polyglotEngine))
+//                        ScriptRAction.of(polyglotEngine),
+//                        ScriptJavaAction.of(polyglotEngine),
+                        ScriptRubyAction.of(polyglotEngine))
                     .clusterElements(
-                        ScriptJavaItemProcessor.of(polyglotEngine),
+//                        ScriptJavaItemProcessor.of(polyglotEngine),
+//                        ScriptRAction.of(polyglotEngine),
                         ScriptJavaScriptItemProcessor.of(polyglotEngine),
                         ScriptPythonItemProcessor.of(polyglotEngine),
                         ScriptRubyItemProcessor.of(polyglotEngine)));
