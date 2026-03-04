@@ -58,7 +58,7 @@ import org.mockito.ArgumentCaptor;
  * @author Monika Domiter
  */
 @ExtendWith(MockContextSetupExtension.class)
-class MicrosoftTeamsOptionUtilsTest {
+class MicrosoftTeamsUtilsTest {
 
     private final Parameters mockedParameters = mock(Parameters.class);
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
@@ -77,7 +77,7 @@ class MicrosoftTeamsOptionUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(E_TAG, "{eTag},1", WEB_DAV_URL, "webDavUrl", NAME, "name"));
 
-        List<Map<String, String>> result = MicrosoftTeamsOptionUtils.getAttachmentsList(
+        List<Map<String, String>> result = MicrosoftTeamsUtils.getAttachmentsList(
             List.of("fileId"), mockedContext);
 
         List<Map<String, String>> expected = List.of(
@@ -119,7 +119,7 @@ class MicrosoftTeamsOptionUtilsTest {
                     "chatType", "type", ID, "id",
                     "members", List.of(Map.of(DISPLAY_NAME, "member1"), Map.of(DISPLAY_NAME, "member2"))))));
 
-        List<Option<String>> result = MicrosoftTeamsOptionUtils.getChatIdOptions(mockedParameters, mockedParameters,
+        List<Option<String>> result = MicrosoftTeamsUtils.getChatIdOptions(mockedParameters, mockedParameters,
             Map.of(), "", mockedActionContext);
 
         assertEquals(List.of(option("type chat: member1,member2", "id")), result);
@@ -151,7 +151,7 @@ class MicrosoftTeamsOptionUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(VALUE, List.of(Map.of(DISPLAY_NAME, "name", ID, "id"))));
 
-        List<Option<String>> result = MicrosoftTeamsOptionUtils.getChannelIdOptions(
+        List<Option<String>> result = MicrosoftTeamsUtils.getChannelIdOptions(
             mockedInputParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(List.of(option("name", "id")), result);
@@ -175,7 +175,7 @@ class MicrosoftTeamsOptionUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(VALUE, List.of(Map.of(DISPLAY_NAME, "team", ID, "id"))));
 
-        List<Option<String>> result = MicrosoftTeamsOptionUtils.getTeamIdOptions(
+        List<Option<String>> result = MicrosoftTeamsUtils.getTeamIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(List.of(option("team", "id")), result);
