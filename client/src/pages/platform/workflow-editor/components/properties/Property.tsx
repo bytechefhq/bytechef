@@ -32,7 +32,7 @@ import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/typ
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
 import {CircleQuestionMarkIcon, EqualIcon} from 'lucide-react';
-import {ReactNode} from 'react';
+import {ReactNode, useEffect, useRef} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
@@ -153,8 +153,17 @@ const Property = ({
         property,
     });
 
+    const controlledDynamicOnChangeRef = useRef<((value: string) => void) | null>(null);
+
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const clusterElementContext = useClusterElementContext();
+
+    useEffect(() => {
+        if (controlledDynamicMode && resetOnModeChangeRef.current && controlledDynamicOnChangeRef.current) {
+            resetOnModeChangeRef.current = false;
+            controlledDynamicOnChangeRef.current('=');
+        }
+    }, [controlledDynamicMode, resetOnModeChangeRef]);
 
     const isToolsClusterElement = toolsMode || currentNode?.clusterElementType === 'tools';
 
@@ -306,10 +315,7 @@ const Property = ({
                             defaultValue={defaultValue}
                             name={calculatedPath}
                             render={({field}) => {
-                                if (resetOnModeChangeRef.current) {
-                                    resetOnModeChangeRef.current = false;
-                                    queueMicrotask(() => field.onChange('='));
-                                }
+                                controlledDynamicOnChangeRef.current = field.onChange;
 
                                 const displayValue = typeof field.value === 'string' ? field.value : '';
                                 const valueIsFromAi =
@@ -617,8 +623,8 @@ const Property = ({
                                         required={required}
                                         showInputTypeSwitchButton={isToolsClusterElement}
                                         value={fieldValue !== undefined ? fieldValue : selectValue}
-                                        workflowId={workflow.id || ''}
-                                        workflowNodeName={currentNode?.name || ''}
+                                        workflowId={workflow.id!}
+                                        workflowNodeName={currentNode!.name}
                                     />
                                 )}
                                 rules={{required}}
@@ -708,7 +714,7 @@ const Property = ({
                                     property={property}
                                     showInputTypeSwitchButton={isToolsClusterElement}
                                     value={(value as string[]) || []}
-                                    workflowId={workflow.id || ''}
+                                    workflowId={workflow.id!}
                                 />
                             )}
                             rules={{required}}
