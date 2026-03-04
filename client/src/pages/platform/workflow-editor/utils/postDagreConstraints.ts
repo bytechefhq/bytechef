@@ -917,18 +917,41 @@ export function constrainLeftGhostPositions(allNodes: Node[], options: Constrain
     const handleCenterDifference = PLACEHOLDER_DOM_CROSS_SIZE / 2 - LEFT_GHOST_VISUAL_SIZE / 2;
     const MAX_RING_WIDTH = direction === 'LR' ? conditionCaseOffset : conditionCaseOffset - handleCenterDifference;
     const LEFT_GHOST_PADDING = 20;
+    const NESTED_RING_INDENT = 50;
     const lrCenteringOffset = direction === 'LR' ? (72 - LEFT_GHOST_VISUAL_SIZE) / 2 : 0;
 
-    allNodes.forEach((leftGhostNode) => {
-        if (leftGhostNode.type !== 'taskDispatcherLeftGhostNode') {
+    // Collect left ghost nodes and pre-compute their descendant sets
+    const leftGhostNodes: Node[] = [];
+    const descendantCache = new Map<string, Set<string>>();
+
+    allNodes.forEach((node) => {
+        if (node.type !== 'taskDispatcherLeftGhostNode') {
             return;
         }
 
-        const taskDispatcherId = (leftGhostNode.data as NodeDataType).taskDispatcherId;
+        const dispatcherId = (node.data as NodeDataType).taskDispatcherId;
 
-        if (!taskDispatcherId) {
+        if (!dispatcherId) {
             return;
         }
+
+        leftGhostNodes.push(node);
+
+        const descendants = new Set<string>();
+
+        collectNestedDispatcherNodes(dispatcherId, allNodes, descendants);
+        descendantCache.set(node.id, descendants);
+    });
+
+    // Sort by descendant count ascending — innermost dispatchers (fewest
+    // descendants) are positioned first so that outer dispatchers can account
+    // for the positions of already-placed nested left ghosts.
+    leftGhostNodes.sort(
+        (ghostA, ghostB) => (descendantCache.get(ghostA.id)?.size || 0) - (descendantCache.get(ghostB.id)?.size || 0)
+    );
+
+    for (const leftGhostNode of leftGhostNodes) {
+        const taskDispatcherId = (leftGhostNode.data as NodeDataType).taskDispatcherId!;
 
         const topGhostNode = allNodes.find(
             (node) =>
@@ -937,33 +960,50 @@ export function constrainLeftGhostPositions(allNodes: Node[], options: Constrain
         );
 
         if (!topGhostNode) {
-            return;
+            continue;
         }
 
         const cappedCross = topGhostNode.position[crossAxis] - MAX_RING_WIDTH;
+        const descendantIds = descendantCache.get(leftGhostNode.id) || new Set();
 
-        const descendantIds = new Set<string>();
-
-        collectNestedDispatcherNodes(taskDispatcherId, allNodes, descendantIds);
-
-        let leftmostDescendantCross = Infinity;
+        let leftmostContentCross = Infinity;
+        let leftmostChildGhostCross = Infinity;
 
         allNodes.forEach((node) => {
-            if (descendantIds.has(node.id) && node.type !== 'taskDispatcherLeftGhostNode') {
-                leftmostDescendantCross = Math.min(leftmostDescendantCross, node.position[crossAxis]);
+            if (!descendantIds.has(node.id) || node.id === leftGhostNode.id) {
+                return;
+            }
+
+            if (node.type === 'taskDispatcherLeftGhostNode') {
+                // Child left ghosts (already positioned by earlier iterations)
+                // need a larger indent so nested rings are visually distinct.
+                leftmostChildGhostCross = Math.min(leftmostChildGhostCross, node.position[crossAxis]);
+            } else {
+                leftmostContentCross = Math.min(leftmostContentCross, node.position[crossAxis]);
             }
         });
 
-        const minRequiredCross =
-            leftmostDescendantCross === Infinity
-                ? cappedCross
-                : leftmostDescendantCross - LEFT_GHOST_PADDING - lrCenteringOffset;
+        const contentRequired =
+            leftmostContentCross === Infinity
+                ? Infinity
+                : leftmostContentCross - LEFT_GHOST_PADDING - lrCenteringOffset;
+
+        const nestingRequired =
+            leftmostChildGhostCross === Infinity
+                ? Infinity
+                : leftmostChildGhostCross - NESTED_RING_INDENT - lrCenteringOffset;
+
+        const minRequiredCross = Math.min(
+            contentRequired === Infinity && nestingRequired === Infinity ? cappedCross : Infinity,
+            contentRequired,
+            nestingRequired
+        );
 
         leftGhostNode.position = {
             ...leftGhostNode.position,
             [crossAxis]: Math.min(cappedCross, minRequiredCross),
         };
-    });
+    }
 }
 
 /**
