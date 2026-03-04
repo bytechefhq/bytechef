@@ -7,6 +7,7 @@ import YamlWorker from 'monaco-yaml/yaml.worker?worker';
 import {Suspense, lazy, useEffect, useState} from 'react';
 
 import type {EditorOptionsType, StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
+import type {editor} from 'monaco-editor';
 
 window.MonacoEnvironment = {
     getWorker(_moduleId: string, label: string) {
@@ -51,6 +52,7 @@ interface MonacoEditorProps {
     defaultLanguage: string;
     onChange: (value: string | undefined) => void;
     onMount: (editor: StandaloneCodeEditorType) => void;
+    onValidate?: (markers: editor.IMarkerData[]) => void;
     options?: EditorOptionsType;
     value?: string;
 }

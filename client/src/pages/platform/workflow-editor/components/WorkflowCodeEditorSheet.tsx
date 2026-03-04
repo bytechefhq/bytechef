@@ -49,7 +49,9 @@ const WorkflowCodeEditorSheet = ({
         handleStopClick,
         handleUnsavedChangesAlertDialogClose,
         handleUnsavedChangesAlertDialogOpen,
+        handleValidate,
         handleWorkflowTestConfigurationDialog,
+        hasErrors,
         showWorkflowTestConfigurationDialog,
         unsavedChangesAlertDialogOpen,
         workflowIsRunning,
@@ -90,17 +92,21 @@ const WorkflowCodeEditorSheet = ({
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
-                                        disabled={!dirty}
-                                        icon={<SaveIcon />}
-                                        onClick={() => handleSaveClick(workflow, definition)}
-                                        size="icon"
-                                        type="submit"
-                                        variant="ghost"
-                                    />
+                                    <div>
+                                        <Button
+                                            disabled={!dirty || hasErrors}
+                                            icon={<SaveIcon />}
+                                            onClick={() => handleSaveClick(workflow, definition)}
+                                            size="icon"
+                                            type="submit"
+                                            variant="ghost"
+                                        />
+                                    </div>
                                 </TooltipTrigger>
 
-                                <TooltipContent>Save current workflow</TooltipContent>
+                                <TooltipContent>
+                                    {hasErrors ? 'Saving is disabled due to code errors.' : 'Save current workflow'}
+                                </TooltipContent>
                             </Tooltip>
 
                             {!workflowIsRunning && (
@@ -166,6 +172,7 @@ const WorkflowCodeEditorSheet = ({
                                         defaultLanguage={workflow.format?.toLowerCase() ?? 'json'}
                                         onChange={(value) => handleDefinitionChange(value as string)}
                                         onMount={(editor) => editor.focus()}
+                                        onValidate={handleValidate}
                                         options={{
                                             folding: true,
                                             foldingStrategy: 'indentation',
