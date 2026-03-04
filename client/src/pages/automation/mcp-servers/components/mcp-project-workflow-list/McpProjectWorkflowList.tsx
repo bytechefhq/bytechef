@@ -1,7 +1,4 @@
-import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
 import {McpProjectWorkflow} from '@/shared/middleware/graphql';
-import {WorkflowIcon} from 'lucide-react';
 
 import McpProjectWorkflowListItem from './McpProjectWorkflowListItem';
 
@@ -13,29 +10,15 @@ const McpProjectWorkflowList = ({mcpProjectWorkflows}: McpProjectWorkflowListPro
     const workflows =
         mcpProjectWorkflows?.filter((workflow): workflow is McpProjectWorkflow => workflow !== null) || [];
 
+    if (workflows.length === 0) {
+        return null;
+    }
+
     return (
-        <div className="py-3">
-            {workflows.length > 0 ? (
-                <ul className="divide-y divide-gray-100">
-                    {workflows.map((workflow) => (
-                        <li
-                            className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
-                            key={workflow.id}
-                        >
-                            <McpProjectWorkflowListItem mcpProjectWorkflow={workflow} />
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <div className="flex justify-center py-8">
-                    <EmptyList
-                        button={<Button disabled label="Create Workflow" />}
-                        icon={<WorkflowIcon className="size-24 text-gray-300" />}
-                        message="Get started by creating a workflow for this MCP project."
-                        title="No Workflows"
-                    />
-                </div>
-            )}
+        <div className="flex flex-wrap gap-2 py-2">
+            {workflows.map((workflow) => (
+                <McpProjectWorkflowListItem key={workflow.id} mcpProjectWorkflow={workflow} />
+            ))}
         </div>
     );
 };
