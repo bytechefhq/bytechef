@@ -3,7 +3,7 @@ import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {FormProvider, useForm} from 'react-hook-form';
 import {describe, expect, it, vi} from 'vitest';
 
-import ControlledObjectEntries from './ControlledObjectEntries';
+import FormControlledObjectEntries from './FormControlledObjectEntries';
 
 vi.mock('../Property', () => ({
     default: ({property, toolsMode}: {property: PropertyAllType; toolsMode?: boolean}) => (
@@ -32,7 +32,7 @@ function Wrapper({
 
     return (
         <FormProvider {...methods}>
-            <ControlledObjectEntries
+            <FormControlledObjectEntries
                 control={methods.control}
                 controlPath="metadata"
                 formState={methods.formState}
@@ -43,7 +43,7 @@ function Wrapper({
     );
 }
 
-describe('ControlledObjectEntries', () => {
+describe('FormControlledObjectEntries', () => {
     it('renders object entries with key labels', () => {
         render(<Wrapper />);
 
