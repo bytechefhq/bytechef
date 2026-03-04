@@ -1,16 +1,12 @@
-import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
 import {Skeleton} from '@/components/ui/skeleton';
 import McpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItem';
-import {McpServer, useMcpComponentsByServerIdQuery} from '@/shared/middleware/graphql';
-import {ComponentIcon} from 'lucide-react';
-
-import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
+import McpComponentToolList from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentToolList';
+import useMcpComponentList from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentList';
+import {McpServer} from '@/shared/middleware/graphql';
+import {Fragment} from 'react';
 
 const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
-    const {data, isLoading: isMcpComponentsLoading} = useMcpComponentsByServerIdQuery({
-        mcpServerId: mcpServer.id!,
-    });
+    const {data, isMcpComponentsLoading} = useMcpComponentList(mcpServer.id!);
 
     if (isMcpComponentsLoading) {
         return (
@@ -41,37 +37,29 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
     }
 
     return (
-        <div className="py-3 pl-4">
-            {data.mcpComponentsByServerId.length > 0 ? (
-                <>
-                    <ul className="divide-y divide-gray-100">
-                        {data.mcpComponentsByServerId
-                            .sort((a, b) => a!.componentName.localeCompare(b!.componentName))
-                            .map((mcpComponent) => (
-                                <McpComponentListItem
-                                    key={mcpComponent?.id}
-                                    mcpComponent={mcpComponent!}
-                                    mcpServer={mcpServer}
-                                />
-                            ))}
-                    </ul>
-                </>
-            ) : (
-                <div className="flex justify-center py-8">
-                    <EmptyList
-                        button={
-                            <McpComponentDialog
-                                mcpComponent={undefined}
-                                mcpServerId={mcpServer.id}
-                                triggerNode={<Button label="Add Component" />}
+        <div className="py-1 pl-4">
+            {data.mcpComponentsByServerId
+                .sort((a, b) => a!.componentName.localeCompare(b!.componentName))
+                .map((mcpComponent) => (
+                    <Fragment key={mcpComponent!.id}>
+                        <McpComponentListItem
+                            key={mcpComponent?.id}
+                            mcpComponent={mcpComponent!}
+                            mcpServer={mcpServer}
+                        />
+
+                        <div className="pl-6">
+                            <McpComponentToolList
+                                componentName={mcpComponent!.componentName}
+                                componentVersion={mcpComponent!.componentVersion}
+                                connectionId={mcpComponent!.connectionId}
+                                mcpComponent={mcpComponent!}
+                                mcpServerId={mcpServer.id!}
+                                mcpTools={mcpComponent!.mcpTools}
                             />
-                        }
-                        icon={<ComponentIcon className="size-24 text-gray-300" />}
-                        message="Get started by creating a new component."
-                        title="No Components"
-                    />
-                </div>
-            )}
+                        </div>
+                    </Fragment>
+                ))}
         </div>
     );
 };
