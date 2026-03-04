@@ -7,29 +7,19 @@ interface FromAiToggleButtonProps {
 }
 
 const FromAiToggleButton = ({isFromAi, onToggle}: FromAiToggleButtonProps) => {
-    if (isFromAi) {
-        return (
-            <Button
-                className="self-center"
-                icon={<XIcon />}
-                onClick={() => onToggle(false)}
-                size="iconSm"
-                title="Customize AI generation"
-                type="button"
-                variant="destructiveGhost"
-            />
-        );
-    }
+    const icon = isFromAi ? <XIcon /> : <SparklesIcon />;
+    const title = isFromAi ? 'Customize AI generation' : 'Generate content with AI';
+    const variant = isFromAi ? 'destructiveGhost' : 'ghost';
 
     return (
         <Button
             className="self-center"
-            icon={<SparklesIcon />}
-            onClick={() => onToggle(true)}
+            icon={icon}
+            onClick={() => onToggle(!isFromAi)}
             size="iconSm"
-            title="Generate content with AI"
+            title={title}
             type="button"
-            variant="ghost"
+            variant={variant}
         />
     );
 };

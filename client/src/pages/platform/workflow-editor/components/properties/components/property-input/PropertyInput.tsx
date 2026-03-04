@@ -65,7 +65,9 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
         const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
             const rawValue = event.target.value;
 
-            setLocalValue(expressionPrefix && rawValue.startsWith('=') ? rawValue.substring(1) : rawValue);
+            const displayValue = expressionPrefix && rawValue.startsWith('=') ? rawValue.substring(1) : rawValue;
+
+            setLocalValue(displayValue);
 
             if (onChange) {
                 onChange(event);
