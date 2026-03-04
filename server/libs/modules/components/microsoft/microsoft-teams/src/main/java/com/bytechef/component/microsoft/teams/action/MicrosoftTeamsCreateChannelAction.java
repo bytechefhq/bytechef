@@ -33,7 +33,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
+import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
@@ -48,7 +48,7 @@ public class MicrosoftTeamsCreateChannelAction {
             string(TEAM_ID)
                 .label("Team ID")
                 .description("ID of the team where the channel will be created.")
-                .options((OptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
+                .options((OptionsFunction<String>) MicrosoftTeamsUtils::getTeamIdOptions)
                 .required(true),
             string(DISPLAY_NAME)
                 .label("Channel Name")
