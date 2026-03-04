@@ -706,7 +706,7 @@ export default function useWorkflowNodeDetailsPanel({
             const oppositeConditionCase =
                 conditionData.conditionCase === CONDITION_CASE_TRUE ? CONDITION_CASE_FALSE : CONDITION_CASE_TRUE;
 
-            const oppositeConditionCaseNodeNames = parentConditionTask.parameters?.[oppositeConditionCase].map(
+            const oppositeConditionCaseNodeNames = parentConditionTask.parameters?.[oppositeConditionCase]?.map(
                 (task: WorkflowTask) => task.name
             );
 
