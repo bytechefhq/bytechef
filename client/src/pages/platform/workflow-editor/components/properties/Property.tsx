@@ -106,10 +106,9 @@ const Property = ({
         hidden,
         inputRef,
         inputValue,
-        isDisplayConditionsPending,
-        isFetchingCurrentDisplayCondition,
         isFormulaMode,
         isFromAi,
+        isLoadingDisplayCondition,
         isNumericalInput,
         isToolsClusterElement,
         isValidControlType,
@@ -160,15 +159,6 @@ const Property = ({
     if (hidden && !control) {
         return <></>;
     }
-
-    const isLoadingDisplayCondition =
-        displayCondition &&
-        type !== 'ARRAY' &&
-        type !== 'OBJECT' &&
-        (isDisplayConditionsPending ||
-            (displayConditionsQuery &&
-                currentComponent?.displayConditions?.[displayCondition] &&
-                isFetchingCurrentDisplayCondition));
 
     if (isLoadingDisplayCondition) {
         return (
