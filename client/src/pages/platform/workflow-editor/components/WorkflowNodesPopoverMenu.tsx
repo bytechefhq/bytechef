@@ -11,6 +11,7 @@ import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import handleTaskDispatcherClick from '../utils/handleTaskDispatcherClick';
+import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuComponentList';
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
 
@@ -87,7 +88,7 @@ const WorkflowNodesPopoverMenu = ({
                     sourceNodeId,
                     taskDispatcherContext,
                     taskDispatcherDefinition: clickedItem,
-                    taskDispatcherName: name as 'condition' | 'loop',
+                    taskDispatcherName: name as keyof typeof TASK_DISPATCHER_CONFIG,
                     updateWorkflowMutation: updateWorkflowMutation!,
                     workflow,
                 });

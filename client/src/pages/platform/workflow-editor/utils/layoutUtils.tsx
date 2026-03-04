@@ -819,6 +819,11 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
             return false;
         } else if (subsequentNodeData.forkJoinData && subsequentNodeData.forkJoinData.forkJoinId === taskDispatcherId) {
             return false;
+        } else if (
+            subsequentNodeData.terminateData &&
+            subsequentNodeData.terminateData.terminateId === taskDispatcherId
+        ) {
+            return false;
         }
 
         for (const task of tasks || []) {

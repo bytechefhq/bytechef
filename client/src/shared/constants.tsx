@@ -126,9 +126,10 @@ export const TASK_DISPATCHER_NAMES = [
     'map',
     'parallel',
     'subflow',
+    'terminate',
 ];
 
-export const CHILDLESS_TASK_DISPATCHER_NAMES = ['loopBreak', 'subflow'];
+export const CHILDLESS_TASK_DISPATCHER_NAMES = ['loopBreak', 'subflow', 'terminate'];
 
 export const SORT_OPTIONS = [
     {
@@ -193,6 +194,7 @@ export const TASK_DISPATCHER_DATA_KEY_MAP = {
     map: 'mapData',
     parallel: 'parallelData',
     subflow: 'subflowData',
+    terminate: 'terminateData',
 };
 
 export const DEFAULT_CANVAS_WIDTH = 670;

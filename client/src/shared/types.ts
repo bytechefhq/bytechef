@@ -139,6 +139,10 @@ type SubflowDataType = {
     subflowId: string;
 };
 
+type TerminateDataType = {
+    terminateId: string;
+};
+
 type ParallelDataType = {
     index: number;
     parallelId: string;
@@ -161,6 +165,7 @@ export type TaskDispatcherDataType = BranchDataType &
     LoopBreakDataType &
     MapDataType &
     SubflowDataType &
+    TerminateDataType &
     ConditionDataType &
     ParallelDataType &
     ForkJoinDataType;
@@ -247,6 +252,8 @@ export type NodeDataType = {
     subflowData?: SubflowDataType;
     taskDispatcher?: boolean;
     taskDispatcherId?: string;
+    terminateData?: TerminateDataType;
+    terminateId?: string;
     title?: string;
     trigger?: boolean;
     type?: string;
@@ -367,6 +374,7 @@ export type TaskDispatcherContextType = {
     parallelId?: string;
     subflowId?: string;
     taskDispatcherId: string;
+    terminateId?: string;
 };
 
 export type BuildNodeDataType = {
