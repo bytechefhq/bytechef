@@ -17,7 +17,6 @@
 package com.bytechef.component.microsoft.teams.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ATTACHMENTS;
@@ -28,7 +27,7 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_PROPERTY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_TYPE_PROPERTY;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
@@ -67,26 +66,7 @@ public class MicrosoftTeamsSendChannelMessageAction {
             CONTENT_TYPE_PROPERTY,
             CONTENT_PROPERTY,
             ATTACHMENTS_PROPERTY)
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(ID)
-                            .description("ID of the message."),
-                        object(BODY)
-                            .description("Plaintext/HTML representation of the content of the chat message.")
-                            .properties(
-                                string(CONTENT_TYPE)
-                                    .description("Type of the content."),
-                                string(CONTENT)
-                                    .description("The content of the message.")),
-                        object("channelIdentity")
-                            .description("Represents identity of the channel.")
-                            .properties(
-                                string(TEAM_ID)
-                                    .description("ID of the team in which the message was posted."),
-                                string(CHANNEL_ID)
-                                    .description("ID of the channel in which the message was posted.")))))
+        .output(outputSchema(MESSAGE_OUTPUT_PROPERTY))
         .perform(MicrosoftTeamsSendChannelMessageAction::perform)
         .help(
             "",
