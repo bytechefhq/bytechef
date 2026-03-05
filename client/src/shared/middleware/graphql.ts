@@ -1910,8 +1910,8 @@ export type Query = {
   clusterElementComponentConnections: Array<ComponentConnection>;
   clusterElementDefinition: ClusterElementDefinition;
   clusterElementDefinitions: Array<ClusterElementDefinition>;
-  clusterElementMissingRequiredProperties: Array<Scalars['String']['output']>;
   clusterElementDynamicProperties: Array<Property>;
+  clusterElementMissingRequiredProperties: Array<Scalars['String']['output']>;
   clusterElementOptions: Array<Option>;
   clusterElementScriptInput?: Maybe<Scalars['Map']['output']>;
   componentDefinition: ComponentDefinition;
@@ -2074,14 +2074,6 @@ export type QueryClusterElementDefinitionsArgs = {
 };
 
 
-export type QueryClusterElementMissingRequiredPropertiesArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
 export type QueryClusterElementDynamicPropertiesArgs = {
   clusterElementName: Scalars['String']['input'];
   componentName: Scalars['String']['input'];
@@ -2090,6 +2082,14 @@ export type QueryClusterElementDynamicPropertiesArgs = {
   inputParameters?: InputMaybe<Scalars['Map']['input']>;
   lookupDependsOnPaths?: InputMaybe<Array<Scalars['String']['input']>>;
   propertyName: Scalars['String']['input'];
+};
+
+
+export type QueryClusterElementMissingRequiredPropertiesArgs = {
+  clusterElementType: Scalars['String']['input'];
+  clusterElementWorkflowNodeName: Scalars['String']['input'];
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
 };
 
 
@@ -3027,6 +3027,14 @@ export type UpdateMcpProjectMutationVariables = Exact<{
 
 
 export type UpdateMcpProjectMutation = { __typename?: 'Mutation', updateMcpProject?: { __typename?: 'McpProject', id: string, mcpServerId: string, projectDeploymentId: string, projectVersion?: number | null } | null };
+
+export type UpdateMcpProjectWorkflowMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: McpProjectWorkflowUpdateInput;
+}>;
+
+
+export type UpdateMcpProjectWorkflowMutation = { __typename?: 'Mutation', updateMcpProjectWorkflow?: { __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters?: any | null } | null };
 
 export type UpdateMcpServerMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -4806,6 +4814,30 @@ export const useUpdateMcpProjectMutation = <
       {
     mutationKey: ['updateMcpProject'],
     mutationFn: (variables?: UpdateMcpProjectMutationVariables) => fetcher<UpdateMcpProjectMutation, UpdateMcpProjectMutationVariables>(UpdateMcpProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateMcpProjectWorkflowDocument = `
+    mutation updateMcpProjectWorkflow($id: ID!, $input: McpProjectWorkflowUpdateInput!) {
+  updateMcpProjectWorkflow(id: $id, input: $input) {
+    id
+    mcpProjectId
+    projectDeploymentWorkflowId
+    parameters
+  }
+}
+    `;
+
+export const useUpdateMcpProjectWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateMcpProjectWorkflowMutation, TError, UpdateMcpProjectWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateMcpProjectWorkflowMutation, TError, UpdateMcpProjectWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['updateMcpProjectWorkflow'],
+    mutationFn: (variables?: UpdateMcpProjectWorkflowMutationVariables) => fetcher<UpdateMcpProjectWorkflowMutation, UpdateMcpProjectWorkflowMutationVariables>(UpdateMcpProjectWorkflowDocument, variables)(),
     ...options
   }
     )};
@@ -7283,7 +7315,7 @@ export const useClusterElementOptionsQuery = <
       variables: ClusterElementOptionsQueryVariables,
       options?: Omit<UseQueryOptions<ClusterElementOptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementOptionsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ClusterElementOptionsQuery, TError, TData>(
       {
     queryKey: ['clusterElementOptions', variables],
