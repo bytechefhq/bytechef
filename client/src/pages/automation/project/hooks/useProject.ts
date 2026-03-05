@@ -230,6 +230,7 @@ export const useProject = () => {
     useEffect(() => {
         if (projectLeftSidebarOpen && !sidebarLoadedRef.current) {
             sidebarLoadedRef.current = true;
+
             setSidebarLoaded(true);
         }
     }, [projectLeftSidebarOpen]);
@@ -249,6 +250,7 @@ export const useProject = () => {
             return () => clearTimeout(timeoutId);
         }
     }, [currentWorkflow, isWorkflowLoading, setWorkflow]);
+
     return {
         bottomResizablePanelRef,
         categories,
