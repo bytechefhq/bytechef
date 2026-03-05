@@ -22,7 +22,7 @@ const FormControlledObjectEntries = ({
     toolsMode,
 }: ControlledObjectEntriesProps) => {
     const [newEntryKey, setNewEntryKey] = useState('');
-    
+
     const {setValue} = useFormContext();
     const watchedValue = useWatch({control, name: controlPath});
 
