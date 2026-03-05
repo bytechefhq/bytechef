@@ -20,6 +20,7 @@ import com.bytechef.ai.mcp.tool.automation.api.ProjectDetailInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectStatusInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectTools;
+import com.bytechef.ai.mcp.tool.automation.api.ReadProjectTools;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnAiEnabled
-public class ReadProjectToolsImpl {
+public class ReadProjectToolsImpl implements ReadProjectTools {
 
     private final ProjectTools delegate;
 
