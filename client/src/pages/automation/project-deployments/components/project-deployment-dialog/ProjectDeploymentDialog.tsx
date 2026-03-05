@@ -107,8 +107,12 @@ const ProjectDeploymentDialog = ({
             return undefined;
         }
 
-        if (!filterWorkflowUuids || filterWorkflowUuids.length === 0) {
+        if (filterWorkflowUuids === undefined) {
             return allWorkflows;
+        }
+
+        if (filterWorkflowUuids.length === 0) {
+            return [];
         }
 
         return allWorkflows.filter((workflow) => filterWorkflowUuids.includes(workflow.workflowUuid!));
@@ -261,7 +265,8 @@ const ProjectDeploymentDialog = ({
             return;
         }
 
-        const projectKey = `${getValues().projectId}-${getValues().projectVersion}`;
+        const filterKey = filterWorkflowUuids ? filterWorkflowUuids.join(',') : '';
+        const projectKey = `${getValues().projectId}-${getValues().projectVersion}-${filterKey}`;
 
         if (initializedProjectKeyRef.current === projectKey) {
             return;
