@@ -201,6 +201,113 @@ Type: OBJECT
 
 
 
+### Create Custom Field
+Name: createCustomField
+
+`Creates a new custom field in a workspace.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace | Workspace | STRING | The workspace to create a custom field in. | true |
+| name | Name | STRING | The name of the custom field. | true |
+| resource_subtype | Resource Subtype | STRING <details> <summary> Options </summary> <span>text</span>, <span>enum</span>, <span>multi_enum</span>, <span>number</span>, <span>date</span>, <span>people</span>, <span>reference</span> </details> | The type of the custom field. | true |
+| text_value | Text Value | STRING | The text value of the custom field. | false |
+| enum_options | Enum Options | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), BOOLEAN\(enabled), STRING\(color)&#125;] </details> | This array specifies the possible values for an enum custom field. | false |
+| number_value | Number Value | NUMBER | This number is the value of a number custom field. | false |
+| precision | Precision | INTEGER | This field dictates the number of places after the decimal to round to. | false |
+| date_value | Date Value | OBJECT <details> <summary> Properties </summary> &#123;DATE\(date), DATE_TIME\(date_time)&#125; </details> | This object reflects the chosen date (and optionally, time) value of a date custom field. | false |
+| people_value | People Value | ARRAY <details> <summary> Items </summary> [STRING] </details> | This array of compact user objects reflects the values of a people custom field. | false |
+| reference_value | Reference Value | ARRAY <details> <summary> Items </summary> [STRING] </details> | This array of objects reflects the values of a reference custom field. | false |
+| input_restrictions | Input Restrictions | ARRAY <details> <summary> Items </summary> [STRING] </details> | This array of strings reflects the allowed types of objects that can be written to a reference custom field value. | false |
+| format | Format | STRING <details> <summary> Options </summary> <span>currency</span>, <span>identifier</span>, <span>percentage</span>, <span>custom</span>, <span>duration</span>, <span>none</span> </details> | The format of this custom field. | false |
+| currency_code | Currency Code | STRING | ISO 4217 currency code to format this custom field. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Custom Field",
+  "name" : "createCustomField",
+  "parameters" : {
+    "workspace" : "",
+    "name" : "",
+    "resource_subtype" : "",
+    "text_value" : "",
+    "enum_options" : [ {
+      "name" : "",
+      "enabled" : false,
+      "color" : ""
+    } ],
+    "number_value" : 0.0,
+    "precision" : 1,
+    "date_value" : {
+      "date" : "2021-01-01",
+      "date_time" : "2021-01-01T00:00:00"
+    },
+    "people_value" : [ "" ],
+    "reference_value" : [ "" ],
+    "input_restrictions" : [ "" ],
+    "format" : "",
+    "currency_code" : ""
+  },
+  "type" : "asana/v1/createCustomField"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(gid), STRING\(name), STRING\(resource_type), STRING\(resource_subtype), [&#123;STRING\(gid), STRING\(name), BOOLEAN\(enabled), STRING\(color)&#125;]\(enum_options), NUMBER\(number_value), STRING\(text_value), &#123;DATE\(date), DATE_TIME\(date_time)&#125;\(date_value), [&#123;STRING\(gid), STRING\(name)&#125;]\(people_value), [&#123;STRING\(gid), STRING\(name)&#125;]\(reference_value), STRING\(format), STRING\(currency_code)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "gid" : "",
+    "name" : "",
+    "resource_type" : "",
+    "resource_subtype" : "",
+    "enum_options" : [ {
+      "gid" : "",
+      "name" : "",
+      "enabled" : false,
+      "color" : ""
+    } ],
+    "number_value" : 0.0,
+    "text_value" : "",
+    "date_value" : {
+      "date" : "2021-01-01",
+      "date_time" : "2021-01-01T00:00:00"
+    },
+    "people_value" : [ {
+      "gid" : "",
+      "name" : ""
+    } ],
+    "reference_value" : [ {
+      "gid" : "",
+      "name" : ""
+    } ],
+    "format" : "",
+    "currency_code" : ""
+  }
+}
+```
+
+
+
+
 
 
 ## What to do if your action is not listed here?
