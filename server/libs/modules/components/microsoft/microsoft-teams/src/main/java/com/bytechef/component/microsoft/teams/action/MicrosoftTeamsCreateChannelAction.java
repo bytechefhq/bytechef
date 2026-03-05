@@ -62,6 +62,8 @@ public class MicrosoftTeamsCreateChannelAction {
             outputSchema(
                 object()
                     .properties(
+                        string("@odata.context")
+                            .description("The OData context URL that indicates the metadata for the response."),
                         string(ID)
                             .description("ID of the channel."),
                         dateTime("createdDateTime")
@@ -72,8 +74,12 @@ public class MicrosoftTeamsCreateChannelAction {
                             .description("Description of the channel."),
                         bool("isFavoriteByDefault")
                             .description("Indicates whether the channel is marked as favorite by default."),
+                        string("email")
+                            .description("The email address of the channel if it is enabled to receive emails."),
                         string("webUrl")
                             .description("URL to access the channel in a web browser."),
+                        string("membershipType")
+                            .description("The type of channel membership, e.g., standard or private."),
                         bool("isArchived")
                             .description("Indicates whether the channel is archived."))))
         .perform(MicrosoftTeamsCreateChannelAction::perform)
