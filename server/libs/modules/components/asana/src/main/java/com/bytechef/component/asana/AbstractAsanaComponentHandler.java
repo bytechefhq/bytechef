@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.asana.action.AsanaCreateProjectAction;
+import com.bytechef.component.asana.action.AsanaCreateSubtaskAction;
 import com.bytechef.component.asana.action.AsanaCreateTaskAction;
 import com.bytechef.component.asana.connection.AsanaConnection;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -37,11 +38,11 @@ public abstract class AbstractAsanaComponentHandler implements OpenApiComponentH
             .description(
                 "Asana is a web and mobile application designed to help teams organize, track, and manage their work tasks and projects efficiently.")
             .version(1))
-                .actions(
-                    modifyActions(AsanaCreateProjectAction.ACTION_DEFINITION, AsanaCreateTaskAction.ACTION_DEFINITION))
+                .actions(modifyActions(AsanaCreateProjectAction.ACTION_DEFINITION,
+                    AsanaCreateSubtaskAction.ACTION_DEFINITION, AsanaCreateTaskAction.ACTION_DEFINITION))
                 .connection(modifyConnection(AsanaConnection.CONNECTION_DEFINITION))
                 .clusterElements(modifyClusterElements(tool(AsanaCreateProjectAction.ACTION_DEFINITION),
-                    tool(AsanaCreateTaskAction.ACTION_DEFINITION)))
+                    tool(AsanaCreateSubtaskAction.ACTION_DEFINITION), tool(AsanaCreateTaskAction.ACTION_DEFINITION)))
                 .triggers(getTriggers());
 
     @Override
