@@ -24,4 +24,5 @@ public class GoogleCommonsContants {
     public static final String FOLDER_ID = "folderId";
     public static final String FILE_NAME = "fileName";
     public static final String FILE_ID = "fileId";
+    public static final String PLACEHOLDER_FORMAT = "placeholderFormat";
 }
