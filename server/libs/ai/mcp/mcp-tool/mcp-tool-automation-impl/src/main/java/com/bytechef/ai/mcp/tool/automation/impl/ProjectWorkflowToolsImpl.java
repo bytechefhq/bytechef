@@ -86,7 +86,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
                     - `input.testInputMapName`
             - context - used for calling Actions from other providers. Parameters of the action are defined as a map.
                       - `context.component.componentName.actionName({'parameterName': parameterValue});`
-                      - ONLY use context property when you need to use outside services
+                      - ONLY use context property when you need to use Bytechef Actions
 
             If the language supports ';' at the end of the line, add ';' at the end of the line.
             """;
