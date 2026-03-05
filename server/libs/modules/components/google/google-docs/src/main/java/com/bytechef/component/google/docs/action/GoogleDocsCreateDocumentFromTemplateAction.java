@@ -52,6 +52,7 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
         .description(
             "Creates a new document based on an existing one and can replace any placeholder variables found in your " +
                 "template document, like [[name]], [[email]], etc.")
+        .help("", "https://docs.bytechef.io/reference/components/google-docs_v1#create-from-template")
         .properties(
             string(FILE_ID)
                 .label("Template Document ID")

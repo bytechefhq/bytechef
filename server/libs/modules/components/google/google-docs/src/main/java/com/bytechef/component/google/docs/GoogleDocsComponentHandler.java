@@ -40,6 +40,7 @@ public class GoogleDocsComponentHandler implements ComponentHandler {
             "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to " +
                 "create, edit, and share documents in real-time.")
         .customAction(true)
+        .customActionHelp("", "https://developers.google.com/workspace/docs/api/how-tos/overview")
         .icon("path:assets/google-docs.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(CONNECTION_DEFINITION)
@@ -50,7 +51,8 @@ public class GoogleDocsComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(GoogleDocsCreateDocumentAction.ACTION_DEFINITION),
             tool(GoogleDocsCreateDocumentFromTemplateAction.ACTION_DEFINITION),
-            tool(GoogleDocsGetDocumentAction.ACTION_DEFINITION));
+            tool(GoogleDocsGetDocumentAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
