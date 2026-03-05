@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.mcp.web.graphql;
 
-import static com.bytechef.platform.component.constant.WorkflowConstants.TOOL_CALLABLE;
+import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_AI_MODEL_CALL;
 import static com.bytechef.platform.component.constant.WorkflowConstants.WORKFLOW;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.mcp.service.McpProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
@@ -59,16 +60,19 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class McpProjectWorkflowGraphQlController {
 
+    private final McpProjectWorkflowFacade mcpProjectWorkflowFacade;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
 
     McpProjectWorkflowGraphQlController(
+        McpProjectWorkflowFacade mcpProjectWorkflowFacade,
         McpProjectWorkflowService mcpProjectWorkflowService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
+        this.mcpProjectWorkflowFacade = mcpProjectWorkflowFacade;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectWorkflowService = projectWorkflowService;
@@ -216,7 +220,7 @@ public class McpProjectWorkflowGraphQlController {
 
     @MutationMapping
     boolean deleteMcpProjectWorkflow(@Argument("id") long id) {
-        mcpProjectWorkflowService.delete(id);
+        mcpProjectWorkflowFacade.deleteMcpProjectWorkflow(id);
 
         return true;
     }
@@ -243,7 +247,7 @@ public class McpProjectWorkflowGraphQlController {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (Objects.equals(workflowNodeType.name(), WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), TOOL_CALLABLE)) {
+                Objects.equals(workflowNodeType.operation(), NEW_AI_MODEL_CALL)) {
 
                 return workflowTrigger;
             }

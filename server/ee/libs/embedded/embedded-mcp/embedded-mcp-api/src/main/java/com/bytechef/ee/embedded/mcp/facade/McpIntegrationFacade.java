@@ -36,4 +36,16 @@ public interface McpIntegrationFacade {
      * @param mcpIntegrationId the unique identifier of the MCP integration to be deleted
      */
     void deleteMcpIntegration(long mcpIntegrationId);
+
+    /**
+     * Updates the selected workflows of an MCP integration by computing a diff against the current state. New workflows
+     * are created, deselected workflows are removed, unchanged workflows are preserved.
+     *
+     * @param mcpIntegrationId    the unique identifier of the MCP integration to update
+     * @param selectedWorkflowIds the new list of selected workflow IDs
+     * @return the updated MCP integration
+     *
+     * @version ee
+     */
+    McpIntegration updateMcpIntegration(long mcpIntegrationId, List<String> selectedWorkflowIds);
 }

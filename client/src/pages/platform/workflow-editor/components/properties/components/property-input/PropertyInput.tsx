@@ -14,13 +14,16 @@ interface PropertyInputProps extends InputHTMLAttributes<HTMLInputElement> {
     description?: string;
     error?: boolean;
     errorMessage?: string;
+    expressionPrefix?: boolean;
     fieldsetClassName?: string;
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     leadingIcon?: ReactNode;
+    mentionInput?: boolean;
     name: string;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     showInputTypeSwitchButton?: boolean;
+    trailingAction?: ReactNode;
     type?: string;
     value?: string;
 }
@@ -34,17 +37,20 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             disabled,
             error,
             errorMessage,
+            expressionPrefix = false,
             fieldsetClassName,
             handleInputTypeSwitchButtonClick,
             id,
             label,
             leadingIcon,
+            mentionInput = false,
             name,
             onChange,
             placeholder,
             required,
             showInputTypeSwitchButton,
             title,
+            trailingAction,
             type = 'text',
             value,
             ...props
@@ -57,7 +63,11 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
         const setFocusedInput = useWorkflowNodeDetailsPanelStore((state) => state.setFocusedInput);
 
         const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-            setLocalValue(event.target.value);
+            const rawValue = event.target.value;
+
+            const displayValue = expressionPrefix && rawValue.startsWith('=') ? rawValue.substring(1) : rawValue;
+
+            setLocalValue(displayValue);
 
             if (onChange) {
                 onChange(event);
@@ -97,7 +107,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                         {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
                             <InputTypeSwitchButton
                                 handleClick={handleInputTypeSwitchButtonClick}
-                                mentionInput={false}
+                                mentionInput={mentionInput}
                             />
                         )}
 
@@ -114,13 +124,16 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                             'focus:ring-2 focus:ring-blue-500 focus-visible:outline-none',
                             leadingIcon && 'relative rounded-md',
                             type === 'hidden' && 'border-0',
-                            error && 'ring-rose-300'
+                            error && 'ring-rose-300',
+                            trailingAction &&
+                                'flex h-9 items-center rounded-md border border-input shadow-sm focus-within:ring-2 focus-within:ring-blue-500'
                         )}
                     >
                         {type !== 'hidden' && leadingIcon && (
                             <div
                                 className={twMerge(
                                     'pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-gray-200 bg-gray-100 px-3',
+                                    trailingAction && 'border-y-0 border-l-0',
                                     error && 'border-r-0 border-rose-300 text-rose-900 placeholder-rose-300'
                                 )}
                             >
@@ -135,6 +148,8 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                                     'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 ring-rose-300 focus-visible:ring-rose-300',
                                 disabled && 'bg-gray-100 text-gray-500',
                                 leadingIcon && 'pl-property-input-position leading-relaxed',
+                                trailingAction &&
+                                    'h-full flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
                                 className
                             )}
                             disabled={disabled}
@@ -155,6 +170,8 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                             value={localValue}
                             {...props}
                         />
+
+                        {trailingAction}
                     </div>
 
                     {error && (

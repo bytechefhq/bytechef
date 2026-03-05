@@ -52,7 +52,7 @@ public class AsanaConnection {
                 scopeMap.put("attachments:read", false);
                 scopeMap.put("attachments:write", false);
                 scopeMap.put("custom_fields:read", false);
-                scopeMap.put("custom_fields:write", false);
+                scopeMap.put("custom_fields:write", true);
                 scopeMap.put("goals:read", false);
                 scopeMap.put("portfolios:read", false);
                 scopeMap.put("portfolios:write", false);

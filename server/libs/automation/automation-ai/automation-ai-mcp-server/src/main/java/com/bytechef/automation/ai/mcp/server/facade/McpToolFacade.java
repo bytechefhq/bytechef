@@ -221,7 +221,7 @@ public class McpToolFacade extends AbstractToolFacade {
             String operation = workflowNodeType.operation();
 
             if (Objects.equals(name, WorkflowConstants.WORKFLOW) &&
-                Objects.equals(operation, WorkflowConstants.TOOL_CALLABLE)) {
+                Objects.equals(operation, WorkflowConstants.NEW_AI_MODEL_CALL)) {
 
                 return workflowTrigger;
             }

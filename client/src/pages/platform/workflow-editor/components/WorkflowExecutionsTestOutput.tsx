@@ -34,8 +34,6 @@ const WorkflowExecutionsTestOutput = ({
         getInitialSelectedItem(workflowTestExecution)
     );
 
-    const setWorkflowExecutionError = useCopilotStore((state) => state.setWorkflowExecutionError);
-
     const job = workflowTestExecution?.job;
     const triggerExecution = workflowTestExecution?.triggerExecution;
     const currentWorkflowId = job?.workflowId;
@@ -49,16 +47,16 @@ const WorkflowExecutionsTestOutput = ({
         const errorItem = getErrorItem(workflowTestExecution);
 
         if (errorItem?.error && currentWorkflowId) {
-            setWorkflowExecutionError({
+            useCopilotStore.getState().setWorkflowExecutionError({
                 errorMessage: errorItem.error.message,
                 stackTrace: errorItem.error.stackTrace,
                 title: errorItem.title,
                 workflowId: currentWorkflowId,
             });
         } else if (!errorItem?.error) {
-            setWorkflowExecutionError(undefined);
+            useCopilotStore.getState().setWorkflowExecutionError(undefined);
         }
-    }, [workflowTestExecution, currentWorkflowId, setWorkflowExecutionError]);
+    }, [workflowTestExecution, currentWorkflowId]);
 
     const tasksTree = useMemo(() => (job ? getTasksTree(job) : []), [job]);
 

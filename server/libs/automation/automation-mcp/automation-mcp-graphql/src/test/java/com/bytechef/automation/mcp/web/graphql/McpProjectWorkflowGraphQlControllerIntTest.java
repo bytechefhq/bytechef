@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.mcp.web.graphql.config.AutomationMcpGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.mcp.web.graphql.config.AutomationMcpGraphQlTestConfiguration;
@@ -52,6 +53,9 @@ class McpProjectWorkflowGraphQlControllerIntTest {
 
     @Autowired
     private GraphQlTester graphQlTester;
+
+    @Autowired
+    private McpProjectWorkflowFacade mcpProjectWorkflowFacade;
 
     @Autowired
     private McpProjectWorkflowService mcpProjectWorkflowService;
@@ -281,7 +285,7 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(mcpProjectWorkflowService).delete(workflowId);
+        verify(mcpProjectWorkflowFacade).deleteMcpProjectWorkflow(workflowId);
     }
 
     private McpProjectWorkflow createMockMcpProjectWorkflow(

@@ -16,25 +16,14 @@
 
 package com.bytechef.platform.workflow.test.web.rest;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.evaluator.Evaluator;
-import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
-import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,35 +54,24 @@ class AiAgentTestApiController {
 
     private static final Logger logger = LoggerFactory.getLogger(AiAgentTestApiController.class);
 
-    private final Cache<String, SseEmitter> activeTests = createCache();
-    private final ActionDefinitionFacade actionDefinitionFacade;
-    private final Evaluator evaluator;
+    private final Cache<String, SseEmitter> activeTests = Caffeine.newBuilder()
+        .expireAfterAccess(30, TimeUnit.MINUTES)
+        .maximumSize(100)
+        .build();
+    private final AiAgentTestFacade aiAgentTestFacade;
     private final Executor executor;
-    private final TempFileStorage tempFileStorage;
-    private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
-    private final WorkflowService workflowService;
-    private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
-    AiAgentTestApiController(
-        ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator, TaskExecutor taskExecutor,
-        TempFileStorage tempFileStorage, WorkflowNodeOutputFacade workflowNodeOutputFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
-
-        this.actionDefinitionFacade = actionDefinitionFacade;
-        this.evaluator = evaluator;
+    AiAgentTestApiController(AiAgentTestFacade aiAgentTestFacade, TaskExecutor taskExecutor) {
+        this.aiAgentTestFacade = aiAgentTestFacade;
         this.executor = taskExecutor;
-        this.tempFileStorage = tempFileStorage;
-        this.workflowNodeOutputFacade = workflowNodeOutputFacade;
-        this.workflowService = workflowService;
-        this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @PostMapping(
         value = "/ai-agent-tests",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    SseEmitter testAiAgent(@RequestBody AiAgentTestRequest aiAgentTestRequest) {
+    public SseEmitter testAiAgent(@RequestBody AiAgentTestRequest aiAgentTestRequest) {
         SseEmitter sseEmitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
 
         String testId = String.valueOf(UUID.randomUUID());
@@ -108,60 +86,10 @@ class AiAgentTestApiController {
             try {
                 sendEvent(sseEmitter, "start", Map.of("testId", testId));
 
-                String workflowId = aiAgentTestRequest.workflowId();
-                String workflowNodeName = aiAgentTestRequest.workflowNodeName();
-                long environmentId = aiAgentTestRequest.environmentId();
-
-                Workflow workflow = workflowService.getWorkflow(workflowId);
-
-                WorkflowTask workflowTask = workflow.getTasks(true)
-                    .stream()
-                    .filter(task -> Objects.equals(task.getName(), workflowNodeName))
-                    .findFirst()
-                    .orElseThrow(
-                        () -> new IllegalArgumentException(
-                            "Workflow task not found: %s".formatted(workflowNodeName)));
-
-                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
-                Map<String, Object> taskParameters = new HashMap<>(workflowTask.getParameters());
-
-                taskParameters.put("conversationId", aiAgentTestRequest.conversationId());
-                taskParameters.put("userPrompt", aiAgentTestRequest.message());
-
-                taskParameters.put("attachments", aiAgentTestRequest.attachments());
-
-                Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-                    workflowId, environmentId);
-
-                Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-                    workflowId, workflowNodeName, environmentId);
-
-                @SuppressWarnings("unchecked")
-                Map<String, Object> evaluatedParameters = (Map<String, Object>) evaluator.evaluate(
-                    taskParameters, MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
-
-                if (evaluatedParameters.containsKey("attachments")) {
-                    evaluatedParameters.put(
-                        "attachments",
-                        TestAttachmentUtils.getFileEntries(tempFileStorage, evaluatedParameters));
-                }
-
-                List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
-                    workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                        workflowId, workflowNodeName, environmentId);
-
-                Map<String, Long> connectionIds = MapUtils.toMap(
-                    workflowTestConfigurationConnections,
-                    WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
-                    WorkflowTestConfigurationConnection::getConnectionId);
-
-                Map<String, ?> extensions = workflowTask.getExtensions();
-
-                Object result = actionDefinitionFacade.executePerform(
-                    workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null,
-                    null, workflowId, evaluatedParameters, connectionIds, extensions, environmentId, null, true, null,
-                    null);
+                Object result = aiAgentTestFacade.executeAiAgentAction(
+                    aiAgentTestRequest.workflowId(), aiAgentTestRequest.workflowNodeName(),
+                    aiAgentTestRequest.environmentId(), aiAgentTestRequest.conversationId(),
+                    aiAgentTestRequest.message(), aiAgentTestRequest.attachments());
 
                 if (result instanceof ActionDefinition.SseEmitterHandler sseEmitterHandler) {
                     AiAgentSseEmitterBridge bridge = new AiAgentSseEmitterBridge(sseEmitter, testId);
@@ -207,7 +135,7 @@ class AiAgentTestApiController {
     }
 
     @PostMapping(value = "/ai-agent-tests/{testId}/stop")
-    ResponseEntity<Void> stopAiAgentTest(@PathVariable String testId) {
+    public ResponseEntity<Void> stopAiAgentTest(@PathVariable String testId) {
         SseEmitter sseEmitter = activeTests.getIfPresent(testId);
 
         if (sseEmitter != null) {
@@ -217,13 +145,6 @@ class AiAgentTestApiController {
         }
 
         return ResponseEntity.ok()
-            .build();
-    }
-
-    private static <K, V> Cache<K, V> createCache() {
-        return Caffeine.newBuilder()
-            .expireAfterAccess(30, TimeUnit.MINUTES)
-            .maximumSize(100)
             .build();
     }
 
@@ -254,11 +175,7 @@ class AiAgentTestApiController {
 
     @SuppressFBWarnings("EI")
     record AiAgentTestRequest(
-        String workflowId,
-        String workflowNodeName,
-        long environmentId,
-        String conversationId,
-        String message,
+        String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
         List<Object> attachments) {
 
         AiAgentTestRequest {

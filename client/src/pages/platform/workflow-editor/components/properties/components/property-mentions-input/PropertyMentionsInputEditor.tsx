@@ -1,14 +1,12 @@
-import Button from '@/components/Button/Button';
 import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {canInsertMentionForProperty} from '@/pages/platform/workflow-editor/components/datapills/DataPill';
+import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {
-    encodeParameters,
-    encodePath,
     escapeHtmlForParagraph,
     transformValueForObjectAccess,
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
@@ -33,14 +31,12 @@ import {EditorView} from '@tiptap/pm/view';
 import {Editor, EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {decode} from 'html-entities';
-import {SparklesIcon, XIcon} from 'lucide-react';
-import resolvePath from 'object-resolve-path';
 import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
-import {useShallow} from 'zustand/shallow';
+import {useShallow} from 'zustand/react/shallow';
 
 import {FormulaMode} from './FormulaMode.extension';
 import {FromAi} from './FromAi.extension';
@@ -79,7 +75,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             elementId,
             handleFromAiClick,
             isFormulaMode,
-            isFromAi,
+            isFromAi = false,
             labelId,
             onChange,
             onFocus,
@@ -95,17 +91,50 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         },
         ref: ForwardedRef<Editor>
     ) => {
-        const [editorValue, setEditorValue] = useState<string | number | undefined>(value);
+        const [editorValue, setEditorValue] = useState<string | number | undefined>(
+            typeof value === 'string' && value.startsWith('=') ? value.substring(1) : value
+        );
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
-        // Saving coordination to avoid parallel saves (which can cause optimistic lock exceptions)
         const lastSavedRef = useRef<string | number | null | undefined>(undefined);
         const savingRef = useRef<Promise<void> | null>(null);
         const pendingValueRef = useRef<string | number | null | undefined>(undefined);
+        const editorValueRef = useRef(editorValue);
 
-        const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
-        const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+        editorValueRef.current = editorValue;
+
+        const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                currentComponent: state.currentComponent,
+                currentNode: state.currentNode,
+            }))
+        );
+
+        const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
+
+        const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
+
+        const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
+            if (!currentNode?.name || !workflow.definition) {
+                return undefined;
+            }
+
+            if (currentNode.clusterElementType) {
+                const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+
+                const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+                    ? getTask({
+                          tasks: workflowDefinitionTasks,
+                          workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                      })
+                    : undefined;
+
+                if (mainClusterRootTask?.clusterElements) {
+                    return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
+                }
+            }
+        }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
 
         const getComponentIcon = useCallback(
             (mentionValue: string) => {
@@ -131,43 +160,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             },
             [componentDefinitions, taskDispatcherDefinitions, workflow.workflowTriggerComponentNames]
         );
-
-        const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
-
-        const {rootClusterElementNodeData} = useWorkflowEditorStore(
-            useShallow((state) => ({
-                rootClusterElementNodeData: state.rootClusterElementNodeData,
-            }))
-        );
-
-        const memoizedWorkflowTask = useMemo(
-            () =>
-                [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
-                    (node) => node.name === currentNode?.name
-                ),
-            [workflow.triggers, workflow.tasks, currentNode?.name]
-        );
-
-        const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
-            if (!currentNode?.name || !workflow.definition) {
-                return undefined;
-            }
-
-            if (currentNode.clusterElementType) {
-                const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
-
-                const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-                    ? getTask({
-                          tasks: workflowDefinitionTasks,
-                          workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-                      })
-                    : undefined;
-
-                if (mainClusterRootTask?.clusterElements) {
-                    return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
-                }
-            }
-        }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
 
         const extensions = useMemo(() => {
             const extensions = [
@@ -284,7 +276,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 return;
             }
 
-            if (validateBeforeSave && !validateBeforeSave(editorValue)) {
+            const valueForValidation =
+                isFormulaMode && typeof editorValue === 'string' && !editorValue.startsWith('=')
+                    ? `=${editorValue}`
+                    : editorValue;
+
+            if (validateBeforeSave && editorValue !== '' && !validateBeforeSave(valueForValidation)) {
                 return;
             }
 
@@ -593,15 +590,17 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             [editor]
         );
 
-        // Sync value prop into editor state when it changes externally (e.g. from Sheet save)
+        // When the value prop changes externally, sync it into editor state unless it already matches the current editor value (to avoid overwriting in-flight local updates such as datapill insertions).
         useEffect(() => {
-            if (value === undefined || value === editorValue) {
+            if (value === undefined || value === editorValueRef.current) {
                 return;
             }
 
+            const strippedValue = typeof value === 'string' && value.startsWith('=') ? value.substring(1) : value;
+
             setIsLocalUpdate(false);
-            setEditorValue(value);
-        }, [value, editorValue]);
+            setEditorValue(strippedValue);
+        }, [value]);
 
         // Sync ref when editor changes - handle both callback and object refs
         useEffect(() => {
@@ -634,42 +633,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 editor.storage.MentionStorage.dataPills = dataPills;
             }
         }, [dataPills, editor]);
-
-        // Update editor content when editorValue changes (but not during local updates)
-        useEffect(() => {
-            if (editor && !isLocalUpdate) {
-                editor.commands.setContent(getContent(editorValue as string)!, {
-                    emitUpdate: false,
-                    parseOptions: {preserveWhitespace: 'full'},
-                });
-            }
-        }, [editor, getContent, editorValue, isLocalUpdate]);
-
-        // Set propertyParameterValue on workflow definition change
-        useEffect(() => {
-            if (!workflow.definition || !currentNode?.name || !path) {
-                return;
-            }
-
-            const encodedParameters = encodeParameters(
-                (memoizedWorkflowTask?.parameters || memoizedClusterElementTask?.parameters) ?? {}
-            );
-            const encodedPath = encodePath(path);
-
-            const propertyValue = resolvePath(encodedParameters, encodedPath);
-
-            if (typeof propertyValue === 'string' && propertyValue.startsWith('=')) {
-                setEditorValue(propertyValue.substring(1));
-            } else {
-                setEditorValue(propertyValue);
-            }
-        }, [
-            currentNode?.name,
-            memoizedClusterElementTask?.parameters,
-            memoizedWorkflowTask?.parameters,
-            path,
-            workflow.definition,
-        ]);
 
         // Update editor content when editorValue changes (but not during local updates)
         useEffect(() => {
@@ -735,27 +698,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     value={editorValue}
                 />
 
-                {fromAiExtension &&
-                    handleFromAiClick &&
-                    (isFromAi ? (
-                        <Button
-                            className="self-center"
-                            icon={<XIcon />}
-                            onClick={() => handleFromAiClick && handleFromAiClick(false)}
-                            size="iconSm"
-                            title="Stop AI generation"
-                            variant="destructiveGhost"
-                        />
-                    ) : (
-                        <Button
-                            className="self-center"
-                            icon={<SparklesIcon />}
-                            onClick={() => handleFromAiClick && handleFromAiClick(true)}
-                            size="iconSm"
-                            title="Generate content with AI"
-                            variant="ghost"
-                        />
-                    ))}
+                {fromAiExtension && handleFromAiClick && currentNode?.clusterElementType === 'tools' && (
+                    <FromAiToggleButton isFromAi={isFromAi} onToggle={handleFromAiClick} />
+                )}
 
                 {controlType === 'RICH_TEXT' && editor && <PropertyMentionsInputBubbleMenu editor={editor} />}
             </>

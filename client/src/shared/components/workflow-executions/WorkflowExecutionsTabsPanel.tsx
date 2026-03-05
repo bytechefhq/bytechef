@@ -15,6 +15,7 @@ import WorkflowExecutionContentClipboardButton from '@/shared/components/workflo
 import WorkflowExecutionLogsContent from '@/shared/components/workflow-executions/WorkflowExecutionLogsContent';
 import {getDisplayValue, hasDialogContentValue} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {TabValueType} from '@/shared/types';
 import {AlertCircleIcon, ExpandIcon, ScrollTextIcon} from 'lucide-react';
 import {useMemo} from 'react';
@@ -38,6 +39,8 @@ const WorkflowExecutionsTabsPanel = ({
     isEditorEnvironment?: boolean;
     triggerExecution?: TriggerExecution;
 }) => {
+    const ff_2896 = useFeatureFlagsStore()('ff-2896');
+
     const displayValue = useMemo(
         () =>
             getDisplayValue({
@@ -119,11 +122,13 @@ const WorkflowExecutionsTabsPanel = ({
                         </TabsTrigger>
                     )}
 
-                    <TabsTrigger className="flex items-center gap-x-1" value="logs">
-                        <ScrollTextIcon className="size-4" />
+                    {ff_2896 && (
+                        <TabsTrigger className="flex items-center gap-x-1" value="logs">
+                            <ScrollTextIcon className="size-4" />
 
-                        <span>Logs</span>
-                    </TabsTrigger>
+                            <span>Logs</span>
+                        </TabsTrigger>
+                    )}
                 </TabsList>
 
                 {hasDialogContent && (
@@ -201,19 +206,21 @@ const WorkflowExecutionsTabsPanel = ({
                         <WorkflowExecutionContent error={selectedItem?.error} />
                     </TabsContent>
 
-                    <TabsContent className="h-full p-3" value="logs">
-                        {job.id && (
-                            <WorkflowExecutionLogsContent
-                                isEditorEnvironment={isEditorEnvironment}
-                                jobId={job.id}
-                                taskExecutionId={
-                                    selectedItem && 'workflowTask' in selectedItem
-                                        ? (selectedItem as TaskExecution).id
-                                        : undefined
-                                }
-                            />
-                        )}
-                    </TabsContent>
+                    {ff_2896 && (
+                        <TabsContent className="h-full p-3" value="logs">
+                            {job.id && (
+                                <WorkflowExecutionLogsContent
+                                    isEditorEnvironment={isEditorEnvironment}
+                                    jobId={job.id}
+                                    taskExecutionId={
+                                        selectedItem && 'workflowTask' in selectedItem
+                                            ? (selectedItem as TaskExecution).id
+                                            : undefined
+                                    }
+                                />
+                            )}
+                        </TabsContent>
+                    )}
                 </div>
 
                 <ScrollBar orientation="horizontal" />

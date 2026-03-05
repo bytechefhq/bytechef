@@ -51,7 +51,7 @@ interface UseWorkflowEditorCanvasParamsI {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
     invalidateWorkflowQueries: () => void;
-    projectLeftSidebarOpen?: boolean;
+    leftSidebarOpen?: boolean;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 }
@@ -60,7 +60,7 @@ const useWorkflowEditorCanvas = ({
     componentDefinitions,
     customCanvasWidth,
     invalidateWorkflowQueries,
-    projectLeftSidebarOpen,
+    leftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: UseWorkflowEditorCanvasParamsI) => {
@@ -102,7 +102,7 @@ const useWorkflowEditorCanvas = ({
 
     const nodeTypes = useMemo(
         () => ({
-            aiAgentNode: AiAgentNode,
+            clusterRoot: AiAgentNode,
             placeholder: PlaceholderNode,
             readonly: ReadOnlyNode,
             readonlyPlaceholder: ReadOnlyPlaceholderNode,
@@ -467,7 +467,7 @@ const useWorkflowEditorCanvas = ({
         canvasWidth -= DATA_PILL_PANEL_WIDTH;
     }
 
-    if (projectLeftSidebarOpen) {
+    if (leftSidebarOpen) {
         canvasWidth -= PROJECT_LEFT_SIDEBAR_WIDTH;
     }
 
@@ -508,6 +508,7 @@ const useWorkflowEditorCanvas = ({
         canvasHeight,
         canvasWidth: customCanvasWidth || canvasWidth,
         componentDefinitions,
+        leftSidebarOpen,
         readOnlyWorkflow: readOnlyWorkflow ? workflow : undefined,
         taskDispatcherDefinitions,
     });

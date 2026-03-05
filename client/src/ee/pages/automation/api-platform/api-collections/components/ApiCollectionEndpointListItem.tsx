@@ -10,6 +10,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
 import {useDeleteApiCollectionEndpointMutation} from '@/ee/shared/mutations/automation/apiCollectionEndpoints.mutations';
@@ -160,6 +161,16 @@ const ApiCollectionEndpointListItem = ({
             </div>
 
             <div className="flex items-center justify-end gap-x-6">
+                <Tooltip>
+                    <TooltipTrigger className="flex items-center text-sm text-muted-foreground">
+                        <span className="text-xs">
+                            {`Executed at ${apiCollectionEndpoint.lastExecutionDate?.toLocaleDateString()} ${apiCollectionEndpoint.lastExecutionDate?.toLocaleTimeString()}`}
+                        </span>
+                    </TooltipTrigger>
+
+                    <TooltipContent>Last Modified Date</TooltipContent>
+                </Tooltip>
+
                 <Switch checked={apiCollectionEndpoint.enabled} onCheckedChange={handleApiCollectionEndpointEnable} />
 
                 <DropdownMenu>

@@ -16,8 +16,9 @@ import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {XIcon} from 'lucide-react';
-import {Suspense, lazy} from 'react';
+import {Suspense, lazy, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 const DataPillPanel = lazy(() => import('./datapills/DataPillPanel'));
 
@@ -38,10 +39,18 @@ const ClusterElementsCanvasDialog = ({
     updateWorkflowMutation,
     workflowNodeOutputs,
 }: ClusterElementsCanvasDialogProps) => {
-    const copilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.copilotPanelOpen);
-    const showAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.showAiAgentEditor);
-    const showDataStreamEditor = useClusterElementsCanvasDialogStore((state) => state.showDataStreamEditor);
-    const testingPanelOpen = useClusterElementsCanvasDialogStore((state) => state.testingPanelOpen);
+    const [shouldRenderDataPillPanel, setShouldRenderDataPillPanel] = useState(false);
+    const [isDataPillPanelVisible, setIsDataPillPanelVisible] = useState(false);
+
+    const {copilotPanelOpen, showAiAgentEditor, showDataStreamEditor, testingPanelOpen} =
+        useClusterElementsCanvasDialogStore(
+            useShallow((state) => ({
+                copilotPanelOpen: state.copilotPanelOpen,
+                showAiAgentEditor: state.showAiAgentEditor,
+                showDataStreamEditor: state.showDataStreamEditor,
+                testingPanelOpen: state.testingPanelOpen,
+            }))
+        );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
@@ -58,11 +67,46 @@ const ClusterElementsCanvasDialog = ({
         handleToggleEditor,
         isAiAgentClusterRoot,
         isDataStreamClusterRoot,
+        isDataStreamSimpleModeAvailable,
     } = useClusterElementsCanvasDialog({
         onOpenChange,
     });
 
     const ff_4070 = useFeatureFlagsStore()('ff-4070');
+
+    useEffect(() => {
+        let outerRafId: number | undefined;
+        let innerRafId: number | undefined;
+        let timerId: ReturnType<typeof setTimeout> | undefined;
+
+        if (dataPillPanelOpen) {
+            setShouldRenderDataPillPanel(true);
+
+            outerRafId = requestAnimationFrame(() => {
+                innerRafId = requestAnimationFrame(() => {
+                    setIsDataPillPanelVisible(true);
+                });
+            });
+        } else {
+            setIsDataPillPanelVisible(false);
+
+            timerId = setTimeout(() => setShouldRenderDataPillPanel(false), 300);
+        }
+
+        return () => {
+            if (outerRafId !== undefined) {
+                cancelAnimationFrame(outerRafId);
+            }
+
+            if (innerRafId !== undefined) {
+                cancelAnimationFrame(innerRafId);
+            }
+
+            if (timerId !== undefined) {
+                clearTimeout(timerId);
+            }
+        };
+    }, [dataPillPanelOpen]);
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
@@ -72,7 +116,7 @@ const ClusterElementsCanvasDialog = ({
                 <DialogDescription />
             </DialogHeader>
 
-            <DialogContent className="absolute bottom-4 left-16 top-12 h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 gap-2 bg-surface-main p-0">
+            <DialogContent className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-col gap-2 overflow-hidden bg-surface-main p-0">
                 {isDataStreamClusterRoot && showDataStreamEditor ? (
                     <div className="flex size-full min-h-0 overflow-hidden">
                         <DataStreamEditor onClose={handleClose} onToggleEditor={handleToggleEditor} />
@@ -80,7 +124,10 @@ const ClusterElementsCanvasDialog = ({
                 ) : showAiAgentEditor ? (
                     <div className="flex size-full min-h-0 overflow-hidden">
                         <AiAgentEditor
-                            className={twMerge(copilotPanelOpen && 'mr-[450px]')}
+                            className={twMerge(
+                                'transition-[margin] duration-300 ease-in-out',
+                                copilotPanelOpen && 'mr-[450px]'
+                            )}
                             copilotEnabled={ff_4070 && copilotEnabled}
                             onClose={handleClose}
                             onCopilotClick={handleCopilotClick}
@@ -90,24 +137,36 @@ const ClusterElementsCanvasDialog = ({
                         />
 
                         <CopilotPanel
-                            className="fixed inset-y-0 right-0 rounded-r-md border-l"
+                            className="absolute inset-y-0 right-0 rounded-r-md border-l"
                             onClose={handleCopilotClose}
                             open={copilotPanelOpen}
                         />
                     </div>
                 ) : (
                     <>
-                        <div className="flex size-full flex-col rounded-lg bg-surface-popover-canvas">
+                        <div
+                            className={twMerge(
+                                'flex min-h-0 flex-1 flex-col rounded-lg bg-surface-popover-canvas transition-[margin] duration-300 ease-in-out',
+                                workflowNodeDetailsPanelOpen && 'mr-[465px]',
+                                workflowNodeDetailsPanelOpen && copilotPanelOpen && 'mr-[915px]'
+                            )}
+                        >
                             {(isAiAgentClusterRoot || isDataStreamClusterRoot) && (
                                 <ClusterElementsWorkflowEditorHeader
-                                    className={twMerge(
-                                        workflowNodeDetailsPanelOpen && 'pr-[470px]',
-                                        workflowNodeDetailsPanelOpen && copilotPanelOpen && 'pr-[920px]'
-                                    )}
                                     copilotEnabled={ff_4070 && copilotEnabled}
                                     onCopilotClick={handleCopilotClick}
                                     onTestClick={handleTestClick}
                                     onToggleEditor={handleToggleEditor}
+                                    showTestButton={isAiAgentClusterRoot}
+                                    showToggleEditor={
+                                        isAiAgentClusterRoot ||
+                                        (isDataStreamClusterRoot && isDataStreamSimpleModeAvailable)
+                                    }
+                                    toggleEditorLabel={
+                                        isAiAgentClusterRoot
+                                            ? 'Switch to AI Agent editor'
+                                            : 'Switch to DataStream editor'
+                                    }
                                 />
                             )}
 
@@ -116,7 +175,7 @@ const ClusterElementsCanvasDialog = ({
 
                         <WorkflowNodeDetailsPanel
                             className={twMerge(
-                                'fixed inset-y-0 right-0 rounded-l-none',
+                                'absolute inset-y-0 right-0 rounded-l-none transition-[right] duration-300 ease-in-out',
                                 copilotPanelOpen && 'right-[450px] rounded-r-none border-r-0'
                             )}
                             closeButton={
@@ -130,12 +189,23 @@ const ClusterElementsCanvasDialog = ({
                             workflowNodeOutputs={workflowNodeOutputs}
                         />
 
-                        {dataPillPanelOpen && (
-                            <Suspense fallback={<DataPillPanelSkeleton />}>
+                        {shouldRenderDataPillPanel && (
+                            <Suspense
+                                fallback={
+                                    <DataPillPanelSkeleton
+                                        className={twMerge(
+                                            'absolute inset-y-0 right-[465px] rounded-none transition-[right,transform,opacity] duration-300 ease-in-out',
+                                            copilotPanelOpen && 'right-[915px]',
+                                            !isDataPillPanelVisible && 'translate-x-8 opacity-0'
+                                        )}
+                                    />
+                                }
+                            >
                                 <DataPillPanel
                                     className={twMerge(
-                                        'fixed inset-y-0 right-[465px] rounded-none',
-                                        copilotPanelOpen && 'right-[915px]'
+                                        'absolute inset-y-0 right-[465px] rounded-none transition-[right,transform,opacity] duration-300 ease-in-out',
+                                        copilotPanelOpen && 'right-[915px]',
+                                        !isDataPillPanelVisible && 'translate-x-8 opacity-0'
                                     )}
                                     previousComponentDefinitions={previousComponentDefinitions}
                                     workflowNodeOutputs={workflowNodeOutputs}
@@ -146,7 +216,7 @@ const ClusterElementsCanvasDialog = ({
                         {testingPanelOpen && (
                             <div
                                 className={twMerge(
-                                    'fixed inset-y-0 right-0 z-0 w-[800px] overflow-hidden border-l border-r bg-background',
+                                    'absolute inset-y-0 right-0 z-0 w-[800px] overflow-hidden border-l border-r bg-background transition-[right] duration-300 ease-in-out',
                                     workflowNodeDetailsPanelOpen && !copilotPanelOpen && 'right-[465px]',
                                     copilotPanelOpen && 'right-[450px] z-10'
                                 )}
@@ -162,7 +232,7 @@ const ClusterElementsCanvasDialog = ({
                         )}
 
                         <CopilotPanel
-                            className="fixed inset-y-0 right-0 rounded-r-md border-l"
+                            className="absolute inset-y-0 right-0 rounded-r-md border-l"
                             onClose={handleCopilotClose}
                             open={copilotPanelOpen}
                         />

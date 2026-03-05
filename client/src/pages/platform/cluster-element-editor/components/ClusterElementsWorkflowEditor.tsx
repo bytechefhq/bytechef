@@ -1,17 +1,39 @@
-import {Background, BackgroundVariant, ControlButton, Controls, ReactFlow, ReactFlowProvider} from '@xyflow/react';
+import {
+    Background,
+    BackgroundVariant,
+    ControlButton,
+    Controls,
+    ReactFlow,
+    ReactFlowProvider,
+    type Viewport,
+} from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 import {CANVAS_BACKGROUND_COLOR, DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
 import {BrushCleaningIcon} from 'lucide-react';
+import {useCallback} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsWorkflowEditor from '../hooks/useClusterElementsWorkflowEditor';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 
 const ClusterElementsWorkflowEditor = () => {
-    const onEdgesChange = useClusterElementsDataStore((state) => state.onEdgesChange);
+    const {onEdgesChange, setCanvasZoom} = useClusterElementsDataStore(
+        useShallow((state) => ({
+            onEdgesChange: state.onEdgesChange,
+            setCanvasZoom: state.setCanvasZoom,
+        }))
+    );
 
     const {clusterElementsEdgeTypes, clusterElementsNodeTypes, edges, handleNodesChange, handleResetLayout, nodes} =
         useClusterElementsWorkflowEditor();
+
+    const handleViewportChange = useCallback(
+        (viewport: Viewport) => {
+            setCanvasZoom(viewport.zoom);
+        },
+        [setCanvasZoom]
+    );
 
     return (
         <div className="flex-1">
@@ -28,6 +50,7 @@ const ClusterElementsWorkflowEditor = () => {
                     nodesDraggable
                     onEdgesChange={onEdgesChange}
                     onNodesChange={handleNodesChange}
+                    onViewportChange={handleViewportChange}
                     panOnDrag
                     panOnScroll
                     proOptions={{hideAttribution: true}}

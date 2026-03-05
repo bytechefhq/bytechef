@@ -3,6 +3,7 @@ mutation updateMcpComponentWithTools($id: ID!, $input: McpComponentWithToolsInpu
         id
         componentName
         componentVersion
+        title
         mcpServerId
         connectionId
         createdBy

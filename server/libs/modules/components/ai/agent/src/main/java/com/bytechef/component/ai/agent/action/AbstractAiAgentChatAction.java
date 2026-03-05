@@ -185,22 +185,22 @@ public abstract class AbstractAiAgentChatAction {
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
         boolean editorEnvironment, @Nullable ToolExecutionListener toolExecutionListener, ActionContext context) {
 
-        List<ToolCallback> rawToolCallbacks = new ArrayList<>();
+        List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         for (ClusterElement clusterElement : toolClusterElements) {
             ComponentConnection componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
 
-            rawToolCallbacks.add(
+            toolCallbacks.add(
                 aiAgentToolFacade.getFunctionToolCallback(clusterElement, componentConnection, editorEnvironment));
         }
 
         if (toolExecutionListener == null) {
-            return rawToolCallbacks;
+            return toolCallbacks;
         }
 
         AtomicReference<AgentThinking> thinkingReference = new AtomicReference<>();
 
-        List<ToolCallback> observableToolCallbacks = rawToolCallbacks.stream()
+        List<ToolCallback> observableToolCallbacks = toolCallbacks.stream()
             .map(
                 toolCallback -> createObservableToolCallback(
                     toolCallback, thinkingReference, toolExecutionListener, context))

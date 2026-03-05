@@ -18,8 +18,11 @@ import com.bytechef.ee.embedded.mcp.service.McpIntegrationWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,7 +82,7 @@ public class McpIntegrationFacadeImpl implements McpIntegrationFacade {
             integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
                 integrationInstanceConfiguration.getId());
             integrationInstanceConfigurationWorkflow.setWorkflowId(workflowId);
-            integrationInstanceConfigurationWorkflow.setEnabled(false);
+            integrationInstanceConfigurationWorkflow.setEnabled(true);
             integrationInstanceConfigurationWorkflow.setInputs(Map.of());
 
             integrationInstanceConfigurationWorkflow =
@@ -114,5 +117,74 @@ public class McpIntegrationFacadeImpl implements McpIntegrationFacade {
         if (integrationInstanceConfigurationId != null) {
             integrationInstanceConfigurationService.delete(integrationInstanceConfigurationId);
         }
+    }
+
+    @Override
+    public McpIntegration updateMcpIntegration(long mcpIntegrationId, List<String> selectedWorkflowIds) {
+        McpIntegration mcpIntegration = mcpIntegrationService.fetchMcpIntegration(mcpIntegrationId)
+            .orElseThrow(() -> new IllegalArgumentException("McpIntegration not found: " + mcpIntegrationId));
+
+        List<McpIntegrationWorkflow> existingMcpIntegrationWorkflows =
+            mcpIntegrationWorkflowService.getMcpIntegrationMcpIntegrationWorkflows(mcpIntegrationId);
+
+        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                mcpIntegration.getIntegrationInstanceConfigurationId());
+
+        Map<Long, IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflowMap =
+            new HashMap<>();
+
+        for (IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow : integrationInstanceConfigurationWorkflows) {
+
+            integrationInstanceConfigurationWorkflowMap.put(
+                integrationInstanceConfigurationWorkflow.getId(), integrationInstanceConfigurationWorkflow);
+        }
+
+        Map<String, McpIntegrationWorkflow> existingWorkflowIdMap = new HashMap<>();
+
+        for (McpIntegrationWorkflow mcpIntegrationWorkflow : existingMcpIntegrationWorkflows) {
+            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                integrationInstanceConfigurationWorkflowMap.get(
+                    mcpIntegrationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+
+            if (integrationInstanceConfigurationWorkflow != null) {
+                existingWorkflowIdMap.put(
+                    integrationInstanceConfigurationWorkflow.getWorkflowId(), mcpIntegrationWorkflow);
+            }
+        }
+
+        Set<String> selectedWorkflowIdSet = new HashSet<>(selectedWorkflowIds);
+
+        for (String workflowId : selectedWorkflowIds) {
+            if (!existingWorkflowIdMap.containsKey(workflowId)) {
+                IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                    new IntegrationInstanceConfigurationWorkflow();
+
+                integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+                    mcpIntegration.getIntegrationInstanceConfigurationId());
+                integrationInstanceConfigurationWorkflow.setWorkflowId(workflowId);
+                integrationInstanceConfigurationWorkflow.setEnabled(true);
+                integrationInstanceConfigurationWorkflow.setInputs(Map.of());
+
+                integrationInstanceConfigurationWorkflow =
+                    integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+
+                mcpIntegrationWorkflowService.create(
+                    mcpIntegrationId, integrationInstanceConfigurationWorkflow.getId());
+            }
+        }
+
+        for (Map.Entry<String, McpIntegrationWorkflow> entry : existingWorkflowIdMap.entrySet()) {
+            if (!selectedWorkflowIdSet.contains(entry.getKey())) {
+                McpIntegrationWorkflow mcpIntegrationWorkflow = entry.getValue();
+
+                mcpIntegrationWorkflowService.delete(mcpIntegrationWorkflow.getId());
+
+                integrationInstanceConfigurationWorkflowService.delete(
+                    mcpIntegrationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+            }
+        }
+
+        return mcpIntegration;
     }
 }

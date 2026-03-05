@@ -26,7 +26,7 @@ type WorkflowEditorPropsType = {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
     invalidateWorkflowQueries: () => void;
-    projectLeftSidebarOpen?: boolean;
+    leftSidebarOpen?: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 };
 
@@ -34,7 +34,7 @@ const WorkflowEditor = ({
     componentDefinitions,
     customCanvasWidth,
     invalidateWorkflowQueries,
-    projectLeftSidebarOpen,
+    leftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: WorkflowEditorPropsType & ConditionalWorkflowEditorPropsType) => {
@@ -65,7 +65,7 @@ const WorkflowEditor = ({
         componentDefinitions,
         customCanvasWidth,
         invalidateWorkflowQueries,
-        projectLeftSidebarOpen,
+        leftSidebarOpen,
         readOnlyWorkflow,
         taskDispatcherDefinitions,
     });

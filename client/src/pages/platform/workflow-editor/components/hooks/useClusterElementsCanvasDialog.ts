@@ -6,7 +6,8 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {useCallback, useEffect} from 'react';
+import {NodeDataType} from '@/shared/types';
+import {useCallback, useEffect, useMemo} from 'react';
 
 interface UseClusterElementsCanvasDialogProps {
     onOpenChange: (open: boolean) => void;
@@ -24,7 +25,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
 
     const isAiAgentClusterRoot = rootClusterElementNodeData?.componentName === 'aiAgent';
     const isDataStreamClusterRoot = rootClusterElementNodeData?.componentName === 'dataStream';
-    const agentNodeName = rootClusterElementNodeData?.workflowNodeName;
+    const workflowNodeName = rootClusterElementNodeData?.workflowNodeName;
 
     const ai = useApplicationInfoStore((state) => state.ai);
     const setContext = useCopilotStore((state) => state.setContext);
@@ -33,11 +34,66 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
 
     const copilotEnabled = ai.copilot.enabled && ff_1570;
 
+    const isDataStreamSimpleModeAvailable = useMemo(() => {
+        if (!isDataStreamClusterRoot) {
+            return true;
+        }
+
+        const clusterElements = rootClusterElementNodeData?.clusterElements;
+
+        if (!clusterElements || Array.isArray(clusterElements)) {
+            return true;
+        }
+
+        const processorValue = clusterElements['processor'];
+
+        if (!processorValue) {
+            return true;
+        }
+
+        const processorElement = (Array.isArray(processorValue) ? processorValue[0] : processorValue) as NodeDataType;
+
+        const typeSegments = processorElement?.type?.split('/') || [];
+
+        const componentName = (processorElement as NodeDataType)?.componentName || typeSegments[0] || '';
+        const clusterElementName = typeSegments[2] || '';
+
+        return componentName === 'dataStreamProcessor' && clusterElementName === 'fieldMapper';
+    }, [isDataStreamClusterRoot, rootClusterElementNodeData?.clusterElements]);
+
+    useEffect(() => {
+        if (isAiAgentClusterRoot && workflowNodeName) {
+            const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[workflowNodeName];
+
+            const showAiAgent = preference ?? true;
+
+            setShowAiAgentEditor(showAiAgent);
+        }
+    }, [isAiAgentClusterRoot, workflowNodeName, setShowAiAgentEditor]);
+
+    useEffect(() => {
+        if (isDataStreamClusterRoot && workflowNodeName) {
+            if (!isDataStreamSimpleModeAvailable) {
+                setShowDataStreamEditor(false);
+
+                return;
+            }
+
+            const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[workflowNodeName];
+
+            const showDataStream = preference ?? true;
+
+            setShowDataStreamEditor(showDataStream);
+        }
+    }, [isDataStreamClusterRoot, isDataStreamSimpleModeAvailable, workflowNodeName, setShowDataStreamEditor]);
+
     const handleToggleEditor = useCallback(
         (showSimpleEditor: boolean) => {
             if (isAiAgentClusterRoot) {
                 setShowAiAgentEditor(showSimpleEditor);
+
                 useTestingModeStore.getState().resetTestingMode();
+
                 useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
             } else if (isDataStreamClusterRoot) {
                 setShowDataStreamEditor(showSimpleEditor);
@@ -64,12 +120,12 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
                 }
             }
 
-            if (agentNodeName) {
-                setEditorPreference(agentNodeName, showSimpleEditor);
+            if (workflowNodeName) {
+                setEditorPreference(workflowNodeName, showSimpleEditor);
             }
         },
         [
-            agentNodeName,
+            workflowNodeName,
             isAiAgentClusterRoot,
             isDataStreamClusterRoot,
             rootClusterElementNodeData,
@@ -139,25 +195,26 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     }, [handleOpenChange]);
 
     useEffect(() => {
-        if (isAiAgentClusterRoot && agentNodeName) {
-            const showAiAgent = useClusterElementsCanvasDialogStore.getState().editorPreferences[agentNodeName] ?? true;
+        if (isAiAgentClusterRoot && workflowNodeName) {
+            const showAiAgent =
+                useClusterElementsCanvasDialogStore.getState().editorPreferences[workflowNodeName] ?? true;
 
             setShowAiAgentEditor(showAiAgent);
         } else {
             setShowAiAgentEditor(false);
         }
-    }, [agentNodeName, isAiAgentClusterRoot, setShowAiAgentEditor]);
+    }, [workflowNodeName, isAiAgentClusterRoot, setShowAiAgentEditor]);
 
     useEffect(() => {
-        if (isDataStreamClusterRoot && agentNodeName) {
+        if (isDataStreamClusterRoot && workflowNodeName) {
             const showDataStream =
-                useClusterElementsCanvasDialogStore.getState().editorPreferences[agentNodeName] ?? true;
+                useClusterElementsCanvasDialogStore.getState().editorPreferences[workflowNodeName] ?? true;
 
             setShowDataStreamEditor(showDataStream);
         } else {
             setShowDataStreamEditor(false);
         }
-    }, [agentNodeName, isDataStreamClusterRoot, setShowDataStreamEditor]);
+    }, [workflowNodeName, isDataStreamClusterRoot, setShowDataStreamEditor]);
 
     return {
         copilotEnabled,
@@ -170,5 +227,6 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         handleToggleEditor,
         isAiAgentClusterRoot,
         isDataStreamClusterRoot,
+        isDataStreamSimpleModeAvailable,
     };
 }

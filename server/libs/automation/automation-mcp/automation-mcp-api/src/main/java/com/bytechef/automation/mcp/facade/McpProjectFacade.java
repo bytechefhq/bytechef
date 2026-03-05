@@ -44,4 +44,14 @@ public interface McpProjectFacade {
      * @param mcpProjectId the unique identifier of the MCP project to be deleted
      */
     void deleteMcpProject(long mcpProjectId);
+
+    /**
+     * Updates the selected workflows of an MCP project by computing a diff against the current state. New workflows are
+     * created, deselected workflows are removed, unchanged workflows are preserved.
+     *
+     * @param mcpProjectId        the unique identifier of the MCP project to update
+     * @param selectedWorkflowIds the new list of selected workflow IDs
+     * @return the updated MCP project
+     */
+    McpProject updateMcpProject(long mcpProjectId, List<String> selectedWorkflowIds);
 }

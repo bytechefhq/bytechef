@@ -1,4 +1,5 @@
 import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {getClusterElementsLabel} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType} from '@/shared/types';
@@ -16,6 +17,7 @@ type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
 interface WorkflowNodesTabsProps {
     actionComponentDefinitions: Array<ComponentDefinitionBasic>;
     clusterElementComponentDefinitions?: Array<ComponentDefinitionBasic>;
+    clusterElementType?: string;
     hideActionComponents?: boolean;
     hideClusterElementComponents?: boolean;
     hideTaskDispatchers?: boolean;
@@ -30,6 +32,7 @@ interface WorkflowNodesTabsProps {
 const WorkflowNodesTabs = ({
     actionComponentDefinitions,
     clusterElementComponentDefinitions,
+    clusterElementType,
     hideActionComponents = false,
     hideClusterElementComponents = false,
     hideTaskDispatchers = false,
@@ -192,7 +195,7 @@ const WorkflowNodesTabs = ({
 
                     {!hideClusterElementComponents && (
                         <TabsTrigger className="w-full data-[state=active]:shadow-none" value="clusterElements">
-                            Cluster Elements
+                            {clusterElementType ? getClusterElementsLabel(clusterElementType) : 'Cluster Elements'}
                         </TabsTrigger>
                     )}
                 </TabsList>

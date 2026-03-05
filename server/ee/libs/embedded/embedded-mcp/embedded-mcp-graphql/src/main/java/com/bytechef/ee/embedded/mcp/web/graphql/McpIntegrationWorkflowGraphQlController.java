@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.mcp.domain.McpIntegrationWorkflow;
+import com.bytechef.ee.embedded.mcp.facade.McpIntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.mcp.service.McpIntegrationWorkflowService;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.definition.PropertyFactory;
@@ -50,16 +51,19 @@ class McpIntegrationWorkflowGraphQlController {
 
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
+    private final McpIntegrationWorkflowFacade mcpIntegrationWorkflowFacade;
     private final McpIntegrationWorkflowService mcpIntegrationWorkflowService;
     private final WorkflowService workflowService;
 
     McpIntegrationWorkflowGraphQlController(
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationWorkflowService integrationWorkflowService,
+        McpIntegrationWorkflowFacade mcpIntegrationWorkflowFacade,
         McpIntegrationWorkflowService mcpIntegrationWorkflowService, WorkflowService workflowService) {
 
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
+        this.mcpIntegrationWorkflowFacade = mcpIntegrationWorkflowFacade;
         this.mcpIntegrationWorkflowService = mcpIntegrationWorkflowService;
         this.workflowService = workflowService;
     }
@@ -211,7 +215,7 @@ class McpIntegrationWorkflowGraphQlController {
 
     @MutationMapping
     boolean deleteMcpIntegrationWorkflow(@Argument("id") long id) {
-        mcpIntegrationWorkflowService.delete(id);
+        mcpIntegrationWorkflowFacade.deleteMcpIntegrationWorkflow(id);
 
         return true;
     }
@@ -240,7 +244,7 @@ class McpIntegrationWorkflowGraphQlController {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), WorkflowConstants.TOOL_CALLABLE)) {
+                Objects.equals(workflowNodeType.operation(), WorkflowConstants.NEW_AI_MODEL_CALL)) {
 
                 return workflowTrigger;
             }

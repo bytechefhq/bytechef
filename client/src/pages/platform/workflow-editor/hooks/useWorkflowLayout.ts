@@ -32,10 +32,8 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
             setRightSidebarOpen: state.setRightSidebarOpen,
         }))
     );
-    const {setComponentDefinitions, setTaskDispatcherDefinitions, workflow, workflowNodes} = useWorkflowDataStore(
+    const {workflow, workflowNodes} = useWorkflowDataStore(
         useShallow((state) => ({
-            setComponentDefinitions: state.setComponentDefinitions,
-            setTaskDispatcherDefinitions: state.setTaskDispatcherDefinitions,
             workflow: state.workflow,
             workflowNodes: state.workflowNodes,
         }))
@@ -160,14 +158,14 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
 
     useEffect(() => {
         if (componentDefinitions) {
-            setComponentDefinitions(componentDefinitions);
+            useWorkflowDataStore.getState().setComponentDefinitions(componentDefinitions);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentDefinitions?.length]);
 
     useEffect(() => {
         if (taskDispatcherDefinitions) {
-            setTaskDispatcherDefinitions(taskDispatcherDefinitions);
+            useWorkflowDataStore.getState().setTaskDispatcherDefinitions(taskDispatcherDefinitions);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [taskDispatcherDefinitions?.length]);

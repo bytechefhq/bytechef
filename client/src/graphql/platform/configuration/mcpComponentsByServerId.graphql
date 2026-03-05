@@ -3,12 +3,17 @@ query mcpComponentsByServerId($mcpServerId: ID!) {
         id
         componentName
         componentVersion
+        title
         connectionId,
+        lastModifiedDate
         mcpServerId
         mcpTools {
             id,
             mcpComponentId
             name
+            parameters
+            title
+            version
         }
         version
     }

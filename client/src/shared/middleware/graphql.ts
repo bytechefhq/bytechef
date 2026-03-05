@@ -34,6 +34,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  Any: { input: any; output: any; }
   Long: { input: any; output: any; }
   Map: { input: any; output: any; }
 };
@@ -840,6 +841,21 @@ export type Integration = {
   name: Scalars['String']['output'];
 };
 
+export type IntegrationWorkflow = {
+  __typename?: 'IntegrationWorkflow';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  integrationWorkflowId: Scalars['ID']['output'];
+  label: Scalars['String']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  workflowTaskComponentNames: Array<Scalars['String']['output']>;
+  workflowTriggerComponentNames: Array<Scalars['String']['output']>;
+  workflowUuid?: Maybe<Scalars['String']['output']>;
+};
+
 export type KnowledgeBase = {
   __typename?: 'KnowledgeBase';
   createdDate?: Maybe<Scalars['Long']['output']>;
@@ -967,6 +983,7 @@ export type McpComponent = {
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   mcpServerId: Scalars['ID']['output'];
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
+  title?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
 };
 
@@ -1009,6 +1026,7 @@ export type McpProjectWorkflow = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   mcpProjectId: Scalars['Long']['output'];
+  parameters?: Maybe<Scalars['Map']['output']>;
   projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
   projectDeploymentWorkflowId: Scalars['Long']['output'];
   version?: Maybe<Scalars['Int']['output']>;
@@ -1022,6 +1040,7 @@ export type McpProjectWorkflowInput = {
 
 export type McpProjectWorkflowUpdateInput = {
   mcpProjectId?: InputMaybe<Scalars['Long']['input']>;
+  parameters?: InputMaybe<Scalars['Map']['input']>;
   projectDeploymentWorkflowId?: InputMaybe<Scalars['Long']['input']>;
 };
 
@@ -1074,6 +1093,7 @@ export type McpTool = {
   mcpComponentId: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   parameters?: Maybe<Scalars['Map']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
 };
 
@@ -1081,6 +1101,7 @@ export type McpToolInput = {
   mcpComponentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   parameters?: InputMaybe<Scalars['Map']['input']>;
+  version?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type McpToolInputForComponent = {
@@ -1121,6 +1142,7 @@ export type Mutation = {
   deleteMcpProject?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  deleteMcpTool?: Maybe<Scalars['Boolean']['output']>;
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
@@ -1164,10 +1186,12 @@ export type Mutation = {
   updateKnowledgeBaseTags: Scalars['Boolean']['output'];
   updateManagementMcpServerUrl: Scalars['String']['output'];
   updateMcpComponentWithTools?: Maybe<McpComponent>;
+  updateMcpProject?: Maybe<McpProject>;
   updateMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   updateMcpServer?: Maybe<McpServer>;
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
+  updateMcpTool?: Maybe<McpTool>;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
 };
@@ -1325,6 +1349,11 @@ export type MutationDeleteMcpProjectWorkflowArgs = {
 
 
 export type MutationDeleteMcpServerArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteMcpToolArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -1578,6 +1607,12 @@ export type MutationUpdateMcpComponentWithToolsArgs = {
 };
 
 
+export type MutationUpdateMcpProjectArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateMcpProjectInput;
+};
+
+
 export type MutationUpdateMcpProjectWorkflowArgs = {
   id: Scalars['ID']['input'];
   input: McpProjectWorkflowUpdateInput;
@@ -1598,6 +1633,12 @@ export type MutationUpdateMcpServerTagsArgs = {
 
 export type MutationUpdateMcpServerUrlArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateMcpToolArgs = {
+  id: Scalars['ID']['input'];
+  input: McpToolInput;
 };
 
 
@@ -1674,7 +1715,7 @@ export type Option = {
   __typename?: 'Option';
   description?: Maybe<Scalars['String']['output']>;
   label?: Maybe<Scalars['String']['output']>;
-  value?: Maybe<Scalars['Map']['output']>;
+  value?: Maybe<Scalars['Any']['output']>;
 };
 
 export type OptionsDataSource = {
@@ -1768,7 +1809,7 @@ export type ProjectDeploymentWorkflow = {
 export type ProjectDeploymentWorkflowConnection = {
   __typename?: 'ProjectDeploymentWorkflowConnection';
   connectionId?: Maybe<Scalars['ID']['output']>;
-  key: Scalars['String']['output'];
+  workflowConnectionKey: Scalars['String']['output'];
   workflowNodeName: Scalars['String']['output'];
 };
 
@@ -1870,6 +1911,8 @@ export type Query = {
   clusterElementDefinition: ClusterElementDefinition;
   clusterElementDefinitions: Array<ClusterElementDefinition>;
   clusterElementMissingRequiredProperties: Array<Scalars['String']['output']>;
+  clusterElementPropertyDynamicProperties: Array<Property>;
+  clusterElementPropertyOptions: Array<Option>;
   clusterElementScriptInput?: Maybe<Scalars['Map']['output']>;
   componentDefinition: ComponentDefinition;
   componentDefinitionSearch: Array<ComponentDefinition>;
@@ -1900,6 +1943,8 @@ export type Query = {
   identityProvider?: Maybe<IdentityProviderType>;
   identityProviders: Array<Maybe<IdentityProviderType>>;
   integration?: Maybe<Integration>;
+  integrationWorkflows: Array<IntegrationWorkflow>;
+  integrationWorkflowsByIntegrationId: Array<IntegrationWorkflow>;
   jobFileLogs: LogPage;
   jobFileLogsExist: Scalars['Boolean']['output'];
   knowledgeBase?: Maybe<KnowledgeBase>;
@@ -1916,6 +1961,7 @@ export type Query = {
   mcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
   mcpProject?: Maybe<McpProject>;
   mcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
+  mcpProjectWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
   mcpProjectWorkflows?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
   mcpProjectWorkflowsByMcpProjectId?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
   mcpProjectWorkflowsByProjectDeploymentWorkflowId?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
@@ -1940,6 +1986,7 @@ export type Query = {
   taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
   taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
   taskExecutionFileLogs: Array<LogEntry>;
+  toolEligibleProjectVersionWorkflows: Array<ProjectWorkflow>;
   triggerDefinition: TriggerDefinition;
   triggerDefinitions: Array<TriggerDefinition>;
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
@@ -2032,6 +2079,28 @@ export type QueryClusterElementMissingRequiredPropertiesArgs = {
   clusterElementWorkflowNodeName: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type QueryClusterElementPropertyDynamicPropertiesArgs = {
+  clusterElementName: Scalars['String']['input'];
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+  connectionId?: InputMaybe<Scalars['Long']['input']>;
+  inputParameters?: InputMaybe<Scalars['Map']['input']>;
+  lookupDependsOnPaths?: InputMaybe<Array<Scalars['String']['input']>>;
+  propertyName: Scalars['String']['input'];
+};
+
+
+export type QueryClusterElementPropertyOptionsArgs = {
+  clusterElementName: Scalars['String']['input'];
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+  connectionId?: InputMaybe<Scalars['Long']['input']>;
+  inputParameters?: InputMaybe<Scalars['Map']['input']>;
+  lookupDependsOnPaths?: InputMaybe<Array<Scalars['String']['input']>>;
+  propertyName: Scalars['String']['input'];
 };
 
 
@@ -2188,6 +2257,11 @@ export type QueryIntegrationArgs = {
 };
 
 
+export type QueryIntegrationWorkflowsByIntegrationIdArgs = {
+  integrationId: Scalars['ID']['input'];
+};
+
+
 export type QueryJobFileLogsArgs = {
   filter?: InputMaybe<LogFilterInput>;
   jobId: Scalars['ID']['input'];
@@ -2239,6 +2313,11 @@ export type QueryMcpProjectArgs = {
 
 export type QueryMcpProjectWorkflowArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryMcpProjectWorkflowPropertiesArgs = {
+  mcpProjectWorkflowId: Scalars['ID']['input'];
 };
 
 
@@ -2342,6 +2421,12 @@ export type QueryTaskDispatcherDefinitionVersionsArgs = {
 export type QueryTaskExecutionFileLogsArgs = {
   jobId: Scalars['ID']['input'];
   taskExecutionId: Scalars['ID']['input'];
+};
+
+
+export type QueryToolEligibleProjectVersionWorkflowsArgs = {
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
 };
 
 
@@ -2596,6 +2681,7 @@ export type TriggerDefinition = {
 };
 
 export enum TriggerType {
+  Callable = 'CALLABLE',
   DynamicWebhook = 'DYNAMIC_WEBHOOK',
   Hybrid = 'HYBRID',
   Listener = 'LISTENER',
@@ -2635,6 +2721,10 @@ export type UpdateKnowledgeBaseDocumentTagsInput = {
 export type UpdateKnowledgeBaseTagsInput = {
   knowledgeBaseId: Scalars['ID']['input'];
   tags?: InputMaybe<Array<TagInput>>;
+};
+
+export type UpdateMcpProjectInput = {
+  selectedWorkflowIds: Array<Scalars['String']['input']>;
 };
 
 export type UpdateRowInput = {
@@ -2769,6 +2859,13 @@ export type DeleteMcpProjectMutationVariables = Exact<{
 
 export type DeleteMcpProjectMutation = { __typename?: 'Mutation', deleteMcpProject?: boolean | null };
 
+export type DeleteMcpProjectWorkflowMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteMcpProjectWorkflowMutation = { __typename?: 'Mutation', deleteMcpProjectWorkflow?: boolean | null };
+
 export type DeleteSharedProjectMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -2838,12 +2935,37 @@ export type ImportWorkflowTemplateMutationVariables = Exact<{
 
 export type ImportWorkflowTemplateMutation = { __typename?: 'Mutation', importWorkflowTemplate: string };
 
+export type McpProjectWorkflowPropertiesQueryVariables = Exact<{
+  mcpProjectWorkflowId: Scalars['ID']['input'];
+}>;
+
+
+export type McpProjectWorkflowPropertiesQuery = { __typename?: 'Query', mcpProjectWorkflowProperties?: Array<
+    | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null }
+    | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
+    | { __typename?: 'DateProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'DateTimeProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, integerDefaultValue?: any | null }
+    | { __typename?: 'NullProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, numberDefaultValue?: number | null }
+    | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, objectDefaultValue?: any | null }
+    | { __typename?: 'StringProperty', controlType: ControlType, defaultValue?: string | null, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'TimeProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+   | null> | null };
+
+export type McpProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type McpProjectsQuery = { __typename?: 'Query', mcpProjects?: Array<{ __typename?: 'McpProject', id: string, mcpServerId: string, project?: { __typename?: 'Project', id: string, name: string } | null } | null> | null };
+
 export type McpProjectsByServerIdQueryVariables = Exact<{
   mcpServerId: Scalars['ID']['input'];
 }>;
 
 
-export type McpProjectsByServerIdQuery = { __typename?: 'Query', mcpProjectsByServerId?: Array<{ __typename?: 'McpProject', id: string, projectDeploymentId: string, mcpServerId: string, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectVersion?: number | null, project?: { __typename?: 'Project', id: string, name: string, category?: { __typename?: 'Category', id?: string | null, name?: string | null } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null, mcpProjectWorkflows?: Array<{ __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', id: string, projectDeploymentId: string, inputs?: any | null, workflowId: string } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
+export type McpProjectsByServerIdQuery = { __typename?: 'Query', mcpProjectsByServerId?: Array<{ __typename?: 'McpProject', id: string, projectDeploymentId: string, mcpServerId: string, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectVersion?: number | null, project?: { __typename?: 'Project', id: string, name: string, category?: { __typename?: 'Category', id?: string | null, name?: string | null } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null, mcpProjectWorkflows?: Array<{ __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', id: string, enabled: boolean, inputs?: any | null, projectDeploymentId: string, version: number, workflowId: string, connections: Array<{ __typename?: 'ProjectDeploymentWorkflowConnection', connectionId?: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
 
 export type PreBuiltProjectTemplatesQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
@@ -2889,6 +3011,22 @@ export type SharedWorkflowQueryVariables = Exact<{
 
 
 export type SharedWorkflowQuery = { __typename?: 'Query', sharedWorkflow?: { __typename?: 'SharedWorkflow', description?: string | null, exported: boolean, projectVersion?: number | null, publicUrl?: string | null } | null };
+
+export type ToolEligibleProjectVersionWorkflowsQueryVariables = Exact<{
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+}>;
+
+
+export type ToolEligibleProjectVersionWorkflowsQuery = { __typename?: 'Query', toolEligibleProjectVersionWorkflows: Array<{ __typename?: 'ProjectWorkflow', id: string, workflow: { __typename?: 'Workflow', id: string, label: string } }> };
+
+export type UpdateMcpProjectMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateMcpProjectInput;
+}>;
+
+
+export type UpdateMcpProjectMutation = { __typename?: 'Mutation', updateMcpProject?: { __typename?: 'McpProject', id: string, mcpServerId: string, projectDeploymentId: string, projectVersion?: number | null } | null };
 
 export type UpdateMcpServerMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2952,7 +3090,7 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number, title?: string | null } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type AddDataTableColumnMutationVariables = Exact<{
   input: AddColumnInput;
@@ -3378,6 +3516,119 @@ export type ClusterElementComponentConnectionsQueryVariables = Exact<{
 
 export type ClusterElementComponentConnectionsQuery = { __typename?: 'Query', clusterElementComponentConnections: Array<{ __typename?: 'ComponentConnection', componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
 
+export type ClusterElementDefinitionQueryVariables = Exact<{
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+  clusterElementName: Scalars['String']['input'];
+}>;
+
+
+export type ClusterElementDefinitionQuery = { __typename?: 'Query', clusterElementDefinition: { __typename?: 'ClusterElementDefinition', componentName?: string | null, componentVersion?: number | null, description?: string | null, name: string, title?: string | null, properties: Array<
+      | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null, items?: Array<
+          | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null }
+          | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
+          | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateDefaultValue?: string | null }
+          | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateTimeDefaultValue?: string | null }
+          | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
+          | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+          | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, integerDefaultValue?: any | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+          | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+          | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, numberDefaultValue?: number | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+          | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, objectDefaultValue?: any | null }
+          | { __typename?: 'StringProperty', controlType: ControlType, defaultValue?: string | null, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+          | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, timeDefaultValue?: string | null }
+        > | null }
+      | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
+      | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateDefaultValue?: string | null }
+      | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateTimeDefaultValue?: string | null }
+      | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
+      | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+      | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, integerDefaultValue?: any | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+      | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+      | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, numberDefaultValue?: number | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+      | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, objectDefaultValue?: any | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null, properties?: Array<
+          | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null }
+          | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
+          | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateDefaultValue?: string | null }
+          | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateTimeDefaultValue?: string | null }
+          | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
+          | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+          | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, integerDefaultValue?: any | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+          | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+          | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, numberDefaultValue?: number | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+          | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, objectDefaultValue?: any | null }
+          | { __typename?: 'StringProperty', controlType: ControlType, defaultValue?: string | null, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+          | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, timeDefaultValue?: string | null }
+        > | null }
+      | { __typename?: 'StringProperty', controlType: ControlType, defaultValue?: string | null, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+      | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, timeDefaultValue?: string | null }
+    > } };
+
+export type ClusterElementPropertyDynamicPropertiesQueryVariables = Exact<{
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+  clusterElementName: Scalars['String']['input'];
+  propertyName: Scalars['String']['input'];
+  connectionId?: InputMaybe<Scalars['Long']['input']>;
+  inputParameters?: InputMaybe<Scalars['Map']['input']>;
+  lookupDependsOnPaths?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+}>;
+
+
+export type ClusterElementPropertyDynamicPropertiesQuery = { __typename?: 'Query', clusterElementPropertyDynamicProperties: Array<
+    | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null, items?: Array<
+        | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
+        | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+        | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+        | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'StringProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+        | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+      > | null }
+    | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
+    | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+    | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+    | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null, properties?: Array<
+        | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
+        | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+        | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+        | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+        | { __typename?: 'StringProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+        | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+      > | null }
+    | { __typename?: 'StringProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
+    | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+  > };
+
+export type ClusterElementPropertyOptionsQueryVariables = Exact<{
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+  clusterElementName: Scalars['String']['input'];
+  propertyName: Scalars['String']['input'];
+  connectionId?: InputMaybe<Scalars['Long']['input']>;
+  inputParameters?: InputMaybe<Scalars['Map']['input']>;
+  lookupDependsOnPaths?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+}>;
+
+
+export type ClusterElementPropertyOptionsQuery = { __typename?: 'Query', clusterElementPropertyOptions: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> };
+
 export type ClusterElementScriptInputQueryVariables = Exact<{
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
@@ -3410,14 +3661,14 @@ export type CreateMcpComponentMutationVariables = Exact<{
 }>;
 
 
-export type CreateMcpComponentMutation = { __typename?: 'Mutation', createMcpComponent?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, mcpServerId: string, connectionId?: string | null } | null };
+export type CreateMcpComponentMutation = { __typename?: 'Mutation', createMcpComponent?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, title?: string | null, mcpServerId: string, connectionId?: string | null } | null };
 
 export type CreateMcpComponentWithToolsMutationVariables = Exact<{
   input: McpComponentWithToolsInput;
 }>;
 
 
-export type CreateMcpComponentWithToolsMutation = { __typename?: 'Mutation', createMcpComponentWithTools?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, mcpServerId: string, connectionId?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
+export type CreateMcpComponentWithToolsMutation = { __typename?: 'Mutation', createMcpComponentWithTools?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, title?: string | null, mcpServerId: string, connectionId?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
 
 export type CreateMcpToolMutationVariables = Exact<{
   input: McpToolInput;
@@ -3440,6 +3691,13 @@ export type DeleteMcpComponentMutationVariables = Exact<{
 
 export type DeleteMcpComponentMutation = { __typename?: 'Mutation', deleteMcpComponent?: boolean | null };
 
+export type DeleteMcpToolMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteMcpToolMutation = { __typename?: 'Mutation', deleteMcpTool?: boolean | null };
+
 export type EnvironmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3455,7 +3713,7 @@ export type McpComponentsByServerIdQueryVariables = Exact<{
 }>;
 
 
-export type McpComponentsByServerIdQuery = { __typename?: 'Query', mcpComponentsByServerId?: Array<{ __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, connectionId?: string | null, mcpServerId: string, version?: number | null, mcpTools?: Array<{ __typename?: 'McpTool', id: string, mcpComponentId: string, name: string } | null> | null } | null> | null };
+export type McpComponentsByServerIdQuery = { __typename?: 'Query', mcpComponentsByServerId?: Array<{ __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, title?: string | null, connectionId?: string | null, lastModifiedDate?: any | null, mcpServerId: string, version?: number | null, mcpTools?: Array<{ __typename?: 'McpTool', id: string, mcpComponentId: string, name: string, parameters?: any | null, title?: string | null, version?: number | null } | null> | null } | null> | null };
 
 export type McpServerTagsQueryVariables = Exact<{
   type: PlatformType;
@@ -3469,14 +3727,14 @@ export type McpServersQueryVariables = Exact<{
 }>;
 
 
-export type McpServersQuery = { __typename?: 'Query', mcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, secretKey: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type McpServersQuery = { __typename?: 'Query', mcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, secretKey: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number, title?: string | null } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type McpToolsByComponentIdQueryVariables = Exact<{
   mcpComponentId: Scalars['ID']['input'];
 }>;
 
 
-export type McpToolsByComponentIdQuery = { __typename?: 'Query', mcpToolsByComponentId?: Array<{ __typename?: 'McpTool', id: string, name: string, mcpComponentId: string, parameters?: any | null } | null> | null };
+export type McpToolsByComponentIdQuery = { __typename?: 'Query', mcpToolsByComponentId?: Array<{ __typename?: 'McpTool', id: string, name: string, title?: string | null, mcpComponentId: string, parameters?: any | null, version?: number | null } | null> | null };
 
 export type SaveClusterElementTestConfigurationConnectionMutationVariables = Exact<{
   workflowId: Scalars['String']['input'];
@@ -3555,7 +3813,7 @@ export type UpdateMcpComponentWithToolsMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMcpComponentWithToolsMutation = { __typename?: 'Mutation', updateMcpComponentWithTools?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, mcpServerId: string, connectionId?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
+export type UpdateMcpComponentWithToolsMutation = { __typename?: 'Mutation', updateMcpComponentWithTools?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, title?: string | null, mcpServerId: string, connectionId?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
 
 export type UpdateMcpServerUrlMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3563,6 +3821,14 @@ export type UpdateMcpServerUrlMutationVariables = Exact<{
 
 
 export type UpdateMcpServerUrlMutation = { __typename?: 'Mutation', updateMcpServerUrl: string };
+
+export type UpdateMcpToolMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: McpToolInput;
+}>;
+
+
+export type UpdateMcpToolMutation = { __typename?: 'Mutation', updateMcpTool?: { __typename?: 'McpTool', id: string, name: string, mcpComponentId: string, parameters?: any | null, version?: number | null } | null };
 
 export type WorkflowNodeComponentConnectionsQueryVariables = Exact<{
   workflowId: Scalars['String']['input'];
@@ -3625,7 +3891,7 @@ export type CreateIdentityProviderMutationVariables = Exact<{
 }>;
 
 
-export type CreateIdentityProviderMutation = { __typename?: 'Mutation', createIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes: string, signingCertificate?: string | null, type: string } };
+export type CreateIdentityProviderMutation = { __typename?: 'Mutation', createIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } };
 
 export type DeleteIdentityProviderMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3646,12 +3912,12 @@ export type IdentityProviderQueryVariables = Exact<{
 }>;
 
 
-export type IdentityProviderQuery = { __typename?: 'Query', identityProvider?: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes: string, signingCertificate?: string | null, type: string } | null };
+export type IdentityProviderQuery = { __typename?: 'Query', identityProvider?: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } | null };
 
 export type IdentityProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IdentityProvidersQuery = { __typename?: 'Query', identityProviders: Array<{ __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes: string, signingCertificate?: string | null, type: string } | null> };
+export type IdentityProvidersQuery = { __typename?: 'Query', identityProviders: Array<{ __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } | null> };
 
 export type InviteUserMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -3668,7 +3934,7 @@ export type UpdateIdentityProviderMutationVariables = Exact<{
 }>;
 
 
-export type UpdateIdentityProviderMutation = { __typename?: 'Mutation', updateIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId: string, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes: string, signingCertificate?: string | null, type: string } };
+export type UpdateIdentityProviderMutation = { __typename?: 'Mutation', updateIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } };
 
 export type UpdateUserMutationVariables = Exact<{
   login: Scalars['String']['input'];
@@ -3710,7 +3976,7 @@ export const useApprovalTaskQuery = <
       variables: ApprovalTaskQueryVariables,
       options?: Omit<UseQueryOptions<ApprovalTaskQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApprovalTaskQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ApprovalTaskQuery, TError, TData>(
       {
     queryKey: ['approvalTask', variables],
@@ -3741,7 +4007,7 @@ export const useApprovalTasksQuery = <
       variables?: ApprovalTasksQueryVariables,
       options?: Omit<UseQueryOptions<ApprovalTasksQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApprovalTasksQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ApprovalTasksQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['approvalTasks'] : ['approvalTasks', variables],
@@ -3764,7 +4030,7 @@ export const useCreateApprovalTaskMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateApprovalTaskMutation, TError, CreateApprovalTaskMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateApprovalTaskMutation, TError, CreateApprovalTaskMutationVariables, TContext>(
       {
     mutationKey: ['createApprovalTask'],
@@ -3783,7 +4049,7 @@ export const useDeleteApprovalTaskMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteApprovalTaskMutation, TError, DeleteApprovalTaskMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteApprovalTaskMutation, TError, DeleteApprovalTaskMutationVariables, TContext>(
       {
     mutationKey: ['deleteApprovalTask'],
@@ -3807,7 +4073,7 @@ export const useUpdateApprovalTaskMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateApprovalTaskMutation, TError, UpdateApprovalTaskMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateApprovalTaskMutation, TError, UpdateApprovalTaskMutationVariables, TContext>(
       {
     mutationKey: ['updateApprovalTask'],
@@ -3831,7 +4097,7 @@ export const useCreateMcpProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpProjectMutation, TError, CreateMcpProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpProjectMutation, TError, CreateMcpProjectMutationVariables, TContext>(
       {
     mutationKey: ['createMcpProject'],
@@ -3854,7 +4120,7 @@ export const useCreateWorkspaceApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateWorkspaceApiKeyMutation, TError, CreateWorkspaceApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateWorkspaceApiKeyMutation, TError, CreateWorkspaceApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['createWorkspaceApiKey'],
@@ -3879,7 +4145,7 @@ export const useCreateMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['createMcpServer'],
@@ -3898,11 +4164,30 @@ export const useDeleteMcpProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpProjectMutation, TError, DeleteMcpProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpProjectMutation, TError, DeleteMcpProjectMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpProject'],
     mutationFn: (variables?: DeleteMcpProjectMutationVariables) => fetcher<DeleteMcpProjectMutation, DeleteMcpProjectMutationVariables>(DeleteMcpProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteMcpProjectWorkflowDocument = `
+    mutation deleteMcpProjectWorkflow($id: ID!) {
+  deleteMcpProjectWorkflow(id: $id)
+}
+    `;
+
+export const useDeleteMcpProjectWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteMcpProjectWorkflowMutation, TError, DeleteMcpProjectWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteMcpProjectWorkflowMutation, TError, DeleteMcpProjectWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteMcpProjectWorkflow'],
+    mutationFn: (variables?: DeleteMcpProjectWorkflowMutationVariables) => fetcher<DeleteMcpProjectWorkflowMutation, DeleteMcpProjectWorkflowMutationVariables>(DeleteMcpProjectWorkflowDocument, variables)(),
     ...options
   }
     )};
@@ -3917,7 +4202,7 @@ export const useDeleteSharedProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteSharedProjectMutation, TError, DeleteSharedProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteSharedProjectMutation, TError, DeleteSharedProjectMutationVariables, TContext>(
       {
     mutationKey: ['deleteSharedProject'],
@@ -3936,7 +4221,7 @@ export const useDeleteSharedWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteSharedWorkflowMutation, TError, DeleteSharedWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteSharedWorkflowMutation, TError, DeleteSharedWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['deleteSharedWorkflow'],
@@ -3955,7 +4240,7 @@ export const useDeleteWorkspaceApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteWorkspaceApiKeyMutation, TError, DeleteWorkspaceApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteWorkspaceApiKeyMutation, TError, DeleteWorkspaceApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['deleteWorkspaceApiKey'],
@@ -3974,7 +4259,7 @@ export const useDeleteWorkspaceMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteWorkspaceMcpServerMutation, TError, DeleteWorkspaceMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteWorkspaceMcpServerMutation, TError, DeleteWorkspaceMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['deleteWorkspaceMcpServer'],
@@ -3993,7 +4278,7 @@ export const useDisconnectConnectionMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DisconnectConnectionMutation, TError, DisconnectConnectionMutationVariables, TContext>) => {
-
+    
     return useMutation<DisconnectConnectionMutation, TError, DisconnectConnectionMutationVariables, TContext>(
       {
     mutationKey: ['DisconnectConnection'],
@@ -4012,7 +4297,7 @@ export const useExportSharedProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ExportSharedProjectMutation, TError, ExportSharedProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<ExportSharedProjectMutation, TError, ExportSharedProjectMutationVariables, TContext>(
       {
     mutationKey: ['exportSharedProject'],
@@ -4031,7 +4316,7 @@ export const useExportSharedWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ExportSharedWorkflowMutation, TError, ExportSharedWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<ExportSharedWorkflowMutation, TError, ExportSharedWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['exportSharedWorkflow'],
@@ -4054,7 +4339,7 @@ export const useImportProjectTemplateMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ImportProjectTemplateMutation, TError, ImportProjectTemplateMutationVariables, TContext>) => {
-
+    
     return useMutation<ImportProjectTemplateMutation, TError, ImportProjectTemplateMutationVariables, TContext>(
       {
     mutationKey: ['importProjectTemplate'],
@@ -4077,11 +4362,107 @@ export const useImportWorkflowTemplateMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ImportWorkflowTemplateMutation, TError, ImportWorkflowTemplateMutationVariables, TContext>) => {
-
+    
     return useMutation<ImportWorkflowTemplateMutation, TError, ImportWorkflowTemplateMutationVariables, TContext>(
       {
     mutationKey: ['importWorkflowTemplate'],
     mutationFn: (variables?: ImportWorkflowTemplateMutationVariables) => fetcher<ImportWorkflowTemplateMutation, ImportWorkflowTemplateMutationVariables>(ImportWorkflowTemplateDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const McpProjectWorkflowPropertiesDocument = `
+    query mcpProjectWorkflowProperties($mcpProjectWorkflowId: ID!) {
+  mcpProjectWorkflowProperties(mcpProjectWorkflowId: $mcpProjectWorkflowId) {
+    advancedOption
+    description
+    displayCondition
+    expressionEnabled
+    hidden
+    name
+    required
+    type
+    ... on StringProperty {
+      controlType
+      defaultValue
+      label
+      placeholder
+    }
+    ... on IntegerProperty {
+      controlType
+      integerDefaultValue: defaultValue
+      label
+      placeholder
+    }
+    ... on NumberProperty {
+      controlType
+      label
+      numberDefaultValue: defaultValue
+      placeholder
+    }
+    ... on BooleanProperty {
+      booleanDefaultValue: defaultValue
+      controlType
+      label
+      placeholder
+    }
+    ... on ArrayProperty {
+      arrayDefaultValue: defaultValue
+      controlType
+      label
+      placeholder
+    }
+    ... on ObjectProperty {
+      controlType
+      label
+      objectDefaultValue: defaultValue
+      placeholder
+    }
+  }
+}
+    `;
+
+export const useMcpProjectWorkflowPropertiesQuery = <
+      TData = McpProjectWorkflowPropertiesQuery,
+      TError = unknown
+    >(
+      variables: McpProjectWorkflowPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<McpProjectWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectWorkflowPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpProjectWorkflowPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['mcpProjectWorkflowProperties', variables],
+    queryFn: fetcher<McpProjectWorkflowPropertiesQuery, McpProjectWorkflowPropertiesQueryVariables>(McpProjectWorkflowPropertiesDocument, variables),
+    ...options
+  }
+    )};
+
+export const McpProjectsDocument = `
+    query mcpProjects {
+  mcpProjects {
+    id
+    mcpServerId
+    project {
+      id
+      name
+    }
+  }
+}
+    `;
+
+export const useMcpProjectsQuery = <
+      TData = McpProjectsQuery,
+      TError = unknown
+    >(
+      variables?: McpProjectsQueryVariables,
+      options?: Omit<UseQueryOptions<McpProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpProjectsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['mcpProjects'] : ['mcpProjects', variables],
+    queryFn: fetcher<McpProjectsQuery, McpProjectsQueryVariables>(McpProjectsDocument, variables),
     ...options
   }
     )};
@@ -4108,10 +4489,18 @@ export const McpProjectsByServerIdDocument = `
       id
       mcpProjectId
       projectDeploymentWorkflowId
+      parameters
       projectDeploymentWorkflow {
         id
-        projectDeploymentId
+        connections {
+          connectionId
+          workflowConnectionKey
+          workflowNodeName
+        }
+        enabled
         inputs
+        projectDeploymentId
+        version
         workflowId
       }
       workflow {
@@ -4141,7 +4530,7 @@ export const useMcpProjectsByServerIdQuery = <
       variables: McpProjectsByServerIdQueryVariables,
       options?: Omit<UseQueryOptions<McpProjectsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectsByServerIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpProjectsByServerIdQuery, TError, TData>(
       {
     queryKey: ['mcpProjectsByServerId', variables],
@@ -4190,7 +4579,7 @@ export const usePreBuiltProjectTemplatesQuery = <
       variables?: PreBuiltProjectTemplatesQueryVariables,
       options?: Omit<UseQueryOptions<PreBuiltProjectTemplatesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PreBuiltProjectTemplatesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<PreBuiltProjectTemplatesQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['preBuiltProjectTemplates'] : ['preBuiltProjectTemplates', variables],
@@ -4232,7 +4621,7 @@ export const usePreBuiltWorkflowTemplatesQuery = <
       variables?: PreBuiltWorkflowTemplatesQueryVariables,
       options?: Omit<UseQueryOptions<PreBuiltWorkflowTemplatesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PreBuiltWorkflowTemplatesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<PreBuiltWorkflowTemplatesQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['preBuiltWorkflowTemplates'] : ['preBuiltWorkflowTemplates', variables],
@@ -4257,7 +4646,7 @@ export const useProjectByIdQuery = <
       variables: ProjectByIdQueryVariables,
       options?: Omit<UseQueryOptions<ProjectByIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectByIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ProjectByIdQuery, TError, TData>(
       {
     queryKey: ['projectById', variables],
@@ -4303,7 +4692,7 @@ export const useProjectTemplateQuery = <
       variables: ProjectTemplateQueryVariables,
       options?: Omit<UseQueryOptions<ProjectTemplateQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectTemplateQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ProjectTemplateQuery, TError, TData>(
       {
     queryKey: ['projectTemplate', variables],
@@ -4330,7 +4719,7 @@ export const useSharedProjectQuery = <
       variables: SharedProjectQueryVariables,
       options?: Omit<UseQueryOptions<SharedProjectQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SharedProjectQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<SharedProjectQuery, TError, TData>(
       {
     queryKey: ['sharedProject', variables],
@@ -4357,11 +4746,66 @@ export const useSharedWorkflowQuery = <
       variables: SharedWorkflowQueryVariables,
       options?: Omit<UseQueryOptions<SharedWorkflowQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SharedWorkflowQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<SharedWorkflowQuery, TError, TData>(
       {
     queryKey: ['sharedWorkflow', variables],
     queryFn: fetcher<SharedWorkflowQuery, SharedWorkflowQueryVariables>(SharedWorkflowDocument, variables),
+    ...options
+  }
+    )};
+
+export const ToolEligibleProjectVersionWorkflowsDocument = `
+    query toolEligibleProjectVersionWorkflows($projectId: ID!, $projectVersion: Int!) {
+  toolEligibleProjectVersionWorkflows(
+    projectId: $projectId
+    projectVersion: $projectVersion
+  ) {
+    id
+    workflow {
+      id
+      label
+    }
+  }
+}
+    `;
+
+export const useToolEligibleProjectVersionWorkflowsQuery = <
+      TData = ToolEligibleProjectVersionWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: ToolEligibleProjectVersionWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<ToolEligibleProjectVersionWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolEligibleProjectVersionWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ToolEligibleProjectVersionWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['toolEligibleProjectVersionWorkflows', variables],
+    queryFn: fetcher<ToolEligibleProjectVersionWorkflowsQuery, ToolEligibleProjectVersionWorkflowsQueryVariables>(ToolEligibleProjectVersionWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateMcpProjectDocument = `
+    mutation updateMcpProject($id: ID!, $input: UpdateMcpProjectInput!) {
+  updateMcpProject(id: $id, input: $input) {
+    id
+    mcpServerId
+    projectDeploymentId
+    projectVersion
+  }
+}
+    `;
+
+export const useUpdateMcpProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateMcpProjectMutation, TError, UpdateMcpProjectMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateMcpProjectMutation, TError, UpdateMcpProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['updateMcpProject'],
+    mutationFn: (variables?: UpdateMcpProjectMutationVariables) => fetcher<UpdateMcpProjectMutation, UpdateMcpProjectMutationVariables>(UpdateMcpProjectDocument, variables)(),
     ...options
   }
     )};
@@ -4380,7 +4824,7 @@ export const useUpdateMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerMutation, TError, UpdateMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpServerMutation, TError, UpdateMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServer'],
@@ -4401,7 +4845,7 @@ export const useUpdateMcpServerTagsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerTagsMutation, TError, UpdateMcpServerTagsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpServerTagsMutation, TError, UpdateMcpServerTagsMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServerTags'],
@@ -4420,7 +4864,7 @@ export const useUpdateWorkspaceApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateWorkspaceApiKeyMutation, TError, UpdateWorkspaceApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateWorkspaceApiKeyMutation, TError, UpdateWorkspaceApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['updateWorkspaceApiKey'],
@@ -4449,7 +4893,7 @@ export const useWorkflowChatProjectDeploymentWorkflowQuery = <
       variables: WorkflowChatProjectDeploymentWorkflowQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowChatProjectDeploymentWorkflowQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowChatProjectDeploymentWorkflowQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkflowChatProjectDeploymentWorkflowQuery, TError, TData>(
       {
     queryKey: ['workflowChatProjectDeploymentWorkflow', variables],
@@ -4499,7 +4943,7 @@ export const useWorkflowChatWorkspaceProjectDeploymentsQuery = <
       variables: WorkflowChatWorkspaceProjectDeploymentsQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowChatWorkspaceProjectDeploymentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowChatWorkspaceProjectDeploymentsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkflowChatWorkspaceProjectDeploymentsQuery, TError, TData>(
       {
     queryKey: ['workflowChatWorkspaceProjectDeployments', variables],
@@ -4538,7 +4982,7 @@ export const useWorkflowTemplateQuery = <
       variables: WorkflowTemplateQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowTemplateQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowTemplateQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkflowTemplateQuery, TError, TData>(
       {
     queryKey: ['workflowTemplate', variables],
@@ -4569,7 +5013,7 @@ export const useWorkspaceApiKeysQuery = <
       variables: WorkspaceApiKeysQueryVariables,
       options?: Omit<UseQueryOptions<WorkspaceApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceApiKeysQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkspaceApiKeysQuery, TError, TData>(
       {
     queryKey: ['workspaceApiKeys', variables],
@@ -4592,6 +5036,7 @@ export const WorkspaceMcpServersDocument = `
       mcpServerId
       componentName
       componentVersion
+      title
     }
     tags {
       id
@@ -4609,7 +5054,7 @@ export const useWorkspaceMcpServersQuery = <
       variables: WorkspaceMcpServersQueryVariables,
       options?: Omit<UseQueryOptions<WorkspaceMcpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceMcpServersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkspaceMcpServersQuery, TError, TData>(
       {
     queryKey: ['workspaceMcpServers', variables],
@@ -4628,7 +5073,7 @@ export const useAddDataTableColumnMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<AddDataTableColumnMutation, TError, AddDataTableColumnMutationVariables, TContext>) => {
-
+    
     return useMutation<AddDataTableColumnMutation, TError, AddDataTableColumnMutationVariables, TContext>(
       {
     mutationKey: ['addDataTableColumn'],
@@ -4647,7 +5092,7 @@ export const useCreateDataTableMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateDataTableMutation, TError, CreateDataTableMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateDataTableMutation, TError, CreateDataTableMutationVariables, TContext>(
       {
     mutationKey: ['createDataTable'],
@@ -4672,7 +5117,7 @@ export const useDataTableRowsQuery = <
       variables: DataTableRowsQueryVariables,
       options?: Omit<UseQueryOptions<DataTableRowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableRowsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTableRowsQuery, TError, TData>(
       {
     queryKey: ['dataTableRows', variables],
@@ -4706,7 +5151,7 @@ export const useDataTableRowsPageQuery = <
       variables: DataTableRowsPageQueryVariables,
       options?: Omit<UseQueryOptions<DataTableRowsPageQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableRowsPageQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTableRowsPageQuery, TError, TData>(
       {
     queryKey: ['dataTableRowsPage', variables],
@@ -4731,7 +5176,7 @@ export const useDataTableTagsQuery = <
       variables?: DataTableTagsQueryVariables,
       options?: Omit<UseQueryOptions<DataTableTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTableTagsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['dataTableTags'] : ['dataTableTags', variables],
@@ -4759,7 +5204,7 @@ export const useDataTableTagsByTableQuery = <
       variables?: DataTableTagsByTableQueryVariables,
       options?: Omit<UseQueryOptions<DataTableTagsByTableQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsByTableQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTableTagsByTableQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['dataTableTagsByTable'] : ['dataTableTagsByTable', variables],
@@ -4790,7 +5235,7 @@ export const useDataTablesQuery = <
       variables: DataTablesQueryVariables,
       options?: Omit<UseQueryOptions<DataTablesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTablesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTablesQuery, TError, TData>(
       {
     queryKey: ['dataTables', variables],
@@ -4809,7 +5254,7 @@ export const useDeleteDataTableRowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteDataTableRowMutation, TError, DeleteDataTableRowMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteDataTableRowMutation, TError, DeleteDataTableRowMutationVariables, TContext>(
       {
     mutationKey: ['deleteDataTableRow'],
@@ -4828,7 +5273,7 @@ export const useDropDataTableMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DropDataTableMutation, TError, DropDataTableMutationVariables, TContext>) => {
-
+    
     return useMutation<DropDataTableMutation, TError, DropDataTableMutationVariables, TContext>(
       {
     mutationKey: ['dropDataTable'],
@@ -4847,7 +5292,7 @@ export const useDuplicateDataTableMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DuplicateDataTableMutation, TError, DuplicateDataTableMutationVariables, TContext>) => {
-
+    
     return useMutation<DuplicateDataTableMutation, TError, DuplicateDataTableMutationVariables, TContext>(
       {
     mutationKey: ['duplicateDataTable'],
@@ -4869,7 +5314,7 @@ export const useExportDataTableCsvQuery = <
       variables: ExportDataTableCsvQueryVariables,
       options?: Omit<UseQueryOptions<ExportDataTableCsvQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ExportDataTableCsvQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ExportDataTableCsvQuery, TError, TData>(
       {
     queryKey: ['exportDataTableCsv', variables],
@@ -4888,7 +5333,7 @@ export const useImportDataTableCsvMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ImportDataTableCsvMutation, TError, ImportDataTableCsvMutationVariables, TContext>) => {
-
+    
     return useMutation<ImportDataTableCsvMutation, TError, ImportDataTableCsvMutationVariables, TContext>(
       {
     mutationKey: ['importDataTableCsv'],
@@ -4910,7 +5355,7 @@ export const useInsertDataTableRowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<InsertDataTableRowMutation, TError, InsertDataTableRowMutationVariables, TContext>) => {
-
+    
     return useMutation<InsertDataTableRowMutation, TError, InsertDataTableRowMutationVariables, TContext>(
       {
     mutationKey: ['insertDataTableRow'],
@@ -4929,7 +5374,7 @@ export const useRemoveDataTableColumnMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<RemoveDataTableColumnMutation, TError, RemoveDataTableColumnMutationVariables, TContext>) => {
-
+    
     return useMutation<RemoveDataTableColumnMutation, TError, RemoveDataTableColumnMutationVariables, TContext>(
       {
     mutationKey: ['removeDataTableColumn'],
@@ -4948,7 +5393,7 @@ export const useRenameDataTableMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<RenameDataTableMutation, TError, RenameDataTableMutationVariables, TContext>) => {
-
+    
     return useMutation<RenameDataTableMutation, TError, RenameDataTableMutationVariables, TContext>(
       {
     mutationKey: ['renameDataTable'],
@@ -4967,7 +5412,7 @@ export const useRenameDataTableColumnMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<RenameDataTableColumnMutation, TError, RenameDataTableColumnMutationVariables, TContext>) => {
-
+    
     return useMutation<RenameDataTableColumnMutation, TError, RenameDataTableColumnMutationVariables, TContext>(
       {
     mutationKey: ['renameDataTableColumn'],
@@ -4989,7 +5434,7 @@ export const useUpdateDataTableRowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateDataTableRowMutation, TError, UpdateDataTableRowMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateDataTableRowMutation, TError, UpdateDataTableRowMutationVariables, TContext>(
       {
     mutationKey: ['updateDataTableRow'],
@@ -5008,7 +5453,7 @@ export const useUpdateDataTableTagsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateDataTableTagsMutation, TError, UpdateDataTableTagsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateDataTableTagsMutation, TError, UpdateDataTableTagsMutationVariables, TContext>(
       {
     mutationKey: ['updateDataTableTags'],
@@ -5034,7 +5479,7 @@ export const useCreateKnowledgeBaseMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateKnowledgeBaseMutation, TError, CreateKnowledgeBaseMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateKnowledgeBaseMutation, TError, CreateKnowledgeBaseMutationVariables, TContext>(
       {
     mutationKey: ['createKnowledgeBase'],
@@ -5053,7 +5498,7 @@ export const useDeleteKnowledgeBaseMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteKnowledgeBaseMutation, TError, DeleteKnowledgeBaseMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteKnowledgeBaseMutation, TError, DeleteKnowledgeBaseMutationVariables, TContext>(
       {
     mutationKey: ['deleteKnowledgeBase'],
@@ -5072,7 +5517,7 @@ export const useDeleteKnowledgeBaseDocumentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteKnowledgeBaseDocumentMutation, TError, DeleteKnowledgeBaseDocumentMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteKnowledgeBaseDocumentMutation, TError, DeleteKnowledgeBaseDocumentMutationVariables, TContext>(
       {
     mutationKey: ['deleteKnowledgeBaseDocument'],
@@ -5091,7 +5536,7 @@ export const useDeleteKnowledgeBaseDocumentChunkMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteKnowledgeBaseDocumentChunkMutation, TError, DeleteKnowledgeBaseDocumentChunkMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteKnowledgeBaseDocumentChunkMutation, TError, DeleteKnowledgeBaseDocumentChunkMutationVariables, TContext>(
       {
     mutationKey: ['deleteKnowledgeBaseDocumentChunk'],
@@ -5144,7 +5589,7 @@ export const useKnowledgeBaseQuery = <
       variables: KnowledgeBaseQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseQuery, TError, TData>(
       {
     queryKey: ['knowledgeBase', variables],
@@ -5171,7 +5616,7 @@ export const useKnowledgeBaseDocumentStatusQuery = <
       variables: KnowledgeBaseDocumentStatusQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseDocumentStatusQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentStatusQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseDocumentStatusQuery, TError, TData>(
       {
     queryKey: ['knowledgeBaseDocumentStatus', variables],
@@ -5196,7 +5641,7 @@ export const useKnowledgeBaseDocumentTagsQuery = <
       variables?: KnowledgeBaseDocumentTagsQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseDocumentTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseDocumentTagsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['knowledgeBaseDocumentTags'] : ['knowledgeBaseDocumentTags', variables],
@@ -5224,7 +5669,7 @@ export const useKnowledgeBaseDocumentTagsByDocumentQuery = <
       variables?: KnowledgeBaseDocumentTagsByDocumentQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['knowledgeBaseDocumentTagsByDocument'] : ['knowledgeBaseDocumentTagsByDocument', variables],
@@ -5249,7 +5694,7 @@ export const useKnowledgeBaseTagsQuery = <
       variables?: KnowledgeBaseTagsQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseTagsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['knowledgeBaseTags'] : ['knowledgeBaseTags', variables],
@@ -5277,7 +5722,7 @@ export const useKnowledgeBaseTagsByKnowledgeBaseQuery = <
       variables?: KnowledgeBaseTagsByKnowledgeBaseQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['knowledgeBaseTagsByKnowledgeBase'] : ['knowledgeBaseTagsByKnowledgeBase', variables],
@@ -5308,7 +5753,7 @@ export const useKnowledgeBasesQuery = <
       variables: KnowledgeBasesQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBasesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBasesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBasesQuery, TError, TData>(
       {
     queryKey: ['knowledgeBases', variables],
@@ -5336,7 +5781,7 @@ export const useSearchKnowledgeBaseQuery = <
       variables: SearchKnowledgeBaseQueryVariables,
       options?: Omit<UseQueryOptions<SearchKnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SearchKnowledgeBaseQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<SearchKnowledgeBaseQuery, TError, TData>(
       {
     queryKey: ['searchKnowledgeBase', variables],
@@ -5362,7 +5807,7 @@ export const useUpdateKnowledgeBaseMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateKnowledgeBaseMutation, TError, UpdateKnowledgeBaseMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateKnowledgeBaseMutation, TError, UpdateKnowledgeBaseMutationVariables, TContext>(
       {
     mutationKey: ['updateKnowledgeBase'],
@@ -5389,7 +5834,7 @@ export const useUpdateKnowledgeBaseDocumentChunkMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateKnowledgeBaseDocumentChunkMutation, TError, UpdateKnowledgeBaseDocumentChunkMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateKnowledgeBaseDocumentChunkMutation, TError, UpdateKnowledgeBaseDocumentChunkMutationVariables, TContext>(
       {
     mutationKey: ['updateKnowledgeBaseDocumentChunk'],
@@ -5408,7 +5853,7 @@ export const useUpdateKnowledgeBaseDocumentTagsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateKnowledgeBaseDocumentTagsMutation, TError, UpdateKnowledgeBaseDocumentTagsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateKnowledgeBaseDocumentTagsMutation, TError, UpdateKnowledgeBaseDocumentTagsMutationVariables, TContext>(
       {
     mutationKey: ['updateKnowledgeBaseDocumentTags'],
@@ -5427,7 +5872,7 @@ export const useUpdateKnowledgeBaseTagsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateKnowledgeBaseTagsMutation, TError, UpdateKnowledgeBaseTagsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateKnowledgeBaseTagsMutation, TError, UpdateKnowledgeBaseTagsMutationVariables, TContext>(
       {
     mutationKey: ['updateKnowledgeBaseTags'],
@@ -5468,7 +5913,7 @@ export const useAutomationSearchQuery = <
       variables: AutomationSearchQueryVariables,
       options?: Omit<UseQueryOptions<AutomationSearchQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationSearchQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AutomationSearchQuery, TError, TData>(
       {
     queryKey: ['automationSearch', variables],
@@ -5522,7 +5967,7 @@ export const useConnectedUserProjectsQuery = <
       variables?: ConnectedUserProjectsQueryVariables,
       options?: Omit<UseQueryOptions<ConnectedUserProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectedUserProjectsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ConnectedUserProjectsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['connectedUserProjects'] : ['connectedUserProjects', variables],
@@ -5547,7 +5992,7 @@ export const useIntegrationByIdQuery = <
       variables: IntegrationByIdQueryVariables,
       options?: Omit<UseQueryOptions<IntegrationByIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationByIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<IntegrationByIdQuery, TError, TData>(
       {
     queryKey: ['integrationById', variables],
@@ -5591,7 +6036,7 @@ export const useApiConnectorQuery = <
       variables: ApiConnectorQueryVariables,
       options?: Omit<UseQueryOptions<ApiConnectorQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiConnectorQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ApiConnectorQuery, TError, TData>(
       {
     queryKey: ['apiConnector', variables],
@@ -5635,7 +6080,7 @@ export const useApiConnectorsQuery = <
       variables?: ApiConnectorsQueryVariables,
       options?: Omit<UseQueryOptions<ApiConnectorsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiConnectorsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ApiConnectorsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['apiConnectors'] : ['apiConnectors', variables],
@@ -5654,7 +6099,7 @@ export const useCancelGenerationJobMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CancelGenerationJobMutation, TError, CancelGenerationJobMutationVariables, TContext>) => {
-
+    
     return useMutation<CancelGenerationJobMutation, TError, CancelGenerationJobMutationVariables, TContext>(
       {
     mutationKey: ['cancelGenerationJob'],
@@ -5695,7 +6140,7 @@ export const useCreateApiConnectorMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateApiConnectorMutation, TError, CreateApiConnectorMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateApiConnectorMutation, TError, CreateApiConnectorMutationVariables, TContext>(
       {
     mutationKey: ['createApiConnector'],
@@ -5714,7 +6159,7 @@ export const useDeleteApiConnectorMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteApiConnectorMutation, TError, DeleteApiConnectorMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteApiConnectorMutation, TError, DeleteApiConnectorMutationVariables, TContext>(
       {
     mutationKey: ['deleteApiConnector'],
@@ -5733,7 +6178,7 @@ export const useEnableApiConnectorMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<EnableApiConnectorMutation, TError, EnableApiConnectorMutationVariables, TContext>) => {
-
+    
     return useMutation<EnableApiConnectorMutation, TError, EnableApiConnectorMutationVariables, TContext>(
       {
     mutationKey: ['enableApiConnector'],
@@ -5754,7 +6199,7 @@ export const useGenerateSpecificationMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<GenerateSpecificationMutation, TError, GenerateSpecificationMutationVariables, TContext>) => {
-
+    
     return useMutation<GenerateSpecificationMutation, TError, GenerateSpecificationMutationVariables, TContext>(
       {
     mutationKey: ['generateSpecification'],
@@ -5781,7 +6226,7 @@ export const useGenerationJobStatusQuery = <
       variables: GenerationJobStatusQueryVariables,
       options?: Omit<UseQueryOptions<GenerationJobStatusQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GenerationJobStatusQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<GenerationJobStatusQuery, TError, TData>(
       {
     queryKey: ['generationJobStatus', variables],
@@ -5822,7 +6267,7 @@ export const useImportOpenApiSpecificationMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ImportOpenApiSpecificationMutation, TError, ImportOpenApiSpecificationMutationVariables, TContext>) => {
-
+    
     return useMutation<ImportOpenApiSpecificationMutation, TError, ImportOpenApiSpecificationMutationVariables, TContext>(
       {
     mutationKey: ['importOpenApiSpecification'],
@@ -5846,7 +6291,7 @@ export const useStartGenerateFromDocumentationPreviewMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<StartGenerateFromDocumentationPreviewMutation, TError, StartGenerateFromDocumentationPreviewMutationVariables, TContext>) => {
-
+    
     return useMutation<StartGenerateFromDocumentationPreviewMutation, TError, StartGenerateFromDocumentationPreviewMutationVariables, TContext>(
       {
     mutationKey: ['startGenerateFromDocumentationPreview'],
@@ -5887,7 +6332,7 @@ export const useUpdateApiConnectorMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateApiConnectorMutation, TError, UpdateApiConnectorMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateApiConnectorMutation, TError, UpdateApiConnectorMutationVariables, TContext>(
       {
     mutationKey: ['updateApiConnector'],
@@ -5927,7 +6372,7 @@ export const useEditorJobFileLogsQuery = <
       variables: EditorJobFileLogsQueryVariables,
       options?: Omit<UseQueryOptions<EditorJobFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorJobFileLogsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<EditorJobFileLogsQuery, TError, TData>(
       {
     queryKey: ['editorJobFileLogs', variables],
@@ -5949,7 +6394,7 @@ export const useEditorJobFileLogsExistQuery = <
       variables: EditorJobFileLogsExistQueryVariables,
       options?: Omit<UseQueryOptions<EditorJobFileLogsExistQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorJobFileLogsExistQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<EditorJobFileLogsExistQuery, TError, TData>(
       {
     queryKey: ['editorJobFileLogsExist', variables],
@@ -5981,7 +6426,7 @@ export const useEditorTaskExecutionFileLogsQuery = <
       variables: EditorTaskExecutionFileLogsQueryVariables,
       options?: Omit<UseQueryOptions<EditorTaskExecutionFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorTaskExecutionFileLogsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<EditorTaskExecutionFileLogsQuery, TError, TData>(
       {
     queryKey: ['editorTaskExecutionFileLogs', variables],
@@ -6021,7 +6466,7 @@ export const useJobFileLogsQuery = <
       variables: JobFileLogsQueryVariables,
       options?: Omit<UseQueryOptions<JobFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<JobFileLogsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<JobFileLogsQuery, TError, TData>(
       {
     queryKey: ['jobFileLogs', variables],
@@ -6043,7 +6488,7 @@ export const useJobFileLogsExistQuery = <
       variables: JobFileLogsExistQueryVariables,
       options?: Omit<UseQueryOptions<JobFileLogsExistQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<JobFileLogsExistQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<JobFileLogsExistQuery, TError, TData>(
       {
     queryKey: ['jobFileLogsExist', variables],
@@ -6075,7 +6520,7 @@ export const useTaskExecutionFileLogsQuery = <
       variables: TaskExecutionFileLogsQueryVariables,
       options?: Omit<UseQueryOptions<TaskExecutionFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TaskExecutionFileLogsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<TaskExecutionFileLogsQuery, TError, TData>(
       {
     queryKey: ['taskExecutionFileLogs', variables],
@@ -6106,7 +6551,7 @@ export const useAdminApiKeysQuery = <
       variables: AdminApiKeysQueryVariables,
       options?: Omit<UseQueryOptions<AdminApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AdminApiKeysQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AdminApiKeysQuery, TError, TData>(
       {
     queryKey: ['adminApiKeys', variables],
@@ -6137,7 +6582,7 @@ export const useApiKeysQuery = <
       variables: ApiKeysQueryVariables,
       options?: Omit<UseQueryOptions<ApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiKeysQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ApiKeysQuery, TError, TData>(
       {
     queryKey: ['apiKeys', variables],
@@ -6170,11 +6615,679 @@ export const useClusterElementComponentConnectionsQuery = <
       variables: ClusterElementComponentConnectionsQueryVariables,
       options?: Omit<UseQueryOptions<ClusterElementComponentConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementComponentConnectionsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ClusterElementComponentConnectionsQuery, TError, TData>(
       {
     queryKey: ['clusterElementComponentConnections', variables],
     queryFn: fetcher<ClusterElementComponentConnectionsQuery, ClusterElementComponentConnectionsQueryVariables>(ClusterElementComponentConnectionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const ClusterElementDefinitionDocument = `
+    query clusterElementDefinition($componentName: String!, $componentVersion: Int!, $clusterElementName: String!) {
+  clusterElementDefinition(
+    componentName: $componentName
+    componentVersion: $componentVersion
+    clusterElementName: $clusterElementName
+  ) {
+    componentName
+    componentVersion
+    description
+    name
+    title
+    properties {
+      advancedOption
+      description
+      displayCondition
+      expressionEnabled
+      hidden
+      name
+      required
+      type
+      ... on StringProperty {
+        controlType
+        defaultValue
+        label
+        placeholder
+        options {
+          description
+          label
+          value
+        }
+        optionsDataSource {
+          optionsLookupDependsOn
+        }
+      }
+      ... on IntegerProperty {
+        controlType
+        integerDefaultValue: defaultValue
+        label
+        placeholder
+        options {
+          description
+          label
+          value
+        }
+        optionsDataSource {
+          optionsLookupDependsOn
+        }
+      }
+      ... on NumberProperty {
+        controlType
+        label
+        numberDefaultValue: defaultValue
+        placeholder
+        options {
+          description
+          label
+          value
+        }
+        optionsDataSource {
+          optionsLookupDependsOn
+        }
+      }
+      ... on BooleanProperty {
+        booleanDefaultValue: defaultValue
+        controlType
+        label
+        placeholder
+      }
+      ... on ArrayProperty {
+        arrayDefaultValue: defaultValue
+        controlType
+        label
+        placeholder
+        optionsDataSource {
+          optionsLookupDependsOn
+        }
+        items {
+          advancedOption
+          description
+          displayCondition
+          expressionEnabled
+          hidden
+          name
+          required
+          type
+          ... on StringProperty {
+            controlType
+            defaultValue
+            label
+            placeholder
+            options {
+              description
+              label
+              value
+            }
+            optionsDataSource {
+              optionsLookupDependsOn
+            }
+          }
+          ... on IntegerProperty {
+            controlType
+            integerDefaultValue: defaultValue
+            label
+            placeholder
+            options {
+              description
+              label
+              value
+            }
+            optionsDataSource {
+              optionsLookupDependsOn
+            }
+          }
+          ... on NumberProperty {
+            controlType
+            label
+            numberDefaultValue: defaultValue
+            placeholder
+            options {
+              description
+              label
+              value
+            }
+            optionsDataSource {
+              optionsLookupDependsOn
+            }
+          }
+          ... on BooleanProperty {
+            booleanDefaultValue: defaultValue
+            controlType
+            label
+            placeholder
+          }
+          ... on ArrayProperty {
+            arrayDefaultValue: defaultValue
+            controlType
+            label
+            placeholder
+          }
+          ... on ObjectProperty {
+            controlType
+            label
+            objectDefaultValue: defaultValue
+            placeholder
+          }
+          ... on DateProperty {
+            controlType
+            dateDefaultValue: defaultValue
+            label
+            placeholder
+          }
+          ... on DateTimeProperty {
+            controlType
+            dateTimeDefaultValue: defaultValue
+            label
+            placeholder
+          }
+          ... on TimeProperty {
+            controlType
+            label
+            placeholder
+            timeDefaultValue: defaultValue
+          }
+          ... on NullProperty {
+            controlType
+            label
+            placeholder
+          }
+          ... on DynamicPropertiesProperty {
+            propertiesDataSource {
+              propertiesLookupDependsOn
+            }
+          }
+        }
+      }
+      ... on ObjectProperty {
+        controlType
+        label
+        objectDefaultValue: defaultValue
+        placeholder
+        optionsDataSource {
+          optionsLookupDependsOn
+        }
+        properties {
+          advancedOption
+          description
+          displayCondition
+          expressionEnabled
+          hidden
+          name
+          required
+          type
+          ... on StringProperty {
+            controlType
+            defaultValue
+            label
+            placeholder
+            options {
+              description
+              label
+              value
+            }
+            optionsDataSource {
+              optionsLookupDependsOn
+            }
+          }
+          ... on IntegerProperty {
+            controlType
+            integerDefaultValue: defaultValue
+            label
+            placeholder
+            options {
+              description
+              label
+              value
+            }
+            optionsDataSource {
+              optionsLookupDependsOn
+            }
+          }
+          ... on NumberProperty {
+            controlType
+            label
+            numberDefaultValue: defaultValue
+            placeholder
+            options {
+              description
+              label
+              value
+            }
+            optionsDataSource {
+              optionsLookupDependsOn
+            }
+          }
+          ... on BooleanProperty {
+            booleanDefaultValue: defaultValue
+            controlType
+            label
+            placeholder
+          }
+          ... on ArrayProperty {
+            arrayDefaultValue: defaultValue
+            controlType
+            label
+            placeholder
+          }
+          ... on ObjectProperty {
+            controlType
+            label
+            objectDefaultValue: defaultValue
+            placeholder
+          }
+          ... on DateProperty {
+            controlType
+            dateDefaultValue: defaultValue
+            label
+            placeholder
+          }
+          ... on DateTimeProperty {
+            controlType
+            dateTimeDefaultValue: defaultValue
+            label
+            placeholder
+          }
+          ... on TimeProperty {
+            controlType
+            label
+            placeholder
+            timeDefaultValue: defaultValue
+          }
+          ... on NullProperty {
+            controlType
+            label
+            placeholder
+          }
+          ... on DynamicPropertiesProperty {
+            propertiesDataSource {
+              propertiesLookupDependsOn
+            }
+          }
+        }
+      }
+      ... on DateProperty {
+        controlType
+        dateDefaultValue: defaultValue
+        label
+        placeholder
+      }
+      ... on DateTimeProperty {
+        controlType
+        dateTimeDefaultValue: defaultValue
+        label
+        placeholder
+      }
+      ... on TimeProperty {
+        controlType
+        label
+        placeholder
+        timeDefaultValue: defaultValue
+      }
+      ... on NullProperty {
+        controlType
+        label
+        placeholder
+      }
+      ... on DynamicPropertiesProperty {
+        propertiesDataSource {
+          propertiesLookupDependsOn
+        }
+      }
+    }
+  }
+}
+    `;
+
+export const useClusterElementDefinitionQuery = <
+      TData = ClusterElementDefinitionQuery,
+      TError = unknown
+    >(
+      variables: ClusterElementDefinitionQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementDefinitionQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementDefinitionQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ClusterElementDefinitionQuery, TError, TData>(
+      {
+    queryKey: ['clusterElementDefinition', variables],
+    queryFn: fetcher<ClusterElementDefinitionQuery, ClusterElementDefinitionQueryVariables>(ClusterElementDefinitionDocument, variables),
+    ...options
+  }
+    )};
+
+export const ClusterElementPropertyDynamicPropertiesDocument = `
+    query clusterElementPropertyDynamicProperties($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
+  clusterElementPropertyDynamicProperties(
+    componentName: $componentName
+    componentVersion: $componentVersion
+    clusterElementName: $clusterElementName
+    propertyName: $propertyName
+    connectionId: $connectionId
+    inputParameters: $inputParameters
+    lookupDependsOnPaths: $lookupDependsOnPaths
+  ) {
+    advancedOption
+    description
+    displayCondition
+    expressionEnabled
+    hidden
+    name
+    required
+    type
+    ... on StringProperty {
+      controlType
+      label
+      placeholder
+      options {
+        description
+        label
+        value
+      }
+      optionsDataSource {
+        optionsLookupDependsOn
+      }
+    }
+    ... on IntegerProperty {
+      controlType
+      label
+      placeholder
+      options {
+        description
+        label
+        value
+      }
+      optionsDataSource {
+        optionsLookupDependsOn
+      }
+    }
+    ... on NumberProperty {
+      controlType
+      label
+      placeholder
+      options {
+        description
+        label
+        value
+      }
+      optionsDataSource {
+        optionsLookupDependsOn
+      }
+    }
+    ... on BooleanProperty {
+      controlType
+      label
+      placeholder
+    }
+    ... on ArrayProperty {
+      controlType
+      label
+      placeholder
+      optionsDataSource {
+        optionsLookupDependsOn
+      }
+      items {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          label
+          placeholder
+          options {
+            description
+            label
+            value
+          }
+          optionsDataSource {
+            optionsLookupDependsOn
+          }
+        }
+        ... on IntegerProperty {
+          controlType
+          label
+          placeholder
+          options {
+            description
+            label
+            value
+          }
+          optionsDataSource {
+            optionsLookupDependsOn
+          }
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          placeholder
+          options {
+            description
+            label
+            value
+          }
+          optionsDataSource {
+            optionsLookupDependsOn
+          }
+        }
+        ... on BooleanProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on DateProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on DateTimeProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on TimeProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on NullProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on DynamicPropertiesProperty {
+          propertiesDataSource {
+            propertiesLookupDependsOn
+          }
+        }
+      }
+    }
+    ... on ObjectProperty {
+      controlType
+      label
+      placeholder
+      optionsDataSource {
+        optionsLookupDependsOn
+      }
+      properties {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          label
+          placeholder
+          options {
+            description
+            label
+            value
+          }
+          optionsDataSource {
+            optionsLookupDependsOn
+          }
+        }
+        ... on IntegerProperty {
+          controlType
+          label
+          placeholder
+          options {
+            description
+            label
+            value
+          }
+          optionsDataSource {
+            optionsLookupDependsOn
+          }
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          placeholder
+          options {
+            description
+            label
+            value
+          }
+          optionsDataSource {
+            optionsLookupDependsOn
+          }
+        }
+        ... on BooleanProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on DateProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on DateTimeProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on TimeProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on NullProperty {
+          controlType
+          label
+          placeholder
+        }
+        ... on DynamicPropertiesProperty {
+          propertiesDataSource {
+            propertiesLookupDependsOn
+          }
+        }
+      }
+    }
+    ... on DateProperty {
+      controlType
+      label
+      placeholder
+    }
+    ... on DateTimeProperty {
+      controlType
+      label
+      placeholder
+    }
+    ... on TimeProperty {
+      controlType
+      label
+      placeholder
+    }
+    ... on NullProperty {
+      controlType
+      label
+      placeholder
+    }
+    ... on DynamicPropertiesProperty {
+      propertiesDataSource {
+        propertiesLookupDependsOn
+      }
+    }
+  }
+}
+    `;
+
+export const useClusterElementPropertyDynamicPropertiesQuery = <
+      TData = ClusterElementPropertyDynamicPropertiesQuery,
+      TError = unknown
+    >(
+      variables: ClusterElementPropertyDynamicPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementPropertyDynamicPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementPropertyDynamicPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ClusterElementPropertyDynamicPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['clusterElementPropertyDynamicProperties', variables],
+    queryFn: fetcher<ClusterElementPropertyDynamicPropertiesQuery, ClusterElementPropertyDynamicPropertiesQueryVariables>(ClusterElementPropertyDynamicPropertiesDocument, variables),
+    ...options
+  }
+    )};
+
+export const ClusterElementPropertyOptionsDocument = `
+    query clusterElementPropertyOptions($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
+  clusterElementPropertyOptions(
+    componentName: $componentName
+    componentVersion: $componentVersion
+    clusterElementName: $clusterElementName
+    propertyName: $propertyName
+    connectionId: $connectionId
+    inputParameters: $inputParameters
+    lookupDependsOnPaths: $lookupDependsOnPaths
+  ) {
+    description
+    label
+    value
+  }
+}
+    `;
+
+export const useClusterElementPropertyOptionsQuery = <
+      TData = ClusterElementPropertyOptionsQuery,
+      TError = unknown
+    >(
+      variables: ClusterElementPropertyOptionsQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementPropertyOptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementPropertyOptionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ClusterElementPropertyOptionsQuery, TError, TData>(
+      {
+    queryKey: ['clusterElementPropertyOptions', variables],
+    queryFn: fetcher<ClusterElementPropertyOptionsQuery, ClusterElementPropertyOptionsQueryVariables>(ClusterElementPropertyOptionsDocument, variables),
     ...options
   }
     )};
@@ -6198,7 +7311,7 @@ export const useClusterElementScriptInputQuery = <
       variables: ClusterElementScriptInputQueryVariables,
       options?: Omit<UseQueryOptions<ClusterElementScriptInputQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementScriptInputQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ClusterElementScriptInputQuery, TError, TData>(
       {
     queryKey: ['clusterElementScriptInput', variables],
@@ -6249,7 +7362,7 @@ export const useComponentDefinitionSearchQuery = <
       variables: ComponentDefinitionSearchQueryVariables,
       options?: Omit<UseQueryOptions<ComponentDefinitionSearchQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ComponentDefinitionSearchQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ComponentDefinitionSearchQuery, TError, TData>(
       {
     queryKey: ['ComponentDefinitionSearch', variables],
@@ -6268,7 +7381,7 @@ export const useCreateApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateApiKeyMutation, TError, CreateApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateApiKeyMutation, TError, CreateApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['createApiKey'],
@@ -6283,6 +7396,7 @@ export const CreateMcpComponentDocument = `
     id
     componentName
     componentVersion
+    title
     mcpServerId
     connectionId
   }
@@ -6293,7 +7407,7 @@ export const useCreateMcpComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpComponentMutation, TError, CreateMcpComponentMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpComponentMutation, TError, CreateMcpComponentMutationVariables, TContext>(
       {
     mutationKey: ['createMcpComponent'],
@@ -6308,6 +7422,7 @@ export const CreateMcpComponentWithToolsDocument = `
     id
     componentName
     componentVersion
+    title
     mcpServerId
     connectionId
     createdBy
@@ -6323,7 +7438,7 @@ export const useCreateMcpComponentWithToolsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpComponentWithToolsMutation, TError, CreateMcpComponentWithToolsMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpComponentWithToolsMutation, TError, CreateMcpComponentWithToolsMutationVariables, TContext>(
       {
     mutationKey: ['createMcpComponentWithTools'],
@@ -6347,7 +7462,7 @@ export const useCreateMcpToolMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpToolMutation, TError, CreateMcpToolMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpToolMutation, TError, CreateMcpToolMutationVariables, TContext>(
       {
     mutationKey: ['createMcpTool'],
@@ -6366,7 +7481,7 @@ export const useDeleteApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteApiKeyMutation, TError, DeleteApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteApiKeyMutation, TError, DeleteApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['deleteApiKey'],
@@ -6385,11 +7500,30 @@ export const useDeleteMcpComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpComponentMutation, TError, DeleteMcpComponentMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpComponentMutation, TError, DeleteMcpComponentMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpComponent'],
     mutationFn: (variables?: DeleteMcpComponentMutationVariables) => fetcher<DeleteMcpComponentMutation, DeleteMcpComponentMutationVariables>(DeleteMcpComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteMcpToolDocument = `
+    mutation deleteMcpTool($id: ID!) {
+  deleteMcpTool(id: $id)
+}
+    `;
+
+export const useDeleteMcpToolMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteMcpToolMutation, TError, DeleteMcpToolMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteMcpToolMutation, TError, DeleteMcpToolMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteMcpTool'],
+    mutationFn: (variables?: DeleteMcpToolMutationVariables) => fetcher<DeleteMcpToolMutation, DeleteMcpToolMutationVariables>(DeleteMcpToolDocument, variables)(),
     ...options
   }
     )};
@@ -6410,7 +7544,7 @@ export const useEnvironmentsQuery = <
       variables?: EnvironmentsQueryVariables,
       options?: Omit<UseQueryOptions<EnvironmentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EnvironmentsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<EnvironmentsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['environments'] : ['environments', variables],
@@ -6432,7 +7566,7 @@ export const useManagementMcpServerUrlQuery = <
       variables?: ManagementMcpServerUrlQueryVariables,
       options?: Omit<UseQueryOptions<ManagementMcpServerUrlQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ManagementMcpServerUrlQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ManagementMcpServerUrlQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['managementMcpServerUrl'] : ['managementMcpServerUrl', variables],
@@ -6447,12 +7581,17 @@ export const McpComponentsByServerIdDocument = `
     id
     componentName
     componentVersion
+    title
     connectionId
+    lastModifiedDate
     mcpServerId
     mcpTools {
       id
       mcpComponentId
       name
+      parameters
+      title
+      version
     }
     version
   }
@@ -6466,7 +7605,7 @@ export const useMcpComponentsByServerIdQuery = <
       variables: McpComponentsByServerIdQueryVariables,
       options?: Omit<UseQueryOptions<McpComponentsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpComponentsByServerIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpComponentsByServerIdQuery, TError, TData>(
       {
     queryKey: ['mcpComponentsByServerId', variables],
@@ -6491,7 +7630,7 @@ export const useMcpServerTagsQuery = <
       variables: McpServerTagsQueryVariables,
       options?: Omit<UseQueryOptions<McpServerTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServerTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpServerTagsQuery, TError, TData>(
       {
     queryKey: ['mcpServerTags', variables],
@@ -6514,6 +7653,7 @@ export const McpServersDocument = `
       mcpServerId
       componentName
       componentVersion
+      title
     }
     tags {
       id
@@ -6531,7 +7671,7 @@ export const useMcpServersQuery = <
       variables: McpServersQueryVariables,
       options?: Omit<UseQueryOptions<McpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpServersQuery, TError, TData>(
       {
     queryKey: ['mcpServers', variables],
@@ -6545,8 +7685,10 @@ export const McpToolsByComponentIdDocument = `
   mcpToolsByComponentId(mcpComponentId: $mcpComponentId) {
     id
     name
+    title
     mcpComponentId
     parameters
+    version
   }
 }
     `;
@@ -6558,7 +7700,7 @@ export const useMcpToolsByComponentIdQuery = <
       variables: McpToolsByComponentIdQueryVariables,
       options?: Omit<UseQueryOptions<McpToolsByComponentIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpToolsByComponentIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpToolsByComponentIdQuery, TError, TData>(
       {
     queryKey: ['mcpToolsByComponentId', variables],
@@ -6585,7 +7727,7 @@ export const useSaveClusterElementTestConfigurationConnectionMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<SaveClusterElementTestConfigurationConnectionMutation, TError, SaveClusterElementTestConfigurationConnectionMutationVariables, TContext>) => {
-
+    
     return useMutation<SaveClusterElementTestConfigurationConnectionMutation, TError, SaveClusterElementTestConfigurationConnectionMutationVariables, TContext>(
       {
     mutationKey: ['saveClusterElementTestConfigurationConnection'],
@@ -6615,7 +7757,7 @@ export const useSaveClusterElementTestOutputMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<SaveClusterElementTestOutputMutation, TError, SaveClusterElementTestOutputMutationVariables, TContext>) => {
-
+    
     return useMutation<SaveClusterElementTestOutputMutation, TError, SaveClusterElementTestOutputMutationVariables, TContext>(
       {
     mutationKey: ['saveClusterElementTestOutput'],
@@ -6640,7 +7782,7 @@ export const useSaveWorkflowTestConfigurationConnectionMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<SaveWorkflowTestConfigurationConnectionMutation, TError, SaveWorkflowTestConfigurationConnectionMutationVariables, TContext>) => {
-
+    
     return useMutation<SaveWorkflowTestConfigurationConnectionMutation, TError, SaveWorkflowTestConfigurationConnectionMutationVariables, TContext>(
       {
     mutationKey: ['saveWorkflowTestConfigurationConnection'],
@@ -6672,7 +7814,7 @@ export const useTestClusterElementScriptMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<TestClusterElementScriptMutation, TError, TestClusterElementScriptMutationVariables, TContext>) => {
-
+    
     return useMutation<TestClusterElementScriptMutation, TError, TestClusterElementScriptMutationVariables, TContext>(
       {
     mutationKey: ['testClusterElementScript'],
@@ -6702,7 +7844,7 @@ export const useTestWorkflowNodeScriptMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<TestWorkflowNodeScriptMutation, TError, TestWorkflowNodeScriptMutationVariables, TContext>) => {
-
+    
     return useMutation<TestWorkflowNodeScriptMutation, TError, TestWorkflowNodeScriptMutationVariables, TContext>(
       {
     mutationKey: ['testWorkflowNodeScript'],
@@ -6721,7 +7863,7 @@ export const useUpdateApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateApiKeyMutation, TError, UpdateApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateApiKeyMutation, TError, UpdateApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['updateApiKey'],
@@ -6740,7 +7882,7 @@ export const useUpdateManagementMcpServerUrlMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateManagementMcpServerUrlMutation, TError, UpdateManagementMcpServerUrlMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateManagementMcpServerUrlMutation, TError, UpdateManagementMcpServerUrlMutationVariables, TContext>(
       {
     mutationKey: ['updateManagementMcpServerUrl'],
@@ -6755,6 +7897,7 @@ export const UpdateMcpComponentWithToolsDocument = `
     id
     componentName
     componentVersion
+    title
     mcpServerId
     connectionId
     createdBy
@@ -6770,7 +7913,7 @@ export const useUpdateMcpComponentWithToolsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpComponentWithToolsMutation, TError, UpdateMcpComponentWithToolsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpComponentWithToolsMutation, TError, UpdateMcpComponentWithToolsMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpComponentWithTools'],
@@ -6789,11 +7932,36 @@ export const useUpdateMcpServerUrlMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerUrlMutation, TError, UpdateMcpServerUrlMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpServerUrlMutation, TError, UpdateMcpServerUrlMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServerUrl'],
     mutationFn: (variables?: UpdateMcpServerUrlMutationVariables) => fetcher<UpdateMcpServerUrlMutation, UpdateMcpServerUrlMutationVariables>(UpdateMcpServerUrlDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateMcpToolDocument = `
+    mutation updateMcpTool($id: ID!, $input: McpToolInput!) {
+  updateMcpTool(id: $id, input: $input) {
+    id
+    name
+    mcpComponentId
+    parameters
+    version
+  }
+}
+    `;
+
+export const useUpdateMcpToolMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateMcpToolMutation, TError, UpdateMcpToolMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateMcpToolMutation, TError, UpdateMcpToolMutationVariables, TContext>(
+      {
+    mutationKey: ['updateMcpTool'],
+    mutationFn: (variables?: UpdateMcpToolMutationVariables) => fetcher<UpdateMcpToolMutation, UpdateMcpToolMutationVariables>(UpdateMcpToolDocument, variables)(),
     ...options
   }
     )};
@@ -6820,7 +7988,7 @@ export const useWorkflowNodeComponentConnectionsQuery = <
       variables: WorkflowNodeComponentConnectionsQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowNodeComponentConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeComponentConnectionsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkflowNodeComponentConnectionsQuery, TError, TData>(
       {
     queryKey: ['workflowNodeComponentConnections', variables],
@@ -6846,7 +8014,7 @@ export const useWorkflowNodeScriptInputQuery = <
       variables: WorkflowNodeScriptInputQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowNodeScriptInputQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeScriptInputQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkflowNodeScriptInputQuery, TError, TData>(
       {
     queryKey: ['workflowNodeScriptInput', variables],
@@ -6882,7 +8050,7 @@ export const useCustomComponentQuery = <
       variables: CustomComponentQueryVariables,
       options?: Omit<UseQueryOptions<CustomComponentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<CustomComponentQuery, TError, TData>(
       {
     queryKey: ['customComponent', variables],
@@ -6915,7 +8083,7 @@ export const useCustomComponentDefinitionQuery = <
       variables: CustomComponentDefinitionQueryVariables,
       options?: Omit<UseQueryOptions<CustomComponentDefinitionQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentDefinitionQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<CustomComponentDefinitionQuery, TError, TData>(
       {
     queryKey: ['customComponentDefinition', variables],
@@ -6951,7 +8119,7 @@ export const useCustomComponentsQuery = <
       variables?: CustomComponentsQueryVariables,
       options?: Omit<UseQueryOptions<CustomComponentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<CustomComponentsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['customComponents'] : ['customComponents', variables],
@@ -6970,7 +8138,7 @@ export const useDeleteCustomComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteCustomComponentMutation, TError, DeleteCustomComponentMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteCustomComponentMutation, TError, DeleteCustomComponentMutationVariables, TContext>(
       {
     mutationKey: ['deleteCustomComponent'],
@@ -6989,7 +8157,7 @@ export const useEnableCustomComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<EnableCustomComponentMutation, TError, EnableCustomComponentMutationVariables, TContext>) => {
-
+    
     return useMutation<EnableCustomComponentMutation, TError, EnableCustomComponentMutationVariables, TContext>(
       {
     mutationKey: ['enableCustomComponent'],
@@ -7011,7 +8179,7 @@ export const useAuthoritiesQuery = <
       variables?: AuthoritiesQueryVariables,
       options?: Omit<UseQueryOptions<AuthoritiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AuthoritiesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AuthoritiesQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['authorities'] : ['authorities', variables],
@@ -7051,7 +8219,7 @@ export const useCreateIdentityProviderMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateIdentityProviderMutation, TError, CreateIdentityProviderMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateIdentityProviderMutation, TError, CreateIdentityProviderMutationVariables, TContext>(
       {
     mutationKey: ['createIdentityProvider'],
@@ -7070,7 +8238,7 @@ export const useDeleteIdentityProviderMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteIdentityProviderMutation, TError, DeleteIdentityProviderMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteIdentityProviderMutation, TError, DeleteIdentityProviderMutationVariables, TContext>(
       {
     mutationKey: ['deleteIdentityProvider'],
@@ -7089,7 +8257,7 @@ export const useDeleteUserMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>(
       {
     mutationKey: ['deleteUser'],
@@ -7132,7 +8300,7 @@ export const useIdentityProviderQuery = <
       variables: IdentityProviderQueryVariables,
       options?: Omit<UseQueryOptions<IdentityProviderQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IdentityProviderQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<IdentityProviderQuery, TError, TData>(
       {
     queryKey: ['identityProvider', variables],
@@ -7175,7 +8343,7 @@ export const useIdentityProvidersQuery = <
       variables?: IdentityProvidersQueryVariables,
       options?: Omit<UseQueryOptions<IdentityProvidersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IdentityProvidersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<IdentityProvidersQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['identityProviders'] : ['identityProviders', variables],
@@ -7194,7 +8362,7 @@ export const useInviteUserMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<InviteUserMutation, TError, InviteUserMutationVariables, TContext>) => {
-
+    
     return useMutation<InviteUserMutation, TError, InviteUserMutationVariables, TContext>(
       {
     mutationKey: ['inviteUser'],
@@ -7234,7 +8402,7 @@ export const useUpdateIdentityProviderMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateIdentityProviderMutation, TError, UpdateIdentityProviderMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateIdentityProviderMutation, TError, UpdateIdentityProviderMutationVariables, TContext>(
       {
     mutationKey: ['updateIdentityProvider'],
@@ -7261,7 +8429,7 @@ export const useUpdateUserMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>(
       {
     mutationKey: ['updateUser'],
@@ -7297,7 +8465,7 @@ export const useUsersQuery = <
       variables?: UsersQueryVariables,
       options?: Omit<UseQueryOptions<UsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<UsersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<UsersQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['users'] : ['users', variables],

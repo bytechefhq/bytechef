@@ -5,6 +5,8 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
+import {useClusterElementPropertyOptionsQuery} from '@/shared/middleware/graphql';
 import {
     useGetClusterElementNodeOptionsQuery,
     useGetWorkflowNodeOptionsQuery,
@@ -86,7 +88,9 @@ const PropertyComboBox = ({
     workflowNodeName,
 }: PropertyComboBoxProps) => {
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(initialValue !== undefined ? initialValue.toString() : defaultValue);
+    const [value, setValue] = useState(initialValue != null ? initialValue.toString() : defaultValue);
+
+    const clusterElementContext = useClusterElementContext();
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -97,11 +101,7 @@ const PropertyComboBox = ({
         }))
     );
 
-    const {rootClusterElementNodeData} = useWorkflowEditorStore(
-        useShallow((state) => ({
-            rootClusterElementNodeData: state.rootClusterElementNodeData,
-        }))
-    );
+    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
     const path = useMemo(() => {
         let updatedPath = initialPath;
@@ -207,6 +207,82 @@ const PropertyComboBox = ({
         Boolean(queryEnabled && currentNode?.clusterElementType)
     );
 
+    const clusterElementInputParameters = useMemo(() => {
+        if (!clusterElementContext?.inputParameters) {
+            return undefined;
+        }
+
+        const filteredParameters: Record<string, unknown> = {};
+
+        for (const [parameterKey, parameterValue] of Object.entries(clusterElementContext.inputParameters)) {
+            if (
+                typeof parameterValue === 'string' &&
+                (parameterValue.startsWith('=') || parameterValue.includes('${'))
+            ) {
+                continue;
+            }
+
+            filteredParameters[parameterKey] = parameterValue;
+        }
+
+        return filteredParameters;
+    }, [clusterElementContext?.inputParameters]);
+
+    const clusterElementLookupDependsOnValues = useMemo(() => {
+        if (!clusterElementInputParameters || !lookupDependsOnPaths?.length) {
+            return undefined;
+        }
+
+        return lookupDependsOnPaths.map((dependencyPath) => clusterElementInputParameters[dependencyPath]);
+    }, [clusterElementInputParameters, lookupDependsOnPaths]);
+
+    const clusterElementContextQueryEnabled = useMemo(() => {
+        if (!clusterElementContext || !optionsDataSource || currentNode) {
+            return false;
+        }
+
+        if (lookupDependsOnPaths?.length && clusterElementLookupDependsOnValues) {
+            return clusterElementLookupDependsOnValues.every(
+                (dependencyValue) => dependencyValue !== undefined && dependencyValue !== null && dependencyValue !== ''
+            );
+        }
+
+        return true;
+    }, [
+        currentNode,
+        lookupDependsOnPaths,
+        clusterElementLookupDependsOnValues,
+        clusterElementContext,
+        optionsDataSource,
+    ]);
+
+    const {data: clusterElementPropertyOptionsData, isLoading: isClusterElementPropertyOptionsLoading} =
+        useClusterElementPropertyOptionsQuery(
+            {
+                clusterElementName: clusterElementContext?.clusterElementName || '',
+                componentName: clusterElementContext?.componentName || '',
+                componentVersion: clusterElementContext?.componentVersion || 0,
+                connectionId: clusterElementContext?.connectionId,
+                inputParameters: clusterElementInputParameters,
+                lookupDependsOnPaths: lookupDependsOnPaths || [],
+                propertyName: path || name || '',
+            },
+            {
+                enabled: clusterElementContextQueryEnabled,
+                queryKey: [
+                    'clusterElementPropertyOptions',
+                    {
+                        clusterElementName: clusterElementContext?.clusterElementName,
+                        componentName: clusterElementContext?.componentName,
+                        componentVersion: clusterElementContext?.componentVersion,
+                        connectionId: clusterElementContext?.connectionId,
+                        lookupDependsOnValues: clusterElementLookupDependsOnValues,
+                        propertyName: path || name,
+                    },
+                ],
+            }
+        );
+
     const options = useMemo(() => {
         if (optionsData) {
             return optionsData.map((option) => ({
@@ -220,13 +296,19 @@ const PropertyComboBox = ({
                 label: option.label ?? option.value,
                 value: option.value.toString(),
             }));
+        } else if (clusterElementPropertyOptionsData?.clusterElementPropertyOptions) {
+            return clusterElementPropertyOptionsData.clusterElementPropertyOptions.map((option) => ({
+                description: option.description,
+                label: option.label ?? option.value,
+                value: String(option.value),
+            }));
         }
 
         return initialOptions.map((option) => ({
             ...option,
             value: option.value?.toString() || '',
         }));
-    }, [optionsData, clusterElementOptionsData, initialOptions]);
+    }, [optionsData, clusterElementOptionsData, clusterElementPropertyOptionsData, initialOptions]);
 
     const currentOption = useMemo(
         () => (options as Array<ComboBoxItemType>)?.find((option) => String(option.value) === String(value)),
@@ -243,14 +325,18 @@ const PropertyComboBox = ({
     );
 
     const noOptionsAvailable = useMemo(() => {
-        const hasValidLookupValues = lookupDependsOnValues?.every((value) => value !== undefined);
-
         if (options.length) {
             return false;
         }
 
+        if (clusterElementContextQueryEnabled) {
+            return false;
+        }
+
+        const hasValidLookupValues = lookupDependsOnValues?.every((value) => value !== undefined);
+
         return !lookupDependsOnValues || !hasValidLookupValues;
-    }, [lookupDependsOnValues, options]);
+    }, [lookupDependsOnValues, clusterElementContextQueryEnabled, options]);
 
     const dependencyMissing = useMemo(
         () => lookupDependsOnPaths?.length && lookupDependsOnValues?.some((value) => value === undefined),
@@ -322,7 +408,7 @@ const PropertyComboBox = ({
     );
 
     useEffect(() => {
-        if (initialValue !== undefined) {
+        if (initialValue != null) {
             setValue(initialValue.toString());
         }
     }, [initialValue]);
@@ -396,13 +482,15 @@ const PropertyComboBox = ({
                                 </span>
                             )}
 
-                        {lookupDependsOnValues && (isLoading || isClusterElementOptionsLoading) && (
+                        {(lookupDependsOnValues && (isLoading || isClusterElementOptionsLoading)) ||
+                        isClusterElementPropertyOptionsLoading ? (
                             <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                 <LoadingIcon /> Loading...
                             </span>
-                        )}
+                        ) : null}
 
-                        {((lookupDependsOnValues && !(isLoading || isClusterElementOptionsLoading)) ||
+                        {((lookupDependsOnValues &&
+                            !(isLoading || isClusterElementOptionsLoading || isClusterElementPropertyOptionsLoading)) ||
                             !lookupDependsOnValues) && (
                             <>
                                 {currentOption ? (
@@ -430,12 +518,7 @@ const PropertyComboBox = ({
                     </Button>
                 </PopoverTrigger>
 
-                <PopoverContent
-                    align="start"
-                    // aria-label="Select options"
-                    className="min-w-combo-box-popper-anchor-width p-0"
-                    side="bottom"
-                >
+                <PopoverContent align="start" className="min-w-combo-box-popper-anchor-width p-0" side="bottom">
                     <Command>
                         <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
 

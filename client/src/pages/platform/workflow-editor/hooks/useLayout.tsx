@@ -1,4 +1,3 @@
-import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import {
     DATA_PILL_PANEL_WIDTH,
     EDGE_STYLES,
@@ -35,6 +34,8 @@ import createForkJoinEdges from '../utils/createForkJoinEdges';
 import createForkJoinNode from '../utils/createForkJoinNode';
 import createLoopEdges from '../utils/createLoopEdges';
 import createLoopNode from '../utils/createLoopNode';
+import createMapEdges from '../utils/createMapEdges';
+import createMapNode from '../utils/createMapNode';
 import createParallelEdges from '../utils/createParallelEdges';
 import createParallelNode from '../utils/createParallelNode';
 import {
@@ -51,6 +52,7 @@ interface UseLayoutProps {
     canvasWidth: number;
     componentDefinitions: Array<ComponentDefinitionBasic>;
     direction?: LayoutDirectionType;
+    leftSidebarOpen?: boolean;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasic>;
 }
@@ -60,6 +62,7 @@ export default function useLayout({
     canvasWidth,
     componentDefinitions,
     direction: directionProp,
+    leftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: UseLayoutProps) {
@@ -84,7 +87,6 @@ export default function useLayout({
         }))
     );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
-    const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
     );
@@ -98,7 +100,7 @@ export default function useLayout({
     const canvasHeightRef = useRef(canvasHeight);
     const previousDataPillPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousNodeDetailsPanelOpenRef = useRef<boolean | undefined>(undefined);
-    const previousProjectLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
+    const previousLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
 
     canvasWidthRef.current = canvasWidth;
     canvasHeightRef.current = canvasHeight;
@@ -126,6 +128,7 @@ export default function useLayout({
         const eachChildTasks = {};
         const forkJoinChildTasks = {};
         const loopChildTasks = {};
+        const mapChildTasks = {};
         const parallelChildTasks = {};
 
         // First pass: collect all task dispatcher data and save it in the corresponding objects
@@ -137,6 +140,7 @@ export default function useLayout({
                 eachChildTasks,
                 forkJoinChildTasks,
                 loopChildTasks,
+                mapChildTasks,
                 parallelChildTasks
             );
         });
@@ -168,7 +172,7 @@ export default function useLayout({
                     },
                     id: name,
                     position: {x: 0, y: 0},
-                    type: 'workflow',
+                    type: task.clusterRoot ? 'clusterRoot' : 'workflow',
                 };
             }
 
@@ -178,6 +182,7 @@ export default function useLayout({
                 eachChildTasks,
                 forkJoinChildTasks,
                 loopChildTasks,
+                mapChildTasks,
                 parallelChildTasks,
                 taskName: name,
             });
@@ -210,6 +215,17 @@ export default function useLayout({
                     allNodes: [...allNodes, taskNode],
                     isNested,
                     loopId: taskNode.id,
+                    options: {
+                        createPlaceholder: !hasSubtasks,
+                    },
+                });
+            } else if (componentName === 'map') {
+                const hasSubtasks = parameters?.iteratee?.length > 0;
+
+                allNodes = createMapNode({
+                    allNodes: [...allNodes, taskNode],
+                    isNested,
+                    mapId: taskNode.id,
                     options: {
                         createPlaceholder: !hasSubtasks,
                     },
@@ -290,6 +306,7 @@ export default function useLayout({
         const isConditionNode = nodeData.componentName === 'condition';
         const isEachNode = nodeData.componentName === 'each';
         const isLoopNode = nodeData.componentName === 'loop';
+        const isMapNode = nodeData.componentName === 'map';
         const isParallellNode = nodeData.componentName === 'parallel';
         const isForkJoinNode = nodeData.componentName === 'fork-join';
 
@@ -314,6 +331,15 @@ export default function useLayout({
             const loopEdges = createLoopEdges(node);
 
             taskEdges.push(...loopEdges);
+
+            return;
+        }
+
+        // Create initial edges for the Map node
+        if (isMapNode) {
+            const mapEdges = createMapEdges(node);
+
+            taskEdges.push(...mapEdges);
 
             return;
         }
@@ -459,7 +485,7 @@ export default function useLayout({
         if (!useWorkflowDataStore.getState().isWorkflowLoaded) {
             previousDataPillPanelOpenRef.current = dataPillPanelOpen;
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
-            previousProjectLeftSidebarOpenRef.current = projectLeftSidebarOpen;
+            previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
             return;
         }
@@ -481,23 +507,23 @@ export default function useLayout({
         }
 
         if (
-            previousProjectLeftSidebarOpenRef.current !== undefined &&
-            previousProjectLeftSidebarOpenRef.current !== projectLeftSidebarOpen
+            previousLeftSidebarOpenRef.current !== undefined &&
+            previousLeftSidebarOpenRef.current !== leftSidebarOpen
         ) {
-            widthDelta += projectLeftSidebarOpen ? PROJECT_LEFT_SIDEBAR_WIDTH : -PROJECT_LEFT_SIDEBAR_WIDTH;
+            widthDelta += leftSidebarOpen ? PROJECT_LEFT_SIDEBAR_WIDTH : -PROJECT_LEFT_SIDEBAR_WIDTH;
         }
 
         if (widthDelta === 0) {
             previousDataPillPanelOpenRef.current = dataPillPanelOpen;
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
-            previousProjectLeftSidebarOpenRef.current = projectLeftSidebarOpen;
+            previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
             return;
         }
 
         previousDataPillPanelOpenRef.current = dataPillPanelOpen;
         previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
-        previousProjectLeftSidebarOpenRef.current = projectLeftSidebarOpen;
+        previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
         const crossAxis = layoutDirection === 'TB' ? 'x' : 'y';
         const positionDelta = -widthDelta / 2;
@@ -516,7 +542,7 @@ export default function useLayout({
         }
 
         cancelAnimationRef.current = animateNodePositions(currentNodes, targetNodes, setNodes);
-    }, [dataPillPanelOpen, layoutDirection, projectLeftSidebarOpen, setNodes, workflowNodeDetailsPanelOpen]);
+    }, [dataPillPanelOpen, layoutDirection, leftSidebarOpen, setNodes, workflowNodeDetailsPanelOpen]);
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
@@ -534,9 +560,14 @@ export default function useLayout({
 
         if (readOnlyWorkflow) {
             layoutNodes = allNodes.map((node) => {
-                if (node.type === 'workflow') {
+                if (node.type === 'workflow' || node.type === 'clusterRoot') {
                     return {
                         ...node,
+                        data: {
+                            ...node.data,
+                            clusterElements: undefined,
+                            clusterRoot: undefined,
+                        },
                         type: 'readonly',
                     };
                 }
