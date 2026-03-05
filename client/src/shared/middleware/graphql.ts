@@ -2859,6 +2859,13 @@ export type DeleteMcpProjectMutationVariables = Exact<{
 
 export type DeleteMcpProjectMutation = { __typename?: 'Mutation', deleteMcpProject?: boolean | null };
 
+export type DeleteMcpProjectWorkflowMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteMcpProjectWorkflowMutation = { __typename?: 'Mutation', deleteMcpProjectWorkflow?: boolean | null };
+
 export type DeleteSharedProjectMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -2928,12 +2935,37 @@ export type ImportWorkflowTemplateMutationVariables = Exact<{
 
 export type ImportWorkflowTemplateMutation = { __typename?: 'Mutation', importWorkflowTemplate: string };
 
+export type McpProjectWorkflowPropertiesQueryVariables = Exact<{
+  mcpProjectWorkflowId: Scalars['ID']['input'];
+}>;
+
+
+export type McpProjectWorkflowPropertiesQuery = { __typename?: 'Query', mcpProjectWorkflowProperties?: Array<
+    | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null }
+    | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
+    | { __typename?: 'DateProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'DateTimeProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, integerDefaultValue?: any | null }
+    | { __typename?: 'NullProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, numberDefaultValue?: number | null }
+    | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, objectDefaultValue?: any | null }
+    | { __typename?: 'StringProperty', controlType: ControlType, defaultValue?: string | null, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { __typename?: 'TimeProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+   | null> | null };
+
+export type McpProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type McpProjectsQuery = { __typename?: 'Query', mcpProjects?: Array<{ __typename?: 'McpProject', id: string, mcpServerId: string, project?: { __typename?: 'Project', id: string, name: string } | null } | null> | null };
+
 export type McpProjectsByServerIdQueryVariables = Exact<{
   mcpServerId: Scalars['ID']['input'];
 }>;
 
 
-export type McpProjectsByServerIdQuery = { __typename?: 'Query', mcpProjectsByServerId?: Array<{ __typename?: 'McpProject', id: string, projectDeploymentId: string, mcpServerId: string, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectVersion?: number | null, project?: { __typename?: 'Project', id: string, name: string, category?: { __typename?: 'Category', id?: string | null, name?: string | null } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null, mcpProjectWorkflows?: Array<{ __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', id: string, projectDeploymentId: string, inputs?: any | null, workflowId: string } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
+export type McpProjectsByServerIdQuery = { __typename?: 'Query', mcpProjectsByServerId?: Array<{ __typename?: 'McpProject', id: string, projectDeploymentId: string, mcpServerId: string, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectVersion?: number | null, project?: { __typename?: 'Project', id: string, name: string, category?: { __typename?: 'Category', id?: string | null, name?: string | null } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null, mcpProjectWorkflows?: Array<{ __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', id: string, enabled: boolean, inputs?: any | null, projectDeploymentId: string, version: number, workflowId: string, connections: Array<{ __typename?: 'ProjectDeploymentWorkflowConnection', connectionId?: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
 
 export type PreBuiltProjectTemplatesQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
@@ -2979,6 +3011,22 @@ export type SharedWorkflowQueryVariables = Exact<{
 
 
 export type SharedWorkflowQuery = { __typename?: 'Query', sharedWorkflow?: { __typename?: 'SharedWorkflow', description?: string | null, exported: boolean, projectVersion?: number | null, publicUrl?: string | null } | null };
+
+export type ToolEligibleProjectVersionWorkflowsQueryVariables = Exact<{
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+}>;
+
+
+export type ToolEligibleProjectVersionWorkflowsQuery = { __typename?: 'Query', toolEligibleProjectVersionWorkflows: Array<{ __typename?: 'ProjectWorkflow', id: string, workflow: { __typename?: 'Workflow', id: string, label: string } }> };
+
+export type UpdateMcpProjectMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateMcpProjectInput;
+}>;
+
+
+export type UpdateMcpProjectMutation = { __typename?: 'Mutation', updateMcpProject?: { __typename?: 'McpProject', id: string, mcpServerId: string, projectDeploymentId: string, projectVersion?: number | null } | null };
 
 export type UpdateMcpServerMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3042,7 +3090,7 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number, title?: string | null } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type AddDataTableColumnMutationVariables = Exact<{
   input: AddColumnInput;
@@ -4125,6 +4173,25 @@ export const useDeleteMcpProjectMutation = <
   }
     )};
 
+export const DeleteMcpProjectWorkflowDocument = `
+    mutation deleteMcpProjectWorkflow($id: ID!) {
+  deleteMcpProjectWorkflow(id: $id)
+}
+    `;
+
+export const useDeleteMcpProjectWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteMcpProjectWorkflowMutation, TError, DeleteMcpProjectWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteMcpProjectWorkflowMutation, TError, DeleteMcpProjectWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteMcpProjectWorkflow'],
+    mutationFn: (variables?: DeleteMcpProjectWorkflowMutationVariables) => fetcher<DeleteMcpProjectWorkflowMutation, DeleteMcpProjectWorkflowMutationVariables>(DeleteMcpProjectWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const DeleteSharedProjectDocument = `
     mutation deleteSharedProject($id: ID!) {
   deleteSharedProject(id: $id)
@@ -4304,6 +4371,102 @@ export const useImportWorkflowTemplateMutation = <
   }
     )};
 
+export const McpProjectWorkflowPropertiesDocument = `
+    query mcpProjectWorkflowProperties($mcpProjectWorkflowId: ID!) {
+  mcpProjectWorkflowProperties(mcpProjectWorkflowId: $mcpProjectWorkflowId) {
+    advancedOption
+    description
+    displayCondition
+    expressionEnabled
+    hidden
+    name
+    required
+    type
+    ... on StringProperty {
+      controlType
+      defaultValue
+      label
+      placeholder
+    }
+    ... on IntegerProperty {
+      controlType
+      integerDefaultValue: defaultValue
+      label
+      placeholder
+    }
+    ... on NumberProperty {
+      controlType
+      label
+      numberDefaultValue: defaultValue
+      placeholder
+    }
+    ... on BooleanProperty {
+      booleanDefaultValue: defaultValue
+      controlType
+      label
+      placeholder
+    }
+    ... on ArrayProperty {
+      arrayDefaultValue: defaultValue
+      controlType
+      label
+      placeholder
+    }
+    ... on ObjectProperty {
+      controlType
+      label
+      objectDefaultValue: defaultValue
+      placeholder
+    }
+  }
+}
+    `;
+
+export const useMcpProjectWorkflowPropertiesQuery = <
+      TData = McpProjectWorkflowPropertiesQuery,
+      TError = unknown
+    >(
+      variables: McpProjectWorkflowPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<McpProjectWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectWorkflowPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpProjectWorkflowPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['mcpProjectWorkflowProperties', variables],
+    queryFn: fetcher<McpProjectWorkflowPropertiesQuery, McpProjectWorkflowPropertiesQueryVariables>(McpProjectWorkflowPropertiesDocument, variables),
+    ...options
+  }
+    )};
+
+export const McpProjectsDocument = `
+    query mcpProjects {
+  mcpProjects {
+    id
+    mcpServerId
+    project {
+      id
+      name
+    }
+  }
+}
+    `;
+
+export const useMcpProjectsQuery = <
+      TData = McpProjectsQuery,
+      TError = unknown
+    >(
+      variables?: McpProjectsQueryVariables,
+      options?: Omit<UseQueryOptions<McpProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpProjectsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['mcpProjects'] : ['mcpProjects', variables],
+    queryFn: fetcher<McpProjectsQuery, McpProjectsQueryVariables>(McpProjectsDocument, variables),
+    ...options
+  }
+    )};
+
 export const McpProjectsByServerIdDocument = `
     query mcpProjectsByServerId($mcpServerId: ID!) {
   mcpProjectsByServerId(mcpServerId: $mcpServerId) {
@@ -4326,10 +4489,18 @@ export const McpProjectsByServerIdDocument = `
       id
       mcpProjectId
       projectDeploymentWorkflowId
+      parameters
       projectDeploymentWorkflow {
         id
-        projectDeploymentId
+        connections {
+          connectionId
+          workflowConnectionKey
+          workflowNodeName
+        }
+        enabled
         inputs
+        projectDeploymentId
+        version
         workflowId
       }
       workflow {
@@ -4584,6 +4755,61 @@ export const useSharedWorkflowQuery = <
   }
     )};
 
+export const ToolEligibleProjectVersionWorkflowsDocument = `
+    query toolEligibleProjectVersionWorkflows($projectId: ID!, $projectVersion: Int!) {
+  toolEligibleProjectVersionWorkflows(
+    projectId: $projectId
+    projectVersion: $projectVersion
+  ) {
+    id
+    workflow {
+      id
+      label
+    }
+  }
+}
+    `;
+
+export const useToolEligibleProjectVersionWorkflowsQuery = <
+      TData = ToolEligibleProjectVersionWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: ToolEligibleProjectVersionWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<ToolEligibleProjectVersionWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolEligibleProjectVersionWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ToolEligibleProjectVersionWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['toolEligibleProjectVersionWorkflows', variables],
+    queryFn: fetcher<ToolEligibleProjectVersionWorkflowsQuery, ToolEligibleProjectVersionWorkflowsQueryVariables>(ToolEligibleProjectVersionWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateMcpProjectDocument = `
+    mutation updateMcpProject($id: ID!, $input: UpdateMcpProjectInput!) {
+  updateMcpProject(id: $id, input: $input) {
+    id
+    mcpServerId
+    projectDeploymentId
+    projectVersion
+  }
+}
+    `;
+
+export const useUpdateMcpProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateMcpProjectMutation, TError, UpdateMcpProjectMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateMcpProjectMutation, TError, UpdateMcpProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['updateMcpProject'],
+    mutationFn: (variables?: UpdateMcpProjectMutationVariables) => fetcher<UpdateMcpProjectMutation, UpdateMcpProjectMutationVariables>(UpdateMcpProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const UpdateMcpServerDocument = `
     mutation updateMcpServer($id: ID!, $input: McpServerUpdateInput!) {
   updateMcpServer(id: $id, input: $input) {
@@ -4810,6 +5036,7 @@ export const WorkspaceMcpServersDocument = `
       mcpServerId
       componentName
       componentVersion
+      title
     }
     tags {
       id
