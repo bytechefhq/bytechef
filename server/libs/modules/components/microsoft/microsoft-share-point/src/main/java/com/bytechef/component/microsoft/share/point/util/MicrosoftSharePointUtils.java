@@ -50,8 +50,6 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.share.point.constant.ColumnType;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -203,12 +201,9 @@ public class MicrosoftSharePointUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
-
-        Map<String, ?> body = context
-            .http(
-                http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/root/children"))
-            .queryParameter("$filter", encode)
+        Map<String, ?> body = context.http(
+            http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/root/children"))
+            .queryParameter("$filter", "folder ne null")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -234,11 +229,11 @@ public class MicrosoftSharePointUtils {
         String searchText, ActionContext context) {
 
         Map<String, ?> body = context.http(http -> http.get("/sites"))
-            .queryParameter("search", "*&select=displayName,id,name")
+            .queryParameter("search", "*")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(context, body, NAME, ID);
+        return getOptions(context, body, DISPLAY_NAME, ID);
     }
 }
