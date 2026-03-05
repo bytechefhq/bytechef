@@ -50,12 +50,32 @@ Creation of OAuth 2.0 application is documented [here](/reference/components/mic
      - Channel.ReadBasic.All
      - ChannelMessage.Send
      - Chat.ReadWrite
+     - Chat.Read
+     - ChatMember.Read
      - Team.ReadBasic.All
      - offline_access
 8. After selecting all the scopes click on **Update permissions**
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/pM8jOSv3CEQnOnICK4NE?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+### Grant Necessary Permissions - For Microsoft OneDrive (needed for sending attachments)
+
+1. Open the Azure Portal: https://portal.azure.com/
+2. Click on **App registrations**.
+3. Click on **All applications**.
+4. Click on application you want to connect to Microsoft OneDrive.
+5. Click on **API permissions**.
+6. Click on **Microsoft Graph (1)**.
+7. Select following scopes:
+  - Files.Read
+  - Files.ReadWrite.All
+  - offline_access
+8. After selecting all the scopes click on **Update permissions**
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/zpYIHd7Hegb549Jmdemu?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
 
 
@@ -104,12 +124,15 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| @odata.context | STRING | The OData context URL that indicates the metadata for the response. |
 | id | STRING | ID of the channel. |
 | createdDateTime | DATE_TIME | The date and time when the channel was created. |
 | displayName | STRING | Name of the channel that will appear to the user in Microsoft Teams. |
 | description | STRING | Description of the channel. |
 | isFavoriteByDefault | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the channel is marked as favorite by default. |
+| email | STRING | The email address of the channel if it is enabled to receive emails. |
 | webUrl | STRING | URL to access the channel in a web browser. |
+| membershipType | STRING | The type of channel membership, e.g., standard or private. |
 | isArchived | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the channel is archived. |
 
 
@@ -118,23 +141,29 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "@odata.context" : "",
   "id" : "",
   "createdDateTime" : "2021-01-01T00:00:00",
   "displayName" : "",
   "description" : "",
   "isFavoriteByDefault" : false,
+  "email" : "",
   "webUrl" : "",
+  "membershipType" : "",
   "isArchived" : false
 }
 ```
 
+#### Find Team ID
+
+To find the Team ID, click [here](/reference/components/microsoft-teams_v1#how-to-find-team-id).
 
 
 
 ### Send Channel Message
 Name: sendChannelMessage
 
-`Sends a message to a channel.`
+`Sends a message to a channel. Sending attachments is supported with Message Text Format is set to "html".`
 
 #### Properties
 
@@ -144,6 +173,7 @@ Name: sendChannelMessage
 | channelId | Channel ID | STRING <details> <summary> Depends On </summary> teamId </details> | Channel to send message to. | true |
 | contentType | Message Text Format | STRING <details> <summary> Options </summary> <span>text</span>, <span>html</span> </details> |  | true |
 | content | Message Text | STRING |  | true |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [STRING\($attachment)] </details> | The attachments to send with the message. The file to attach must already be in SharePoint. | false |
 
 #### Example JSON Structure
 ```json
@@ -154,7 +184,8 @@ Name: sendChannelMessage
     "teamId" : "",
     "channelId" : "",
     "contentType" : "",
-    "content" : ""
+    "content" : "",
+    "attachments" : [ "" ]
   },
   "type" : "microsoftTeams/v1/sendChannelMessage"
 }
@@ -171,9 +202,28 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the message. |
+| id | STRING | Unique identifier of the message. |
+| replyToId | STRING | ID of the parent message if this is a reply. |
+| etag | STRING | Entity tag for versioning. |
+| messageType | STRING | Type of the message. |
+| createdDateTime | STRING | Timestamp when the message was created. |
+| lastModifiedDateTime | STRING | Timestamp when the message was last modified. |
+| lastEditedDateTime | STRING | Timestamp when the message was last edited. |
+| deletedDateTime | STRING | Timestamp when the message was deleted. |
+| subject | STRING | Subject/title of the message. |
+| summary | STRING | Summary of the message. |
+| chatId | STRING | ID of the chat. |
+| importance | STRING | Importance level of the message. |
+| locale | STRING | Locale of the message. |
+| webUrl | STRING | Web URL to access the message. |
+| policyViolation | STRING | Policy violation details if applicable. |
+| eventDetail | STRING | Event details associated with the message. |
+| from | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#125;\(application), &#123;&#125;\(device), &#123;STRING\(@odata.type), STRING\(id), STRING\(displayName), STRING\(userIdentityType), STRING\(tenantId)&#125;\(user)&#125; </details> | Information about the sender. |
 | body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content)&#125; </details> | Plaintext/HTML representation of the content of the chat message. |
-| channelIdentity | OBJECT <details> <summary> Properties </summary> &#123;STRING\(teamId), STRING\(channelId)&#125; </details> | Represents identity of the channel. |
+| channelIdentity | OBJECT <details> <summary> Properties </summary> &#123;STRING\(teamId), STRING\(channelId)&#125; </details> | Channel identity where the message was posted. |
+| attachments | ARRAY <details> <summary> Items </summary> [] </details> | List of attachments included in the message. |
+| mentions | ARRAY <details> <summary> Items </summary> [] </details> | List of mentions in the message. |
+| reactions | ARRAY <details> <summary> Items </summary> [] </details> | List of reactions to the message. |
 
 
 
@@ -182,6 +232,32 @@ Type: OBJECT
 ```json
 {
   "id" : "",
+  "replyToId" : "",
+  "etag" : "",
+  "messageType" : "",
+  "createdDateTime" : "",
+  "lastModifiedDateTime" : "",
+  "lastEditedDateTime" : "",
+  "deletedDateTime" : "",
+  "subject" : "",
+  "summary" : "",
+  "chatId" : "",
+  "importance" : "",
+  "locale" : "",
+  "webUrl" : "",
+  "policyViolation" : "",
+  "eventDetail" : "",
+  "from" : {
+    "application" : { },
+    "device" : { },
+    "user" : {
+      "@odata.type" : "",
+      "id" : "",
+      "displayName" : "",
+      "userIdentityType" : "",
+      "tenantId" : ""
+    }
+  },
   "body" : {
     "contentType" : "",
     "content" : ""
@@ -189,17 +265,25 @@ Type: OBJECT
   "channelIdentity" : {
     "teamId" : "",
     "channelId" : ""
-  }
+  },
+  "attachments" : [ ],
+  "mentions" : [ ],
+  "reactions" : [ ]
 }
 ```
 
+#### Find Team ID and Channel ID
+
+To find the Team ID, click [here](/reference/components/microsoft-teams_v1#how-to-find-team-id).
+
+To find the Channel ID, click [here](/reference/components/microsoft-teams_v1#how-to-find-channel-id).
 
 
 
-### Send Chat Message
-Name: sendChatMessage
+### Send Direct Message
+Name: sendDirectMessage
 
-`Sends a message in an existing chat.`
+`Sends a direct message in an existing chat. Sending attachments is supported with Message Text Format set to "html".`
 
 #### Properties
 
@@ -208,18 +292,20 @@ Name: sendChatMessage
 | chatId | Chat ID | STRING |  | true |
 | contentType | Message Text Format | STRING <details> <summary> Options </summary> <span>text</span>, <span>html</span> </details> |  | true |
 | content | Message Text | STRING |  | true |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [STRING\($attachment)] </details> | The attachments to send with the message. The file to attach must already be in SharePoint. | false |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Send Chat Message",
-  "name" : "sendChatMessage",
+  "label" : "Send Direct Message",
+  "name" : "sendDirectMessage",
   "parameters" : {
     "chatId" : "",
     "contentType" : "",
-    "content" : ""
+    "content" : "",
+    "attachments" : [ "" ]
   },
-  "type" : "microsoftTeams/v1/sendChatMessage"
+  "type" : "microsoftTeams/v1/sendDirectMessage"
 }
 ```
 
@@ -234,9 +320,28 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the message. |
+| id | STRING | Unique identifier of the message. |
+| replyToId | STRING | ID of the parent message if this is a reply. |
+| etag | STRING | Entity tag for versioning. |
+| messageType | STRING | Type of the message. |
+| createdDateTime | STRING | Timestamp when the message was created. |
+| lastModifiedDateTime | STRING | Timestamp when the message was last modified. |
+| lastEditedDateTime | STRING | Timestamp when the message was last edited. |
+| deletedDateTime | STRING | Timestamp when the message was deleted. |
+| subject | STRING | Subject/title of the message. |
+| summary | STRING | Summary of the message. |
 | chatId | STRING | ID of the chat. |
+| importance | STRING | Importance level of the message. |
+| locale | STRING | Locale of the message. |
+| webUrl | STRING | Web URL to access the message. |
+| policyViolation | STRING | Policy violation details if applicable. |
+| eventDetail | STRING | Event details associated with the message. |
+| from | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#125;\(application), &#123;&#125;\(device), &#123;STRING\(@odata.type), STRING\(id), STRING\(displayName), STRING\(userIdentityType), STRING\(tenantId)&#125;\(user)&#125; </details> | Information about the sender. |
 | body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content)&#125; </details> | Plaintext/HTML representation of the content of the chat message. |
+| channelIdentity | OBJECT <details> <summary> Properties </summary> &#123;STRING\(teamId), STRING\(channelId)&#125; </details> | Channel identity where the message was posted. |
+| attachments | ARRAY <details> <summary> Items </summary> [] </details> | List of attachments included in the message. |
+| mentions | ARRAY <details> <summary> Items </summary> [] </details> | List of mentions in the message. |
+| reactions | ARRAY <details> <summary> Items </summary> [] </details> | List of reactions to the message. |
 
 
 
@@ -245,14 +350,187 @@ Type: OBJECT
 ```json
 {
   "id" : "",
+  "replyToId" : "",
+  "etag" : "",
+  "messageType" : "",
+  "createdDateTime" : "",
+  "lastModifiedDateTime" : "",
+  "lastEditedDateTime" : "",
+  "deletedDateTime" : "",
+  "subject" : "",
+  "summary" : "",
   "chatId" : "",
+  "importance" : "",
+  "locale" : "",
+  "webUrl" : "",
+  "policyViolation" : "",
+  "eventDetail" : "",
+  "from" : {
+    "application" : { },
+    "device" : { },
+    "user" : {
+      "@odata.type" : "",
+      "id" : "",
+      "displayName" : "",
+      "userIdentityType" : "",
+      "tenantId" : ""
+    }
+  },
   "body" : {
     "contentType" : "",
     "content" : ""
-  }
+  },
+  "channelIdentity" : {
+    "teamId" : "",
+    "channelId" : ""
+  },
+  "attachments" : [ ],
+  "mentions" : [ ],
+  "reactions" : [ ]
 }
 ```
 
+
+
+
+
+## Triggers
+
+
+### New Channel Message
+Name: newChannelMessage
+
+`Triggers when new message is received in selected channel.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| teamId | Team ID | STRING | ID of the team where the channel is located. | true |
+| channelId | Channel ID | STRING <details> <summary> Depends On </summary> teamId </details> | Channel to monitor for new messages. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Unique identifier of the message. |
+| replyToId | STRING | ID of the parent message if this is a reply. |
+| etag | STRING | Entity tag for versioning. |
+| messageType | STRING | Type of the message. |
+| createdDateTime | STRING | Timestamp when the message was created. |
+| lastModifiedDateTime | STRING | Timestamp when the message was last modified. |
+| lastEditedDateTime | STRING | Timestamp when the message was last edited. |
+| deletedDateTime | STRING | Timestamp when the message was deleted. |
+| subject | STRING | Subject/title of the message. |
+| summary | STRING | Summary of the message. |
+| chatId | STRING | ID of the chat. |
+| importance | STRING | Importance level of the message. |
+| locale | STRING | Locale of the message. |
+| webUrl | STRING | Web URL to access the message. |
+| policyViolation | STRING | Policy violation details if applicable. |
+| eventDetail | STRING | Event details associated with the message. |
+| from | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#125;\(application), &#123;&#125;\(device), &#123;STRING\(@odata.type), STRING\(id), STRING\(displayName), STRING\(userIdentityType), STRING\(tenantId)&#125;\(user)&#125; </details> | Information about the sender. |
+| body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content)&#125; </details> | Plaintext/HTML representation of the content of the chat message. |
+| channelIdentity | OBJECT <details> <summary> Properties </summary> &#123;STRING\(teamId), STRING\(channelId)&#125; </details> | Channel identity where the message was posted. |
+| attachments | ARRAY <details> <summary> Items </summary> [] </details> | List of attachments included in the message. |
+| mentions | ARRAY <details> <summary> Items </summary> [] </details> | List of mentions in the message. |
+| reactions | ARRAY <details> <summary> Items </summary> [] </details> | List of reactions to the message. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Channel Message",
+  "name" : "newChannelMessage",
+  "parameters" : {
+    "teamId" : "",
+    "channelId" : ""
+  },
+  "type" : "microsoftTeams/v1/newChannelMessage"
+}
+```
+#### Find Team ID and Channel ID
+
+To find the Team ID, click [here](/reference/components/microsoft-teams_v1#how-to-find-team-id).
+
+To find the Channel ID, click [here](/reference/components/microsoft-teams_v1#how-to-find-channel-id).
+
+
+
+### New Direct Message
+Name: newDirectMessage
+
+`Triggers when new direct message is received.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| chatId | Chat ID | STRING |  | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Unique identifier of the message. |
+| replyToId | STRING | ID of the parent message if this is a reply. |
+| etag | STRING | Entity tag for versioning. |
+| messageType | STRING | Type of the message. |
+| createdDateTime | STRING | Timestamp when the message was created. |
+| lastModifiedDateTime | STRING | Timestamp when the message was last modified. |
+| lastEditedDateTime | STRING | Timestamp when the message was last edited. |
+| deletedDateTime | STRING | Timestamp when the message was deleted. |
+| subject | STRING | Subject/title of the message. |
+| summary | STRING | Summary of the message. |
+| chatId | STRING | ID of the chat. |
+| importance | STRING | Importance level of the message. |
+| locale | STRING | Locale of the message. |
+| webUrl | STRING | Web URL to access the message. |
+| policyViolation | STRING | Policy violation details if applicable. |
+| eventDetail | STRING | Event details associated with the message. |
+| from | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#125;\(application), &#123;&#125;\(device), &#123;STRING\(@odata.type), STRING\(id), STRING\(displayName), STRING\(userIdentityType), STRING\(tenantId)&#125;\(user)&#125; </details> | Information about the sender. |
+| body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content)&#125; </details> | Plaintext/HTML representation of the content of the chat message. |
+| channelIdentity | OBJECT <details> <summary> Properties </summary> &#123;STRING\(teamId), STRING\(channelId)&#125; </details> | Channel identity where the message was posted. |
+| attachments | ARRAY <details> <summary> Items </summary> [] </details> | List of attachments included in the message. |
+| mentions | ARRAY <details> <summary> Items </summary> [] </details> | List of mentions in the message. |
+| reactions | ARRAY <details> <summary> Items </summary> [] </details> | List of reactions to the message. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Direct Message",
+  "name" : "newDirectMessage",
+  "parameters" : {
+    "chatId" : ""
+  },
+  "type" : "microsoftTeams/v1/newDirectMessage"
+}
+```
 
 
 
@@ -264,3 +542,29 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find Team ID
+
+You can get your Team ID from your Microsoft Teams:
+
+1. Open **Microsoft Teams**
+2. Go to **Teams and Channels**
+3. Click the **three dots (...)** next to the team name
+4. Select **Copy link**
+5. You'll get URL like: `https://teams.microsoft.com/l/team/19%3aabc123def456%40thread.tacv2/conversations?groupId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&tenantId=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy`
+6. The **Team ID** is the value of: `groupId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+
+### How to find Channel ID
+
+You can get your Channel ID from your Microsoft Teams:
+
+1. Open **Microsoft Teams**
+2. Go to **Teams and Channels**
+3. Click the **three dots (...)** next to the channel name
+4. Select **Copy link**
+5. You'll get URL like: `https://teams.microsoft.com/l/channel/19%3abc8e04002356415884ba1769f437de36%40thread.tacv2/General?groupId=e95fd37a-caad-496e-8a89-762f0aa441bf&tenantId=43f519c0-e5a6-438f-808f-6491be63b3be`
+6. The **Channel ID** is the value after **/l/channel/**: `19:bc8e04002356415884ba1769f437de36@thread.tacv2`
+7. Important notice is that string in the URL is URL encoded `19%3abc8e04002356415884ba1769f437de36%40thread.tacv2` so you will have to decode it to get `19:bc8e04002356415884ba1769f437de36@thread.tacv2`
