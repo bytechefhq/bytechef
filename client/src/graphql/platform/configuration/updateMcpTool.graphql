@@ -1,0 +1,9 @@
+mutation updateMcpTool($id: ID!, $input: McpToolInput!) {
+    updateMcpTool(id: $id, input: $input) {
+        id
+        name
+        mcpComponentId
+        parameters
+        version
+    }
+}

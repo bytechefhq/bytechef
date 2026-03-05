@@ -111,6 +111,12 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
 ### Server Side
 
 3. **Change working directory to the `BYTECHEF_HOME/server` folder.**
+4. Create a .env file in the `BYTECHEF_HOME/server` directory.
+5. Paste the following content into the .env file:
+
+    ```bash
+    PASSWORD_FROM_LOCAL_DOT_ENV_FILE=postgres
+    ```
 4. Start up the docker container with dependent infrastructure
 
     ```bash
@@ -143,10 +149,20 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
 
 Build and run the server codebase in a Docker container. This is the easiest way to get the server instance up and running if you are more interested in contributing to the [client codebase](#client-side).
 
-```bash
-docker compose -f docker-compose.dev.server.yml down --rmi local
-docker compose -f docker-compose.dev.server.yml up -d
-```
+3. **Change working directory to the `BYTECHEF_HOME/server` folder.**
+4. Create a .env file in the `BYTECHEF_HOME/server` directory.
+5. Paste the following content into the .env file:
+
+    ```bash
+    PASSWORD_FROM_LOCAL_DOT_ENV_FILE=postgres
+    ```
+4. Start up the docker container with dependent infrastructure
+
+    ```bash
+    docker compose -f docker-compose.dev.server.yml down --rmi local
+    docker compose -f docker-compose.dev.server.yml up -d
+    ```
+5. Make sure `java -version` and `JAVA_HOME` references Java JDK 25+
 
 ### Client Side
 

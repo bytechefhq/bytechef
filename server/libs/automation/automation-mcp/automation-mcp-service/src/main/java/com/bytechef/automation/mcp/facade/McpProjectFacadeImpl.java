@@ -27,8 +27,11 @@ import com.bytechef.automation.mcp.service.McpProjectWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,7 +84,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
             projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
             projectDeploymentWorkflow.setWorkflowId(workflowId);
-            projectDeploymentWorkflow.setEnabled(false);
+            projectDeploymentWorkflow.setEnabled(true);
             projectDeploymentWorkflow.setInputs(Map.of());
 
             projectDeploymentWorkflow = projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
@@ -113,5 +116,63 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         if (projectDeploymentId != null) {
             projectDeploymentService.delete(projectDeploymentId);
         }
+    }
+
+    @Override
+    public McpProject updateMcpProject(long mcpProjectId, List<String> selectedWorkflowIds) {
+        McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
+            .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
+
+        List<McpProjectWorkflow> existingMcpProjectWorkflows =
+            mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProjectId);
+
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(mcpProject.getProjectDeploymentId());
+
+        Map<Long, ProjectDeploymentWorkflow> projectDeploymentWorkflowMap = new HashMap<>();
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            projectDeploymentWorkflowMap.put(projectDeploymentWorkflow.getId(), projectDeploymentWorkflow);
+        }
+
+        Map<String, McpProjectWorkflow> existingWorkflowIdMap = new HashMap<>();
+
+        for (McpProjectWorkflow mcpProjectWorkflow : existingMcpProjectWorkflows) {
+            ProjectDeploymentWorkflow projectDeploymentWorkflow =
+                projectDeploymentWorkflowMap.get(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+
+            if (projectDeploymentWorkflow != null) {
+                existingWorkflowIdMap.put(projectDeploymentWorkflow.getWorkflowId(), mcpProjectWorkflow);
+            }
+        }
+
+        Set<String> selectedWorkflowIdSet = new HashSet<>(selectedWorkflowIds);
+
+        for (String workflowId : selectedWorkflowIds) {
+            if (!existingWorkflowIdMap.containsKey(workflowId)) {
+                ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+                projectDeploymentWorkflow.setProjectDeploymentId(mcpProject.getProjectDeploymentId());
+                projectDeploymentWorkflow.setWorkflowId(workflowId);
+                projectDeploymentWorkflow.setEnabled(true);
+                projectDeploymentWorkflow.setInputs(Map.of());
+
+                projectDeploymentWorkflow = projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
+
+                mcpProjectWorkflowService.create(mcpProjectId, projectDeploymentWorkflow.getId());
+            }
+        }
+
+        for (Map.Entry<String, McpProjectWorkflow> entry : existingWorkflowIdMap.entrySet()) {
+            if (!selectedWorkflowIdSet.contains(entry.getKey())) {
+                McpProjectWorkflow mcpProjectWorkflow = entry.getValue();
+
+                mcpProjectWorkflowService.delete(mcpProjectWorkflow.getId());
+
+                projectDeploymentWorkflowService.delete(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+            }
+        }
+
+        return mcpProject;
     }
 }

@@ -22,8 +22,14 @@ interface DataPillPanelProps {
 const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOutputs}: DataPillPanelProps) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
-    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+    const {setDataPillPanelOpen} = useDataPillPanelStore(
+        useShallow((state) => ({
+            setDataPillPanelOpen: state.setDataPillPanelOpen,
+        }))
+    );
+
     const workflow = useWorkflowDataStore((state) => state.workflow);
+
     const {aiAgentNodeDetailsPanelOpen, currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             aiAgentNodeDetailsPanelOpen: state.aiAgentNodeDetailsPanelOpen,
@@ -77,13 +83,13 @@ const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOut
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [aiAgentNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen]);
 
+    const sharedClasses =
+        'z-10 w-screen max-w-data-pill-panel-width overflow-hidden border border-stroke-neutral-secondary bg-background';
+    const defaultPositionClasses =
+        'absolute bottom-6 right-[536px] top-2 rounded-md animate-[slideInFromRight_300ms_ease-out]';
+
     return (
-        <div
-            className={twMerge(
-                'absolute bottom-6 right-[536px] top-2 z-10 w-screen max-w-data-pill-panel-width animate-[slideInFromRight_300ms_ease-out] overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
-                className
-            )}
-        >
+        <div className={twMerge(sharedClasses, className || defaultPositionClasses)}>
             <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
                 <header className="flex content-center items-center p-4 text-lg font-medium">
                     <span>Data Pill Panel</span>

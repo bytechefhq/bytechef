@@ -161,6 +161,16 @@ describe('getContextFromPlaceholderNode', () => {
         });
     });
 
+    it('should extract context for map placeholder', () => {
+        const node = makePlaceholderNode('map_1-map-placeholder-0', {mapId: 'map_1', taskDispatcherId: 'map_1'});
+
+        expect(getContextFromPlaceholderNode(node)).toMatchObject({
+            index: 0,
+            mapId: 'map_1',
+            taskDispatcherId: 'map_1',
+        });
+    });
+
     it('should fallback to taskDispatcherId and index for unknown placeholder', () => {
         const node = makePlaceholderNode('foo-bar-placeholder-7', {taskDispatcherId: 'foo'});
 
@@ -206,6 +216,74 @@ describe('getTaskDispatcherContext', () => {
             caseKey: 'case_0',
             index: 1,
             taskDispatcherId: 'foo',
+        });
+    });
+
+    it('should return context for ghost-to-ghost edge from dispatcher node data', () => {
+        const mapTaskNode = makeNode({
+            data: {
+                componentName: 'map',
+                mapData: {index: 0, mapId: 'map_1'},
+                name: 'map_1',
+                taskDispatcherId: 'map_1',
+                workflowNodeName: 'Map',
+            },
+            id: 'map_1',
+        });
+        const topGhostNode = makeNode({
+            data: {mapId: 'map_1', taskDispatcherId: 'map_1'},
+            id: 'map_1-map-top-ghost',
+            type: 'taskDispatcherTopGhostNode',
+        });
+        const bottomGhostNode = makeNode({
+            data: {taskDispatcherId: 'map_1'},
+            id: 'map_1-map-bottom-ghost',
+            type: 'taskDispatcherBottomGhostNode',
+        });
+        const edge: Edge = {
+            data: {},
+            id: 'map_1-map-top-ghost=>map_1-map-bottom-ghost',
+            source: 'map_1-map-top-ghost',
+            target: 'map_1-map-bottom-ghost',
+        };
+
+        const result = getTaskDispatcherContext({
+            edge,
+            nodes: [mapTaskNode, topGhostNode, bottomGhostNode],
+        });
+
+        expect(result).toMatchObject({
+            index: 1,
+            mapId: 'map_1',
+            taskDispatcherId: 'map_1',
+        });
+    });
+
+    it('should return taskDispatcherId when edge target is map placeholder', () => {
+        const placeholderNode = makeNode({
+            data: {mapId: 'map_1', taskDispatcherId: 'map_1'},
+            id: 'map_1-map-placeholder-0',
+            type: 'placeholder',
+        });
+        const topGhostNode = makeNode({
+            data: {mapId: 'map_1', taskDispatcherId: 'map_1'},
+            id: 'map_1-map-top-ghost',
+            type: 'taskDispatcherTopGhostNode',
+        });
+        const edge: Edge = {
+            data: {},
+            id: 'map_1-map-top-ghost=>map_1-map-placeholder-0',
+            source: 'map_1-map-top-ghost',
+            target: 'map_1-map-placeholder-0',
+        };
+
+        const result = getTaskDispatcherContext({
+            edge,
+            nodes: [topGhostNode, placeholderNode],
+        });
+
+        expect(result).toMatchObject({
+            taskDispatcherId: 'map_1',
         });
     });
 });

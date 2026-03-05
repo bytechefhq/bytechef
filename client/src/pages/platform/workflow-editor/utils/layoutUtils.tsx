@@ -24,6 +24,7 @@ import {
     EachChildTasksType,
     ForkJoinChildTasksType,
     LoopChildTasksType,
+    MapChildTasksType,
     NodeDataType,
     ParallelChildTasksType,
 } from '@/shared/types';
@@ -75,11 +76,11 @@ export const calculateNodeHeight = (node: Node) => {
     const isBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
     const isLeftGhostNode = node.type === 'taskDispatcherLeftGhostNode';
     const isPlaceholderNode = node.type === 'placeholder';
-    const isAiAgentNode = node.type === 'aiAgentNode';
+    const isClusterRoot = node.type === 'clusterRoot';
     const isGhostNode = isTopGhostNode || isBottomGhostNode || isLeftGhostNode;
 
     let height = NODE_HEIGHT;
-    const aiAgentNodeHeight = 150;
+    const clusterRootNodeHeight = 150;
 
     if (isPlaceholderNode || isGhostNode) {
         height = PLACEHOLDER_NODE_HEIGHT;
@@ -89,8 +90,8 @@ export const calculateNodeHeight = (node: Node) => {
         }
     }
 
-    if (isAiAgentNode) {
-        height = aiAgentNodeHeight;
+    if (isClusterRoot) {
+        height = clusterRootNodeHeight;
     }
 
     return height;
@@ -114,7 +115,7 @@ function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): nu
         return 2;
     }
 
-    if (node.type === 'aiAgentNode') {
+    if (node.type === 'clusterRoot') {
         const hasClusterElements =
             node.data.clusterElements &&
             Object.entries(node.data.clusterElements).some(
@@ -155,7 +156,7 @@ export const convertTaskToNode = (
         },
         id: task.name,
         position: {x: 0, y: 0},
-        type: task.clusterRoot ? 'aiAgentNode' : 'workflow',
+        type: task.clusterRoot ? 'clusterRoot' : 'workflow',
     };
 };
 
@@ -446,7 +447,7 @@ export const getLayoutElements = async ({
         if (effectiveDirection === 'LR') {
             if (isGhostNode || node.type === 'placeholder') {
                 width = height;
-            } else if (node.type === 'aiAgentNode') {
+            } else if (node.type === 'clusterRoot') {
                 const nodeHasClusterElements =
                     node.data.clusterElements &&
                     Object.entries(node.data.clusterElements).some(
@@ -800,7 +801,7 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
     const subsequentNodes = allNodes.slice(index + 1);
 
     const nextTaskNodeOutsideTaskDispatcher = subsequentNodes.find((subsequentNode) => {
-        if (subsequentNode.type !== 'workflow' && subsequentNode.type !== 'aiAgentNode') {
+        if (subsequentNode.type !== 'workflow' && subsequentNode.type !== 'clusterRoot') {
             return false;
         }
 
@@ -930,6 +931,7 @@ export function collectTaskDispatcherData(
     eachChildTasks: EachChildTasksType,
     forkJoinChildTasks: ForkJoinChildTasksType,
     loopChildTasks: LoopChildTasksType,
+    mapChildTasks: MapChildTasksType,
     parallelChildTasks: ParallelChildTasksType
 ): void {
     const {name, parameters, type} = task;
@@ -950,6 +952,12 @@ export function collectTaskDispatcherData(
         };
     } else if (componentName === 'loop' && parameters?.iteratee) {
         loopChildTasks[name] = {
+            iteratee: Array.isArray(parameters.iteratee)
+                ? parameters.iteratee.map((iteratee: WorkflowTask) => iteratee.name)
+                : [],
+        };
+    } else if (componentName === 'map' && parameters?.iteratee) {
+        mapChildTasks[name] = {
             iteratee: Array.isArray(parameters.iteratee)
                 ? parameters.iteratee.map((iteratee: WorkflowTask) => iteratee.name)
                 : [],
@@ -1001,6 +1009,7 @@ interface GetTaskAncestryProps {
     eachChildTasks: EachChildTasksType;
     forkJoinChildTasks: ForkJoinChildTasksType;
     loopChildTasks: LoopChildTasksType;
+    mapChildTasks: MapChildTasksType;
     parallelChildTasks: ParallelChildTasksType;
     taskName: string;
 }
@@ -1011,6 +1020,7 @@ export function getTaskAncestry({
     eachChildTasks,
     forkJoinChildTasks,
     loopChildTasks,
+    mapChildTasks,
     parallelChildTasks,
     taskName,
 }: GetTaskAncestryProps): {nestingData: Record<string, unknown>; isNested: boolean} {
@@ -1047,6 +1057,23 @@ export function getTaskAncestry({
                     loopData: {
                         index: loopData.iteratee.indexOf(taskName),
                         loopId,
+                    },
+                };
+
+                isNested = true;
+
+                break;
+            }
+        }
+    }
+
+    if (!isNested) {
+        for (const [mapId, mapData] of Object.entries(mapChildTasks)) {
+            if (mapData.iteratee.includes(taskName)) {
+                nestingData = {
+                    mapData: {
+                        index: mapData.iteratee.indexOf(taskName),
+                        mapId,
                     },
                 };
 

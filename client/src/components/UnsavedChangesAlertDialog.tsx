@@ -1,7 +1,6 @@
+import Button from '@/components/Button/Button';
 import {
     AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogFooter,
@@ -20,19 +19,22 @@ const UnsavedChangesAlertDialog = ({onCancel, onClose, open}: UnsavedChangesAler
         <AlertDialog open={open}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogTitle>Discard code changes?</AlertDialogTitle>
 
                     <AlertDialogDescription>
-                        There are unsaved changes. This action cannot be undone.
+                        You have unsaved changes. Are you sure you want to discard them?
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    <AlertDialogCancel className="shadow-none" onClick={onCancel}>
-                        Cancel
-                    </AlertDialogCancel>
+                    <Button label="Keep editing" onClick={onCancel} variant="outline" />
 
-                    <AlertDialogAction onClick={onClose}>Close</AlertDialogAction>
+                    <Button
+                        className="opacity-100"
+                        label="Close & discard"
+                        onClick={onClose}
+                        variant="destructiveGhost"
+                    />
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

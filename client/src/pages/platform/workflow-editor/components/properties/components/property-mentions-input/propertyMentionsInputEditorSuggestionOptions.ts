@@ -67,9 +67,12 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
         render: () => {
             let component: ReactRenderer<PropertyMentionsInputListRefType> | undefined;
             let popup: TippyInstance | undefined;
+            let lastValidRect: DOMRect = DOM_RECT_FALLBACK;
+            let wheelAbortController: AbortController | undefined;
 
             return {
                 onExit() {
+                    wheelAbortController?.abort();
                     popup?.destroy();
                     component?.destroy();
                 },
@@ -98,30 +101,51 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                         props,
                     });
 
-                    if (!props.clientRect) {
+                    const initialRect = props.clientRect?.();
+
+                    if (!initialRect) {
+                        component.destroy();
+                        component = undefined;
+
                         return;
                     }
+
+                    lastValidRect = initialRect;
 
                     popup = tippy('body', {
                         appendTo: () => document.body,
                         content: component.element,
-                        getReferenceClientRect: () => props.clientRect?.() ?? DOM_RECT_FALLBACK,
+                        getReferenceClientRect: () => lastValidRect,
                         interactive: true,
                         placement: 'bottom-start',
                         showOnCreate: true,
                         trigger: 'manual',
                     })[0];
+
+                    popup.popper.style.pointerEvents = 'auto';
+
+                    wheelAbortController = new AbortController();
+
+                    popup.popper.addEventListener('wheel', (event) => event.stopPropagation(), {
+                        capture: true,
+                        passive: true,
+                        signal: wheelAbortController.signal,
+                    });
                 },
 
                 onUpdate(props) {
                     component?.updateProps(props);
 
-                    if (!props.clientRect) {
+                    const updatedRect = props.clientRect?.();
+
+                    if (!updatedRect) {
                         return;
                     }
 
+                    lastValidRect = updatedRect;
+
                     popup?.setProps({
-                        getReferenceClientRect: () => props.clientRect?.() ?? DOM_RECT_FALLBACK,
+                        getReferenceClientRect: () => lastValidRect,
                     });
                 },
             };

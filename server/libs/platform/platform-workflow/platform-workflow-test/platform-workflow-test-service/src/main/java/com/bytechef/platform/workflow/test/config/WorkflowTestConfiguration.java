@@ -48,15 +48,19 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
+import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
+import com.bytechef.platform.workflow.test.facade.AiAgentTestFacadeImpl;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutorImpl;
 import com.bytechef.task.dispatcher.approval.WaitForApprovalTaskDispatcher;
@@ -96,6 +100,17 @@ import tools.jackson.databind.ObjectMapper;
 public class WorkflowTestConfiguration {
 
     @Bean
+    AiAgentTestFacade aiAgentTestFacade(
+        ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator, TempFileStorage tempFileStorage,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
+
+        return new AiAgentTestFacadeImpl(
+            actionDefinitionFacade, evaluator, tempFileStorage, workflowNodeOutputFacade, workflowService,
+            workflowTestConfigurationService);
+    }
+
+    @Bean
     TestWorkflowExecutor testWorkflowExecutor(
         ComponentDefinitionService componentDefinitionService, Environment environment, Evaluator evaluator,
         ObjectMapper objectMapper, SubflowResolver subflowResolver,
@@ -118,9 +133,7 @@ public class WorkflowTestConfiguration {
         return new TestWorkflowExecutorImpl(
             componentDefinitionService, contextService, evaluator,
             new JobSyncExecutor(
-                contextService, evaluator, jobService, 1000,
-                role -> (role == JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR)
-                    ? asyncMessageBroker : new AsyncMessageBroker(environment),
+                contextService, evaluator, jobService, 1000, asyncMessageBroker,
                 getApplicationEventListeners(
                     evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
                 getTaskCompletionHandlerFactories(

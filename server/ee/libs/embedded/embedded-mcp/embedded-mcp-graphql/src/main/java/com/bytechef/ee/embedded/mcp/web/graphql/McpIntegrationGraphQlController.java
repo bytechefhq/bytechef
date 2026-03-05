@@ -68,6 +68,11 @@ class McpIntegrationGraphQlController {
         return true;
     }
 
+    @MutationMapping
+    McpIntegration updateMcpIntegration(@Argument long id, @Argument UpdateMcpIntegrationInput input) {
+        return mcpIntegrationFacade.updateMcpIntegration(id, input.selectedWorkflowIds());
+    }
+
     @QueryMapping
     McpIntegration mcpIntegration(@Argument long id) {
         return mcpIntegrationService.fetchMcpIntegration(id)
@@ -107,5 +112,9 @@ class McpIntegrationGraphQlController {
     @SuppressFBWarnings("EI")
     record CreateMcpIntegrationInput(
         long mcpServerId, long integrationId, int integrationVersion, List<String> selectedWorkflowIds) {
+    }
+
+    @SuppressFBWarnings("EI")
+    record UpdateMcpIntegrationInput(List<String> selectedWorkflowIds) {
     }
 }

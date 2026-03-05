@@ -1,11 +1,14 @@
-import Button from '@/components/Button/Button';
 import {MultiSelectOptionType} from '@/components/MultiSelect/MultiSelect';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ArrayProperty from '@/pages/platform/workflow-editor/components/properties/ArrayProperty';
+import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
+import FormControlledArrayItems from '@/pages/platform/workflow-editor/components/properties/components/FormControlledArrayItems';
+import FormControlledObjectEntries from '@/pages/platform/workflow-editor/components/properties/components/FormControlledObjectEntries';
+import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicProperties';
@@ -17,8 +20,9 @@ import PropertyInput from '@/pages/platform/workflow-editor/components/propertie
 import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilder';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
-import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
+import resolveExpressionValue from '@/pages/platform/workflow-editor/utils/resolveExpressionValue';
+import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {
     GetClusterElementParameterDisplayConditions200Response,
     Option,
@@ -26,9 +30,9 @@ import {
 import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/types';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
-import {CircleQuestionMarkIcon, PlusIcon, XIcon} from 'lucide-react';
-import {ReactNode, useMemo, useRef, useState} from 'react';
-import {Control, Controller, FieldValues, FormState, useFormContext, useWatch} from 'react-hook-form';
+import {CircleQuestionMarkIcon, EqualIcon} from 'lucide-react';
+import {ReactNode} from 'react';
+import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
 interface PropertyProps {
@@ -49,214 +53,8 @@ interface PropertyProps {
     parentArrayItems?: Array<ArrayPropertyType>;
     path?: string;
     property: PropertyAllType;
+    toolsMode?: boolean;
 }
-
-interface ControlledArrayItemsProps {
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    control: Control<any, any>;
-    controlPath: string;
-    formState?: FormState<FieldValues>;
-    property: PropertyAllType;
-}
-
-/**
- * Renders array items in controlled (react-hook-form) mode.
- * Must be rendered within a FormProvider ancestor (e.g., shadcn's Form component).
- */
-const ControlledArrayItems = ({control, controlPath, formState, property}: ControlledArrayItemsProps) => {
-    const {setValue} = useFormContext();
-    const watchedValue = useWatch({control, name: controlPath});
-    const itemKeysRef = useRef<string[]>([]);
-
-    const items = Array.isArray(watchedValue) ? (watchedValue as unknown[]) : [];
-    const itemDefinition = property.items?.[0];
-
-    // Sync stable keys with items (handles initial load and external resets)
-    while (itemKeysRef.current.length < items.length) {
-        itemKeysRef.current.push(crypto.randomUUID());
-    }
-
-    itemKeysRef.current.length = items.length;
-
-    if (!itemDefinition) {
-        return null;
-    }
-
-    return (
-        <>
-            <ul className="ml-2 flex flex-col space-y-4 border-l border-l-border/50">
-                {items.map((item, index) => (
-                    <li className="flex items-center gap-1" key={itemKeysRef.current[index]}>
-                        <Property
-                            control={control}
-                            controlPath={controlPath}
-                            customClassName="w-full pl-2"
-                            deletePropertyButton={
-                                <Button
-                                    icon={<XIcon />}
-                                    onClick={() => {
-                                        itemKeysRef.current.splice(index, 1);
-
-                                        setValue(
-                                            controlPath,
-                                            items.filter((_, itemIndex) => itemIndex !== index)
-                                        );
-                                    }}
-                                    size="iconXs"
-                                    variant="destructiveGhost"
-                                />
-                            }
-                            formState={formState}
-                            parameterValue={item}
-                            property={
-                                {
-                                    ...itemDefinition,
-                                    defaultValue: item,
-                                    label: `Item ${index}`,
-                                    name: String(index),
-                                } as PropertyAllType
-                            }
-                        />
-                    </li>
-                ))}
-            </ul>
-
-            <Button
-                className="mt-3 rounded-sm"
-                icon={<PlusIcon />}
-                label="Add item"
-                onClick={() => {
-                    itemKeysRef.current.push(crypto.randomUUID());
-
-                    setValue(controlPath, [...items, '']);
-                }}
-                size="sm"
-                variant="secondary"
-            />
-        </>
-    );
-};
-
-interface ControlledObjectEntriesProps {
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    control: Control<any, any>;
-    controlPath: string;
-    formState?: FormState<FieldValues>;
-    property: PropertyAllType;
-}
-
-/**
- * Renders dynamic key-value entries for objects in controlled (react-hook-form) mode.
- * Must be rendered within a FormProvider ancestor (e.g., shadcn's Form component).
- */
-const ControlledObjectEntries = ({control, controlPath, formState, property}: ControlledObjectEntriesProps) => {
-    const {setValue} = useFormContext();
-    const watchedValue = useWatch({control, name: controlPath});
-    const [newEntryKey, setNewEntryKey] = useState('');
-
-    const entries = useMemo(() => {
-        if (watchedValue && typeof watchedValue === 'object' && !Array.isArray(watchedValue)) {
-            return Object.entries(watchedValue as Record<string, unknown>);
-        }
-
-        return [];
-    }, [watchedValue]);
-
-    const itemDefinition = property.additionalProperties?.[0];
-
-    const handleAddEntry = () => {
-        const trimmedKey = newEntryKey.trim();
-
-        if (!trimmedKey) {
-            return;
-        }
-
-        const currentObject =
-            watchedValue && typeof watchedValue === 'object' && !Array.isArray(watchedValue)
-                ? (watchedValue as Record<string, unknown>)
-                : {};
-
-        if (trimmedKey in currentObject) {
-            return;
-        }
-
-        setValue(controlPath, {
-            ...currentObject,
-            [trimmedKey]: '',
-        });
-
-        setNewEntryKey('');
-    };
-
-    return (
-        <>
-            <ul className="ml-2 flex flex-col space-y-4 border-l border-l-border/50">
-                {entries.map(([entryKey, entryValue]) => (
-                    <li className="flex items-center gap-1" key={`${controlPath}_${entryKey}`}>
-                        <Property
-                            control={control}
-                            controlPath={controlPath}
-                            customClassName="w-full pl-2"
-                            deletePropertyButton={
-                                <Button
-                                    icon={<XIcon />}
-                                    onClick={() => {
-                                        const currentObject = {...(watchedValue as Record<string, unknown>)};
-
-                                        delete currentObject[entryKey];
-
-                                        setValue(controlPath, currentObject);
-                                    }}
-                                    size="iconXs"
-                                    variant="destructiveGhost"
-                                />
-                            }
-                            formState={formState}
-                            parameterValue={entryValue}
-                            property={
-                                {
-                                    ...itemDefinition,
-                                    controlType: 'TEXT',
-                                    defaultValue: entryValue,
-                                    label: entryKey,
-                                    name: entryKey,
-                                    type: itemDefinition?.type || 'STRING',
-                                } as PropertyAllType
-                            }
-                        />
-                    </li>
-                ))}
-            </ul>
-
-            <div className="mt-3 flex items-center gap-2">
-                <input
-                    className="h-8 flex-1 rounded-md border bg-background px-2 text-sm"
-                    onChange={(event) => setNewEntryKey(event.target.value)}
-                    onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                            event.preventDefault();
-
-                            handleAddEntry();
-                        }
-                    }}
-                    placeholder="Key name"
-                    type="text"
-                    value={newEntryKey}
-                />
-
-                <Button
-                    className="rounded-sm"
-                    disabled={!newEntryKey.trim()}
-                    icon={<PlusIcon />}
-                    label="Add"
-                    onClick={handleAddEntry}
-                    size="sm"
-                    variant="secondary"
-                />
-            </div>
-        </>
-    );
-};
 
 const Property = ({
     arrayIndex,
@@ -274,10 +72,15 @@ const Property = ({
     parentArrayItems,
     path,
     property,
+    toolsMode,
 }: PropertyProps) => {
     const {
         calculatedPath,
         controlType,
+        controlledBlurError,
+        controlledDynamicMode,
+        controlledDynamicOnChangeRef,
+        controlledFromAi,
         currentComponent,
         currentNode,
         defaultValue,
@@ -286,9 +89,13 @@ const Property = ({
         editorRef,
         errorMessage,
         formattedOptions,
+        fromAiExpression,
         handleCodeEditorChange,
+        handleControlledBlur,
+        handleControlledModeSwitch,
         handleDeleteCustomPropertyClick,
         handleFromAiClick,
+        handleFromAiToggle,
         handleInputChange,
         handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
@@ -299,11 +106,11 @@ const Property = ({
         hidden,
         inputRef,
         inputValue,
-        isDisplayConditionsPending,
-        isFetchingCurrentDisplayCondition,
         isFormulaMode,
         isFromAi,
+        isLoadingDisplayCondition,
         isNumericalInput,
+        isToolsClusterElement,
         isValidControlType,
         label,
         languageId,
@@ -323,6 +130,7 @@ const Property = ({
         propertyParameterValue,
         required,
         selectValue,
+        setDataPillPanelOpen,
         setIsFormulaMode,
         setSelectValue,
         showInputTypeSwitchButton,
@@ -343,15 +151,16 @@ const Property = ({
         parentArrayItems,
         path,
         property,
+        toolsMode,
     });
 
-    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+    const clusterElementContext = useClusterElementContext();
 
     if (hidden && !control) {
         return <></>;
     }
 
-    if (displayCondition && isDisplayConditionsPending && type !== 'ARRAY' && type !== 'OBJECT') {
+    if (isLoadingDisplayCondition) {
         return (
             <div className={twMerge('flex flex-col space-y-1', objectName && 'ml-2 mt-1')}>
                 <Skeleton className="h-5 w-1/4" />
@@ -361,24 +170,7 @@ const Property = ({
         );
     }
 
-    if (
-        displayConditionsQuery &&
-        displayCondition &&
-        currentComponent?.displayConditions?.[displayCondition] &&
-        (isFetchingCurrentDisplayCondition || isDisplayConditionsPending) &&
-        type !== 'ARRAY' &&
-        type !== 'OBJECT'
-    ) {
-        return (
-            <div className={twMerge('flex flex-col space-y-1', objectName && 'ml-2 mt-1')}>
-                <Skeleton className="h-5 w-1/4" />
-
-                <Skeleton className="h-9 w-full" />
-            </div>
-        );
-    }
-
-    if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
+    if (!control && displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
         return <></>;
     }
 
@@ -423,58 +215,70 @@ const Property = ({
 
             {!mentionInput && (
                 <>
-                    {((controlType === 'OBJECT_BUILDER' && name !== '__item') ||
-                        controlType === 'ARRAY_BUILDER' ||
-                        controlType === 'NULL') && (
-                        <div className={twMerge('flex items-center', controlType !== 'NULL' && 'pb-1')}>
-                            {typeIcon && controlType !== 'NULL' && (
-                                <span className={twMerge(label ? 'pr-2' : 'pr-1')} title={type}>
-                                    {typeIcon}
-                                </span>
-                            )}
+                    {!controlledDynamicMode &&
+                        ((controlType === 'OBJECT_BUILDER' && name !== '__item') ||
+                            controlType === 'ARRAY_BUILDER' ||
+                            controlType === 'NULL') && (
+                            <div className={twMerge('flex items-center', controlType !== 'NULL' && 'pb-1')}>
+                                {typeIcon && controlType !== 'NULL' && (
+                                    <span className={twMerge(label ? 'pr-2' : 'pr-1')} title={type}>
+                                        {typeIcon}
+                                    </span>
+                                )}
 
-                            {(label || description || showInputTypeSwitchButton) && (
-                                <div className="flex w-full items-center justify-between">
-                                    <div className="flex items-center">
-                                        {label && (
-                                            <Label className="leading-normal">
-                                                {label}
+                                {(label || description || showInputTypeSwitchButton) && (
+                                    <div className="flex w-full items-center justify-between">
+                                        <div className="flex items-center">
+                                            {label && (
+                                                <Label className="leading-normal">
+                                                    {label}
 
-                                                {required && <RequiredMark />}
-                                            </Label>
-                                        )}
+                                                    {required && <RequiredMark />}
+                                                </Label>
+                                            )}
 
-                                        {!label && arrayIndex !== undefined && (
-                                            <Label className="leading-normal">Item</Label>
-                                        )}
+                                            {!label && arrayIndex !== undefined && (
+                                                <Label className="leading-normal">Item</Label>
+                                            )}
 
-                                        {description && (
-                                            <Tooltip>
-                                                <TooltipTrigger>
-                                                    <CircleQuestionMarkIcon className="ml-1 size-4 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                            {description && (
+                                                <Tooltip>
+                                                    <TooltipTrigger>
+                                                        <CircleQuestionMarkIcon className="ml-1 size-4 text-muted-foreground" />
+                                                    </TooltipTrigger>
 
-                                                <TooltipPortal>
-                                                    <TooltipContent className="max-w-md">{description}</TooltipContent>
-                                                </TooltipPortal>
-                                            </Tooltip>
-                                        )}
+                                                    <TooltipPortal>
+                                                        <TooltipContent className="max-w-md">
+                                                            {description}
+                                                        </TooltipContent>
+                                                    </TooltipPortal>
+                                                </Tooltip>
+                                            )}
+                                        </div>
+
+                                        <div className="flex items-center gap-1">
+                                            {showInputTypeSwitchButton && (
+                                                <InputTypeSwitchButton
+                                                    handleClick={handleInputTypeSwitchButtonClick}
+                                                    mentionInput={mentionInput}
+                                                />
+                                            )}
+
+                                            {!showInputTypeSwitchButton && control && isToolsClusterElement && (
+                                                <InputTypeSwitchButton
+                                                    handleClick={() =>
+                                                        handleControlledModeSwitch(!controlledDynamicMode)
+                                                    }
+                                                    mentionInput={controlledDynamicMode}
+                                                />
+                                            )}
+
+                                            {deletePropertyButton}
+                                        </div>
                                     </div>
-
-                                    <div className="flex items-center gap-1">
-                                        {showInputTypeSwitchButton && (
-                                            <InputTypeSwitchButton
-                                                handleClick={handleInputTypeSwitchButtonClick}
-                                                mentionInput={mentionInput}
-                                            />
-                                        )}
-
-                                        {deletePropertyButton}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                                )}
+                            </div>
+                        )}
 
                     {!control && controlType === 'ARRAY_BUILDER' && calculatedPath && (
                         <ArrayProperty
@@ -485,12 +289,85 @@ const Property = ({
                         />
                     )}
 
-                    {control && controlType === 'ARRAY_BUILDER' && calculatedPath && (
-                        <ControlledArrayItems
+                    {control && controlledDynamicMode && calculatedPath && (
+                        <Controller
+                            control={control}
+                            defaultValue={defaultValue}
+                            name={calculatedPath}
+                            render={({field}) => {
+                                controlledDynamicOnChangeRef.current = field.onChange;
+
+                                const displayValue = typeof field.value === 'string' ? field.value : '';
+                                const valueIsFromAi =
+                                    typeof field.value === 'string' && field.value.startsWith('=fromAi(');
+
+                                const isFieldFromAi =
+                                    isToolsClusterElement &&
+                                    (controlledFromAi !== undefined ? controlledFromAi : valueIsFromAi);
+
+                                const isExpressionMode = displayValue.startsWith('=');
+                                const strippedDisplayValue = isExpressionMode
+                                    ? displayValue.substring(1)
+                                    : displayValue;
+                                const strippedFromAiValue = fromAiExpression.startsWith('=')
+                                    ? fromAiExpression.substring(1)
+                                    : fromAiExpression;
+
+                                const {onChange: fieldOnChange, ...fieldRest} = field;
+
+                                return (
+                                    <PropertyInput
+                                        {...fieldRest}
+                                        deletePropertyButton={deletePropertyButton}
+                                        description={description}
+                                        disabled={isFieldFromAi}
+                                        error={hasError}
+                                        errorMessage={errorMessage}
+                                        expressionPrefix
+                                        handleInputTypeSwitchButtonClick={() => {
+                                            fieldOnChange('');
+                                            handleControlledModeSwitch(false);
+                                        }}
+                                        label={label || name}
+                                        leadingIcon={
+                                            isExpressionMode || isFieldFromAi ? (
+                                                <EqualIcon className="size-4" />
+                                            ) : (
+                                                typeIcon
+                                            )
+                                        }
+                                        mentionInput
+                                        onChange={(event) => {
+                                            fieldOnChange(resolveExpressionValue(event.target.value, field.value));
+                                        }}
+                                        onFocus={() => setDataPillPanelOpen(true)}
+                                        placeholder="Use '=' for an expression"
+                                        required={required}
+                                        showInputTypeSwitchButton
+                                        trailingAction={
+                                            isToolsClusterElement ? (
+                                                <FromAiToggleButton
+                                                    isFromAi={!!isFieldFromAi}
+                                                    onToggle={(fromAi) => handleFromAiToggle(fromAi, fieldOnChange)}
+                                                />
+                                            ) : undefined
+                                        }
+                                        type={hidden ? 'hidden' : 'text'}
+                                        value={isFieldFromAi ? strippedFromAiValue : strippedDisplayValue}
+                                    />
+                                );
+                            }}
+                            rules={{required}}
+                        />
+                    )}
+
+                    {control && !controlledDynamicMode && controlType === 'ARRAY_BUILDER' && calculatedPath && (
+                        <FormControlledArrayItems
                             control={control}
                             controlPath={calculatedPath}
                             formState={formState}
                             property={property}
+                            toolsMode={isToolsClusterElement}
                         />
                     )}
 
@@ -506,6 +383,7 @@ const Property = ({
                     )}
 
                     {control &&
+                        !controlledDynamicMode &&
                         (controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') &&
                         calculatedPath &&
                         !!property.properties?.length && (
@@ -518,53 +396,179 @@ const Property = ({
                                         formState={formState}
                                         key={subProperty.name || `${property.name}_${index}`}
                                         property={subProperty}
+                                        toolsMode={isToolsClusterElement}
                                     />
                                 ))}
                             </ul>
                         )}
 
                     {control &&
+                        !controlledDynamicMode &&
                         (controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') &&
                         calculatedPath &&
                         !property.properties?.length && (
-                            <ControlledObjectEntries
+                            <FormControlledObjectEntries
                                 control={control}
                                 controlPath={calculatedPath}
                                 formState={formState}
                                 property={property}
+                                toolsMode={isToolsClusterElement}
                             />
                         )}
 
-                    {control && (isValidControlType || isNumericalInput) && calculatedPath && (
-                        <Controller
-                            control={control}
-                            defaultValue={defaultValue}
-                            name={calculatedPath}
-                            render={({field}) => (
-                                <PropertyInput
-                                    description={description}
-                                    error={hasError}
-                                    errorMessage={errorMessage}
-                                    label={label || name}
-                                    leadingIcon={typeIcon}
-                                    onFocus={() => setDataPillPanelOpen(true)}
-                                    placeholder={placeholder}
-                                    required={required}
-                                    type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                                    {...field}
-                                />
-                            )}
-                            rules={{required}}
-                        />
-                    )}
+                    {control &&
+                        !controlledDynamicMode &&
+                        (isValidControlType || isNumericalInput) &&
+                        calculatedPath && (
+                            <Controller
+                                control={control}
+                                defaultValue={defaultValue}
+                                name={calculatedPath}
+                                render={({field, fieldState}) => {
+                                    const showControlledSwitch = isToolsClusterElement && type !== 'STRING';
+                                    const showFromAi = isToolsClusterElement && type === 'STRING';
+
+                                    const valueIsFromAi =
+                                        showFromAi &&
+                                        typeof field.value === 'string' &&
+                                        field.value.startsWith('=fromAi(');
+
+                                    const isFieldFromAi =
+                                        showFromAi &&
+                                        (controlledFromAi !== undefined ? controlledFromAi : valueIsFromAi);
+
+                                    const displayValue =
+                                        typeof field.value === 'string'
+                                            ? field.value
+                                            : field.value != null
+                                              ? String(field.value)
+                                              : '';
+
+                                    const isExpressionMode = showFromAi && displayValue.startsWith('=');
+                                    const strippedDisplayValue = isExpressionMode
+                                        ? displayValue.substring(1)
+                                        : displayValue;
+                                    const strippedFromAiValue = fromAiExpression.startsWith('=')
+                                        ? fromAiExpression.substring(1)
+                                        : fromAiExpression;
+
+                                    const {onChange: fieldOnChange, ...fieldRest} = field;
+
+                                    return (
+                                        <>
+                                            <PropertyInput
+                                                {...fieldRest}
+                                                deletePropertyButton={deletePropertyButton}
+                                                description={description}
+                                                disabled={isFieldFromAi}
+                                                error={!!fieldState.error || !!controlledBlurError}
+                                                errorMessage={fieldState.error?.message || controlledBlurError}
+                                                expressionPrefix={showFromAi}
+                                                fieldsetClassName={objectName && arrayName && 'ml-2'}
+                                                handleInputTypeSwitchButtonClick={
+                                                    showControlledSwitch
+                                                        ? () => {
+                                                              fieldOnChange('=');
+                                                              handleControlledModeSwitch(true);
+                                                          }
+                                                        : undefined
+                                                }
+                                                label={label || name}
+                                                leadingIcon={
+                                                    isExpressionMode || isFieldFromAi ? (
+                                                        <EqualIcon className="size-4" />
+                                                    ) : (
+                                                        typeIcon
+                                                    )
+                                                }
+                                                max={maxValue}
+                                                maxLength={maxLength}
+                                                min={minValue}
+                                                minLength={minLength}
+                                                onBlur={() => {
+                                                    field.onBlur();
+                                                    handleControlledBlur(field.value);
+                                                }}
+                                                onChange={(event) => {
+                                                    if (!showFromAi) {
+                                                        if (isNumericalInput && event.target.value !== '') {
+                                                            fieldOnChange(
+                                                                type === 'INTEGER'
+                                                                    ? parseInt(event.target.value, 10)
+                                                                    : parseFloat(event.target.value)
+                                                            );
+                                                        } else {
+                                                            fieldOnChange(event);
+                                                        }
+
+                                                        return;
+                                                    }
+
+                                                    fieldOnChange(
+                                                        resolveExpressionValue(event.target.value, field.value)
+                                                    );
+                                                }}
+                                                placeholder={
+                                                    isNumericalInput && minValue && maxValue
+                                                        ? `From ${minValue} to ${maxValue}`
+                                                        : placeholder ||
+                                                          `Type a ${isNumericalInput ? 'number' : 'something'} ...`
+                                                }
+                                                required={required}
+                                                showInputTypeSwitchButton={showControlledSwitch}
+                                                title={type}
+                                                trailingAction={
+                                                    showFromAi ? (
+                                                        <FromAiToggleButton
+                                                            isFromAi={!!isFieldFromAi}
+                                                            onToggle={(fromAi) =>
+                                                                handleFromAiToggle(fromAi, fieldOnChange)
+                                                            }
+                                                        />
+                                                    ) : undefined
+                                                }
+                                                type={hidden ? 'hidden' : getInputHTMLType(controlType)}
+                                                value={isFieldFromAi ? strippedFromAiValue : strippedDisplayValue}
+                                            />
+
+                                            {!!options?.length && (
+                                                <PropertySelect
+                                                    deletePropertyButton={deletePropertyButton}
+                                                    description={description}
+                                                    label={label || name}
+                                                    leadingIcon={typeIcon}
+                                                    name={name}
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+
+                                                        setSelectValue(value);
+                                                    }}
+                                                    options={options as Array<SelectOptionType>}
+                                                    required={required}
+                                                    value={selectValue}
+                                                />
+                                            )}
+                                        </>
+                                    );
+                                }}
+                                rules={{
+                                    required: required ? ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED : false,
+                                    validate: (value: string | number) => {
+                                        if (value === '' || value == null) {
+                                            return true;
+                                        }
+
+                                        return validatePropertyValue(value) || ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE;
+                                    },
+                                }}
+                            />
+                        )}
 
                     {control &&
+                        !controlledDynamicMode &&
                         controlType === 'SELECT' &&
                         type !== 'BOOLEAN' &&
-                        calculatedPath &&
-                        optionsDataSource &&
-                        workflow.id &&
-                        currentNode?.name && (
+                        calculatedPath && (
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
@@ -573,10 +577,15 @@ const Property = ({
                                     <PropertyComboBox
                                         arrayIndex={arrayIndex}
                                         defaultValue={defaultValue}
+                                        deletePropertyButton={deletePropertyButton}
                                         description={description}
+                                        handleInputTypeSwitchButtonClick={() => {
+                                            onChange('=');
+                                            handleControlledModeSwitch(true);
+                                        }}
                                         label={label || fieldName}
                                         leadingIcon={typeIcon}
-                                        lookupDependsOnPaths={optionsDataSource.optionsLookupDependsOn?.map(
+                                        lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
                                             (optionLookupDependency) =>
                                                 optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
                                         )}
@@ -592,6 +601,7 @@ const Property = ({
                                         optionsDataSource={optionsDataSource}
                                         path={calculatedPath}
                                         required={required}
+                                        showInputTypeSwitchButton={isToolsClusterElement}
                                         value={fieldValue !== undefined ? fieldValue : selectValue}
                                         workflowId={workflow.id!}
                                         workflowNodeName={currentNode!.name}
@@ -602,17 +612,22 @@ const Property = ({
                         )}
 
                     {control &&
+                        !controlledDynamicMode &&
                         controlType === 'SELECT' &&
-                        type !== 'BOOLEAN' &&
-                        calculatedPath &&
-                        !optionsDataSource && (
+                        type === 'BOOLEAN' &&
+                        calculatedPath && (
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
                                 name={calculatedPath}
                                 render={({field: {name, onChange, value: fieldValue}}) => (
                                     <PropertySelect
+                                        deletePropertyButton={deletePropertyButton}
                                         description={description}
+                                        handleInputTypeSwitchButtonClick={() => {
+                                            onChange('=');
+                                            handleControlledModeSwitch(true);
+                                        }}
                                         label={label || name}
                                         leadingIcon={typeIcon}
                                         name={name}
@@ -621,8 +636,11 @@ const Property = ({
 
                                             setSelectValue(value);
                                         }}
-                                        options={options as Array<SelectOptionType>}
-                                        required={required}
+                                        options={[
+                                            {label: 'True', value: 'true'},
+                                            {label: 'False', value: 'false'},
+                                        ]}
+                                        showInputTypeSwitchButton={isToolsClusterElement}
                                         value={fieldValue !== undefined ? fieldValue : selectValue}
                                     />
                                 )}
@@ -630,40 +648,14 @@ const Property = ({
                             />
                         )}
 
-                    {control && controlType === 'SELECT' && type === 'BOOLEAN' && calculatedPath && (
-                        <Controller
-                            control={control}
-                            defaultValue={defaultValue}
-                            name={calculatedPath}
-                            render={({field: {name, onChange, value: fieldValue}}) => (
-                                <PropertySelect
-                                    description={description}
-                                    label={label || name}
-                                    leadingIcon={typeIcon}
-                                    name={name}
-                                    onValueChange={(value) => {
-                                        onChange(value);
-
-                                        setSelectValue(value);
-                                    }}
-                                    options={[
-                                        {label: 'True', value: 'true'},
-                                        {label: 'False', value: 'false'},
-                                    ]}
-                                    value={fieldValue !== undefined ? fieldValue : selectValue}
-                                />
-                            )}
-                            rules={{required}}
-                        />
-                    )}
-
-                    {control && controlType === 'TEXT_AREA' && calculatedPath && (
+                    {control && !controlledDynamicMode && controlType === 'TEXT_AREA' && calculatedPath && (
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
                             name={calculatedPath}
                             render={({field}) => (
                                 <PropertyTextArea
+                                    deletePropertyButton={deletePropertyButton}
                                     description={description}
                                     error={hasError}
                                     errorMessage={errorMessage}
@@ -677,7 +669,7 @@ const Property = ({
                         />
                     )}
 
-                    {control && controlType === 'MULTI_SELECT' && calculatedPath && workflow.id && (
+                    {control && !controlledDynamicMode && controlType === 'MULTI_SELECT' && calculatedPath && (
                         <Controller
                             control={control}
                             defaultValue={defaultValue || []}
@@ -685,14 +677,22 @@ const Property = ({
                             render={({field: {onChange, value}}) => (
                                 <PropertyMultiSelect
                                     defaultValue={(value as string[]) || []}
-                                    deletePropertyButton={null}
+                                    deletePropertyButton={deletePropertyButton}
+                                    handleInputTypeSwitchButtonClick={() => {
+                                        handleControlledModeSwitch(true);
+                                    }}
                                     leadingIcon={typeIcon}
+                                    lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
+                                        (optionLookupDependency) =>
+                                            optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
+                                    )}
+                                    lookupDependsOnValues={lookupDependsOnValues}
                                     onChange={onChange}
                                     options={(formattedOptions as MultiSelectOptionType[]) || []}
                                     optionsDataSource={optionsDataSource}
                                     path={calculatedPath}
                                     property={property}
-                                    showInputTypeSwitchButton={false}
+                                    showInputTypeSwitchButton={isToolsClusterElement}
                                     value={(value as string[]) || []}
                                     workflowId={workflow.id!}
                                 />
@@ -775,7 +775,7 @@ const Property = ({
                             lookupDependsOnValues={lookupDependsOnValues}
                             name={name}
                             onValueChange={(value: string) => handleSelectChange(value, name!)}
-                            options={(formattedOptions as Array<Option>) || undefined || []}
+                            options={(formattedOptions as Array<Option>) || []}
                             optionsDataSource={optionsDataSource}
                             path={calculatedPath}
                             required={required}
@@ -845,18 +845,23 @@ const Property = ({
                 </>
             )}
 
-            {type === 'DYNAMIC_PROPERTIES' && currentNode && (
+            {type === 'DYNAMIC_PROPERTIES' && (currentNode || clusterElementContext) && (
                 <PropertyDynamicProperties
+                    control={control}
+                    controlPath={controlPath}
                     currentOperationName={operationName}
                     enabled={
+                        !!clusterElementContext ||
                         !!(currentNode?.connectionId && currentNode?.connections) ||
                         currentNode?.connections?.length === 0
                     }
+                    formState={formState}
                     lookupDependsOnPaths={propertiesDataSource?.propertiesLookupDependsOn}
                     lookupDependsOnValues={lookupDependsOnValues}
                     name={name}
                     parameterValue={propertyParameterValue}
                     path={calculatedPath}
+                    toolsMode={toolsMode}
                 />
             )}
 

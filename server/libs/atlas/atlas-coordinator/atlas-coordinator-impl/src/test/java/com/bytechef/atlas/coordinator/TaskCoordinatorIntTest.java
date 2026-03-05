@@ -131,7 +131,7 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, evaluator, jobService, -1, role -> new AsyncMessageBroker(environment), List.of(),
+            contextService, evaluator, jobService, -1, new AsyncMessageBroker(environment), List.of(),
             taskExecutionService,
             new TaskExecutor() {
                 private final Executor executor = Executors.newVirtualThreadPerTaskExecutor();

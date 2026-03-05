@@ -19,10 +19,18 @@ query mcpProjectsByServerId($mcpServerId: ID!) {
             id
             mcpProjectId
             projectDeploymentWorkflowId
+            parameters
             projectDeploymentWorkflow {
                 id
-                projectDeploymentId
+                connections {
+                    connectionId
+                    workflowConnectionKey
+                    workflowNodeName
+                }
+                enabled
                 inputs
+                projectDeploymentId
+                version
                 workflowId
             }
             workflow {

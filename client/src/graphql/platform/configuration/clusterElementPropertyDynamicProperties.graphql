@@ -1,0 +1,291 @@
+query clusterElementPropertyDynamicProperties(
+    $componentName: String!
+    $componentVersion: Int!
+    $clusterElementName: String!
+    $propertyName: String!
+    $connectionId: Long
+    $inputParameters: Map
+    $lookupDependsOnPaths: [String!]
+) {
+    clusterElementPropertyDynamicProperties(
+        componentName: $componentName
+        componentVersion: $componentVersion
+        clusterElementName: $clusterElementName
+        propertyName: $propertyName
+        connectionId: $connectionId
+        inputParameters: $inputParameters
+        lookupDependsOnPaths: $lookupDependsOnPaths
+    ) {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+            controlType
+            label
+            placeholder
+            options {
+                description
+                label
+                value
+            }
+            optionsDataSource {
+                optionsLookupDependsOn
+            }
+        }
+        ... on IntegerProperty {
+            controlType
+            label
+            placeholder
+            options {
+                description
+                label
+                value
+            }
+            optionsDataSource {
+                optionsLookupDependsOn
+            }
+        }
+        ... on NumberProperty {
+            controlType
+            label
+            placeholder
+            options {
+                description
+                label
+                value
+            }
+            optionsDataSource {
+                optionsLookupDependsOn
+            }
+        }
+        ... on BooleanProperty {
+            controlType
+            label
+            placeholder
+        }
+        ... on ArrayProperty {
+            controlType
+            label
+            placeholder
+            optionsDataSource {
+                optionsLookupDependsOn
+            }
+            items {
+                advancedOption
+                description
+                displayCondition
+                expressionEnabled
+                hidden
+                name
+                required
+                type
+                ... on StringProperty {
+                    controlType
+                    label
+                    placeholder
+                    options {
+                        description
+                        label
+                        value
+                    }
+                    optionsDataSource {
+                        optionsLookupDependsOn
+                    }
+                }
+                ... on IntegerProperty {
+                    controlType
+                    label
+                    placeholder
+                    options {
+                        description
+                        label
+                        value
+                    }
+                    optionsDataSource {
+                        optionsLookupDependsOn
+                    }
+                }
+                ... on NumberProperty {
+                    controlType
+                    label
+                    placeholder
+                    options {
+                        description
+                        label
+                        value
+                    }
+                    optionsDataSource {
+                        optionsLookupDependsOn
+                    }
+                }
+                ... on BooleanProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on ArrayProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on ObjectProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on DateProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on DateTimeProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on TimeProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on NullProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on DynamicPropertiesProperty {
+                    propertiesDataSource {
+                        propertiesLookupDependsOn
+                    }
+                }
+            }
+        }
+        ... on ObjectProperty {
+            controlType
+            label
+            placeholder
+            optionsDataSource {
+                optionsLookupDependsOn
+            }
+            properties {
+                advancedOption
+                description
+                displayCondition
+                expressionEnabled
+                hidden
+                name
+                required
+                type
+                ... on StringProperty {
+                    controlType
+                    label
+                    placeholder
+                    options {
+                        description
+                        label
+                        value
+                    }
+                    optionsDataSource {
+                        optionsLookupDependsOn
+                    }
+                }
+                ... on IntegerProperty {
+                    controlType
+                    label
+                    placeholder
+                    options {
+                        description
+                        label
+                        value
+                    }
+                    optionsDataSource {
+                        optionsLookupDependsOn
+                    }
+                }
+                ... on NumberProperty {
+                    controlType
+                    label
+                    placeholder
+                    options {
+                        description
+                        label
+                        value
+                    }
+                    optionsDataSource {
+                        optionsLookupDependsOn
+                    }
+                }
+                ... on BooleanProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on ArrayProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on ObjectProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on DateProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on DateTimeProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on TimeProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on NullProperty {
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on DynamicPropertiesProperty {
+                    propertiesDataSource {
+                        propertiesLookupDependsOn
+                    }
+                }
+            }
+        }
+        ... on DateProperty {
+            controlType
+            label
+            placeholder
+        }
+        ... on DateTimeProperty {
+            controlType
+            label
+            placeholder
+        }
+        ... on TimeProperty {
+            controlType
+            label
+            placeholder
+        }
+        ... on NullProperty {
+            controlType
+            label
+            placeholder
+        }
+        ... on DynamicPropertiesProperty {
+            propertiesDataSource {
+                propertiesLookupDependsOn
+            }
+        }
+    }
+}

@@ -8,7 +8,10 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
+import {MarkerSeverity} from 'monaco-editor';
 import {useCallback, useEffect, useState} from 'react';
+
+import type {editor} from 'monaco-editor';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -31,6 +34,9 @@ const useWorkflowCodeEditorSheet = ({
     const [unsavedChangesAlertDialogOpen, setUnsavedChangesAlertDialogOpen] = useState(false);
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
+
+    const [markers, setMarkers] = useState<editor.IMarkerData[]>([]);
+    const hasErrors = markers.some((marker) => marker.severity === MarkerSeverity.Error);
 
     const ai = useApplicationInfoStore((state) => state.ai);
     const setContext = useCopilotStore((state) => state.setContext);
@@ -167,6 +173,10 @@ const useWorkflowCodeEditorSheet = ({
         [workflow.definition]
     );
 
+    const handleValidate = useCallback((newMarkers: editor.IMarkerData[]) => {
+        setMarkers(newMarkers);
+    }, []);
+
     const handleUnsavedChangesAlertDialogClose = useCallback(() => {
         useCopilotStore.getState().restoreConversationState();
         setCopilotPanelOpen(false);
@@ -207,7 +217,9 @@ const useWorkflowCodeEditorSheet = ({
         handleStopClick,
         handleUnsavedChangesAlertDialogClose,
         handleUnsavedChangesAlertDialogOpen: setUnsavedChangesAlertDialogOpen,
+        handleValidate,
         handleWorkflowTestConfigurationDialog: setShowWorkflowTestConfigurationDialog,
+        hasErrors,
         showWorkflowTestConfigurationDialog,
         unsavedChangesAlertDialogOpen,
         workflowIsRunning,

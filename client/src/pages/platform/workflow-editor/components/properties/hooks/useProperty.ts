@@ -64,7 +64,47 @@ const MENTION_INPUT_PROPERTY_CONTROL_TYPES = [
     'URL',
 ];
 
+function getInitialControlledDynamicMode(
+    control: Control<FieldValues, FieldValues> | undefined,
+    controlPath: string,
+    propertyName: string | undefined
+): boolean {
+    if (!control?._formValues || !propertyName) {
+        return false;
+    }
+
+    const fieldPath = controlPath ? `${controlPath}.${propertyName}` : propertyName;
+    const fieldValue = fieldPath
+        .split('.')
+        .reduce<unknown>(
+            (currentObject, key) => (currentObject as Record<string, unknown>)?.[key],
+            control._formValues
+        );
+
+    return typeof fieldValue === 'string' && fieldValue.startsWith('=');
+}
+
+function getInitialInputValue(
+    control: Control<FieldValues, FieldValues> | undefined,
+    property: PropertyAllType
+): string {
+    if (!control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
+        return '';
+    }
+
+    if (!INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
+        return '';
+    }
+
+    return property.defaultValue || '';
+}
+
 type UsePropertyReturnType = {
+    calculatedPath: string | undefined;
+    controlledBlurError: string | undefined;
+    controlledDynamicMode: boolean;
+    controlledDynamicOnChangeRef: RefObject<((value: string) => void) | null>;
+    controlledFromAi: boolean | undefined;
     controlType?: ControlType;
     currentComponent: ComponentType | undefined;
     currentNode: NodeDataType | undefined;
@@ -74,24 +114,28 @@ type UsePropertyReturnType = {
     editorRef: RefObject<Editor | null>;
     errorMessage: string;
     formattedOptions: Array<Option> | undefined;
+    fromAiExpression: string;
     handleCodeEditorChange: (value?: string) => void;
+    handleControlledBlur: (value: unknown) => void;
+    handleControlledModeSwitch: (toDynamic: boolean) => void;
     handleDeleteCustomPropertyClick: (path: string) => void;
     handleFromAiClick: (fromAi: boolean) => void;
+    handleFromAiToggle: (fromAi: boolean, fieldOnChange: (value: string) => void) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
-    handleMentionInputValueChange: (value: string | number) => void;
     handleInputTypeSwitchButtonClick: () => void;
     handleJsonSchemaBuilderChange: (value?: SchemaRecordType) => void;
+    handleMentionInputValueChange: (value: string | number) => void;
     handleMultiSelectChange: (value: string[]) => void;
     handleSelectChange: (value: string, name: string) => void;
     hasError: boolean;
     hidden: boolean | undefined;
     inputRef: RefObject<HTMLInputElement | null>;
     inputValue: string;
-    isDisplayConditionsPending: boolean;
-    isFetchingCurrentDisplayCondition: boolean;
-    isFromAi: boolean;
     isFormulaMode: boolean;
+    isFromAi: boolean;
+    isLoadingDisplayCondition: boolean;
     isNumericalInput: boolean;
+    isToolsClusterElement: boolean;
     isValidControlType: boolean | undefined;
     label?: string;
     languageId?: string;
@@ -106,13 +150,15 @@ type UsePropertyReturnType = {
     name: string | undefined;
     options?: PropertyAllType['options'];
     optionsDataSource?: OptionsDataSource;
-    calculatedPath: string | undefined;
     placeholder: string;
     propertiesDataSource?: PropertiesDataSource;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     propertyParameterValue: any;
     required: boolean;
+    resetOnModeChangeRef: RefObject<boolean>;
     selectValue: string;
+    setControlledFromAi: Dispatch<SetStateAction<boolean | undefined>>;
+    setDataPillPanelOpen: (open: boolean) => void;
     setIsFormulaMode: Dispatch<SetStateAction<boolean>>;
     setSelectValue: Dispatch<SetStateAction<string>>;
     showInputTypeSwitchButton: boolean;
@@ -137,6 +183,7 @@ interface UsePropertyProps {
     parentArrayItems?: Array<ArrayPropertyType>;
     path?: string;
     property: PropertyAllType;
+    toolsMode?: boolean;
 }
 
 export const useProperty = ({
@@ -150,20 +197,11 @@ export const useProperty = ({
     parameterValue,
     path,
     property,
+    toolsMode,
 }: UsePropertyProps): UsePropertyReturnType => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
-    const [inputValue, setInputValue] = useState(() => {
-        if (!control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
-            return '';
-        }
-
-        if (!INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
-            return '';
-        }
-
-        return property.defaultValue || '';
-    });
+    const [inputValue, setInputValue] = useState(() => getInitialInputValue(control, property));
     const [isFormulaMode, setIsFormulaModeInternal] = useState(property.controlType === 'FORMULA_MODE');
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<unknown> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
@@ -176,14 +214,23 @@ export const useProperty = ({
         property.defaultValue !== undefined ? property.defaultValue : 'null'
     );
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
-        (property.type !== 'STRING' && property.expressionEnabled) || false
+        !control && ((property.type !== 'STRING' && property.expressionEnabled) || false)
     );
     const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(true);
+    const [controlledBlurError, setControlledBlurError] = useState<string | undefined>();
+    const [controlledDynamicMode, setControlledDynamicMode] = useState(() =>
+        getInitialControlledDynamicMode(control, controlPath, property.name?.replace(/\s/g, '_'))
+    );
+    const [controlledFromAi, setControlledFromAi] = useState<boolean | undefined>(undefined);
 
+    const controlledDynamicOnChangeRef = useRef<((value: string) => void) | null>(null);
     const editorRef = useRef<Editor>(null!);
+    const initialMountRef = useRef(true);
     const inputRef = useRef<HTMLInputElement>(null!);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
+    const mentionInputValueRef = useRef<string | number | undefined>(undefined);
+    const resetOnModeChangeRef = useRef(false);
 
     const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore(
@@ -196,6 +243,8 @@ export const useProperty = ({
         );
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
+
+    const isToolsClusterElement = toolsMode || currentNode?.clusterElementType === 'tools';
 
     const {isFetchedAfterMount: isDisplayConditionsFetched, isPending: isDisplayConditionsPending} =
         displayConditionsQuery ?? {
@@ -248,34 +297,6 @@ export const useProperty = ({
 
     let {displayCondition} = property;
 
-    const formattedOptions = useMemo(() => {
-        return options
-            ?.map((option) => {
-                if (option.value === '') {
-                    return null;
-                }
-
-                return option;
-            })
-            .filter((option) => option !== null);
-    }, [options]);
-
-    const isValidControlType = useMemo(() => {
-        return controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
-    }, [controlType]);
-
-    const isNumericalInput = useMemo(() => {
-        return !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER');
-    }, [mentionInput, controlType]);
-
-    const typeIcon = useMemo(() => {
-        if (controlType === 'MULTI_SELECT') {
-            return TYPE_ICONS[property.items?.[0].type as keyof typeof TYPE_ICONS];
-        }
-
-        return TYPE_ICONS[type as keyof typeof TYPE_ICONS];
-    }, [controlType, property.items, type]);
-
     const {
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
@@ -283,11 +304,7 @@ export const useProperty = ({
         updateWorkflowNodeParameterMutation,
     } = useWorkflowEditor();
 
-    const {rootClusterElementNodeData} = useWorkflowEditorStore(
-        useShallow((state) => ({
-            rootClusterElementNodeData: state.rootClusterElementNodeData,
-        }))
-    );
+    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
     if (!path && name) {
         path = name;
@@ -330,6 +347,76 @@ export const useProperty = ({
             }
         }
     }
+
+    const formattedOptions = useMemo(() => {
+        return options
+            ?.map((option) => {
+                if (option.value === '') {
+                    return null;
+                }
+
+                return option;
+            })
+            .filter((option) => option !== null);
+    }, [options]);
+
+    const fromAiExpression = useMemo(
+        () => (description ? `=fromAi('${name}', '${description}')` : `=fromAi('${name}')`),
+        [description, name]
+    );
+
+    const isValidControlType = useMemo(
+        () => controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType),
+        [controlType]
+    );
+
+    const isNumericalInput = useMemo(
+        () => !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER'),
+        [mentionInput, controlType]
+    );
+
+    const typeIcon = useMemo(() => {
+        if (controlType === 'MULTI_SELECT') {
+            return TYPE_ICONS[property.items?.[0].type as keyof typeof TYPE_ICONS];
+        }
+
+        return TYPE_ICONS[type as keyof typeof TYPE_ICONS];
+    }, [controlType, property.items, type]);
+
+    const isFromAi = useMemo(() => {
+        if (!currentComponent?.metadata?.ui?.fromAi || !path) {
+            return false;
+        }
+
+        return currentComponent.metadata.ui.fromAi.includes(path);
+    }, [currentComponent?.metadata?.ui?.fromAi, path]);
+
+    const memoizedWorkflowTask = useMemo(() => {
+        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
+            (node) => node.name === currentNode?.name
+        );
+    }, [workflow.triggers, workflow.tasks, currentNode?.name]);
+
+    const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
+        if (!currentNode?.name || !workflow.definition) {
+            return undefined;
+        }
+
+        if (currentNode.clusterElementType) {
+            const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+
+            const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+                ? getTask({
+                      tasks: workflowDefinitionTasks,
+                      workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                  })
+                : undefined;
+
+            if (mainClusterRootTask?.clusterElements) {
+                return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
+            }
+        }
+    }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
 
     const validatePropertyValue = useCallback(
         (value: string | number): boolean => {
@@ -480,6 +567,33 @@ export const useProperty = ({
         [deleteWorkflowNodeParameterMutation, deleteClusterElementParameterMutation, workflow.id]
     );
 
+    const handleControlledBlur = useCallback(
+        (value: unknown) => {
+            const isInvalid = value !== '' && value != null && !validatePropertyValue(value as string | number);
+
+            setControlledBlurError(isInvalid ? ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE : undefined);
+        },
+        [validatePropertyValue]
+    );
+
+    const handleControlledModeSwitch = useCallback((toDynamic: boolean) => {
+        resetOnModeChangeRef.current = true;
+
+        setControlledDynamicMode(toDynamic);
+        setControlledFromAi(undefined);
+    }, []);
+
+    const handleFromAiToggle = useCallback(
+        (fromAi: boolean, fieldOnChange: (value: string) => void) => {
+            setControlledFromAi(fromAi);
+
+            if (fromAi) {
+                fieldOnChange(fromAiExpression);
+            }
+        },
+        [fromAiExpression]
+    );
+
     const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
         if (
             !currentComponent ||
@@ -505,6 +619,30 @@ export const useProperty = ({
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         const {value} = event.target;
+
+        if (isNumericalInput && value && value.startsWith('=') && expressionEnabled) {
+            setMentionInput(true);
+            setIsFormulaMode(true);
+
+            const expressionContent = value.substring(1);
+
+            setMentionInputValue(expressionContent);
+
+            setTimeout(() => {
+                if (editorRef.current) {
+                    editorRef.current.commands.setContent(expressionContent);
+                    editorRef.current.commands.focus();
+
+                    setFocusedInput(editorRef.current);
+
+                    if (workflowNodeDetailsPanelOpen) {
+                        setDataPillPanelOpen(true);
+                    }
+                }
+            }, 50);
+
+            return;
+        }
 
         if (isNumericalInput && value) {
             const numericValue = parseFloat(value);
@@ -631,7 +769,40 @@ export const useProperty = ({
     );
 
     const handleInputTypeSwitchButtonClick = () => {
-        setMentionInput(!mentionInput);
+        const switchingToDynamic = !mentionInput;
+
+        setMentionInput(switchingToDynamic);
+
+        if (switchingToDynamic && isFromAi) {
+            setMentionInputValue(fromAiExpression.substring(1));
+            setPropertyParameterValue(fromAiExpression);
+            setMultiSelectValue([]);
+
+            setTimeout(() => {
+                setFocusedInput(editorRef.current);
+            }, 50);
+
+            if (
+                currentComponent &&
+                name &&
+                path &&
+                (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
+                workflow.id
+            ) {
+                saveProperty({
+                    fromAi: true,
+                    includeInMetadata: true,
+                    path,
+                    type,
+                    updateClusterElementParameterMutation,
+                    updateWorkflowNodeParameterMutation,
+                    value: fromAiExpression,
+                    workflowId: workflow.id!,
+                });
+            }
+
+            return;
+        }
 
         setMentionInputValue('');
         setPropertyParameterValue('');
@@ -904,41 +1075,6 @@ export const useProperty = ({
         [property.controlType]
     );
 
-    const isFromAi = useMemo(() => {
-        if (!currentComponent?.metadata?.ui?.fromAi || !path) {
-            return false;
-        }
-
-        return currentComponent.metadata.ui.fromAi.includes(path);
-    }, [currentComponent?.metadata?.ui?.fromAi, path]);
-
-    const memoizedWorkflowTask = useMemo(() => {
-        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
-            (node) => node.name === currentNode?.name
-        );
-    }, [workflow.triggers, workflow.tasks, currentNode?.name]);
-
-    const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
-        if (!currentNode?.name || !workflow.definition) {
-            return undefined;
-        }
-
-        if (currentNode.clusterElementType) {
-            const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
-
-            const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-                ? getTask({
-                      tasks: workflowDefinitionTasks,
-                      workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-                  })
-                : undefined;
-
-            if (mainClusterRootTask?.clusterElements) {
-                return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
-            }
-        }
-    }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
-
     // set default mentionInput state
     useEffect(() => {
         if (control || mentionInput) {
@@ -949,13 +1085,18 @@ export const useProperty = ({
             const isStringValue = typeof propertyParameterValue === 'string';
 
             const hasDataPill = isStringValue && propertyParameterValue.includes('${');
+            const hasExpression = isStringValue && propertyParameterValue.startsWith('=');
             const hasFormula = isStringValue && propertyParameterValue.includes('#{');
 
-            const shouldUseMentionInput = hasDataPill || hasFormula;
+            const shouldUseMentionInput = hasDataPill || hasExpression || hasFormula;
 
             if (shouldUseMentionInput) {
                 setMentionInput(true);
-                setMentionInputValue(propertyParameterValue);
+                setMentionInputValue(hasExpression ? propertyParameterValue.substring(1) : propertyParameterValue);
+
+                if (hasExpression) {
+                    setIsFormulaMode(true);
+                }
 
                 return;
             } else {
@@ -1013,6 +1154,8 @@ export const useProperty = ({
         const encodedParameters = encodeParameters(parameters);
         const encodedPath = path ? encodePath(path) : undefined;
 
+        const isExpressionValue = typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=');
+
         if (Object.keys(parameters).length && (!propertyParameterValue || propertyParameterValue === defaultValue)) {
             if (!path || !encodedPath) {
                 setPropertyParameterValue(parameters[name]);
@@ -1027,12 +1170,18 @@ export const useProperty = ({
 
                 if (typeof valueFromDefinition === 'string' && valueFromDefinition.startsWith('=')) {
                     setMentionInput(true);
+                    setMentionInputValue(valueFromDefinition.substring(1));
 
                     setIsFormulaMode(true);
                 }
             } else {
                 setPropertyParameterValue(encodedParameters[name]);
             }
+        } else if (isExpressionValue) {
+            setMentionInput(true);
+            setMentionInputValue(propertyParameterValue.substring(1));
+
+            setIsFormulaMode(true);
         }
 
         const shouldSaveHiddenProperty =
@@ -1099,16 +1248,21 @@ export const useProperty = ({
         setErrorMessage(regexMismatch ? VALUE_DOES_NOT_MATCH_PATTERN : INCORRECT_VALUE);
     }, [INCORRECT_VALUE, mentionInput, mentionInputValue, maxLength, minLength, regex, VALUE_DOES_NOT_MATCH_PATTERN]);
 
-    // set value to propertyParameterValue
+    // Sync propertyParameterValue one-way into value states
     useEffect(() => {
-        // Skip updating if a save operation is in progress
         if (isSavingRef.current) {
             return;
         }
 
         if (propertyParameterValue === '' || propertyParameterValue === undefined) {
             if (mentionInput) {
-                setMentionInputValue('');
+                const userHasUnsavedInput = !mentionInputValueRef.current && mentionInputValue;
+
+                if (!userHasUnsavedInput) {
+                    setMentionInputValue('');
+
+                    mentionInputValueRef.current = undefined;
+                }
             } else {
                 setInputValue('');
                 setSelectValue('');
@@ -1116,19 +1270,41 @@ export const useProperty = ({
 
                 setPropertyParameterValue('');
             }
+
+            return;
         }
 
         if (typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=')) {
-            setMentionInputValue(propertyParameterValue.substring(1));
+            if (mentionInputValueRef.current !== propertyParameterValue) {
+                setMentionInputValue(propertyParameterValue.substring(1));
+
+                mentionInputValueRef.current = propertyParameterValue;
+            }
+
+            return;
         }
 
-        if (
+        const shouldSyncMentionInputFromPlainStringParameter =
+            mentionInput &&
+            mentionInputValueRef.current !== propertyParameterValue &&
+            typeof propertyParameterValue === 'string' &&
+            propertyParameterValue !== '';
+
+        if (shouldSyncMentionInputFromPlainStringParameter) {
+            setMentionInputValue(propertyParameterValue);
+
+            mentionInputValueRef.current = propertyParameterValue;
+
+            return;
+        }
+
+        const shouldApplyParameterValueToEmptyPlainInput =
             !mentionInput &&
             controlType &&
             INPUT_PROPERTY_CONTROL_TYPES.includes(controlType) &&
-            inputValue === '' &&
-            propertyParameterValue
-        ) {
+            propertyParameterValue;
+
+        if (shouldApplyParameterValueToEmptyPlainInput) {
             setInputValue(propertyParameterValue);
         }
 
@@ -1156,63 +1332,79 @@ export const useProperty = ({
             }
         }
 
-        if (
-            isNumericalInput &&
-            (inputValue === null || inputValue === undefined) &&
-            propertyParameterValue !== null &&
-            propertyParameterValue !== undefined &&
-            parameterValue
-        ) {
+        if (isNumericalInput && propertyParameterValue !== null && propertyParameterValue !== undefined) {
             setInputValue(propertyParameterValue);
         }
 
-        if (
-            isNumericalInput &&
-            inputValue !== null &&
-            inputValue !== undefined &&
-            propertyParameterValue !== null &&
-            propertyParameterValue !== undefined &&
-            propertyParameterValue !== inputValue
-        ) {
-            setInputValue(propertyParameterValue);
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mentionInputValue, propertyParameterValue, mentionInput, controlType, inputValue]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- omit mentionInputValue/inputValue to avoid feedback loop
+    }, [propertyParameterValue, mentionInput, controlType]);
 
     // set options lookup dependencies
     useEffect(() => {
-        if (!currentComponent?.parameters || !optionsDataSource?.optionsLookupDependsOn) {
+        if (!optionsDataSource?.optionsLookupDependsOn) {
             return;
         }
 
-        const optionsLookupDependsOnValues: unknown[] = optionsDataSource?.optionsLookupDependsOn.map(
-            (optionLookupDependency) =>
-                resolvePath(currentComponent?.parameters, optionLookupDependency.replace('[index]', `[${arrayIndex}]`))
+        const parametersSource = currentComponent?.parameters || (control ? control._formValues : undefined);
+
+        if (!parametersSource) {
+            return;
+        }
+
+        const optionsLookupDependsOnValues: unknown[] = optionsDataSource.optionsLookupDependsOn.map(
+            (optionLookupDependency) => {
+                const resolvedValue = resolvePath(
+                    parametersSource,
+                    optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
+                );
+
+                if (typeof resolvedValue === 'string' && resolvedValue.startsWith('=fromAi(')) {
+                    return undefined;
+                }
+
+                return resolvedValue;
+            }
         );
 
         setLookupDependsOnValues(optionsLookupDependsOnValues);
-    }, [arrayIndex, currentComponent?.parameters, optionsDataSource?.optionsLookupDependsOn]);
+    }, [arrayIndex, control, currentComponent?.parameters, optionsDataSource?.optionsLookupDependsOn]);
 
     // set properties lookup dependencies
     useEffect(() => {
-        if (!currentComponent?.parameters || !propertiesDataSource?.propertiesLookupDependsOn) {
+        if (!propertiesDataSource?.propertiesLookupDependsOn) {
             return;
         }
 
-        const propertiesLookupDependsOnValues: unknown[] = propertiesDataSource?.propertiesLookupDependsOn.map(
-            (propertyLookupDependency) =>
-                resolvePath(
-                    currentComponent?.parameters,
+        const parametersSource = currentComponent?.parameters || (control ? control._formValues : undefined);
+
+        if (!parametersSource) {
+            return;
+        }
+
+        const propertiesLookupDependsOnValues: unknown[] = propertiesDataSource.propertiesLookupDependsOn.map(
+            (propertyLookupDependency) => {
+                const resolvedValue = resolvePath(
+                    parametersSource,
                     propertyLookupDependency.replace('[index]', `[${arrayIndex}]`)
-                )
+                );
+
+                if (typeof resolvedValue === 'string' && resolvedValue.startsWith('=fromAi(')) {
+                    return undefined;
+                }
+
+                return resolvedValue;
+            }
         );
 
         setLookupDependsOnValues(propertiesLookupDependsOnValues);
-    }, [arrayIndex, currentComponent?.parameters, propertiesDataSource?.propertiesLookupDependsOn]);
+    }, [arrayIndex, control, currentComponent?.parameters, propertiesDataSource?.propertiesLookupDependsOn]);
 
     // set showInputTypeSwitchButton state depending on the controlType
     useEffect(() => {
+        if (control) {
+            return;
+        }
+
         if (controlType === 'FILE_ENTRY') {
             setShowInputTypeSwitchButton(false);
         }
@@ -1234,11 +1426,17 @@ export const useProperty = ({
         if (controlType === 'FORMULA_MODE') {
             setShowInputTypeSwitchButton(false);
         }
-    }, [controlType, expressionEnabled]);
+    }, [control, controlType, expressionEnabled]);
 
-    // set propertyParameterValue on workflow definition change
+    // Sync propertyParameterValue from workflow definition on change; skip initial mount (mount effect already set from store).
     useEffect(() => {
         if (control) {
+            return;
+        }
+
+        if (initialMountRef.current) {
+            initialMountRef.current = false;
+
             return;
         }
 
@@ -1267,6 +1465,8 @@ export const useProperty = ({
             setInputValue(parameterDefaultValue);
             setMentionInputValue(parameterDefaultValue);
             setSelectValue(parameterDefaultValue.toString());
+
+            mentionInputValueRef.current = undefined;
 
             if (Array.isArray(parameterDefaultValue)) {
                 setMultiSelectValue(parameterDefaultValue);
@@ -1313,9 +1513,30 @@ export const useProperty = ({
         }
     }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionsFetched]);
 
+    useEffect(() => {
+        if (controlledDynamicMode && resetOnModeChangeRef.current && controlledDynamicOnChangeRef.current) {
+            resetOnModeChangeRef.current = false;
+            controlledDynamicOnChangeRef.current('=');
+        }
+    }, [controlledDynamicMode, resetOnModeChangeRef]);
+
+    const isLoadingDisplayCondition = !!(
+        displayCondition &&
+        type !== 'ARRAY' &&
+        type !== 'OBJECT' &&
+        (isDisplayConditionsPending ||
+            (displayConditionsQuery &&
+                currentComponent?.displayConditions?.[displayCondition] &&
+                isFetchingCurrentDisplayCondition))
+    );
+
     return {
         calculatedPath: path,
         controlType,
+        controlledBlurError,
+        controlledDynamicMode,
+        controlledDynamicOnChangeRef,
+        controlledFromAi,
         currentComponent,
         currentNode,
         defaultValue,
@@ -1324,9 +1545,13 @@ export const useProperty = ({
         editorRef,
         errorMessage,
         formattedOptions,
+        fromAiExpression,
         handleCodeEditorChange,
+        handleControlledBlur,
+        handleControlledModeSwitch,
         handleDeleteCustomPropertyClick,
         handleFromAiClick,
+        handleFromAiToggle,
         handleInputChange,
         handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
@@ -1337,11 +1562,11 @@ export const useProperty = ({
         hidden,
         inputRef,
         inputValue,
-        isDisplayConditionsPending,
-        isFetchingCurrentDisplayCondition,
         isFormulaMode,
         isFromAi,
+        isLoadingDisplayCondition,
         isNumericalInput,
+        isToolsClusterElement,
         isValidControlType,
         label,
         languageId,
@@ -1360,7 +1585,10 @@ export const useProperty = ({
         propertiesDataSource,
         propertyParameterValue,
         required,
+        resetOnModeChangeRef,
         selectValue,
+        setControlledFromAi,
+        setDataPillPanelOpen,
         setIsFormulaMode,
         setSelectValue,
         showInputTypeSwitchButton,

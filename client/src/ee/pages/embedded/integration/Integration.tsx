@@ -1,17 +1,11 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import IntegrationHeader from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeader';
-import IntegrationsSidebar from '@/ee/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebar';
-import IntegrationsSidebarHeader from '@/ee/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebarHeader';
+import IntegrationsLeftSidebar from '@/ee/pages/embedded/integration/components/integrations-sidebar/IntegrationsLeftSidebar';
 import {useIntegration} from '@/ee/pages/embedded/integration/hooks/useIntegration';
 import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
 import {useCreateConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
-import {
-    ConnectionKeys,
-    useGetConnectionTagsQuery,
-    useGetConnectionsQuery,
-} from '@/ee/shared/queries/embedded/connections.queries';
-import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
@@ -19,12 +13,9 @@ import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
-import Header from '@/shared/layout/Header';
-import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useQueryClient} from '@tanstack/react-query';
-import {useParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const Integration = () => {
@@ -43,88 +34,103 @@ const Integration = () => {
     const {cancelLeave, confirmLeave, showLeaveDialog, workflowIsRunning, workflowTestExecution} =
         useWorkflowTestRunGuard(workflow.id, currentEnvironmentId);
 
-    const {integrationId, integrationWorkflowId} = useParams();
-
-    const queryClient = useQueryClient();
-
     const {
         bottomResizablePanelRef,
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
+        handleIntegrationClick,
         handleWorkflowExecutionsTestOutputCloseClick,
+        integrationId,
+        integrationWorkflowId,
+        integrations,
+        invalidateWorkflowQueries,
         updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
-    } = useIntegration({
-        integrationId: parseInt(integrationId!),
-        integrationWorkflowId: parseInt(integrationWorkflowId!),
-    });
-
+        useGetConnectionsQuery,
+    } = useIntegration();
     const {runDisabled} = useRun();
 
     return (
-        <>
+        <div className="flex w-full">
             <WorkflowTestRunLeaveDialog onCancel={cancelLeave} onConfirm={confirmLeave} open={showLeaveDialog} />
-            <LayoutContainer
-                className="bg-muted/50"
-                leftSidebarBody={<IntegrationsSidebar integrationId={+integrationId!} />}
-                leftSidebarClass="bg-background"
-                leftSidebarHeader={<Header right={<IntegrationsSidebarHeader />} title="Integrations" />}
-                leftSidebarOpen={leftSidebarOpen}
-                leftSidebarWidth="96"
-                topHeader={
-                    integrationId && (
-                        <IntegrationHeader
+
+            {integrations && (
+                <div className="shrink-0 overflow-hidden">
+                    <div
+                        className={twMerge(
+                            'w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
+                            leftSidebarOpen ? 'ml-0 opacity-100' : '-ml-[355px] opacity-0'
+                        )}
+                    >
+                        <IntegrationsLeftSidebar
                             bottomResizablePanelRef={bottomResizablePanelRef}
-                            integrationId={parseInt(integrationId)}
-                            integrationWorkflowId={parseInt(integrationWorkflowId!)}
-                            runDisabled={runDisabled}
-                            updateWorkflowMutation={updateWorkflowMutation}
+                            currentWorkflowId={workflow.id!}
+                            integrationId={integrationId}
+                            onIntegrationClick={handleIntegrationClick}
                         />
-                    )
-                }
-            >
-                <ResizablePanelGroup className="flex-1 bg-surface-main" orientation="vertical">
-                    <ResizablePanel className="relative flex" defaultSize={650}>
-                        <WorkflowEditorProvider
-                            value={{
-                                ConnectionKeys: ConnectionKeys,
-                                deleteClusterElementParameterMutation,
-                                deleteWorkflowNodeParameterMutation,
-                                invalidateWorkflowQueries: () => {
-                                    queryClient.invalidateQueries({
-                                        queryKey: IntegrationWorkflowKeys.integrationWorkflows(+integrationId!),
-                                    });
-                                },
-                                updateClusterElementParameterMutation,
-                                updateWorkflowMutation: updateWorkflowEditorMutation,
-                                updateWorkflowNodeParameterMutation,
-                                useCreateConnectionMutation: useCreateConnectionMutation,
-                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                                useGetConnectionTagsQuery: useGetConnectionTagsQuery,
-                                useGetConnectionsQuery: useGetConnectionsQuery,
-                                webhookTriggerTestApi: new WebhookTriggerTestApi(),
-                            }}
-                        >
-                            {integrationId && (
-                                <WorkflowEditorLayout runDisabled={runDisabled} showWorkflowInputs={true} />
-                            )}
-                        </WorkflowEditorProvider>
-                    </ResizablePanel>
+                    </div>
+                </div>
+            )}
 
-                    <ResizableHandle className="bg-muted" />
+            <div className="flex w-full flex-col">
+                {integrationId && (
+                    <IntegrationHeader
+                        bottomResizablePanelRef={bottomResizablePanelRef}
+                        chatTrigger={
+                            workflow.triggers &&
+                            workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
+                        }
+                        integrationId={integrationId}
+                        integrationWorkflowId={integrationWorkflowId}
+                        runDisabled={runDisabled}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                    />
+                )}
 
-                    <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
-                        <WorkflowExecutionsTestOutput
-                            onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
-                            workflowIsRunning={workflowIsRunning}
-                            workflowTestExecution={workflowTestExecution}
-                        />
-                    </ResizablePanel>
-                </ResizablePanelGroup>
-            </LayoutContainer>
-        </>
+                <div className="flex flex-1">
+                    <ResizablePanelGroup className="flex-1 bg-surface-main" orientation="vertical">
+                        <ResizablePanel className="relative flex" defaultSize={650}>
+                            <WorkflowEditorProvider
+                                value={{
+                                    ConnectionKeys: ConnectionKeys,
+                                    deleteClusterElementParameterMutation,
+                                    deleteWorkflowNodeParameterMutation,
+                                    invalidateWorkflowQueries,
+                                    updateClusterElementParameterMutation,
+                                    updateWorkflowMutation: updateWorkflowEditorMutation,
+                                    updateWorkflowNodeParameterMutation,
+                                    useCreateConnectionMutation: useCreateConnectionMutation,
+                                    useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
+                                    useGetConnectionTagsQuery: useGetConnectionTagsQuery,
+                                    useGetConnectionsQuery,
+                                    webhookTriggerTestApi: new WebhookTriggerTestApi(),
+                                }}
+                            >
+                                {integrationId && (
+                                    <WorkflowEditorLayout
+                                        leftSidebarOpen={leftSidebarOpen}
+                                        runDisabled={runDisabled}
+                                        showWorkflowInputs={true}
+                                    />
+                                )}
+                            </WorkflowEditorProvider>
+                        </ResizablePanel>
+
+                        <ResizableHandle className="bg-muted" />
+
+                        <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
+                            <WorkflowExecutionsTestOutput
+                                onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
+                                workflowIsRunning={workflowIsRunning}
+                                workflowTestExecution={workflowTestExecution}
+                            />
+                        </ResizablePanel>
+                    </ResizablePanelGroup>
+                </div>
+            </div>
+        </div>
     );
 };
 

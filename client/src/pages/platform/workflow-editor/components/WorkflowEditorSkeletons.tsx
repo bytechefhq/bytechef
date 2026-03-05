@@ -20,6 +20,18 @@ export const FieldsetSkeleton = ({bottomBorder = false, label}: {bottomBorder?: 
 
 export const PropertySkeleton = () => <Skeleton className="h-9 w-full" />;
 
+export const PropertyDynamicPropertiesSkeleton = () => (
+    <ul className="flex flex-col gap-4">
+        {Array.from({length: 3}).map((_, index) => (
+            <li className="flex flex-col space-y-1" key={index}>
+                <Skeleton className="h-5 w-1/4" />
+
+                <Skeleton className="h-9 w-full" />
+            </li>
+        ))}
+    </ul>
+);
+
 export const DescriptionTabSkeleton = () => (
     <div className="flex flex-col gap-y-4 p-4">
         <div className="flex flex-col gap-y-2">
@@ -36,13 +48,16 @@ export const DescriptionTabSkeleton = () => (
     </div>
 );
 
-export const DataPillPanelSkeleton = ({className}: {className?: string}) => (
-    <div
-        className={twMerge(
-            'absolute bottom-6 right-data-pill-panel-placement top-2 z-10 w-screen max-w-data-pill-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
-            className
-        )}
-    >
+const DATA_PILL_PANEL_SKELETON_BASE_CLASSES =
+    'z-10 w-screen max-w-data-pill-panel-width overflow-hidden border border-stroke-neutral-secondary bg-background';
+const DATA_PILL_PANEL_SKELETON_DEFAULT_PLACEMENT = 'absolute bottom-6 right-data-pill-panel-placement top-2 rounded-md';
+
+export const DataPillPanelSkeleton = ({
+    className = DATA_PILL_PANEL_SKELETON_DEFAULT_PLACEMENT,
+}: {
+    className?: string;
+}) => (
+    <div className={twMerge(DATA_PILL_PANEL_SKELETON_BASE_CLASSES, className)}>
         <ul className="flex flex-col">
             {Array.from({length: 12}).map((_, index) => (
                 <li className="flex items-center space-x-4 border-b border-border/50 p-4" key={index}>

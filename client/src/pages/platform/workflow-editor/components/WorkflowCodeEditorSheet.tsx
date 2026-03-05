@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import UnsavedChangesAlertDialog from '@/components/UnsavedChangesAlertDialog';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetClose, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/WorkflowTestConfigurationDialog';
@@ -10,7 +10,7 @@ import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SparklesIcon, SquareIcon} from 'lucide-react';
+import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SparklesIcon, SquareIcon, XIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
 import {Suspense, lazy} from 'react';
 
@@ -49,7 +49,9 @@ const WorkflowCodeEditorSheet = ({
         handleStopClick,
         handleUnsavedChangesAlertDialogClose,
         handleUnsavedChangesAlertDialogOpen,
+        handleValidate,
         handleWorkflowTestConfigurationDialog,
+        hasErrors,
         showWorkflowTestConfigurationDialog,
         unsavedChangesAlertDialogOpen,
         workflowIsRunning,
@@ -73,15 +75,16 @@ const WorkflowCodeEditorSheet = ({
                     <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
                         <span className="text-lg font-semibold">Edit Workflow</span>
 
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-2">
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
                                         disabled={testConfigurationDisabled}
                                         icon={<Settings2Icon />}
+                                        label="Test Configuration"
                                         onClick={() => handleWorkflowTestConfigurationDialog(true)}
-                                        size="icon"
-                                        variant="ghost"
+                                        size="sm"
+                                        variant="secondary"
                                     />
                                 </TooltipTrigger>
 
@@ -90,17 +93,21 @@ const WorkflowCodeEditorSheet = ({
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
-                                        disabled={!dirty}
-                                        icon={<SaveIcon />}
-                                        onClick={() => handleSaveClick(workflow, definition)}
-                                        size="icon"
-                                        type="submit"
-                                        variant="ghost"
-                                    />
+                                    <div>
+                                        <Button
+                                            disabled={!dirty || hasErrors}
+                                            icon={<SaveIcon />}
+                                            onClick={() => handleSaveClick(workflow, definition)}
+                                            size="iconSm"
+                                            type="submit"
+                                            variant="secondary"
+                                        />
+                                    </div>
                                 </TooltipTrigger>
 
-                                <TooltipContent>Save current workflow</TooltipContent>
+                                <TooltipContent>
+                                    {hasErrors ? 'Saving is disabled due to code errors.' : 'Save current workflow'}
+                                </TooltipContent>
                             </Tooltip>
 
                             {!workflowIsRunning && (
@@ -109,10 +116,10 @@ const WorkflowCodeEditorSheet = ({
                                         <span tabIndex={0}>
                                             <Button
                                                 disabled={runDisabled || dirty}
-                                                icon={<PlayIcon className="text-success" />}
+                                                icon={<PlayIcon />}
                                                 onClick={handleRunClick}
                                                 size="icon"
-                                                variant="ghost"
+                                                variant="default"
                                             />
                                         </span>
                                     </TooltipTrigger>
@@ -150,7 +157,15 @@ const WorkflowCodeEditorSheet = ({
                                 </Tooltip>
                             )}
 
-                            <SheetCloseButton />
+                            <SheetClose asChild>
+                                <Button
+                                    className="mb-2.5 ml-1"
+                                    icon={<XIcon />}
+                                    onClick={() => handleOpenChange(false)}
+                                    size="iconXs"
+                                    variant="ghost"
+                                />
+                            </SheetClose>
                         </div>
                     </header>
 
@@ -166,6 +181,7 @@ const WorkflowCodeEditorSheet = ({
                                         defaultLanguage={workflow.format?.toLowerCase() ?? 'json'}
                                         onChange={(value) => handleDefinitionChange(value as string)}
                                         onMount={(editor) => editor.focus()}
+                                        onValidate={handleValidate}
                                         options={{
                                             folding: true,
                                             foldingStrategy: 'indentation',

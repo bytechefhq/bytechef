@@ -224,11 +224,16 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                     return parameterItem;
                 }
 
+                const parameterItemIsObject =
+                    parameterItem && typeof parameterItem === 'object' && !Array.isArray(parameterItem);
+
                 const subProperties = (matchingItem as ObjectProperty).properties?.map((property) =>
+                    parameterItemIsObject &&
                     Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
                         ? {
                               ...property,
                               defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                              expressionEnabled: property.expressionEnabled ?? property.type !== 'STRING',
                           }
                         : property
                 );
@@ -236,6 +241,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 return {
                     ...matchingItem,
                     custom: true,
+                    expressionEnabled: true,
                     name: index.toString(),
                     properties: subProperties,
                 };
@@ -246,11 +252,16 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             }
         } else if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {
             const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
+                const parameterItemIsObject =
+                    parameterItem && typeof parameterItem === 'object' && !Array.isArray(parameterItem);
+
                 const subProperties = (items[0] as ObjectProperty).properties?.map((property) =>
+                    parameterItemIsObject &&
                     Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
                         ? {
                               ...property,
                               defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                              expressionEnabled: property.expressionEnabled ?? property.type !== 'STRING',
                           }
                         : property
                 );
@@ -258,6 +269,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 return {
                     ...items[0],
                     custom: true,
+                    expressionEnabled: true,
                     name: index.toString(),
                     properties: subProperties,
                 };
@@ -301,6 +313,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                     controlType,
                     custom: true,
                     defaultValue: parameterItemValue,
+                    expressionEnabled: true,
                     label,
                     name: index.toString(),
                     path: subPropertyPath,
@@ -308,7 +321,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 };
 
                 if (parameterItemType === 'OBJECT') {
-                    if (parameterItemValue) {
+                    if (parameterItemValue && typeof parameterItemValue === 'object') {
                         const customSubProperties = Object.keys(parameterItemValue).map((key) => {
                             const decodedKey = decodePath(key);
                             const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
