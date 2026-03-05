@@ -1,0 +1,8 @@
+mutation updateMcpProjectWorkflow($id: ID!, $input: McpProjectWorkflowUpdateInput!) {
+    updateMcpProjectWorkflow(id: $id, input: $input) {
+        id
+        mcpProjectId
+        projectDeploymentWorkflowId
+        parameters
+    }
+}
