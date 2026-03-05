@@ -2,7 +2,6 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import IntegrationHeader from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeader';
 import IntegrationsLeftSidebar from '@/ee/pages/embedded/integration/components/integrations-sidebar/IntegrationsLeftSidebar';
 import {useIntegration} from '@/ee/pages/embedded/integration/hooks/useIntegration';
-import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
 import {useCreateConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
@@ -20,11 +19,6 @@ import {useShallow} from 'zustand/react/shallow';
 
 const Integration = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {leftSidebarOpen} = useIntegrationsLeftSidebarStore(
-        useShallow((state) => ({
-            leftSidebarOpen: state.leftSidebarOpen,
-        }))
-    );
     const {workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             workflow: state.workflow,
@@ -42,8 +36,9 @@ const Integration = () => {
         handleWorkflowExecutionsTestOutputCloseClick,
         integrationId,
         integrationWorkflowId,
-        integrations,
         invalidateWorkflowQueries,
+        leftSidebarOpen,
+        sidebarLoaded,
         updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
@@ -56,23 +51,23 @@ const Integration = () => {
         <div className="flex w-full">
             <WorkflowTestRunLeaveDialog onCancel={cancelLeave} onConfirm={confirmLeave} open={showLeaveDialog} />
 
-            {integrations && (
-                <div className="shrink-0 overflow-hidden">
-                    <div
-                        className={twMerge(
-                            'w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
-                            leftSidebarOpen ? 'ml-0 opacity-100' : '-ml-[355px] opacity-0'
-                        )}
-                    >
+            <div className="shrink-0 overflow-hidden">
+                <div
+                    className={twMerge(
+                        'w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
+                        leftSidebarOpen ? 'ml-0 opacity-100' : '-ml-[355px] opacity-0'
+                    )}
+                >
+                    {sidebarLoaded && (
                         <IntegrationsLeftSidebar
                             bottomResizablePanelRef={bottomResizablePanelRef}
                             currentWorkflowId={workflow.id!}
                             integrationId={integrationId}
                             onIntegrationClick={handleIntegrationClick}
                         />
-                    </div>
+                    )}
                 </div>
-            )}
+            </div>
 
             <div className="flex w-full flex-col">
                 {integrationId && (
