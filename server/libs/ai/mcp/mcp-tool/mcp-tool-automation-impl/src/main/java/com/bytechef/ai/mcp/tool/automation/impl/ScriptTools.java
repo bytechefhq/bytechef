@@ -1,8 +1,23 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.ai.mcp.tool.automation.impl;
 
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowInfo;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
-import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.commons.util.JsonUtils;
@@ -44,7 +59,8 @@ public class ScriptTools {
 
             if (!workflowDefinition.contains(scriptName)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Script component '{}' not found in workflow '{}'", scriptName, projectWorkflowDTO.getId());
+                    logger.debug("Script component '{}' not found in workflow '{}'", scriptName,
+                        projectWorkflowDTO.getId());
                 }
 
                 return null;
@@ -54,7 +70,8 @@ public class ScriptTools {
             JsonNode tasksNode = rootNode.get("tasks");
 
             for (JsonNode taskNode : tasksNode) {
-                if (scriptName.equals(taskNode.get("name").stringValue())) {
+                if (scriptName.equals(taskNode.get("name")
+                    .stringValue())) {
                     ObjectNode parametersNode = (ObjectNode) taskNode.get("parameters");
 
                     parametersNode.put("script", code);
