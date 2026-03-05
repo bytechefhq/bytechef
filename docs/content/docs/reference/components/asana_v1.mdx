@@ -127,6 +127,85 @@ Type: OBJECT
 
 
 
+### Create Subtask
+Name: createSubtask
+
+`Creates a new subtask and adds it to the parent task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| task_gid | Task gID | STRING | The task gID of the task that will be the parent of the subtask. | true |
+| data | Data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), STRING\(assignee)&#125; </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Subtask",
+  "name" : "createSubtask",
+  "parameters" : {
+    "task_gid" : "",
+    "data" : {
+      "workspace" : "",
+      "project" : "",
+      "name" : "",
+      "notes" : "",
+      "due_on" : "2021-01-01",
+      "assignee" : ""
+    }
+  },
+  "type" : "asana/v1/createSubtask"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(gid), DATE\(due_on), STRING\(notes), STRING\(name), &#123;STRING\(gid), STRING\(name)&#125;\(workspace), &#123;STRING\(gid), STRING\(name)&#125;\(project), &#123;STRING\(gid), STRING\(name)&#125;\(parent), &#123;STRING\(gid), STRING\(name)&#125;\(assignee)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "gid" : "",
+    "due_on" : "2021-01-01",
+    "notes" : "",
+    "name" : "",
+    "workspace" : {
+      "gid" : "",
+      "name" : ""
+    },
+    "project" : {
+      "gid" : "",
+      "name" : ""
+    },
+    "parent" : {
+      "gid" : "",
+      "name" : ""
+    },
+    "assignee" : {
+      "gid" : "",
+      "name" : ""
+    }
+  }
+}
+```
+
+
+
+
 ### Create Task
 Name: createTask
 
