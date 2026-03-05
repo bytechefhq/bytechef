@@ -107,30 +107,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }))
         );
 
-        const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
-
         const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
-
-        const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
-            if (!currentNode?.name || !workflow.definition) {
-                return undefined;
-            }
-
-            if (currentNode.clusterElementType) {
-                const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
-
-                const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-                    ? getTask({
-                          tasks: workflowDefinitionTasks,
-                          workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-                      })
-                    : undefined;
-
-                if (mainClusterRootTask?.clusterElements) {
-                    return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
-                }
-            }
-        }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
 
         const getComponentIcon = useCallback(
             (mentionValue: string) => {
