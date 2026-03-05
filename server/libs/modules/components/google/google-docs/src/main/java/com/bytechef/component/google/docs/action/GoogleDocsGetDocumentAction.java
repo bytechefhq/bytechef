@@ -17,10 +17,12 @@
 package com.bytechef.component.google.docs.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.APPLICATION_VND_GOOGLE_APPS_DOCUMENT;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DOCUMENT_ID;
-import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DOCUMENT_OUTPUT_PROPERTY;
+import static com.bytechef.component.google.docs.util.GoogleDocsUtils.getDocument;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -28,7 +30,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.docs.v1.Docs;
-import java.io.IOException;
+import com.google.api.services.docs.v1.model.Document;
 
 /**
  * @author Monika Kušter
@@ -37,7 +39,7 @@ public class GoogleDocsGetDocumentAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getDocument")
         .title("Get Document")
-        .description("Retrieve a specified document from your Google Drive.")
+        .description("Gets the latest version of the specified document.")
         .help("", "https://docs.bytechef.io/reference/components/google-docs_v1#get-document")
         .properties(
             string(DOCUMENT_ID)
@@ -45,23 +47,15 @@ public class GoogleDocsGetDocumentAction {
                 .description("The ID of the document to read.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_DOCUMENT, true))
                 .required(true))
-        .output()
+        .output(outputSchema(DOCUMENT_OUTPUT_PROPERTY))
         .perform(GoogleDocsGetDocumentAction::perform);
 
     private GoogleDocsGetDocumentAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Document perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Docs docs = GoogleServices.getDocs(connectionParameters);
 
-        try {
-            return docs
-                .documents()
-                .get(inputParameters.getRequiredString(DOCUMENT_ID))
-                .execute();
-        } catch (IOException e) {
-            throw translateGoogleIOException(e);
-        }
+        return getDocument(docs, inputParameters.getRequiredString(DOCUMENT_ID));
     }
-
 }
