@@ -43,6 +43,7 @@ public class GoogleDocsCreateDocumentAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createDocument")
         .title("Create Document")
         .description("Create a document on Google Docs.")
+        .help("", "https://docs.bytechef.io/reference/components/google-docs_v1#create-document")
         .properties(
             string(TITLE)
                 .label("Title")

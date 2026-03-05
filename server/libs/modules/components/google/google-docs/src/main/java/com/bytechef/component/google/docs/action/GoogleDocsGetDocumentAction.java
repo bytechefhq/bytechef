@@ -38,6 +38,7 @@ public class GoogleDocsGetDocumentAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getDocument")
         .title("Get Document")
         .description("Retrieve a specified document from your Google Drive.")
+        .help("", "https://docs.bytechef.io/reference/components/google-docs_v1#get-document")
         .properties(
             string(DOCUMENT_ID)
                 .label("Document Id")
