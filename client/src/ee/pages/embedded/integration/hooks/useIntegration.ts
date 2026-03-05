@@ -29,6 +29,8 @@ import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 export const useIntegration = () => {
+    const [sidebarLoaded, setSidebarLoaded] = useState(false);
+
     const {setIsWorkflowLoaded, setWorkflow, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             setIsWorkflowLoaded: state.setIsWorkflowLoaded,
@@ -51,8 +53,6 @@ export const useIntegration = () => {
     );
     const leftSidebarOpen = useIntegrationsLeftSidebarStore((state) => state.leftSidebarOpen);
     const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
-
-    const [sidebarLoaded, setSidebarLoaded] = useState(false);
 
     const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
     const sidebarLoadedRef = useRef(false);

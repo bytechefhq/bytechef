@@ -45,6 +45,7 @@ const Project = () => {
         updateWorkflowNodeParameterMutation,
         useGetConnectionsQuery,
     } = useProject();
+
     const {runDisabled} = useRun();
 
     return (
