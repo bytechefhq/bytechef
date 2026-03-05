@@ -108,4 +108,21 @@ class AsanaUtilsTest {
             expectedOptions,
             AsanaUtils.getWorkspaceOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
+
+    @Test
+    void testGetTaskGidOptions() {
+        when(mockedParameters.getRequiredFromPath("data.project", String.class))
+            .thenReturn("projectId");
+
+        Map<String, Object> responseMap = new LinkedHashMap<>();
+        responseMap.put("data", map.get("data"));
+        responseMap.put("next_page", null);
+
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
+
+        assertEquals(
+            expectedOptions,
+            AsanaUtils.getTaskGidOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+    }
 }

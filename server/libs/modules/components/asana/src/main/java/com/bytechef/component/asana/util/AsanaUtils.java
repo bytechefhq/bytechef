@@ -102,6 +102,55 @@ public class AsanaUtils extends AbstractAsanaUtils {
         return getOptions(body);
     }
 
+    public static List<Option<String>> getTaskGidOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Map<String, String>> tasks = new ArrayList<>();
+        String offset = null;
+
+        do {
+            final String currentOffset = offset;
+
+            StringBuilder urlBuilder = new StringBuilder();
+            urlBuilder.append("/projects/")
+                .append(inputParameters.getRequiredFromPath("data.project", String.class))
+                .append("/tasks?opt_fields=gid,name&limit=100");
+
+            if (currentOffset != null) {
+                urlBuilder.append("&offset=")
+                    .append(currentOffset);
+            }
+
+            Map<String, Object> response = context.http(http -> http.get(urlBuilder.toString()))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<Map<String, Object>>() {});
+
+            Object dataObj = response.get("data");
+            if (dataObj instanceof List<?> dataList) {
+                for (Object taskObj : dataList) {
+                    if (taskObj instanceof Map<?, ?> taskMap) {
+                        tasks.add(Map.of(
+                            "gid", String.valueOf(taskMap.get("gid")),
+                            "name", String.valueOf(taskMap.get("name"))));
+                    }
+                }
+            }
+
+            Object nextPageObj = response.get("next_page");
+            if (nextPageObj instanceof Map<?, ?> nextPageMap) {
+                Object offsetObj = nextPageMap.get("offset");
+                offset = offsetObj != null ? offsetObj.toString() : null;
+            } else {
+                offset = null;
+            }
+
+        } while (offset != null);
+
+        return getOptions(Map.of("data", tasks));
+    }
+
     private static List<Option<String>> getOptions(Map<String, List<Map<String, String>>> body) {
         List<Option<String>> options = new ArrayList<>();
 
