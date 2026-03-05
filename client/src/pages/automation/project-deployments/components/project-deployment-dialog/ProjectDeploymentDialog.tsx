@@ -94,7 +94,7 @@ const ProjectDeploymentDialog = ({
     const watchedProjectDeploymentWorkflows = watch('projectDeploymentWorkflows');
     const hasEnabledWorkflows = watchedProjectDeploymentWorkflows?.some((workflow) => workflow.enabled) ?? false;
 
-    const {data: allWorkflows, isPending: isWorkflowsPending} = useGetProjectVersionWorkflowsQuery(
+    const {data: projectVersionWorkflows, isPending: isWorkflowsPending} = useGetProjectVersionWorkflowsQuery(
         getValues().projectId!,
         getValues().projectVersion!,
         true,
@@ -103,20 +103,20 @@ const ProjectDeploymentDialog = ({
     );
 
     const workflows = useMemo(() => {
-        if (!allWorkflows) {
+        if (!projectVersionWorkflows) {
             return undefined;
         }
 
         if (filterWorkflowUuids === undefined) {
-            return allWorkflows;
+            return projectVersionWorkflows;
         }
 
         if (filterWorkflowUuids.length === 0) {
             return [];
         }
 
-        return allWorkflows.filter((workflow) => filterWorkflowUuids.includes(workflow.workflowUuid!));
-    }, [allWorkflows, filterWorkflowUuids]);
+        return projectVersionWorkflows.filter((workflow) => filterWorkflowUuids.includes(workflow.workflowUuid!));
+    }, [projectVersionWorkflows, filterWorkflowUuids]);
 
     const hasVisibleConnections = workflows?.some((workflow) => {
         const isEnabled = workflowEnabledMap.get(workflow.id!);
@@ -129,6 +129,7 @@ const ProjectDeploymentDialog = ({
     });
 
     const queryClient = useQueryClient();
+
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -220,9 +221,7 @@ const ProjectDeploymentDialog = ({
         }, 300);
     };
 
-    const handleNextClick = () => {
-        setActiveStepIndex(activeStepIndex + 1);
-    };
+    const handleNextClick = () => setActiveStepIndex(activeStepIndex + 1);
 
     const handleSaveClick = (formData: ProjectDeployment) => {
         if (!formData) {
@@ -266,6 +265,7 @@ const ProjectDeploymentDialog = ({
         }
 
         const filterKey = filterWorkflowUuids ? filterWorkflowUuids.join(',') : '';
+
         const projectKey = `${getValues().projectId}-${getValues().projectVersion}-${filterKey}`;
 
         if (initializedProjectKeyRef.current === projectKey) {
@@ -353,7 +353,7 @@ const ProjectDeploymentDialog = ({
                                                             ? 'border-gray-900 hover:border-gray-800'
                                                             : 'hover:border-gray-30 border-gray-200'
                                                     )}
-                                                ></div>
+                                                />
                                             </li>
                                         ))}
                                     </ol>
