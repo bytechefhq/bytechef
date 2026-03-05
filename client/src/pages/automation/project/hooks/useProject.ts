@@ -66,11 +66,6 @@ export const useProject = () => {
     const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
     const sidebarLoadedRef = useRef(false);
 
-    if (projectLeftSidebarOpen && !sidebarLoadedRef.current) {
-        sidebarLoadedRef.current = true;
-        setSidebarLoaded(true);
-    }
-
     const {projectId, projectWorkflowId} = useParams();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -231,6 +226,13 @@ export const useProject = () => {
             setRightSidebarOpen(false);
         };
     }, [setProjectLeftSidebarOpen, setRightSidebarOpen]);
+
+    useEffect(() => {
+        if (projectLeftSidebarOpen && !sidebarLoadedRef.current) {
+            sidebarLoadedRef.current = true;
+            setSidebarLoaded(true);
+        }
+    }, [projectLeftSidebarOpen]);
 
     // Reset loading state when workflow ID changes
     useEffect(() => {
