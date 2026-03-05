@@ -16,16 +16,32 @@
 
 package com.bytechef.component.asana;
 
+import static com.bytechef.component.definition.ComponentDsl.tool;
+
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.asana.action.AsanaCreateCustomFieldAction;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
+import java.util.List;
 
 /**
  * @author Monika Domiter
  */
 @AutoService(OpenApiComponentHandler.class)
 public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
+
+    @Override
+    public List<ModifiableActionDefinition> getCustomActions() {
+        return List.of(AsanaCreateCustomFieldAction.ACTION_DEFINITION);
+    }
+
+    @Override
+    public List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
+        return List.of(tool(AsanaCreateCustomFieldAction.ACTION_DEFINITION));
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
