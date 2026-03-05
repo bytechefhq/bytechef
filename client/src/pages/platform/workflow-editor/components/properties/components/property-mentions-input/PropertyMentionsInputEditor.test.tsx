@@ -96,7 +96,7 @@ import {
     type UpdateWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {render, screen, userEvent} from '@/shared/util/test-utils';
+import {render, screen} from '@/shared/util/test-utils';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import * as React from 'react';
 import {type Mock, afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -306,17 +306,13 @@ describe('PropertyMentionsInputEditor', () => {
     });
 
     describe('isFromAi behavior', () => {
-        it('should disable editor interaction when isFromAi is true', async () => {
+        it('should show overlay message instead of editor when isFromAi is true', async () => {
             renderEditor({isFromAi: true, value: 'fromAi content'});
 
             await microtaskTick(2);
 
-            const textbox = screen.getByRole('textbox', {name: 'Editor'});
-            const editorContent = textbox.closest('.ProseMirror')?.parentElement;
-
-            expect(editorContent).toHaveAttribute('disabled');
-            expect(editorContent?.className).toContain('pointer-events-none');
-            expect(editorContent?.className).toContain('cursor-not-allowed');
+            expect(screen.getByText('Automatically defined by the model')).toBeInTheDocument();
+            expect(screen.queryByRole('textbox', {name: 'Editor'})).not.toBeInTheDocument();
         });
 
         it('should not disable the editor when isFromAi is false', async () => {
@@ -339,13 +335,7 @@ describe('PropertyMentionsInputEditor', () => {
 
             await microtaskTick(2);
 
-            const textbox = screen.getByRole('textbox', {name: 'Editor'});
-            const user = userEvent.setup();
-
-            await user.click(textbox);
-
-            await microtaskTick(3);
-
+            expect(screen.queryByRole('textbox', {name: 'Editor'})).not.toBeInTheDocument();
             expect(savePropertyMock).not.toHaveBeenCalled();
 
             unmount();
