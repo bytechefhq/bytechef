@@ -49,7 +49,7 @@ const OutputSchemaCreationControls = ({
                         <div className="self-center">Explore Output Schema</div>
 
                         <p className="text-sm text-muted-foreground">
-                            Explore the expected output schema by testing tool
+                            Explore the expected output schema by testing the tool
                         </p>
                     </div>
                 ) : outputDefined || variablePropertiesDefined ? (
