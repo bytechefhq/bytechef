@@ -119,10 +119,13 @@ public class MicrosoftSharePointUploadFileAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
+        String urlEncodedFileEntryName = context.encoder(
+            encoder -> encoder.base64UrlEncode(fileEntry.getName()));
+
         return context
             .http(http -> http.put(
                 "/sites/%s/drive/items/%s:/%s:/content".formatted(
-                    inputParameters.getRequiredString(SITE_ID), getFolderId(inputParameters), fileEntry.getName())))
+                    inputParameters.getRequiredString(SITE_ID), getFolderId(inputParameters), urlEncodedFileEntryName)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(fileEntry))
             .execute()
