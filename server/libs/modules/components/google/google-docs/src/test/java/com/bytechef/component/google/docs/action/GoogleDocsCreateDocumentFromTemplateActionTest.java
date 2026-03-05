@@ -16,10 +16,10 @@
 
 package com.bytechef.component.google.docs.action;
 
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.IMAGES;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.VALUES;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.PLACEHOLDER_FORMAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -30,15 +30,15 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.docs.v1.Docs;
+import com.google.api.services.docs.v1.model.BatchUpdateDocumentResponse;
+import com.google.api.services.docs.v1.model.Document;
 import com.google.api.services.docs.v1.model.ReplaceAllTextRequest;
-import com.google.api.services.docs.v1.model.ReplaceImageRequest;
 import com.google.api.services.docs.v1.model.Request;
 import com.google.api.services.docs.v1.model.SubstringMatchCriteria;
 import com.google.api.services.drive.model.File;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
@@ -47,19 +47,24 @@ import org.mockito.MockedStatic;
  */
 class GoogleDocsCreateDocumentFromTemplateActionTest {
 
-    private final ArgumentCaptor<Docs> docsArgumentCaptor = ArgumentCaptor.forClass(Docs.class);
+    private final ArgumentCaptor<Docs> docsArgumentCaptor = forClass(Docs.class);
     @SuppressWarnings("rawtypes")
-    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Parameters mockedConnectionParameters = mock(Parameters.class);
     private final Docs mockedDocs = mock(Docs.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(VALUES, Map.of("textKey1", "textValue1"), IMAGES, Map.of("imageId1", "url1")));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final Document mockedDocument = mock(Document.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(
+        Map.of(PLACEHOLDER_FORMAT, "[[]]", VALUES, Map.of("textKey1", "textValue1")));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     @SuppressWarnings("unchecked")
-    void perform() throws Exception {
+    void testPerform() {
+        BatchUpdateDocumentResponse batchUpdateDocumentResponse =
+            new BatchUpdateDocumentResponse().setDocumentId("123");
+
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleDocsUtils> googleDocsUtilsMockedStatic = mockStatic(GoogleDocsUtils.class);
             MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class)) {
@@ -71,21 +76,23 @@ class GoogleDocsCreateDocumentFromTemplateActionTest {
                 .when(() -> GoogleUtils.copyFileOnGoogleDrive(
                     parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
                 .thenReturn(new File().setId("destinationFile"));
-
             googleDocsUtilsMockedStatic
                 .when(() -> GoogleDocsUtils.writeToDocument(
                     docsArgumentCaptor.capture(), stringArgumentCaptor.capture(), listArgumentCaptor.capture()))
-                .thenAnswer(Answers.RETURNS_DEFAULTS);
+                .thenReturn(batchUpdateDocumentResponse);
+            googleDocsUtilsMockedStatic
+                .when(() -> GoogleDocsUtils.getDocument(docsArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(mockedDocument);
 
-            Object result = GoogleDocsCreateDocumentFromTemplateAction.perform(
-                mockedParameters, mockedParameters, mockedActionContext);
+            Document result = GoogleDocsCreateDocumentFromTemplateAction.perform(
+                mockedInputParameters, mockedConnectionParameters, mockedActionContext);
 
-            assertNull(result);
+            assertEquals(mockedDocument, result);
             assertEquals(
-                List.of(mockedParameters, mockedParameters, mockedParameters),
+                List.of(mockedConnectionParameters, mockedConnectionParameters, mockedInputParameters),
                 parametersArgumentCaptor.getAllValues());
-            assertEquals(mockedDocs, docsArgumentCaptor.getValue());
-            assertEquals("destinationFile", stringArgumentCaptor.getValue());
+            assertEquals(List.of(mockedDocs, mockedDocs), docsArgumentCaptor.getAllValues());
+            assertEquals(List.of("destinationFile", "123"), stringArgumentCaptor.getAllValues());
 
             Request replaceAllText = new Request()
                 .setReplaceAllText(
@@ -96,13 +103,7 @@ class GoogleDocsCreateDocumentFromTemplateActionTest {
                                 .setMatchCase(true))
                         .setReplaceText("textValue1"));
 
-            Request replaceImage = new Request()
-                .setReplaceImage(
-                    new ReplaceImageRequest()
-                        .setImageObjectId("imageId1")
-                        .setUri("url1"));
-
-            assertEquals(List.of(replaceAllText, replaceImage), listArgumentCaptor.getValue());
+            assertEquals(List.of(replaceAllText), listArgumentCaptor.getValue());
         }
     }
 }
