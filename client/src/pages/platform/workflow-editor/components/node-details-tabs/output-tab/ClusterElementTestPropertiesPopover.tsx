@@ -53,6 +53,7 @@ const ClusterElementTestPropertiesPopover = ({
                             </div>
 
                             <button
+                                aria-label="Close"
                                 className="text-muted-foreground hover:text-foreground"
                                 onClick={() => onOpenChange(false)}
                                 type="button"
