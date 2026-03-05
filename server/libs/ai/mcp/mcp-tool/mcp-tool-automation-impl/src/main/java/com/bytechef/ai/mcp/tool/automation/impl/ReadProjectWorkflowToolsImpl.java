@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.tool.automation.impl;
 
 import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.api.ReadProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowInfo;
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowValidationResult;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnAiEnabled
-public class ReadProjectWorkflowToolsImpl {
+public class ReadProjectWorkflowToolsImpl implements ReadProjectWorkflowTools {
 
     private final ProjectWorkflowTools delegate;
 
@@ -45,8 +46,7 @@ public class ReadProjectWorkflowToolsImpl {
 
     @Tool(
         description = "Instructions for writing custom code in Script component")
-    public String getScriptCodeInstructions(
-        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId) {
+    public String getScriptCodeInstructions() {
         return delegate.getScriptCodeInstructions();
     }
 

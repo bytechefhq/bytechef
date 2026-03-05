@@ -112,7 +112,6 @@ public class ComponentTools {
         this.vectorStore = vectorStore;
     }
 
-    // Helper methods
     @Tool(
         description = "Get comprehensive information about a specific component. Returns detailed project information including: name, description, triggers and actions")
     public ComponentInfo getComponent(
