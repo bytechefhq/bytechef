@@ -23,7 +23,7 @@ import {
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
 import {useQueryClient} from '@tanstack/react-query';
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
@@ -49,9 +49,13 @@ export const useIntegration = () => {
     const setWorkflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.setWorkflowNodeDetailsPanelOpen
     );
+    const leftSidebarOpen = useIntegrationsLeftSidebarStore((state) => state.leftSidebarOpen);
     const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
 
+    const [sidebarLoaded, setSidebarLoaded] = useState(false);
+
     const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
+    const sidebarLoadedRef = useRef(false);
 
     const {integrationId, integrationWorkflowId} = useParams();
     const navigate = useNavigate();
@@ -195,6 +199,13 @@ export const useIntegration = () => {
         };
     }, [setLeftSidebarOpen, setRightSidebarOpen]);
 
+    useEffect(() => {
+        if (leftSidebarOpen && !sidebarLoadedRef.current) {
+            sidebarLoadedRef.current = true;
+            setSidebarLoaded(true);
+        }
+    }, [leftSidebarOpen]);
+
     // Reset loading state when workflow ID changes
     useEffect(() => {
         setIsWorkflowLoaded(false);
@@ -221,6 +232,8 @@ export const useIntegration = () => {
         integrationWorkflowId: parseInt(integrationWorkflowId!),
         integrations,
         invalidateWorkflowQueries,
+        leftSidebarOpen,
+        sidebarLoaded,
         updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
