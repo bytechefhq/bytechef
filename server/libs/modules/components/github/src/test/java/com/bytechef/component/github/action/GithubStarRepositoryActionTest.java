@@ -19,30 +19,57 @@ package com.bytechef.component.github.action;
 import static com.bytechef.component.github.constant.GithubConstants.OWNER;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
-class GithubStarRepositoryActionTest extends AbstractGithubActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class GithubStarRepositoryActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(OWNER, "testOwner", REPOSITORY, "testRepo"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() throws Exception {
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedHttp.put(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
 
-        Object result = executePerformFunction(GithubStarRepositoryAction.ACTION_DEFINITION, mockedParameters);
+        Object result = GithubStarRepositoryAction.perform(mockedParameters, null, mockedContext);
 
         assertNull(result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         assertEquals("/user/starred/testOwner/testRepo", stringArgumentCaptor.getValue());
     }
 }

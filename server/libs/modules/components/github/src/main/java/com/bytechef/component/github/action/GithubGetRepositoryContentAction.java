@@ -47,6 +47,7 @@ public class GithubGetRepositoryContentAction {
         .description(
             "Gets the contents of a file or directory in a repository. If the content is a directory, the response " +
                 "will be each item in the directory and if the content is a file, the response will be file as a string.")
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#get-repository-content")
         .properties(
             OWNER_PROPERTY,
             string(REPOSITORY)

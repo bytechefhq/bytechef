@@ -16,6 +16,7 @@
 
 package com.bytechef.component.github.action;
 
+import static com.bytechef.component.definition.HttpStatus.OK;
 import static com.bytechef.component.github.constant.GithubConstants.BASE;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.HEAD;
@@ -24,37 +25,66 @@ import static com.bytechef.component.github.constant.GithubConstants.OWNER;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Anas Elgarhy (@0x61nas)
  * @author Monika Kušter
  */
-class GitHubCreatePullRequestActionTest extends AbstractGithubActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class GitHubCreatePullRequestActionTest {
 
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             OWNER, "testOwner", REPOSITORY, "testRepo", TITLE, "name", HEAD, "feat/123",
             HEAD_REPO, "head-repo", BASE, "master", BODY, "description"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() throws Exception {
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of());
+            .thenReturn(Map.of(OK, true));
 
-        Object result = executePerformFunction(GitHubCreatePullRequestAction.ACTION_DEFINITION, mockedParameters);
+        Object result = GitHubCreatePullRequestAction.perform(mockedParameters, null, mockedContext);
 
-        assertEquals(Map.of(), result);
+        assertEquals(Map.of(OK, true), result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         assertEquals("/repos/testOwner/testRepo/pulls", stringArgumentCaptor.getValue());
         assertEquals(
             Http.Body.of(

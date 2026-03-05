@@ -44,6 +44,7 @@ public class GithubCreateForkAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFork")
         .title("Create Fork")
         .description("Create a fork of Github repository.")
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#create-fork")
         .properties(
             OWNER_PROPERTY,
             string(REPOSITORY)

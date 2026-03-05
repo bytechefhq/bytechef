@@ -44,6 +44,7 @@ public class GithubGetIssueAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getIssue")
         .title("Get Issue")
         .description("Get information from a specific issue")
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#get-issue")
         .properties(
             OWNER_PROPERTY,
             string(REPOSITORY)
