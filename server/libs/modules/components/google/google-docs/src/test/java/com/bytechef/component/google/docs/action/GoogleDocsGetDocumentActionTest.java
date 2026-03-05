@@ -18,17 +18,17 @@ package com.bytechef.component.google.docs.action;
 
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DOCUMENT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.docs.util.GoogleDocsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.docs.v1.model.Document;
-import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -39,36 +39,35 @@ import org.mockito.MockedStatic;
  */
 class GoogleDocsGetDocumentActionTest {
 
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Docs> docsArgumentCaptor = forClass(Docs.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Parameters mockedConnectionParameters = mock(Parameters.class);
     private final Docs mockedDocs = mock(Docs.class);
     private final Document mockedDocument = mock(Document.class);
-    private final Docs.Documents mockedDocuments = mock(Docs.Documents.class);
-    private final Docs.Documents.Get mockedGet = mock(Docs.Documents.Get.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(DOCUMENT_ID, "documentId"));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(DOCUMENT_ID, "xy"));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void perform() throws IOException {
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+    void testPerform() {
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleDocsUtils> googleDocsUtilsMockedStatic = mockStatic(GoogleDocsUtils.class)) {
 
             googleServicesMockedStatic
                 .when(() -> GoogleServices.getDocs(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedDocs);
-
-            when(mockedDocs.documents())
-                .thenReturn(mockedDocuments);
-            when(mockedDocuments.get(stringArgumentCaptor.capture()))
-                .thenReturn(mockedGet);
-            when(mockedGet.execute())
+            googleDocsUtilsMockedStatic
+                .when(() -> GoogleDocsUtils.getDocument(docsArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedDocument);
 
-            Object result =
-                GoogleDocsGetDocumentAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            Document result = GoogleDocsGetDocumentAction.perform(
+                mockedInputParameters, mockedConnectionParameters, mockedActionContext);
 
-            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
             assertEquals(mockedDocument, result);
-            assertEquals("documentId", stringArgumentCaptor.getValue());
+            assertEquals(mockedDocs, docsArgumentCaptor.getValue());
+            assertEquals(mockedConnectionParameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedDocument, result);
+            assertEquals("xy", stringArgumentCaptor.getValue());
         }
     }
 }
