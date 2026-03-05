@@ -45,6 +45,17 @@ public class GoogleDocsUtils {
         }
     }
 
+    public static Document getDocument(Docs docs, String documentId) {
+        try {
+            return docs
+                .documents()
+                .get(documentId)
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
+    }
+
     public static BatchUpdateDocumentResponse writeToDocument(Docs docs, String documentId, List<Request> requests) {
         try {
             return docs

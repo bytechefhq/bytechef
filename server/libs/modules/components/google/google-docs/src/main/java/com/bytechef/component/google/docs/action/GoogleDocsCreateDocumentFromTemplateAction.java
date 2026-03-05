@@ -18,14 +18,18 @@ package com.bytechef.component.google.docs.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.APPLICATION_VND_GOOGLE_APPS_DOCUMENT;
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.IMAGES;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DOCUMENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.VALUES;
+import static com.bytechef.component.google.docs.util.GoogleDocsUtils.getDocument;
 import static com.bytechef.component.google.docs.util.GoogleDocsUtils.writeToDocument;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.PLACEHOLDER_FORMAT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -33,14 +37,15 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.docs.v1.Docs;
+import com.google.api.services.docs.v1.model.BatchUpdateDocumentResponse;
+import com.google.api.services.docs.v1.model.Document;
 import com.google.api.services.docs.v1.model.ReplaceAllTextRequest;
-import com.google.api.services.docs.v1.model.ReplaceImageRequest;
 import com.google.api.services.docs.v1.model.Request;
 import com.google.api.services.docs.v1.model.SubstringMatchCriteria;
 import com.google.api.services.drive.model.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Monika Kušter
@@ -59,14 +64,22 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
                 .description("The ID of the template document from which the new document will be created.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_DOCUMENT, true))
                 .required(true),
+            string(PLACEHOLDER_FORMAT)
+                .label("Placeholder Format")
+                .description("Choose the format of placeholders in your template.")
+                .options(
+                    option("Curly Braces {{}}", "{{}}"),
+                    option("Square Brackets [[]]", "[[]]"))
+                .defaultValue("{{}}")
+                .required(true),
             string(FILE_NAME)
-                .label("New Document Name")
+                .label("Title of New Document")
                 .description("Name of the new document.")
                 .required(true),
             string(FOLDER_ID)
-                .label("Folder for New Document")
+                .label("Folder ID")
                 .description(
-                    "Folder ID where the new document will be saved. If not provided, the new document " +
+                    "ID of the folder where the new document will be saved. If not provided, the new document " +
                         "will be saved in the same folder as the template document.")
                 .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
                 .required(false),
@@ -74,62 +87,45 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
                 .label("Variables")
                 .description("Don't include the \"[[]]\", only the key name and its value.")
                 .additionalProperties(string())
-                .required(false),
-            object(IMAGES)
-                .label("Images")
-                .description("Key: Image ID (get it manually from the Read File Action), Value: Image URL.")
-                .additionalProperties(string())
                 .required(false))
-        .output()
+        .output(outputSchema(DOCUMENT_OUTPUT_PROPERTY))
         .perform(GoogleDocsCreateDocumentFromTemplateAction::perform);
 
     private GoogleDocsCreateDocumentFromTemplateAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Document perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Docs docs = GoogleServices.getDocs(connectionParameters);
         File copiedPresentation = GoogleUtils.copyFileOnGoogleDrive(connectionParameters, inputParameters);
         List<Request> requests = createRequests(inputParameters);
 
-        return writeToDocument(docs, copiedPresentation.getId(), requests);
+        BatchUpdateDocumentResponse batchUpdateDocumentResponse =
+            writeToDocument(docs, copiedPresentation.getId(), requests);
+
+        return getDocument(docs, batchUpdateDocumentResponse.getDocumentId());
     }
 
     private static List<Request> createRequests(Parameters inputParameters) {
-        List<Request> requests = new ArrayList<>();
-
+        String placeholderFormat = inputParameters.getRequiredString(PLACEHOLDER_FORMAT);
         Map<String, String> values = inputParameters.getMap(VALUES, String.class, Map.of());
 
-        for (Map.Entry<String, String> entry : values.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
+        boolean isBracketFormat = "[[]]".equals(placeholderFormat);
 
-            Request request = new Request()
-                .setReplaceAllText(
-                    new ReplaceAllTextRequest()
-                        .setContainsText(
-                            new SubstringMatchCriteria()
-                                .setText("[[" + key + "]]")
-                                .setMatchCase(true))
-                        .setReplaceText(value));
+        return values.entrySet()
+            .stream()
+            .map(entry -> {
+                String key = entry.getKey();
+                String text = isBracketFormat ? "[[" + key + "]]" : "{{" + key + "}}";
 
-            requests.add(request);
-        }
-
-        Map<String, String> images = inputParameters.getMap(IMAGES, String.class, Map.of());
-
-        for (Map.Entry<String, String> entry : images.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-
-            Request request = new Request()
-                .setReplaceImage(
-                    new ReplaceImageRequest()
-                        .setImageObjectId(key)
-                        .setUri(value));
-
-            requests.add(request);
-        }
-        return requests;
+                return new Request()
+                    .setReplaceAllText(
+                        new ReplaceAllTextRequest()
+                            .setContainsText(
+                                new SubstringMatchCriteria()
+                                    .setText(text)
+                                    .setMatchCase(true))
+                            .setReplaceText(entry.getValue()));
+            })
+            .collect(Collectors.toList());
     }
-
 }
