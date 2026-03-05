@@ -494,10 +494,20 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 if (tokenResponse.getStatusCode() == 200) {
                     Map<String, Object> responseBody = tokenResponse.getBody(Map.class);
 
-                    return (String) responseBody.get(Authorization.ACCESS_TOKEN);
+                    Object accessTokenObject = responseBody.get(Authorization.ACCESS_TOKEN);
+
+                    if (accessTokenObject instanceof String accessTokenString) {
+                        if (!accessTokenString.isBlank()) {
+                            return accessTokenString;
+                        }
+
+                        context.log(log -> log.error("Extracted access token has no value"));
+
+                        throw new RuntimeException("OAuth token request failed");
+                    }
                 }
 
-                context.log(log -> log.debug(
+                context.log(log -> log.error(
                     "Access token request failed with status code: {}",
                     tokenResponse.getStatusCode()));
 
@@ -505,7 +515,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     context.log(log -> log.trace("Response body: {}", tokenResponse.getBody()));
                 }
 
-                throw new RuntimeException("OAuth provider rejected access token request");
+                throw new RuntimeException(
+                    "OAuth provider rejected access token request with status " + tokenResponse.getStatusCode());
             });
 
             return ApplyResponse.ofHeaders(
