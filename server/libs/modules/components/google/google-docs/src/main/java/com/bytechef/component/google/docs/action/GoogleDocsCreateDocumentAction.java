@@ -17,10 +17,13 @@
 package com.bytechef.component.google.docs.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.BODY;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DOCUMENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.TITLE;
 import static com.bytechef.component.google.docs.util.GoogleDocsUtils.createDocument;
+import static com.bytechef.component.google.docs.util.GoogleDocsUtils.getDocument;
 import static com.bytechef.component.google.docs.util.GoogleDocsUtils.writeToDocument;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -29,6 +32,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.docs.v1.Docs;
+import com.google.api.services.docs.v1.model.BatchUpdateDocumentResponse;
 import com.google.api.services.docs.v1.model.Document;
 import com.google.api.services.docs.v1.model.EndOfSegmentLocation;
 import com.google.api.services.docs.v1.model.InsertTextRequest;
@@ -47,20 +51,22 @@ public class GoogleDocsCreateDocumentAction {
         .properties(
             string(TITLE)
                 .label("Title")
-                .description("Document title.")
+                .description("The title of the document.")
                 .required(true),
             string(BODY)
                 .label("Content")
-                .description("Document content.")
+                .description("Content of the document.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
-        .output()
+        .output(outputSchema(DOCUMENT_OUTPUT_PROPERTY))
         .perform(GoogleDocsCreateDocumentAction::perform);
 
     private GoogleDocsCreateDocumentAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Document perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         Docs docs = GoogleServices.getDocs(connectionParameters);
 
         Document newDocument = createDocument(inputParameters.getRequiredString(TITLE), docs);
@@ -70,6 +76,9 @@ public class GoogleDocsCreateDocumentAction {
                 .setText(inputParameters.getRequiredString(BODY))
                 .setEndOfSegmentLocation(new EndOfSegmentLocation()));
 
-        return writeToDocument(docs, newDocument.getDocumentId(), List.of(request));
+        BatchUpdateDocumentResponse batchUpdateDocumentResponse = writeToDocument(
+            docs, newDocument.getDocumentId(), List.of(request));
+
+        return getDocument(docs, batchUpdateDocumentResponse.getDocumentId());
     }
 }
