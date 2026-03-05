@@ -42,6 +42,12 @@ public class MicrosoftSharePointConstants {
     public static final String SITE_ID = "siteId";
     public static final String VALUE = "value";
 
+    public static final ModifiableStringProperty PARENT_FOLDER_PROPERTY = string(PARENT_FOLDER)
+        .label("Parent Folder ID")
+        .optionsLookupDependsOn(SITE_ID)
+        .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
+        .required(false);
+
     public static final ModifiableStringProperty SITE_ID_PROPERTY = string(SITE_ID)
         .label("Site ID")
         .options((OptionsFunction<String>) MicrosoftSharePointUtils::getSiteOptions)
