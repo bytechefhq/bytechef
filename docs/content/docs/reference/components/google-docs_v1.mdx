@@ -66,8 +66,8 @@ Name: createDocument
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| title | Title | STRING | Document title. | true |
-| body | Content | STRING | Document content. | true |
+| title | Title | STRING | The title of the document. | true |
+| body | Content | STRING | Content of the document. | true |
 
 #### Example JSON Structure
 ```json
@@ -84,9 +84,51 @@ Name: createDocument
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| documentId | STRING | The ID of the document. |
+| title | STRING | The title of the document. |
+| tabs | ARRAY <details> <summary> Items </summary> [&#123;&#123;STRING\(tabId), STRING\(title), STRING\(parentTabId), INTEGER\(index), INTEGER\(nestingLevel), STRING\(iconEmoji)&#125;\(tabProperties), [&#123;&#125;]\(childTabs)&#125;] </details> | Tabs that are part of a document. |
+| revisionId | STRING | The revision ID of the document. |
+| suggestionsViewMode | STRING | The suggestions view mode applied to the document. |
+| body | OBJECT <details> <summary> Properties </summary> &#123;[&#123;INTEGER\(startIndex), INTEGER\(endIndex)&#125;]\(content)&#125; </details> | The main body of the document. |
+
+
+
+
+#### Output Example
+```json
+{
+  "documentId" : "",
+  "title" : "",
+  "tabs" : [ {
+    "tabProperties" : {
+      "tabId" : "",
+      "title" : "",
+      "parentTabId" : "",
+      "index" : 1,
+      "nestingLevel" : 1,
+      "iconEmoji" : ""
+    },
+    "childTabs" : [ { } ]
+  } ],
+  "revisionId" : "",
+  "suggestionsViewMode" : "",
+  "body" : {
+    "content" : [ {
+      "startIndex" : 1,
+      "endIndex" : 1
+    } ]
+  }
+}
+```
 
 
 
@@ -101,10 +143,10 @@ Name: createDocumentFromTemplate
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileId | Template Document ID | STRING | The ID of the template document from which the new document will be created. | true |
-| fileName | New Document Name | STRING | Name of the new document. | true |
-| folderId | Folder for New Document | STRING | Folder ID where the new document will be saved. If not provided, the new document will be saved in the same folder as the template document. | false |
+| placeholderFormat | Placeholder Format | STRING <details> <summary> Options </summary> <span>&#123;&#123;&#125;&#125;</span>, <span>[[]]</span> </details> | Choose the format of placeholders in your template. | true |
+| fileName | Title of New Document | STRING | Name of the new document. | true |
+| folderId | Folder ID | STRING | ID of the folder where the new document will be saved. If not provided, the new document will be saved in the same folder as the template document. | false |
 | values | Variables | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Don't include the "[[]]", only the key name and its value. | false |
-| images | Images | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Key: Image ID (get it manually from the Read File Action), Value: Image URL. | false |
 
 #### Example JSON Structure
 ```json
@@ -113,10 +155,10 @@ Name: createDocumentFromTemplate
   "name" : "createDocumentFromTemplate",
   "parameters" : {
     "fileId" : "",
+    "placeholderFormat" : "",
     "fileName" : "",
     "folderId" : "",
-    "values" : { },
-    "images" : { }
+    "values" : { }
   },
   "type" : "googleDocs/v1/createDocumentFromTemplate"
 }
@@ -124,17 +166,66 @@ Name: createDocumentFromTemplate
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| documentId | STRING | The ID of the document. |
+| title | STRING | The title of the document. |
+| tabs | ARRAY <details> <summary> Items </summary> [&#123;&#123;STRING\(tabId), STRING\(title), STRING\(parentTabId), INTEGER\(index), INTEGER\(nestingLevel), STRING\(iconEmoji)&#125;\(tabProperties), [&#123;&#125;]\(childTabs)&#125;] </details> | Tabs that are part of a document. |
+| revisionId | STRING | The revision ID of the document. |
+| suggestionsViewMode | STRING | The suggestions view mode applied to the document. |
+| body | OBJECT <details> <summary> Properties </summary> &#123;[&#123;INTEGER\(startIndex), INTEGER\(endIndex)&#125;]\(content)&#125; </details> | The main body of the document. |
 
 
 
+
+#### Output Example
+```json
+{
+  "documentId" : "",
+  "title" : "",
+  "tabs" : [ {
+    "tabProperties" : {
+      "tabId" : "",
+      "title" : "",
+      "parentTabId" : "",
+      "index" : 1,
+      "nestingLevel" : 1,
+      "iconEmoji" : ""
+    },
+    "childTabs" : [ { } ]
+  } ],
+  "revisionId" : "",
+  "suggestionsViewMode" : "",
+  "body" : {
+    "content" : [ {
+      "startIndex" : 1,
+      "endIndex" : 1
+    } ]
+  }
+}
+```
+
+#### Find Document ID
+
+To find the Document ID, click [here](/reference/components/google-docs_v1#how-to-find-document-id).
+
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/google-docs_v1#how-to-find-folder-id).
 
 
 
 ### Get Document
 Name: getDocument
 
-`Retrieve a specified document from your Google Drive.`
+`Gets the latest version of the specified document.`
 
 #### Properties
 
@@ -156,10 +247,55 @@ Name: getDocument
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| documentId | STRING | The ID of the document. |
+| title | STRING | The title of the document. |
+| tabs | ARRAY <details> <summary> Items </summary> [&#123;&#123;STRING\(tabId), STRING\(title), STRING\(parentTabId), INTEGER\(index), INTEGER\(nestingLevel), STRING\(iconEmoji)&#125;\(tabProperties), [&#123;&#125;]\(childTabs)&#125;] </details> | Tabs that are part of a document. |
+| revisionId | STRING | The revision ID of the document. |
+| suggestionsViewMode | STRING | The suggestions view mode applied to the document. |
+| body | OBJECT <details> <summary> Properties </summary> &#123;[&#123;INTEGER\(startIndex), INTEGER\(endIndex)&#125;]\(content)&#125; </details> | The main body of the document. |
 
 
 
+
+#### Output Example
+```json
+{
+  "documentId" : "",
+  "title" : "",
+  "tabs" : [ {
+    "tabProperties" : {
+      "tabId" : "",
+      "title" : "",
+      "parentTabId" : "",
+      "index" : 1,
+      "nestingLevel" : 1,
+      "iconEmoji" : ""
+    },
+    "childTabs" : [ { } ]
+  } ],
+  "revisionId" : "",
+  "suggestionsViewMode" : "",
+  "body" : {
+    "content" : [ {
+      "startIndex" : 1,
+      "endIndex" : 1
+    } ]
+  }
+}
+```
+
+#### Find Document ID
+
+To find the Document ID, click [here](/reference/components/google-docs_v1#how-to-find-document-id).
 
 
 
@@ -174,6 +310,29 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+### How to find Document ID
+
+To find a Document ID, open the document in your browser. The ID is the long string of letters and numbers in the URL between `/d/` and the next `/` (usually `/edit`).
+
+For example, in the URL `https://docs.google.com/document/d/1234567890abcdefghijklmnopqrstuvwxyz/edit`, the Document ID is `1234567890abcdefghijklmnopqrstuvwxyz`.
+
+The Document ID can also be found in the output of the following actions:
+* **Create Document**
+* **Create Document from Template**
+* **Get Document**
+
+### How to find Folder ID
+
+To find a Folder ID, open the Google Drive folder in your browser. The ID is the string of characters at the end of the URL after `folders/`.
+
+For example, in the URL `https://drive.google.com/drive/folders/abcjhadjh213102398890r4`, the Folder ID is `abcjhadjh213102398890r4`.
+
+The Folder ID can also be found in the output of the following Google Drive actions and triggers:
+* **Create New Folder**
+* **Get File**
+* **List Folders**
+* **New Folder** trigger
 
 ## Troubleshooting
 
