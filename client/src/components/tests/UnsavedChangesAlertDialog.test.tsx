@@ -14,8 +14,10 @@ describe('UnsavedChangesAlertDialog', () => {
         render(<UnsavedChangesAlertDialog {...defaultProps} />);
 
         expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-        expect(screen.getByText('Are you absolutely sure?')).toBeInTheDocument();
-        expect(screen.getByText('There are unsaved changes. This action cannot be undone.')).toBeInTheDocument();
+        expect(screen.getByText('Discard code changes?')).toBeInTheDocument();
+        expect(
+            screen.getByText('You have unsaved changes. Are you sure you want to discard them?')
+        ).toBeInTheDocument();
     });
 
     it('does not render the dialog when open is false', () => {
@@ -24,39 +26,39 @@ describe('UnsavedChangesAlertDialog', () => {
         expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     });
 
-    it('renders Cancel and Close buttons', () => {
+    it('renders Keep editing and Close & discard buttons', () => {
         render(<UnsavedChangesAlertDialog {...defaultProps} />);
 
-        expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Keep editing'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Close & discard'})).toBeInTheDocument();
     });
 
-    it('calls onCancel when Cancel button is clicked', () => {
+    it('calls onCancel when Keep editing button is clicked', () => {
         const onCancelMock = vi.fn();
 
         render(<UnsavedChangesAlertDialog {...defaultProps} onCancel={onCancelMock} />);
 
-        fireEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+        fireEvent.click(screen.getByRole('button', {name: 'Keep editing'}));
 
         expect(onCancelMock).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onClose when Close button is clicked', () => {
+    it('calls onClose when Close & discard button is clicked', () => {
         const onCloseMock = vi.fn();
 
         render(<UnsavedChangesAlertDialog {...defaultProps} onClose={onCloseMock} />);
 
-        fireEvent.click(screen.getByRole('button', {name: 'Close'}));
+        fireEvent.click(screen.getByRole('button', {name: 'Close & discard'}));
 
         expect(onCloseMock).toHaveBeenCalledTimes(1);
     });
 
-    it('Cancel button has shadow-none class', () => {
+    it('Keep editing button has shadow-none class', () => {
         render(<UnsavedChangesAlertDialog {...defaultProps} />);
 
-        const cancelButton = screen.getByRole('button', {name: 'Cancel'});
+        const keepEditingButton = screen.getByRole('button', {name: 'Keep editing'});
 
-        expect(cancelButton).toHaveClass('shadow-none');
+        expect(keepEditingButton).toHaveClass('shadow-none');
     });
 
     it('displays correct title and description', () => {
@@ -64,9 +66,9 @@ describe('UnsavedChangesAlertDialog', () => {
 
         const title = screen.getByRole('heading', {level: 2});
 
-        expect(title).toHaveTextContent('Are you absolutely sure?');
+        expect(title).toHaveTextContent('Discard code changes?');
 
-        const description = screen.getByText('There are unsaved changes. This action cannot be undone.');
+        const description = screen.getByText('You have unsaved changes. Are you sure you want to discard them?');
 
         expect(description).toBeInTheDocument();
     });
